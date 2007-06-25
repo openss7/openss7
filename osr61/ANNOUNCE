@@ -183,3 +183,128 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			osr61
+Version:		0.9.2.2
+Entered-date:		2007-06-24
+Description:		Dialogic Open Systems Release 6.1.
+			Dialogic Open System Release 6.1 STREAMS Drivers.
+			The osr61 package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of STREAMS modules and
+			drivers.
+			This package provides the Dialogic OSR 6.1 GPL Drivers
+			modified to compile for Linux Fast-STREAMS.
+			This distribution is currently applicable to 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, pcc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		STREAMS, SVR 4.2 MP, LiS, LfS, OSR61
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			3M osr61-0.9.2.2.tar.gz
+			2M osr61-0.9.2.2.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M osr61-0.9.2.2-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.3 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.6-1, strxns 0:0.9.2.6-1
+			strxnet 0:0.9.2.11-1
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: osr61 0.9.2.2 Released - OpenSS7 Dialogic Open System Release 6.1
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package osr61-0.9.2.2 was released under GPLv2 2007-06-24.
+
+The Dialogic Open Systems Release 6.1 package provides STREAMS modules
+and drivers, libraries, programs, init scripts, and daemons that
+implement the Dialogic(R) Open System Release 6.1 drivers for Linux
+Fast-STREAMS.
+
+This is an OpenSS7 Project modified release of the GPL Dialogic(R) OSR
+6.1 Release 239 drivers modified for use with Linux Fast-STREAMS.
+
+The Dialogic Open Systems Release 6.1 package includes kernel modules,
+SVR 4.2 STREAMS drivers, modules, libraries, utilities, test programs,
+daemons, and development environment for the development and execution
+of Dialogic Open Systems Release 6.1 components and applications for the
+SVR 4.2 STREAMS environment. It provides true STREAMS-based Dialogic(R)
+OSR 6.1 drivers for Linux.
+
+This is the second release from The OpenSS7 Project of the Dialogic Open
+Systems Release 6.1 package and is now part of the OpenSS7 Master
+Package (openss7-0.9.2.F). This package provides dlgn, mercd and pmacd
+device drivers, as well as a dvbm and sctmr module. Additional drivers
+are the gncfd and gpio modules. The package contains all the necessary
+manual pages and other documentation for components in an autoconf
+tarball.
+
+This release is the second public release.
+
+Major features are as follows:
+
+  - Dramatic performance improvements enabled by Linux Fast-STREAMS.
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is another public alpha release of the package. Please see
+README-alpha in the release, or Maturity, in the manual.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production kernels
+without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 2'.  The release is available as an autoconf tarball, SRPM, DSC,
+and set of binary RPMs and DEBs.  See the downloads page
+<http://www.openss7.org/download.html> for the autoconf tarballs, SRPMs
+and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs, see the
+osr61 package page <http://www.openss7.org/osr61_pkg.html>.
+
+See <http://www.openss7.org/codefiles/osr61-0.9.2.2/ChangeLog> and
+<http://www.openss7.org/codefiles/osr61-0.9.2.2/NEWS> in the release
+for more information.  Also, see the `osr61.pdf' manual in the
+release, also in html <http://www.openss7.org/osr61_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_M.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

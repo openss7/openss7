@@ -341,3 +341,137 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strsctp
+Version:		0.9.2.8
+Entered-date:		2007-06-24
+Description:		OpenSS7 STREAMS SCTP.
+			OpenSS7 STREAMS SCTP (Stream Control Transmission
+			Protocol) for Linux Fast-STREAMS.
+			The strsctp package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of Stream Control Transmission
+			Protocol (SCTP) protocol stack components and
+			applications for the Linux Fast-STREAMS environment.
+			This distribution is applicable to 2.4 and 2.6 kernels
+			and was targetted at ix86, x86_64, ppc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		SCTP, TPI, NPI
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			4M strsctp-0.9.2.8.tar.gz
+			3M strsctp-0.9.2.8.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			3M strsctp-0.9.2.8-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.3 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.6-1,
+			strxns 0:0.9.2.6-1,
+			strxnet 0:0.9.2.11-1.
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strsctp 0.9.2.8 Released - STREAMS SCTP for Linux Fast-STREAMS and SIGTRAN
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strsctp-0.9.2.8 was released under GPLv2 2007-06-24.
+
+OpenSS7 STREAMS SCTP (`strsctp') is an OpenSS7 Project implementation
+of Stream Control Transmission Protocol (SCTP - RFC 2960) for Linux
+Fast-STREAMS. It is based on the same protocol engine core as the
+OpenSS7 Linux Native (Sockets) version of OpenSS7 SCTP. The package
+provides a STREAMS SCTP driver for use with SIGTRAN components of the
+OpenSS7 stack.
+
+This release is the eighth separate release of the OpenSS7 STREAMS
+SCTP driver that was formerly present in the OpenSS7
+SS7/SIGTRAN/ISDN/VoIP strss7 package. The networking driver
+(streams-sctp) is provided, as well as NPI, TPI and XTI header files
+for SCTP operation. The package contains the necessary manual pages
+and other documentation for SCTP components in a separate autoconf
+tarball.
+
+This release is a stable production release for Linux Fast-STREAMS.
+This release is primarily a maintenance release to support recent
+distributions and tool chains.
+
+Major features since the last public release are as follows:
+
+  - Staggering performance improvements. The performance
+    improvements/correction provided in the streams-0.9.2.3 Linux
+    Fast-STREAMS package and a little bit of performance tuning of the
+    streams-sctp driver has resulted in staggering performance
+    improvements.
+
+  - STREAMS SCTP now runs up to 300% faster than Linux TCP in tests.
+    See the STREAMS SCTP Performance page for more information
+    <http://www.openss7.org/strsctp_perf.html>.
+
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases. Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and
+2.6 RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public
+License Version 2'.  The release is available as an `autoconf'
+tarball, SRPM, DSC, and set of binary RPMs and DEBs.  See the
+downloads page <http://www.openss7.org/download.html> for the
+`autoconf' tarballs, SRPMs and DSCs.  For tarballs, SRPMs, DSCs and
+binary RPMs and DEBs, see the strsctp package page
+<http://www.openss7.org/strsctp_pkg.html>.
+
+See <http://www.openss7.org/codefiles/strsctp-0.9.2.8/ChangeLog> and
+<http://www.openss7.org/codefiles/strsctp-0.9.2.8/NEWS> in the release
+for more information.  Also, see the `strsctp.pdf' manual in the
+release, also in html <http://www.openss7.org/strsctp_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_A.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

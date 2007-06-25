@@ -214,3 +214,117 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strutil
+Version:		0.9.2.6
+Entered-date:		2007-06-24
+Description:		OpenSS7 STREAMS Utilities.
+			OpenSS7 STREAMS Utilities for Linux Fast-STREAMS.
+			The strutil package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of STREAMS modules and
+			drivers.  This package contains primarily user-space
+			utilities and test programs.
+			This distribution is applicable to Linux 2.4 and 2.6
+			kernels and was targetted at ix86, x86_64, ppc and ppc64
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		STREAMS, SVR 4.2 MP, LfS
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			2M strutil-0.9.2.6.tar.gz
+			2M strutil-0.9.2.6.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			2M strutil-0.9.2.6-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.3 SVR 4.2 STREAMS
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@gsyc.escet.urjc.es>
+Subject: strutil 0.9.2.6 Released - STREAMS Terminals for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strutil-0.9.2.6 was released under GPLv2 on 2007-06-24.
+
+The OpenSS7 STREAMS Utilities package provides STREAMS modules and
+drivers, programs and daemons for administration and handling of the
+STREAMS subsystem.
+
+The strutil package is currently incomplete. The purpose of the
+package was to move STREAMS utility programs and modules outside of
+the STREAMS release package so as to allow them to be used with both
+LiS and Linux Fast-STREAMS. As Linux Fast-STREAMS has already shown
+superior to LiS in terms of both performance and conformance, it is no
+longer necessary to keep these packages separate and they can be
+combined once again with Linux Fast-STREAMS.
+
+This is an internal alpha release of the package.
+
+Major features since the last internal release are as follows:
+
+  - Dramatic performance improvements enabled by Linux Fast-STREAMS.
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is a public alpha release of the package. This package is
+currently incomplete. It is being released as a reference point for
+the community.  If you are interested in completion of this package,
+contact <mailto:info@openss7.com>.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and
+2.6 RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is released under the 'GNU Public License Version 2'.
+The release is available as an autoconf/RPM tarball, SRPM and set of
+binary RPMs.  See the download page <http://www.openss7.org/download.html>
+for the autoconf tarballs and SRPMs.  See the strutil package page at
+<http://www.openss7.org/strutil_pkg.html> for tarballs, SRPMs and
+binary RPMs.
+
+See <http://www.openss7.org/codefiles/strutil-0.9.2.6/ChangeLog> and
+<http://www.openss7.org/codefiles/strutil-0.9.2.6/NEWS> in the release
+for more information.  Also, see the strutil.pdf manual in the
+release, also in html <http://www.openss7.org/strutil_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_H.html>
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

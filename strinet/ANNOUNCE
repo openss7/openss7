@@ -362,3 +362,143 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:			strinet
+Version:		0.9.2.6
+Entered-date:		2007-06-24
+Description:		OpenSS7 INET Networking
+			OpenSS7 STREAMS INET (Internet Protocol) Driver for
+			Linux Fast-STREAMS.
+			The strinet package includes kernel modules, SVR 4.2
+			STREAMS drivers, modules, libraries, utilities, test
+			programs, daemons, and development environment for the
+			development and execution of Internet Protocols (INET)
+			protocol stack components and applications for the
+			Linux Fast-STREAMS STREAMS environment.
+			This distribution is applicable to 2.4 and 2.6 kernels
+			and was targetted at ix86, x86_64, ppc64 and ppc
+			architectures, but should build and install for other
+			architectures as well.
+			Supports a wide range of new and old Linux distributions.
+			Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:		XNS, INET, TPI
+Author:			bidulock@openss7.org (Brian Bidulock)
+Maintained-by:		bidulock@openss7.org (Brian Bidulock)
+Primary-site:		http://www.openss7.org/ tarballs/
+			4M strinet-0.9.2.6.tar.gz
+			3M strinet-0.9.2.6.tar.bz2
+Alternate-site:		http://www.openss7.org/ rpms/SRPMS/
+			3M strinet-0.9.2.6-1.src.rpm
+Original-site:		
+Platforms:		Linux
+			Requires: Linux kernel 2.4 or 2.6,
+			streams 0.9.2.3 SVR 4.2 STREAMS,
+			strcompat 0:0.9.2.6-1,
+			strxns 0:0.9.2.6-1,
+			strxnet 0:0.9.2.11-1.
+Copying-policy:		GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: strinet 0.9.2.6 Released - XTI Library for Linux Fast-STREAMS
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package strinet-0.9.2.6 was released under GPLv2 2007-06-24.
+
+The OpenSS7 INET Networking package is an implementation of the
+Internet Protocol suite for Linux Fast-STREAMS directly over Linux
+NET4 Sockets implementation, using a STREAMS over Sockets approach.
+This permits modules to be pushed on UDP or TCP Streams and allows use
+of the XTI/TLI library with Internet Protocols on Linux. The package
+now also includes direct STREAMS implementations of RAW IP and UDP,
+and will include direct implementations of TI loop-back devices and
+TCP in the future.
+
+This OpenSS7 Project release is another separate add-on package
+release of the OpenSS7 INET Networking package that was formerly
+present in the (now deprecated) LiS package. The networking drivers
+are provided, as well as the TPI and XTI header files for INET and
+loop-back operation.  The package contains all the necessary manual
+packages and other documentation for INET components in a separate
+autoconf tarball. This release is a stable, production grade release
+for Linux Fast-STREAMS and is part of the OpenSS7 Master Package
+(openss7-0.9.2.F).
+
+This release is primarily a maintenance release to support recent
+distributions and tool chains.
+
+Major features since the last public release are as follows:
+
+  - Staggering performance improvements. The performance
+    improvements/correction provided in the streams-0.9.2.3 Linux
+    Fast-STREAMS package and a little bit of performance tuning of the
+    streams-inet and streams-udp drivers has resulted in staggering
+    performance improvements.
+
+  - STREAMS XTIoS TCP now runs up to 300% faster than Linux TCP in
+    tests. See the TCP Performance page for more information
+    <http://www.openss7.org/tcp_perf.html>.
+
+  - STREAMS UDP now runs up to 60% faster than Linux UDP in tests.
+    See the UDP Performance page for more information
+    <http://www.openss7.org/udp_perf.html>.
+
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is a public stable production grade release of the package: it
+deprecates previous releases. Please upgrade to the current release
+before reporting bugs.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and
+2.6 RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public
+License Version 2'.  The release is available as an autoconf tarball,
+SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
+<http://www.openss7.org/download.html> for the autoconf tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the strinet package page <http://www.openss7.org/strinet_pkg.html>.
+
+See <http://www.openss7.org/codefiles/strinet-0.9.2.6/ChangeLog> and
+<http://www.openss7.org/codefiles/strinet-0.9.2.6/NEWS> in the release
+for more information.  Also, see the `strinet.pdf' manual in the
+release, also in html <http://www.openss7.org/strinet_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_B.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+

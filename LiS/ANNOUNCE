@@ -320,3 +320,149 @@ Brian F. G. Bidulock
 bidulock@openss7.org
 http://www.openss7.org/
 
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Software Map" <LSM@qqx.org>
+Subject: add
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Begin4
+Title:          LiS - Linux STREAMS
+Version:	2.18.6
+Entered-date:	2007-06-24
+Description:	Linux STREAMS (LiS).
+		OpenSS7 Linux STREAMS (LiS), SVR 4 STREAMS for Linux.
+		LiS is a STREAMS framework that is compatible with SVR4
+		STREAMS.  It has lots of debugging features not found in other
+		STREAMS packages.  Good to do networking and other things.  It
+		allows for installation of binary drivers.
+		This distribution is currently applicable to 2.4 and 2.6 kernels
+		and was targetted at ix86, x86_64, ppc and ppc64 architectures,
+		but should build and install for other architectures as well.
+		Mailing-List: linux-streams@openss7.org
+		Supports a wide range of new and old Linux distributions.
+		Bug-Reports: Report bugs to bugs@openss7.org
+Keywords:	STREAMS, SVR4, LiS
+Author:		dave@gcom.com (David Grothe)
+Maintained-by:	bidulock@openss7.org (Brian Bidulock)
+Primary-site:	http://www.openss7.org/ tarballs/
+		3M LiS-2.18.6.tar.gz
+		2M LiS-2.18.6.tar.bz2
+Alternate-site:	http://www.openss7.org/ rpms/SRPMS/
+		3M LiS-2.18.6-1.src.rpm
+Original-site:	ftp.gcom.com /pub/linux/src/LiS
+		748K LiS-2.18.0.tgz
+Platforms:	Linux
+		Requires: Linux kernel 2.4 or 2.6
+Copying-policy:	GPL
+End
+
+From bidulock@openss7.org Sun Jun 24 19:45:14 2007
+Date: Sun, 24 Jun 2007 19:45:14 -0600
+From: "Brian F. G. Bidulock" <bidulock@openss7.org>
+To: "Linux Announce" <cola@stump.algebra.com>
+Cc: "OpenSS7 Announce List" <openss7-announce@openss7.org>,
+    "OpenSS7 List" <openss7@openss7.org>,
+    "LiS" <linux-streams@openss7.org>
+Subject: LiS 2.18.6 Released - SVR 4 STREAMS for Linux
+Reply-To: bidulock@openss7.org
+Organization: The OpenSS7 Project <http://www.openss7.org/>
+Dsn-Notification-To: <bidulock@openss7.org>
+Return-Receipt-To: <bidulock@openss7.org>
+
+Package LiS-2.18.6 was released under GPLv2 2007-06-24.
+
+The OpenSS7 Linux STREAMS (LiS) package is an OpenSS7 modified version
+of the LiS-2.18 package formerly from GCOM, and formerly maintained by
+David Grothe.
+
+Note: The original LiS package from GCOM is no longer actively
+maintained by either GCOM or the OpenSS7 Project: use the OpenSS7
+Linux Fast-STREAMS package instead.
+
+The following are claims made by its authors and original maintainer:
+
+  The Linux STREAMS (LiS) package is as STREAMS framework that is
+  compatible with SVR 4 STREAMS. It has lots of debugging features not
+  found in other STREAMS packages. Good to do networking and other
+  things. It allows for installation of binary drivers.
+
+Linux STREAMS (LiS) aims to provide SVR 4 compatible STREAMS
+implementation for Linux and claims to have special debugging
+facilities; however, the package suffers from the major failings that
+it is:
+
+  - no longer maintained;
+  - full of bugs;
+  - incompatible with POSIX;
+  - implements SVR 4 STREAMS rather than the more popular SVR 4.2
+    MP/ES STREAMS;
+  - portions dubiously licensed under the LGPL;
+  - unsuitable for mainline adoption;
+  - adapts poorly to production kernels;
+  - many SMP races and lockups;
+  - broken 32-bit over 64-bit compatibility;
+  - no strlog(9) STREAMS logger;
+
+This is an internal release of LiS. It is only available for download
+by subscribers and sponsors of the OpenSS7 Project. There are too many
+packages that cannot build against LiS due to its implementation
+deficiencies.
+
+Do not use this release (even if you are a subscriber or sponsor).
+Port to Linux Fast-STREAMS. Do not report bugs on this release. The
+OpenSS7 Project no longer actively maintains LiS.
+
+Major changes for release LiS-2.18.6:
+
+  - Performance of LiS has now been shown to be dismally poor: Linux
+    Fast-STREAMS is running 25 times faster in 1/10th the footprint.
+  - Support build on openSUSE 10.2.
+  - Support build on Fedora 7 with 2.6.21 kernel.
+  - Support build on CentOS 5.0 (RHEL5).
+  - Support build on Ubuntu 7.04.
+  - Updated to gettext 0.16.1.
+  - Changes to support build on 2.6.20-1.2307.fc5 and
+    2.6.20-1.2933.fc6 kernel.
+  - Supports build on Fedora Core 6.
+  - Support for recent distributions and tool chains.
+
+This is an unstable internal alpha release of the package. Please see
+README-alpha in the release for more information. Do not report bugs
+on this package.
+
+A large number of additional tests cases were found to fail on x86_64
+and SMP architectures making the LiS packages largely unusable,
+especially on 64-bit or SMP kernels.
+
+Deprecated and unmaintained. Download the latest streams package
+version instead.
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and
+2.6 RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public
+License Version 2'.  The release is available as an autoconf tarball,
+SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
+<http://www.openss7.org/download.html> for the autoconf tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the LiS package page <http://www.openss7.org/LiS_pkg.html>.
+
+See <http://www.openss7.org/codefiles/LiS-2.18.6/ChangeLog> and
+<http://www.openss7.org/codefiles/LiS-2.18.6/NEWS> in the release for
+more information.  Also, see the `LiS.pdf' manual in the release, also
+in html <http://www.openss7.org/LiS_manual.html>.
+
+For the news release, see <http://www.openss7.org/rel20070624_0.html>.
+
+--
+Brian F. G. Bidulock
+bidulock@openss7.org
+http://www.openss7.org/
+
