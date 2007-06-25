@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.29 2007/06/23 23:17:57 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.30 2007/06/25 19:49:15 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/23 23:17:57 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/25 19:49:15 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-0.9.2.11::		Release 11
 * Release @value{PACKAGE}-0.9.2.10::		Release 10
 * Release @value{PACKAGE}-0.9.2.9::		Release 9
 * Release @value{PACKAGE}-0.9.2.8::		Release 8
@@ -95,6 +96,34 @@ OpenSS7 style autoconf tarball.
 This release is a stable, production grade release
 and is part of the OpenSS7 Master Package
 (@file{openss7-@value{VERSION_OPENSS7}}).
+
+This release is primarily a maintenance release to support recent distributions
+and tool chains.
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-0.9.2.11
+@unnumberedsubsec Major changes for release @value{PACKAGE}-0.9.2.11
+@cindex release @value{PACKAGE}-0.9.2.11
+
+This @cite{OpenSS7 Project} release is another separate release of the
+@cite{@value{PACKAGE_TITLE}} package whose components were formerly part of the
+@file{strinet} package.  These networking modules provide TPI and XTI/TLI
+library, as well as providing TPI and XTI header files.  The package contains
+all the necessary manual pages and other documentation, including a reprint of
+the TPI 1.5 specification, for XTI components.  The package is packaged as an
+OpenSS7 style autoconf tarball.
+
+This release is a stable, production grade release
+and is part of the OpenSS7 Master Package
+(@file{openss7-0.9.2.F}).
 
 This release is primarily a maintenance release to support recent distributions
 and tool chains.
@@ -144,7 +173,7 @@ OpenSS7 style autoconf tarball.
 
 This release is a stable, production grade release for @cite{Linux Fast-STREAMS}
 and is part of the OpenSS7 Master Package
-(@file{openss7-@value{VERSION_OPENSS7}}).
+(@file{openss7-0.9.2.E).
 
 This release is primarily a maintenance release to support recent distributions
 and tool chains.

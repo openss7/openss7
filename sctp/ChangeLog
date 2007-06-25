@@ -1,3 +1,9 @@
+2007-06-25  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgrelease: bumped release numbers
+	* debian/changelog: bumped release numbers
+	* doc/manual/news.texi: bumped release numbers
+
 2007-06-24  Brian Bidulock  <bidulock@openss7.org>
 
 	* sctp.spec.in: recognize EL4 and EL5 for kernel-develop

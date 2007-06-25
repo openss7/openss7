@@ -1,3 +1,9 @@
+iperf (2.0.8-0) experimental; urgency=low
+
+  * Eighth public release.
+
+ -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon, 25 Jun 2007 13:20:33 -0600
+
 iperf (2.0.7-0) experimental; urgency=low
 
   * Seventh public release.

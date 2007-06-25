@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.20 2007/06/23 23:17:12 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.21 2007/06/25 19:47:40 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/23 23:17:12 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/25 19:47:40 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -66,6 +66,7 @@ as well as compatibility information of OpenSS7 releases to the original
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::		Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-2.0.7::		Release 7
 * Release @value{PACKAGE}-2.0.6::		Release 6
 * Release @value{PACKAGE}-2.0.5::		Release 5
 * Release @value{PACKAGE}-2.0.5.rc3::		Release 5 Candidate 3
@@ -84,6 +85,27 @@ as well as compatibility information of OpenSS7 releases to the original
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the eighth full release of the @cite{@value{PACKAGE_TITLE}} package.
+This is a stable, production grade release: it deprecates previous releases.
+Please upgrade to the most current release before reporting bugs.
+
+This release is largely a maintenance release that provides support for more
+distributions an architectures as well as tracking feature updates on related
+packages (i.e. @file{sctp-@value{VERSION_SCTP}}).
+
+Major features since the last public release are as follows:
+
+@itemize -
+@item
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-2.0.7
+@unnumberedsubsec Major changes for release @value{PACKAGE}-2.0.7
+@cindex release @value{PACKAGE}-2.0.7
 
 This is the seventh full release of the @cite{@value{PACKAGE_TITLE}} package.
 This is a stable, production grade release: it deprecates previous releases.

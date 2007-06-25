@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.27 2007/06/23 23:17:10 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.28 2007/06/25 19:47:37 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/23 23:17:10 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/25 19:47:37 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -64,6 +64,7 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::	Release @value{PACKAGE_RELEASE}
+* Release @value{PACKAGE}-2.18.6::		Release 6
 * Release @value{PACKAGE}-2.18.5::		Release 5
 * Release @value{PACKAGE}-2.18.4::		Release 4
 * Release @value{PACKAGE}-2.18.4.rc3::	Release 4 Candidate 3
@@ -105,6 +106,27 @@ The sections that follow provide information on OpenSS7 releases of the @*
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is an internal release of LiS.  It is only available for download by
+subscribers and sponsors of the OpenSS7 Project.  There are too many packages
+that cannot build against LiS due to its implementation deficiencies.
+
+Do not use this release (even if you are a subscriber or sponsor).  Port to
+Linux Fast-STREAMS.  Do not report bugs on this release.  The OpenSS7 Project
+no longer actively maintains LiS.
+
+Major features since the last internal release are as follows:
+
+@itemize -
+@item
+
+@end itemize
+
+@c ----------------------------------------------------------------------------
+
+@node Release @value{PACKAGE}-2.18.6
+@unnumberedsubsec Major changes for release @value{PACKAGE}-2.18.6
+@cindex release @value{PACKAGE}-2.18.6
 
 This is an internal release of LiS.  It is only available for download by
 subscribers and sponsors of the OpenSS7 Project.  There are too many packages
