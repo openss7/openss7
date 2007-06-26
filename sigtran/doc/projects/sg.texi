@@ -1,0 +1,3545 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: sg.texi,v 0.9.2.1 2007/06/26 18:08:59 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2007/06/26 18:08:59 $ by $Author: brian $
+%
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c %**start of header
+@setfilename sg.info
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Signalling Gateway
+@set MANUAL_TYPE Preliminary Design and Proposal
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* SG: (sg).			OpenSS7 Signalling Gateway
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Signalling Gateway
+@set MANUAL_TYPE Preliminary Design and Proposal
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the OpenSS7 Signalling Gateway.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Signalling Gateway
+@set MANUAL_TYPE Preliminary Design and Proposal
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top OpenSS7 Signalling Gateway
+@end ifnottex
+
+@menu
+* Executive Overview::
+* Preface::
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* System Architecture::
+* Platform Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Index::
+@end menu
+
+@node Executive Overview
+@unnumbered Executive Overview
+
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.  The initial an primary
+purpose of this equipment is to provide a local legacy SS7 compatible Signalling Gateway platform
+that interfaces with existing equipment, yet provides SS7 connectivity to remote switching service
+points (SSPs) and service control points (SCPs) over an IP network utilizing the Internet Protocol
+suite.  Because the solution attempts to avoid excessive costs for long haul graded SS7 links, the
+platform would benefit from using low cost commodity hardware and open source software.
+
+@subsubheading The OpenSS7 Project
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
+developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
+Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+software under terms less restrictive than the GPL.
+
+@subsubheading Signalling Gateway
+
+OpenSS7 can provide Signalling Gateway platform capabilities in a high-performance, low-cost,
+small-footprint platform leveraging the GNU/Linux operating system distributions and tools, and
+utilizing low-cost commodity hardware.
+
+For details on platform applications, see @ref{Application Architecture}, @ref{Network
+Architecture}, @ref{Optional Application Support}, and @ref{Optional Network Support}.
+
+@subsubheading Open Source Software
+
+The OpenSS7 Project leverages the widespread use of GNU/Linux operation systems, distributions, and
+FSF tools such as @samp{autoconf} and open source software such as @dfn{RPM}.  For example, this
+document was formatted for PDF, HTML, info and plain text using the GNU @dfn{texinfo} system,
+@samp{autoconf}, and the @TeX{} formatting system.
+
+The open source model avoids proprietary lock-in and permits in-house or outsourced development.
+All source code is available for use and modification by the end customer.  All build tools,
+documentation and associated resources are generally available.  The availability of the source code
+and complete documentation eases problem resolution and can offer upgrades and fixes even in advance
+of client problem reports.  
+
+For details on software solutions, see @ref{Protocol Architecture}, @ref{Software Architecture},
+@ref{Optional Protocol Support}, and @ref{Optional Software Support}.
+
+@subsubheading Commodity Hardware
+
+By best utilizing commodity PC or standardized CompactPCI and AdvancedTCA hardware, OpenSS7 makes
+available the highest performance platforms available on the market at back-to-school prices.  When
+carrier-grade is not essential, 3GHz Pentium or Xeon class servers in hardened rack mount chassis
+can be used at a fraction of the cost, and yet outperform, other solutions.  Where carrier-grade is
+necessary, embedded Linux on standardized CompactPCI and AdvanceTCA NEBS compliant chassis make for
+a higher cost, but more reliable alternative.
+
+For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Rapid Development
+
+The OpenSS7 Project has already developed protocol components completing the SS7 and SIGTRAN
+signalling stacks including MTP Level 2 and Level 3, ISUP, SCCP, TCAP; and SCTP, M2PA, M2UA, M3UA,
+SUA and TUA.  Development of a Signalling Gateway Platform to meet low scale deployment requirements
+needs only the development of a SIGTRAN capability between the OpenSS7 platform and the utlimate
+service switching point (SSP) or service control point (SCP).
+
+For details on scheduling, see @ref{Logistics}.
+
+@subsubheading An Evolving Solution
+
+The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
+for an ever expanding capability is demonstrated by the additional options available as described in
+@ref{Optional Application Support}, @ref{Optional Network Support},
+@ref{Optional Protocol Support}, @ref{Optional Software Support},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Conclusions
+
+In summary, a Signalling Gateway Platform for small scale deployments is an excellent application of
+the OpenSS7 SS7 and SIGTRAN stacks and can be provided at a affordable price on short time-lines,
+while offering an evolution path for future deployment applications.
+
+@sp 4
+
+@flushright
+@email{bidulock@@openss7.org, Brian Bidulock}
+The OpenSS7 Project
+@end flushright
+
+@node Executive Summary
+@unnumbered Executive Summary
+
+@subsubheading Time Boxing
+
+@subsubheading Client Needs
+
+@subsubheading Development Effort
+
+@subsubheading Schedule
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex Document information
+
+@subsection Abstract
+@cindex Document abstract
+
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+
+@subsection Objective
+@cindex Document objective
+
+The objective of this document is to provide a @value{MANUAL_TYPE} for the development of a low
+cost, high-performance, @value{MANUAL_TITLE} using OpenSS7 SS7 stack components, software, and
+compatible systems and hardware.
+
+@subsection Intent
+@cindex Document intent
+
+The intent of this document is to act as a @value{MANUAL_TYPE} for a project for an
+@value{MANUAL_TYPE} As a @value{MANUAL_TYPE}, this document discusses components and systems which
+are not necessarily complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
+obligation to provide any software, system or feature listed herein.
+
+@subsection Audience
+@cindex Document audience
+
+This document is intended for a technical audience.  The reader should be familiar with most
+ETSI, ITU-T and ANSI, Signalling System No. 7 recommendations, as well as IETF drafts and RFCs for
+SIGTRAN protocols.  ETSI Because much of the focus of a Signalling Gateway Platform is on SS7
+signalling, the reader should be familiar with ITU-T, ETSI and ANSI standards regarding Signalling
+System No. 7.
+
+@subsection Revisions
+@cindex Document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+@ignore
+@subsubsection Version Control
+
+@smallexample
+
+$Log: sg.texi,v $
+Revision 0.9.2.1  2007/06/26 18:08:59  brian
+- added new doc files
+
+@end smallexample
+@end ignore
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed or
+postscript) version of this document is an @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+@cindex Document disclaimer
+
+@noindent
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@section Document Organization
+@cindex Document organization
+
+This document is organized as follows:
+
+@ifnottex
+@menu
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* System Architecture::
+* Platform Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Index::
+@end menu
+@end ifnottex
+@iftex
+@table @emph
+@item @ref{Introduction}
+Introduction to the @value{MANUAL_TITLE} application.
+@item @ref{Application Architecture}
+The application requirements and architecture.
+@item @ref{Network Architecture}
+The network architecture for the application.
+@item @ref{System Architecture}
+The architecture of the @value{MANUAL_TITLE} system.
+@item @ref{Platform Architecture}
+The architecture of the @value{MANUAL_TITLE} platform.
+@item @ref{Protocol Architecture}
+The protocol architecture supporting the application.
+@item @ref{Software Architecture}
+The software architecture supporting the protocol stack and application.
+@item @ref{Hardware Architecture}
+The hardware architecture supporting the protocol stack and application.
+@item @ref{Logistics}
+Project logistics for completion of the @value{MANUAL_TITLE} application.
+@item @ref{Optional Application Support}
+Additional application support not directly contributing to the current objective.
+@item @ref{Optional Network Support}
+Additional network interface support not directly contributing to the current objective.
+@item @ref{Optional Protocol Support}
+Additional protocol component support not directly contributing to the current objective.
+@item @ref{Optional Software Support}
+Additional software support not directly contributing to the current objective.
+@item @ref{Optional Hardware Support}
+Additional hardware support not directly contributing to the current objective.
+@item @ref{Programmatic Interfaces}
+Programmatic interfaces to selected protocol components.
+@item @ref{Platform Sizing}
+Detailed platform sizing considerations.
+@item @ref{Index}
+Index of concepts.
+@end table
+@end iftex
+
+@node Introduction
+@chapter Introduction
+@cindex Introduction
+
+This document provides a @value{MANUAL_TYPE} for a platform to provide the @value{MANUAL_TITLE}
+capabilities.  The primary driver for this platform is to provide a system that avoid the use of
+expensive graded long haul SS7 facilities.  The document provides a high-level design and proposal
+for a production system to provide this capability.
+
+The proposal utilizes, where possible, existing OpenSS7 SS7 and SIGTRAN stack components and
+provides a development plan for components that are specific to the @value{MANUAL_TITLE}
+requirements.
+
+This document discusses the resulting software configuration that will be put in place on the
+production system, the platform configuration for the production system, and a lab network
+configuration for evaluation.  Also discussed is an overview of the project management logistics for
+successful completion over the course of this development project.
+
+It is intended that this document be a ``living'' document, that is updated over the course of this
+development project.
+
+@menu
+* Signalling Gateway::
+* Project Drivers::
+* Scope::
+@end menu
+
+@node Signalling Gateway
+@section Signalling Gateway
+@cindex Signalling Gateway
+
+This project provides an @value{MANUAL_TITLE} that accepts and responds locally to low volume SS7
+transactions and call control over traditional SS7 links, but across the CO floor, and passes the
+queries to a remove system using the Internet Protocol suite.
+
+@node Project Drivers
+@section Project Drivers
+@cindex Project drivers
+
+The lead purpose of the @value{MANUAL_TITLE} is to provide a cost-effective solution to existing
+call control and transaction services that utilize high-cost long haul graded SS7 link facilities.
+
+@node Scope
+@section Scope
+@cindex Scope
+
+Because of the focus on low cost and the need for low scale deployment, the @value{MANUAL_TITLE}
+is constructed using commodity computing platforms and PCI based hardware cards.  This will
+initially result in a non-carrier grade system for low deployment cost.  For production platforms,
+carrier grade options are available but are not pursued until completion of the initial phases.
+
+@menu
+* Phases::
+* Gates::
+@end menu
+
+@node Phases
+@subsection Phases
+@cindex Project phases
+
+The longer term project is broken into the following phases:
+
+@table @dfn
+@item Phase 1 @footnote{Although some reference is made to capabilities supporting other phases,
+@dfn{Phase 1} and @dfn{Phase 2} are the focus of this document.} The initial phase of the project is
+intended to provide the capabilities of @value{MANUAL_TITLE} operation for the deployment platform.
+@item Phase 2
+The second phase of the project is to integrate the deployment platform with remote softswitches and
+databases using the Internet Protocol suite.
+@item Phase 3
+The third phase of the project is to perform interoperability testing and a field trial of the
+deployment platform.
+@end table
+
+Although some reference is made to capabilities supporting other phases, @dfn{Phase 1} and
+@dfn{Phase 2} are the focus of this document.
+
+@node Gates
+@subsection Gates
+@cindex Project gates
+
+Each phase of the project consists of seven gates.  The seven gates are defined as follows:
+
+@table @dfn
+
+@item Gate 0 --- Concept
+
+@noindent
+@dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
+High-Level Design.  This is an internal OpenSS7 gate.
+
+@item Gate 1 --- High Level Design
+
+@dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
+consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
+once the High-Level Design has been published and work is begun on a detailed design.
+@footnote{This document is a @value{MANUAL_TYPE} document and it meets the internal requirements for
+passing Gate 1 of Phase 1 and Phase 2 of the project.  An external review of this document by a Beta
+or Gamma client or sponsor is pending.}
+
+@item Gate 2 --- Detailed Design
+
+@dfn{Gate 2} is passed when the detailed design has been reviewed to the satisfaction of the
+consumers of the project and the developers on the project.  This is an external as well as an
+internal review gate.  OpenSS7 passes this gate once the Detailed Design has been published and work
+base begin on development and implementation of the design.  @footnote{OpenSS7 requires a
+contractual commitment for purchase from a Beta or Gamma client, or
+funding from a Sponsor of the OpenSS7 Project, before this gate can be passed and development
+started.}
+Passing this gate moves from the design stage to the development stage of the project.
+
+@item Gate 3 --- Development and Implementation
+
+@dfn{Gate 3} is passed when the software and systems development and implementation to the detailed
+design is complete and testing has begun.  This is an internal review gate.  OpenSS7 internally
+passes this gate when software is code complete and hardware has been installed for testing.
+
+@item Gate 4 --- System Test
+
+@dfn{Gate 4} is passed once the product implementation meets all internal ad hoc and formal
+conformance test suites and internal testing is complete.  This is an internal review gate.  OpenSS7
+passes this gate internally once conformance testing is complete.  Passing this gate moves from the
+development stage to the support stage of the project.
+
+@item Gate 5 --- Acceptance Test
+
+@dfn{Gate 5} is passed once the product implementation has passed external Gamma client acceptance
+testing.  This is an external review gate.  OpenSS7 passes this gate internally once participation
+in external acceptance testing is complete.
+
+@item Gate 6 --- Project Complete
+
+@dfn{Gate 6} is passed once all support obligations for the product implementation have been
+discharged.  This is an internal review gate.  OpenSS7 passes this gate once support agreements have
+terminated.
+
+@end table
+
+For more details on Gate scheduling for Phase 1 and Phase 2 of the project, @pxref{Schedule}.
+
+@node Application Architecture
+@chapter Application Architecture
+@cindex Application architecture
+
+The @value{MANUAL_TITLE} is intended to provide a low scale, low cost CNAM query service.
+
+@menu
+* Application Requirements::
+* Solution Architecture::
+@end menu
+
+@node Application Requirements
+@section Application Requirements
+@cindex Application requirements
+
+The platform has the following application requirements:
+
+@menu
+* Phase 1 Requirements
+* Phase 2 Requirements
+* Phase 3 Requirements
+@end menu
+
+@node Phase 1 Requirements
+@subsection Phase 1 Requirements
+@cindex Project phase 1, requirements
+
+@itemize
+@item Direct SS7 link connectivity to one or more switches across the CO floor (i.e. utilizing
+F-links).
+@item ANSI MTP2 conformance and interoperability (F-link operation).
+@item ANSI MTP3 conformance and interoperability (F-link operation).
+@item ANSI SCCP conformance and interoperability (Connectionless Protocol Class 0).
+@item ANSI TCAP conformance and interoperability (Basic Query/Response).
+@item CNAM conformance and interoperability.
+@end itemize
+
+@node Phase 2 Requirements
+@subsection Phase 2 Requirements
+@cindex Project phase 2, requirements
+
+@itemize
+@item SIGTRAN TUA (draft-bidulock-sigtran-tua-04.txt) or SR 3332 (TA 1129+) signalling transport of
+TCAP, or other offboard query capability such as ONC RPC.
+@cindex TUA
+@cindex ONC RPC
+@end itemize
+
+@node Phase 3 Requirements
+@subsection Phase 3 Requirements
+@cindex Project phase 3, requirements
+
+@itemize
+@item Full integration of CNAM/TCAP and off-board query capabilities.
+@end itemize
+
+@node Solution Architecture
+@section Solution Architecture
+@cindex Solution architecture
+
+@menu
+* HLR Implementation for Testing::
+@end menu
+
+To meet client test objectives, two solution architectures are possible:
+
+@enumerate
+
+@item HLR Implementation for Testing
+
+In this arrangement, an stand-alone HLR is implemented to fit into the laboratory test environment.
+Other nodes in a GPRS network are emulated by other pieces of test equipment.  This solution
+architecture is the focus of the current document and is described in @ref{HLR Implementation for
+Testing}.
+
+@item Ferry Clip Testing
+
+In this arrangement, the one test platform emulates all nodes in the GPRS network to perform full
+ferry-clip testing of the @dfn{Implementation Under Test}.  This solution architecture would be a
+better arrangement for systematic testing with a single test harness and is described in @ref{Ferry
+Clip Testing}.  Development of such an arrangement is outside the scope of the current proposal.
+
+@end enumerate
+
+@node HLR Implementation for Testing
+@subsection HLR Implementation for Testing
+@cindex HLR implementation for testing
+
+The first possible test arrangement is the HLR Implementation arrangement.  In this case, the
+OpenSS7 Test Platform behaves like the 3GPP GSM/UMTS HLR and the other components surrounding the
+SGSN must be provided by other equipment.  To take this approach only the @dfn{Gr} and @dfn{Gc}
+interfaces need be implemented initially.  The narrowband SS7 signalling bearer@footnote{The
+narrowband SS7 signalling bearer includes Q.703 Annex B.} is used for Phase 1.  The @dfn{C}
+and @dfn{D} interfaces are implemented in @dfn{Phase 2} along with the 3GPP TS 29.202 M3UA/SCTP
+signalling bearer.  This case is illustrated in @figref{1} below.
+
+@c @figure{hlrtest,1,HLR Implementation for Testing}
+
+The High Performance GSM/UMTS GPRS HLR is built using the OpenSS7 SS7 and SIGTRAN stacks and
+associated utilities.  This project provides an additional 3GPP TS 24.060 GPRS HLR @dfn{STREAMS}
+SS7 Stack component and 3GPP TS 29.002 Mobile Application Part (MAP) @dfn{STREAMS} SS7 Stack
+component that provides the core capabilities of the HLR.
+
+This HLR capability consists of a number of components:
+@enumerate
+@item A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 TCAP protocol component,
+accept TCAP queries and provide conversations and responses.  This component contains the 3GPP TS
+29.002 message encoder and decoders and mapping to and from the TC interface
+@footnote{OpenSS7 implements the Q.771 TC interface with the Transaction Component Interface.
+@xref{Introduction,,,tci,Transaction Component Interface Specification}.  See also
+@uref{http://www.openss7.org/man/man2hml?7+tci, @b{tci}(7)}.}
+primitives of the TCAP component below.  This module implements a new GSM MAP primitive interface
+providing 3GPP TS 29.002 defined primitives.
+@footnote{OpenSS7 implements the 3GPP TS 29.002 MAP interface with the Mobile Application Part
+Interface.  @xref{Introduction,,,mapi,Mobile Application Part Interface Specification}.  See also
+@uref{http://www.openss7.org/man/man2html/7+mapi, @b{mapi}(8)}.}
+@item A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 MAP protocol component.
+This component exchanges 3GPP TS 29.002 MAP primitives with the module beneath and implements the
+3GPP TS 24.060 Release 4 state machines for a GPRS HLR.  This module also provides rule-based,
+template, and cached subscriber profile requests.
+@item A user-space daemon that services cache miss IMSI profile requests against an external database.
+@item User application programs used to configure and provision rules, templates and the external
+database.
+@end enumerate
+
+The solution architecture reuses where possible OpenSS7 SS7 and SIGTRAN stack components,
+drivers and hardware.  The solution starts as a hardened chassis non-redundant PC-based PCI
+platform.  A
+@cindex carrier grade
+@dfn{carrier grade} redundant and network protection switched CompactPCI NEBS chassis
+is made available in @dfn{Phase 3}. (@xref{CPC 388}.)
+@cindex CPC 388
+
+@node Network Architecture
+@chapter Network Architecture
+@cindex Network architecture
+
+@figref{5} illustrates the network configuration for the @value{MANUAL_TITLE} in a typical
+deployment scenario.  The Signalling Gateway platform is positioned and attached to switching
+equipment with intra-office SS7 A-links or F-links and communicates with the databases or softswitch
+proper using an IP network.
+
+@figuresized{sg_netarch,5,Network Architecture,6in}
+
+Under this service deployment scenario, placement of a small, cost-effective Signalling Gateway
+platform at the central office permits a centralized database or switching element to be able to
+connect to legacy central office equipment that is not capable of directly passing SS7 over IP using
+SIGTRAN.  At the central office, the SG converts between the legacy TDM SS7 links and an SS7 network
+built over an IP network using SIGTRAN.
+
+In an F-link arrangement, SS7 F-links between the legacy SSP and the SG appear to be directly
+connected to a remote SSP or SCP from the legacy equipment.
+
+The device is attached to SSPs (switches) via V401P-SS7
+@cindex V401P-SS7
+or other OpenSS7 SS7 link cards,
+@footnote{For other hardware alternatives, @pxref{Hardware Architecture}}
+terminating SS7 A-links or F-links, either 24 channels per span (T1), 56kbps or 64kbps ANSI T1.111.3
+links, or 31 channels per span (E1), 64kbps Q.703 links, or full span
+@cindex Q.703 Annex B
+@cindex ANSI T1.111.3 Annex B
+ANSI T1.111.3 Annex B 1.544Mbps or Q.703 Annex B 2.048Mbps high-speed links, or via a signalling
+gateway device terminating SS7 Level 2, 3 or 4 and transporting M3UA back-haul signalling to the
+load device over
+@cindex SCTP
+SCTP.
+@cindex M3UA
+
+On the IP network side of the device, the platform is connected on an internal LAN with multiple
+Ethernet segments and IP subnetworks.  CNAM requests originating on SSP within the SS7 network are
+accepted and responded to by the CNAM databases.  Queries are converted from traditional TDM SS7 to
+SIGTRAN over the IP network via the Signalling Gateway.
+
+From the viewpoint of the SS7 or SIGTRAN network, the platform acts as a Signalling Gateway
+for the purposes of passing CNAM queries and responses between the CNAM database and the locally
+attached SSPs.
+
+@menu
+* SG Reference Interfaces::
+@end menu
+
+@node SG Reference Interfaces
+@section SG Reference Interfaces
+@cindex SG reference interfaces
+
+@figref{6} illustrates the HLR Reference Interfaces from 3GPP TS 24.060 Release 4.9.0
+that are supported by the High Performance GSM/UMTS GPRS HLR.
+
+@c @figure{cnam_iface,6,SG Reference Interfaces}
+
+@multitable {@b{Gc Interface}}{This connects the HLR to the SMS-GMSC, SMS-IWMSC or SMS-SC.}
+@item @b{C Interface} @tab
+This connects the HLR to the SMS-GMSC, SMS-IWMSC or SMS-SC.
+@item @b{D Interface} @tab
+This connects the HLR to the MSC/VLR.
+@item @b{Gr Interface} @tab
+This connects the HLR to the SGSN.
+@item @b{Gc Interface} @tab
+This connects the HLR to the GGSN.
+@end multitable
+
+@menu
+* C Interface::
+* D Interface::
+* Gr Interface::
+* Gc Interface::
+* Signalling Bearers::
+* Other Interfaces::
+@end menu
+
+@node C Interface
+@subsection C Interface
+@cindex C Interface
+
+The @dfn{C Interface} is not used for GSM GPRS
+@footnote{Although most of the transaction protocol components are already provided in @dfn{Phase
+1}, the @dfn{C Interface} is not fully implemented until @dfn{Phase 2}.}
+but may optionally be used for combined RA and LA registration services for
+SMS under UMTS.@footnote{@xref{Attach Transaction Flow}.}
+It is a direct MAP interface between  GMSC, IWMSC or SMSC and the HLR and consists
+of 3GPP TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried either over
+Q.704 MTP or over RFC 3332 M3UA.
+@cindex M3UA
+
+@c @figure{c,7,C Interface}
+
+@node D Interface
+@subsection D Interface
+@cindex D Interface
+
+The @dfn{D Interface} is not used for GSM GPRS
+@footnote{Although most of the transaction protocol components are already provided in @dfn{Phase
+1}, the @dfn{D Interface} is not fully implemented until @dfn{Phase 2}.}
+but may optionally be used for combined RA and LA registration services for
+SMS under UMTS.@footnote{@xref{Attach Transaction Flow}.}
+It is a direct MAP interface between  MSC or VLR and the HLR and consists of 3GPP
+TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried either over Q.704 MTP
+or over RFC 3332 M3UA.
+@cindex M3UA
+
+@c @figure{d,8,D Interface}
+
+@page
+@node Gr Interface
+@subsection Gr Interface
+@cindex Gr Interface
+
+The @dfn{Gr Interface} connects the 3G SGSN to the HLR.
+
+The @dfn{Gr Interface} is the primary GPRS interface.  It is an interface between the SGSN and the
+HLR and consists of 3GPP TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are
+carried either over Q.704 MTP or over RFC 3332 M3UA.
+@cindex M3UA
+
+@c @figure{gr,9,Gr Interface}
+
+@table @dfn
+
+@item Mobile Application Part (MAP):-
+
+This protocol supports signalling exchange with the HLR as defined in 3GPP TS 29.002, with the
+enhancements for GPRS as described in 3GPP TS 23.060.
+
+@item TCAP and SCCP:-
+
+These are the same protocols used to support MAP in CS PLMNs.
+
+@item Signalling Bearer:-
+
+The Signalling Bearer is one of the signalling bearers specified in 3GPP TS 29.202, which provides
+the signalling bearers illustrated in @figref{10} below.
+
+@end table
+
+The @dfn{Gr Interface} is the focus of @dfn{Phase 1} of the HLR project.
+
+@node Gc Interface
+@subsection Gc Interface
+@cindex Gc Interface
+
+The @dfn{Gc Interface} connects the GGSN to the HLR.
+
+The @dfn{Gc Interface} is an optional GPRS interface.
+@footnote{Although most of the transaction protocol components are already provided in @dfn{Phase
+1}, the @dfn{Gc Interface} is not fully implemented until @dfn{Phase 2}.}
+It is a direct MAP interface between the GGSN and the HLR and consists of 3GPP TS 29.002 MAP over
+Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried either over Q.704 MTP or over RFC 3332
+M3UA.
+@cindex M3UA
+It is also possible for a GGSN to tunnel MAP messages over GTP into SS7 MAP via another GSN
+that is PSPDN connected.
+
+@c @figure{gc,11,Gc Interface}
+
+@c @figure{gc2,12,Gn/Gc Interface}
+
+@table @dfn
+
+@item Mobile Application Part (MAP):-
+
+This protocol supports signalling exchange with the HLR, as described in "Network-Requested PDP
+Context Activation Procedure" of 3GPP TS 23.060.
+
+@item GPRS Tunnelling Protocol for the control plane (GTP-C):-
+
+This protocol tunnels signalling messages between the GGSN and the protocol-converting GSN in the
+backbone network.
+
+@item Interworking:-
+
+This function provides interworking between GTP and MAP for GGSN-HLR signalling.
+
+@end table
+
+@node Signalling Bearers
+@subsection Signalling Bearers
+
+The signalling bearers that can be used to transport the @dfn{C}, @dfn{D}, or @dfn{Gr Interface} are
+described in 3GPP TS 29.202.  Signalling bearers include M3UA
+@cindex M3UA
+over
+@cindex SCTP
+SCTP,
+traditional narrowband MTP including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B, and broadband MTP (MTP3b) using SSCOP over AAL5 using an ATM or G.804 physical
+medium.  @figref{10} illustrates the possible signalling bearers below.
+
+Because broadband MTP has is not an initial requirement for the project, broadband MTP components
+is deferred to @dfn{Phase 3} of the project.  Narrowband MTP (including
+@cindex Q.703 Annex B
+Q.703 Annex B) and
+@cindex M3UA
+@cindex SCTP
+M3UA/SCTP
+is configured in @dfn{Phase 1}.
+
+@c @figure{sigbearer,10,TS 29.202 Signalling Bearers}
+
+@node Other Interfaces
+@subsection Other Interfaces
+@cindex Other interfaces
+
+Additional interfaces are implemented in other phases of the project.  For additional information,
+@pxref{Optional Network Support}.
+
+@node System Architecture
+@chapter System Architecture
+@cindex System architecture
+
+This section details the solution system architecture.  The solution system architecture consists of
+the computing platform and its placement within the locale installation environment.
+
+The solution system has the following requirements:
+
+@itemize ---
+
+@item 19" rack.
+
+@item 110 VAC electrical power.
+
+@item Commercial cooling.
+
+@item Bantam to RJ-48c patch panel.
+
+@end itemize
+
+@node Platform Architecture
+@chapter Platform Architecture
+@cindex Platform architecture
+
+@menu
+* Platform Capacity::
+@end menu
+
+This section details the platform architecture.  The solution platform architecture consists of the
+computing platform and associated hardware, interfaces and peripherals.
+
+@figref{13} illustrates the solution platform rack configuration.
+
+@c @figure{rack,13,Rack Mount Components}
+
+The solution platform consists of the following:
+
+@itemize ---
+
+@item One hardened PC (5U) chassis per system.
+
+@item One 10/100 Mbps (10/100baseT) RJ-45c Layer 2 Ethernet Switch.
+
+@end itemize
+
+@node Platform Capacity
+@section Platform Capacity
+
+The PC chassis is equipped with the following:@footnote{For detailed sizing considerations, 
+@pxref{Platform Sizing}.}
+
+@itemize --
+@item 3GHz ix86 Pentium class Motherboard.
+@item 66 MHz PCI 2.1 bus.
+@item 2G DDR memory.
+@item Ultra SCSI hard drive.
+@item 3 x 100baseT Ethernet NICs.
+@item 2 x A104c Quad E1 inteface cards.
+@end itemize
+
+@node Protocol Architecture
+@chapter Protocol Architecture
+@cindex Protocol architecture
+
+@figref{14} illustrates the protocol configuration for the High Performance GSM/UMTS GPRS HLR
+system.  The protocol stack uses the following OpenSS7 stack components:
+
+@c @figuresized{protconf,14,Protocol Architecture,4in}
+
+@menu
+* Protocol Components::
+@end menu
+
+@node Protocol Components
+@section Protocol Components
+@cindex Protocol components
+
+The following Protocol Components are provided as part the OpenSS7 SS7 and SIGTRAN stacks:
+
+@menu
+* High Performance HLR 3GPP TS 23.060 GPRS Application::
+* High Performance HLR 3GPP TS 29.002 Mobile Application Part Application::
+* SS7 Stack Manager::
+* MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver::
+* Transaction Capabilities Application Part (TCAP) Driver::
+* Signalling Connection Control Part (SCCP) Driver::
+* Message Transfer Part (MTP) Driver::
+* MTP Level 3 User Adaptation Layer (M3UA) Driver::
+* Signalling Link (SL) Module::
+* Signalling Data Terminal (SDT) Module::
+* Stream Control Transmission Protocol (SCTP) Driver::
+@end menu
+
+@node High Performance HLR 3GPP TS 23.060 GPRS Application
+@subsection High Performance HLR 3GPP TS 23.060 GPRS Application
+@cindex High Performance HLR 3GPP TS 23.060 GPRS Application
+
+The High Performance HLR 3GPP TS 23.060 Rel 4. GPRS Application is responsible for providing hybrid
+rule-based partitioning and HLR High Performance database information to the MAP 3GPP TS 29.002 HLR
+driver.  This is a user-space application that provides user-interface for specification of database
+rules and records.
+
+The High Performance GSM/UMTS GPRS HLR Application is made up from a User-space application combined
+with the OpenSS7 SS7 and SIGTRAN stacks.  The High Performance GSM/UMTS GPRS HLR application
+communicates only with the top of the SS7 stack, that is, the MAP and SCCP-GTT modules.
+
+The High Performance GSM/UMTS GPRS HLR Application is responsible for providing data configuration
+instructions to the MAP and GTT modules.  MAP and GTT modules accept both rule based and indexed
+record entries for responding to transactions and translations; any transaction or translation which
+neither matches a rule nor matches an indexed entry results in a transaction or translation
+indication to the attached High Performance GSM/UMTS GPRS HLR Application.
+
+This protocol component is developed as part of @dfn{Phase 1} of this project.
+
+@node High Performance HLR 3GPP TS 29.002 Mobile Application Part Application
+@subsection High Performance HLR 3GPP TS 29.002 Mobile Application Part Application
+@cindex High Performance HLR 3GPP TS 29.002 Mobile Application Part Application
+
+The High Performance HLR 3GPP TS 29.002 Mobile Application Part Application is responsible for accepting
+location update and authentication requests from the back end AC gateway and turning those requests
+into GSM MAP queries to an Authentication centre and propagating the response.  This is a
+straightforward application that converts between ONC RPC queries and responses and GSM MAP TCAP
+queues and responses using the published Transaction Component Interface (TCI).
+
+The Mobile Application Part (MAP)  Home Location Register (HLR) module is responsible for responding
+to MAP-HLR transactions originating from the TCAP module beneath (e.g. MapLocationUpdate) and is
+responsible for generating outgoing MAP-HLR transactions to the TCAP module beneath (e.g.
+MapInsertSubscriber).  To perform its function, the MAP-HLR indexes all information based on the
+IMSI of the MS, including dynamic (state) and provisioned (subscriber) information.  For performance
+in both a testing and production environment, the module provides three levels of database
+partitioning and caching:
+
+@table @emph
+@item Rules
+Rules can be provided that is used to determine provisioned information based on components of
+the index (IMSI).  These rules can be used to generate a rather large simulated database without
+maintaining or accessing large database record areas.  The rule base provides a simulated
+partitioned database.  Each rule refers to a template or partial template of provisioned data.
+@item Templates
+Templates can be provided that specify a profile of provisioned information for a class of
+indexes (IMSI).  Templates provide a compact local in-kernel cache of templates.  Indexes reference
+templates rather than complete records.
+@item Records
+Records can be provided that specify the provisioned information for the specific index (IMSI).
+Records provide a local in-kernel cache of specified records.  Records are unique for each index.
+@item Transactions
+The application can be queried by indicating the index IMSI and the module awaits a response
+containing the provisioned information.  Transactions provide access to an external database.
+@end table
+
+This protocol component is developed as part of @dfn{Phase 1} of this project.
+
+@node SS7 Stack Manager
+@subsection SS7 Stack Manager
+@cindex SS7 Stack Manager
+
+The SS7 stack manager is responsible for configuration of the SS7 stack, maintenance, statistics
+collection, operational measurements, management events and controls, log and alarm generation.
+This is daemon process that is typically customized to meet a specific application.
+
+This is an existing component of the OpenSS7 stack that is extended to include the HLR
+components developed above and the MAP component developed below.
+
+@node MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver
+@subsection MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver
+@cindex MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver
+
+The MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver is responsible for accepting location update
+and authentication requests from the TCAP or TUA streams linked below as well as performing any
+necessary Global Title Translations (GTT) for the SCCP GTT control streams linked below.  The driver
+contains an in-kernel-memory HLR database.  The in-memory database is hybrid rule-based an IMSI
+indexed record-based.
+
+The MAP driver supports 3GPP TS 29.002 Release 4.
+This protocol component is developed as part of @dfn{Phase 1} of this project.
+
+@node Transaction Capabilities Application Part (TCAP) Driver
+@subsection Transaction Capabilities Application Part (TCAP) Driver
+@cindex Transaction Capabilities Application Part (TCAP) Driver
+
+The transaction capabilities application part driver performs the essential transaction functions of
+the SS7 signalling stack.  SCCP or SUA streams are linked under the driver and the driver provides
+the functions of a TCAP SSP or SCP, MSC or HLR, SMSC and other TCAP nodes.  Transaction Capabilities
+Application Part streams bound to INAP, MAP or LNP TCAP-SAPs are accessed by the transaction
+application using the Transaction Component Interface (TCI).
+
+The TCAP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including operation classes 1 through 5.  The TCAP driver provides a specialized TR and TC
+interface to its users and accepts an X/Open NPI Version 2.0 interface from beneath.  In addition, a
+TPI Version 2.0 user interface supporting an X/Open XNS 5.2 mOSI XTI library interface is provided.
+
+The TCAP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+The primary scale limiting characteristic of the TCAP driver is the number of simultaneous open
+transactions.  Each open transaction requires a number of timers, state information and dynamic
+transaction information such as addressing.  Transaction Identifier indexed hash tables must be
+appropriately sized and the mean and maximum simultaneous open transactions should be known for
+proper sizing.
+
+The Transaction Capabilities Application Part (TCAP) @dfn{STREAMS} module is responsible for
+providing TCAP services on top of a Signalling Connection Control Part (SCCP) or SCCP-User
+Adaptation Layer (SUA) stream.  In addition, it is possible to use an ISO/OSI Network Service
+Provider to provide the network services to TCAP.
+
+The OpenSS7 TCAP component has message encoding and decoding for ITU-T/ETSI Application Context TCAP
+and ANSI Private TCAP.  Interfaces provided to TCAP users include an XTI/mOSI capable TPI Version
+2.0 interface, a Transaction Interface (TRI) as described in ITU-T Q.791, and a Component Interface
+(TCI) as also described in ITU-T Q.791.  The ITU-T Q.791 TR and TC interfaces are support Java
+JTCAP.
+
+Of these interfaces, the Transaction Interface (TRI) and Component Interface (TCI) are most
+efficient.  This is because it is not necessary to open a new stream for each transaction as is the
+case with the TPI interface and the XTI/mOSI.
+
+The OpenSS7 TCAP module supports all Operations Classes.
+
+@c @figuresized{tcap,15,Transaction Capabilities Application Part (TCAP) Modules,3in}
+
+A SIGTRAN TCAP-User Adaptation  Layer (TUA) or OpenSS7 @dfn{STREAMS} over
+@cindex SCTP
+SCTP multiplexing driver can be used between the TCAP and the TCAP-User to export the TCAP/TCAP-User
+interface between a provider and user host.
+
+Signalling Connection Control Part (SCCP) streams are linked beneath the TCAP module to provide SCCP
+services to TCAP.  Alternately, a SIGTRAN SCCP-User Adaptation Layer (SUA) or OpenSS7 @dfn{STREAMS}
+over
+@cindex SCTP
+SCTP stream may be linked.
+
+The OpenSS7 TCAP module contains all the necessary state machines, timers, transaction error
+handling and component error handling as required by the ITU-T, ETSI and ANSI specifications.
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{tcap(4), tcap(4), tcap(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+tcap, @b{tcap}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for TCAP include integration testing with the MAP and HLR components.
+
+@node Signalling Connection Control Part (SCCP) Driver
+@subsection Signalling Connection Control Part (SCCP) Driver
+@cindex Signalling Connection Control Part (SCCP) Driver
+
+The signalling connection control part driver performs the essential transport functions of the SS7
+signalling stack.  Message Transfer Part or MTP3 User Adaptation Layer streams are linked under the
+driver and the driver provides the functions of a SCCP endpoint or relay with full global title
+translations.  Signalling Connection Control Part streams bound to TCAP SCCP-SAPs are linked under
+the TCAP driver to form a complete SS7 stack in support of call transactions.
+
+@c @figuresized{sccp,16,Signalling Connection Control Part (SCCP) Module,3in}
+
+The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
+SCCP driver provides an extended NPI Version 2.0 interface to its users and accepts an NPI Version
+2.0 (Connectionless) MTP interface from beneath or a specialized OpenSS7 MTPI interface.  In
+addition, a TPI Version 2.0 user interface supporting an X/Open XNS 5.2 XTI library interface is
+provided.
+
+The SCCP driver also provide GTT streams for servicing Global Title Translations requests.  These
+streams can be used by a user-space program for servicing GTT requests from a local or remote
+database, or can have specialized @dfn{STREAMS} modules pushed to perform rule-based GTT in the
+operating system kernel.
+
+The SCCP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+The Signalling Connection Control Part (SCCP) @dfn{STREAMS} module is responsible for providing SCCP
+services on top of a Message Transfer Part (MTP) Level 3 (MTP3) or MTP3-User Adaptation Layer (M3UA)
+@cindex M3UA
+stream.  In addition, it is possible to use an ISO/OSI connectionless Network Service Provider to
+provide the network services to SCCP.
+
+The OpenSS7 SCCP component has message encoding and decoding for ITU-T/ETSI and ANSI SCCP.
+Interfaces provided to SCCP users include an XTI/OSI capable TPI Version 2.0 interface, an NPI
+Version 2.0 interface, and an SCCP-specific interface.
+
+The OpenSS7 SCCP module supports all Protocol Classes.
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sccp(4), sccp(4), sccp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sccp, @b{sccp}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for SCCP include integration testing with the MAP and HLR components.
+
+@menu
+* Global Title Translations (GTT)::
+@end menu
+
+@node Global Title Translations (GTT)
+@subsubsection Global Title Translations (GTT)
+
+The Signalling Connection Control Part (SCCP) Global Title Translations (GTT) module is responsible
+for responding to SCCP-GTT translations originating from the SCCP module beneath and is responsible
+for generating outgoing SCCP-GTT translations to the SCCP module beneath.  To perform its function,
+the SCCP-GTT indexes all information based on the SCCP Address, including dynamic (state) and
+provisioned (result) information.  For performance in both a testing and production environment, the
+module provides three levels of database partitioning and caching:
+
+@table @emph
+@item Rules
+Rules can be provided that are used to determine provisioned information based on components of
+the index (GT).  These rules can be used to generate a rather large simulated database without
+maintaining or accessing large database record areas.  The rule base provides a simulated
+partitioned database.  Each rule refers to a template or partial template of provisioned data.
+@item Templates
+Templates can be provided that specify a profile of provisioned information for a class of
+indexes (GT).  Templates provide a compact local in-kernel cache of templates.  Indexes reference
+templates rather than complete records.
+@item Records
+Records can be provided that specify the provisioned information for the specific index (GT).
+Records provide a local in-kernel cache of specified records.  Records are unique for each index.
+@item Translations
+The application can be queried by indicating the index (GT) and the module awaits a response
+containing the provisioned information.  Translations provide access to an external database or
+algorithm.
+
+For the High Performance GSM/UMTS GPRS HLR application, messages can be routed on Translation Type
+or on the basis of the Subsystem Number alone, resulting in a simple rule provided to the SCCP-GTT.
+If the High Performance GSM/UMTS GPRS HLR application is not expected to perform in any other role,
+the High Performance GSM/UMTS GPRS HLR application can bind as the "Default Destination" for all
+SCCP Unitdata messages, obviating the need for GTT.
+@end table
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sccp(4), sccp(4), sccp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sccp, @b{sccp}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for SCCP include integration testing with the MAP and HLR components.
+
+@node Message Transfer Part (MTP) Driver
+@subsection Message Transfer Part (MTP) Driver
+@cindex Message Transfer Part (MTP) Driver
+
+The message transfer part driver performs the essential network functions of the SS7 signalling
+stack.  M2UA streams (see below) may be linked under the driver and the driver provides the
+functions of a Signalling End Point (SEP) or Signalling Transfer Point (STP).
+@footnote{Message Transfer Part streams bound to ISUP MTP-SAPs are linked under the ISUP driver
+above to form a complete SS7 stack in support of call switching.  Message Transfer Part streams
+bound to SCCP MTP-SAPs are linked under the SCCP driver above to form a complete SS7 stack in
+support of transaction services.}
+
+@c @figuresized{mtp3,17,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
+
+The MTP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including full transfer function.  The MTP driver provides a specialized MTP interface to
+its users, in addition to an NPI Version 2.0 connectionless interface.  A TPI Version 2.0
+(connectionless) user interface support X/Open XNS 5.2 XTI library functions is also provided.
+
+The MTP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+The Message Transfer Part (MTP) Level 3 (MTP3) module is responsible for providing MTP services to
+its users.
+
+The Message Transfer Part (MTP) Level 2 (MTP2) module is responsible for providing MTP services to
+its users.
+
+@c @figuresized{mtp2,18,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
+
+These are an existing OpenSS7 SS7 stack components; for documentation, see:
+@ifinfo
+@ref{mtp(4), mtp(4), mtp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+mtp, @b{mtp}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for MTP3 and MTP2 include integration testing with the MAP and HLR
+components.
+
+@node MTP Level 3 User Adaptation Layer (M3UA) Driver
+@subsection MTP Level 3 User Adaptation Layer (M3UA) Driver
+@cindex MTP Level 3 User Adaptation Layer (M3UA) Driver
+@cindex M3UA
+
+The M3UA driver provides the HLR with the ability to act as an M3UA AS (Application Server) in
+conjunction with an M3UA SG (Signalling Gateway). In this project, the SG function is performed by
+existing lab equipment.  The M3UA driver accepts the transport of the MTP to MTP-User interface from
+the SG to the HLR.
+The M3UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport
+services for exporting the MTP-User interface.  The M3UA driver provides the same interface to its
+users as the OpenSS7 MTP.
+
+The M3UA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{m3ua(4), m3ua(4), m3ua(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+m3ua, @b{m3ua}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for M3UA include integration testing with the MAP and HLR
+components.
+
+@node Signalling Link (SL) Module
+@subsection Signalling Link (SL) Module
+@cindex Signalling Link (SL) Module
+
+The signalling link module performs HDLC and SS7 Message Transfer Part Level 2 (Link) functions on a
+raw communications channel, such as that provided by the X400P-SS7 driver and the E400P-SS7 card.
+@cindex E400P-SS7
+This module converts between the channel media stream (raw octet stream) and an SS7 signalling link
+signalling stream.  These streams comprise SS7 signalling links and are linked under the MTP driver.
+
+The SL module supports CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SL module provides a specialized SL interface to its users, in addition to an NCR Comten CDI
+Version 2.0 Style 2 connectionless interface.
+
+The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
+
+The Signalling Link (SL) module is responsible for providing SL services to its users.
+
+@c @figuresized{sl,29,Signalling Link (SL) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sl(4), sl(4), sl(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sl, @b{sl}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for MTP2 include integration testing with the MAP and HLR
+components.
+
+@node Signalling Data Terminal (SDT) Module
+@subsection Signalling Data Terminal (SDT) Module
+@cindex Signalling Data Terminal (SDT) Module
+
+The signalling data terminal module performs HDLC and lower level SS7 Message Transfer Part Level 2
+(Link) functions including DAEDR, DAEDT, AERM, SUERM and SU Compression/Repetition on a raw
+communications channel or span, such as that provided by OpenSS7 Channel Drivers.  This module
+converts between the raw channel media stream (raw octet stream) and an SS7 signalling data terminal
+stream.  These streams comprise SS7 signalling data terminals and are pushed beneath the SL module.
+
+The SDT module supports CCITT/ITU-T version (Blue Book forward), ETSI and ANSI versions (1992
+forward), including Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
+The SDT module provides a specialized SDT interface to its users, in addition to an NCR Comten CDI
+Version 2.0 Style 2 connectionless interface.
+
+The Signalling Data Terminal (SDT) module is responsible for providing SDT services to its users.
+
+@c @figuresized{sdt,20,Signalling Data Terminal (SDT) Module,3in}
+
+This is an existing OpenSS7 SS7 stack component; for documentation, see:
+@ifinfo
+@ref{sdt(4), sdt(4), sdt(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sdt, @b{sdt}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for MTP2 include integration testing with the MAP and HLR
+components.
+
+@node Stream Control Transmission Protocol (SCTP) Driver
+@subsection Stream Control Transmission Protocol (SCTP) Driver
+@cindex Stream Control Transmission Protocol (SCTP) Driver
+@cindex SCTP
+
+OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
+transport protocol and provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS} SCTP
+implementation provides an NPI Version 2.0 and TPI Version 2.0 interface to its users.  Also
+supported is an X/Open XNS 5.2 XTI library.  The Linux Native SCTP implementation provides a Sockets
+interface.
+
+This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
+@ifinfo
+@ref{sctp(4), sctp(4), sctp(4), *manpages*, The Manual Pages}.
+@end ifinfo
+@ifnotinfo
+@uref{http://www.openss7.org/man/man2html?4+sctp, @b{sctp}(4)}.
+@end ifnotinfo
+@dfn{Phase 1} activities for SCTP include integration testing with the MAP and HLR
+components.
+
+@node Software Architecture
+@chapter Software Architecture
+@cindex Software architecture
+
+This chapter details the software configuration of OpenSS7 solutions.  Open SS7 stack software is
+based on the @dfn{STREAMS} facility running on the Linux Operating System.  The provides for use of
+the Linux Operating System while maintaining portability and consistency with major UNIX operating
+systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
+
+@menu
+* Linux Operating System::
+* STREAMS Facility::
+* OpenSS7 SS7 and SIGTRAN Stack::
+@end menu
+
+@node Linux Operating System
+@section Linux Operating System
+@cindex Linux operating system
+
+The OpenSS7 @dfn{STREAMS} releases and stacks currently support the 2.4 Linux Kernel.  A Linux
+kernel version greater than or equal to 2.4.18 is recommended.  The Linux 2.5 and 2.6 kernel series
+are not yet supported.  The Linux 2.5 series will likely not ever be supported.  Linux 2.6 kernel
+series will be supported once the kernel releases stabilize.  Linux 2.4 kernels released by popular
+distributions are supported.  These include kernel.org releases, RedHat (7.2, 9, EL3), WhiteBox EL3,
+Fedora Core 1 (FC1), Debian Woody, SuSE 8.2.  Currently our preferred distribution is Fedora Core 1
+with all updates applied.
+@cindex RedHat
+@cindex WhiteBox EL3
+@cindex Debian
+@cindex SuSE
+@cindex Fedora
+
+Although OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+stacks compile and install on PPC (MPC 8260), HPPA, and other processor architectures supported by
+the Linux 2.4 kernel.
+
+@node STREAMS Facility
+@section STREAMS Facility
+@cindex STREAMS facility
+
+OpenSS7 @dfn{STREAMS} SS7 and SIGTRAN stacks utilize an @dfn{SVR 4.2 ES/MP STREAMS} facility.  Two
+such facilities are available for Linux:
+@enumerate
+@cindex LiS
+@item @dfn{Linux STREAMS} (referred to as LiS), and
+@item @dfn{Linux Fast-STREAMS} (referred to as LfS).
+For additional information on @dfn{Linux Fast-STREAMS}, @xref{Linux Fast-STREAMS (LfS)}.
+@end enumerate
+
+@menu
+* Linux STREAMS (LiS)::
+@end menu
+
+@node Linux STREAMS (LiS)
+@subsection Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+@cindex Linux STREAMS (LiS)
+@cindex LiS
+
+@dfn{Linux STREAMS (LiS)}
+@footnote{At the time that this document what written, GCOM had just announced that it is no longer
+supporting the Open Source Linux STREAMS package.  The OpenSS7 Project continues to support our
+autoconf/RPM 2.16.18 releases of LiS until such time that Linux Fast-STREAMS is complete and
+available as a replacement.  The newer 2.18 GCOM releases are not supported.}
+is a mixture of LGPL and GPL code that is available from GCOM.  OpenSS7
+provides stabilized autoconf/RPM releases of LiS on the OpenSS7 Project website.  Current
+recommendations for the use of LiS is the LiS-2.16.18-19 release available from the OpenSS7 Project
+website.  Direct releases from GCOM are not recommended as the OpenSS7 releases have a number of
+patches that correct difficulties with the GCOM releases.  Also, OpenSS7 Project releases of
+LiS-2.16.18-19 include the OpenSS7  X/Open XNS 5.2 compatible XTI Library, timod and tirdwr modules,
+and corrected INET and LDL drivers.
+
+@node OpenSS7 SS7 and SIGTRAN Stack
+@section OpenSS7 SS7 and SIGTRAN Stack
+@cindex OpenSS7 SS7 and SIGTRAN stack
+
+The OpenSS7 SS7 and SIGTRAN stacks are implemented using the @dfn{STREAMS} facility.  Protocol
+modules within the stack are implemented as @dfn{STREAMS} modules, device drivers, multiplexing
+drivers and pseudo-device drivers.  The @dfn{STREAMS} facility has the ability to stack modules and
+multiplexing drivers above a real or pseudo-device driver using @dfn{STREAMS} I_PUSH and I_LINK
+facilities.  As STEAMS modules (and drivers) run within the context of the Operating System Kernel
+using message-based scheduling, greatly increased performance is experienced over equivalent
+user-space applications.  @dfn{STREAMS} modules and drivers communicate by passing @dfn{STREAMS}
+message blocks upstream and downstream with bidirectional queueing and 256 levels of priority.  In
+addition, @dfn{STREAMS} provides memory management, timer, locking, synchronization, flow control
+and other facilities commonly used by protocol modules.
+
+@c @figure{osimap,21,SS7 to ISO/OSI Mapping}
+
+Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
+specialized interfaces.  Many of the OpenSS7 protocols modules provide TPI Version 2.0 interfaces
+with support for the OpenSS7 XTI/TLI Library.
+
+@c @figuresized{stack,22,STREAMS SS7/SIGTRAN Stack Architecture,3in}
+
+@figref{22} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
+pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
+equivalent SIGTRAN User Adaptation Layer (UA) can be used.  So, for example, between MTP Level 3 and
+its Users, the M3UA
+@cindex M3UA
+protocol can be employed.  Each UA provides the same lower layer interface and
+upper layer interface.  So, M3UA
+@cindex M3UA
+provides an MTP/MTP-User interface at its lower layer interface as
+well as at its upper layer interface.
+
+@node Hardware Architecture
+@chapter Hardware Architecture
+@cindex Hardware architecture
+@cindex Hardware
+
+@figref{23} illustrates the hardware configuration for the High Performance GSM/UMTS GPRS HLR
+evaluation platform.
+
+@c @figuresized{platconf,23,Platform Architecture,5in}
+
+The High Performance GSM/UMTS GPRS HLR prototype platform consists of a medium end ix86 single
+processor PC in a hardened 19" rack mount chassis, loaded with WBEL3 Linux running a 2.4.21 kernel,
+@cindex LiS
+LiS 2.16.18-22, the OpenSS7 stack (strss7-0.9.2-1) software and the High Performance GSM/UMTS GPRS
+HLR application.
+
+SS7 or SIGTRAN signalling links are terminated either on E400P-SS7 cards (or other OpenSS7
+@cindex E400P-SS7
+compatible E1 cards) directly attached to the test platform, or via Signalling Gateway devices
+back-hauling M2UA, M3UA
+@cindex M3UA
+or SUA to the test platform over an internal LAN connection.
+
+OAM&P of the prototype platform is performed over an internal LAN connection.
+
+Hardware requirements are as follows:
+@itemize
+@item
+1 x medium end (2.0 GHz) single processor, 19" rack mount, hardened chassis PC, 110 VAC commercial
+power.
+@item
+2 x E400-SS7 Cards (or equivalent).
+@cindex E400P-SS7
+@item
+4 x 100baseT Ethernet NICs (3com 905B or equivalent).
+@end itemize
+
+For a redundant configuration (two hosts serving the same gateway), twice the hardware is
+required.
+
+@menu
+* Interface Devices::
+@end menu
+
+@node Interface Devices
+@section Interface Devices
+@cindex Interface devices
+
+@menu
+* T400P/E400P-SS7::
+* TE405/410-SS7::
+* A101/102/104c::
+* PCI 384::
+* Other Interface Cards::
+@end menu
+
+The interface device hardware cards listed below are supported for the OpenSS7 Platform.  All of the
+interface device hardware listed here has good price-performance, however, varying levels of
+performance (and therefore price) is available.  These cards are available either directly from the
+card manufacturer or are also resold by @uref{http://www.openss7.com/, OpenSS7 Corporation}.
+
+For the High Performance GSM/UMTS GPRS HLR application, Either the A104c or PCI 384 cards are
+recommended.
+
+The following interface device hardware is available for the OpenSS7 Platform:
+
+@node T400P/E400P-SS7
+@subsection T400P/E400P-SS7
+@cindex T400P-SS7
+@cindex E400P-SS7
+
+The T400P-SS7 and E400P-SS7 cards are 4-span T1 or E1 cards manufactured by
+@uref{http://www.govarion.com/, Varion}.  These cards were previously manufactured by
+@uref{http://www.digium.com/, Digium}.
+@figref{24} shows a picture of a T400P-SS7 card.
+
+@c @figure{v400p,24,T400P/E400P-SS7}
+
+The T400P-SS7 and E400P-SS7 cards have the lowest level of signalling performance due to the lack of
+on-board HDLC functions.  Transfers to the host processor over the PCI bus use PCI I/O ports and
+memory mapping.
+
+@subsubheading Driver
+
+These cards are supported by the X400-SS7 driver.
+
+The function of the T/E400P-SS7 Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the T400P-SS7 and E400P-SS7 cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item Dallas framer.
+@cindex Dallas framer
+@item PLX PCI 9030 PCI bus chip.
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Uses OpenSS7 Soft-HDLC engine for SS7, ISDN and ISO.
+@item 96 channels per card (T400P-SS7)
+@item 124 channels per card (E400P-SS7).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the T400P-SS7 and E400P-SS7 cards:
+
+@itemize @bullet
+@item Low cost.
+@item PC Compatibility.
+@item Released by Jim Dixon under the GNU Public License.
+@item Open Hardware design: schematics, artwork and Gerber plots available.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a number of Open Source drivers.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the T400P-SS7 and E400P-SS7 cards:
+
+@itemize @bullet
+@item Lower performance.
+@item No on-board HLDC.
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item I/O Port and Memory Map instead of PCI DMA bus-mastering and burst transfers.
+@item Does not run on high speed buses.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+Ultimately, the performance limiting factor of the T400P-SS7 and E400P-SS7 cards is the bandwidth of
+the PCI bus and the ability of the processor to perform Soft-HDLC and TDM switching in software.  A
+350MHz processor is capable of processing the bandwidth of an entire E400P-SS7 card (124 signalling
+links) with a combined link throughput of 8.192 Mbps.
+
+For the High Performance GSM/UMTS GPRS HLR, this performance is more than adequate.  A medium grade 2GHz
+PC should be capable of handling 2 cards (248 SS7 links) with adequate excess capacity available for
+background operations.
+
+These cards are very cost-effective and can provide 64kbps SS7 links at average incremental
+interface cost of approximately $8.00 USD per signalling link.
+
+@node TE405/410-SS7
+@subsection TE405/410-SS7
+@cindex TE405-SS7
+@cindex TE410-SS7
+
+The TE405/410-SS7 cards are 4-span E1/T1 cards manufactured by @uref{http://www.digium.com/,
+Digium}.
+These cards are a higher performance replacement for the T400P-SS7 and E400P-SS7 cards.
+@figref{25} shows a picture of a T405P-SS7 card.
+
+@c @figure{t400p-ss7,25,TE405/410-SS7}
+
+The TE405-SS7 and TE410-SS7 cards have a low level of signalling performance due to the lack of
+on-board HDLC functions.  However, transfers to the host process over the PCI bus use bus-mastering
+PCI burst DMA transfers, unlike their T400P and E400P predecessors.
+
+@subsubheading Driver
+
+These cards are supported by the TE400-SS7 driver.
+
+The function of the TE405/410-SS7 Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the TE405-SS7 and TE410-SS7 cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item PMC Sierra framer
+@cindex PMC Sierra framer
+@item PLX PCI 9030 PCI bus chip.
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Uses OpenSS7 Soft-HDLC engine for SS7, ISDN and ISO.
+@item 96 channels per card (T1).
+@item 124 channels per card (E1).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the TE405-SS7 and TE410-SS7 cards:
+
+@itemize @bullet
+@item Lower cost.
+@item PCI DMA bus-mastering and burst transfers.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a number of Open Source drivers.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the TE405-SS7 and TE410-SS7 cards:
+
+@itemize @bullet
+@item Lower performance, although better than predecessor.
+@item No on-board HLDC.
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+As with their predecessors, the performance limiting factor of the TE405-SS7 and TE410-SS7 cards is
+the bandwidth of the PCI bus and the ability of the processor to perform Soft-HDLC and TDM switching
+in software.  A 350MHz processor is capable of processing the bandwidth of an entire TE405-SS7 card
+(124 signalling link) with a combined linke throughput of 8.192 Mbps.
+
+For the High Performance GSM/UMTS HLR, this performance is more than adequate.  A medium grade 2GHz
+PC should be capable of handling 2 cards (248 SS7 links) with adequate excess capacity available for
+background operations.
+
+These cards are cost-effective and can provide 64kbps SS7 links at average incremental interface
+cost of approximately $12.00 USD per signalling link.
+
+@node A101/102/104c
+@subsection A101/102/104c
+@cindex A101c
+@cindex A102c
+@cindex A104c
+
+The A101/102/104c cards are 1-, 2- and 4-span E1, T1 or J1 cards manufactured by
+@uref{http://www.sangoma.com/, Sangoma}.
+@figref{26} shows a picture of an A101c card.
+
+@c @figure{a101c,26,A101/102/104c}
+
+The A10Xc cards have an increased level of signalling performance due to availability of on-board
+HDLC processing.  Transfers to the host are performed using bus-mastering PCI DMA burst transfers
+for lower host processor overhead.  These cards do not support direct on-board TDM switching;
+neither do they have integrated Ethernet.
+
+@subsubheading Driver
+
+These cards are supported by the A100-SS7 driver.
+
+The function of the A100-SS7 Channel driver is to provide for the termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital paths to OpenSS7 media and signalling protocol modules as well as
+providing T1 or E1 management, framing, coding, alarms, and synchronization.
+
+@subsubheading Features
+
+Following are the features of the A101c, A102c and A104c cards:
+
+@itemize @bullet
+@item 1, 2 or 4 E1 spans per card.
+@item PMC Comet framer.
+@cindex Comet framer
+@item Xilinx Spartan XC2S50 processor.
+@cindex Xilinx
+@item Raw transfer of octets from framers to PCI bus.
+@item Can use OpenSS7 Soft-HDLC engines for SS7, ISDN and ISO.
+@item Also provides for onboard HLDC (SS7 DAEDR/DAEDT AERM/SUERM).
+@item 24, 48 and 96 channels per card (T1 A101, A102 and A104).
+@item 31, 62 and 124 channels per card (E1 A101, A102 and A104).
+@item Full span addressable.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the A101, A102 and A104 cards:
+
+@itemize @bullet
+@item Low cost.
+@item PC Comaptibility.
+@item Homolgomation and world-wide support.
+@item Flash programmable Xilinx chip.
+@item Field upgradable.
+@item Supports a wide range of Open Source drivers.
+@item Linux kernel WAN support.
+@item Asterisk driver support.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the A101, A102 and A104 cards:
+
+@itemize @bullet
+@item Cannot TDM switch on card or between cards, media channels must be transferred through host to switch between cards.
+@item No integrated Ethernet for SIGTRAN and VoIP applications.
+@item Synchronization per-card instead of per-system.
+@end itemize
+
+The performance limiting factor of the A101c, A102c and A104c cards is the bandwidth of the PCI bus
+and the ability of the processor to perform TDM switching is software.
+
+For the High Performance GMS/UMTS GPRS HLR, this performance is more than adequate, particularly as
+TDM switching is not a requirement for this pure signalling application.  Although these cards lack
+integrated Ethernet support, for the non-redundant HLR application, and where interworking between
+SIGTRAN and SS7 is not required, this is not a limitation.
+
+These cards have excellent price-performance and can provide 64kbps SS7 links at average incremental
+interface cost of approximately $12.00 USD per signalling link.
+
+@node PCI 384
+@subsection PCI 384
+@cindex PCI 384
+
+The PCI 384 card is a 4-span E1/T1/J1 cards with 10/100baseT Ethernet manufactured by
+@uref{http://www.pti.com/, Performance Technologies}.
+@figref{27} shows a picture of an PCI 384 card.
+
+@c @figure{t400p-ss7,27,PCI 384}
+
+The PCI 384 cards have the highest level of signalling performance because they have an on-board
+PowerQUICC II processor that performs Layer 2 (HDLC) and even some Layer 3 functions.  Transfers to
+the host are performed over SIGTRAN protocols using the on-board Ethernet interface, or over the PCI
+bus in a bus mastering mode.  OpenSS7 @dfn{STREAMS} drivers and modules run directly on the card.
+
+The PCI 384 cards have an integral H.110 bus that can be connected using ribbon cable between cards
+providing for non-blocking switching of 4096 channels between cards.  In E1 mode, these cards each
+provide 124 channels of SS7, ISDN or voice.  In T1 or J1 mode, these cards each provide 96 channels
+of SS7, ISDN or voice.
+
+The PCI 384 card accepts the same software as the CPC 388 (@pxref{CPC 388}) card for a carrier-grade
+evolution path.
+@cindex CPC 388
+
+@subsubheading Driver
+
+These cards are supported by the CPC-388 drivers.
+
+The function of the CPC-388 MG driver is to provide for the switching and termination of 2.048Mbps,
+1.544Mbps, 64kbps and 56kbps digital paths.  This driver provides direct access to the channelized
+or unchannelized T1 or E1 digital patchs to OpenSS7 meida and signalling protocol modules as well as
+providing T1 or E1 management, protection switching, monitoring, framing, coding, alarms, and
+synchronization.  It also provides to the switching of TDM channels on card and between cards via
+the H.110 TDM bus.
+
+@subsubheading Features
+
+Following are the features of the PCI 384 cards:
+
+@itemize @bullet
+@item 4 T1 or E1 spans per card.
+@item FALC framer.
+@cindex FALC framer
+@item Motorola PowerQUICC II MPC 8260 200Mhz processor running embedded Linux.
+@item PowerSpan Bus-mastering PCI interface with mailbox support.
+@item OpenSS7 SS7, SIGTRAN, ISDN and VoIP stacks run on-card.
+@item Minimal host processor transfer over PCI bus.
+@item Scalable to 4096 channels.
+@item Can utilizes OpenSS7 Soft-HDLC engine on-card for SS7, ISDN and ISO.
+@item 96 channels per card (T1).
+@item 124 channels per card (E1).
+@item Full span addressable.
+@item Internal H.110 expansion bus.
+@item Integrated 10/100baseT Ethernet (MPC8260 FCC).
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the PCI 384 cards:
+
+@itemize @bullet
+@item Highest performance.
+@item Internal H.110 bus.
+@item Internal/External 10/100baseT Ethernet.
+@item On-board TDM switch.
+@item Flash programmable MPC8260 chip.
+@item Field upgradable.
+@item Software compatible with CPC 388 (@pxref{CPC 388}).
+@item OpenSource NexusWare Linux Kernel distribution.
+@item Multiple cards can synchronize of of same H.110 bus.
+@cindex CPC 388
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the PCI 384 cards:
+
+@itemize @bullet
+@item Higher cost.
+@item Non-redundant.
+@item Cannot be hot-swapped.
+@end itemize
+
+@node Other Interface Cards
+@subsection Other Interface Cards
+@cindex Other Interface Cards
+
+Additional interface cards could be implemented in other phases of the project.  For additional
+information, @pxref{Optional Hardware Support}.
+
+@node Logistics
+@chapter Logistics
+@cindex Logistics
+
+Following are estimates of hardware, software, consulting, schedule and costs:
+
+@menu
+* Hardware::
+* Software::
+* Consulting::
+* Schedule::
+* Cost::
+@end menu
+
+@node Hardware
+@section Hardware
+@cindex Hardware
+
+Prototype hardware sufficient for trial of all projects consists of the following:
+
+@itemize @bullet
+@item
+2 x high-end (2.0 GHz) PCs
+@item
+6 x NICs (3 for each PC)
+@item
+4 x A104 Cards (2 for each PC)
+@end itemize
+
+@menu
+* Sizing Considerations::
+@end menu
+
+@node Sizing Considerations
+@subsection Sizing Considerations
+@cindex Sizing considerations
+
+Sizing provided here is adequate to meet the scale requirements under @ref{System Architecture}.
+For detail on sizing, see @ref{Platform Sizing}.
+
+@node Software
+@section Software
+@cindex Software
+
+Prototype software sufficient for trial of all projects consists of the following:
+
+@itemize @bullet
+@item
+WhiteBox EL3 Linux distribution (or equivalent)
+@item
+Linux 2.4.21 kernel (GPL, download)
+@item
+@cindex LiS
+@dfn{Linux STREAMS} (LiS 2.16.18-22 or equivalent, GPL download)
+@item
+OpenSS7 CVS access
+@item
+OpenSS7 components listed under project
+@end itemize
+
+@node Consulting
+@section Consulting
+@cindex Consulting
+
+Consulting consists of the following:
+
+@itemize @bullet
+@item
+Completion of OpenSS7 components marked as "incomplete" under project description suitable for use
+for prototype.
+@item
+Development and documentation of "application" components under project descriptions.
+@item
+Loading and configuring software for evaluation platforms.
+@item
+Participating in evaluation testing.
+@item
+Answering questions and providing guidance to client staff on the use and testing of the evaluation
+platform.
+@end itemize
+
+@node Schedule
+@section Schedule
+@cindex Schedule
+
+@menu
+* Gate 0 --- Concept::
+* Gate 1 --- High-Level Design::
+* Gate 2 --- Detailed Design::
+* Gate 3 --- Development and Implementation::
+* Gate 4 --- System Test::
+* Gate 5 --- Acceptance Testing::
+* Gate 6 --- Support Complete::
+@end menu
+
+Below is an estimated schedule.  The estimate considers that OpenSS7 staff would be performing all
+development work and that Gamma client or Sponsor would participate in external gate reviews and
+acceptance testing in a timely manner.
+
+@tabref{S-0} lists the initial (Gate 0) schedule estimates.
+
+@c @tabfig{hlr_schest,S-0,Initial (Gate 0) Project Estimate}
+
+@tabref{S-1} through @tabref{S-8} list the current (Gate 1) schedule estimates.
+These are planning estimates only and no commitment is provided to deliver to any schedule until
+Gate 2 is complete.
+
+@c @tabfig{hlr_sched,S-1,HLR Project Schedule}
+
+@node Gate 0 --- Concept
+@subsection Gate 0 --- Concept
+
+@dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
+High-Level Design.  This is an internal OpenSS7 gate.
+@tabref{S-2} below lists the estimated schedule leading into @dfn{Gate 0}.
+
+@c @tabfig{hlr_gate0,S-2,HLR Project Schedule --- Gate 0}
+
+Gate 0 was completed for the project on September 24, 2004 with the creation of the Initial design
+document and internal OpenSS7 staff decision to move forward with a High-Level Design.
+
+@node Gate 1 --- High-Level Design
+@subsection Gate 1 --- High-Level Design
+
+@dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
+consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
+once the High-Level Design has been published and work is begun on a detailed design.
+@footnote{This document is a High-Level Design an Proposal document and it meets the internal
+requirements for passing Gate 1 of Phase 1 of the HLR project.  An external review of this document
+by a Beta or Gamma client or sponsor is pending.}
+@tabref{S-3} below lists the estimated schedule leading into @dfn{Gate 1}.
+
+@c @tabfig{hlr_gate1,S-3,HLR Project Schedule --- Gate 1}
+
+This document completes the Gate 1 requirements October 20, 2004.  We are currently awaiting
+external review of this document and proceeding on Detailed Design documentation.
+
+@node Gate 2 --- Detailed Design
+@subsection Gate 2 --- Detailed Design
+
+@dfn{Gate 2} is passed when the detailed design has been reviewed to the satisfaction of the
+consumers of the project and the developers on the project.  This is an external as well as an
+internal review gate.  OpenSS7 passes this gate once the Detailed Design has been published and work
+base begin on development and implementation of the design.
+@footnote{OpenSS7 requires a contractual commitment for purchase from a Beta or Gamma client, or
+funding from a Sponsor of the OpenSS7 Project, before this gate can be passed and development
+started.}
+Passing this gate moves from the design stage to the development stage of the project.
+@tabref{S-4} below lists the estimated schedule leading into @dfn{Gate 2}.
+
+@c @tabfig{hlr_gate2,S-4,HLR Project Schedule --- Gate 2}
+
+@node Gate 3 --- Development and Implementation
+@subsection Gate 3 --- Development and Implementation
+
+@dfn{Gate 3} is passed when the software and systems development and implementation to the detailed
+design is complete and testing has begun.  This is an internal review gate.  OpenSS7 internally
+passes this gate when software is code complete and hardware has been installed for testing.
+@tabref{S-5} below lists the estimated schedule leading into @dfn{Gate 3}.
+
+@c @tabfig{hlr_gate3,S-5,HLR Project Schedule --- Gate 3}
+
+@node Gate 4 --- System Test
+@subsection Gate 4 --- System Test
+
+@dfn{Gate 4} is passed once the product implementation meets all internal ad hoc and formal
+conformance test suites and internal testing is complete.  This is an internal review gate.  OpenSS7
+passes this gate internally once conformance testing is complete.  Passing this gate moves from the
+development stage to the support stage of the project.
+@tabref{S-6} below lists the estimated schedule leading into @dfn{Gate 4}.
+
+@c @tabfig{hlr_gate4,S-6,HLR Project Schedule --- Gate 4}
+
+@node Gate 5 --- Acceptance Testing
+@subsection Gate 5 --- Acceptance Testing
+
+@dfn{Gate 5} is passed once the product implementation has passed external Gamma client acceptance
+testing.  This is an external review gate.  OpenSS7 passes this gate internally once participation
+in external acceptance testing is complete.
+@tabref{S-7} below lists the estimated schedule leading into @dfn{Gate 5}.
+
+@c @tabfig{hlr_gate5,S-7,HLR Project Schedule --- Gate 5}
+
+@node Gate 6 --- Support Complete
+@subsection Gate 6 --- Support Complete
+
+@dfn{Gate 6} is passed once all support obligations for the product implementation have been
+discharged.  This is an internal review gate.  OpenSS7 passes this gate once support agreements have
+terminated.
+@tabref{S-8} below lists the estimated schedule leading into @dfn{Gate 6}.
+
+@c @tabfig{hlr_gate6,S-8,HLR Project Schedule --- Gate 6}
+
+@node Cost
+@section Cost
+@cindex Cost
+
+@tabref{T-2}
+below provides a cost estimate.  The estimate is in US Dollars and assumes that all Evaluation platform
+hardware would be provided by OpenSS7 and that all Signalling Gateway, STP and Cross-Connect
+hardware, Routers and LAN, and other sundry lab equipment be provided by the client.  Development
+time is estimated at 100% effort per calendar week at our normal loaded rate.  Shipping costs,
+training, training material and travel costs are not listed and would be billed separately.
+
+@c @tabfig{hlr_cost,T-2,Estimated Cost}
+
+@ignore
+@iftex
+@float Table,Table S-9
+@caption{Cost Estimate}
+@multitable @columnfractions .7 .15 .15
+@item 2 x high-end (2.0 GHz) PCs
+@tab
+@flushright
+10,000
+@end flushright
+@tab
+@flushright
+20,000
+@end flushright
+@item 6 x NICs (3 for each PC)
+@tab
+@flushright
+100
+@end flushright
+@tab
+@flushright
+600
+@end flushright
+@item 4 x E400P-SS7 cards
+@cindex E400P-SS7
+@tab
+@flushright
+1895
+@end flushright
+@tab
+@flushright
+7,200
+@end flushright
+@item High Performance GSM/UMTS GPRS HLR Evaluation
+@tab
+@flushright
+20,000
+@end flushright
+@tab
+@flushright
+40,000
+@end flushright
+@item Evaluation
+@tab
+@flushright
+20,000
+@end flushright
+@tab
+@flushright
+20,000
+@end flushright
+@item Production Platform
+@tab
+@flushright
+20,000
+@end flushright
+@tab
+@flushright
+30,000
+@end flushright
+@item Total @tab @tab
+@flushright
+117,800
+@end flushright
+@end multitable
+@end float
+@end iftex
+@end ignore
+
+@node Optional Application Support
+@appendix Optional Application Support
+
+@menu
+* Other Solution Architecture
+@end menu
+
+@node Other Solution Architecture
+@section Other Solution Architecture
+@cindex Other solution architecture
+
+@menu
+* Ferry Clip Testing::
+@end menu
+
+@node Ferry Clip Testing
+@subsection Ferry Clip Testing
+@cindex Ferry clip testing
+
+The other possible test arrangement is the Ferry Clip arrangement.  In this case, the OpenSS7 Test
+Platform behaves like the 3GPP GSM/UMTS network surrounding the SGSN Implementation Under Test.
+This is illustrated in @figref{A-1} below.
+
+@c @figure{sgsntest,A-1,Ferry Clip Testing}
+
+@node Optional Network Support
+@appendix Optional Network Support
+
+@menu
+* SGSN Reference Interfaces::
+@end menu
+
+@node SGSN Reference Interfaces
+@section SGSN Reference Interfaces
+@cindex SGSN reference interfaces
+
+@figref{A-2} illustrates the SGSN Reference Interfaces from 3GPP TS 24.060 Release 5.9.0 that are
+supported by the High Performance GSM/UMTS GPRS HLR.
+
+@c @figure{sgsn,A-2,SGSN Reference Interfaces}
+
+@table @strong
+@item Iu Interface
+This connects the 3G SGSN to a UTRAN.
+@item Gb Interface
+This connects the 2G SGSN to a BSS.
+@item Gd Interface
+This connects the 3G SGSN to a SMS-GMSC or SMS-IWMSC.
+@item Ge Interface
+This connects the 3G SGSN to a Camel GSM SCF.
+@item Gn Interface
+This connects the 3G SGSN to a (local) GGSN.
+@item Gp Interface
+This connects the 3G SGSN to a (foreign) GGSN.
+@item Gs Interface
+This connects the 3G SGSN to an MSC/VLR.
+@end table
+
+@menu
+* Gb Interface::
+* Gd Interface::
+* Ge Interface::
+* Gf Interface::
+* Gn Interface::
+* Gp Interface::
+* Gs Interface::
+* Iu Interface::
+@end menu
+
+@node Iu Interface
+@subsection Iu Interface
+@cindex Iu Interface
+
+The @strong{Iu} interface connects the 3G SGSN to the UTRAN.
+
+@c @figure{iu,A-3,Iu Interface}
+
+UMTS Mobility Management and Session Management (GMM/SM): GMM supports mobility management
+functionality such as attach, detach, security, and routing area update, as described in "Mobility
+Management Functionality".  SM supports PDP context activation and PDP context deactivation, as
+described in "PDP Context Activation, Modification, Deactivation, and Preservation Functions" of TS
+23.060.
+
+SMS supports the mobile-originated and mobile-terminated short message service described in 3GPP TS
+23.040.
+
+Radio Access Network Application Protocol (RANAP): This protocol encapsulates and carries
+higher-layer signalling, handles signalling between the 3G-SGSN and UTRAN, and manages the GTP
+connections on the Iu interface.  RANAP is specified in 3GPP TS 25.413.  The layers below RANAP are
+defined in 3GPP TS 23.121.
+
+Radio Link Control (RLC): The RLC protocol offers logical link control over the radio interface for
+the transmission of higher layer signalling messages and SMS.  RLC is defined in 3GPP TS 25.322.
+RLC for GSM is described in GSM 04.60.
+
+For transport of RANAP messages over Iu an SCCP protocol shall be used for both packet and circuit
+switche domains.  The SCCP protocol shall fully comply with ITU-T White Book.  RANAP protocol shall
+be designed to use this service according to the ITU-T standard.  Iu shall be design so that RANAP
+is not impacted by alternatives for SCCP message transport on layers below SCCP.
+
+In the circuit switched domain, SCCP message shall be transported on a broadband SS7 stack
+comprising MTP3b on top of SAAL-NNI.  In this domain no other alternatives are standardized in
+release 99.
+
+In the packet switched domain the UMTS standard shall allow operators to choose one our of two
+standardized protocol suites for transport of SCCP messages.
+
+@enumerate
+@item Broadband SS7 stack comprising MTP3b on top of SAAL-NNI.
+@item IETF/Sigtran CTP protocol suite for MTP3 users with adaptation to SCCP.  The protocol suite
+shall fully comply with IETF standards developed by the Sigtran working group.  No UMTS specific
+adaptation shall be standardized below the SCCP protocol.
+@end enumerate
+
+See aslo TS 29.202 which provides the following signalling bearers:
+
+@c @figure{sigbearer,A-4,TS 29.2002 Signalling Bearers}
+
+@node Gb Interface
+@subsection Gb Interface
+@cindex Gb Interface
+
+The @strong{Gb} interface connects the 2G SGSN to the BSS.
+
+@c @figure{gb,A-5,Gb Interface}
+
+GPRS Mobility Management and Session Management (GMM/SM): This protocol supports mobility management
+functionality such as GPRS attach, GPRS detach, security, routing area update, location update, PDP
+context activation, and PDP context deactivation, as described in "Mobility Management
+Functionality" and "PDP Context Activation, Modification, Deactivation, and Preservation Functions"
+of TS 23.060.
+
+Radio Link Control (RLC): The RLC protocol offers logical link control over the radio interface for
+the transmission of higher layer signalling messages and SMS.  RLC is defined in 3GPP TS 25.322.
+RLC for GSM is described in GSM 04.60.
+
+Logical Link Control (LLC):-  LLC is defined in GSM 04.64.
+
+BSS GPRS Protocol (BSSGP):- BSSGP is defined in GSM 08.18.
+
+Network Service:-  The Network Service is defined in GSM 08.16.
+
+The Network Service consists of a network services protocol over a Frame Relay (FRF 1.1) Sub-Network
+Service Protocol.
+
+L1 of the Gb interface is defined in GSM 08.14 and consists of one or more of the following
+FRF 1.1 supporting interfaces:
+
+@enumerate
+@item ANSI T1.403
+@item V.35, physical circuit and DTE/DCE interface
+@item G.703
+@item G.704
+@item X.21
+@item ANSI-530-A-1992
+@item HSSI
+@end enumerate
+
+The Gb interface may be multiplexed with the A interface on the same E1 (2048 kbit/s), or T1 (1544
+Kbit/s) digital path.  In the case of E1 interface, CCITT Recommendation G.704 shall be applied
+and 3GPP TS 08.04 as appropriate, and in case of T1 interface ANSI Recommendation T1.403 shall be
+applied and 3GPP TS 08.04 as appropriate.  In the case where multiple 64 kbit/s channels are used on
+an E1 (2048 kbit/s) digital patch on the Gb interface, it is recommended to aggregate them into one
+nx64 kbit/s channel, see CCITT Recommendation G.704, clause 5 and included sub-clauses.  In case
+where multiple 64 kbit/s channels are used on a T1 (1544 kbit/s) digital path on the Gb interface,
+it is recommended to aggregate them into nx64kbit/s (where 2<=n<=24) channel, see Bellcore
+TR-NWT-1203.  This approach optimizes the use of the available bandwidth by taking advantage of the
+statistical multiplexing at the upper layer.  However, this approach requires that no slipping
+occurs between individual 64 kbit/s channels e.g. when passing through intermediate equipment
+between BSS and SGSN.
+
+The physical channels on the Gb interface shall be permanently reserved by means of administrative
+procedures.
+
+@node Gd Interface
+@subsection Gd Interface
+@cindex Gd Interface
+
+The @strong{Gd} interface connects the 3G SGSN to the SMS-GMSC or SMS-IWMSC.
+
+@c @figure{gd,A-6,Gd Interface}
+
+Mobile Application Part (MAP):-  This protocol supports signalling between SGSN and SMS-GMSC or
+SMS-IWMSC, as described in clause "Point-to-point Short Message Service" of 3GPP TS 23.060.
+
+@node Ge Interface
+@subsection Ge Interface
+@cindex Ge Interface
+
+The @strong{Ge} interface connects the 3G SGSN to the Camel GSM SCF.
+
+@c @figure{ge,A-7,Ge Interface}
+
+@node Gf Interface
+@subsection Gf Interface
+@cindex Gf Interface
+
+The @strong{Gf} interface connects the 2G SGSN to the EIR.
+
+@c @figure{gf,A-8,Gg Interface}
+
+Mobile Application Part (MAP):-  This protocol supports signalling between the SGSN and the EIR, as
+described in "Identify Check" of 3GPP TS 23.060.
+
+@node Gn Interface
+@subsection Gn Interface
+@cindex Gn Interface
+
+The @strong{Gn} interface connects the 3G SGSN to the local GGSN.
+
+@c @figure{gn,A-9,Gn Interface}
+
+GPRS Tunnelling Protocol for the control plane (GTP-C):-  This protocol tunnels signalling messages
+between SGSNs and GGSNs (Gn), and between SGSNs in the backbone network (Gp).
+
+User Datagram Protocol (UDP):-  This protocol transfers signalling messages between GSNs.  UDP is
+defined in RFC 768.
+
+@node Gp Interface
+@subsection Gp Interface
+@cindex Gp Interface
+
+The @strong{Gp} interface connects the 3G SGSN to the foreign GGSN.
+
+@c @figure{gp,A-10,Gp Interface}
+
+GPRS Tunnelling Protocol for the control plane (GTP-C):-  This protocol tunnels signalling messages
+between SGSNs and GGSNs (Gn), and between SGSNs in the backbone network (Gp).
+
+User Datagram Protocol (UDP):-  This protocol transfers signalling messages between GSNs.  UDP is
+defined in RFC 768.
+
+@node Gs Interface
+@subsection Gs Interface
+@cindex Gs Interface
+
+The @strong{Gs} interface connects the 3G SGSN to the MSC/VLR.
+
+@c @figure{gs,A-11,Gs Interface}
+
+Base Station System Application Part + (BSSAP+):-  A subset of BSSAP procedures supports signalling
+between the SGSN and MSC/VLR, as described in "Mobility Management Functionality" in 3GPP TS 23.060
+and in 3GPP TS 29.018.  The requirements for the lower layers are specified in 3GPP TS 29.016.
+
+Additional information about supported signalling bearers is provided in 3GPP TS 29.202 as follows:
+
+@c @figure{sigbearer,A-12,TS 29.202 Signalling Bearers}
+
+@node Optional Protocol Support
+@appendix Optional Protocol Support
+
+@menu
+* Other Protocol Components
+@end menu
+
+@node Other Protocol Components
+@section Other Protocol Components
+@cindex Other protocol components
+
+@menu
+* SCCP User Adaptation Layer (SUA) Driver::
+* MTP Level 3 Broadband (MTP3b) Module::
+* Service Specific Connection Oriented Protocol (SSCOP) Driver::
+* MTP Level 2 User Adaptation Layer (M2UA) Driver::
+@end menu
+
+@node SCCP User Adaptation Layer (SUA) Driver
+@subsection SCCP User Adaptation Layer (SUA) Driver
+@cindex SCCP User Adaptation Layer (SUA) Driver
+@cindex SUA
+
+The SUA driver provides the HLR with the ability to act as an SUA AS (Application Server) in
+conjunction with an SUA SG (Signalling Gateway).  In this project, the SG function is performed by
+existing lab equipment.  The SUA driver accepts the transport of the SCCP to SCCP-User interface
+from the SG to the HLR.  The SUA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the
+transport services for exporting the SCCP-User interface.  The SUA driver provides the same
+interfaces to its users as the OpenSS7 SCCP.
+
+The SUA driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
+
+@node MTP Level 3 Broadband (MTP3b) Module
+@subsection MTP Level 3 Broadband (MTP3b) Module
+@cindex MTP Level 3 Broadband (MTP3b) Module
+@cindex MTP3b
+
+@node Service Specific Connection Oriented Protocol (SSCOP) Driver
+@subsection Service Specific Connection Oriented Protocol (SSCOP) Driver
+@cindex Service Specific Connection Oriented Protocol (SSCOP) Driver
+@cindex SSCOP
+
+@node MTP Level 2 User Adaptation Layer (M2UA) Driver
+@subsection MTP Level 2 User Adaptation Layer (M2UA) Driver
+@cindex MTP Level 2 User Adaptation Layer (M2UA) Driver
+@cindex M2UA
+
+The M2UA driver provides the HLR with the ability to act as an M2UA AS (Application Server) in
+conjunction with an M2UA SG (Signalling Gateway). In this project, the SG function is performed by
+existing lab equipment.  The M2UA driver accepts the transport of the SL to SL-User interface from
+the SG to the HLR.  The M2UA driver links
+@cindex SCTP
+SCTP driver streams underneath it to provide the transport
+services for exporting the SL-User interface.  The M2UA driver provides the same interface to its
+users as the OpenSS7 SL module.
+
+@node Optional Software Support
+@appendix Optional Software Support
+
+@menu
+* Operating System Options::
+* STREAMS Options::
+@end menu
+
+@node Operating System Options
+@section Operating System Options
+@cindex Operating system options
+
+OpenSS7 components and applications support the following additional Linux Distributions:
+
+@table @emph
+@item RedHat Linux 7.2 (rh7.2)
+@cindex RedHat
+@item RedHat Linux 9 (rh9)
+@cindex RedHat
+@item RedHat Linux EL3 (el3)
+@cindex RedHat
+@item Fedora Core 1 (fc1)
+@cindex Fedora
+@item Debian (Woody)
+@cindex Debian
+@item SuSE 8.0
+@cindex SuSE
+@end table
+
+@node STREAMS Options
+@section STREAMS Options
+@cindex STREAMS options
+
+@menu
+* Linux Fast-STREAMS (LfS)::
+@end menu
+
+@node Linux Fast-STREAMS (LfS)
+@subsection Linux Fast-STREAMS (LfS)
+@cindex Linux Fast-STREAMS (LfS)
+
+@dfn{Linux Fast-STREAMS (LfS)} is a dual licensed original work of OpenSS7 Corporation.  It was
+designed an implemented as a directly replacement for LiS (@pxref{Linux STREAMS (LiS)}) for use with
+OpenSS7 stack releases.  This complete reimplementation of an SVR 4.2 ES/MP compatible @dfn{STREAMS}
+facility exhibits simplified debugging and management, greatly increased performance, smaller memory
+footprint, wider compatibility.  Only alpha and beta release of @dfn{Linux Fast-STREAMS} are
+currently available. Current recommendations are to use the latest LiS (@pxref{Linux STREAMS (LiS)})
+release in preference to LfS until such time as LfS has been deemed production stable.  Because all
+OpenSS7 software beginning with the 0.9.2-1 releases are source level compatible with both
+@dfn{Linux STREAMS} (LiS) and @dfn{Linux Fast-STREAMS} (LfS), a later migration will be smooth.
+Once LfS has been deemed stable, LiS will no longer be supported.
+
+Depending upon timing of the High Performance GSM/UMTS GPRS HLR releases with respect to LfS
+releases, the High Performance GSM/UMTS GPRS HLR is released with the latest stable OpenSS7
+release of either LiS or LfS.
+
+@node Optional Hardware Support
+@appendix Optional Hardware Support
+
+@menu
+* Other Interface Devices::
+@end menu
+
+@node Other Interface Devices
+@section Other Interface Devices
+@cindex Other interface devices
+
+This section provides information on additional interface cards available for use with the OpenSS7
+SS7, SIGTRAN, ISDN and VoIP stacks:
+
+@menu
+* ACB56::
+* CPC 388::
+* CPC 396::
+* PCA 200E::
+* BRI::
+@end menu
+
+@iftex
+@table @asis
+
+@item @ref{ACB56}
+An EISA V.35 card.
+
+@item @ref{CPC 388}
+A CompactPCI Octal E1/T1/J1 card with embedded Linux.
+
+@item @ref{CPC 396}
+A CompactPCI Dual T3 card with embedded Linux.
+
+@item @ref{PCA 200E}
+A 155 MHz ATM card.
+
+@item @ref{BRI}
+An ISDN BRI card.
+
+@end table
+@end iftex
+
+@node ACB56
+@subsection ACB56
+@cindex ACB56
+
+The ACB56 cards are single V.35 56/64kbps synchronous cards manufactured by
+SeaLevel Systems and distributed by ICS.
+@figref{A-13} shows a picture of an ACB56 card.
+
+@c @figure{acb56,A-13,ACB56}
+
+@subsubheading Driver
+
+The driver for the ACB56 card provides, CH, SDL or SDT access to the card.  The CH or SDL driver
+places the Zilog part into transparent mode and passes octets directly off the line to the channel
+or signalling data link driver.  The SDT driver places the Zilog part into HDLC mode and performs
+SS7 HDLC using the Zilog SCC.  The SDT driver performs better, of course, than the CH or SDL
+drivers, however, the Zilog SCC HDLC is incapable of performing some SS7 functions that are provided
+by the OpenSS7 SDT (SS7-HDLC) module for the CH or SDL drivers.
+
+@subsubheading Features
+
+Following are some features of the ACB56 card:
+@itemize
+@item 1 x V.35 56kbps or 64 kbps synchronous port on DB-25 connector.
+@item DB-25 to N-type cable available.
+@item 56 kbps or 64kbps DTE mode.
+@item 56 kbps DCE mode.
+@item Based on Zilog 80585 Serial Communications Controller (SCC).
+@item ISA Bus.
+@item Supports dual-channel ISA DMA.
+@item Also supports RS-232C although not useful for SS7.
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the ACB56 card:
+@itemize
+@item Provides V.35 interface where necessary.
+@end itemize
+
+The ACB56 card has few advantages.  It only provides low-cost V.35 interface where absolutely
+necessary.  Any other V.35 capable card might be a better choice.
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the ACB56 card:
+@itemize
+@item ISA bus.
+@item Low density.
+@item Limited number of cards per host due to ISA IRQ and DMA limitations.
+@item Needs external CSU/DSU.
+@item Does not support TDM voice channels.
+@end itemize
+
+Due to its disadvantages, another V.35 card (PCI based, higher density, integrated CSU/DSU) should
+be considered where V.35 interface is completely necessary.
+
+The High Performance GSM/UMTS GPRS HLR does not have a requirement for V.35 interface and this card
+is not used on the deployment platform.  If V.35 interface becomes a requirement at a later
+date, a different card will be selected.  The selected card will have a higher density, PCI with PCI
+DMA and bus-mastering, integrated CSU/DSU, and other features absent from the ACB56 card.
+
+@node CPC 388
+@subsection CPC 388
+@cindex CPC 388
+
+The CPC 388 cards are 8-span E1/T1/J1 cards with dual-port Ethernet in a CompactPCI PCMIG 2.15 card
+manufactured by @uref{http://www.pti.com/, Performance Technologies}.
+@figref{A-14} shows a picture of an CPC 388 card.
+
+@c @figure{cpc388,A-14,CPC 388}
+
+The CPC 388 cards have a high level of signalling performance because they have an on-board
+PowerQUICC II processor running an embedded Linux operating system (NexusWare based on YellowDog).
+The embedded processor performs Layer 2 (HDLC) and even some Layer 3 functions and higher functions.
+These cards can run as stand-alone hosts or can transfer to a host SBC over the PCMIG 2.15 dual
+Ethernet bus or CompactPCI bus.  OpenSS7 @dfn{STREAMS} drivers and modules, as well as complete
+applications can be run directly on the card.
+
+The CPC 388 cards have an integral H.110 bus and TDM switch that communicate over the PCMIG 2.15 TDM
+bus.  This provides for non-blocking switching of up to 4096 TDM channels across the backplane.  In
+E1 mode (and with an E1 RTM), these cards provide 248 channels of SS7, ISDN or voice.  In T1 or J1
+mode, these cards each provide 192 channels of SS7, ISDN or voice.
+
+The CPC 388 cards accept the same software as the PCI 384 cards (and dual T3 CPC 396 cards,
+@cindex CPC 396
+@pxref{CPC 396}) providing a carrier-grade evolution path from m the PCI 384.
+
+@subsubheading Driver
+
+@itemize @bullet
+@item Provides @dfn{STREAMS} Media Gateway (MG) Interface that controls onboard TDM switch and H.110 bus.
+@item Provides Soft-HDLC for Q.703 and
+@cindex Q.703 Annex B
+Q.703 Annex B operation.
+@item Provides G.804/AF-PHY-00016 ATM/PDH E1 or T1 SAAL.
+@end itemize
+
+@subsubheading Features
+
+Following are the features of the CPC 388 cards:
+
+@itemize @bullet
+@item Octal E1/T1/J1 (requires appropriate RTM).
+@item Dual E1/T1/J1 monitoring ports.
+@item Dual QuadFALC framers.
+@item Mitel/Zarlink MT 20098 H.110 switch.
+@item Dual FCC 10/100baseT Ethernet Ports (RTM RJ-45 or J5 connector).
+@item Tundra PowerSpan CompactPCI interface.
+@item 200MHz Motorola PowerQUICC II (MPC8260) processor.
+@item 256 Mb SDRAM.
+@item 128 Mb Flash.
+@item Runs NexusWare embedded Linux operating system.
+@item 2 serial ports.
+@item Individual E1/T1/J1 status LEDs on front panel.
+@item Blue ejector LED.
+@item Hot swappable (per PCMIG 2.15).
+@item NEBS Compliant (lights on front, wires on back)
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the CPC 388 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the CPC 388 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@node CPC 396
+@subsection CPC 396
+@cindex CPC 396
+
+The CPC 396 cards are dual T3 cards with dual-port Ethernet in a CompactPCI PCMIG 2.15 card
+manufactured by @uref{http://www.pti.com/, Performance Technologies}.
+@figref{A-15} shows a picture of an CPC 396 card.
+
+@c @figure{cpc396,A-15,CPC 396}
+
+@subsubheading Driver
+
+@subsubheading Features
+
+Following are the features of the CPC 396 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the CPC 396 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the CPC 396 cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@node PCA 200E
+@subsection PCA 200E
+@cindex PCA 200E
+
+The PCA 200E card is a 155MHz ATM card manufactured by Marconi (formerly FORE).
+@figref{A-16} shows a picture of an PCA 200E card.
+
+@c @figure{pca200e,A-16,PCA 200E}
+
+The PCA 200E cards have a good level of signalling performance because they have an on-board 25MHz
+i960 Intel RISC processor performing cell processing using buffer rings in the same manner as an
+Ethernet controller.
+
+@subsubheading Driver
+
+@subsubheading Features
+
+Following are the features of the PCA 200E cards:
+
+@itemize @bullet
+@item 155 MHz ATM, ST/SC SM/MM and RJ-45 UTP 5
+@item AAL1, AAL2, AAL3 and AAL5 modes.
+@item Integrated 25 MHz i960 RISC cell processor.
+@item Enhance SAR Processor (ESP) ASIC
+@item Special-purpose hardware for AAL5 and AAL3/4, HEC, and CRC calculations.
+@item Dual-ported RAM and Buffer Ring technique similar to Ethernet Controller.
+@item Serial communications emulation.
+@item Supports ABR
+@item ATM cell processing per ANSI T1S1.5/92-002R3, ITU I.361, ATM Form UNI v3.0, 3.1, 4.0
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the PCA 200E cards:
+
+@itemize @bullet
+@item Inexpensive (about $200 a card).
+@item Supports MTP3b.
+@item Can support 3GPP UMTS Iu User and Control Plane over PVCs.
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the PCA 200E cards:
+
+@itemize @bullet
+@item Does not support traditional SS7 links.
+@item Requires external ATM switch or point-to-point ATM connection.
+@end itemize
+
+@node BRI
+@subsection BRI
+@cindex BRI
+
+A BRI card.
+
+@c @figure{bri,A-17,BRI}
+
+@subsubheading Driver
+
+@subsubheading Features
+
+Following are the features of the BRI cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Advantages
+
+Following are the advantages of the BRI cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@subsubheading Disadvantages
+
+Following are the disadvantages of the BRI cards:
+
+@itemize @bullet
+@item
+@item
+@item
+@end itemize
+
+@node Programmatic Interfaces
+@appendix Programmatic Interfaces
+
+@menu
+* Transaction Component Interface::
+* Mobile Application Part Interface::
+@end menu
+
+To support a framework for providing transaction products in the UNIX system, an effort is underway
+to define service interfaces to map to strategic levels of the Signalling System Number 7 (SS7)
+model.  These service interfaces hide implementation details of a particular service from the
+consumer of the service.  This enables system programmers to develop software independent of the
+particular protocol that provides a specific service.  The interfaces being specified for UNIX
+System V are defined within the @dfn{STREAMS} environment.  This document specifies a kernel-level
+interface that supports the services of the Transaction Capabilities Application Part for Operation
+Class 1, 2, 3 and 4 services.
+
+This specification applies to @dfn{System V Release 4.2 ES/MP STREAMS}.
+
+@node Transaction Component Interface
+@section  Transaction Component Interface
+@cindex  Transaction component interface
+
+@menu
+* TC Interface Local Management Primitives::
+* TC Interface Dialogue Handling Primitives::
+* TC Interface Component Handling Primitives::
+@end menu
+
+The transaction component interface defines a message interface to a transaction provider
+implemented under @dfn{STREAMS}.  @footnote{It is assumed that the reader of this document is familiar
+with the concept @dfn{STREAMS}.} A user communicates to a transport provider via a full duplex path
+known as a @emph{stream} (see @emph{Figure F-1}).  This @emph{stream} provides a mechanism in which
+messages may be passed to the transaction provider from the transaction user and visa versa.
+
+@cartouche
+@center @emph{Figure F-1 - Example of a stream from a user to a transaction provider}
+@end cartouche
+
+The @dfn{STREAMS} messages that are used to communicate transaction service primitives between the
+transaction user and the transaction provider may have one of the following formats:
+
+@enumerate
+@item A @code{M_PROTO} message block followed by zero or more @code{M_DATA} message blocks.  The
+@code{M_PROTO} message block contains the type of transaction service primitive and all the relevant
+arguments associated with the primitive.  The @code{M_DATA} blocks contain transaction user data
+associated with the transaction service primitive.
+@end enumerate
+
+@subsection Common Transaction Primitives
+
+The following transaction primitives are common to all operation classes:
+
+@subsubsection User-Originated Primitives
+
+The following describes the format of the transaction primitives which are generated by the
+transaction user.
+
+@unnumberedsubsubsec @code{TC_INFO_REQ} - get transaction protocol parameter sizes
+
+This primitive requests the transaction provider to return sizes of all relevant protocol
+parameters, plus the current state of the provider.@footnote{The @code{TC_INFO_REQ} and
+@code{TC_INFO_ACK} primitives have no effect on the state of the transaction provider and do not
+appear in state tables}.  The format of the message is one @code{M_PCPROTO} message block.  The
+format of the @code{M_PCPROTO} message block is as follows:
+
+@smallexample
+struct TC_info_req @{
+        long PRIM_type;             /* always TC_INFO_REQ */
+@};
+@end smallexample
+
+
+
+@node TCI Model
+@subsection TCI Model
+@cindex TCI Model
+
+@node TC Interface Local Management Primitives
+@subsection TC Interface Local Management Primitives
+@cindex TC Interface Local Management Primitives
+
+The following local management primitives provide local management functions within the
+@dfn{STREAMS} environment that are not standardized (implementation dependent).  Some of the
+functions are informatively described in ITU-T Recommendation Q.771.
+
+Local Management primitives:
+@table @code
+
+@item TC_INFO_REQ, TC_INFO_ACK
+Information request and acknowledgement.  Returns the maximum dialogue SDU size for begin, continue
+and end, the interface SDU size, the maximum address size, maximum options size, service type,
+current state, provider flags and version.
+
+@item TC_OPTMGMT_REQ, TC_OPTMGMT_ACK
+Options management request and acknowledgement.  Negotiates options according to management flags.
+
+@item TC_BIND_REQ, TC_BIND_ACK
+Bind to transport address request and acknowledgement.  Contains the transport address for the bind
+and the maximum negotiated number of outstanding transactions.
+
+@item TC_SUBS_BIND_REQ, TC_SUBS_BIND_ACK
+Subsequent bind to transport address request and acknowledgement.
+
+@item TC_SUBS_UNBIND_REQ
+Subsequent unbind from transport address request.
+
+@item TC_UNBIND_REQ
+Unbind from transport address request.
+
+@item TC_OK_ACK
+Success acknowledgement.  Returns the primitive that was successful.
+
+@item TC_ERROR_ACK
+Error acknowledgement.  Returns the primitive that was unsuccessful, the error code (transport or
+UNIX), dialogue identifier and component identifier.
+
+@end table
+
+@node TC Interface Dialogue Handling Primitives
+@subsection TC Interface Dialogue Handling Primitives
+@cindex TC Interface Dialogue Handling Primitives
+
+The following dialogue handling primitives correspond to the primitives described in ITU-T
+Recommendation Q.771.
+
+Dialogue Handling primitives:
+@table @code
+
+@item TC_UNI_REQ, TC_UNI_IND
+Unidirectional dialogue request and indication.  Includes the source transport address, the
+destination transport address, associated negotiated options, dialogue identifier and component
+flags.
+
+@item TC_BEGIN_REQ, TC_BEGIN_IND, TC_BEGIN_RES, TC_BEGIN_CON
+Begin dialogue request, indication, response and confirmation.  Includes the source transport
+address, the destination transport address, associated negotiated options, dialogue identifier and
+component flags.
+
+@item TC_CONT_REQ, TC_CONT_IND
+Continue dialogue request and indication.  Includes the associated negotiated options, dialogue
+identifier and component flags.
+
+@item TC_END_REQ, TC_END_IND
+End dialogue request and indication.  Includes the associated options, dialogue identifier,
+component flags and termination scenario.
+
+@item TC_ABORT_REQ, TC_ABORT_IND
+Abort dialogue request and indication.  Includes the associated negotiated options, dialogue
+identifier, abort reason and originator.
+
+@item TC_NOTICE_IND
+Notice indication.  Includes the report cause.
+
+@end table
+
+@node TC Interface Component Handling Primitives
+@subsection TC Interface Component Handling Primitives
+@cindex TC Interface Component Handling Primitives
+
+The following component handling primitives correspond to the primitives described in ITU-T
+Recommendation Q.771.
+
+Component Handling primitives:
+@table @code
+
+@item TC_INVOKE_REQ, TC_INVOKE_IND
+Invoke operation request and indication.
+Includes the dialogue identifier, application protocol class, invoke identifier, linked invoke
+identifier, invoke operation, segmentation flag, and requested timeout.
+
+@item TC_RESULT_REQ, TC_RESULT_IND
+Return result to operation request and indication.
+Includes the dialogue identifier, invoke identifier, invoke operation, and segmentation flag.
+
+@item TC_ERROR_REQ, TC_ERROR_IND
+Error of operation request and indication.
+Includes the dialogue identifier, invoke identifier, error code and segmentation flag.
+
+@item TC_REJECT_REQ, TC_REJECT_IND
+Reject operation request and indication.
+Includes the dialogue identifier, invoke identifier, originator, and problem code.
+
+@item TC_CANCEL_REQ, TC_CANCEL_IND
+Cancel component request and indication.
+Includes the dialogue identifier and invoke identifier.
+@end table
+
+@node Mobile Application Part Interface
+@section Mobile Application Part Interface
+@cindex Mobile application part interface
+
+@menu
+* MAP Interface Common Primitives::
+* MAP Interface User-Specific Primitives::
+@end menu
+
+@node MAP Interface Common Primitives
+@subsection MAP Interface Common Primitives
+@cindex MAP Interface Common Primitives
+
+For a mapping of Common MAP primitives onto TC primitives, see 3GPP TS 29.002 Table 7.5/1 and Table
+7.5/2.
+
+@table @code
+
+@item MAP_OPEN_REQ, MAP_OPEN_IND, MAP_OPEN_RES, MAP_OPEN_CON
+Opens a MAP dialogue.
+Contains application context name, destination address and reference; originating address and
+reference; specific information, responding address, result, refusal-reason, provider error.
+
+@item MAP_DELIMITER
+Delimits a sequence of components in a MAP dialogue.
+
+@item MAP_CLOSE_REQ, MAP_CLOSE_IND
+Closes a MAP dialogue.
+Contains release method and specific information.
+
+@item MAP_ABORT_REQ, MAP_ABORT_IND
+Aborts a MAP dialogue.
+Include user reason, diagnostic information and specific information; or, provider reason and
+source.
+
+@item MAP_NOTICE
+Protocol problem notice.
+Includes the problem diagnostic.
+
+@item MAP_SXPORT_REQ, MAP_SXPORT_IND, MAP_SXPORT_RES, MAP_SXPORT_CON
+MAP secure transport.
+Includes operation class, security header, protected payload, user error or provider error.
+
+@end table
+
+@node MAP Interface User-Specific Primitives
+@subsection MAP Interface User-Specific Primitives
+@cindex MAP Interface User-Specific Primitives
+
+For a mapping of User-Specific primitives onto TC primitives, see 3GPP TS 29.002 Table 7.5/3 and
+Table 7.5/4.
+
+@node Platform Sizing
+@appendix Platform Sizing
+@cindex Platform sizing
+
+@menu
+* HLR Sizing::
+* MAP/TCAP Sizing::
+* SCCP Sizing::
+* MTP Sizing::
+* M3UA Sizing::
+* SCTP Sizing::
+* IP/Ethernet Sizing::
+@end menu
+
+@tabref{T-1} below provides a traffic model for sizing the HLR application.
+
+@c @tabfig{hlr_traf,T-1,Low Mobility Traffic Model --- Peak}
+
+@node HLR Sizing
+@section HLR Sizing
+@cindex HLR Sizing
+
+Phase 1 imposes HLR sizing requirements as follows:
+
+@itemize ---
+
+@item @dfn{Number of Subscriber Records}
+
+To support the HLR application, the number of subscriber records supported is 15 million.
+
+@item @dfn{Number of Subscriber Templates}
+
+To support the HLR application, subscriber templates will be used where possible.  There is no hard
+limit on the number of subscriber templates (up to the number of subscriber records).  The expected
+number of subscriber templates provided is 1024.
+
+@item @dfn{Amount of Physical Memory}
+
+To support in-core access to the entire subscriber database, 2 Gbytes of physical memory is
+provided.
+
+@item @dfn{Event Rate}
+
+From @tabref{T-1} with 15 million subscribers, the event rate provided is 3855 events per second.
+The in-core database will provide a transaction rate of 4000 transactions per second.
+
+@end itemize
+
+Phase 2 does not add any additional HLR sizing requirements.
+
+
+@node MAP/TCAP Sizing
+@section MAP/TCAP Sizing
+@cindex MAP/TCAP Sizing
+
+Phase 1 imposes MAP/TCAP sizing requirements as follows:
+
+@itemize ---
+
+@item @dfn{Transaction Rate}
+
+From @tabref{T-1} with 15 million subscribers, the MAP/TCAP transaction rate provided is 10,000
+MAP/TCAP transactions per second.
+
+@item @dfn{Number of Simultaneous open Transactions}
+
+Although the OpenSS7 TCAP component does not have a hard limit on the number of open TCP
+transactions, the component can be optimized for an expected maximum number of open transactions.
+To meet the expected transaction rate and MAP loading, the TCAP component is optimized for a maximum
+of 4096 open transactions.  If open transactions exceed 4096, performance is degraded.
+Open transactions fewer than 4096 wil have no impact on the platform.
+
+@end itemize
+
+
+@node SCCP Sizing
+@section SCCP Sizing
+@cindex SCCP Sizing
+
+Phase 1 imposes SCCP sizing requirements as follows:
+
+@itemize ---
+
+@item @dfn{Number of Protocol Variants}
+
+The OpenSS7 SCCP component provides simultaneous support for ITU-T, ETSI and ANSI protocol variants
+in a single protocol module.  To support the Phase 1 HLR application, three protocol variants will
+be provided:
+@enumerate
+@item ITU-T SCCP Q.713 1988/93
+@item ETSI SCCP Q.713 1988/93
+@item ANSI T1.112/1996
+@end enumerate
+
+@item @dfn{SCCP Routing}
+
+Although the OpenSS7 SCCP component supports a wide range of routing, including local GTT, to meet
+the HLR application requirements, routing will be performed on PC only.
+
+@item @dfn{Number of Local Subsystems}
+
+Although there is no hard limit on the number of local subsystems that can be supported by
+the OpenSS7 SCCP protocol component,
+to support the HLR application, two local subsystems are provided:
+@enumerate
+@item One HLR subsystem is provided associated with an ITU-T/ETSI point code in the ITU-T/ETSI
+domain.
+@item Another HLR subsystem is provided associated with an ANSI point code in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Remote Signalling Points}
+
+Although there is no hard limit on the number of remote signalling points that can be supported by
+the OpenSS7 SCCP protocol component,
+to support the HLR application, six (6) remote signalling points are provided:
+@enumerate
+@item One (1) remote signalling point codes for one SGSN in the ITU-T/ETSI domain.
+@item One (1) remote signalling point codes for one SGSN in the ANSI domain.
+@item One (1) remote signalling point codes for another SGSN in the ITU-T/ETSI domain.
+@item One (1) remote signalling point codes for another SGSN in the ANSI domain.
+@item One (1) remote signalling point codes for a SMS-IWMSC/GMSC platform in the ITU-T/ETSI domain.
+@item One (1) remote signalling point codes for a SMS-IWMSC/GMSC platform in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Remote Subsystems}
+
+Although there is no hard limit on the number of remote subsystems that can be supported by
+the OpenSS7 SCCP protocol component,
+to support the HLR application, six (6) remote subsystems are provided:
+@enumerate
+@item One (1) remote SGSN subsystems for one SGSN in the ITU-T/ETSI domain.
+@item One (1) remote SGSN subsystems for one SGSN in the ANSI domain.
+@item One (1) remote SGSN subsystems for another SGSN in the ITU-T/ETSI domain.
+@item One (1) remote SGSN subsystems for another SGSN in the ANSI domain.
+@item One (1) remote MSC subsystems for a SMS-IWMSC/GMSC platform in the ITU-T/ETSI domain.
+@item One (1) remote MSC subsystems for a SMS-IWMSC/GMSC platform in the ANSI domain.
+@end enumerate
+
+@end itemize
+
+Phase 2 does not add any additional MAP/TCAP sizing requirements.
+
+
+@node MTP Sizing
+@section MTP Sizing
+@cindex MTP Sizing
+
+Phase 1 imposes MTP Level 3 sizing requirements as follows:
+
+@itemize ---
+
+@item @dfn{Number of Protocol Variants}
+
+The OpenSS7 MTP component provides simutaneous support for ITU-T, ETSI and ANSI protocol variants
+in a single protocol module.  To support the Phase 1 HLR application, three protocol variants will
+be provided:
+@enumerate
+@item ITU-T MTP Q.703/Q.704 1988/93
+@item ETSI MTP Q.703/Q.704 1988/93
+@item ANSI MTP T1.111/1996
+@end enumerate
+
+@item @dfn{Number of Signalling Points}
+
+Although there is no hard limit on the number of local signalling points that can be supported by
+the OpenSS7 MTP protocol component,
+to support the HLR application, two (2) local signalling points are provided:
+@enumerate
+@item One local signalling point in the ITU-T/ETSI domain.
+@item One local signalling point in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Point Codes}
+
+Although there is no hard limit on the number of signalling point codes per local signalling point
+that can be supported by the OpenSS7 MTP protocol component,
+to support the HLR application, two (2) signalling point codes are provided:
+@enumerate
+@item One signalling point code in the ITU-T/ETSI domain.
+@item One signalling point code in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Route Sets}
+
+Although there is no hard limit on the number of remote signalling points (routesets) that can be
+supported by the OpenSS7 MTP protocol component,
+to support the HLR application, six (10) routesets are provided:
+@enumerate
+@item One (1) routeset for one SGSN in the ITU-T/ETSI domain.
+@item One (1) routeset for one SGSN in the ANSI domain.
+@item One (1) routeset for another SGSN in the ITU-T/ETSI domain.
+@item One (1) routeset for another SGSN in the ANSI domain.
+@item One (1) routeset for an SMS-IWMSC/GMSC in the ITU-T/ETSI domain.
+@item One (1) routeset for an SMS-IWMSC/GMSC in the ANSI domain.
+@item Two (2) routesets, one for each mated pair of STPs in the ITU-T/ETSI domain.
+@item Two (2) routesets, one for each mated pair of STPs in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Signalling Link Sets}
+
+Although there is no hard limit on the number of signalling link sets that can be supported by the
+OpenSS78 MTP protocol component,
+to support the HLR application, two (2) combined linksets for a total of four (4) linksets are
+provided:
+@enumerate
+@item One (1) combined A-linkset or two (2) A-linksets, one for each mated pair of STPs in the
+ITU-T/ETSI domain.
+@item One (1) combined A-linkset or two (2) A-linksets, one for each mated pair of STPs in the
+ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Signalling Links}
+
+@tabref{T-1} provides a traffic model for the required number of signalling links.
+Worst case traffic at 15 million subscribers is as follows:
+375 octets per subscriber per hour, or 12.5 Mbps of signalling links.  This will require 195 low
+speed signalling links, or 6.3 Q.703 Annex B high-speed signalling links.
+
+To support the HLR application, signalling links will be provided as follows:
+@itemize --
+@item Eight high-speed (2.048 Mbps) signalling links (E1), alternately in the ITU-T/ETSI domain or
+in the ANSI domain.
+@item Because the number of low-speed signalling links would far exceed the ANSI maximum of 32,
+low-speed signalling links cannot be used for 15 million subscriber tests.
+@end itemize
+
+@item @dfn{Numebr of Interface Cards}
+
+To support the SS7 signalling links will require:
+@itemize --
+@item Two E400P-SS7 card; or,
+@item Two TE410-SS7 card; or,
+@item Two A104c card; or,
+@item Two PCI 384 card.
+@end itemize
+
+@end itemize
+
+Phase 2 imposes SCCP sizing requirements as follows:
+
+@itemize ---
+
+@item @dfn{SCCP Protocol Variants}
+
+The OpenSS7 SCCP component provides simultaneous support for ITU-T, ETSI and ANSI protocol variants
+in a single protocol module, and is unaffected by whether the underlying message transfer part is
+SS7 MTP Level 3 or M3UA.
+
+@item @dfn{SCCP Routing}
+
+Phase 2 does not impose any new SCCP routing requirements and routing will still be performed on PC
+only.
+
+@item @dfn{Number of Local Subsystems}
+
+To support M3UA, two additional subsystems are provided:
+@enumerate
+@item One HLR subsystem for the ITU-T M3UA ASP.
+@item Another HLR subsystem for the ANSI M3UA ASP.
+@end enumerate
+
+@item @dfn{Number of Remote Signalling Points}
+
+Phase 2 does not impose any new requirements on the number of remote signalling points.
+
+@item @dfn{Number of Remote Subsystems}
+
+Phase 2 does not impose any new requirements on the number of remote signalling subsystems.
+
+@end itemize
+
+
+@node M3UA Sizing
+@section M3UA Sizing
+@cindex M3UA Sizing
+
+Phase 2 adds requirements for M3UA sizing as follows:
+
+@itemize ---
+
+@item @dfn{Number of Protocol Variants}
+
+The OpenSS7 M3UA component provides simultaneous support for ITU-T, ETSI and ANSI protocol variants
+in a single protocol module.  To support the Phase 1 HLR application, three protocol variants will
+be provided:
+@enumerate
+@item ITU-T MTP Q.703/Q.704 1988/93
+@item ETSI MTP Q.703/Q.704 1988/93
+@item ANSI MTP T1.111/1996
+@end enumerate
+
+These protocol variants will be provided in two (2) Network Appearances:
+@enumerate
+@item One network appearance in the ITU-T/ETSI domain.
+@item One network appearance in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Signalling Points}
+
+Phase 2 adds the requirement for two (2) additional signalling points:
+@enumerate
+@item One local signalling point in the ITU-T/ETSI domain.
+@item One local signalling point in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Point Codes}
+
+Phase 2 adds the requirement for two (2) additional signalling point codes:
+@enumerate
+@item One signalling point code in the ITU-T/ETSI domain.
+@item One signalling point code in the ANSI domain.
+@end enumerate
+
+@item @dfn{Number of Application Server Processes}
+
+Provision for 1 Application Server Process.  The HLR will represent a single Application Server
+Process within the M3UA domain.
+
+@item @dfn{Number of Application Servers}
+
+Provision for 2 M3UA Application Servers:
+@enumerate
+@item One M3UA ASP is provisioned on the HLR within an ITU-T/ETSI network appearance requiring
+1 ITU-T SS7 Signalling Point Code.  This ASP utilizes a Routing Key that consists of the ITU-T
+Network Appearance, ITU-T DPC, and SI value for SCCP (3).
+@item Another M3UA ASP is provisioned on the HLR within an ANSI network appearance requiring 1
+ANSI SS7 Signalling Point Code.  This ASP utilizes a Routing Key that consists of the ANSI
+Network Appearance, ANSI DPC, and SI value for SCCP (3).
+@end enumerate
+Each ASP is an Override AS that has only one active ASP within the AS.
+
+@end itemize
+
+
+@node SCTP Sizing
+@section SCTP Sizing
+@cindex SCTP Sizing
+
+Phase 2 adds requirement for SCTP sizing as follows:
+
+@itemize ---
+
+@item @dfn{Number of Associations}
+
+Although there is no hard limit to the number of SCTP associations that can be supported by the
+OpenSS7 SCTP component, to meet the HLR requirements, two (2) associations will be provided:
+@enumerate
+@item One association between the HLR and one SG acting as an STP mated pair.
+@item One association between the HLR and another SG acting as an STP mated pair.
+@end enumerate
+These two associations will each support the two Application Servers listed above under M3UA sizing.
+
+@end itemize
+
+
+@node IP/Ethernet Sizing
+@section IP/Ethernet Sizing
+@cindex IP/Ethernet Sizing
+
+Phase 2 adds requirement for IP/Ethernet sizing as follows:
+
+@itemize ---
+
+@item @dfn{IP Addresses}
+
+Two additional IP addresses and interfaces will be provided  to accommodate SCTP multihomed
+associations.
+
+@item @dfn{Ethernet Interfaces}
+
+Two additional Ethernet 100baseT NICs will be provided to accommodate M3UA traffic.  Because worst
+case traffic is estimated per @tabref{T-1} at 15 millions subscribers at 25 Mbps, these additional
+NICs should accommodate full M3UA traffic.
+
+@item @dfn{Ethernet Switch}
+
+A 100baseT Layer 2 switch is provided to ensure that M3UA/SCTP traffic is not hubbed.
+
+@end itemize
+
+
+@c @include texi/fdl.texi
+
+@node Index
+@unnumbered Index
+@printindex cp
+
+@page
+@shortcontents
+@page
+@contents
+@bye
+
