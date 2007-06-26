@@ -1,12 +1,12 @@
-% -*- texinfo -*- vim: ft=texinfo
+% -*- texinfo -*-
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: voip.texi,v 0.9.2.13 2006/08/26 09:17:01 brian Exp $
+% @(#) $Id: voip.texi,v 0.9.2.14 2007/06/26 18:15:55 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2005  OpenSS7 Corporation <www.openss7.com>
+% Copyright (C) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,13 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:17:01 $ by $Author: brian $
+% Last Modified $Date: 2007/06/26 18:15:55 $ by $Author: brian $
+%
+% =========================================================================
+%
+% $Log: voip.texi,v $
+% Revision 0.9.2.14  2007/06/26 18:15:55  brian
+% - added new documentation
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -63,18 +69,18 @@
 @setfilename voip.info
 @include texi/args.texi
 @set MANUAL_TITLE OpenSS7 VoIP Switch
-@set MANUAL_TYPE PRELIMINARY Application Notes
+@set MANUAL_TYPE High-Level Design and Project Plan
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenSS7
 @direntry
-* VoIP GW: (voip).			OpenSS7 VoIP Switch
+* VoIP Switch: (voip).			OpenSS7 VoIP Switch
 @end direntry
 
 @include texi/args.texi
 @set MANUAL_TITLE OpenSS7 VoIP Switch
-@set MANUAL_TYPE PRELIMINARY Application Notes
+@set MANUAL_TYPE High-Level Design and Project Plan
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
@@ -83,7 +89,7 @@ This file documents the OpenSS7 VoIP Switch
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
 
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -120,7 +126,7 @@ no obligation to provide any feature listed herein.
 
 @include texi/args.texi
 @set MANUAL_TITLE OpenSS7 VoIP Switch
-@set MANUAL_TYPE PRELIMINARY Application Notes
+@set MANUAL_TYPE High-Level Design and Project Plan
 
 @ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -134,12 +140,12 @@ no obligation to provide any feature listed herein.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2005  OpenSS7 Corporation
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
 @subheading Abstract
-This document provides Application Notes for The OpenSS7 VoIP Switch.
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -155,7 +161,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2001-2005  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 @noindent
@@ -216,6 +222,7 @@ no obligation to provide any feature listed herein.
 
 @menu
 * Executive Overview::
+* Executive Summary::
 * Preface::
 * Introduction::
 * Application Architecture::
@@ -240,8 +247,8 @@ no obligation to provide any feature listed herein.
 @node Executive Overview
 @unnumbered Executive Overview
 
-This document provides a Application Notes for the OpenSS7 VoIP Switch.  The initial and primary
-purposes of this equiment is to provide a scalable, carrier-grade platforn for interconnecting VoIP
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.  The initial and primary
+purposes of this equipment is to provide a scalable, carrier-grade platform for interconnecting VoIP
 backbone networks to the PSTN using SS7.
 
 @subsubheading The OpenSS7 Project
@@ -287,8 +294,8 @@ used at a fraction of the cost, and yet outperform, other solutions.  Where carr
 necessary, embedded Linux on standardized PICMG 2.16 NEBS compliant chassis make for a higher cost,
 but more reliable alternative.
 
-For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture},
-and @ref{Optional Hardware Support}.
+For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture}, and
+@ref{Optional Hardware Support}.
 
 @subsubheading Rapid Development
 
@@ -303,9 +310,8 @@ For details on scheduling, see @ref{Logistics}.
 
 The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
 for an ever expanding capability is demonstrated by the additional options available as described in
-@ref{Optional Application Support}, @ref{Optional Network Support},
-@ref{Optional Protocol Support}, @ref{Optional Software Support},
-and @ref{Optional Hardware Support}.
+@ref{Optional Application Support}, @ref{Optional Network Support}, @ref{Optional Protocol Support},
+@ref{Optional Software Support}, and @ref{Optional Hardware Support}.
 
 @subsubheading Conclusions
 
@@ -320,6 +326,52 @@ future deployment applications.
 The OpenSS7 Project
 @end flushright
 
+@node Executive Summary
+@unnumbered Executive Summary
+
+The overarching objective of this project is replacing Excel's existing Veraz Softswitches with an
+opensource replacement on rapid timelines in Excel's existing network.  This is a high-risk
+development project with many development challenges that must be closely managed to be successful.
+The project is suitable for a time-boxing approach.
+
+Under time-boxing, development gaps and deliverables are placed on a matrix with two axes which
+reflect increasing client need and increasing development effort.  Then the deliverables which are
+most needed by the client and which require the least effort are attempted first, followed by lower
+needs and more effort, at last completed with the least need and the most effort.
+
+While intended to be an iterative and refined process, the current time-boxing is as follows:
+
+@enumerate
+
+@item
+Demonstrate M3UA interoperability with the Tekelec Eagle in a redundant configuration.
+
+@item
+Demonstrate interoperability with Excel's LNP LSCP (via the Tekelec Eagles using M3UA) by dipping the
+database for various numbers.
+
+@item
+Demonstrate interoperability with the Veraz, Cisco and Sonus Media Gateways@footnote{Not necessarily
+in that order and not necessarily together.} by performing basic circuit connections, tone
+generation and detection using MEGACO/H.248 binary format over UDP per MSF per
+MSF-IA-MEGACO.003.01-FINAL.
+
+@item
+Demonstrate ISUP interoperability with the DMS-250 by performing Q.784/Telcordia interoperability
+testing.  Perform call connections between DSM-250's utilizing a media gateway.
+
+@item
+Demonstrate ISUP to SIP and SIP to ISUP call handling via a Media Gateway.
+
+@item
+Demonstrate Application Server interaction (call-by-call control) and successful routing operation
+and billing generation.
+
+@item
+Demonstrate high-capacity call handling and redundant fail-over.
+
+@end enumerate
+
 @node Preface
 @unnumbered Preface
 
@@ -329,27 +381,27 @@ The OpenSS7 Project
 @subsection Abstract
 @cindex Document abstract
 
-This document provides Application Notes for the OpenSS7 VoIP Switch.
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
 
 @subsection Objective
 @cindex Document objective
 
-The objective of this document is to provide Application Notes for the development of a low cost,
-high-performance, VoIP Switch using OpenSS7 SS7 stack components, software, and compatible systems
-and hardware.
+The objective of this document is to provide a @value{MANUAL_TYPE} for the development of a low
+cost, high-performance, VoIP Switch using OpenSS7 SS7 stack components, software, and compatible
+systems and hardware.
 
 @subsection Intent
 @cindex Document intent
 
-The intent of this document is to act as Application Notes for an OpenSS7 project for a VoIP Switch.
-As Application Notes, this document discusses components and systems which are not necessarily
-complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any
-software, system or feature listed herein.
+The intent of this document is to act as a @value{MANUAL_TYPE} for a project for an
+@value{MANUAL_TITLE}.  As a @value{MANUAL_TYPE}, this document discusses components and systems
+which are not necessarily complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no
+obligation to provide any software, system or feature listed herein.
 
 @subsection Audience
 @cindex Document audience
 
-This document is intended for a technical audience.  The reaser should be familiar with most most
+This document is intended for a technical audience.  The reader should be familiar with most
 ETSI, ITU-T and ANSI, Signalling System No. 7 recommendations, H.323, H.225, H.245, as well as IETF
 drafts and RFCS for RTP, SIP, SIP-T, MEGACO, MGCP, and SIGTRAN protocols.
 
@@ -367,6 +419,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: voip.texi,v $
+Revision 0.9.2.14  2007/06/26 18:15:55  brian
+- added new documentation
+
 Revision 0.9.2.13  2006/08/26 09:17:01  brian
 - better release file generation
 
@@ -465,7 +520,7 @@ This document is organized as follows:
 @iftex
 @table @emph
 @item @ref{Introduction}
-Introduction to the OpenSS7 VoIP Switch application.
+Introduction to the @value{MANUAL_TITLE} application.
 @item @ref{Application Architecture}
 The application requirements and architecture.
 @item @ref{Network Architecture}
@@ -473,9 +528,9 @@ The network architecture for the application.
 @item @ref{Reference Architecture}
 The reference architecture for the application.
 @item @ref{System Architecture}
-The architecture of the VoIP Switch system.
+The architecture of the @value{MANUAL_TITLE} system.
 @item @ref{Platform Architecture}
-The architecture of the VoIP Switch platform.
+The architecture of the @value{MANUAL_TITLE} platform.
 @item @ref{Protocol Architecture}
 The protocol architecture supporting the application.
 @item @ref{Software Architecture}
@@ -483,7 +538,7 @@ The software architecture supporting the protocol stack and application.
 @item @ref{Hardware Architecture}
 The hardware architecture supporting the protocol stack and application.
 @item @ref{Logistics}
-Project logistics for completion of the VoIP GW application.
+Project logistics for completion of the VoIP Switch application.
 @item @ref{Optional Application Support}
 Additional application support not directly contributing to the current objective.
 @item @ref{Optional Network Support}
@@ -503,18 +558,18 @@ Index of concepts.
 @end table
 @end iftex
 
-
 @node Introduction
 @chapter Introduction
 @cindex Introduction
 
-This document provides Application Notes for an OpenSS7 patform to provide scalable VoIP Switch
-capabilities.  The primary driver for the OpenSS7 VoIP Switch is to provide a system capable of
-interconnecting a VoIP backbone to the PSTN using SS7.  This document provide a high-level designa
-nd proposal for a production system to provide this capability at a number of scale points.
+This document provides a @value{MANUAL_TYPE} for a platform to provide scalable @value{MANUAL_TITLE}
+capabilities.  The primary driver for the @value{MANUAL_TITLE} is to provide a system capable of
+interconnecting a VoIP backbone to the PSTN using SS7.  This document provide a high-level design
+and proposal for a production system to provide this capability at a number of scale points.
 
-The proposal utilizes, where possible, existing OpenSS7 SS7 and VoIP stack components and provides a
-development plan for components that are specific to the OpenSS7 VoIP Switch initial requirements.
+The proposal utilizes, where possible, existing OpenSS7 SS7, SIGTRAN and VoIP stack components and
+provides a development plan for components that are specific to the OpenSS7 VoIP Switch initial
+requirements.
 
 This document discusses the resulting software configuration that will be put in place on the
 production system, the platform configuration for the production system, and a network configuration
@@ -534,40 +589,117 @@ development project.
 @section The OpenSS7 VoIP Switch
 @cindex The OpenSS7 VoIP Switch
 
-This project provides an OpenSS7 VoIP Switch platform that provides interconnection to the PSTN
+This project provides an @value{MANUAL_TITLE} platform that provides interconnection to the PSTN
 using SS7 ISUP trunks and is capable of routing calls to and from the PSTN and a VoIP backbone
-network using SIP-T, H.323 or BICC signalling an RTP transport.
+network using SIP, SIP-T, H.323 or BICC signalling and controlling Media Gateways utilizing RTP
+transport using MEGACO/H.248.
 
 @node Project Drivers
 @section Project Drivers
 @cindex Project drivers
 
-The lead purpose of the OpenSS7 VoIP Switch is to provide PTSN interconnection to an existing VoIP
-backbone and deployment infrastructure that lacks same.
+The lead purpose of the @value{MANUAL_TITLE} is to provide PTSN interconnection to an existing VoIP
+backbone and deployment infrastructure using a fully opensource solution.
 
 @node Scope
 @section Scope
 @cindex Scope
 
-Because of early deployment drivers yet requirements for scale, the OpenSS7 VoIP Switch platform is
-contructed using standardized PICMG 2.16 telephony hardware in a NEBS 3/ETSI compliant chassis
-providing carrier-grade serviciablity and reliability.  Non-carrier-grade platforms utilizing
-commodity PC hardware for lower scale installations are possible.
+Because of early deployment drivers, requirements for scale, yet a focus on opensource software, the
+@value{MANUAL_TITLE} platform is constructed using standardized COTS (Commodity Off The Shelf)
+hardware in a NEBS 3/ETSI compatible chassis providing cost effective servicability and reliability.
+Carrier-grade serviciability and reliability utilizing standardized PICMG 2.16 or AdvancedTCA
+telephony hardware in a a NEBS 3/ETSI compliant chassis for more hardenned installations remains
+possible.
 
 @menu
-* Phases::
+* Objectives and Milestones::
+* Phases and Timeboxing::
 * Gates::
 @end menu
 
-@node Phases
-@subsection Phases
-@cindex Project phases
+@node Objectives and Milestones
+@subsection Objectives and Milestones
+@cindex Project objectives and milestones
+
+The project lays out the following objectives, in no particular order:
+
+@enumerate
+
+@item
+Establish interoperability with the Veraz Media Gateway.
+It is intended that the Veraz Media Gateway be controlled using MEGACO/H.248 Version 2 binary format
+over UDP or SCTP per MSF-IA-MEGACO.003.01-FINAL.
+Successful interoperability will be demonstrated by successfully connecting basic calls at the local
+and access tandem level on SS7 IMTs.
+
+@item
+Establish interoperability with the Cisco Gateway.
+It is intended that the Cisco Media Gateway be controlled using MEGACO/H.248 Version 2 binary format
+over UDP or SCTP per MSF-IA-MEGACO.003.01-FINAL.
+Successful interoperability will be demonstrated by successfully connecting basic calls at the local
+and access tandem level on SS7 IMTs.
+
+@item
+Establish interoperability with the Sonus Media Gateway.
+It is intended that the Sonus Media Gateway be controlled using MEGACO/H.248 Version 2 binary format
+over UDP or SCTP per MSF-IA-MEGACO.003.01-FINAL.
+Successful interoperability will be demonstrated by successfully connecting basic calls at the local
+and access tandem level on SS7 IMTs.
+
+@item
+Establish interoperability with the Tekelec Eagle M3UA implementation.
+It is intended that the Tekelec Eagle be interconnected using RFC 3332, RFC 4666 or ETSI TS 102 142
+M3UA using RFC 2960, RFC 4460 or ETSI TS 102 141 SCTP.
+Successful interoperability will be demonstrated by successfully exchanging ISUP and LNP/TCAP
+signalling via the STP.
+
+@item
+Establish interoperability with a DMS-250.
+It is intended that the DMS-250 be interconnected using ANSI ISUP.
+Sucessful interoperability will be demonstrated by successfully connecting basic calls at the local
+and access tandem level on SS7 IMTs.
+
+@item
+Establish interoperability with an (unidentified vendor) LNP LSCP.
+It is intended that the LSCTP be interconnected using ANSI TCAP.
+Successful interoperablity will be demonstrated by successfully dipping the LNP database.
+
+@item
+Establish interoperatbiliy with an Application Server peforming call-by-call control, the design and
+implementation to be provided by Excel.
+It is currently intended that SPIRITS or INAP or AIN be used by the Application Server (SCP) to
+control the OpenSS7 VoIP Switch running an AIN/INAP call model.
+Successful interoperability will be demonstrated by successfully connecting basic calls at the local
+and access tandem level on SS7 IMTs, including:
+@itemize
+@item
+Connect ISUP to ISUP calls across Excel's network.
+@item
+Connect ISUP to SIP calls across Excel's network.
+@item
+Connect SIP to ISUP calls across Excel's network.
+@item
+Connect SIP to SIP calls across Excel's network.
+@end itemize
+
+@item
+Demonstrate high levels of call handling capability (over 250 calls per second) in the laboratory.
+
+@item
+Demonstrate high levels of call handling capability under failover scenarios in the laboratory.
+
+@end enumerate
+
+@node Phases and Timeboxing
+@subsection Phases and Timeboxing
+@cindex Project phases and timeboxing
 
 The longer term project is broken into the following phases:
 
 @table @dfn
 @item Phase 1 @footnote{Although some reference is made to capabilities supporting other phases, @dfn{Phase 1} and @dfn{Phase 2} are the focus of this document.}
-The initial phase of the project is intended to provide the capabilities of the OpenSS7 VoIP Switch
+The initial phase of the project is intended to provide the capabilities of the @value{MANUAL_TITLE}
 for PSTN to VoIP backbone tandem for H.323.
 @item Phase 2
 The second phase of the project adds tandem gateway capabilities for SIP-T.
@@ -596,13 +728,13 @@ Each phase of the project consists of seven gates.  The seven gates are defined 
 @dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
 High-Level Design.  This is an internal OpenSS7 gate.
 
-@item Gate 1 --- High Level Design
+@item Gate 1 --- High-Level Design
 
 @dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
 consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
 once the High-Level Design has been published and work is begun on a detailed design.
 @footnote{This document is a High-Level Design an Proposal document and it meets the internal
-requirements for passing Gate 1 of Phase 1 and Phase 2 of the VoIP GW project.  An external review of
+requirements for passing Gate 1 of Phase 1 and Phase 2 of the VoIP Switch project.  An external review of
 this document by a Beta or Gamma client or sponsor is pending.}
 
 @item Gate 2 --- Detailed Design
@@ -643,7 +775,7 @@ terminated.
 
 @end table
 
-For more details on Gate scheduling for Phase 1 and Phase 2 of the VoIP GW project, @pxref{Schedule}.
+For more details on Gate scheduling for Phase 1 and Phase 2 of the VoIP Switch project, @pxref{Schedule}.
 
 @node Application Architecture
 @chapter Application Architecture

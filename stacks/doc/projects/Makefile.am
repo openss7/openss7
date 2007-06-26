@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/14 04:27:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/26 18:15:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/14 04:27:27 $ by $Author: brian $
+# Last Modified $Date: 2007/06/26 18:15:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,7 +56,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= lab.texi hlr.texi voip.texi
+info_TEXINFOS		+= lab.texi hlr.texi voip.texi cnam.texi
 
 lab_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -70,12 +70,18 @@ voip_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi
 
+cnam_TEXINFOS		= \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi
+
 if MAINTAINER_MODE
 lab_TEXINFOS		+= \
 			  texi/args.texi
 hlr_TEXINFOS		+= \
 			  texi/args.texi
 voip_TEXINFOS		+= \
+			  texi/args.texi
+cnam_TEXINFOS		+= \
 			  texi/args.texi
 endif
 
@@ -84,13 +90,16 @@ EXTRA_info_TEXINFOS	= \
 			  $(info_TEXINFOS) \
 			  $(lab_TEXINFOS) \
 			  $(hlr_TEXINFOS) \
-			  $(voip_TEXINFOS)
+			  $(voip_TEXINFOS) \
+			  $(cnam_TEXINFOS)
 
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 FIG_FIGS		= \
+			cnam_netarch.fig \
+			cnam_iface.fig \
 			c.fig \
 			d.fig \
 			gb.fig \
@@ -206,6 +215,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.19  2007/06/26 18:15:55  brian
+# - added new documentation
+#
 # Revision 0.9.2.18  2007/03/14 04:27:27  brian
 # - typo
 #
