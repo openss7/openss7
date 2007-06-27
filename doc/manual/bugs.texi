@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.3 2007/06/22 00:18:20 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/06/27 18:52:22 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,12 +53,23 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:20 $ by $Author: brian $
+@c Last Modified $Date: 2007/06/27 18:52:22 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
-@item (no items)
+@item 001.  2007-06-27T08:53:51+0000
+
+A report was made by Chris from Sandia that the build process choked on building 32-bit libraries
+and applications on an x86_64 system under Ubuntu Fiesty (7.04).  While most other distributions
+include the @command{gcc} 32-bit compatibility libraries for 64-bit architectures with a 32-bit
+emulation mode, Ubuntu (and maybe Debian too) does not.  The Ubuntu 7.04 package that is missing is
+the @file{lib32gcc1} package.  There are two workarounds to this difficulty: add the
+@file{lib32gcc1} package (with apt), or add the @samp{--disable-32bit-libs} flag to
+@samp{configure}.
+
+@emph{*noted*} in @command{openss7-0.9.2.G}
+
 @end table
 
 For a history of defects for each of the individual subpackages, see the
