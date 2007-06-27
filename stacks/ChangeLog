@@ -1,5 +1,8 @@
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* strss7.spec.in: add mtpi spec to release
+	* debian/rules.in: add mtpi spec to release
+
 	* doc/specs/cci/cci.texi: corrections and updates
 	* doc/specs/dlpi/dlpi.texi: corrections and updates
 	* doc/specs/mapi/mapi.texi: corrections and updates

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.90 $) $Date: 2007/06/24 12:10:10 $
+# @(#) $RCSfile: strss7.spec.in,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2007/06/27 18:52:24 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/24 12:10:10 $ by $Author: brian $
+# Last Modified $Date: 2007/06/27 18:52:24 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,7 +98,7 @@
 #global preloads    
 #global libraries   
 %global tools       strss7_mknod test-m2pa test-q781 test-tcpc test-tcps test-udpc test-udps test-x100p test-x400p
-%global infofiles   %{base} libxnet cci tri tci mapi hlr voip tpi_tcap
+%global infofiles   %{base} libxnet cci tri tci mapi mtpi hlr voip tpi_tcap
 %global initfiles   %{base}
 %global conffiles   %{name}.conf
 
@@ -1963,9 +1963,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strss7.spec.in,v $
-# Revision 0.9.2.90  2007/06/24 12:10:10  brian
-# - recognize EL4 and EL5 for kernel-develop
+# Revision 0.9.2.91  2007/06/27 18:52:24  brian
+# - working up documentation
 #
+
+* Sun Jun 24 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.90  2007/06/24 12:10:10  brian
+- recognize EL4 and EL5 for kernel-develop
 
 * Wed Jun 20 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.89  2007/06/20 09:27:24  brian
