@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/26 08:26:16 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/06/27 08:42:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/26 08:26:16 $ by $Author: brian $
+# Last Modified $Date: 2007/06/27 08:42:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.43 $) $Date: 2007/03/26 08:26:16 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.44 $) $Date: 2007/06/27 08:42:02 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -189,6 +189,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/tci/Makefile
 		 doc/specs/mapi/Makefile
 		 doc/specs/cci/Makefile
+		 doc/specs/mtpi/Makefile
 		 src/modules/ti/lis.conf
 		 src/modules/inet/lis.conf
 		 src/modules/sctp/lis.conf
@@ -212,6 +213,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.44  2007/06/27 08:42:02  brian
+# - added MTPI spec document
+#
 # Revision 0.9.2.43  2007/03/26 08:26:16  brian
 # - need gnu gettext version 0.16.1 for autoconf 2.61
 #

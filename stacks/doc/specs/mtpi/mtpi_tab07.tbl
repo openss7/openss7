@@ -1,0 +1,55 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS H
+box center tab(:);
+l|l.
+\fI\)MTPI Primitive\fR:\fI\)T1.111.1 Primitive\fR
+=
+.TH
+MTP_INFO_REQ:\-
+MTP_INFO_ACK:\-
+MTP_BIND_REQ:\-
+MTP_BIND_ACK:\-
+MTP_UNBIND_REQ:\-
+MTP_ADDR_REQ:\-
+MTP_ADDR_ACK:\-
+MTP_OK_ACK:\-
+MTP_ERROR_ACK:\-
+_
+MTP_CONN_REQ:\-
+MTP_DISCON_REQ:\-
+_
+MTP_TRANSFER_REQ:MTP-TRANSFER Request
+MTP_TRANSFER_IND:MTP-TRANSFER Indication
+_
+MTP_STATUS_IND:MTP-STATUS Indication
+MTP_PAUSE_IND:MTP-PAUSE Indication
+MTP_RESUME_IND:MTP-RESUME Indication
+_
+MTP_RESTART_BEGINS_IND:\-
+MTP_RESTART_COMPLETE_IND:\-
+.TE

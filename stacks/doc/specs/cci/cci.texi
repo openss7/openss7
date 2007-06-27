@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: cci.texi,v 0.9.2.7 2007/06/17 01:55:58 brian Exp $
+% @(#) $Id: cci.texi,v 0.9.2.8 2007/06/27 08:42:05 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+% Copyright (c) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 %
 % All Rights Reserved.
 %
@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/17 01:55:58 $ by $Author: brian $
+% Last Modified $Date: 2007/06/27 08:42:05 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -76,6 +76,7 @@
 @set MANUAL_TITLE Call Control Interface (CCI)
 @set MANUAL_TYPE Application Programming Interface
 
+@comment The following copyright information goes at the head of each .info file.
 @ifinfo
 This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
@@ -83,7 +84,7 @@ This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
 @value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
 published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -131,14 +132,14 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2006  OpenSS7 Corporation
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
 @subheading Abstract
 This document specifies a @value{MANUAL_TITLE} @value{MANUAL_TYPE} in support of the OpenSS7 Integrated Service Digital
 Network (ISDN) and ISDN User Part (ISUP) protocol stacks.@footnote{As a future extension to the interface, H.225, BSSAP,
-and SIP will be supported.} It provides abstraction of the call control interface to these components as well as
+and SIP will be supported.}  It provides abstraction of the call control interface to these components as well as
 providing a basis for call control for other call control signalling protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
@@ -147,7 +148,7 @@ providing a basis for call control for other call control signalling protocols.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2006  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 @noindent
@@ -316,8 +317,8 @@ made available in the software package.
 @section Intent
 
 It is the intent of this document that it act as the primary source of information concerning the @value{MANUAL_TITLE}.
-This document is intended to provide information for writers of OpenSS7 Call Control Interface (CCI) applications as
-well as writers of OpenSS7 Call Control Interface (CCI) Users.
+This document is intended to provide information for writers of OpenSS7 @value{MANUAL_TITLE} applications as well as
+writers of OpenSS7 @value{MANUAL_TITLE} Users.
 
 @section Audience
 
@@ -336,11 +337,15 @@ Take care that you are working with a current version of this documentation: you
 ensure that you are working with a current version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for
 a current version.
 
-A printed (or postscript) version of this document is an UNCONTROLLED version.
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document is an
+@strong{UNCONTROLLED VERSION}.
 
 @smallexample
 
 $Log: cci.texi,v $
+Revision 0.9.2.8  2007/06/27 08:42:05  brian
+- added MTPI spec document
+
 Revision 0.9.2.7  2007/06/17 01:55:58  brian
 - updates for release, remove any later language
 
@@ -381,12 +386,11 @@ Added initial documentation for call control interface.
 
 This document specifies a @cite{STREAMS}-based
 @cpindex STREAMS
-kernel-level instantiation of the ITU-T Call Control Interface definition.  The Call Control Interface (CCI) enables the
-user of a call control service to access and use any of a variety of conforming call control service providers without
-specific knowledge of the provider's protocol.  The service interface is designed to support any network call control
-protocol and user call control protocol.  This interface only specifies access to call control service providers, and
-does not address issues concerning call control and circuit management, protocol performance, and performance analysis
-tools.
+kernel-level instantiation of the ITU-T @value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a
+call control service to access and use any of a variety of conforming call control service providers without specific
+knowledge of the provider's protocol.  The service interface is designed to support any network call control protocol
+and user call control protocol.  This interface only specifies access to call control service providers, and does not
+address issues concerning call control and circuit management, protocol performance, and performance analysis tools.
 
 This specification assumes that the reader is familiar with ITU-T state machines and call control interfaces (e.g.,
 Q.764, Q.931), and @cite{STREAMS}.
@@ -11924,7 +11928,7 @@ Indicates the offset of the address from the start of the block.
 @smallexample
 /*****************************************************************************
 
- @@(#) $Id: cci.texi,v 0.9.2.7 2007/06/17 01:55:58 brian Exp $
+ @@(#) $Id: cci.texi,v 0.9.2.8 2007/06/27 08:42:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11969,14 +11973,14 @@ Indicates the offset of the address from the start of the block.
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:55:58 $ by $Author: brian $
+ Last Modified $Date: 2007/06/27 08:42:05 $ by $Author: brian $
 
  *****************************************************************************/
 
 #ifndef __SS7_ISUPI_H__
 #define __SS7_ISUPI_H__
 
-#ident "@@(#) $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 1997-2006 OpenSS7 Corporation."
+#ident "@@(#) $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 1997-2006 OpenSS7 Corporation."
 
 /*
  *  ISUP addresss
