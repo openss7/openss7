@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/06 11:38:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/27 08:42:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:38:22 $ by $Author: brian $
+# Last Modified $Date: 2007/06/27 08:42:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2007/06/27 08:42:03  brian
+# - added MTPI spec document
+#
 # Revision 0.9.2.6  2006/03/06 11:38:22  brian
 # - updated headers
 #
@@ -57,6 +60,6 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = cci tri tci mapi
+SUBDIRS = cci tri tci mapi mtpi
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

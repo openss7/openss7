@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: tci.texi,v 0.9.2.11 2007/03/17 08:31:42 brian Exp $
+% @(#) $Id: tci.texi,v 0.9.2.12 2007/06/27 08:42:15 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2004  OpenSS7 Corporation <www.openss7.com>
+% Copyright (c) 2001-2007  OpenSS7 Corporation <www.openss7.com>
 %
 % All Rights Reserved.
 %
@@ -17,7 +17,7 @@
 % Permission is granted to copy and distribute modified versions of this
 % manual under the conditions for verbatim copying, provided that the
 % entire resulting derived work is distributed under the terms of a
-% permission notice identical to this one
+% permission notice identical to this one.
 % 
 % Since the Linux kernel and libraries are constantly changing, this
 % manual page may be incorrect or out-of-date.  The author(s) assume no
@@ -54,14 +54,17 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/03/17 08:31:42 $ by $Author: brian $
+% Last Modified $Date: 2007/06/27 08:42:15 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
 @c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 @c %**start of header
 @setfilename tci.info
-@settitle Transaction Component Interface
+@include texi/args.texi
+@set MANUAL_TITLE Transaction Interface (TRI)
+@set MANUAL_TYPE Specification
+@settitle @value{MANUAL_TITLE}
 @c %**end of header
 
 @dircategory OpenSS7
@@ -70,14 +73,17 @@
 @end direntry
 
 @include texi/args.texi
+@set MANUAL_TITLE Transaction Interface (TRI)
+@set MANUAL_TYPE Specification
 
 @ifinfo
-This file documents the Transaction Component Interface.
+This file documents the OpenSS7 @value{MANUAL_TITLE}.
 
 This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
-@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
+published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
 
-Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
 
 All Rights Reserved.
@@ -103,14 +109,16 @@ another language, under the above conditions for modified versions.
 @end ifinfo
 
 @include texi/args.texi
+@set MANUAL_TITLE Signalling Link Interface
+@set MANUAL_TYPE Specification
 
 @ignore
-@shorttitlepage Transaction Component Interface --- Application Program Interface
+@shorttitlepage @value{MANUAL_TITLE} -- @value{MANUAL_TYPE}
 @end ignore
 @titlepage
-@titlefont{Transaction Component Interface}
+@titlefont{@value{MANUAL_TITLE}}
 @sp 0.5
-@title Application Program Interface
+@title @value{MANUAL_TYPE}
 @subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
 @subtitle Updated @value{PACKAGE_DATE}
 @sp 0.2
@@ -121,7 +129,7 @@ another language, under the above conditions for modified versions.
 
 @page
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001-2004  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 All Rights Reserved. @*
 
@@ -225,7 +233,7 @@ regard to this documentation including all implied warranties of
 merchantability, fitness for a particular purpose, non-infringement, or title;
 that the contents of the document are suitable for any purpose, or that the
 implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall
+copyrights, trademarks or other rights.  In no event shall
 @uref{http://www.openss7.com/,OpenSS7 Corporation} be liable for any direct,
 indirect, special or consequential damages or any damages whatsoever resulting
 from loss of use, data or profits, whether in an action of contract, negligence
@@ -234,30 +242,36 @@ document or the performance or implementation of the contents thereof.
 
 @section Abstract
 
-This document is a Application Program Interface containing technical details
-concerning the implementation of the Transaction Component Interface (TCI) for
-OpenSS7.  It contains recommendations on software architecture as well as
-platform and system applicability of the Transaction Component Interface (TCI).
+This document is a @value{MANUAL_TYPE} containing technical details concerning
+the implementation of the @value{MANUAL_TITLE} for OpenSS7.  It contains
+recommendations on software architecture as well as platform and system
+applicability of the @value{MANUAL_TITLE}.
 
 @section Purpose
 
 The purpose of this document is to provide technical documentation of the
-Transaction Component Interface (TCI).  This document is intended to be included
-with the OpenSS7 STREAMS software package released by
-@uref{http://www.openss7.com/,OpenSS7 Corporation}.  It is intended to assist
-software developers, maintainers and users of the Transaction Component
-Interface (TCI) with understanding the software architecture and technical
-interfaces which are made available in the software package.
+@value{MANUAL_TITLE}.  This document is intended to be included with the OpenSS7
+@cite{STREAMS}
+@cpindex STREAMS
+software package released by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+It is intended to assist software developers, maintainers and users of the
+@value{MANUAL_TITLE} with understanding the software architecture and technical
+interfaces that are made available in the software package.
 
 @section Intent
 
 It is the intent of this document that it act as the primary source of
-information concerning the Transaction Component Interface (TCI).
+information concerning the @value{MANUAL_TITLE}.
 
 @section Audience
 
 The audience for this document is software developers, maintainers and users and
-integrators of the Transaction Component Interface (TCI).
+integrators of the @value{MANUAL_TITLE}.
+
+@section Disclaimer
+
+Although the author has attempted to ensure that the information in this document is complete and correct, neither
+the Author nor OpenSS7 Corporation will take any responsibility in it.
 
 @section Revision History
 
@@ -265,23 +279,32 @@ Take care that you are working with a current version of this documentation: you
 will not be notified of updates.  To ensure that you are working with a current
 version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for a
 current version.
+@sp 1
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document is an
+@strong{UNCONTROLLED VERSION}.
 
-A printed (or postscript) version of this document is an UNCONTROLLED version.
+@smallexample
+
+$Log: tci.texi,v $
+Revision 0.9.2.12  2007/06/27 08:42:15  brian
+- added MTPI spec document
+
+@end smallexample
 
 @node Introduction
 @chapter Introduction
 
-This document specifies a STREAMS-based kernel-level instantiation of the ITU-T
-Transaction Capabilities Application Part (TCAP) Component (TC) Sub-Layer.  The
-Transaction Component Interface (TCI) enables the user of a component sub-layer
-service to access and use any of a variety of conforming transaction providers
-without specific knowledge of the provider's protocol.  The service interface is
-designed to support any transaction protocol but is intended for the ITU-T
-Recommendation Q.771 Transaction Capabilities Application Part (TCAP) Component
-(TC) Sub-Layer.  This interface only specifies access to transaction component
-sub-layer services providers, and does not address issues concerning transaction
-or component sub-layer management, protocol performance, and performance
-analysis tools.
+This document specifies a @cite{STREAMS}-based
+kernel-level instantiation of the ITU-T Transaction Capabilities Application
+Part (TCAP) Component (TC) Sub-Layer.  The Transaction Component Interface (TCI)
+enables the user of a component sub-layer service to access and use any of a
+variety of conforming transaction providers without specific knowledge of the
+provider's protocol.  The service interface is designed to support any
+transaction protocol but is intended for the ITU-T Recommendation Q.771
+Transaction Capabilities Application Part (TCAP) Component (TC) Sub-Layer.  This
+interface only specifies access to transaction component sub-layer services
+providers, and does not address issues concerning transaction or component
+sub-layer management, protocol performance, and performance analysis tools.
 
 The specification assumes that the reader is familiar with the ISO reference
 model terminology, ISO/ITU-T transaction service definitions (ROSE, ACSE, TCAP),
@@ -289,24 +312,15 @@ and STREAMS.
 
 @section Related Documentation
 
-@itemize
-
+@itemize ---
 @item ITU-T Recommendation X.200 (White Book) --- ISO/IEC 7498-1:1994
-
 @item ITU-T Recommendation X.219 (White Book) --- ISO/IEC
-
 @item ITU-T Recommendation X.229 (White Book) --- ISO/IEC
-
 @item ITU-T Recommendation X.217 (White Book) --- ISO/IEC 8649 : 1996
-
 @item ITU-T Recommendation X.227 (White Book) --- ISO/IEC 8650-1 : 1995
-
 @item ITU-T Recommendation X.237 (White Book) --- ISO/IEC 10035-1 : 1995
-
 @item ITU-T Recommendation Q.771 (White Book)
-
 @item System V Interface Definition, Issue 2 - Volume 3
-
 @end itemize
 
 @subsection Role
