@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/06/26 18:09:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/28 01:17:14 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/26 18:09:03 $ by $Author: brian $
+## Last Modified $Date: 2007/06/28 01:17:14 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -77,7 +77,49 @@ EXTRA_info_TEXINFOS	= \
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		=
+FIG_FIGS		= \
+			overview.fig \
+			voip_ifa.fig \
+			voip_ifa_h323.fig \
+			voip_ifa_sipt.fig \
+			voip_ifc.fig \
+			voip_ifc_h323.fig \
+			voip_ifc_sipt.fig \
+			voip_ifd.fig \
+			voip_ifd_h323.fig \
+			voip_ifd_sipt.fig \
+			voip_ifeb_atm.fig \
+			voip_ifeb.fig \
+			voip_ifeb_ss7.fig \
+			voip_ifj.fig \
+			voip_ifj_gr303v5.fig \
+			voip_ifj_isdn.fig \
+			voip_ifj_ss7.fig \
+			voip_netconf.fig \
+			tiphon.fig \
+			osimap.fig \
+			rack.fig
+
+PNG_PNGS		= \
+			v400p.png \
+			t400p-ss7.png \
+			a101c.png \
+			acb56.png \
+			cpc388.png \
+			cpc396.png \
+			pca200e.png \
+			bri.png
+
+PS_PSS			= \
+			mtp2.ps \
+			mtp3.ps \
+			platconf.ps \
+			protconf.ps \
+			sccp.ps \
+			sdt.ps \
+			sl.ps \
+			stack.ps \
+			tcap.ps
 
 ## PKG_BUILD_INDEP
 endif
@@ -90,6 +132,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2007/06/28 01:17:14  brian
+## - added more documentation files
+##
 ## Revision 0.9.2.1  2007/06/26 18:09:03  brian
 ## - added new doc files
 ##

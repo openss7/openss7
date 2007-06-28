@@ -1,0 +1,50 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center expand tab(:);
+cssss
+lb|cb|cb|cb|cb
+l|n|n|n|n.
+GSM
+_
+Event:Events/Hr/Sub:Msgs/Event:Octets/Event IC:Octets/Event OG
+=
+Attach:0.400:6:297:483
+Detach:0.050:2:0:0
+Inter RAU:0.380:6:186:234
+SMS MT:0.050:2:133:155
+Modify:0.045:2:69:300
+_
+Total:::200:375
+=
+.T&
+cssss
+lb|cb|cb|cb|cb
+l|n|n|n|n.
+UMTS
+_
+Event:Events/Hr/Sub:Msgs/Event:Octets/Event IC:Octets/Event OG
+=
+Attach:0.400:6:
+Detach:0.050:2:
+Inter RAU:0.380:6:
+SMS MT:0.050:2:
+Modify:0.045:2:
+_
+Total::::
+.TE

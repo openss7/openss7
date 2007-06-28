@@ -1,0 +1,26 @@
+                                                                                
+                 _______                                _______                 
+                |       | STREAM                       |       | STREAM         
+                 \_____/  head                          \_____/  head           
+ Network Provider   |                                      |                    
+ Interface (NPI)    /               Signalling Connection  /                    
+                    \               Control Part Interface \                    
+ Transport Provider /               (SCCPI)                /                    
+ Interface (TPI)    |                                      |                    
+                    |                                      |                    
+          ,-----O---O---O------------------------------O---O---O-----,          
+          |     |   |   |                              |   |   |     |          
+          |   __|___|___|__                          __|___|___|__   |          
+          |  |             |      SCCP Driver       |             |  |          
+          |  |             |                        |             |  |          
+          |  |             |  Signalling Connection |             |  |          
+          |  |_____________|     Control Part       |_____________|  |          
+          |         |                                      |         |          
+          |         |                                      |         |          
+          |         |                                      |         |          
+          '---------O--------------------------------------O---------'          
+                    |                                      |                    
+                    |                 MTPI                 |                    
+                    |    Message Transfer Part Interface   |                    
+                    |                                      |                    
+                                                                                

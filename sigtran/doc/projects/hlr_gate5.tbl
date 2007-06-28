@@ -1,0 +1,32 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center expand tab(:);
+rb|lbw(2.0i)|cb|cb|nb|nb
+r|lw(2.0i)|c|c|n|n.
+Key:Description:Start Date:End Date:Duration:Slack
+=
+Stage 5:Installation:2004/12/10:2004/12/11::
+:Test Bed Configuration:2004/12/20:2004/12/21::
+:Acceptance Tests:2004/12/30:2005/01/01::
+:Initial Operation Testing:2005/01/06:2005/01/07::
+:_:_:_:_:_
+:Acceptance Testing:2004/12/10:2005/01/07:28:0
+_
+Gate 5:Acceptance Test Review:2005/01/06:2005/01/07:1:0
+.TE

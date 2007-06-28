@@ -1,0 +1,26 @@
+                                                                                
+                 _______                                _______                 
+                |       | STREAM                       |       | STREAM         
+                 \_____/  head                          \_____/  head           
+ Data Link Provider |                                      |                    
+ Interface (DLPI)   /                                      /                    
+                    \               Signalling Link Set    \                    
+ Comm. Device       /               Interface (SLSI)       /                    
+ Interface (CDI)    |                                      |                    
+                    |                                      |                    
+          ,---------O--------------------------------------O---------,          
+          |         |                                      |         |          
+          |   ______|______                          ______|______   |          
+          |  |             |                        |             |  |          
+          |  |             |       SLS Driver       |             |  |          
+          |  |             |   Signalling Link Set  |             |  |          
+          |  |_____________|                        |_____________|  |          
+          |    ___|||||___                            ___|||||___    |          
+          |   |   _|||_   |                          |   _|||_   |   |          
+          |   |  |  |  |  |                          |  |  |  |  |   |          
+          '---O--O--O--O--O--------------------------O--O--O--O--O---'          
+              |  |  |  |  |                          |  |  |  |  |              
+              |  |  |  |  |           SLI            |  |  |  |  |              
+              |  |  |  |  | Signalling Link Interface|  |  |  |  |              
+              |  |  |  |  |                          |  |  |  |  |              
+                                                                                

@@ -1,5 +1,7 @@
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/projects/cnam_lab.fig: added figure
+
 	* strss7.spec.in: add mtpi spec to release
 	* debian/rules.in: add mtpi spec to release
 
