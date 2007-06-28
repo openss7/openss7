@@ -1,3 +1,7 @@
+2007-06-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/sg.texi: doc updates
+
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: updates

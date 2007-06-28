@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sg.texi,v 0.9.2.2 2007/06/28 01:17:05 brian Exp $
+% @(#) $Id: sg.texi,v 0.9.2.3 2007/06/28 07:49:03 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/28 01:17:05 $ by $Author: brian $
+% Last Modified $Date: 2007/06/28 07:49:03 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -236,6 +236,15 @@ no obligation to provide any feature listed herein.
 * Index::
 @end menu
 
+@iftex
+@page
+@heading List of Figures
+@listoffloats Figure
+@page
+@heading List of Tables
+@listoffloats Table
+@end iftex
+
 @node Executive Overview
 @unnumbered Executive Overview
 
@@ -383,6 +392,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: sg.texi,v $
+Revision 0.9.2.3  2007/06/28 07:49:03  brian
+- doc updates
+
 Revision 0.9.2.2  2007/06/28 01:17:05  brian
 - added more documentation files
 
@@ -2110,13 +2122,13 @@ acceptance testing in a timely manner.
 
 @tabref{S-0} lists the initial (Gate 0) schedule estimates.
 
-@tabfig{hlr_schest,S-0,Initial (Gate 0) Project Estimate}
+@tabfigsized{hlr_schest,S-0,Initial (Gate 0) Project Estimate,6.0in}
 
 @tabref{S-1} through @tabref{S-8} list the current (Gate 1) schedule estimates.
 These are planning estimates only and no commitment is provided to deliver to any schedule until
 Gate 2 is complete.
 
-@tabfig{hlr_sched,S-1,HLR Project Schedule}
+@tabfigsized{hlr_sched,S-1,HLR Project Schedule,6.0in}
 
 @node Gate 0 --- Concept
 @subsection Gate 0 --- Concept
@@ -2125,7 +2137,7 @@ Gate 2 is complete.
 High-Level Design.  This is an internal OpenSS7 gate.
 @tabref{S-2} below lists the estimated schedule leading into @dfn{Gate 0}.
 
-@tabfig{hlr_gate0,S-2,HLR Project Schedule --- Gate 0}
+@tabfigsized{hlr_gate0,S-2,HLR Project Schedule --- Gate 0,6.0in}
 
 Gate 0 was completed for the project on September 24, 2004 with the creation of the Initial design
 document and internal OpenSS7 staff decision to move forward with a High-Level Design.
@@ -2141,7 +2153,7 @@ requirements for passing Gate 1 of Phase 1 of the HLR project.  An external revi
 by a Beta or Gamma client or sponsor is pending.}
 @tabref{S-3} below lists the estimated schedule leading into @dfn{Gate 1}.
 
-@tabfig{hlr_gate1,S-3,HLR Project Schedule --- Gate 1}
+@tabfigsized{hlr_gate1,S-3,HLR Project Schedule --- Gate 1,6.0in}
 
 This document completes the Gate 1 requirements October 20, 2004.  We are currently awaiting
 external review of this document and proceeding on Detailed Design documentation.
@@ -2159,7 +2171,7 @@ started.}
 Passing this gate moves from the design stage to the development stage of the project.
 @tabref{S-4} below lists the estimated schedule leading into @dfn{Gate 2}.
 
-@tabfig{hlr_gate2,S-4,HLR Project Schedule --- Gate 2}
+@tabfigsized{hlr_gate2,S-4,HLR Project Schedule --- Gate 2,6.0in}
 
 @node Gate 3 --- Development and Implementation
 @subsection Gate 3 --- Development and Implementation
@@ -2169,7 +2181,7 @@ design is complete and testing has begun.  This is an internal review gate.  Ope
 passes this gate when software is code complete and hardware has been installed for testing.
 @tabref{S-5} below lists the estimated schedule leading into @dfn{Gate 3}.
 
-@tabfig{hlr_gate3,S-5,HLR Project Schedule --- Gate 3}
+@tabfigsized{hlr_gate3,S-5,HLR Project Schedule --- Gate 3,6.0in}
 
 @node Gate 4 --- System Test
 @subsection Gate 4 --- System Test
@@ -2180,7 +2192,7 @@ passes this gate internally once conformance testing is complete.  Passing this 
 development stage to the support stage of the project.
 @tabref{S-6} below lists the estimated schedule leading into @dfn{Gate 4}.
 
-@tabfig{hlr_gate4,S-6,HLR Project Schedule --- Gate 4}
+@tabfigsized{hlr_gate4,S-6,HLR Project Schedule --- Gate 4,6.0in}
 
 @node Gate 5 --- Acceptance Testing
 @subsection Gate 5 --- Acceptance Testing
@@ -2190,7 +2202,7 @@ testing.  This is an external review gate.  OpenSS7 passes this gate internally 
 in external acceptance testing is complete.
 @tabref{S-7} below lists the estimated schedule leading into @dfn{Gate 5}.
 
-@tabfig{hlr_gate5,S-7,HLR Project Schedule --- Gate 5}
+@tabfigsized{hlr_gate5,S-7,HLR Project Schedule --- Gate 5,6.0in}
 
 @node Gate 6 --- Support Complete
 @subsection Gate 6 --- Support Complete
@@ -2200,7 +2212,7 @@ discharged.  This is an internal review gate.  OpenSS7 passes this gate once sup
 terminated.
 @tabref{S-8} below lists the estimated schedule leading into @dfn{Gate 6}.
 
-@tabfig{hlr_gate6,S-8,HLR Project Schedule --- Gate 6}
+@tabfigsized{hlr_gate6,S-8,HLR Project Schedule --- Gate 6,6.0in}
 
 @node Cost
 @section Cost
@@ -2213,7 +2225,7 @@ hardware, Routers and LAN, and other sundry lab equipment be provided by the cli
 time is estimated at 100% effort per calendar week at our normal loaded rate.  Shipping costs,
 training, training material and travel costs are not listed and would be billed separately.
 
-@tabfig{hlr_cost,T-2,Estimated Cost}
+@tabfigsized{hlr_cost,T-2,Estimated Cost,6.0in}
 
 @ignore
 @iftex
@@ -3217,7 +3229,7 @@ Table 7.5/4.
 
 @tabref{T-1} below provides a traffic model for sizing the HLR application.
 
-@tabfig{hlr_traf,T-1,Low Mobility Traffic Model --- Peak}
+@tabfigsized{hlr_traf,T-1,Low Mobility Traffic Model --- Peak,6.0in}
 
 @node HLR Sizing
 @section HLR Sizing
