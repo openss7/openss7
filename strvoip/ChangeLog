@@ -1,3 +1,7 @@
+2007-06-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/carrier/overview.fig: change orientation to portrait
+
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/Makefile.am: prepare for projects documentation
