@@ -2,6 +2,14 @@
 
 	* doc/projects/sg.texi: doc updates
 
+	* doc/manual/fig1.fig: change orientation to portrait
+	* doc/papers/sctp.fig: change orientation to portrait
+	* doc/papers/sockets.fig: change orientation to portrait
+	* doc/papers/xtios.fig: change orientation to portrait
+	* doc/projects/cnam_lab.fig: change orientation to portrait
+	* doc/projects/protconf.fig: change orientation to portrait
+	* doc/projects/sg_netarch.fig: change orientation to portrait
+
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: updates

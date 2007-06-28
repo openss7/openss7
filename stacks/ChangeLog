@@ -1,3 +1,81 @@
+2007-06-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/cnam_lab.fig: change orientation to portrait
+	* doc/projects/cnam_netarch.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi01.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi02.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi03.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi04.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi05.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi06.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi07.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi08.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi09.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi10.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi10b.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi11.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi11b.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi12.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi13.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi14.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi15.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi16.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi17.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi18.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi19.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi20.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi21.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi22.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi23.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi24.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi25.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi26.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi27.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi28.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi2_1.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi30.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi31.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi32.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi33.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi34.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi35.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi36.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi37.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi38.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi39.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_1.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_10.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_11.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_12.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_13.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_14.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_15.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_2.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_3.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_4.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_5.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_6.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_7.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_8.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi3_9.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi40.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi41.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi42.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi43.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi44.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi45.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi46.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi47.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi48.fig: change orientation to portrait
+	* doc/specs/mtpi/mtpi49.fig: change orientation to portrait
+
+	* doc/projects/cnam_m2ua.fig: added new figure
+	* doc/projects/cnam_m3ua.fig: added new figure
+	* doc/projects/cnam_soap.fig: added new figure
+	* doc/projects/cnam_sua.fig: added new figure
+	* doc/projects/cnam_tua.fig: added new figure
+
+
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/cnam_lab.fig: added figure
