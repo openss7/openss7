@@ -1,6 +1,7 @@
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document lib32gcc1 problem on ubuntu
+	* am/info.am: force portrait mode for ps, eps and pdf
 
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
