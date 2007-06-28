@@ -1,0 +1,27 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center expand tab(:);
+rb|lbw(2.0i)|cb|cb|nb|nb
+r|lw(2.0i)|c|c|n|n.
+Key:Description:Start Date:End Date:Duration:Slack
+=
+Stage 6:Support:2005/01/07:2005/04/07:90:0
+_
+Gate 6:Support Complete:2005/04/07:2005/04/08:1:0
+.TE

@@ -1,0 +1,31 @@
+.ie '\*(.T'ps' \{
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center expand tab(:);
+lb|cb|cb|cb
+l|n|n|n.
+Description:Qty:Unit Price:Extended Price
+=
+Processor Chassis:2:$80,000.00:$160,000.00
+_
+Installation Support:1:$40,000.00:$40,000.00
+_
+Warranty and On-Site Support:1:$100,000.00:$100,000.00
+=
+Total:::$300,000.00
+.TE

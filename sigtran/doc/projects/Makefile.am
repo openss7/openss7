@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2007/06/26 18:08:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2007/06/28 01:17:05 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/26 18:08:59 $ by $Author: brian $
+## Last Modified $Date: 2007/06/28 01:17:05 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -81,10 +81,65 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 FIG_FIGS		= \
-			  sg_netarch.fig
-TBL_TBLS		=
-PNG_PNGS		=
-PS_PSS			=
+			c.fig \
+			cnam_iface.fig \
+			d.fig \
+			gb.fig \
+			gc2.fig \
+			gc.fig \
+			gd.fig \
+			ge.fig \
+			gf.fig \
+			gn.fig \
+			gp.fig \
+			gr.fig \
+			gs.fig \
+			hlrtest.fig \
+			iu.fig \
+			osimap.fig \
+			rack.fig \
+			sg_netarch.fig \
+			sgsn.fig \
+			sgsntest.fig \
+			sigbearer.fig \
+			protconf.fig \
+			cnam_lab.fig
+
+TBL_TBLS		= \
+			hlr_cost.tbl \
+			hlr_gate0.tbl \
+			hlr_gate1.tbl \
+			hlr_gate2.tbl \
+			hlr_gate3.tbl \
+			hlr_gate4.tbl \
+			hlr_gate5.tbl \
+			hlr_gate6.tbl \
+			hlr_sched.tbl \
+			hlr_schest.tbl \
+			hlr_traf.tbl \
+			labmini.tbl \
+			labnodes.tbl \
+			labpref.tbl
+
+PNG_PNGS		= \
+			a101c.png \
+			acb56.png \
+			bri.png \
+			cpc388.png \
+			cpc396.png \
+			pca200e.png \
+			t400p-ss7.png \
+			v400p.png
+
+PS_PSS			= \
+			mtp2.ps \
+			mtp3.ps \
+			platconf.ps \
+			sccp.ps \
+			sdt.ps \
+			sl.ps \
+			stack.ps \
+			tcap.ps
 
 ## PKG_BUILD_INDEP
 endif
@@ -97,6 +152,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.2  2007/06/28 01:17:05  brian
+## - added more documentation files
+##
 ## Revision 1.1.2.1  2007/06/26 18:08:59  brian
 ## - added new doc files
 ##

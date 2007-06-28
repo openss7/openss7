@@ -2,6 +2,73 @@
 
 	* doc/Makefile.am: prepare for projects documentation
 
+	* configure.ac: added projects docs
+	* doc/Makefile.am: added projects docs
+	* doc/projects/carrier/Makefile.am: added projects docs
+
+	* doc/projects/.cvsignore: added figure
+	* doc/projects/carrier/.cvsignore: added figure
+
+	* doc/projects/carrier/a101c.png: added figure
+	* doc/projects/carrier/acb56.png: added figure
+	* doc/projects/carrier/bri.png: added figure
+	* doc/projects/carrier/cpc388.png: added figure
+	* doc/projects/carrier/cpc396.png: added figure
+	* doc/projects/carrier/pca200e.png: added figure
+	* doc/projects/carrier/t400p-ss7.png: added figure
+	* doc/projects/carrier/v400p.png: added figure
+
+	* doc/projects/carrier/osimap.fig: added figure
+	* doc/projects/carrier/rack.fig: added figure
+	* doc/projects/carrier/tiphon.fig: added figure
+	* doc/projects/carrier/voip_ifa.fig: added figure
+	* doc/projects/carrier/voip_ifa_h323.fig: added figure
+	* doc/projects/carrier/voip_ifa_sipt.fig: added figure
+	* doc/projects/carrier/voip_ifc.fig: added figure
+	* doc/projects/carrier/voip_ifc_h323.fig: added figure
+	* doc/projects/carrier/voip_ifc_sipt.fig: added figure
+	* doc/projects/carrier/voip_ifd.fig: added figure
+	* doc/projects/carrier/voip_ifd_h323.fig: added figure
+	* doc/projects/carrier/voip_ifd_sipt.fig: added figure
+	* doc/projects/carrier/voip_ifeb.fig: added figure
+	* doc/projects/carrier/voip_ifeb_atm.fig: added figure
+	* doc/projects/carrier/voip_ifeb_ss7.fig: added figure
+	* doc/projects/carrier/voip_ifj.fig: added figure
+	* doc/projects/carrier/voip_ifj_gr303v5.fig: added figure
+	* doc/projects/carrier/voip_ifj_isdn.fig: added figure
+	* doc/projects/carrier/voip_ifj_ss7.fig: added figure
+	* doc/projects/carrier/voip_netconf.fig: added figure
+
+	* doc/projects/carrier/mtp2.ag: added figure
+	* doc/projects/carrier/mtp3.ag: added figure
+	* doc/projects/carrier/platconf.ag: added figure
+	* doc/projects/carrier/protconf.ag: added figure
+	* doc/projects/carrier/sccp.ag: added figure
+	* doc/projects/carrier/sdt.ag: added figure
+	* doc/projects/carrier/sl.ag: added figure
+	* doc/projects/carrier/stack.ag: added figure
+	* doc/projects/carrier/tcap.ag: added figure
+
+	* doc/projects/carrier/mtp2.ps: added figure
+	* doc/projects/carrier/mtp3.ps: added figure
+	* doc/projects/carrier/platconf.ps: added figure
+	* doc/projects/carrier/protconf.ps: added figure
+	* doc/projects/carrier/sccp.ps: added figure
+	* doc/projects/carrier/sdt.ps: added figure
+	* doc/projects/carrier/sl.ps: added figure
+	* doc/projects/carrier/stack.ps: added figure
+	* doc/projects/carrier/tcap.ps: added figure
+
+	* doc/projects/carrier/acb56.txt: added figure
+	* doc/projects/carrier/cpc388.txt: added figure
+	* doc/projects/carrier/cpc396.txt: added figure
+	* doc/projects/carrier/osimap.txt: added figure
+	* doc/projects/carrier/pca200e.txt: added figure
+	* doc/projects/carrier/rack.txt: added figure
+	* doc/projects/carrier/t400p-ss7.txt: added figure
+	* doc/projects/carrier/v400p.txt: added figure
+
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* ANNOUNCE: fixed date error

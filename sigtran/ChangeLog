@@ -1,3 +1,112 @@
+2007-06-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/Makefile.am: updates
+	* doc/projects/sg.texi: updates
+
+	* doc/projects/a101c.png: added figure
+	* doc/projects/acb56.png: added figure
+	* doc/projects/bri.png: added figure
+	* doc/projects/cpc388.png: added figure
+	* doc/projects/cpc396.png: added figure
+	* doc/projects/pca200e.png: added figure
+	* doc/projects/t400p-ss7.png: added figure
+	* doc/projects/v400p.png: added figure
+
+	* doc/projects/c.fig: added figure
+	* doc/projects/cnam_iface.fig: added figure
+	* doc/projects/cnam_lab.fig: added figure
+	* doc/projects/d.fig: added figure
+	* doc/projects/gb.fig: added figure
+	* doc/projects/gc.fig: added figure
+	* doc/projects/gc2.fig: added figure
+	* doc/projects/gd.fig: added figure
+	* doc/projects/ge.fig: added figure
+	* doc/projects/gf.fig: added figure
+	* doc/projects/gn.fig: added figure
+	* doc/projects/gp.fig: added figure
+	* doc/projects/gr.fig: added figure
+	* doc/projects/gs.fig: added figure
+	* doc/projects/hlrtest.fig: added figure
+	* doc/projects/iu.fig: added figure
+	* doc/projects/osimap.fig: added figure
+	* doc/projects/protconf.fig: added figure
+	* doc/projects/rack.fig: added figure
+	* doc/projects/sgsn.fig: added figure
+	* doc/projects/sgsntest.fig: added figure
+	* doc/projects/sigbearer.fig: added figure
+
+	* doc/projects/mtp2.ag: added figure
+	* doc/projects/mtp3.ag: added figure
+	* doc/projects/osimap.ag: added figure
+	* doc/projects/platconf.ag: added figure
+	* doc/projects/protconf.ag: added figure
+	* doc/projects/sccp.ag: added figure
+	* doc/projects/sdt.ag: added figure
+	* doc/projects/sl.ag: added figure
+	* doc/projects/stack.ag: added figure
+	* doc/projects/tcap.ag: added figure
+
+	* doc/projects/mtp2.ps: added figure
+	* doc/projects/mtp3.ps: added figure
+	* doc/projects/osimap.ps: added figure
+	* doc/projects/platconf.ps: added figure
+	* doc/projects/protconf.ps: added figure
+	* doc/projects/sccp.ps: added figure
+	* doc/projects/sdt.ps: added figure
+	* doc/projects/sl.ps: added figure
+	* doc/projects/stack.ps: added figure
+	* doc/projects/tcap.ps: added figure
+
+	* doc/projects/hlr_cost.tbl: added figure
+	* doc/projects/hlr_gate0.tbl: added figure
+	* doc/projects/hlr_gate1.tbl: added figure
+	* doc/projects/hlr_gate2.tbl: added figure
+	* doc/projects/hlr_gate3.tbl: added figure
+	* doc/projects/hlr_gate4.tbl: added figure
+	* doc/projects/hlr_gate5.tbl: added figure
+	* doc/projects/hlr_gate6.tbl: added figure
+	* doc/projects/hlr_sched.tbl: added figure
+	* doc/projects/hlr_schest.tbl: added figure
+	* doc/projects/hlr_traf.tbl: added figure
+	* doc/projects/labmini.tbl: added figure
+	* doc/projects/labnodes.tbl: added figure
+	* doc/projects/labpref.tbl: added figure
+
+	* doc/projects/acb56.txt: added figure
+	* doc/projects/c.txt: added figure
+	* doc/projects/cpc388.txt: added figure
+	* doc/projects/cpc396.txt: added figure
+	* doc/projects/d.txt: added figure
+	* doc/projects/gb.txt: added figure
+	* doc/projects/gc.txt: added figure
+	* doc/projects/gc2.txt: added figure
+	* doc/projects/gd.txt: added figure
+	* doc/projects/ge.txt: added figure
+	* doc/projects/gf.txt: added figure
+	* doc/projects/gn.txt: added figure
+	* doc/projects/gp.txt: added figure
+	* doc/projects/gr.txt: added figure
+	* doc/projects/gs.txt: added figure
+	* doc/projects/hlrtest.txt: added figure
+	* doc/projects/iu.txt: added figure
+	* doc/projects/mtp2.txt: added figure
+	* doc/projects/mtp3.txt: added figure
+	* doc/projects/osimap.txt: added figure
+	* doc/projects/pca200e.txt: added figure
+	* doc/projects/platconf.txt: added figure
+	* doc/projects/protconf.txt: added figure
+	* doc/projects/rack.txt: added figure
+	* doc/projects/sccp.txt: added figure
+	* doc/projects/sdt.txt: added figure
+	* doc/projects/sgsn.txt: added figure
+	* doc/projects/sgsntest.txt: added figure
+	* doc/projects/sigbearer.txt: added figure
+	* doc/projects/sl.txt: added figure
+	* doc/projects/stack.txt: added figure
+	* doc/projects/t400p-ss7.txt: added figure
+	* doc/projects/tcap.txt: added figure
+	* doc/projects/v400p.txt: added figure
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release numbers

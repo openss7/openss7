@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sg.texi,v 0.9.2.1 2007/06/26 18:08:59 brian Exp $
+% @(#) $Id: sg.texi,v 0.9.2.2 2007/06/28 01:17:05 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/26 18:08:59 $ by $Author: brian $
+% Last Modified $Date: 2007/06/28 01:17:05 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -244,16 +244,16 @@ purpose of this equipment is to provide a local legacy SS7 compatible Signalling
 that interfaces with existing equipment, yet provides SS7 connectivity to remote switching service
 points (SSPs) and service control points (SCPs) over an IP network utilizing the Internet Protocol
 suite.  Because the solution attempts to avoid excessive costs for long haul graded SS7 links, the
-platform would benefit from using low cost commodity hardware and open source software.
+platform benefits from using low cost commodity hardware and open source software.
 
 @subsubheading The OpenSS7 Project
 
 The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
-developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
-Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
-OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
-License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
-software under terms less restrictive than the GPL.
+developed protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.  Intellectual
+property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/, OpenSS7
+Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public License
+Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project software under
+terms less restrictive than the GPL.
 
 @subsubheading Signalling Gateway
 
@@ -383,6 +383,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: sg.texi,v $
+Revision 0.9.2.2  2007/06/28 01:17:05  brian
+- added more documentation files
+
 Revision 0.9.2.1  2007/06/26 18:08:59  brian
 - added new doc files
 
@@ -623,7 +626,42 @@ For more details on Gate scheduling for Phase 1 and Phase 2 of the project, @pxr
 @chapter Application Architecture
 @cindex Application architecture
 
+@menu
+* M2UA Signalling Gateway::
+* M2UA to M3UA Conversion Gateway::
+* CNAM Delivery Platform::
+@end menu
+
+This section discusses the a number of initial applications of the @value{MANUAL_TITLE}. 
+
+@subsubheading M2UA Signalling Gateway
+
+This application is detailed in @ref{M2UA Signalling Gateway}.
+
+@subsubheading M2UA to M3UA Conversion Gateway
+
+The @value{MANUAL_TITLE} is intended to provide intermediate SIGTRAN Gateway capabilities.  This
+platfor communicates with remote SS7 links using SIGTRAN M2UA (MTP2 User Adaptation Layer),
+implements the MTP Level 3 protocol, and delivers ISUP using SIGTRAN M3UA (MTP3 User Adaptation
+Layer) to call control platforms.
+
+This application is detailed in @ref{M2UA to M3UA Conversion Gateway}.
+
+@subsubheading CNAM Delivery Platform
+
 The @value{MANUAL_TITLE} is intended to provide a low scale, low cost CNAM query service.
+This platform provides SS7 stack capabilities up through TCAP and delivers CNAM queries across the
+Internet using SIGTRAN TUA (TCAP User Adatpation Layer).
+
+This application is detailed in @ref{CNAM Delivery Platform}.
+
+@page
+@node M2UA Signalling Gateway
+@section M2UA Signalling Gateway
+
+@page
+@node M2UA to M3UA Conversion Gateway
+@section M2UA to M3UA Conversion Gateway
 
 @menu
 * Application Requirements::
@@ -631,7 +669,7 @@ The @value{MANUAL_TITLE} is intended to provide a low scale, low cost CNAM query
 @end menu
 
 @node Application Requirements
-@section Application Requirements
+@subsection Application Requirements
 @cindex Application requirements
 
 The platform has the following application requirements:
@@ -643,7 +681,7 @@ The platform has the following application requirements:
 @end menu
 
 @node Phase 1 Requirements
-@subsection Phase 1 Requirements
+@subsubsection Phase 1 Requirements
 @cindex Project phase 1, requirements
 
 @itemize
@@ -657,7 +695,7 @@ F-links).
 @end itemize
 
 @node Phase 2 Requirements
-@subsection Phase 2 Requirements
+@subsubsection Phase 2 Requirements
 @cindex Project phase 2, requirements
 
 @itemize
@@ -668,7 +706,7 @@ TCAP, or other offboard query capability such as ONC RPC.
 @end itemize
 
 @node Phase 3 Requirements
-@subsection Phase 3 Requirements
+@subsubsection Phase 3 Requirements
 @cindex Project phase 3, requirements
 
 @itemize
@@ -676,7 +714,7 @@ TCAP, or other offboard query capability such as ONC RPC.
 @end itemize
 
 @node Solution Architecture
-@section Solution Architecture
+@subsection Solution Architecture
 @cindex Solution architecture
 
 @menu
@@ -704,7 +742,7 @@ Clip Testing}.  Development of such an arrangement is outside the scope of the c
 @end enumerate
 
 @node HLR Implementation for Testing
-@subsection HLR Implementation for Testing
+@subsubsection HLR Implementation for Testing
 @cindex HLR implementation for testing
 
 The first possible test arrangement is the HLR Implementation arrangement.  In this case, the
@@ -715,7 +753,7 @@ narrowband SS7 signalling bearer includes Q.703 Annex B.} is used for Phase 1.  
 and @dfn{D} interfaces are implemented in @dfn{Phase 2} along with the 3GPP TS 29.202 M3UA/SCTP
 signalling bearer.  This case is illustrated in @figref{1} below.
 
-@c @figure{hlrtest,1,HLR Implementation for Testing}
+@figure{hlrtest,1,HLR Implementation for Testing}
 
 The High Performance GSM/UMTS GPRS HLR is built using the OpenSS7 SS7 and SIGTRAN stacks and
 associated utilities.  This project provides an additional 3GPP TS 24.060 GPRS HLR @dfn{STREAMS}
@@ -751,6 +789,19 @@ platform.  A
 @dfn{carrier grade} redundant and network protection switched CompactPCI NEBS chassis
 is made available in @dfn{Phase 3}. (@xref{CPC 388}.)
 @cindex CPC 388
+
+@page
+@node CNAM Delivery Platform
+@section CNAM Delivery Platform
+
+@subsection Application Requirements
+
+@subsubsection Phase 1 Requirements
+@subsubsection Phase 2 Requirements
+@subsubsection Phase 3 Requirements
+
+@subsection Solution Architecture
+
 
 @node Network Architecture
 @chapter Network Architecture
@@ -807,7 +858,7 @@ attached SSPs.
 @figref{6} illustrates the HLR Reference Interfaces from 3GPP TS 24.060 Release 4.9.0
 that are supported by the High Performance GSM/UMTS GPRS HLR.
 
-@c @figure{cnam_iface,6,SG Reference Interfaces}
+@figure{cnam_iface,6,SG Reference Interfaces}
 
 @multitable {@b{Gc Interface}}{This connects the HLR to the SMS-GMSC, SMS-IWMSC or SMS-SC.}
 @item @b{C Interface} @tab
@@ -843,7 +894,7 @@ of 3GPP TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are c
 Q.704 MTP or over RFC 3332 M3UA.
 @cindex M3UA
 
-@c @figure{c,7,C Interface}
+@figure{c,7,C Interface}
 
 @node D Interface
 @subsection D Interface
@@ -859,7 +910,7 @@ TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried e
 or over RFC 3332 M3UA.
 @cindex M3UA
 
-@c @figure{d,8,D Interface}
+@figure{d,8,D Interface}
 
 @page
 @node Gr Interface
@@ -873,7 +924,7 @@ HLR and consists of 3GPP TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP pe
 carried either over Q.704 MTP or over RFC 3332 M3UA.
 @cindex M3UA
 
-@c @figure{gr,9,Gr Interface}
+@figure{gr,9,Gr Interface}
 
 @table @dfn
 
@@ -911,9 +962,9 @@ M3UA.
 It is also possible for a GGSN to tunnel MAP messages over GTP into SS7 MAP via another GSN
 that is PSPDN connected.
 
-@c @figure{gc,11,Gc Interface}
+@figure{gc,11,Gc Interface}
 
-@c @figure{gc2,12,Gn/Gc Interface}
+@figure{gc2,12,Gn/Gc Interface}
 
 @table @dfn
 
@@ -956,7 +1007,7 @@ Q.703 Annex B) and
 M3UA/SCTP
 is configured in @dfn{Phase 1}.
 
-@c @figure{sigbearer,10,TS 29.202 Signalling Bearers}
+@figure{sigbearer,10,TS 29.202 Signalling Bearers}
 
 @node Other Interfaces
 @subsection Other Interfaces
@@ -999,7 +1050,7 @@ computing platform and associated hardware, interfaces and peripherals.
 
 @figref{13} illustrates the solution platform rack configuration.
 
-@c @figure{rack,13,Rack Mount Components}
+@figure{rack,13,Rack Mount Components}
 
 The solution platform consists of the following:
 
@@ -1033,7 +1084,7 @@ The PC chassis is equipped with the following:@footnote{For detailed sizing cons
 @figref{14} illustrates the protocol configuration for the High Performance GSM/UMTS GPRS HLR
 system.  The protocol stack uses the following OpenSS7 stack components:
 
-@c @figuresized{protconf,14,Protocol Architecture,4in}
+@figuresized{protconf,14,Protocol Architecture,2.5in}
 
 @menu
 * Protocol Components::
@@ -1181,7 +1232,7 @@ case with the TPI interface and the XTI/mOSI.
 
 The OpenSS7 TCAP module supports all Operations Classes.
 
-@c @figuresized{tcap,15,Transaction Capabilities Application Part (TCAP) Modules,3in}
+@figuresized{tcap,15,Transaction Capabilities Application Part (TCAP) Modules,3in}
 
 A SIGTRAN TCAP-User Adaptation  Layer (TUA) or OpenSS7 @dfn{STREAMS} over
 @cindex SCTP
@@ -1216,7 +1267,7 @@ driver and the driver provides the functions of a SCCP endpoint or relay with fu
 translations.  Signalling Connection Control Part streams bound to TCAP SCCP-SAPs are linked under
 the TCAP driver to form a complete SS7 stack in support of call transactions.
 
-@c @figuresized{sccp,16,Signalling Connection Control Part (SCCP) Module,3in}
+@figuresized{sccp,16,Signalling Connection Control Part (SCCP) Module,3in}
 
 The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
@@ -1313,7 +1364,7 @@ above to form a complete SS7 stack in support of call switching.  Message Transf
 bound to SCCP MTP-SAPs are linked under the SCCP driver above to form a complete SS7 stack in
 support of transaction services.}
 
-@c @figuresized{mtp3,17,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
+@figuresized{mtp3,17,Message Transfer Part (MTP) Level 3 (MTP3) Module,3in}
 
 The MTP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including full transfer function.  The MTP driver provides a specialized MTP interface to
@@ -1328,7 +1379,7 @@ its users.
 The Message Transfer Part (MTP) Level 2 (MTP2) module is responsible for providing MTP services to
 its users.
 
-@c @figuresized{mtp2,18,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
+@figuresized{mtp2,18,Message Transfer Part (MTP) Level 2 (MTP2) Module,3in}
 
 These are an existing OpenSS7 SS7 stack components; for documentation, see:
 @ifinfo
@@ -1388,7 +1439,7 @@ The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximu
 
 The Signalling Link (SL) module is responsible for providing SL services to its users.
 
-@c @figuresized{sl,29,Signalling Link (SL) Module,3in}
+@figuresized{sl,29,Signalling Link (SL) Module,3in}
 
 This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifinfo
@@ -1419,7 +1470,7 @@ Version 2.0 Style 2 connectionless interface.
 
 The Signalling Data Terminal (SDT) module is responsible for providing SDT services to its users.
 
-@c @figuresized{sdt,20,Signalling Data Terminal (SDT) Module,3in}
+@figuresized{sdt,20,Signalling Data Terminal (SDT) Module,3in}
 
 This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifinfo
@@ -1539,13 +1590,13 @@ message blocks upstream and downstream with bidirectional queueing and 256 level
 addition, @dfn{STREAMS} provides memory management, timer, locking, synchronization, flow control
 and other facilities commonly used by protocol modules.
 
-@c @figure{osimap,21,SS7 to ISO/OSI Mapping}
+@figuresized{osimap,21,SS7 to ISO/OSI Mapping,3.5in}
 
 Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
 specialized interfaces.  Many of the OpenSS7 protocols modules provide TPI Version 2.0 interfaces
 with support for the OpenSS7 XTI/TLI Library.
 
-@c @figuresized{stack,22,STREAMS SS7/SIGTRAN Stack Architecture,3in}
+@figuresized{stack,22,STREAMS SS7/SIGTRAN Stack Architecture,3in}
 
 @figref{22} illustrates the organization of @dfn{STREAMS} modules, multiplexing drivers,
 pseudo-device drivers and real device drivers in the OpenSS7 SS7 stack.  At each interface, the
@@ -1566,7 +1617,7 @@ well as at its upper layer interface.
 @figref{23} illustrates the hardware configuration for the High Performance GSM/UMTS GPRS HLR
 evaluation platform.
 
-@c @figuresized{platconf,23,Platform Architecture,5in}
+@figuresized{platconf,23,Platform Architecture,5in}
 
 The High Performance GSM/UMTS GPRS HLR prototype platform consists of a medium end ix86 single
 processor PC in a hardened 19" rack mount chassis, loaded with WBEL3 Linux running a 2.4.21 kernel,
@@ -1634,7 +1685,7 @@ The T400P-SS7 and E400P-SS7 cards are 4-span T1 or E1 cards manufactured by
 @uref{http://www.digium.com/, Digium}.
 @figref{24} shows a picture of a T400P-SS7 card.
 
-@c @figure{v400p,24,T400P/E400P-SS7}
+@figure{v400p,24,T400P/E400P-SS7}
 
 The T400P-SS7 and E400P-SS7 cards have the lowest level of signalling performance due to the lack of
 on-board HDLC functions.  Transfers to the host processor over the PCI bus use PCI I/O ports and
@@ -1718,7 +1769,7 @@ Digium}.
 These cards are a higher performance replacement for the T400P-SS7 and E400P-SS7 cards.
 @figref{25} shows a picture of a T405P-SS7 card.
 
-@c @figure{t400p-ss7,25,TE405/410-SS7}
+@figure{t400p-ss7,25,TE405/410-SS7}
 
 The TE405-SS7 and TE410-SS7 cards have a low level of signalling performance due to the lack of
 on-board HDLC functions.  However, transfers to the host process over the PCI bus use bus-mastering
@@ -1798,7 +1849,7 @@ The A101/102/104c cards are 1-, 2- and 4-span E1, T1 or J1 cards manufactured by
 @uref{http://www.sangoma.com/, Sangoma}.
 @figref{26} shows a picture of an A101c card.
 
-@c @figure{a101c,26,A101/102/104c}
+@figure{a101c,26,A101/102/104c}
 
 The A10Xc cards have an increased level of signalling performance due to availability of on-board
 HDLC processing.  Transfers to the host are performed using bus-mastering PCI DMA burst transfers
@@ -1876,7 +1927,7 @@ The PCI 384 card is a 4-span E1/T1/J1 cards with 10/100baseT Ethernet manufactur
 @uref{http://www.pti.com/, Performance Technologies}.
 @figref{27} shows a picture of an PCI 384 card.
 
-@c @figure{t400p-ss7,27,PCI 384}
+@figure{t400p-ss7,27,PCI 384}
 
 The PCI 384 cards have the highest level of signalling performance because they have an on-board
 PowerQUICC II processor that performs Layer 2 (HDLC) and even some Layer 3 functions.  Transfers to
@@ -2059,13 +2110,13 @@ acceptance testing in a timely manner.
 
 @tabref{S-0} lists the initial (Gate 0) schedule estimates.
 
-@c @tabfig{hlr_schest,S-0,Initial (Gate 0) Project Estimate}
+@tabfig{hlr_schest,S-0,Initial (Gate 0) Project Estimate}
 
 @tabref{S-1} through @tabref{S-8} list the current (Gate 1) schedule estimates.
 These are planning estimates only and no commitment is provided to deliver to any schedule until
 Gate 2 is complete.
 
-@c @tabfig{hlr_sched,S-1,HLR Project Schedule}
+@tabfig{hlr_sched,S-1,HLR Project Schedule}
 
 @node Gate 0 --- Concept
 @subsection Gate 0 --- Concept
@@ -2074,7 +2125,7 @@ Gate 2 is complete.
 High-Level Design.  This is an internal OpenSS7 gate.
 @tabref{S-2} below lists the estimated schedule leading into @dfn{Gate 0}.
 
-@c @tabfig{hlr_gate0,S-2,HLR Project Schedule --- Gate 0}
+@tabfig{hlr_gate0,S-2,HLR Project Schedule --- Gate 0}
 
 Gate 0 was completed for the project on September 24, 2004 with the creation of the Initial design
 document and internal OpenSS7 staff decision to move forward with a High-Level Design.
@@ -2090,7 +2141,7 @@ requirements for passing Gate 1 of Phase 1 of the HLR project.  An external revi
 by a Beta or Gamma client or sponsor is pending.}
 @tabref{S-3} below lists the estimated schedule leading into @dfn{Gate 1}.
 
-@c @tabfig{hlr_gate1,S-3,HLR Project Schedule --- Gate 1}
+@tabfig{hlr_gate1,S-3,HLR Project Schedule --- Gate 1}
 
 This document completes the Gate 1 requirements October 20, 2004.  We are currently awaiting
 external review of this document and proceeding on Detailed Design documentation.
@@ -2108,7 +2159,7 @@ started.}
 Passing this gate moves from the design stage to the development stage of the project.
 @tabref{S-4} below lists the estimated schedule leading into @dfn{Gate 2}.
 
-@c @tabfig{hlr_gate2,S-4,HLR Project Schedule --- Gate 2}
+@tabfig{hlr_gate2,S-4,HLR Project Schedule --- Gate 2}
 
 @node Gate 3 --- Development and Implementation
 @subsection Gate 3 --- Development and Implementation
@@ -2118,7 +2169,7 @@ design is complete and testing has begun.  This is an internal review gate.  Ope
 passes this gate when software is code complete and hardware has been installed for testing.
 @tabref{S-5} below lists the estimated schedule leading into @dfn{Gate 3}.
 
-@c @tabfig{hlr_gate3,S-5,HLR Project Schedule --- Gate 3}
+@tabfig{hlr_gate3,S-5,HLR Project Schedule --- Gate 3}
 
 @node Gate 4 --- System Test
 @subsection Gate 4 --- System Test
@@ -2129,7 +2180,7 @@ passes this gate internally once conformance testing is complete.  Passing this 
 development stage to the support stage of the project.
 @tabref{S-6} below lists the estimated schedule leading into @dfn{Gate 4}.
 
-@c @tabfig{hlr_gate4,S-6,HLR Project Schedule --- Gate 4}
+@tabfig{hlr_gate4,S-6,HLR Project Schedule --- Gate 4}
 
 @node Gate 5 --- Acceptance Testing
 @subsection Gate 5 --- Acceptance Testing
@@ -2139,7 +2190,7 @@ testing.  This is an external review gate.  OpenSS7 passes this gate internally 
 in external acceptance testing is complete.
 @tabref{S-7} below lists the estimated schedule leading into @dfn{Gate 5}.
 
-@c @tabfig{hlr_gate5,S-7,HLR Project Schedule --- Gate 5}
+@tabfig{hlr_gate5,S-7,HLR Project Schedule --- Gate 5}
 
 @node Gate 6 --- Support Complete
 @subsection Gate 6 --- Support Complete
@@ -2149,7 +2200,7 @@ discharged.  This is an internal review gate.  OpenSS7 passes this gate once sup
 terminated.
 @tabref{S-8} below lists the estimated schedule leading into @dfn{Gate 6}.
 
-@c @tabfig{hlr_gate6,S-8,HLR Project Schedule --- Gate 6}
+@tabfig{hlr_gate6,S-8,HLR Project Schedule --- Gate 6}
 
 @node Cost
 @section Cost
@@ -2162,7 +2213,7 @@ hardware, Routers and LAN, and other sundry lab equipment be provided by the cli
 time is estimated at 100% effort per calendar week at our normal loaded rate.  Shipping costs,
 training, training material and travel costs are not listed and would be billed separately.
 
-@c @tabfig{hlr_cost,T-2,Estimated Cost}
+@tabfig{hlr_cost,T-2,Estimated Cost}
 
 @ignore
 @iftex
@@ -2256,7 +2307,7 @@ The other possible test arrangement is the Ferry Clip arrangement.  In this case
 Platform behaves like the 3GPP GSM/UMTS network surrounding the SGSN Implementation Under Test.
 This is illustrated in @figref{A-1} below.
 
-@c @figure{sgsntest,A-1,Ferry Clip Testing}
+@figure{sgsntest,A-1,Ferry Clip Testing}
 
 @node Optional Network Support
 @appendix Optional Network Support
@@ -2272,7 +2323,7 @@ This is illustrated in @figref{A-1} below.
 @figref{A-2} illustrates the SGSN Reference Interfaces from 3GPP TS 24.060 Release 5.9.0 that are
 supported by the High Performance GSM/UMTS GPRS HLR.
 
-@c @figure{sgsn,A-2,SGSN Reference Interfaces}
+@figure{sgsn,A-2,SGSN Reference Interfaces}
 
 @table @strong
 @item Iu Interface
@@ -2308,7 +2359,7 @@ This connects the 3G SGSN to an MSC/VLR.
 
 The @strong{Iu} interface connects the 3G SGSN to the UTRAN.
 
-@c @figure{iu,A-3,Iu Interface}
+@figure{iu,A-3,Iu Interface}
 
 UMTS Mobility Management and Session Management (GMM/SM): GMM supports mobility management
 functionality such as attach, detach, security, and routing area update, as described in "Mobility
@@ -2349,7 +2400,7 @@ adaptation shall be standardized below the SCCP protocol.
 
 See aslo TS 29.202 which provides the following signalling bearers:
 
-@c @figure{sigbearer,A-4,TS 29.2002 Signalling Bearers}
+@figure{sigbearer,A-4,TS 29.2002 Signalling Bearers}
 
 @node Gb Interface
 @subsection Gb Interface
@@ -2357,7 +2408,7 @@ See aslo TS 29.202 which provides the following signalling bearers:
 
 The @strong{Gb} interface connects the 2G SGSN to the BSS.
 
-@c @figure{gb,A-5,Gb Interface}
+@figure{gb,A-5,Gb Interface}
 
 GPRS Mobility Management and Session Management (GMM/SM): This protocol supports mobility management
 functionality such as GPRS attach, GPRS detach, security, routing area update, location update, PDP
@@ -2413,7 +2464,7 @@ procedures.
 
 The @strong{Gd} interface connects the 3G SGSN to the SMS-GMSC or SMS-IWMSC.
 
-@c @figure{gd,A-6,Gd Interface}
+@figure{gd,A-6,Gd Interface}
 
 Mobile Application Part (MAP):-  This protocol supports signalling between SGSN and SMS-GMSC or
 SMS-IWMSC, as described in clause "Point-to-point Short Message Service" of 3GPP TS 23.060.
@@ -2424,7 +2475,7 @@ SMS-IWMSC, as described in clause "Point-to-point Short Message Service" of 3GPP
 
 The @strong{Ge} interface connects the 3G SGSN to the Camel GSM SCF.
 
-@c @figure{ge,A-7,Ge Interface}
+@figure{ge,A-7,Ge Interface}
 
 @node Gf Interface
 @subsection Gf Interface
@@ -2432,7 +2483,7 @@ The @strong{Ge} interface connects the 3G SGSN to the Camel GSM SCF.
 
 The @strong{Gf} interface connects the 2G SGSN to the EIR.
 
-@c @figure{gf,A-8,Gg Interface}
+@figure{gf,A-8,Gg Interface}
 
 Mobile Application Part (MAP):-  This protocol supports signalling between the SGSN and the EIR, as
 described in "Identify Check" of 3GPP TS 23.060.
@@ -2443,7 +2494,7 @@ described in "Identify Check" of 3GPP TS 23.060.
 
 The @strong{Gn} interface connects the 3G SGSN to the local GGSN.
 
-@c @figure{gn,A-9,Gn Interface}
+@figure{gn,A-9,Gn Interface}
 
 GPRS Tunnelling Protocol for the control plane (GTP-C):-  This protocol tunnels signalling messages
 between SGSNs and GGSNs (Gn), and between SGSNs in the backbone network (Gp).
@@ -2457,7 +2508,7 @@ defined in RFC 768.
 
 The @strong{Gp} interface connects the 3G SGSN to the foreign GGSN.
 
-@c @figure{gp,A-10,Gp Interface}
+@figure{gp,A-10,Gp Interface}
 
 GPRS Tunnelling Protocol for the control plane (GTP-C):-  This protocol tunnels signalling messages
 between SGSNs and GGSNs (Gn), and between SGSNs in the backbone network (Gp).
@@ -2471,7 +2522,7 @@ defined in RFC 768.
 
 The @strong{Gs} interface connects the 3G SGSN to the MSC/VLR.
 
-@c @figure{gs,A-11,Gs Interface}
+@figure{gs,A-11,Gs Interface}
 
 Base Station System Application Part + (BSSAP+):-  A subset of BSSAP procedures supports signalling
 between the SGSN and MSC/VLR, as described in "Mobility Management Functionality" in 3GPP TS 23.060
@@ -2479,7 +2530,7 @@ and in 3GPP TS 29.018.  The requirements for the lower layers are specified in 3
 
 Additional information about supported signalling bearers is provided in 3GPP TS 29.202 as follows:
 
-@c @figure{sigbearer,A-12,TS 29.202 Signalling Bearers}
+@figure{sigbearer,A-12,TS 29.202 Signalling Bearers}
 
 @node Optional Protocol Support
 @appendix Optional Protocol Support
@@ -2646,7 +2697,7 @@ The ACB56 cards are single V.35 56/64kbps synchronous cards manufactured by
 SeaLevel Systems and distributed by ICS.
 @figref{A-13} shows a picture of an ACB56 card.
 
-@c @figure{acb56,A-13,ACB56}
+@figure{acb56,A-13,ACB56}
 
 @subsubheading Driver
 
@@ -2708,7 +2759,7 @@ The CPC 388 cards are 8-span E1/T1/J1 cards with dual-port Ethernet in a Compact
 manufactured by @uref{http://www.pti.com/, Performance Technologies}.
 @figref{A-14} shows a picture of an CPC 388 card.
 
-@c @figure{cpc388,A-14,CPC 388}
+@figure{cpc388,A-14,CPC 388}
 
 The CPC 388 cards have a high level of signalling performance because they have an on-board
 PowerQUICC II processor running an embedded Linux operating system (NexusWare based on YellowDog).
@@ -2786,7 +2837,7 @@ The CPC 396 cards are dual T3 cards with dual-port Ethernet in a CompactPCI PCMI
 manufactured by @uref{http://www.pti.com/, Performance Technologies}.
 @figref{A-15} shows a picture of an CPC 396 card.
 
-@c @figure{cpc396,A-15,CPC 396}
+@figure{cpc396,A-15,CPC 396}
 
 @subsubheading Driver
 
@@ -2827,7 +2878,7 @@ Following are the disadvantages of the CPC 396 cards:
 The PCA 200E card is a 155MHz ATM card manufactured by Marconi (formerly FORE).
 @figref{A-16} shows a picture of an PCA 200E card.
 
-@c @figure{pca200e,A-16,PCA 200E}
+@figure{pca200e,A-16,PCA 200E}
 
 The PCA 200E cards have a good level of signalling performance because they have an on-board 25MHz
 i960 Intel RISC processor performing cell processing using buffer rings in the same manner as an
@@ -2876,7 +2927,7 @@ Following are the disadvantages of the PCA 200E cards:
 
 A BRI card.
 
-@c @figure{bri,A-17,BRI}
+@figure{bri,A-17,BRI}
 
 @subsubheading Driver
 
@@ -3166,7 +3217,7 @@ Table 7.5/4.
 
 @tabref{T-1} below provides a traffic model for sizing the HLR application.
 
-@c @tabfig{hlr_traf,T-1,Low Mobility Traffic Model --- Peak}
+@tabfig{hlr_traf,T-1,Low Mobility Traffic Model --- Peak}
 
 @node HLR Sizing
 @section HLR Sizing

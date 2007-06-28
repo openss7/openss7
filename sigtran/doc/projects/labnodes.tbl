@@ -1,0 +1,59 @@
+.ie '\*(.T'ps' \{
+\X'ps: pagesize letter'
+.in 0.5i
+.ll 6.0i
+.lt 6.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.pl 11.0i
+.\}
+.el \{
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.\}
+.TS
+box center tab(:);
+cb|cb|cb|cb|cb|lbsssss
+c|c|c|c|c|lsssss.
+Node:Role:SS7:SIGTRAN:VoIP:Comments
+=
+A:LEC:SSP:\-:\-:T{
+Equivalent nodes B and C.
+T}
+B:::\-:\-:T{
+Equivalent nodes A and C.
+T}
+C:::\-:\-:T{
+Equivalent nodes A and B.
+T}
+::_:::_
+D::STP:\-:\-:T{
+Associated pair with E.
+T}
+E:::\-:\-:T{
+Associated pair with D.
+T}
+:_::_::_
+F:IC::SG:\-:T{
+Associated pair with G.
+T}
+G::::\-:T{
+Associated pair with F.
+T}
+::_::_:_
+H::SSP::MGC:T{
+Connected to SIGTRAN network only.
+T}
+:::_::_
+I:::ASP::T{
+Connected to SIGTRAN, VoIP Control and VoIP Signalling networks.
+T}
+:_:_:_:_:_
+J:X:Any:Any:Any:T{
+Administrative node and attacker simulation node.
+T}
+.TE
