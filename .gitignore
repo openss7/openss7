@@ -317,6 +317,7 @@ sigtran/doc/papers/xtios.eps
 sigtran/doc/papers/xtios.gif
 sigtran/doc/papers/xtios.pdf
 sigtran/doc/papers/xtios.png
+sigtran/doc/projects/sg.info
 sigtran/libltdl/*
 sigtran/LSM
 sigtran/scripts/config.guess
@@ -578,6 +579,7 @@ stacks/doc/manual/strss7.info
 stacks/doc/manual/strss7.info-1
 stacks/doc/manual/strss7.info-2
 stacks/doc/manual/strss7.info-3
+stacks/doc/projects/cnam.info
 stacks/doc/projects/hlr.info
 stacks/doc/projects/lab.info
 stacks/doc/projects/Makefile.in
@@ -593,6 +595,7 @@ stacks/doc/specs/mapi/Makefile.in
 stacks/doc/specs/mapi/mapi.info
 stacks/doc/specs/mapi/mapi.info-1
 stacks/doc/specs/mapi/mapi.info-2
+stacks/doc/specs/mtpi/mtpi.info
 stacks/doc/specs/npi/Makefile.in
 stacks/doc/specs/npi/npi.info
 stacks/doc/specs/npi/npi.info-1
@@ -1850,6 +1853,7 @@ strutil/tests/Makefile.in
 strutil/TODO
 strvoip/doc/manual/strvoip.info
 strvoip/doc/manual/strvoip.info-1
+strvoip/doc/projects/carrier/carrier.info
 strvoip/libltdl/*
 strvoip/LSM
 strvoip/scripts/config.guess

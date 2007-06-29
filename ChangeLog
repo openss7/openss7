@@ -1,3 +1,7 @@
+2007-06-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* .gitignore: more files to ignore
+
 2007-06-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/bugs.texi: document lib32gcc1 problem on ubuntu
