@@ -894,6 +894,85 @@ From the viewpoint of the SS7 or SIGTRAN network, the platform acts as a Signall
 for the purposes of passing CNAM queries and responses between the CNAM database and the locally
 attached SSPs.
 
+@figuresized{cnam_m2ua,44a,M2UA Network Architecture,4.5in}
+
+@figref{44a} illustrates functional separation between the CNAM signalling gateway and database at
+the lowest functional level in the SS7 stack, MTP Level 2.
+This arrangement has the following characteristics:
+
+@itemize @bullet
+
+@item SG nodes may be colocated with SSP nodes removing the need for graded SS7 transport
+facilities.
+
+@item The greatest number of SCTP associations are required between the DB and SG: one SCTP
+association is required for each signalling link, so each DB requires 3 SCTP associations to each SG
+for the configuration in @figref{44a}.
+
+@item MTP Level 3 must be shared across databases.  Therefore, some TCAP queries or aborts may
+appear at the wrong DB and must be routed to the other with cross-links.  Because of tight coupling
+of the DB nodes, they must be colocated.
+
+@item Functional placement does not efficiently utilize capacity: that is, the SG nodes will be
+performing very little work while the DB nodes will be performing the bulk of the work (both SS7
+stack processing as well as CNAM application processing).
+
+@end itemize
+
+
+@figuresized{cnam_m3ua,44b,M3UA Network Architecture,4.5in}
+
+@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+MTP Level 3.
+This arrangement has the following characteristics:
+
+@itemize @bullet
+
+@item
+
+@end itemize
+
+
+@figuresized{cnam_sua,44c,SUA Network Architecture,4.5in}
+
+@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+SCCP.
+This arrangement has the following characteristics:
+
+@itemize @bullet
+
+@item
+
+@end itemize
+
+
+@figuresized{cnam_tua,44d,TUA Network Architecture,4.5in}
+
+@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+TCAP.
+This arrangement has the following characteristics:
+
+@itemize @bullet
+
+@item
+
+@end itemize
+
+
+@figuresized{cnam_soap,44e,SOAP Network Architecture,4.5in}
+
+@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+SOAP.
+This arrangement has the following characteristics:
+
+@itemize @bullet
+
+@item
+
+@end itemize
+
+
+
 @menu
 * SG Reference Interfaces::
 @end menu

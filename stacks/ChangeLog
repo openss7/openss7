@@ -1,3 +1,13 @@
+2007-06-29  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/Makefile.am: working up CNAM document
+	* doc/projects/cnam.texi: working up CNAM document
+	* doc/projects/cnam_m2ua.fig: working up CNAM document
+	* doc/projects/cnam_m3ua.fig: working up CNAM document
+	* doc/projects/cnam_soap.fig: working up CNAM document
+	* doc/projects/cnam_sua.fig: working up CNAM document
+	* doc/projects/cnam_tua.fig: working up CNAM document
+
 2007-06-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/cnam_lab.fig: change orientation to portrait

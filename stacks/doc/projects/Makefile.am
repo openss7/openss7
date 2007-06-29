@@ -98,8 +98,14 @@ if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
 FIG_FIGS		= \
-			cnam_netarch.fig \
 			cnam_iface.fig \
+			cnam_lab.fig \
+			cnam_m2ua.fig \
+			cnam_m3ua.fig \
+			cnam_netarch.fig \
+			cnam_soap.fig \
+			cnam_sua.fig \
+			cnam_tua.fig \
 			c.fig \
 			d.fig \
 			gb.fig \
