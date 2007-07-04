@@ -1,3 +1,7 @@
+2007-07-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/cnam.texi: documentation updates
+
 2007-06-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: working up CNAM document

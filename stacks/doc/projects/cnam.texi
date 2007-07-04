@@ -928,7 +928,9 @@ This arrangement has the following characteristics:
 
 @itemize @bullet
 
-@item
+@item MTP Level 3 must be shared across the SGs, requiring cross-links between the SGs; however, as
+it is expected that both SGs are colocated wth the SSP, this does not present a difficulty.  DBs can
+be geographically dispersed.
 
 @end itemize
 
