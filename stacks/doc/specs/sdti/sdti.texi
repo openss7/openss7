@@ -1,0 +1,669 @@
+% -*- texinfo -*- vim: ft=texinfo
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% =========================================================================
+%
+% @(#) $Id: sdti.texi,v 0.9.2.1 2007/07/04 08:24:57 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2007/07/04 08:24:57 $ by $Author: brian $
+%
+% =========================================================================
+\input texinfo @c -*- texinfo -*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c %**start of header
+@setfilename sdti.info
+@include texi/args.texi
+@set MANUAL_TITLE Signalling Data Terminal Interface (SDTI)
+@set MANUAL_TYPE Application Programming Interface
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* SDTI: (sdti).			Signalling Data Terminal Interface
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE Signalling Data Terminal Interface (SDTI)
+@set MANUAL_TYPE Application Programming Interface
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the OpenSS7 @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}
+published by @uref{http://www.openss7.com/,OpenSS7 Corporation}.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
+royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
+copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
+this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
+representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed document carries
+copying permission notice identical to this one except for the removal of this paragraph (this paragraph not being
+relevant to the printed manual).
+
+@end ignore
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
+merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
+suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
+copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
+special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
+action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
+or the performance or implementation of the contents thereof.
+
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
+limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
+referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE Signalling Data Terminal Interface (SDTI)
+@set MANUAL_TYPE Application Programming Interface
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
+@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
+applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the signalling data terminal interface to these components
+as well as providing a basis for signalling data terminal control for other signalling data terminal protocols.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Unauthorized distribution or duplication is prohibited.
+
+@sp 1
+
+@ignore
+@noindent
+This software and related documentation is protected by copyright and distributed under licenses restricting its use,
+copying, distribution and decompilation.  No part of this software or related documentation may be reproduced in any
+form by any means without the prior written authorization of the copyright holder, and licensors, if any.
+
+@noindent
+The recipient of this document, by its retention and use, warrants that the recipient will protect this information and
+keep it confidential, and will not disclose the information contained in this document without the written permission of
+its owner.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
+limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
+referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+@end ignore
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
+royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
+copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
+this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
+representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
+merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
+suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
+copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
+special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
+action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
+or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
+limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
+technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
+referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@c Define an index of primitives
+@defindex pr
+@c Define an index of primitive values
+@defindex pv
+@c Define an index of protocol states
+@defindex st
+
+@c @syncodeindex pr cp
+@c @syncodeindex pv cp
+@c @syncodeindex tp cp
+@c @syncodeindex vr cp
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top Signalling Data Terminal Interface
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction::
+* The Signalling Data Terminal Layer::
+* SDTI Services Definition::
+* SDTI Primitives::
+* Diagnostics Requirements::
+* Addendum for ITU-T Q.703 Conformance::
+* Addendum for ANSI T1.111.3 Conformance::
+* Addendum for ETSI Conformance::
+* Mapping of SDTI Primitives to ITU-T Q.703::
+* Mapping of SDTI Primitives to ANSI T1.111.3::
+* State/Event Tables::
+* Primitive Precedence Tables::
+* SDTI Header File Listing::
+* License::
+* Glossary::
+* Acronyms::
+* References::
+* Indices::
+@end menu
+
+@node Preface
+@unnumbered Preface
+
+@section Security Warning
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
+royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
+copies and that the name of @cite{OpenSS7 Corporation} not be used in advertising or publicity pertaining to
+distribution of this documentation or its contents without specific, written prior permission.  @cite{OpenSS7
+Corporation} makes no representation about the suitability of this documentation for any purpose.  It is provided ``as
+is'' without express or implied warranty.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this documentation including
+all implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that the
+contents of the document are suitable for any purpose, or that the implementation of such contents will not infringe on
+any third party patents, copyrights, trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable
+for any direct, indirect, special or consequential damages or any damages whatsoever resulting from loss of use, data or
+profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with any
+use of this document or the performance or implementation of the contents thereof.
+
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a reference point for the
+industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this release of the
+document, minor changes may be made prior to products conforming to the interfaces being made available.
+
+@section Abstract
+
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
+@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
+applicability of the @value{MANUAL_TITLE}.
+
+@noindent
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Data Terminal (SDT) protocol
+stacks.  It provides abstraction of the signalling data terminal interface to these components as well as providing a basis for
+signalling data terminal control for other data terminal control protocols.
+
+@section Purpose
+
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.  This document
+is intended to be included with the OpenSS7 @cite{STREAMS}
+@cpindex STREAMS
+software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and
+users of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces that are
+made available in the software package.
+
+@section Intent
+
+It is the intent of this document that it act as the primary source of information concerning the @value{MANUAL_TITLE}.
+This document is intended to provide information for writers of OpenSS7 @value{MANUAL_TITLE} applications as well as
+writers of OpenSS7 @value{MANUAL_TITLE} Users.
+
+@section Audience
+
+The audience for this document is software developers, maintainers and users and integrators of the
+@value{MANUAL_TITLE}.
+The target audience is developers and users of the OpenSS7 SS7 stack.
+
+@section Disclaimer
+
+Although the author has attempted to ensure that the information in this document is complete and correct, neither
+the Author nor OpenSS7 Corporation will take any responsibility in it.
+
+@section Revision History
+
+Take care that you are working with a current version of this documentation: you will not be notified of updates.  To
+ensure that you are working with a current version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for
+a current version.
+
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document is an
+@strong{UNCONTROLLED VERSION}.
+
+@smallexample
+
+$Log: sdti.texi,v $
+Revision 0.9.2.1  2007/07/04 08:24:57  brian
+- added new files
+
+@end smallexample
+
+@node Introduction
+@chapter Introduction
+
+This document specifies a @cite{STREAMS}-based
+@cpindex STREAMS
+kernel-level instantiation of the ITU-T @value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a
+a signalling data terminal service to access and use any of a variety of conforming signalling data terminal providers without specific
+knowledge of the provider's protocol.  The service interface is designed to support any network signalling data terminal protocol
+and user signalling data terminal protocol.  This interface only specifies access to signalling data terminal service providers, and does not
+address issues concerning signalling data terminal management, protocol performance, and performance analysis tools.
+
+This specification assumes that the reader is familiar with ITU-T state machines and signalling data terminal interfaces (e.g.
+Q.703, Q.2210), and @cite{STREAMS}.
+@cpindex STREAMS
+
+@section Related Documentation
+
+@itemize ---
+@item @strong{ITU-T Recommendation Q.703 (White Book)}
+@item @strong{ITU-T Recommendation Q.2210 (White Book)}
+@item @strong{ANSI T1.111.3/2002}
+@item @strong{System V Interface Definition, Issue 2 - Volume 3}
+@end itemize
+
+@subsection Role
+
+This document specifies an interface that supports the services provided by the
+@dfn{Signalling System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation Q.703,
+ITU-T Recommendation Q.2210, ANSI T1.111.3, ETSI ETS 300 008-1.  These
+specifications are targeted for use by developers and testers of protocol modules that require signalling data terminal service.
+
+@section Definitions, Acronyms, Abbreviations
+
+@table @dfn
+@item Originating SDT User
+A SDT-User that initiates a Signalling Data Terminal.
+@item Destination SDT User
+A SDT-User with whom an originating SDT user wishes to establish a Signalling Data Terminal.
+@item ISO
+International Organization for Standardization
+@item SDT User
+Kernel level protocol or user level application that is accessing the services
+of the Signalling Data Terminal sub-layer.
+@item SDT Provider
+Signalling Data Terminal sub-layer entity/entities that provide/s the services of the
+Signalling Data Terminal interface.
+@item SDTI
+Signalling Data Terminal Interface
+@item TIDU
+Signalling Data Terminal Interface Data Unit
+@item TSDU
+Signalling Data Terminal Service Data Unit
+@item OSI
+Open Systems Interconnection
+@item QOS
+Quality of Service
+@item STREAMS
+@cpindex STREAMS
+A communication services development facility first available with UNIX System V Release 3.
+@end table
+
+@node The Signalling Data Terminal Layer
+@chapter The Signalling Data Terminal Layer
+
+@menu
+* Model of the SDTI::
+* SDTI Services::
+@end menu
+
+The Signalling Data Terminal Layer provides the means to manage the association of SDT-Users into connections.  It is responsible
+for the routing and management of data to and from signalling data terminal connections between SDT-user entities.
+
+@node Model of the SDTI
+@section Model of the SDTI
+
+The SDTI defines the services provided by the signalling data terminal layer to the signalling data terminal user at the boundary between
+the signalling data terminal provider and the signalling data terminal user entity.  The interface consists of a set of primitives defined
+as @cite{STREAMS}
+@cpindex STREAMS
+messages that provide access to the signalling data terminal layer services, and are transferred between the SDTS user entity and the
+SDTS provider.  These primitives are of two types; ones that originate from the SDTS user, and other that originate from
+the SDTS provider.  The primitives that originate from the SDTS user make requests to the SDTS provider, or respond to an
+indication of an event of the SDTS provider.  The primitives that originate from the SDTS provider are either
+confirmations of a request or are indications to the CCS user that an event has occurred.  @figref{1} shows the model
+of the SDTI.
+
+@figuresized{sdti01,1,Model of the SDTI,4.0in}
+
+The SDTI allows the SDTS provider to be configured with any call control layer user (such as an ISDN user call control
+application) that also conforms to the SDTI.  A call control layer user can also be a user program that conforms to the
+SDTI and accesses the SDTS provider via
+@command{@b{putmsg}(2s)}
+and
+@command{@b{getmsg}(2s)}
+system calls.
+
+@node SDTI Services
+@section SDTI Services
+
+The features of the SDTI are defined in terms of the services provided by the SDTS provider, and the individual primitives
+that may flow between the SDTS user and the SDTS provider.
+
+
+
+
+@node Diagnostics Requirements
+@chapter Diagnostics Requirements
+
+Two error handling facilities should be provided to the SDTS user: one to handle non-fatal errors, and the other
+to handle fatal errors.
+
+@section Non-Fatal Error Handling Facility
+
+These are errors that do not change the state of the SDTS interface as seen by the SDTS user and provide
+the user with the option of reissuing the MAP primitive with the corrected options specification.  The non-fatal error
+handling is provided only to those primitives that require acknowledgements, and uses the @code{MAP_ERROR_ACK} to report
+these errors.  These errors retain the state of the SDTS interface the same as it was before the MAP provider
+received the primitive that was in error.  Syntax errors and rule violations are reported via the non-fatal error
+handling facility.
+
+@section Fatal Error Handling Facility
+
+These errors are issued by the MAP provider when it detects errors that are not correctable by the MAP user, or if it is
+unable to report a correctible error to the SDTS user.  Fatal errors are indicated via the STREAMS message type
+@code{M_ERROR} with the UNIX system error @code{EPROTO}.  The @code{M_ERROR} STREAMS message type will result in the
+failure of all the UNIX system calls on the stream.  The SDTS user can recover from a fatal error by having all
+the processes close the files associated with the stream, and then reopening them for processing.
+
+@node References
+@chapter References
+
+@enumerate
+@item CCITT X.213, (Geneva, 1986), ``Network Service Definition for Open Systems Interconnection (OSI) for CCITT Applications,'' (Grey Book).
+@item ISO 8348 --- ``Information Processing Systems --- Data Communications --- Newtork Service Definition,'' 4/15/87
+@item ISO 8348/AD --- ``Information Processing Systems --- Data Communications --- Newtork Service Definition --- Addendum 1: Connectionless Mode Transmission,'' 4/15/87
+@item ISO 8373 --- ``Information Processing Systems --- Data Communicatoins Protocol for Providing the Connectionless Mode Network Service,'' SC6 N4542
+@item ISO 8208 --- ``Information Processing Systems --- X.25 Packet Level Protocol for Data Terminal Equipment,'' 9/1/87
+@item ISO 8878 --- ``Information Processing Systems --- Data Communications --- Use of X.25 to Provide the OSI Connection-Mode Network Service,'' 9/1/87
+@item System V Interface Definition, Issue 2 -- Volume 3
+@item CCITT X.210, (Geneva 1984), ``Open Systems Interconnection (OSI) Layer Service Definition Conventions,'' (Red Book)
+@end enumerate
+
+@node Addendum for 3GPP Conformance
+@unnumbered Addendum for 3GPP Conformance
+
+@node Mapping SDTI Primitives to 3GPP TS 29.002
+@appendix Mapping SDTI Primitives to 3GPP TS 29.002
+
+Table A-1 shows the mapping of the SDTI primitives to the SDTS definition primitives listed in 3GPP TS 29.002
+Release 6.6.0.
+
+@node State/Event Tables
+@appendix State/Event Tables
+
+@node Primitive Precedence Tables
+@appendix Primitive Precedence Tables
+
+@node SDTI Header File Listing
+@appendix SDTI Header File Listing
+
+@node License
+@unnumbered License
+
+@menu
+* GNU Free Documentation License::
+@end menu
+
+@include texi/fdl.texi
+
+@node SDTI Header File
+@chapter SDTI Header File
+
+@node Glossary
+@unnumbered Glossary
+
+@table @emph
+
+@item Signalling Data Terminal Service Data Unit
+
+A grouping of SDT user data whose boundaries are preserved from one end of the signalling data terminal connection to the
+other.
+
+@item Data transfer
+
+The phase in connection and connectionless modes that supports the transfer of data between to signalling data terminal
+users.
+
+@item SDT provider
+
+The signalling data terminal layer protocol that provides the services of the signalling data terminal interface.
+
+@item SDT user
+
+The user-level application or user-level or kernel-level protocol that accesses the services of the signalling data terminal
+layer.
+
+@item Local management
+
+The phase in connection and connectionless modes in which a SDT user initializes a stream and attaches a PPA address to
+the stream.  Primitives in this phase generate local operations only.
+
+@item PPA
+
+The point at which a system attaches itself to a physical communications medium.
+
+@item PPA identifier
+
+An identifier of a particular physical medium over which communication transpires.
+@end table
+
+@node Acronyms
+@unnumbered Acronyms
+
+@multitable {SDT SDU}{International Telecommunication Union - Telecom Sector}
+@item SDTI @tab Signalling Data Terminal Interface
+@item SDT @tab Signalling Data Terminal
+@item SDT SDU @tab Signalling Data Terminal Service Data Unit
+@item ITU-T @tab International Telecommunications Union - Telecom Sector
+@item PPA @tab Physical Point of Attachment
+@end multitable
+
+@node References
+@unnumbered References
+
+@multitable {000}{Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.}
+@item [1] @tab ITU-T Recommendation Q.700
+@item [2] @tab ITU-T Recommendation Q.701
+@item [3] @tab ITU-T Recommendation Q.702
+@item [4] @tab ITU-T Recommendation Q.703
+@item [5] @tab ITU-T Recommendation Q.704
+@item [6] @tab Geoffrey Gerrien, ``CDI - Application Program Interface Guide,'' Gcom, Inc., March 1999.
+@item [7] @tab ITU-T Recommendation Q.771
+@end multitable
+
+@c @node Index
+@c @unnumbered Index
+@c @printindex cp
+
+@node Indices
+@unnumbered Indices
+
+@menu
+* Concept Index::
+* Type Index::
+@c * Function Index::
+* Variable Index::
+@c * File Index::
+@c * Option Index::
+@c * Author Index::
+* Primitive Index::
+@c * Primitive Value Index::
+* Protocol State Index::
+@end menu
+
+@page
+@node Concept Index
+@section Concept Index
+
+@printindex cp
+
+@page
+@node Type Index
+@section Type Index
+
+@printindex tp
+
+@c @page
+@c @node Function Index
+@c @section Function Index
+
+@c @printindex fn
+
+@page
+@node Variable Index
+@section Variable Index
+
+@printindex vr
+
+@c @page
+@c @node File Index
+@c @section File Index
+
+@printindex pg
+
+@c @page
+@c @node Option Index
+@c @section Option Index
+
+@c @printindex op
+
+@c @page
+@c @node Author Index
+@c @section Author Index
+
+@c @printindex au
+
+@page
+@node Primitive Index
+@section Primitive Index
+
+@printindex pr
+
+@c @page
+@c @node Primitive Value Index
+@c @section Primitive Value Index
+
+@c @printindex pv
+
+@page
+@node Protocol State Index
+@section Protocol State Index
+
+@printindex st
+
+
+@page
+@shortcontents
+@page
+@contents
+@bye

@@ -1,0 +1,697 @@
+% -*- texinfo -*-
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+% =========================================================================
+%
+% @(#) $Id: mg.texi,v 0.9.2.1 2007/07/04 08:25:00 brian Exp $
+%
+% =========================================================================
+%
+% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+%
+% All Rights Reserved.
+%
+% Permission is granted to make and distribute verbatim copies of this
+% manual provided the copyright notice and this permission notice are
+% preserved on all copies.
+%
+% Permission is granted to copy and distribute modified versions of this
+% manual under the conditions for verbatim copying, provided that the
+% entire resulting derived work is distributed under the terms of a
+% permission notice identical to this one.
+% 
+% Since the Linux kernel and libraries are constantly changing, this
+% manual page may be incorrect or out-of-date.  The author(s) assume no
+% responsibility for errors or omissions, or for damages resulting from
+% the use of the information contained herein.  The author(s) may not
+% have taken the same level of care in the production of this manual,
+% which is licensed free of charge, as they might when working
+% professionally.
+% 
+% Formatted or processed versions of this manual, if unaccompanied by
+% the source, must acknowledge the copyright and authors of this work.
+%
+% -------------------------------------------------------------------------
+%
+% U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+% on behalf of the U.S. Government ("Government"), the following
+% provisions apply to you.  If the Software is supplied by the Department
+% of Defense ("DoD"), it is classified as "Commercial Computer Software"
+% under paragraph 252.227-7014 of the DoD Supplement to the Federal
+% Acquisition Regulations ("DFARS") (or any successor regulations) and the
+% Government is acquiring only the license rights granted herein (the
+% license rights customarily provided to non-Government users).  If the
+% Software is supplied to any unit or agency of the Government other than
+% DoD, it is classified as "Restricted Computer Software" and the
+% Government's rights in the Software are defined in paragraph 52.227-19
+% of the Federal Acquisition Regulations ("FAR") (or any successor
+% regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+% NASA Supplement to the FAR (or any successor regulations).
+%
+% =========================================================================
+% 
+% Commercial licensing and support of this software is available from
+% OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+% 
+% =========================================================================
+%
+% Last Modified $Date: 2007/07/04 08:25:00 $ by $Author: brian $
+%
+% =========================================================================
+%
+% $Log: mg.texi,v $
+% Revision 0.9.2.1  2007/07/04 08:25:00  brian
+% - added new files
+%
+% =========================================================================
+\input texinfo @c -*-texinfo-*-
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
+@c %**start of header
+@setfilename mg.info
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Media Gateway
+@set MANUAL_TYPE High-Level Design
+@settitle @value{MANUAL_TITLE}
+@c %**end of header
+
+@dircategory OpenSS7
+@direntry
+* Open MG: (openmg).			OpenSS7 Media Gateway
+@end direntry
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Media Gateway
+@set MANUAL_TYPE High-Level Design
+
+@comment The following copyright information goes at the head of each .info file.
+@ifinfo
+This file documents the @value{MANUAL_TITLE}.
+
+This is Edition @value{PACKAGE_VERSION}, last updated @value{PACKAGE_DATE}, for
+@value{PACKAGE_TITLE} version @value{PACKAGE_VERSION} release @value{PACKAGE_RELEASE}.
+
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+All Rights Reserved.
+
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@ignore
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries a copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
+
+@end ignore
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+@end ifinfo
+
+@include texi/args.texi
+@set MANUAL_TITLE OpenSS7 Media Gateway
+@set MANUAL_TYPE High-Level Design
+
+@ignore
+@shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
+@end ignore
+@titlepage
+@titlefont{@value{MANUAL_TITLE}}
+@sp 0.5
+@title @value{MANUAL_TYPE}
+@subtitle Version @value{PACKAGE_VERSION} Edition @value{PACKAGE_RELEASE}
+@subtitle Updated @value{PACKAGE_DATE}
+@sp 0.2
+@subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
+@sp 2
+@subtitle Copyright @copyright{} 2007  OpenSS7 Corporation
+@subtitle All Rights Reserved.
+@sp 4
+@quotation
+@subheading Abstract
+This document provides a @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+@end quotation
+@author Brian Bidulock <@email{bidulock@@openss7.org}> for
+@sp 0.2
+@author The OpenSS7 Project <@uref{http://www.openss7.org/}>
+
+@page
+@vskip 0pt plus 1filll
+@subsubheading Published by:
+@noindent
+@uref{http://www.openss7.com/,OpenSS7 Corporation} @*
+1469 Jefferys Crescent @*
+Edmonton, Alberta  T6L 6T1 @*
+Canada @*
+
+@noindent
+Copyright @copyright{} 2001-2007  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
+Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock}
+
+@noindent
+All Rights Reserved.
+
+@sp 1
+
+@noindent
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
+
+@subsubheading Notice:
+
+@noindent
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
+
+@sp 1
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@vskip 0pt
+@end titlepage
+@iftex
+@headings off
+@everyheading @thistitle @| @thisfile @| @thischaptername
+@evenheading @thischapter @| @| @thisfile
+@oddheading @thistitle @| @| @thischaptername
+@everyfooting Version @value{PACKAGE_VERSION} Ed. @value{PACKAGE_RELEASE} @| @value{PACKAGE_DATE} @| @thispage
+@evenfooting @thispage @| @| Version @value{PACKAGE_VERSION} Ed.  @value{PACKAGE_RELEASE}
+@oddfooting @value{PACKAGE_DATE} @| @| @thispage
+@end iftex
+@page
+
+@include texi/macros.texi
+@include texi/versions.texi
+
+@ifnottex
+@node Top
+@top OpenSS7 Media Gateway
+@end ifnottex
+
+@menu
+* Executive Overview::
+* Preface::
+* Introduction::
+* Index::
+@end menu
+
+@node Executive Overview
+@unnumbered Executive Overview
+
+This document provides a @value{MANUAL_TYPE} for @value{MANUAL_TITLE}.  The initial and primary
+purposes of this equipment is to provide a scalable, carrier-grade platform for terminating TDM
+voice circuits from the PSTN and providing Media Gatway capabilities for those terminated circuits.
+The purpose is both one of @dfn{hard switching}, where circuits are directly connected, as well as
+@dfn{soft switching}, where circuits are converted to RTP sessions and passed to another Media
+Gateway.
+
+@subsubheading The OpenSS7 Project
+
+The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software project that has
+developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
+Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
+OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
+License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+software under terms less restrictive than the GPL.
+
+@subsubheading The OpenSS7 Media Gateway
+
+OpenSS7 can provide VoIP gateway capabilities in a high-performance, low-cost, small-footprint
+platform leaveraging the GNU/Linux operating system distributions and tools, and utilizing low-cost
+commodity, or high-quality standardized hardware.
+
+For details on platform applications, see @ref{Application Architecture}, @ref{Network
+Architecture}, @ref{Optional Application Support}, and @ref{Optional Network Support}.
+
+@subsubheading Open Source Software
+
+The OpenSS7 Project leverages the widespread use of GNU/Linux operation systems, distributions, and
+FSF tools such as @samp{autoconf} and @dfn{RPM}.  For example, this document was formatted for PDF,
+HTML, info and plain text using the GNU @dfn{texinfo} system, @samp{autoconf}, and the @TeX{}
+formatting system.
+
+The open source model avoids proprietary lock-in and permits in-house or outsourced development.
+All source code is available for use and modification by the end customer.  All build tools,
+documentation and associated resources are generally available.  The availability of the source code
+and complete documentation eases problem resolution and can offer upgrades and fixes even in advance
+of client problem reports.  
+
+For details on software solutions, see @ref{Protocol Architecture}, @ref{Software Architecture},
+@ref{Optional Protocol Support}, and @ref{Optional Software Support}.
+
+@subsubheading Commodity Hardware
+
+By best utilizing commodity PC or standardized CompactPCI hardware, OpenSS7 makes available the
+highest performance platforms available on the market at back-to-school prices.  When carrier-grade
+and large scale is not essential, 3GHz Pentium class servers in hardened rack mount chassis can be
+used at a fraction of the cost, and yet outperform, other solutions.  Where carrier-grade is
+necessary, embedded Linux on standardized PICMG 2.16 NEBS compliant chassis make for a higher cost,
+but more reliable alternative.
+
+For details on hardware solutions, see @ref{Platform Architecture}, @ref{Hardware Architecture},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Rapid Development
+
+The OpenSS7 Project has already developed protocol components completing the SS7 and SIGTRAN
+signalling stacks including MTP Level 2 and Level 3, ISUP, SCCP, TCAP; and SCTP, M2PA, M2UA, M3UA,
+SUA and TUA.  Development of a Carrier VoIP Switch to meet initial field requirements needs only the
+development of some intermediate and auxillary modules.
+
+For details on scheduling, see @ref{Logistics}.
+
+@subsubheading An Evolving Solution
+
+The OpenSS7 Project is evolving to support more protocol stacks including ISDN and VoIP.  Support
+for an ever expanding capability is demonstrated by the additional options available as described in
+@ref{Optional Application Support}, @ref{Optional Network Support},
+@ref{Optional Protocol Support}, @ref{Optional Software Support},
+and @ref{Optional Hardware Support}.
+
+@subsubheading Conclusions
+
+In summary, an OpenSS7 Carrier VoIP Switch an excellent application of the OpenSS7 SS7 and VoIP stacks and
+can be provided at a affordable price on short time-lines, while offering an evolution path for
+future deployment applications.
+
+@sp 4
+
+@flushright
+@email{bidulock@@openss7.org, Brian Bidulock}
+The OpenSS7 Project
+@end flushright
+
+@node Preface
+@unnumbered Preface
+
+@section Document Information
+@cindex Document information
+
+@subsection Abstract
+@cindex Document abstract
+
+This document provides @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
+
+@subsection Objective
+@cindex Document objective
+
+The objective of this document is to provide Application Notes for the development of a low cost,
+high-performance, @value{MANUAL_TITLE} using OpenSS7 protocol components, software, and compatible
+systems and hardware.
+
+@subsection Intent
+@cindex Document intent
+
+The intent of this document is to act as a @value{MANUAL_TYPE} for an project for an @value{MANUAL_TYPE}.
+As a @value{MANUAL_TYPE}, this document discusses components and systems which are not necessarily
+complete.  @uref{http://www.openss7.com/,OpenSS7 Corporation} is under no obligation to provide any
+software, system or feature listed herein.
+
+@subsection Audience
+@cindex Document audience
+
+This document is intended for a technical audience.  The reaser should be familiar with most most
+ETSI, ITU-T and ANSI, Signalling System No. 7 recommendations, H.323, H.225, H.245, as well as IETF
+drafts and RFCS for RTP, SIP, SIP-T, MEGACO, MGCP, and SIGTRAN protocols.
+
+@subsection Revisions
+@cindex Document revisions
+
+Take care that you are working with a current version of this document: you will not be notified of
+updates.  To ensure that you are working with a current version, contact the
+@uref{mailto:bidulock@@openss7.org,Author}, or check @uref{http://www.openss7.org/,The OpenSS7
+Project} website for a current version.
+
+@subsubsection Version Control
+
+@smallexample
+
+$Log: mg.texi,v $
+Revision 0.9.2.1  2007/07/04 08:25:00  brian
+- added new files
+
+@end smallexample
+
+@subsubsection ISO 9000 Compliance
+
+Only the @TeX{}, texinfo, or roff source for this document is controlled.  An opaque (printed or
+postscript) version of this document is an @strong{UNCONTROLLED VERSION}.
+
+@subsection Disclaimer
+@cindex Document disclaimer
+
+@noindent
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
+
+@noindent
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
+
+@section Document Organization
+@cindex Document organization
+
+This document is organized as follows:
+
+@ifnottex
+@menu
+* Introduction::
+* Application Architecture::
+* Network Architecture::
+* Reference Architecture::
+* System Architecture::
+* Platform Architecture::
+* Protocol Architecture::
+* Software Architecture::
+* Hardware Architecture::
+* Logistics::
+* Optional Application Support::
+* Optional Network Support::
+* Optional Protocol Support::
+* Optional Software Support::
+* Optional Hardware Support::
+* Programmatic Interfaces::
+* Platform Sizing::
+* Index::
+@end menu
+@end ifnottex
+@iftex
+@table @emph
+@item @ref{Introduction}
+Introduction to the @value{MANUAL_TITLE} application.
+@item @ref{Application Architecture}
+The application requirements and architecture.
+@item @ref{Network Architecture}
+The network architecture for the application.
+@item @ref{Reference Architecture}
+The reference architecture for the application.
+@item @ref{System Architecture}
+The architecture of the @value{MANUAL_TITLE} system.
+@item @ref{Platform Architecture}
+The architecture of the @value{MANUAL_TITLE} platform.
+@item @ref{Protocol Architecture}
+The protocol architecture supporting the application.
+@item @ref{Software Architecture}
+The software architecture supporting the protocol stack and application.
+@item @ref{Hardware Architecture}
+The hardware architecture supporting the protocol stack and application.
+@item @ref{Logistics}
+Project logistics for completion of the VoIP GW application.
+@item @ref{Optional Application Support}
+Additional application support not directly contributing to the current objective.
+@item @ref{Optional Network Support}
+Additional network interface support not directly contributing to the current objective.
+@item @ref{Optional Protocol Support}
+Additional protocol component support not directly contributing to the current objective.
+@item @ref{Optional Software Support}
+Additional software support not directly contributing to the current objective.
+@item @ref{Optional Hardware Support}
+Additional hardware support not directly contributing to the current objective.
+@item @ref{Programmatic Interfaces}
+Programmatic interfaces to selected protocol components.
+@item @ref{Platform Sizing}
+Detailed platform sizing considerations.
+@item @ref{Index}
+Index of concepts.
+@end table
+@end iftex
+
+
+@node Introduction
+@chapter Introduction
+@cindex Introduction
+
+This document provides a @value{MANUAL_TYPE} for a  patform to provide scalable @value{MANUAL_TITLE}
+capabilities.  The primary driver for the @value{MANUAL_TITLE} is to provide a system capable of
+interconnecting a VoIP backbone to the PSTN using SS7.  This document provide a high-level design
+and proposal for a production system to provide this capability at a number of scale points.
+
+The proposal utilizes, where possible, existing OpenSS7 protocol stack components and provides a
+development plan for components that are specific to the @value{MANUAL_TITLE} initial requirements.
+
+This document discusses the resulting software configuration that will be put in place on the
+production system, the platform configuration for the production system, and a network configuration
+for deployment.  Also discussed is an overview of the project management logistics for successful
+completion over the course of this development project.
+
+It is intended that the document be a ``living'' document, that is updated over the course of this
+development project.
+
+@menu
+* The OpenSS7 Media Gateway::
+* Project Drivers::
+* Scope::
+@end menu
+
+@node The OpenSS7 Media Gateway
+@section The OpenSS7 Media Gateway
+@cindex The OpenSS7 Media Gateway
+
+This project provides an @value{MANUAL_TITLE} platform that provides interconnection to the PSTN
+using TDM circuits and is capable of routng call to and from the PSTN and a VoIP backbone network
+using @dfn{hard switching}, physical circuit switching, or @dfn{soft switching}, RTP transport.
+
+@node Project Drivers
+@section Project Drivers
+@cindex Project drivers
+
+The lead purpose of the @value{MANUAL_TITLE} is to provide PSTN interconnection to an existing VoIP
+backbone deployment infrastructure that lacks same.
+
+@node Scope
+@section Scope
+@cindex Scope
+
+Because of early deployment drivers yet requirements for scale, the @value{MANUAL_TITLE} platform is
+constructed using standardized PICMG 2.16 telephony hardware in a NEBS 3/ETSI compliant chassis
+providing carrier-grade serviceability and reliability.  Non-carrier-grade platforms utilizing
+commodity PC hardware for lower scale installations are possible.
+
+@menu
+* Phases::
+* Gates::
+@end menu
+
+@node Phases
+@subsection Phases
+@cindex Project phases
+
+The longer term project is broken into the following phases:
+
+@table @dfn
+@item Phase 1
+@item Phase 2
+@item Phase 3
+@item Phase 4
+@item Phase 5
+@end table
+
+Although some reference is made to capabilities supporting other phases, @dfn{Phase 1} and
+@dfn{Phase 2} are the focus of this document.
+
+@node Gates
+@subsection Gates
+@cindex Project gates
+
+Each phase of the project consists of seven gates.  The seven gates are defined as follows:
+
+@table @dfn
+
+@item Gate 0 --- Concept
+
+@noindent
+@dfn{Gate 0} is passed when the initial concept has been elucidated and work is begun on a
+High-Level Design.  This is an internal OpenSS7 gate.
+
+@item Gate 1 --- High Level Design
+
+@dfn{Gate 1} is passed when the high-level design has been reviewed to the satisfaction of the
+consumers of the project.  This is an external review gate.  OpenSS7 internally passes this gate
+once the High-Level Design has been published and work is begun on a detailed design.
+@footnote{This document is a High-Level Design an Proposal document and it meets the internal
+requirements for passing Gate 1 of Phase 1 and Phase 2 of the VoIP GW project.  An external review of
+this document by a Beta or Gamma client or sponsor is pending.}
+
+@item Gate 2 --- Detailed Design
+
+@dfn{Gate 2} is passed when the detailed design has been reviewed to the satisfaction of the
+consumers of the project and the developers on the project.  This is an external as well as an
+internal review gate.  OpenSS7 passes this gate once the Detailed Design has been published and work
+base begin on development and implementation of the design.
+@footnote{OpenSS7 requires a contractual commitment for purchase from a Beta or Gamma client, or
+funding from a Sponsor of the OpenSS7 Project, before this gate can be passed and development
+started.}
+Passing this gate moves from the design stage to the development stage of the project.
+
+@item Gate 3 --- Development and Implementation
+
+@dfn{Gate 3} is passed when the software and systems development and implementation to the detailed
+design is complete and testing has begun.  This is an internal review gate.  OpenSS7 internally
+passes this gate when software is code complete and hardware has been installed for testing.
+
+@item Gate 4 --- System Test
+
+@dfn{Gate 4} is passed once the product implementation meets all internal ad hoc and formal
+conformance test suites and internal testing is complete.  This is an internal review gate.  OpenSS7
+passes this gate internally once conformance testing is complete.  Passing this gate moves from the
+development stage to the support stage of the project.
+
+@item Gate 5 --- Acceptance Test
+
+@dfn{Gate 5} is passed once the product implementation has passed external Gamma client acceptance
+testing.  This is an external review gate.  OpenSS7 passes this gate internally once participation
+in external acceptance testing is complete.
+
+@item Gate 6 --- Project Complete
+
+@dfn{Gate 6} is passed once all support obligations for the product implementation have been
+discharged.  This is an internal review gate.  OpenSS7 passes this gate once support agreements have
+terminated.
+
+@end table
+
+For more details on Gate scheduling for Phase 1 and Phase 2 of the project, @pxref{Schedule}.
+
+@node Application Architecture
+@chapter Application Architecture
+@cindex Application architecture
+
+The @value{MANUAL_TITLE} is intendend to provide high-performance and high-density PSTN to VoIP
+backbone gateway.
+
+@section Application Requirements
+
+Application requirements have been broken into 5 phases using the timeboxing approach.
+
+@subsection Phase 1 Requirements
+
+Phase 1 requirements provide a VoIP gateway capability that will connect an existing H.323 VoIP
+network to the PSTN using SS7 ISUP trunks.
+
+@itemize ---
+@end itemize
+
+@itemize ---
+@end itemize
+
+@subsection Phase 2 Requirements
+
+Phase 2 requirements provide SIP-T capabilities.
+
+@itemize ---
+@end itemize
+
+@subsection Phase 3 Requirements
+
+Phase 3 requirements provide network service capabilities.
+
+@itemize ---
+@end itemize
+
+@subsection Phase 4 Requirements
+
+Phase 4 requirements expose internal interfaces to provide softswitch capabilities.
+
+@itemize ---
+@end itemize
+
+@subsection Phase 5 Requirements
+
+Phase 5 requirements complete full VoIP (NGN) switching.
+
+@itemize ---
+@end itemize
+
+@section Solution Architecture
+
+Although the functions of @dfn{Media Gateway Controller}, @dfn{Media Gateway} and @dfn{Signalling
+Gateway} have been decomposed, and in the past these functional groups have been implemented on
+separate physical platforms, modern compute capacity and densities permit these functions to be
+integrated into a single physical platform without limitation.  Open standard interfaces are
+utilized internal to the platform to permit a decomposed model to be split out and to permit ETSI
+Tiphon Version 4 compatiblity as well as Multi-Services Forum Version 2 compatibility.
+
+@subsection OpenSS7 Media Gateway for Deployment
+
+In light of the foregoing, the solution architecture takes the form of an integrated media gateway
+capable of providing a number of functional groups in the traditional models.  The OpenSS7 Media
+Gateway integrates the following functional groups while still permitting standard interfaces to be
+exposed for maximum deployment flexibility:
+
+@itemize ---
+@item
+@item
+@item
+@item
+@end itemize
+
+@section Call Flows
+
+This section provides some illustrative application call flows:@footnote{This section is not
+intended as a @dfn{Detailed Design}, but provides illustration only for these
+@dfn{@value{MANUAL_TYPE}}.}
+
+@node Network Architecture
+@chapter Network Architecture
+@cindex Network architecture
+
+
+
+@node Programmatic Interfaces
+@appendix Programmatic Interfaces
+@cindex Programmatic interfaces
+
+@node Platform Sizing
+@appendix Platform Sizing
+@cindex Platform sizing
+
+@node Index
+@unnumbered Index
+@printindex cp
+
+@page
+@shortcontents
+@page
+@contents
+@bye
