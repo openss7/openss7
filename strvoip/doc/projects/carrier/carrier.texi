@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: carrier.texi,v 0.9.2.1 2007/06/26 18:09:03 brian Exp $
+% @(#) $Id: carrier.texi,v 0.9.2.2 2007/07/04 08:32:19 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (C) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+% Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 %
 % All Rights Reserved.
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/26 18:09:03 $ by $Author: brian $
+% Last Modified $Date: 2007/07/04 08:32:19 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: carrier.texi,v $
+% Revision 0.9.2.2  2007/07/04 08:32:19  brian
+% - doc updates and m2pa correction
+%
 % Revision 0.9.2.1  2007/06/26 18:09:03  brian
 % - added new doc files
 %
@@ -104,14 +107,14 @@ implied warranty.
 
 @ignore
 Permission is granted to process this file through Tex and print the results, provided the printed
-document carries copying permission notice identical to this one except for the removal of this
+document carries a copying permission notice identical to this one except for the removal of this
 paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
 OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
 warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
 the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
 damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
@@ -184,7 +187,7 @@ implied warranty.
 @b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
 implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
 that the contents of the document are suitable for any purpose, or that the implementation of such
-contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+contents will not infringe on any third party patents, copyrights, trademarks or other rights.  In
 no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
 damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
 of contract, negligence or other tortious action, arising out of or in connection with any use of
@@ -325,8 +328,8 @@ This document provides @value{MANUAL_TYPE} for the @value{MANUAL_TITLE}.
 @cindex Document objective
 
 The objective of this document is to provide Application Notes for the development of a low cost,
-high-performance, Carrier VoIP Switch using OpenSS7 SS7 stack components, software, and compatible systems
-and hardware.
+high-performance, @value{MANUAL_TITLE} using OpenSS7 protocol components, software, and compatible
+systems and hardware.
 
 @subsection Intent
 @cindex Document intent
@@ -356,6 +359,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: carrier.texi,v $
+Revision 0.9.2.2  2007/07/04 08:32:19  brian
+- doc updates and m2pa correction
+
 Revision 0.9.2.1  2007/06/26 18:09:03  brian
 - added new doc files
 
@@ -464,8 +470,8 @@ capabilities.  The primary driver for the @value{MANUAL_TITLE} is to provide a s
 interconnecting a VoIP backbone to the PSTN using SS7.  This document provide a high-level design
 and proposal for a production system to provide this capability at a number of scale points.
 
-The proposal utilizes, where possible, existing OpenSS7 SS7 and VoIP stack components and provides a
-development plan for components that are specific to the OpenSS7 VoIP Switch initial requirements.
+The proposal utilizes, where possible, existing OpenSS7 protocol stack components and provides a
+development plan for components that are specific to the @value{MANUAL_TITLE} initial requirements.
 
 This document discusses the resulting software configuration that will be put in place on the
 production system, the platform configuration for the production system, and a network configuration
@@ -493,7 +499,7 @@ network using SIP-T, H.323 or BICC signalling an RTP transport.
 @section Project Drivers
 @cindex Project drivers
 
-The lead purpose of the @value{MANUAL_TITLE} is to provide PTSN interconnection to an existing VoIP
+The lead purpose of the @value{MANUAL_TITLE} is to provide PSTN interconnection to an existing VoIP
 backbone and deployment infrastructure that lacks same.
 
 @node Scope
@@ -501,7 +507,7 @@ backbone and deployment infrastructure that lacks same.
 @cindex Scope
 
 Because of early deployment drivers yet requirements for scale, the @value{MANUAL_TITLE} platform is
-contructed using standardized PICMG 2.16 telephony hardware in a NEBS 3/ETSI compliant chassis
+constructed using standardized PICMG 2.16 telephony hardware in a NEBS 3/ETSI compliant chassis
 providing carrier-grade serviciablity and reliability.  Non-carrier-grade platforms utilizing
 commodity PC hardware for lower scale installations are possible.
 
@@ -673,14 +679,14 @@ Phase 5 requirements complete full VoIP (NGN) switching.
 Although the functions of @dfn{Media Gateway Controller}, @dfn{Media Gateway} and @dfn{Signalling
 Gateway} have been decomposed, and in the past these functional groups have been implemented on
 separate physical platforms, modern compute capacity and densities permit these functions to be
-integrated into a single phyical platform without limitation.  Open standard interfaces are utilized
-internal to the platform to permit a decomposed model to be split out and to permit ETSI Tiphon
-Version 4 compatibility.
+integrated into a single physical platform without limitation.  Open standard interfaces are
+utilized internal to the platform to permit a decomposed model to be split out and to permit ETSI
+Tiphon Version 4 compatiblity as well as Multi-Services Forum Version 2 compatibility.
 
 @subsection OpenSS7 VoIP Switch for Deployment
 
 In light of the foregoing, the solution architecture takes the form of an integrated VoIP switch
-capability of providing a number of functional groups in the traditional models.  The OpenSS7 VoIP
+capable of providing a number of functional groups in the traditional models.  The OpenSS7 VoIP
 Switch integrates the following functional groups while still permitting standard interfaces to be
 exposed for maximum deployment flexibility:
 

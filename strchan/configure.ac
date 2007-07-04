@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/26 08:26:17 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/04 08:32:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/26 08:26:17 $ by $Author: brian $
+# Last Modified $Date: 2007/07/04 08:32:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strchan],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/26 08:26:17 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/04 08:32:18 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -181,6 +181,8 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/texi/args.texi
 		 doc/manual/Makefile
+		 doc/projects/Makefile
+		 doc/projects/mg/Makefile
 		 src/modules/Config
 		 src/drivers/Config])
 
@@ -189,6 +191,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.7  2007/07/04 08:32:18  brian
+# - doc updates and m2pa correction
+#
 # Revision 0.9.2.6  2007/03/26 08:26:17  brian
 # - need gnu gettext version 0.16.1 for autoconf 2.61
 #

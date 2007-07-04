@@ -4,6 +4,8 @@
 	* doc/projects/mg/Makefile.am: added new files
 	* doc/projects/mg/mg.texi: added new files
 
+	* configure.ac: added new makefiles
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release numbers

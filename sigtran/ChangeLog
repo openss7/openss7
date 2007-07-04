@@ -1,3 +1,7 @@
+2007-07-04  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/modules/m2pa_sl.c: ignore LSA in ALIGNED-READY state (w/o proving)
+
 2007-06-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/sg.texi: doc updates

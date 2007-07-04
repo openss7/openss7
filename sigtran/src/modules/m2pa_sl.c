@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/18 12:24:02 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/04 08:32:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:24:02 $ by $Author: brian $
+ Last Modified $Date: 2007/07/04 08:32:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.16  2007/07/04 08:32:14  brian
+ - doc updates and m2pa correction
+
  Revision 0.9.2.15  2007/05/18 12:24:02  brian
  - indentation
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/18 12:24:02 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/04 08:32:14 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/18 12:24:02 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/04 08:32:14 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -128,7 +131,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/05/18 12:24:02 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/04 08:32:14 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2875,6 +2878,10 @@ sl_lsc_status_alignment(struct sl *sl, queue_t *q)
 		sl_timer_start(sl, t3);
 		sl_set_state(sl, MS_ALIGNED);
 		return (QR_DONE);
+	case MS_ALIGNED_READY:
+		if (!proving)
+			return (QR_DONE);
+		/* fall through */
 	default:
 		if (sl->sl.notify.events & SL_EVT_FAIL_RECEIVED_SIO)
 			if ((err = lmi_event_ind(sl, q, SL_EVT_FAIL_RECEIVED_SIO, 0, NULL, 0)) < 0)
