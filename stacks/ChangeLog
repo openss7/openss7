@@ -9,6 +9,14 @@
 	* doc/specs/sli/Makefile.am: added new files
 	* doc/specs/sli/sli.texi: added new files
 
+	* doc/projects/Makefile.am: documentation updates
+	* doc/projects/cnam.texi: documentation updates
+	* doc/projects/cnam_m2ua.fig: documentation updates
+	* doc/projects/cnam_m3ua.fig: documentation updates
+	* doc/projects/cnam_soap.fig: documentation updates
+	* doc/projects/cnam_sua.fig: documentation updates
+	* doc/projects/cnam_tua.fig: documentation updates
+
 2007-06-29  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: working up CNAM document
