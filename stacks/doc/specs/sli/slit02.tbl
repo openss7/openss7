@@ -1,0 +1,223 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cbw(1.0in)|cbw(1.0in)|cbw(3.0in)
+l|l|l.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Initialization
+T}:T{
+.hy 0
+.ad l
+Power On
+T}:T{
+.hy 0
+.ad l
+SL_POWER_ON_REQ,
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Emergency
+T}:T{
+.hy 0
+.ad l
+SL_EMERGENCY_REQ,
+SL_EMERGENCY_CEASES_REQ,
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Start
+T}:T{
+.hy 0
+.ad l
+SL_START_REQ,
+SL_IN_SERVICE_IND,
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Stop
+T}:T{
+.hy 0
+.ad l
+SL_OUT_OF_SERVICE_IND,
+SL_STOP_REQ,
+T}
+_
+T{
+.hy 0
+.ad l
+Data Transfer
+T}:T{
+.hy 0
+.ad l
+Data Transfer
+T}:T{
+.hy 0
+.ad l
+SL_PDU_REQ,
+SL_PDU_IND
+T}
+_
+T{
+.hy 0
+.ad l
+Congestion
+T}:T{
+.hy 0
+.ad l
+Transmit Congestion
+T}:T{
+.hy 0
+.ad l
+SL_LINK_CONGESTED_IND,
+SL_LINK_CONGESTION_CEASED_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Receive Congestion
+T}:T{
+.hy 0
+.ad l
+SL_CONGESTION_DISCARD_REQ,
+SL_CONGESTION_ACCEPT_REQ,
+SL_NO_CONGESTION_REQ
+T}
+_
+T{
+.hy 0
+.ad l
+Restoration
+T}:T{
+.hy 0
+.ad l
+BSNT Retrieval
+T}:T{
+.hy 0
+.ad l
+SL_RETRIEVE_BSNT_REQ,
+SL_BSNT_IND,
+SL_BSNT_NOT_RETRIEVABLE_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Buffer Updating
+T}:T{
+.hy 0
+.ad l
+SL_RETRIEVAL_REQUEST_AND_FSNC_REQ,
+SL_RETRIEVED_MESSAGE_IND,
+SL_RETRIEVAL_COMPLETE_IND,
+SL_RETRIEVAL_NOT_POSSIBLE_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Buffer Clearing
+T}:T{
+.hy 0
+.ad l
+SL_CLEAR_BUFFERS_REQ,
+SL_CLEAR_RTB_REQ,
+SL_RB_CLEARED_IND,
+SL_RTB_CLEARED_IND
+T}
+_
+T{
+.hy 0
+.ad l
+Processor Outage
+T}:T{
+.hy 0
+.ad l
+Local Processor Outage
+T}:T{
+.hy 0
+.ad l
+SL_LOCAL_PROCESSOR_OUTAGE_REQ,
+SL_LOCAL_PROCESSOR_OUTAGE_IND,
+SL_RESUME_REQ,
+SL_LOCAL_PROCESSOR_RECOVERED_IND
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Remote Processor Outage
+T}:T{
+.hy 0
+.ad l
+SL_REMOTE_PROCESSOR_OUTAGE_IND,
+SL_REMOTE_PROCESSOR_RECOVERED_IND,
+SL_CONTINUE_REQ
+T}
+_
+T{
+.hy 0
+.ad l
+Options Management
+T}:T{
+.hy 0
+.ad l
+Options Management
+T}:T{
+.hy 0
+.ad l
+SL_OPTMGMT_REQ,
+SL_OPTMGMT_ACK
+T}
+_
+T{
+.hy 0
+.ad l
+Event Notification
+T}:T{
+.hy 0
+.ad l
+Event Notification
+T}:T{
+.hy 0
+.ad l
+SL_NOTIFY_REQ,
+SL_NOTIFY_IND
+T}
+.TE
