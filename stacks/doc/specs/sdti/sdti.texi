@@ -1,8 +1,8 @@
 % -*- texinfo -*- vim: ft=texinfo
-% vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+% vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sdti.texi,v 0.9.2.1 2007/07/04 08:24:57 brian Exp $
+% @(#) $Id: sdti.texi,v 0.9.2.2 2007/07/09 09:12:59 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,11 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/07/04 08:24:57 $ by $Author: brian $
+% Last Modified $Date: 2007/07/09 09:12:59 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
-@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
+@c vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 @c %**start of header
 @setfilename sdti.info
 @include texi/args.texi
@@ -89,31 +89,34 @@ Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidu
 
 All Rights Reserved.
 
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
 @ignore
-Permission is granted to process this file through Tex and print the results, provided the printed document carries
-copying permission notice identical to this one except for the removal of this paragraph (this paragraph not being
-relevant to the printed manual).
+Permission is granted to process this file through Tex and print the results, provided the printed
+document carries copying permission notice identical to this one except for the removal of this
+paragraph (this paragraph not being relevant to the printed manual).
 
 @end ignore
-OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
-merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
-action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.
+OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied
+warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that
+the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.
 
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ifinfo
 
 @include texi/args.texi
@@ -137,10 +140,11 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @sp 4
 @quotation
 @subheading Abstract
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
-@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the signalling data terminal interface to these components
-as well as providing a basis for signalling data terminal control for other signalling data terminal protocols.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.  It provides abstraction of the
+signalling data terminal interface to these components as well as providing a basis for signalling
+data terminal control for other signalling data terminal protocols.
 @end quotation
 @author Brian Bidulock <@email{bidulock@@openss7.org}> for
 @sp 0.2
@@ -168,48 +172,53 @@ Unauthorized distribution or duplication is prohibited.
 
 @ignore
 @noindent
-This software and related documentation is protected by copyright and distributed under licenses restricting its use,
-copying, distribution and decompilation.  No part of this software or related documentation may be reproduced in any
-form by any means without the prior written authorization of the copyright holder, and licensors, if any.
+This software and related documentation is protected by copyright and distributed under licenses
+restricting its use, copying, distribution and decompilation.  No part of this software or related
+documentation may be reproduced in any form by any means without the prior written authorization of
+the copyright holder, and licensors, if any.
 
 @noindent
-The recipient of this document, by its retention and use, warrants that the recipient will protect this information and
-keep it confidential, and will not disclose the information contained in this document without the written permission of
-its owner.
+The recipient of this document, by its retention and use, warrants that the recipient will protect
+this information and keep it confidential, and will not disclose the information contained in this
+document without the written permission of its owner.
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 @end ignore
 
 @noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of OpenSS7 Corporation not be used in advertising or publicity pertaining to distribution of
-this documentation or its contents without specific, written prior permission.  OpenSS7 Corporation makes no
-representation about the suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of OpenSS7 Corporation not be used in
+advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  OpenSS7 Corporation makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
 implied warranty.
 
 @subsubheading Notice:
 
 @noindent
-@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all implied warranties of
-merchantability, fitness for a particular purpose, non-infringement, or title; that the contents of the document are
-suitable for any purpose, or that the implementation of such contents will not infringe on any third party patents,
-copyrights, trademarks or other rights..  In no event shall OpenSS7 Corporation be liable for any direct, indirect,
-special or consequential damages or any damages whatsoever resulting from loss of use, data or profits, whether in an
-action of contract, negligence or other tortious action, arising out of or in connection with any use of this document
-or the performance or implementation of the contents thereof.}
+@b{OpenSS7 Corporation disclaims all warranties with regard to this documentation including all
+implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title;
+that the contents of the document are suitable for any purpose, or that the implementation of such
+contents will not infringe on any third party patents, copyrights, trademarks or other rights..  In
+no event shall OpenSS7 Corporation be liable for any direct, indirect, special or consequential
+damages or any damages whatsoever resulting from loss of use, data or profits, whether in an action
+of contract, negligence or other tortious action, arising out of or in connection with any use of
+this document or the performance or implementation of the contents thereof.}
 
 @sp 1
 
 @noindent
-OpenSS7 Corporation reserves the right to revise this software and documentation for any reason, including but not
-limited to, conformity with standards promulgated by various agencies, utilization of advances in the state of the
-technical arts, or the reflection of changes in the design of any techniques, or procedures embodied, described, or
-referred to herein.  OpenSS7 Corporation is under no obligation to provide any feature listed herein.
+OpenSS7 Corporation reserves the right to revise this software and documentation for any reason,
+including but not limited to, conformity with standards promulgated by various agencies, utilization
+of advances in the state of the technical arts, or the reflection of changes in the design of any
+techniques, or procedures embodied, described, or referred to herein.  OpenSS7 Corporation is under
+no obligation to provide any feature listed herein.
 
 @vskip 0pt
 @end titlepage
@@ -225,19 +234,49 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @page
 
 @c Define an index of primitives
-@defindex pr
+@defcodeindex pr
 @c Define an index of primitive values
-@defindex pv
+@defcodeindex pv
 @c Define an index of protocol states
-@defindex st
+@defcodeindex st
+@c Define an index of manual pages
+@defcodeindex pe
+@c Define an index of protocol errors
+@defindex mp
 
 @c @syncodeindex pr cp
 @c @syncodeindex pv cp
+@c @syncodeindex pe cp
 @c @syncodeindex tp cp
 @c @syncodeindex vr cp
 
 @include texi/macros.texi
 @include texi/versions.texi
+
+@macro prim {name}
+@prindex \name\
+@code{\name\}
+@end macro
+
+@macro pval {name}
+@pvindex \name\
+@code{\name\}
+@end macro
+
+@macro perr {name}
+@peindex \name\
+@code{\name\}
+@end macro
+
+@macro psta {name}
+@stindex \name\
+@code{\name\}
+@end macro
+
+@macro parm {name}
+@vrindex \name\
+@code{\name\}
+@end macro
 
 @ifnottex
 @node Top
@@ -251,13 +290,14 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 * SDTI Services Definition::
 * SDTI Primitives::
 * Diagnostics Requirements::
-* Addendum for ITU-T Q.703 Conformance::
-* Addendum for ANSI T1.111.3 Conformance::
-* Addendum for ETSI Conformance::
-* Mapping of SDTI Primitives to ITU-T Q.703::
-* Mapping of SDTI Primitives to ANSI T1.111.3::
-* State/Event Tables::
-* Primitive Precedence Tables::
+@c * Addendum for ITU-T Q.703 Conformance::
+@c * Addendum for ANSI T1.111.3 Conformance::
+@c * Addendum for ETSI ETS 300 008-1 Conformance::
+@c * Mapping of SDTI Primitives to ITU-T Q.703::
+@c * Mapping of SDTI Primitives to ANSI T1.111.3::
+@c * State/Event Tables::
+@c * Primitive Precedence Tables::
+* LMI Header File Listing::
 * SDTI Header File Listing::
 * License::
 * Glossary::
@@ -272,76 +312,83 @@ referred to herein.  OpenSS7 Corporation is under no obligation to provide any f
 @section Security Warning
 
 @noindent
-Permission to use, copy and distribute this documentation without modification, for any purpose and without fee or
-royalty is hereby granted, provided that both the above copyright notice and this permission notice appears in all
-copies and that the name of @cite{OpenSS7 Corporation} not be used in advertising or publicity pertaining to
-distribution of this documentation or its contents without specific, written prior permission.  @cite{OpenSS7
-Corporation} makes no representation about the suitability of this documentation for any purpose.  It is provided ``as
-is'' without express or implied warranty.
+Permission to use, copy and distribute this documentation without modification, for any purpose and
+without fee or royalty is hereby granted, provided that both the above copyright notice and this
+permission notice appears in all copies and that the name of @cite{OpenSS7 Corporation} not be used
+in advertising or publicity pertaining to distribution of this documentation or its contents without
+specific, written prior permission.  @cite{OpenSS7 Corporation} makes no representation about the
+suitability of this documentation for any purpose.  It is provided ``as is'' without express or
+implied warranty.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this documentation including
-all implied warranties of merchantability, fitness for a particular purpose, non-infringement, or title; that the
-contents of the document are suitable for any purpose, or that the implementation of such contents will not infringe on
-any third party patents, copyrights, trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable
-for any direct, indirect, special or consequential damages or any damages whatsoever resulting from loss of use, data or
-profits, whether in an action of contract, negligence or other tortious action, arising out of or in connection with any
-use of this document or the performance or implementation of the contents thereof.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} disclaims all warranties with regard to this
+documentation including all implied warranties of merchantability, fitness for a particular purpose,
+non-infringement, or title; that the contents of the document are suitable for any purpose, or that
+the implementation of such contents will not infringe on any third party patents, copyrights,
+trademarks or other rights.  In no event shall @cite{OpenSS7 Corporation} be liable for any direct,
+indirect, special or consequential damages or any damages whatsoever resulting from loss of use,
+data or profits, whether in an action of contract, negligence or other tortious action, arising out
+of or in connection with any use of this document or the performance or implementation of the
+contents thereof.
 
 @noindent
-@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a reference point for the
-industry.  While @cite{OpenSS7 Corporation} believes that these interfaces are well defined in this release of the
-document, minor changes may be made prior to products conforming to the interfaces being made available.
+@uref{http://www.openss7.com/,OpenSS7 Corporation} is making this documentation available as a
+reference point for the industry.  While @cite{OpenSS7 Corporation} believes that these interfaces
+are well defined in this release of the document, minor changes may be made prior to products
+conforming to the interfaces being made available.
 
 @section Abstract
 
-This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of the
-@value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well as platform and system
-applicability of the @value{MANUAL_TITLE}.
+This document is a @value{MANUAL_TYPE} containing technical details concerning the implementation of
+the @value{MANUAL_TITLE} for OpenSS7.  It contains recommendations on software architecture as well
+as platform and system applicability of the @value{MANUAL_TITLE}.
 
 @noindent
-This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling Data Terminal (SDT) protocol
-stacks.  It provides abstraction of the signalling data terminal interface to these components as well as providing a basis for
-signalling data terminal control for other data terminal control protocols.
+This document specifies a @value{MANUAL_TITLE} Specification in support of the OpenSS7 Signalling
+Data Terminal (SDT) protocol stacks.  It provides abstraction of the signalling data terminal
+interface to these components as well as providing a basis for signalling data terminal control for
+other data terminal control protocols.
 
 @section Purpose
 
-The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.  This document
-is intended to be included with the OpenSS7 @cite{STREAMS}
+The purpose of this document is to provide technical documentation of the @value{MANUAL_TITLE}.
+This document is intended to be included with the OpenSS7 @cite{STREAMS}
 @cpindex STREAMS
-software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software developers, maintainers and
-users of the @value{MANUAL_TITLE} with understanding the software architecture and technical interfaces that are
-made available in the software package.
+software package released by @cite{OpenSS7 Corporation}.  It is intended to assist software
+developers, maintainers and users of the @value{MANUAL_TITLE} with understanding the software
+architecture and technical interfaces that are made available in the software package.
 
 @section Intent
 
-It is the intent of this document that it act as the primary source of information concerning the @value{MANUAL_TITLE}.
-This document is intended to provide information for writers of OpenSS7 @value{MANUAL_TITLE} applications as well as
-writers of OpenSS7 @value{MANUAL_TITLE} Users.
+It is the intent of this document that it act as the primary source of information concerning the
+@value{MANUAL_TITLE}.  This document is intended to provide information for writers of OpenSS7
+@value{MANUAL_TITLE} applications as well as writers of OpenSS7 @value{MANUAL_TITLE} Users.
 
 @section Audience
 
 The audience for this document is software developers, maintainers and users and integrators of the
-@value{MANUAL_TITLE}.
-The target audience is developers and users of the OpenSS7 SS7 stack.
+@value{MANUAL_TITLE}.  The target audience is developers and users of the OpenSS7 SS7 stack.
 
 @section Disclaimer
 
-Although the author has attempted to ensure that the information in this document is complete and correct, neither
-the Author nor OpenSS7 Corporation will take any responsibility in it.
+Although the author has attempted to ensure that the information in this document is complete and
+correct, neither the Author nor OpenSS7 Corporation will take any responsibility in it.
 
 @section Revision History
 
-Take care that you are working with a current version of this documentation: you will not be notified of updates.  To
-ensure that you are working with a current version, check the @uref{http://www.openss7.org/,OpenSS7 Project} website for
-a current version.
+Take care that you are working with a current version of this documentation: you will not be
+notified of updates.  To ensure that you are working with a current version, check the
+@uref{http://www.openss7.org/,OpenSS7 Project} website for a current version.
 
-Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document is an
-@strong{UNCONTROLLED VERSION}.
+Only the texinfo or roff source is controlled.  A printed (or postscript) version of this document
+is an @strong{UNCONTROLLED VERSION}.
 
 @smallexample
 
 $Log: sdti.texi,v $
+Revision 0.9.2.2  2007/07/09 09:12:59  brian
+- working up SDTI specification
+
 Revision 0.9.2.1  2007/07/04 08:24:57  brian
 - added new files
 
@@ -352,14 +399,16 @@ Revision 0.9.2.1  2007/07/04 08:24:57  brian
 
 This document specifies a @cite{STREAMS}-based
 @cpindex STREAMS
-kernel-level instantiation of the ITU-T @value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE} enables the user of a
-a signalling data terminal service to access and use any of a variety of conforming signalling data terminal providers without specific
-knowledge of the provider's protocol.  The service interface is designed to support any network signalling data terminal protocol
-and user signalling data terminal protocol.  This interface only specifies access to signalling data terminal service providers, and does not
-address issues concerning signalling data terminal management, protocol performance, and performance analysis tools.
+kernel-level instantiation of the ITU-T @value{MANUAL_TITLE} definition.  The @value{MANUAL_TITLE}
+enables the user of a a signalling data terminal service to access and use any of a variety of
+conforming signalling data terminal providers without specific knowledge of the provider's protocol.
+The service interface is designed to support any network signalling data terminal protocol and user
+signalling data terminal protocol.  This interface only specifies access to signalling data terminal
+service providers, and does not address issues concerning signalling data terminal management,
+protocol performance, and performance analysis tools.
 
-This specification assumes that the reader is familiar with ITU-T state machines and signalling data terminal interfaces (e.g.
-Q.703, Q.2210), and @cite{STREAMS}.
+This specification assumes that the reader is familiar with ITU-T state machines and signalling data
+terminal interfaces (e.g.  Q.703, Q.2210), and @cite{STREAMS}.
 @cpindex STREAMS
 
 @section Related Documentation
@@ -373,14 +422,23 @@ Q.703, Q.2210), and @cite{STREAMS}.
 
 @subsection Role
 
-This document specifies an interface that supports the services provided by the
-@dfn{Signalling System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation Q.703,
-ITU-T Recommendation Q.2210, ANSI T1.111.3, ETSI ETS 300 008-1.  These
-specifications are targeted for use by developers and testers of protocol modules that require signalling data terminal service.
+This document specifies an interface that supports the services provided by the @dfn{Signalling
+System No. 7 (SS7)} for ITU-T, ANSI and ETSI applications as described in ITU-T Recommendation
+Q.703, ITU-T Recommendation Q.2210, ANSI T1.111.3, ETSI ETS 300 008-1.  These specifications are
+targeted for use by developers and testers of protocol modules that require signalling data terminal
+service.
 
 @section Definitions, Acronyms, Abbreviations
 
 @table @dfn
+@item LM
+Local Management.
+@item LMS
+Local Management Service.
+@item LMS User
+A user of Local Management Services.
+@item LMS Provider
+A provider of Local Management Services.
 @item Originating SDT User
 A SDT-User that initiates a Signalling Data Terminal.
 @item Destination SDT User
@@ -414,98 +472,4847 @@ A communication services development facility first available with UNIX System V
 @menu
 * Model of the SDTI::
 * SDTI Services::
+* Purpose of the SDTI::
 @end menu
 
-The Signalling Data Terminal Layer provides the means to manage the association of SDT-Users into connections.  It is responsible
-for the routing and management of data to and from signalling data terminal connections between SDT-user entities.
+The Signalling Data Terminal Layer provides the means to manage the association of SDT-Users into
+connections.  It is responsible for the routing and management of data to and from signalling data
+terminal connections between SDT-user entities.
 
 @node Model of the SDTI
 @section Model of the SDTI
 
-The SDTI defines the services provided by the signalling data terminal layer to the signalling data terminal user at the boundary between
-the signalling data terminal provider and the signalling data terminal user entity.  The interface consists of a set of primitives defined
-as @cite{STREAMS}
+The SDTI defines the services provided by the signalling data terminal layer to the signalling data
+terminal user at the boundary between the signalling data terminal provider and the signalling data
+terminal user entity.  The interface consists of a set of primitives defined as @cite{STREAMS}
 @cpindex STREAMS
-messages that provide access to the signalling data terminal layer services, and are transferred between the SDTS user entity and the
-SDTS provider.  These primitives are of two types; ones that originate from the SDTS user, and other that originate from
-the SDTS provider.  The primitives that originate from the SDTS user make requests to the SDTS provider, or respond to an
-indication of an event of the SDTS provider.  The primitives that originate from the SDTS provider are either
-confirmations of a request or are indications to the CCS user that an event has occurred.  @figref{1} shows the model
+messages that provide access to the signalling data terminal layer services, and are transferred between
+the SDTS user entity and the SDTS provider.  These primitives are of two types; ones that originate
+from the SDTS user, and other that originate from the SDTS provider.  The primitives that originate
+from the SDTS user make requests to the SDTS provider, or respond to an indication of an event of
+the SDTS provider.  The primitives that originate from the SDTS provider are either confirmations of
+a request or are indications to the CCS user that an event has occurred.  @figref{1} shows the model
 of the SDTI.
 
-@figuresized{sdti01,1,Model of the SDTI,4.0in}
+@figuresized{sdti01,1,Model of the SDTI,3.0in}
 
-The SDTI allows the SDTS provider to be configured with any call control layer user (such as an ISDN user call control
-application) that also conforms to the SDTI.  A call control layer user can also be a user program that conforms to the
-SDTI and accesses the SDTS provider via
-@command{@b{putmsg}(2s)}
-and
-@command{@b{getmsg}(2s)}
-system calls.
+The SDTI allows the SDTS provider to be configured with any signalling data terminal layer user (such as
+a signalling link application) that also conforms to the SDTI.  A signalling data terminal
+layer user can also be a user program that conforms to the SDTI and accesses the SDTS provider via
+@command{@b{putmsg}(2s)} and @command{@b{getmsg}(2s)} system calls.  The typical configuration,
+however, is to place a signalling link module above the signalling data terminal layer.
 
 @node SDTI Services
 @section SDTI Services
 
-The features of the SDTI are defined in terms of the services provided by the SDTS provider, and the individual primitives
-that may flow between the SDTS user and the SDTS provider.
+The features of the SDTI are defined in terms of the services provided by the SDTS provider, and the
+individual primitives that may flow between the SDTS user and the SDTS provider.
+
+The SDTI Services are broken into two groups: local management services and protocol services.
+Local management services are responsible for the local management of streams, assignment of streams
+to physical points of attachment, enabling and disabling of streams, management of options
+associated with a stream, and general acknowledgement and event reporting for the stream.  Protocol
+services consist of connecting a stream to a medium, exchanging data with the medium, and
+disconnecting the stream from the medium.
+
+@subsection Local Management
+
+Local management services are listed in @tabref{1}.
+
+@tabfig{lmit01,1,Local Management Services}
+
+The local management services interface is described in @ref{Local Management Services}, and the
+primitives are detailed in @ref{Local Management Service Primitives}.  The local management services
+interface is defined by the @file{ss7/lmi.h} header file (@pxref{LMI Header File Listing}).
+
+@subsection Protocol
+
+Protocol services are listed in @tabref{2}.
+
+@tabfig{sdtit02,2,Protocol Services}
+
+The protocol services interface is described in @ref{Protocol Services}, and the primitives are
+detailed in @ref{Protocol Service Primitives}.  The protocol services interface is defined by the
+@file{ss7/sdti.h} header file (@pxref{SDTI Header File Listing}).
+
+@node Purpose of the SDTI
+@section Purpose of the SDTI
+
+The SDTI is typically implemented as a device driver controlling a MPCC (Multi-Protocol Controller Chip)
+device that provides access to channels.  The purpose behind exposing this low level interface is
+that almost all communications channel devices can be placed into a SS7 HDLC mode, where a data
+stream can be exchanged between the driver and the medium.  The SDTI provides and inteface that, once
+implemented as a driver for a new device, can provide complete and verified SS7 signalling link
+capabilities by pushing generic SL (Signalling Link) modules over
+an open device stream.
+
+This allows SL modules to be verified independently for correct operation and then simply
+used for all manner of new device drivers that can implement the SDTI interface.
+
+@node SDTI Services Definition
+@chapter SDTI Services Definition
+
+@menu
+* Local Management Services::
+* Protocol Services::
+@end menu
+
+@node Local Management Services
+@section Local Management Services
+
+@menu
+* Acknowledgement Service::
+* Information Reporting Service::
+* Physical Point of Attachment Service::
+* Initialization Service::
+* Options Management Service::
+* Error Reporting Service::
+* Statistics Reporting Service::
+* Event Reporting Service::
+@end menu
+
+@node Acknowledgement Service
+@subsection Acknowledgement Service
+
+The acknowledgement service provides the LMS user with the ability to receive positive and negative
+acknowledgements regarding the successful or unsuccessful completion of services.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-OK_@-ACK}}:
+The @prim{LMI_@-OK_@-ACK} message is used by the LMS provider to indicate successful receipt and
+completion of a service primitive request that requires positive acknowledgement.
+
+@item @b{@prim{LMI_@-ERROR_@-ACK}}:
+The @prim{LMI_@-ERROR_@-ACK} message is used by the LMS provider to indicate successful receipt and
+failure to complete a service primitive request that requires negative acknowledgement.
+
+@end itemize
+
+A successful invocation of the acknowledgement service is illustrated in @figref{15}.
+
+@figuresized{lmi15,15,Message Flow: Successful Acknowledgement Service,4.0in}
+
+As illustrated in @figref{15}, the
+service primitives for which a positive acknowledgement may be returned are the
+@prim{LMI_@-ATTACH_@-REQ} and @prim{LMI_@-DETACH_@-REQ}.
+
+An unsuccessful invocation of the acknowledgement service is illustrated in @figref{16}.
+
+@figuresized{lmi16,16,Message Flow: Unsuccessful Acknowledgement Service,4.0in}
+
+As illustrated in @figref{16}, the
+service primitives for which a negative acknowledgement may be returned are the
+@prim{LMI_@-INFO_@-REQ}, @prim{LMI_@-ATTACH_@-REQ}, @prim{LMI_@-DETACH_@-REQ},
+@prim{LMI_@-ENABLE_@-REQ}, @prim{LMI_@-DISABLE_@-REQ} and @prim{LMI_@-OPTMGMT_@-REQ} messages.
+
+@node Information Reporting Service
+@subsection Information Reporting Service
+
+The information reporting service provides the LMS user with the ability to elicit information from
+the LMS provider.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-INFO_@-REQ}}:
+The @prim{LMI_@-INFO_@-REQ} message is used by the LMS user to request information about the LMS
+provider.
+
+@item @b{@prim{LMI_@-INFO_@-ACK}}:
+The @prim{LMI_@-INFO_@-ACK} message is issued by the LMS provider to provide requested information about
+the LMS provider.
+
+@end itemize
+
+A successful invocation of the information reporting service is illustrated in @figref{2}.
+
+@figuresized{lmi02,2,Message Flow: Successful Information Reporting Service,4.0in}
+
+@node Physical Point of Attachment Service
+@subsection Physical Point of Attachment Service
+
+The local management interface provides the LMS user with the ability to associate a stream to a
+physical point of appearance (@dfn{PPA}) or to disassociate a stream from a PPA.  The local
+management interface provides for two styles of LMS provider:
+
+@subsubheading Style 1 LMS Provider
+
+A @dfn{Style 1} LMS provider is a provider that associates a stream with a PPA at the time of the
+first @manref{open(2)} call for the device, and disassociates a stream from a PPA at the time of the
+last @manref{close(2)} call for the device.
+
+Physical points of attachment (PPA) are assigned to major and minor device number combinations.
+When the major and minor device number combination is opened, the opened stream is automatically
+associated with the PPA for the major and minor device number combination.  The last close of the
+device disassociates the PPA from the stream.
+
+Freshly opened @dfn{Style 1} LMS provider streams start life in the @psta{LMI_@-DISABLED} state.
+
+This approach is suitable for LMS providers implemented as real or pseudo-device drivers and is
+applicable when the number of minor devices is small and static.
+
+@subsubheading Style 2 LMS Provider
+
+A @dfn{Style 2} LMS provider is a provider that associates a stream with a PPA at the time that the
+LMS user issues the @prim{LMI_@-ATTACH_@-REQ} message.  Freshly opened streams are not associated with any
+PPA.  The @dfn{Style 2} LMS provider stream is disassociated from a PPA when the stream is closed
+or when the LMS user issues the @prim{LMI_@-DETACH_@-REQ} message.
+
+Freshly opened @dfn{Style 2} LMS provider streams start life in the @psta{LMI_@-UNATTACHED} state.
+
+This approach is suitable for LMS providers implemented as clone real or pseudo-device drivers  and
+is applicable when the number of minor devices is large or dynamic.
+
+@menu
+* PPA Attachment Service::
+* PPA Detachment Service::
+@end menu
+
+@node PPA Attachment Service
+@subsubsection PPA Attachment Service
+
+The PPA attachment service provides the LMS user with the ability to attach a @dfn{Style 2} LMS
+provider stream to a physical point of appearance (PPA).
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-ATTACH_@-REQ}}:
+The @prim{LMI_@-ATTACH_@-REQ} message is issued by the LMS user to request that a @dfn{Style 2} LMS
+provider stream be attached to a specified physical point of appearance (PPA).
+
+@item @b{@prim{LMI_@-OK_@-ACK}}:
+Upon successful receipt and processing of the @prim{LMI_@-ATTACH_@-REQ} message, the LMS provider
+acknowledges the success of the service completion with a @prim{LMI_@-OK_@-ACK} message.
+
+@item @b{@prim{LMI_@-ERROR_@-ACK}}:
+Upon successful receipt but failure to process the @prim{LMI_@-ATTACH_@-REQ} message, the LMS provider
+acknowledges the failure of the service completion with a @prim{LMI_@-ERROR_@-ACK} message.
+
+@end itemize
+
+A successful invocation of the attachment service is illustrated in @figref{3}.
+
+@figuresized{lmi03,3,Message Flow: Successful Attachment Service,4.0in}
 
 
+@node PPA Detachment Service
+@subsubsection PPA Detachment Service
+
+The PPA detachment service provides the LMS user with the ability to detach a @dfn{Style 2} LMS
+provider stream from a physical point of attachment (PPA).
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-DETACH_@-REQ}}:
+The @prim{LMI_@-DETACH_@-REQ} message is issued by the LMS user to request that a @dfn{Style 2} LMS
+provider stream be detached from the attached physical point of appearance (PPA).
+
+@item @b{@prim{LMI_@-OK_@-ACK}}:
+Upon successful receipt and processing of the @prim{LMI_@-DETACH_@-REQ} message, the LMS provider
+acknowledges the success of the service completion with a @prim{LMI_@-OK_@-ACK} message.
+
+@item @b{@prim{LMI_@-ERROR_@-ACK}}:
+Upon successful receipt but failure to process the @prim{LMI_@-DETACH_@-REQ} message, the LMS provider
+acknowledges the failure of the service completion with a @prim{LMI_@-ERROR_@-ACK} message.
+
+@end itemize
+
+A successful invocation of the detachment service is illustrated in @figref{4}.
+
+@figuresized{lmi04,4,Message Flow: Successful Detachment Service,4.0in}
+
+@node Initialization Service
+@subsection Initialization Service
+
+The initialization service provides the LMS user with the abilty to enable and disable the stream
+for the associated PPA.
+
+@menu
+* Interface Enable Service::
+* Interface Disable Service::
+@end menu
+
+@node Interface Enable Service
+@subsubsection Interface Enable Service
+
+The interface enable service provides the LMS user with the ability to enable an LMS provider
+stream that is associated with a PPA.  Enabling the interface permits the LMS user to exchange
+protocol service interface messages with the LMS provider.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-ENABLE_@-REQ}}:
+The @prim{LMI_@-ENABLE_@-REQ} message is issued by the LMS user to request that the protocol service
+interface be enabled.
+
+@item @b{@prim{LMI_@-ENABLE_@-CON}}:
+Upon successful enabling of the protocol service interface, the LMS provider acknowledges
+successful completion of the service by issuing a @prim{LMI_@-ENABLE_@-CON} message to the LMS user.
+
+@item @b{@prim{LMI_@-ERRORK_@-ACK}}:
+Upon unsuccessful enabling of the protocol service interface, the LMS provider acknowledges the
+failure to complete the service by issuing an @prim{LMI_@-ERROR_@-ACK} message to the LMS user.
+
+@end itemize
+
+A successful invocation of the enable service is illustrated in @figref{5}.
+
+@figuresized{lmi05,5,Message Flow: Successful Enable Service,4.0in}
+
+@node Interface Disable Service
+@subsubsection Interface Disable Service
+
+The interface disable service provides the LMS user with the ability to disable an LMS provider
+stream that is associated with a PPA.  Disabling the interface withdraws the LMS user's ability to
+exchange protocol service interface messages with the LMS provider.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-DISABLE_@-REQ}}:
+The @prim{LMI_@-DISABLE_@-REQ} message is issued by the LMS user to request that the protocol service
+interface be disabled.
+
+@item @b{@prim{LMI_@-DISABLE_@-CON}}:
+Upon successful disabling of the protocol service interface, the LMS provider acknowledges
+successful completion of the service by issuing a @prim{LMI_@-DISABLE_@-CON} message to the LMS user.
+
+@item @b{@prim{LMI_@-ERRORK_@-ACK}}:
+Upon unsuccessful disabling of the protocol service interface, the LMS provider acknowledges the
+failure to complete the service by issuing an @prim{LMI_@-ERROR_@-ACK} message to the LMS user.
+
+@end itemize
+
+A successful invocation of the disable service is illustrated in @figref{6}.
+
+@figuresized{lmi06,6,Message Flow: Successful Disable Service,4.0in}
+
+@node Options Management Service
+@subsection Options Management Service
+
+The options management service provides the LMS user with the ability to control and affect various
+generic and provider-specific options associated with the LMS provider.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-OPTMGMT_@-REQ}}:
+The LMS user issues a @prim{LMI_@-OPTMGMT_@-REQ} message when it wishes to interrogate or affect the
+setting of various generic or provider-specific options associated with the LMS provider for the
+stream upon which the message is issued.
+
+@item @b{@prim{LMI_@-OPTMGMT_@-ACK}}:
+Upon successful receipt of the @prim{LMI_@-OPTMGMT_@-REQ} message, and successful options processing, the
+LMS provider acknowledges the successful completion of the service with an @prim{LMI_@-OPTMGMT_@-ACK}
+message.
+
+@item @b{@prim{LMI_@-ERROR_@-ACK}}:
+Upon successful receipt of the @prim{LMI_@-OPTMGMT_@-REQ} message, and unsuccessful options processing, the
+LMS provider acknowledges the failure to complete the service by issuing an @prim{LMI_@-ERROR_@-ACK}
+message to the LMS user.
+
+@end itemize
+
+A successful invocation of the options management service is illustrated in @figref{7}.
+
+@figuresized{lmi07,7,Message Flow: Successful Options Management Service,4.0in}
+
+@node Error Reporting Service
+@subsection Error Reporting Service
+
+The error reporting service provides the LMS provider with the ability to indicate asynchronous
+errors to the LMS user.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-ERROR_@-IND}}:
+The LMS provider issues the @prim{LMI_@-ERROR_@-IND} message to the LMS user when it needs to indicate an
+asynchronous error (such as the unusability of the communications medium).
+
+@end itemize
+
+A successful invocation of the error reporting service is illustrated in @figref{8}.
+
+@figuresized{lmi08,8,Message Flow: Successful Error Reporting Service,4.0in}
+
+@node Statistics Reporting Service
+@subsection Statistics Reporting Service
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-STATS_@-IND}}:
+
+@end itemize
+
+A successful invocation of the statistics reporting service is illustrated in @figref{9}.
+
+@figuresized{lmi09,9,Message Flow: Successful Statistics Reporting Service,4.0in}
+
+@node Event Reporting Service
+@subsection Event Reporting Service
+
+The event reporting service provides the LMS provider with the ability to indicate specific
+asynchronous management events to the LMS user.
+
+@itemize @bullet
+
+@item @b{@prim{LMI_@-EVENT_@-IND}}:
+The LMS provider issues the @prim{LMI_@-EVENT_@-IND} message to the LMS user when it wishes to indicate
+an asynchronous (management) event to the LMS user.
+
+@end itemize
+
+A successful invocation of the event reporting service is illustrated in @figref{10}.
+
+@figuresized{lmi10,10,Message Flow: Successful Event Reporting Service,4.0in}
+
+@node Protocol Services
+@section Protocol Services
+
+Protocol services are specific to the Signalling Data Terminal interface.  These services consist of
+connection services that permit the transmit and receive directions to be connected to or
+disconnected from the medium, and data transfer services that permit the exchange of data between SDTS
+users.
+
+@menu
+* Power On Service::
+* Data Transfer Service::
+* Initial Alignment Service::
+* Error Rate Monitoring Service::
+* Receive Congestion Service::
+@end menu
+
+@node Power On Service
+@subsection Power On Service
+
+The power on service provides the SDTS user with the ability to power up the receive and trasmitters
+associated with the medium.  Transmitters and receivers can be powered up independently.  Data
+trasnfer cannot occur until the transmitters or receivers have been powered up.
+
+@itemize @bullet
+
+@item @prim{SDT_@-DAEDT_@-START_@-REQ}:
+This service primitive allows the SDTS user to request that transmission of bits begin on the
+medium.
+
+@item @prim{SDT_@-DAEDR_@-START_@-REQ}:
+This service primitive allows the SDTS user to request that receiption of bits from the medium begin.
+
+@end itemize
+
+@node Data Transfer Service
+@subsection Data Transfer Service
+
+The data transfer service provides the SDTS user with the ability to exchange signal units with the
+SDTS provider.  Signal units may be sent to the SDTS provider for transmission and received
+signal units are delivered to the SDTS user by the SDTS provider.  Timing queues can also be
+indicated by the SDTS provider.
+
+@itemize @bullet
+
+@item @prim{SDT_@-DAEDT_@-TRANSMISSION_@-REQ}:
+This service primitive allows the SDTS user to request the transmission of a signal unit.
+
+@item @prim{SDT_@-RC_@-SIGNAL_@-UNIT_@-IND}:
+This service primitive allows the SDTS provider to indicate when a signal unit has been received.
+
+@item @prim{SDT_@-TXC_@-TRANSMISSION_@-REQUEST_@-IND}:
+This service primitive allows the SDTS provider to indicate when it is idle (that is, it is
+requesting transmission).
+
+@end itemize
+
+@node Initial Alignment Service
+@subsection Initial Alignment Service
+
+The initial alignment service provides for all of the mechanisms associated with the Alignment Error
+Rate Monitor (AERM).  This includes the ability for the SDTS user to start and stop the AERM, set
+the proving period to either normal proving or emergency proving, to receive correct signal unit
+indications and indications of when the error rate exceeds the configured threshold.
+
+@itemize @bullet
+
+@item @prim{SDT_@-AERM_@-START_@-REQ}:
+This service primitive allows the SDTS user to request that the ERM for alignment be started.  This
+is normally performed when initial alignment begins on the signalling link.
+
+@item @prim{SDT_@-AERM_@-SET_@-TI_@-TO_@-TIN_@-REQ}:
+This service primitive allows the SDTS user to request that the ERM for alignment use the error
+threshold values for normal alignment.
+
+@item @prim{SDT_@-AERM_@-SET_@-TI_@-TO_@-TIE_@-REQ}:
+This service primitive allows the SDTS user to request that the ERM for alignment use the error
+threshold values for emergency alignment.
+
+@item @prim{SDT_@-IAC_@-CORRECT_@-SU_@-IND}:
+This service primitive allows the SDTS provider to indicate when a signal unit has sucessfully been
+received during initial alignment.
+
+@item @prim{SDT_@-IAC_@-ABORT_@-PROVING_@-IND}:
+This service primitive allows the SDTS provider to indicate when the Alignment Error Rate Monitor
+(AERM) exceeds it threshold.
+
+@item @prim{SDT_@-AERM_@-STOP_@-REQ}:
+This service primitive allows the SDTS user to request that the ERM for alignment be stopped.  This
+is normally performed when initial alignement ends for the signalling link.
+
+@end itemize
+
+@node Error Rate Monitoring Service
+@subsection Error Rate Monitoring Service
+
+The error rate monitoring service provides all of the mechanisms associated with the Signal Unit
+Error Rate Monitor (SUERM) or Errored Interval Monitor (EIM).  This includes the ability for the
+SDTS user to start and stop the SUERM/EIM, and be notified when the error rate exceeds the
+configured threshold.
+
+@itemize @bullet
+
+@item @prim{SDT_@-SUERM_@-START_@-REQ}:
+This service primitive allows the SDTS user to request that the ERM for normal operation be started.
+This is normally performed when intial alignment ends for the signalling link.
+
+@item @prim{SDT_@-LSC_@-LINK_@-FAILURE_@-IND}:
+This service primitive allows the SDTS provider to indicate when the Signal Unit Error Rate Monitor
+(SUERM) exceeds its threshold.
+
+@item @prim{SDT_@-SUERM_@-STOP_@-REQ}:
+This service primitive allows the SDTS user to request that the ERM for normal operation be stopped.
+This is normally performed when initial alignment begins for the signalling link.
+
+@end itemize
+
+@node Receive Congestion Service
+@subsection Receive Congestion Service
+
+The receive congestion service providers mechanisms to implement provider-specific receive
+congestion indications to the SDTS user.
+
+@itemize @bullet
+
+@item @prim{SDT_@-RC_@-CONGESTION_@-ACCEPT_@-IND}:
+This service primitive allows the SDTS provider to indicate when receive congestion has onset, but
+not to the point that it is dicarding signal units.
+
+@item @prim{SDT_@-RC_@-CONGESTION_@-DISCARD_@-IND}:
+This service primitive allows the SDTS provider to indicate when receive congestion has onset, and
+signal units are being dicarded.
+
+@item @prim{SDT_@-RC_@-NO_@-CONGESTION_@-IND}:
+This service primitive allows the SDTS provider to indicate when receive congestion abates.
+
+@end itemize
+
+@node SDTI Primitives
+@chapter SDTI Primitives
+
+@menu
+* Local Management Service Primitives::
+* Protocol Service Primitives::
+@end menu
+
+@node Local Management Service Primitives
+@section Local Management Service Primitives
+
+These service primitives implement the local management services (@pxref{Local Management
+Services}).
+
+@menu
+* Acknowledgement Service Primitives::
+* Information Reporting Service Primitives::
+* Physical Point of Attachment Service Primitives::
+* Initialization Service Primitives::
+* Options Management Service Primitives::
+* Event Reporting Service Primitives::
+@end menu
+
+@node Acknowledgement Service Primitives
+@subsection Acknowledgement Service Primitives
+
+These service primitives implement the acknowledgement service (@pxref{Acknowledgement Service}).
+
+@menu
+* LMI_OK_ACK::
+* LMI_ERROR_ACK::
+@end menu
+
+@node LMI_OK_ACK
+@subsubsection LMI_OK_ACK
+
+@subsubheading Description
+
+This primitive is used to acknowledge receipt and successful service completion for
+primitives requiring acknowledgement that have no confirmation primitive.
+
+@subsubheading Format
+
+This primitive consists of one @prim{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_long lmi_correct_primitive;
+    lmi_ulong lmi_state;
+} lmi_ok_ack_t;
+@end verbatim
+@tpindex lmi_ok_ack_t
+@end display
+
+@subsubheading Parameters
+
+The service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-OK_@-ACK}.
+
+@item lmi_@-correct_@-primitive
+Indicates the service primitive that was received and serviced correctly.  This field can be one of
+the following values:
+
+@table @prim
+
+@ignore
+@item LMI_@-INFO_@-REQ
+Information request.
+@end ignore
+@item LMI_@-ATTACH_@-REQ
+Attach request.
+@item LMI_@-DETACH_@-REQ
+Detach request.
+@ignore
+@item LMI_@-ENABLE_@-REQ
+Enable request.
+@item LMI_@-DISABLE_@-REQ
+Disable request.
+@item LMI_@-OPTMGMT_@-REQ
+Options management request.
+@item LMI_@-INFO_@-ACK
+Information acknowledgement.
+@item LMI_@-OK_@-ACK
+Successful receipt acknowledgement.
+@item LMI_@-ERROR_@-ACK
+Error acknowledgement.
+@item LMI_@-ENABLE_@-CON
+Enable confirmation.
+@item LMI_@-DISABLE_@-CON
+Disable confirmation.
+@item LMI_@-OPTMGMT_@-ACK
+Options Management acknowledgement.
+@item LMI_@-ERROR_@-IND
+Error indication.
+@item LMI_@-STATS_@-IND
+Statistics indication.
+@item LMI_@-EVENT_@-IND
+Event indication.
+@end ignore
+
+@end table
+
+@item lmi_@-state
+
+Indicates the current state of the LMS provider at the time that the primitive was issued.
+This field can be one of the following values:
+
+@table @psta
+
+@item LMI_@-UNATTACHED
+No PPA attached, awaiting @prim{LMI_@-ATTACH_@-REQ}.
+@ignore
+@item LMI_@-ATTACH_@-PENDING
+Waiting for attach.
+@end ignore
+@item LMI_@-UNUSABLE
+Device cannot be used, STREAM in hung state.
+@item LMI_@-DISABLED
+PPA attached, awaiting @prim{LMI_@-ENABLE_@-REQ}.
+@ignore
+@item LMI_@-ENABLE_@-PENDING
+Waiting to send @prim{LMI_@-ENABLE_@-CON}.
+@end ignore
+@item LMI_@-ENABLED
+Ready for use, awaiting primitive exchange.
+@ignore
+@item LMI_@-DISABLE_@-PENDING
+Waiting to send @prim{LMI_@-DISABLE_@-CON}.
+@item LMI_@-DETACH_@-PENDING
+Waiting for detach.
+@end ignore
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the LMS provider in the @psta{LMI_@-ATTACH_@-PENDING} or
+@psta{LMI_@-DETACH_@-PENDING} state.
+
+@subsubheading New State
+
+The new state is @psta{LMI_@-UNATTACHED} or @psta{LMI_@-DISABLED}, depending on thee primitive to
+which the message is responding.
+
+@page
+@node LMI_ERROR_ACK
+@subsubsection LMI_ERROR_ACK
+
+@subsubheading Description
+
+The error acknowledgement primitive is used to acknowledge receipt and unsuccessful service
+completion for primitives requiring acknowledgement.
+
+@subsubheading Format
+
+The error acknowledgement primitive consists of one @prim{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_errno;
+    lmi_ulong lmi_reason;
+    lmi_long lmi_error_primitive;
+    lmi_ulong lmi_state;
+} lmi_error_ack_t;
+@end verbatim
+@tpindex lmi_error_ack_t
+@end display
+
+@subsubheading Parameters
+
+The error acknowledgement primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+
+Indicates the primitive type.  Always @prim{LMI_@-ERROR_@-ACK}.
+
+@item lmi_@-errno
+
+Indicates the LM error number.
+This field can have one of the following values:
+
+@table @perr
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+@end table
+
+@item lmi_@-reason
+
+Indicates the reason for failure.  This field is protocol-specific.  When the @parm{lmi_@-errno} field
+is @perr{LMI_@-SYSERR}, the @parm{lmi_@-reason} field is the UNIX error number as described in
+@manref{errno(3)}.
+
+@item lmi_@-error_@-primitive
+
+Indicates the primitive that was in error.
+This field can have one of the following values:
+
+@table @prim
+@item LMI_@-INFO_@-REQ
+Information request.
+@item LMI_@-ATTACH_@-REQ
+Attach request.
+@item LMI_@-DETACH_@-REQ
+Detach request.
+@item LMI_@-ENABLE_@-REQ
+Enable request.
+@item LMI_@-DISABLE_@-REQ
+Disable request.
+@item LMI_@-OPTMGMT_@-REQ
+Options management request.
+@item LMI_@-INFO_@-ACK
+Information acknowledgement.
+@item LMI_@-OK_@-ACK
+Successful receipt acknowledgement.
+@item LMI_@-ERROR_@-ACK
+Error acknowledgement.
+@item LMI_@-ENABLE_@-CON
+Enable confirmation.
+@item LMI_@-DISABLE_@-CON
+Disable confirmation.
+@item LMI_@-OPTMGMT_@-ACK
+Options Management acknowledgement.
+@item LMI_@-ERROR_@-IND
+Error indication.
+@item LMI_@-STATS_@-IND
+Statistics indication.
+@item LMI_@-EVENT_@-IND
+Event indication.
+@end table
+
+@item lmi_@-state
+
+Indicates the state of the LMS provider at the time that the primitive was issued.
+This field can have one of the following values:
+
+@table @psta
+@item LMI_@-UNATTACHED
+No PPA attached, awaiting @prim{LMI_@-ATTACH_@-REQ}.
+@item LMI_@-ATTACH_@-PENDING
+Waiting for attach.
+@item LMI_@-UNUSABLE
+Device cannot be used, STREAM in hung state.
+@item LMI_@-DISABLED
+PPA attached, awaiting @prim{LMI_@-ENABLE_@-REQ}.
+@item LMI_@-ENABLE_@-PENDING
+Waiting to send @prim{LMI_@-ENABLE_@-CON}.
+@item LMI_@-ENABLED
+Ready for use, awaiting primitive exchange.
+@item LMI_@-DISABLE_@-PENDING
+Waiting to send @prim{LMI_@-DISABLE_@-CON}.
+@item LMI_@-DETACH_@-PENDING
+Waiting for detach.
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive can be issued in any state for which a local acknowledgement is not pending.  The
+LMS provider state at the time that the primitive was issued is indicated in the primitive.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Information Reporting Service Primitives
+@subsection Information Reporting Service Primitives
+
+These service primitives implement the information reporting service (@pxref{Information Reporting
+Service}).
+
+@menu
+* LMI_INFO_REQ::
+* LMI_INFO_ACK::
+@end menu
+
+@node LMI_INFO_REQ
+@subsubsection LMI_INFO_REQ
+
+@subsubheading Description
+
+This LMS user originated primitive is issued by the LMS user to request that the LMS provider
+return information concerning the capabilities and state of the LMS provider.
+
+@subsubheading Format
+
+The primitive consists of one @prim{M_PROTO} or @prim{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_ulong lmi_primitive;
+} lmi_info_req_t;
+@end verbatim
+@tpindex lmi_info_req_t
+@end display
+
+@subsubheading Parameters
+
+This primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Specifies the primitive type.  Always @prim{LMI_@-INFO_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive may be issued in any state but only when a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Response
+
+This primitive requires the LMS provider to acknowledge receipt of the primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+The LMS provider is required to acknowledge receipt of the primitive and provide the requested
+information using the @prim{LMI_@-INFO_@-ACK} primitive.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+The LMS provider is required to negatively acknowledge the primitive using the @prim{LMI_@-ERROR_@-ACK}
+primitive, and include the reason for failure in the primitive.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}: applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node LMI_INFO_ACK
+@subsubsection LMI_INFO_ACK
+
+@subsubheading Description
+
+This LMS provider originated primitive acknowledges receipt and successful processing of the
+@prim{LMI_@-INFO_@-REQ} primitive and provides the request information concerning the LMS provider.
+
+@subsubheading Format
+
+This message is formatted a one @prim{M_PROTO} or @prim{M_PCPROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_version;
+    lmi_ulong lmi_state;
+    lmi_ulong lmi_max_sdu;
+    lmi_ulong lmi_min_sdu;
+    lmi_ulong lmi_header_len;
+    lmi_ulong lmi_ppa_style;
+    lmi_uchar lmi_ppa_addr[0];
+} lmi_info_ack_t;
+@end verbatim
+@tpindex lmi_info_ack_t
+@end display
+
+@subsubheading Parameters
+
+The information acknowledgement service primitive has the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-INFO_@-ACK}.
+
+@item lmi_@-version
+Indicates the version of this specification that is being used by the LMS provider.
+
+@item lmi_@-state
+Indicates the state of the LMS provider at the time that the information acknowledgement service
+primitive was issued.  This field can be one of the following values:
+
+@table @psta
+
+@item LMI_@-UNATTACHED
+No PPA attached, awaiting @prim{LMI_@-ATTACH_@-REQ}.
+@item LMI_@-ATTACH_@-PENDING
+Waiting for attach.
+@item LMI_@-UNUSABLE
+Device cannot be used, STREAM in hung state.
+@item LMI_@-DISABLED
+PPA attached, awaiting @prim{LMI_@-ENABLE_@-REQ}.
+@item LMI_@-ENABLE_@-PENDING
+Waiting to send @prim{LMI_@-ENABLE_@-CON}.
+@item LMI_@-ENABLED
+Ready for use, awaiting primitive exchange.
+@item LMI_@-DISABLE_@-PENDING
+Waiting to send @prim{LMI_@-DISABLE_@-CON}.
+@item LMI_@-DETACH_@-PENDING
+Waiting for detach.
+
+@end table
+
+@item lmi_@-max_@-sdu
+Indicates the maximum size of a Service Data Unit.
+
+@item lmi_@-min_@-sdu
+Indicates the minimum size of a Service Data Unit.
+
+@item lmi_@-header_@-len
+Indicates the amount of header space that should be reserved for placing LMS provider headers.
+
+@item lmi_@-ppa_@-style
+Indicates the PPA style of the LMS provider.  This value can be one of the following values:
+
+@table @pval
+
+@item LMI_@-STYLE1
+PPA is implicitly attached by @manref{open(2)}.
+
+@item LMI_@-STYLE2
+PPA must be explicitly attached using @prim{LMI_@-ATTACH_@-REQ}.
+
+@end table
+
+@item lmi_@-ppa_@-addr
+This is a variable length field.  The length of the field is determined by the length of the
+@prim{M_PROTO}
+or @prim{M_PCPROTO} message block.
+
+For a @dfn{Style 2} driver, when @parm{lmi_@-ppa_@-style} is @pval{LMI_@-STYLE2}, and when in an attached state,
+this field providers the current PPA associated with the stream; the length is typically 4 bytes.
+
+For a @dfn{Style 1} driver, when @parm{lmi_@-ppa_@-style} is @pval{LMI_@-STYLE1}, the length it 0 bytes.
+
+@end table
+
+@subsubheading State
+
+This primitive can be issued in any state where a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Physical Point of Attachment Service Primitives
+@subsection Physical Point of Attachment Service Primitives
+
+These service primitives implement the physical point of attachment service (@pxref{Physical Point
+of Attachment Service}).
+
+@menu
+* LMI_ATTACH_REQ::
+* LMI_DETACH_REQ::
+@end menu
+
+@node LMI_ATTACH_REQ
+@subsubsection LMI_ATTACH_REQ
+
+@subsubheading Description
+
+This LMS user originated primitive requests that the stream upon which the primitive is issued by
+associated with the specified Physical Point of Attachment (PPA).  This primitive is only applicable
+to @dfn{Style 2} LMS provider streams, that is, streams that return @pval{LMI_@-STYLE2} in the
+@parm{lmi_@-ppa_@-style} field of the @prim{LMI_@-INFO_@-ACK}.
+
+@subsubheading Format
+
+This primitive consists of one @prim{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_uchar lmi_ppa[0];
+} lmi_attach_req_t;
+@end verbatim
+@tpindex lmi_attach_req_t
+@end display
+
+@subsubheading Parameters
+
+The attach request primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Specifies the service primitive type.  Always @prim{LMI_@-ATTACH_@-REQ}.
+
+@item lmi_@-ppa
+Specifies the Physical Point of Attachment (PPA) to which to associated the @dfn{Style 2} stream.
+This is a variable length identifier whose length is determined by the length of the @prim{M_PROTO} message
+block.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in state @psta{LMI_@-UNATTACHED} and when a local acknowledgement is not
+pending.
+
+@subsubheading New State
+
+Upon success, the new state is @psta{LMI_@-ATTACH_@-PENDING}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The attach request service primitive requires that the LMS provider respond as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+The LMS provider acknowledges receipt of the primitive and successful outcome of the attach service
+with a @prim{LMI_@-OK_@-ACK} primitive.  The new state is @psta{LMI_@-DISABLED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+The LMS provider acknowledges receipt of the primitive and failure of the attach service with a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the reason for failure.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node LMI_DETACH_REQ
+@subsubsection LMI_DETACH_REQ
+
+@subsubheading Description
+
+This LMS user originated primitive request that the stream upon which the primitive is issued be
+disassociated from the Physical Point of Appearance (PPA) to which it is currently attached.  This
+primitive is only applicable to @dfn{Style 2} LMS provider streams, that is, streams that return
+@pval{LMI_@-STYLE2} in the @parm{lmi_@-ppa_@-style} field of the @prim{LMI_@-INFO_@-ACK}.
+
+@subsubheading Format
+
+The detach request service primitive consists of one @prim{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+} lmi_detach_req_t;
+@end verbatim
+@tpindex lmi_detach_req_t
+@end display
+
+@subsubheading Parameters
+
+The detach request service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Specifies the service primitive type.  Always @prim{LMI_@-DETACH_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is valid in the @psta{LMI_@-DISABLED} state and when no local acknowledgement is pending.
+
+@subsubheading New State
+
+Upon success, the new state is @psta{LMI_@-DETACH_@-PENDING}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The detach request service primitive requires that the LMS provider respond as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+The LMS provider acknowledges receipt of the primitive and successful outcome of the detach service
+with a @prim{LMI_@-OK_@-ACK} primitive.  The new state is @psta{LMI_@-UNATTACHED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+The LMS provider acknowledges receipt of the primitive and failure of the detach service with a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the reason for failure.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node Initialization Service Primitives
+@subsection Initialization Service Primitives
+
+Initialization service primitives allow the LMS user to enable or disable the protocol service
+interface.  Enabling the protocol service interface may require that some action be taken to prepare
+the protocol service interface for use or to remove it from use.  For example, where the PPA
+corresponds to a signalling data link identifier as defined in Q.704, it may be necessary to perform
+switching to connect or disconnect the circuit identification code associated with the signalling
+data link identifier.
+
+These service primitives implement the initialization service (@pxref{Initialization Service}).
+
+@menu
+* LMI_ENABLE_REQ::
+* LMI_ENABLE_CON::
+* LMI_DISABLE_REQ::
+* LMI_DISABLE_CON::
+@end menu
+
+@node LMI_ENABLE_REQ
+@subsubsection LMI_ENABLE_REQ
+
+@subsubheading Description
+
+This LMS user originated primitive request that the LMS provider perform the actions necessary to
+enable the protocol service interface and confirm that it is enabled.  This primitive is applicable
+to both styles of PPA.
+
+@subsubheading Format
+
+The enable request service primitive consists of one @prim{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_uchar lmi_rem[0];
+} lmi_enable_req_t;
+@end verbatim
+@tpindex lmi_enable_req_t
+@end display
+
+@subsubheading Parameters
+
+The enable request service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Specifies the service primitive type.  Always @prim{LMI_@-ENABLE_@-REQ}.
+
+@item lmi_@-rem
+Specifies a remote address to which to connect the PPA.  The need for and form of this address is
+provider-specific.  The length of the field is determined by the length of the @prim{M_PROTO} message
+block.  This remote address could be a circuit identification code, an IP address, or some other
+form of circuit or channel identifier.
+
+@end table
+
+@subsubheading State
+
+This primitive is valid in the @psta{LMI_@-DISABLED} state and when no local acknowledgement is pending.
+
+@subsubheading New State
+
+Upon success the new state is @psta{LMI_@-ENABLE_@-PENDING}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The enable request service primitive requires that the LMS provider acknowledge receipt of the
+primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+When successful, the LMS provider acknowledges successful completion of the enable service with an
+@prim{LMI_@-ENABLE_@-CON} primitive.  The new state is @psta{LMI_@-ENABLED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+When unsuccessful, the LMS provider acknowledges the failure of the  enable service wtih an
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node LMI_ENABLE_CON
+@subsubsection LMI_ENABLE_CON
+
+@subsubheading Description
+
+This LMS provider originated primitive is issued by the LMS provider to confirm the successful
+completion of the enable service.
+
+@subsubheading Format
+
+The enable confirmation service primitive consists of one @prim{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_state;
+} lmi_enable_con_t;
+@end verbatim
+@tpindex lmi_enable_con_t
+@end display
+
+@subsubheading Parameters
+
+The enable confirmation service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-ENABLE_@-CON}.
+
+@item lmi_@-state
+Indicates the state following issuing the enable confirmation primitive.  This field can take on one
+of the following values:
+
+@table @psta
+
+@ignore
+@item LMI_@-UNATTACHED
+No PPA attached, awaiting @prim{LMI_@-ATTACH_@-REQ}.
+@item LMI_@-ATTACH_@-PENDING
+Waiting for attach.
+@item LMI_@-UNUSABLE
+Device cannot be used, STREAM in hung state.
+@item LMI_@-DISABLED
+PPA attached, awaiting @prim{LMI_@-ENABLE_@-REQ}.
+@item LMI_@-ENABLE_@-PENDING
+Waiting to send @prim{LMI_@-ENABLE_@-CON}.
+@end ignore
+@item LMI_@-ENABLED
+Ready for use, awaiting primitive exchange.
+@ignore
+@item LMI_@-DISABLE_@-PENDING
+Waiting to send @prim{LMI_@-DISABLE_@-CON}.
+@item LMI_@-DETACH_@-PENDING
+Waiting for detach.
+@end ignore
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the LMS provider in the @psta{LMI_@-ENABLE_@-PENDING} state.
+
+@subsubheading New State
+
+The new state is @psta{LMI_@-ENABLED}.
+
+@page
+@node LMI_DISABLE_REQ
+@subsubsection LMI_DISABLE_REQ
+
+@subsubheading Description
+
+This LMS user originated primitive requests that the LMS provider perform the actions necessary to
+disable the protocol service interface and confirm that it is disabled.  The primitive is applicable
+to both styles of PPA.
+
+@subsubheading Format
+
+The disable request service primitive consists of one @prim{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+} lmi_disable_req_t;
+@end verbatim
+@tpindex lmi_disable_req_t
+@end display
+
+@subsubheading Parameters
+
+The disable request service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Specifies the service primitive type.  Always @prim{LMI_@-DISABLE_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+The disable request service primitive is valid in the @psta{LMI_@-ENABLED} state and when no local
+acknowledgement is pending.
+
+@subsubheading New State
+
+Upon success, the new state is @psta{LMI_@-DISABLE_@-PENDING}.  Upon failure, the state remains unchanged.
+
+@subsubheading Response
+
+The disable request service primitive requires the LMS provider to acknowledge receipt of the
+primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+When successful, the LMS provider acknowledges successful completion of the disable service with an
+@prim{LMI_@-DISABLE_@-CON} primitive.  The new state is @psta{LMI_@-DISABLED}.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+When unsuccessful, the LMS provider acknowledges the failure of the disable service with an
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error.  The new state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node LMI_DISABLE_CON
+@subsubsection LMI_DISABLE_CON
+
+@subsubheading Description
+
+This LMS provider originated primitive is issued by the LMS provider to confirm the successful
+completion of the disable service.
+
+@subsubheading Format
+
+The disable confirmation service primitive consists of one @prim{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_state;
+} lmi_disable_con_t;
+@end verbatim
+@tpindex lmi_disable_con_t
+@end display
+
+@subsubheading Parameters
+
+The disable confirmation service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-DISABLE_@-CON}.
+
+@item lmi_@-state
+Indicates the state following issuing the disable confirmation primitive.  This field can take on one
+of the following values:
+
+@table @psta
+
+@ignore
+@item LMI_@-UNATTACHED
+No PPA attached, awaiting @prim{LMI_@-ATTACH_@-REQ}.
+@item LMI_@-ATTACH_@-PENDING
+Waiting for attach.
+@item LMI_@-UNUSABLE
+Device cannot be used, STREAM in hung state.
+@end ignore
+@item LMI_@-DISABLED
+PPA attached, awaiting @prim{LMI_@-ENABLE_@-REQ}.
+@ignore
+@item LMI_@-ENABLE_@-PENDING
+Waiting to send @prim{LMI_@-ENABLE_@-CON}.
+@item LMI_@-ENABLED
+Ready for use, awaiting primitive exchange.
+@item LMI_@-DISABLE_@-PENDING
+Waiting to send @prim{LMI_@-DISABLE_@-CON}.
+@item LMI_@-DETACH_@-PENDING
+Waiting for detach.
+@end ignore
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the LMS provider in the @psta{LMI_@-DISABLE_@-PENDING} state.
+
+@subsubheading New State
+
+The new state is @psta{LMI_@-DISABLED}.
+
+@page
+@node Options Management Service Primitives
+@subsection Options Management Service Primitives
+
+The options management service primitives allow the LMS user to negotiate options with the LMS
+provider, retrieve the current and default values of options, and check that values specified for
+options are correct.
+
+The options management service primitive implement the options management service (@pxref{Options
+Management Service}).
+
+@menu
+* LMI_OPTMGMT_REQ::
+* LMI_OPTMGMT_ACK::
+@end menu
+
+@node LMI_OPTMGMT_REQ
+@subsubsection LMI_OPTMGMT_REQ
+
+@subsubheading Description
+
+This LMS user originated primitive requests that LMS provider options be managed.
+
+@subsubheading Format
+
+The option management request service primitive consists of one @prim{M_PROTO} or @prim{M_PCPROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_opt_length;
+    lmi_ulong lmi_opt_offset;
+    lmi_ulong lmi_mgmt_flags;
+} lmi_optmgmt_req_t;
+@end verbatim
+@tpindex lmi_optmgmt_req_t
+@end display
+
+@subsubheading Parameters
+
+The option management request service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Specifies the service primitive type.  Always @prim{LMI_@-OPTMGMT_@-REQ}.
+
+@item lmi_@-opt_@-length
+Specifies the length of the options.
+
+@item lmi_@-opt_@-offset
+Specifies the offset, from the beginning of the @prim{M_PROTO} message block, of the start of the options.
+
+@item lmi_@-mgmt_@-flags
+Specifies the management flags which determine what operation the LMS provider is expected to
+perform on the specified options.  This field can assume one of the following values:
+
+@table @pval
+
+@item LMI_@-NEGOTIATE
+Negotiate the specified value of each specified option and return the negotiated value.
+
+@item LMI_@-CHECK
+Check the validity of the specified value of each specified option and return the result.  Do not
+alter the current value assumed by the LMS provider.
+
+@item LMI_@-DEFAULT
+Return the default value for the specified options (or all options).  Do not alter the current value
+assumed by the LMS provider.
+
+@item LMI_@-CURRENT
+Return the current value for the specified options (or all options).  Do not alter the current value
+assumed by the LMS provider.
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is valid in any state where a local acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Response
+
+The option management request service primitive requires the LMS provider to acknowledge receipt of
+the primitive as follows:
+
+@itemize @minus
+
+@item @b{Successful}:
+Upon success, the LMS provider acknowledges receipt of the service primitive and successful
+completion of the options management service with an @prim{LMI_@-OPTMGMT_@-ACK} primitive containing the
+options management result.  The state remains unchanged.
+
+@item @b{Unsuccessful (non-fatal errors)}:
+Upon failure, the LMS provider acknowledges receipt of the service primitive and failure to
+complete the options management service with an @prim{LMI_@-ERROR_@-ACK} primitive containing the error.
+The state remains unchanged.
+
+@end itemize
+
+@subsubheading Reasons for Failure
+
+@b{Non-Fatal Errors}:  applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node LMI_OPTMGMT_ACK
+@subsubsection LMI_OPTMGMT_ACK
+
+@subsubheading Description
+
+This LMS provider originated primitive is issued by the LMS provider upon successful completion of
+the options management service.  It indicates the outcome of the options management operation
+requested by the LMS user in a @prim{LMI_@-OPTMGMT_@-REQ} primitive.
+
+@subsubheading Format
+
+The option management acknowledgement service primitive consists of one @prim{M_PCPROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_opt_length;
+    lmi_ulong lmi_opt_offset;
+    lmi_ulong lmi_mgmt_flags;
+} lmi_optmgmt_ack_t;
+@end verbatim
+@tpindex lmi_optmgmt_ack_t
+@end display
+
+@subsubheading Parameters
+
+The option management acknowledgement service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-OPTMGMT_@-ACK}.
+
+@item lmi_@-opt_@-length
+Indicates the length of the returned options.
+
+@item lmi_@-opt_@-offset
+Indicates the offset of the returned options from the start of the @prim{M_PCPROTO} message block.
+
+@item lmi_@-mgmt_@-flags
+Indicates the returned management flags.  These flags indicate the overall success of the options
+management service.  This field can assume one of the following values:
+
+@table @pval
+
+@item LMI_@-SUCCESS
+The LMS provider succeeded in negotiating or returning all of the options specified by the LMS
+user in the @prim{LMI_@-OPTMGMT_@-REQ} primitive.
+
+@item LMI_@-FAILURE
+The LMS provider failed to negotiate one or more of the options specified by the LMS user.
+
+@item LMI_@-PARTSUCCESS
+The LMS provider negotiated a value of lower quality for one or more of the options specified by
+the LMS user.
+
+@item LMI_@-READONLY
+The LMS provider failed to negotiate one ore more of the options specified by the LMS user because
+the option is treated as read-only by the LMS provider.
+
+@item LMI_@-NOTSUPPORT
+The LMS provider failed to recognize one or more of the options specified by the LMS user.
+
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive is issued by the LMS provider in direct response to an @prim{LMI_@-OPTMGMT_@-REQ} primitive.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Rules
+
+The LMS provider follows the following rules when processing option management service requests:
+
+@itemize ---
+
+@item
+When the @parm{lmi_@-mgmt_@-flags} field in the @prim{LMI_@-OPTMGMT_@-REQ} primitive is set to @pval{LMI_@-NEGOTIATE},
+the LMS provider will attempt to negotiate a value for each of the options specified in the
+request.
+
+@item
+When the flags are @pval{LMI_@-DEFAULT}, the LMS provider will return the default values of the specified
+options, or the default values of all options known to the LMS provider if no options were
+specified.
+
+@item
+When the flags are @pval{LMI_@-CURRENT}, the LMS provider will return the current values of the specified
+options, or all options.
+
+@item
+When the flags are @pval{LMI_@-CHECK}, the LMS provider will attempt to negotiate a value for each of the
+options specified in the request and return the resulg of the negotiation, but will not affect the
+current value of the option.
+
+@end itemize
+
+@page
+@node Event Reporting Service Primitives
+@subsection Event Reporting Service Primitives
+
+The event reporting service primitives allow the LMS provider to indicate asynchronous errors,
+events and statistics collection to the LMS user.
+
+These service primitives implement the event reporting service (@pxref{Event Reporting Service}).
+
+@menu
+* LMI_ERROR_IND::
+* LMI_STATS_IND::
+* LMI_EVENT_IND::
+@end menu
+
+@node LMI_ERROR_IND
+@subsubsection LMI_ERROR_IND
+
+@subsubheading Description
+
+This LMS provider originated service primitive is issued by the LMS provider when it detects and
+asynchronous error event.  The service primitive is applicable to all styles of PPA.
+
+@subsubheading Format
+
+The error indication service primitive consists of one @prim{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_errno;
+    lmi_ulong lmi_reason;
+    lmi_ulong lmi_state;
+} lmi_error_ind_t;
+@end verbatim
+@tpindex lmi_error_ind_t
+@end display
+
+@subsubheading Parameters
+
+The error indication service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-ERROR_@-IND}.
+
+@item lmi_@-errno
+Indicates the LMI error number describing the error.  This field can have one of the following
+values:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADADDRESS
+Address was invalid.
+@item LMI_@-BADADDRTYPE
+Invalid address type.
+@item LMI_@-BADDIAL
+(Not used.)
+@item LMI_@-BADDIALTYPE
+(Not used.)
+@item LMI_@-BADDISPOSAL
+Invalid disposal parameter.
+@item LMI_@-BADFRAME
+Defective SDU received.
+@item LMI_@-BADPPA
+Invalid PPA identifier.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-WRITEFAIL
+Unitdata request failed.
+@item LMI_@-CRCERR
+CRC or FCS error.
+@item LMI_@-DLE_@-EOT
+DLE EOT detected.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-HDLC_@-ABORT
+Aborted frame detected.
+@item LMI_@-OVERRUN
+Input overrun.
+@item LMI_@-TOOSHORT
+Frame too short.
+@item LMI_@-INCOMPLETE
+Partial frame received.
+@item LMI_@-BUSY
+Telephone was busy.
+@item LMI_@-NOANSWER
+Connection went unanswered.
+@item LMI_@-CALLREJECT
+Connection rejected.
+@item LMI_@-HDLC_@-IDLE
+HDLC line went idle.
+@item LMI_@-HDLC_@-NOTIDLE
+HDLC link no longer idle.
+@item LMI_@-QUIESCENT
+Line being reassigned.
+@item LMI_@-RESUMED
+Line has been reassigned.
+@item LMI_@-DSRTIMEOUT
+Did not see DSR in time.
+@item LMI_@-LAN_@-COLLISIONS
+LAN excessive collisions.
+@item LMI_@-LAN_@-REFUSED
+LAN message refused.
+@item LMI_@-LAN_@-NOSTATION
+LAN no such station.
+@item LMI_@-LOSTCTS
+Lost Clear to Send signal.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@item lmi_@-reason
+
+Indicates the reason for failure.  This field is protocol-specific.  When the @parm{lmi_@-errno} field
+is @perr{LMI_@-SYSERR}, the @parm{lmi_@-reason} field is the UNIX error number as described in
+@manref{errno(3)}.
+
+@item lmi_@-state
+
+Indicates the state of the LMS provider at the time that the primitive was issued.
+This field can have one of the following values:
+
+@table @psta
+@item LMI_@-UNATTACHED
+No PPA attached, awaiting @prim{LMI_@-ATTACH_@-REQ}.
+@item LMI_@-ATTACH_@-PENDING
+Waiting for attach.
+@item LMI_@-UNUSABLE
+Device cannot be used, STREAM in hung state.
+@item LMI_@-DISABLED
+PPA attached, awaiting @prim{LMI_@-ENABLE_@-REQ}.
+@item LMI_@-ENABLE_@-PENDING
+Waiting to send @prim{LMI_@-ENABLE_@-CON}.
+@item LMI_@-ENABLED
+Ready for use, awaiting primitive exchange.
+@item LMI_@-DISABLE_@-PENDING
+Waiting to send @prim{LMI_@-DISABLE_@-CON}.
+@item LMI_@-DETACH_@-PENDING
+Waiting for detach.
+@end table
+
+@end table
+
+@subsubheading State
+
+This primitive can be issued in any state for which a local acknowledgement is not pending.  The
+LMS provider state at the time that the primitive was issued is indicated in the primitive.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node LMI_STATS_IND
+@subsubsection LMI_STATS_IND
+
+@subsubheading Description
+
+This LMS provider originated primitive is issued by the LMS provider to indicate a periodic
+statistics collection event.  The service primitive is applicable to all styles of PPA.
+
+@subsubheading Format
+
+The statistics indication service primitive consists of one @prim{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_interval;
+    lmi_ulong lmi_timestamp;
+} lmi_stats_ind_t;
+@end verbatim
+@tpindex lmi_stats_ind_t
+@end display
+
+Following this structure within the @prim{M_PROTO} message block is the provider-specific statistics.
+
+@subsubheading Parameters
+
+The statistics indication service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-STATS_@-IND}.
+
+@item lmi_@-interval
+Indicates the statistics collection interval to which the statistics apply.  This interval is
+specified in milliseconds.
+
+@item lmi_@-timestamp
+Indicates the UNIX time (from epoch) at which statistics were collected.  The timestamp is given in
+milliseconds from epoch.
+
+@end table
+
+@subsubheading State
+
+This service primitive may be issued by the LMS provider in any state in which a local
+acknowledgement is not pending.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node LMI_EVENT_IND
+@subsubsection LMI_EVENT_IND
+
+@subsubheading Description
+
+This LMS provider originated primitive is issued by the LMS provider to indicate an asynchronous
+event.  The service primitive is applicable to all styles of PPA.
+
+@subsubheading Format
+
+The event indication service primitive consists of one @prim{M_PROTO} message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_objectid;
+    lmi_ulong lmi_timestamp;
+    lmi_ulong lmi_severity;
+} lmi_event_ind_t;
+@end verbatim
+@tpindex lmi_event_ind_t
+@end display
+
+Following this structure within the @prim{M_PROTO} message block is the provider-specific event
+information.
+
+@subsubheading Parameters
+
+THe event indication service primitive contains the following parameters:
+
+@table @parm
+
+@item lmi_@-primitive
+Indicates the service primitive type.  Always @prim{LMI_@-EVENT_@-IND}.
+
+@item lmi_@-objectid
+Indicates the provider-specific object identifier that identifies the managed object to which the
+event is associated.
+
+@item lmi_@-timestamp
+Indicates the UNIX time from epoch (in milliseconds).
+
+@item lmi_@-severity
+Indicates the provider-specific severity of the event.
+
+@end table
+
+@subsubheading State
+
+This service primitive can be issued by the LMS provider in any state where a local
+acknowledgement is not pending.  Normally the LMS provider must be in the @psta{LMI_@-ENABLED} state for
+event reporting to occur.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@page
+@node Protocol Service Primitives
+@section Protocol Service Primitives
+
+The protocol service primitives implement the services of the DAEDT, DAEDR, AERM, SUERM/EIM and a
+provider specific receive congestion function, including power on, initial alignment support, error
+rate monitoring, receive cnogestion detection, and data transfer.
+
+These service primitives implement the protocol services (@pxref{Protocol Services}).
+
+@menu
+* Power On Service Primitives::
+* Data Transfer Service Primitives::
+* Initial Alignment Service Primitives::
+* Error Rate Monitoring Service Primitives::
+* Receive Congestion Service Primitives::
+@end menu
+
+@node Power On Service Primitives
+@subsection Power On Service Primitives
+
+The power on service primitives provide the ability for the SDTS user to power on the DAEDR and
+DAEDT functions within the SDTS provider.
+
+These service primitives implement the power on service (@pxref{Power On Service}).
+
+@menu
+* SDT_DAEDT_START_REQ::
+* SDT_DAEDR_START_REQ::
+@end menu
+
+@node SDT_DAEDT_START_REQ
+@subsubsection SDT_DAEDT_START_REQ
+
+@subsubheading Description
+
+The DAEDT start request service primitive is originated by the SDTS user when it wishes to start the
+transmitters as part of a power-on sequence.  Once started, the transmitters cannot be stopped under
+protocol control.
+
+@subsubheading Format
+
+The DAEDT start request service primitive consists of one @prim{M_PROTO} message block, formatted as
+follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_daedt_start_req_t;
+@end verbatim
+@tpindex sdt_daedt_start_req_t
+@end display
+
+@subsubheading Parameters
+
+The DAEDT start request service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-DAEDT_@-START_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state and is valid when the DAEDT
+is in the @psta{IDLE} state.
+
+@subsubheading New State
+
+The new DAEDT state is the @psta{IN-SERVICE} state.
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The link state is
+unchanged.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+When the terminal is in the @psta{LMI_@-ENABLED} management state and the DAEDT is already in the
+@psta{IN-SERVICE} state, this primitive should be ignored and the SDTS provider should @emph{not}
+generate a non-fatal error.
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node SDT_DAEDR_START_REQ
+@subsubsection SDT_DAEDR_START_REQ
+
+@subsubheading Description
+
+The DAEDR start request service primitive is originated by the SDTS user when it wishes to start the
+receivers as part of a power-on sequence.  Once started, the receivers cannot be stopped under
+protocol control.  This primitive is a request from the Reception Control (RC) function in the SDTS
+user to the DAEDR function in the SDTS provider.
+
+@subsubheading Format
+
+The DAEDR start request service primitive consists of one @prim{M_PROTO} message block, formatted as
+follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_daedr_start_req_t;
+@end verbatim
+@tpindex sdt_daedr_start_req_t
+@end display
+
+@subsubheading Parameters
+
+The DAEDR start request service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-DAEDR_@-START_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state and is valid when the DAEDR
+is in the @psta{IDLE} state.
+
+@subsubheading New State
+
+The new DAEDR state is the @psta{IN-SERVICE} state.
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The link state is
+unchanged.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+When the terminal is in the @psta{LMI_@-ENABLED} management state and the DAEDR is already in the
+@psta{IN-SERVICE} state, this primitive should be ignored and the SDTS provider should @emph{not}
+generate a non-fatal error.
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node Data Transfer Service Primitives
+@subsection Data Transfer Service Primitives
+
+The data transfer service primitives provide the means for transfering data between SDTS users
+across a signalling data link.  Data is sent and received in signal units.  Signal units are the
+data contained in frames that occur between flags on the line excluding the checksum octets.  These
+are packets of data that contain an integer number of octets (a multiple of 8 bits).  When
+performing data transfer, signal units that are correctly received on the signalling data link are
+delivered to the SDTS user as they arrive.  Signal units for transmission are delivered to the SDTS
+provider on demand, however, during quiescent periods it is sometimes advantageous from the point of
+view of synchronous driver design to request trasnmission of additional signal units in a @dfn{pull}
+arrangement rather than a @dfn{push} arrangement.  Therefore there is a primitive to allow the SDTS
+provider to  request additional data for trasnsmission.
+
+These service primitives implement the data transfer service (@pxref{Data Transfer Service}).
+
+@menu
+* SDT_DAEDT_TRANSMISSION_REQ::
+* SDT_RC_SIGNAL_UNIT_IND::
+* SDT_TXC_TRANSMISSION_REQUEST_IND::
+@end menu
+
+@node SDT_DAEDT_TRANSMISSION_REQ
+@subsubsection SDT_DAEDT_TRANSMISSION_REQ
+
+@subsubheading Description
+
+The DAEDT transmission request service primitive is originated by the SDTS user to request that the
+SDTS provider trasnmit a signal unit on the medium.  A signal unit is a self-contained packet of
+data containing an integer number of octets of information.  This primitive is a request from the
+Transmission Control (TXC) function in the SDTS user to the DAEDT function in the SDTS provider.
+
+@subsubheading Format
+
+The DAEDT transmission request service primitive consists of zero or one @prim{M_PROTO} message
+block, followed by one or more @prim{M_DATA} message blocks containing the signal unit to transmit.
+The @prim{M_PROTO} mesage block, when present, is structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_daedt_transmission_req_t;
+@end verbatim
+@tpindex sdt_daedt_transmission_req_t
+@end display
+
+@subsubheading Parameters
+
+The DAEDT transmission request service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-DAEDT_@-TRANSMISSION_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state with the DAEDT in the
+@psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The new state is unchanged.
+
+@subsubheading Rules
+
+The SDTS user must observe the following rules when issuing the DAEDT transmission request service
+primitive:
+
+@itemize ---
+
+@item
+This primitive should only be issued by the SDTS provider after the transmitters have been enabled
+with a @prim{SDT_@-DAEDT_@-START_@-REQ} and the DAEDT is in the @psta{IN-SERVICE} state.
+
+@item
+After the transmitter have been enabled while in the @psta{LMI_@-ENABLED} management state, the
+DAEDT state is always appropriate for the SDTS user to issue this primitive.
+
+@item
+The @prim{M_PROTO} message block is optional.  The SDTS provider will be prepared to accept
+@prim{M_DATA} message blocks from the SDTS user, without any @prim{M_PROTO} message block, as service
+primitive of this type.
+
+@item
+Most narrowband SS7 SDTS providers peform what is known as SU repetition.  When SUs that correspond
+to FISUs (Fill-In Signal Units) or LSSUs (Link Status Signal Units) which are sent continuously on
+the signalling link, the SDTS user need only send the first such signal unit.  The SDTS provider
+will continuously repeat a FISU or LSSU, when appropriate,@footnote{Note that the only LSSU that is
+not repeated continuously is the SIB.} until the next signal unit is presented for transmission.  To
+perform this function, a narrowband SS7 SDTS provider must know the protocol options associated with
+the signalling link (i.e. the size of the sequence numbers and length indicator).
+
+Activate or deactivation of @dfn{SU Repeating} is a provider-specific function.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The link state is
+unchanged.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+When the terminal is in the @psta{LMI_@-ENABLED} management state, but the DAEDT is still in the
+@psta{IDLE} state, the primitive should be ignored and the corresponding data discarded without
+generating a non-fatal error.
+
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node SDT_RC_SIGNAL_UNIT_IND
+@subsubsection SDT_RC_SIGNAL_UNIT_IND
+
+@subsubheading Description
+
+The RC signal unit indication service primitive is issued by the SDTS provider when a signal unit
+arrives on the signalling data link and passes error detection.  The primitive is named the
+@samp{RC} signal unit indication because this signal is normally sent to reception control (RC)
+within the SS7 Level 2 state machine.  This primitive is an indication from the DAEDR function in
+the SDTS provider to the Reception Control (RC) function in the SDTS user.
+
+@subsubheading Format
+
+The RC signal unit indication service primtive consists of one optional @prim{M_PROTO} message block
+followed by one or more @prim{M_DATA} message blocks containing the receive signal unit.  The
+@prim{M_PROTO} message block, when present, is structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+    sdt_ulong sdt_count;
+} sdt_rc_signal_unit_ind_t;
+@end verbatim
+@tpindex sdt_rc_signal_unit_ind_t
+@end display
+
+@subsubheading Parameters
+
+The RC signal unit indication service primtive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-RC_@-SIGNAL_@-UNIT_@-IND}.
+
+@item sdt_@-count
+When signal unit compression is in effect, this field contains a count of the number of compressed
+identical signal units (not counting the original).  When signal unit compression is not in effect,
+or the signal unit was not compressed (it was not repeated on the line), this field is set to the
+value 0.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued from the @psta{LMI_@-ENABLED} management state.
+
+@subsubheading New State
+
+The state remains unchanged.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when generating the RC signal unit indication
+primitive:
+
+@itemize ---
+
+@item
+The primitive is only issued when the signalling data terminal is in the @psta{LMI_@-ENABLED}
+management state.
+
+@item
+Received signal units are indicated only after the receivers have been enabled using the
+@prim{SDT_@-DAEDR_@-START_@-REQ} command and the DAEDR is in the @psta{IN-SERVICE} state.
+
+@item
+Once the SDTS user is receiving signal units, it will continue to do so until a fatal error occurs,
+the stream is closed, or the signalling data terminal is disabled with the
+@prim{LMI_@-DISABLE_@-REQ} primitive.
+
+@item
+The @prim{M_PROTO} message block is optional and is only really required for indicating the count of
+compressed signal units.  When signal unit compression is not in effect, or when a signal unit is
+not compressed (i.e. has a @parm{sdt_@-count} of zero), the @prim{M_PROTO} message block is
+unnecessary and SDTS providers are encouraged to not include it.  When the @prim{M_PROTO} message
+block is not included, the signal unit is delivered simply as a chain of one or more @prim{M_DATA}
+message blocks to the SDTS user.  The SDTS user must be prepared to receive RC signal unit
+indications consisting of only @prim{M_DATA} message blocks.
+
+@item
+Most narrowband SS7 SDTS providers provider for signal unit compression.  Under this scheme, the
+first non-identical signal unit is indicated with a @parm{sdt_@-count} of zero.  Should additional
+identical signal units be received, the will be counted until another non-identical signal unit is
+received.  At that point, an RC signal unit indication with a @parm{sdt_@-count} indicating the
+number of compressed signal units is indicated followed by an indication of the new non-identical
+signal unit with a @parm{sdt_@-count} of zero.  And the cycle repeats.
+
+To support this feature, SDTS users must be prepared to accept a compressed frame representing all
+of the contiguous identical signalling units in this fashion.  For example, the SDTS user cannot
+rely by its design on the third identical signal unit causing a state transsition in a timely
+manner.
+
+@item
+Invocation and applicability of a signal unit compression feature is provider-specific.  So, for
+example, Q.703 drivers use FISU and LSSU compression techniques, whereas, M2PA (RFC 4165) does not
+require them.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a response from the SDTS user.
+
+@page
+@node SDT_TXC_TRANSMISSION_REQUEST_IND
+@subsubsection SDT_TXC_TRANSMISSION_REQUEST_IND
+
+@subsubheading Description
+
+The TXC transmission request indication service primitive is originated by the SDTS provider to
+indicate that if a signal unit is not available for transmission that the signalling terminal will
+idle the signalling data link.  Depending on the specific SDTS provider, idling the signalling data
+link may consist of idling continuous flags, FISUs or LSSUs.  This indication provides timing ques
+to the SDTS user.  This primitive is an indication from the DAEDT function in the SDTS provider to
+the Transmission Control (TXC) function in the SDTS user.
+
+@subsubheading Format
+
+The TXC transmission request indication service primitive consists of one @prim{M_PROTO} message
+block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_txc_transmission_request_ind_t;
+@end verbatim
+@tpindex sdt_txc_transmission_request_ind_t
+@end display
+
+@subsubheading Parameters
+
+The TXC transmission request indication service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-TXC_@-TRANSMISSION_@-REQUEST_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued from the @psta{LMI_@-ENABLED} management state and when the DAEDT is
+in the @psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The new state is unchanged.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when issuing the TXC transmission request indication
+service primitive:
+
+@itemize ---
+
+@item
+This service primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED}
+management state.
+
+@item
+This service primitive is only issued when the DAEDT is in the @psta{IN-SERVICE} state; that is, a
+@prim{SDT_@-DAEDT_@-START_@-REQ} primitive has been received by the SDTS provider for the signalling
+terminal.
+
+@item
+This service primitive is only issued by the SDTS provider when its transmission queue is empty.
+
+@item
+This service primitive is only issued by the SDTS provider when the provider is configured to
+generate these indications.  Configuration of the SDTS provider is a provider-specific matter.
+
+@end itemize
+
+
+@subsubheading Response
+
+This primitive does not require a specific response from the SDTS user.  Upon receiving this
+primitive, if the SDTS user does not wish the signalling data link to idle flags, FISUs or LSSUs, it
+should generate another trasnmission request using the @prim{SDT_@-DAEDT_@-TRANSMISSION_@-REQ}
+primitive.
+
+@page
+@node Initial Alignment Service Primitives
+@subsection Initial Alignment Service Primitives
+
+The initial alignment service primitives peform the functions of the Alignment Error Rate Monitor
+(AERM).  They provide the SDTS user with the ability to start and stop the AERM, set normal or
+emergency proving periods, and receive correct signal unit indications and indications that the
+error rate has exceeded the threshold.
+
+Not all SDTS providers implement nor require an AERM function.  For example, broadband signalling
+links can be configured to not perform proving, in which case the AERM function is not necessary.
+Regardless of whether the AERM function is necessary or not, each SDTS provider should be prepared
+to handle requests and generate appropriate indications as though an AERM function existed, and
+without generating non-fatal errors.
+
+Note that some designs do no permit the AERM function and the SUERM or EIM function to be active
+simultaneously.
+
+These service primitives implement the initial alignment service (@pxref{Initial Alignment
+Service}).
+
+@menu
+* SDT_AERM_START_REQ::
+* SDT_AERM_SET_TI_TO_TIN_REQ::
+* SDT_AERM_SET_TI_TO_TIE_REQ::
+* SDT_IAC_CORRECT_SU_IND::
+* SDT_IAC_ABORT_PROVING_IND::
+* SDT_AERM_STOP_REQ::
+@end menu
+
+@node SDT_AERM_START_REQ
+@subsubsection SDT_AERM_START_REQ
+
+@subsubheading Description
+
+The AERM start request service primitive is originated by the SDTS use to request that the Alignment
+Error Rate Monitor be started.  This primitive is a request from the Initial Alignment Control (IAC)
+function in the SDTS user to the AERM function in the SDTS provider.
+
+@subsubheading Format
+
+The AERM start request service primitive consists of one @prim{M_PROTO} message block, structured
+as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_aerm_start_req_t;
+@end verbatim
+@tpindex sdt_aerm_start_req_t
+@end display
+
+@subsubheading Parameters
+
+The AERM start request service primitive containst the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-AERM_@-START_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state and valid when the DAEDR
+function is in the @psta{IN-SERVICE} state and the AERM function is in the @psta{IDLE} state.
+
+@subsubheading New State
+
+The new state of the AERM function is the @psta{IN-SERVICE} state.
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The AERM function is moved
+to the @psta{IN-SERVICE} state.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+When the signalling terminal is in the @psta{LMI_@-ENABLED} management state, the DAEDR is in the
+@psta{IN-SERIVCE} state and the AERM is already in the @psta{IN-SERVICE} state, this service
+primitive should be ignored without generating a non-fatal error.  Some STDS providers may generate
+a non-fatal error when the SUERM/EIM function is not in the @psta{IDLE} state.
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node SDT_AERM_SET_TI_TO_TIN_REQ
+@subsubsection SDT_AERM_SET_TI_TO_TIN_REQ
+
+@subsubheading Description
+
+The AERM set Ti to Tin request service primitive is originated by the SDTS user to request that the
+normal proving period be used for the current or next initial alignment error rate monitoring.  This
+primitive is a request from the Initial Alignment Control (IAC) function in the SDTS user to the
+AERM function in the SDTS provider.
+
+@subsubheading Format
+
+The AERM set Ti to Tin request service primitive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_aerm_set_ti_to_tin_req_t;
+@end verbatim
+@tpindex sdt_aerm_set_ti_to_tin_req_t
+@end display
+
+@subsubheading Parameters
+
+The AERM set Ti to Tin request service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-AERM_@-SET_@-TI_@-TO_@-TIN_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state but may be issued in any
+signalling terminal state.
+
+@subsubheading New State
+
+The new state remains unchanged and normal proving is asserted.
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The link state is
+unchanged.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node SDT_AERM_SET_TI_TO_TIE_REQ
+@subsubsection SDT_AERM_SET_TI_TO_TIE_REQ
+
+@subsubheading Description
+
+The AERM set Ti to Tie request service primitive is originated by the SDTS user to request that the
+emergency proving period be used for the current or next initial alignment error rate monitoring.
+This primitive is a request from the Initial Alignment Control (IAC) function in the SDTS user to
+the AERM function in the SDTS provider.
+
+@subsubheading Format
+
+The AERM set Ti to Tie request service primitive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_aerm_set_ti_to_tie_req_t;
+@end verbatim
+@tpindex sdt_aerm_set_ti_to_tie_req_t
+@end display
+
+@subsubheading Parameters
+
+The AERM set Ti to Tie request service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-AERM_@-SET_@-TI_@-TO_@-TIE_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state but may be issued in any
+signalling terminal state.
+
+@subsubheading New State
+
+The new state is unchanged and emergency proving is asserted.
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The link state is
+unchanged.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node SDT_IAC_CORRECT_SU_IND
+@subsubsection SDT_IAC_CORRECT_SU_IND
+
+@subsubheading Description
+
+The IAC correct SU indication service primitive is issued by the SDTS provider during the intial
+alignment phase to indicate that a correct signal unit has been received.  Some STDS user state
+machines require this primitive; others can use the @prim{SDT_@-RC_@-SIGNAL_@-UNIT_@-IND} primitive
+in its stead.  This primitive is an indication from the AERM function in the SDTS provider to the
+Initial Alignment Control (IAC) function in the SDTS user.
+
+@subsubheading Format
+
+The IAC correct SU indication service primitive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_iac_correct_su_ind_t;
+@end verbatim
+@tpindex sdt_iac_correct_su_ind_t
+@end display
+
+@subsubheading Parameters
+
+The IAC correct SU indication service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-IAC_@-CORRECT_@-SU_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued from the @psta{LMI_@-ENABLED} management state and when the DAEDR
+function is in the @psta{IN-SERVICE} state and the AERM function is in the @psta{IN-SERVICE} state.
+It is only issued for the first correct signal unit received in this total state.
+
+@subsubheading New State
+
+The new state remains unchanged.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when issuing the IAC correct SU indication service
+primitive:
+
+@itemize ---
+
+@item
+The primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED} management
+state.
+
+@item
+The primitive is only issued when the DEADR function is in the @psta{IN-SERVICE} state.
+
+@item
+The primitive is only issued when the AERM function is in the @psta{IN-SERVICE} state.
+
+@item
+The primitive is only issued for the first correct signal unit that is received in the appropriate
+states.
+
+@item
+Whether the primitive is issued in the appropriate state is SDTS provider-specific.  Some SDTS
+providers may need configuration options set before this primitive will be issued.  The SDTS user
+should be prepared to use a @prim{SDT_@-RC_@-SIGNAL_@-UNIT_@-IND} primitive in its stead.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a specific response from the SDTS user.
+
+@page
+@node SDT_IAC_ABORT_PROVING_IND
+@subsubsection SDT_IAC_ABORT_PROVING_IND
+
+@subsubheading Description
+
+The IAC abort proving indication service primitive is issued by the SDTS provider to indicate that
+the error rate experience on the signalling data link has exceeded the operating threshold.  This
+primitive is an indication from the AERM function in the SDTS provider to the Initial Alignment
+Control (IAC) function in the SDTS user.
+
+@subsubheading Format
+
+The IAC abort proving indication service primitive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_iac_abort_proving_ind_t;
+@end verbatim
+@tpindex sdt_iac_abort_proving_ind_t
+@end display
+
+@subsubheading Parameters
+
+The IAC abort proving indication service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-IAC_@-ABORT_@-PROVING_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued from the @psta{LMI_@-ENABLED} management state with the DAEDR function
+in the @psta{IN-SERIVCE} state and the AERM function in the @psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The new state is unchanged.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when issuing the IAC abort proving indication service
+primitive:
+
+@itemize ---
+
+@item
+The primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED} management
+state.
+
+@item
+The primitive is only issued when the DAEDR function is in the @psta{IN-SERVICE} state.
+
+@item
+The primitive is only issued when the AERM function is in the @psta{IN-SERVICE} state.
+
+@item
+The primitive is only issued from the appropriate state when the error rate is detected as exceeding
+the operating threshold.  The setting of the operating threshold is a SDTS provider-specific
+configuration matter.
+
+@item
+Not all SDTS providers have a fully functional AERM.  Some providers may never issue this
+primitive.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a response from the SDTS user.
+
+@page
+@node SDT_AERM_STOP_REQ
+@subsubsection SDT_AERM_STOP_REQ
+
+@subsubheading Description
+
+The AERM stop request service primitive is originated by the SDTS user to request that the AERM
+function be stopped (moved to the @psta{IDLE} state).
+This primitive is a request from the Initial Alignment Control (IAC) function in the SDTS user to
+the AERM function in the SDTS provider.
+
+@subsubheading Format
+
+The AERM stop request service primitive consists of one @prim{M_PROTO} message block, structured as
+follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_aerm_stop_req_t;
+@end verbatim
+@tpindex sdt_aerm_stop_req_t
+@end display
+
+@subsubheading Parameters
+
+The AERM stop request service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-AERM_@-STOP_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state with the DAEDR function in
+the @psta{IN-SERVICE} state and the AERM function in the @psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The new state of the AERM function is the @psta{IDLE} state.
+
+@subsubheading Response
+
+This primitive does not require receipt acknowledgement.
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive does not require receipt acknowledgement.  The AERM state is moved to
+the @psta{IDLE} state.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider negatively acknowledges the primitive using a
+@prim{LMI_@-ERROR_@-ACK} primitive containing the error and reason for failure.  The state remains
+unchanged.
+
+@end itemize
+
+When the signalling terminal is in the @psta{LMI_@-ENABLED} management state and the AERM function
+is already in the @psta{IDLE} state, this primitive should be ignored and no non-fatal error
+generated.
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event occurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-INITFAILED
+Link initialization failed.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node Error Rate Monitoring Service Primitives
+@subsection Error Rate Monitoring Service Primitives
+
+The error rate monitoring service primitives perform the functions of the Signal Unit Error Rate
+Monitor (SUERM) or Errored Interval Monitor (EIM).  They provide the SDTS user with the ability to
+start and stop the SUERM/EIM, and receive indications that the error rate has exceeded the operating
+threshold.
+
+Not all SDTS providers implement nor require a SUERM/EIM function.  Regardless of whether the
+SUERM/EIM function is necessary or not, each SDTS provider should be prepared to handle requests and
+generate appropriate indications as though a SUERM or EIM function existed, and without generating
+non-fatal errors.
+
+Note that some designs do no permit the AERM function and the SUERM or EIM function to be active
+simultaneously.
+
+These service primitives implement the error rate monitoring service (@pxref{Error Rate Monitoring
+Service}).
+
+@menu
+* SDT_SUERM_START_REQ::
+* SDT_LSC_LINK_FAILURE_IND::
+* SDT_SUERM_STOP_REQ::
+@end menu
+
+@node SDT_SUERM_START_REQ
+@subsubsection SDT_SUERM_START_REQ
+
+@subsubheading Description
+
+This SDTS user originated primitive is used to start the Signal Unit Error Rate Monitor (SUERM) or
+Errorred Interval Monitor (EIM) service.
+This primitive is a request from the Link State Control (LSC) function in the SDTS user to the
+SUERM/EIM function in the SDTS provider.
+
+@subsubheading Format
+
+The SUERM start service primitive consists of one @prim{M_PROTO} or @prim{M_PCPROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_suerm_start_req_t;
+@end verbatim
+@tpindex sdt_suerm_start_req_t
+@end display
+
+@subsubheading Parameters
+
+The SUERM start service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-SUERM_@-START_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state, when the DAEDR is in the
+@psta{IN-SERVICE} state, when the AERM is in the @psta{IDLE} state and when the SUERM/EIM is in the
+@psta{IDLE} state.
+
+@subsubheading New State
+
+The new management state remains unchanged.  The state of the SUERM is moved to @psta{IN-SERVICE}
+state.
+
+@subsubheading Response
+
+This service primitive is not acknowledged, but can cause a non-fatal error as follows:
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive is not acknowledged.  The SUERM/EIM function is moved to the
+@psta{IN-SERVICE} state.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider responds with a @prim{LMI_@-ERROR_@-ACK} primitive containing
+the error.
+
+@end itemize
+
+When the signalling terminal is in the @psta{LMI_@-ENABLED} state and the SUERM/EIM function is
+already in the @psta{IN-SERVICE} state, this primitive should be ignored without generating a
+non-fatal error.
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event ocurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node SDT_LSC_LINK_FAILURE_IND
+@subsubsection SDT_LSC_LINK_FAILURE_IND
+
+@subsubheading Description
+
+This SDTS provider originated primitive is issued by the SDTS provider while the SUERM/EIM service
+is active to indicate that the error rate monitor has detected errors that exceed the configured
+threshold and that the link should be failed for execessive errors.
+This primitive is an indication from the SUERM/EIM function in the SDTS provider to the Link State
+Control (LSC) function in the SDTS user.
+
+@subsubheading Format
+
+The link failure indication service primitive consists of one @prim{M_PROTO} or @prim{M_PCPROTO}
+message block, structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_lsc_link_failure_ind_t;
+@end verbatim
+@tpindex sdt_lsc_link_failure_ind_t
+@end display
+
+@subsubheading Parameters
+
+The link failure service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-LSC_@-LINK_@-FAILURE_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive will only be issued when the signalling terminal is in the @psta{LMI_@-ENABLED}
+management state and the SUERM/EIM is in the @psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The new state for the SUERM remains unchanged.
+
+@subsubheading Rules
+
+The following rules apply to the link failure indication service primitive:
+
+@itemize ---
+
+@item
+The SDTS provider will only issue an @prim{SDT_@-LSC_@-LINK_@-FAILURE_@-IND} primitive while the
+SUERM or EIM is in the @psta{IN-SERVICE} state and the monitored error rate exceeds the operating
+threshold configured for the error monitor.
+
+@item
+Not all STDS providers have a fully functional SUERM/EIM.  Some providers may never issue this
+primitive.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a response from the SDTS user.
+
+@page
+@node SDT_SUERM_STOP_REQ
+@subsubsection SDT_SUERM_STOP_REQ
+
+@subsubheading Description
+
+This SDTS user originated primitive is used to stop the Signal Unit Error Rate Monitor (SUERM) or Errorred
+Interval Monitor (EIM) service.
+This primitive is a request from the Link State Control (LSC) function in the SDTS user to the
+SUERM/EIM function in the SDTS provider.
+
+@subsubheading Format
+
+The SUERM stop service primitive consists of one @prim{M_PROTO} or @prim{M_PCPROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_suerm_stop_req_t;
+@end verbatim
+@tpindex sdt_suerm_stop_req_t
+@end display
+
+@subsubheading Parameters
+
+The SUERM stop service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Specifies the service primitive type.  Always @prim{SDT_@-SUERM_@-STOP_@-REQ}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only valid in the @psta{LMI_@-ENABLED} management state, and when the SUERM/EIM is
+in the @psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The state of the SUERM/EIM is moved to @psta{IDLE} state.
+
+@subsubheading Response
+
+This service primitive is not acknowledged, but can cause a non-fatal error as follows:
+
+@itemize @minus
+
+@item @b{Successful:}
+When successful, the primitive is not acknowledged.  The SUERM function is moved to the @psta{IDLE}
+state.
+
+@item @b{Unsuccessful (non-fatal errors):}
+When unsuccessful, the SDTS provider responds with a @prim{LMI_@-ERROR_@-ACK} primitive containing
+the error.  The state remains unchanged.
+
+@end itemize
+
+When the signalling terminal is in the @psta{LMI_@-ENABLED} management state and the SUERM/EIM is
+already in the @psta{IDLE} state, this primitive should be ignored without generating a non-fatal
+error.
+
+@subsubheading Reason for Failure
+
+@b{Non-Fatal Errors:} applicable non-fatal errors are as follows:
+
+@table @perr
+
+@item LMI_@-UNSPEC
+Unknown or unspecified.
+@item LMI_@-BADPRIM
+Unrecognized primitive.
+@item LMI_@-DISC
+Disconnected.
+@item LMI_@-EVENT
+Protocol-specific event ocurred.
+@item LMI_@-FATALERR
+Device has become unusable.
+@item LMI_@-NOTSUPP
+Primitive not supported by this device.
+@item LMI_@-OUTSTATE
+Primitive was issued from invalid state.
+@item LMI_@-PROTOSHORT
+@prim{M_PROTO} block too short.
+@item LMI_@-SYSERR
+UNIX system error.
+@item LMI_@-FORMAT
+Format error detected.
+@item LMI_@-DEVERR
+Start of device-specific error codes.
+
+@end table
+
+@page
+@node Receive Congestion Service Primitives
+@subsection Receive Congestion Service Primitives
+
+The receive congestion service primitives provide the SDTS user with the ability to be informed by
+the SDTS provider when it detects receive congestion conditions and can determine a receive
+congestion policy.  Receive congestion is a provider-specific matter.  The SDTS user is also
+capable of detecting receive congestion without the assistance of these primitives.  They are used
+to indicate receive congestion to the SDTS user that can only be detected within the SDTS provider. 
+
+These service primitives implement the receive congestion service (@pxref{Receive Congestion
+Service}).
+
+@menu
+* SDT_RC_CONGESTION_ACCEPT_IND::
+* SDT_RC_CONGESTION_DISCARD_IND::
+* SDT_RC_NO_CONGESTION_IND::
+@end menu
+
+@node SDT_RC_CONGESTION_ACCEPT_IND
+@subsubsection SDT_RC_CONGESTION_ACCEPT_IND
+
+@subsubheading Description
+
+The RC convestion accept indication service primitive is indicated by the SDTS provider when it is
+experiencing receive congestion but signal units continue to be delivered by the SDTS provider.
+This primitive is an indication from a provider-specific function in the SDTS provider to the
+Reception Control (RC) function in the SDTS user. 
+
+@subsubheading Format
+
+The RC congestion accept indication service primtive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_rc_congestion_accept_ind_t;
+@end verbatim
+@tpindex sdt_rc_congestion_accept_ind_t
+@end display
+
+@subsubheading Parameters
+
+The RC congestion accept indication service primtive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-RC_@-CONGESTION_@-ACCEPT_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED} management
+state and the DAEDR function is in the @psta{IN-SERVICE} state.
+
+@subsubheading New State
+
+The receive congestion state is moved to @psta{CONGESTION-ACCEPT}.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when issuing the RC congestion accept service
+primitive:
+
+@itemize ---
+
+@item
+This primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED} management
+state, the DAEDR function is in the @psta{IN-SERVICE} state, and the SDTS provider has detected
+receive congestion but is not discarding signal units.
+
+@item
+Not all SDTS providers have a fully functional receive congestion function.  Some SDTS providers
+may never generate this primitive.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a response from the SDTS user.
+
+@page
+@node SDT_RC_CONGESTION_DISCARD_IND
+@subsubsection SDT_RC_CONGESTION_DISCARD_IND
+
+@subsubheading Description
+
+The RC convestion discard indication service primitive is indicated by the SDTS provider when it is
+experiencing receive congestion and signal units are being discarded by the SDTS provider.
+This primitive is an indication from a provider-specific function in the SDTS provider to the
+Reception Control (RC) function in the SDTS user.
+
+@subsubheading Format
+
+The RC congestion discard indication service primitive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_rc_congestion_discard_ind_t;
+@end verbatim
+@tpindex sdt_rc_congestion_discard_ind_t
+@end display
+
+@subsubheading Parameters
+
+The RC congestion discard indication service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-RC_@-CONGESTION_@-DISCARD_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued from the @psta{LMI_@-ENABLED} management state.
+
+@subsubheading New State
+
+The receive congestion state is moved to @psta{CONGESTION-DISCARD}.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when issuing the RC congestion discard service
+primitive:
+
+@itemize ---
+
+@item
+This primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED} management
+state, the DAEDR function is in the @psta{IN-SERVICE} state, and the SDTS provider has detected
+receive congestion and is discarding signal units.
+
+@item
+Not all SDTS providers have a fully functional receive congestion function.  Some SDTS providers
+may never generate this primitive.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a response from the SDTS user.
+
+@page
+@node SDT_RC_NO_CONGESTION_IND
+@subsubsection SDT_RC_NO_CONGESTION_IND
+
+@subsubheading Description
+
+This SDTS provider originated primitive
+This primitive is an indication from a provider-specific function in the SDTS provider to the
+Reception Control (RC) function in the SDTS user.
+
+@subsubheading Format
+
+The RC no congestion indication service primitive consists of one @prim{M_PROTO} message block,
+structured as follows:
+
+@display
+@verbatim
+typedef struct {
+    sdt_long sdt_primitive;
+} sdt_rc_no_congestion_ind_t;
+@end verbatim
+@tpindex sdt_rc_no_congestion_ind_t
+@end display
+
+@subsubheading Parameters
+
+The RC no congestion indication service primitive contains the following parameters:
+
+@table @parm
+
+@item sdt_@-primitive
+Indicates the service primitive type.  Always @prim{SDT_@-RC_@-NO_@-CONGESTION_@-IND}.
+
+@end table
+
+@subsubheading State
+
+This primitive is only issued from the @psta{LMI_@-ENABLED} management state.
+
+@subsubheading New State
+
+The receive congestion state is moved to @psta{NO-CONGESTION}.
+
+@subsubheading Rules
+
+The SDTS provider observes the following rules when issuing the RC no congestion service
+primitive:
+
+@itemize ---
+
+@item
+This primitive is only issued when the signalling terminal is in the @psta{LMI_@-ENABLED} management
+state, the DAEDR function is in the @psta{IN-SERVICE} state, and the SDTS provider has detected
+that receive congestion has abated.
+
+@item
+Not all SDTS providers have a fully functional receive congestion function.  Some SDTS providers
+may never generate this primitive.
+
+@end itemize
+
+@subsubheading Response
+
+This primitive does not require a response from the SDTS user.
 
 
 @node Diagnostics Requirements
 @chapter Diagnostics Requirements
 
-Two error handling facilities should be provided to the SDTS user: one to handle non-fatal errors, and the other
-to handle fatal errors.
+Two error handling facilities should be provided to the SDTS user: one to handle non-fatal errors,
+and the other to handle fatal errors.
 
 @section Non-Fatal Error Handling Facility
 
-These are errors that do not change the state of the SDTS interface as seen by the SDTS user and provide
-the user with the option of reissuing the MAP primitive with the corrected options specification.  The non-fatal error
-handling is provided only to those primitives that require acknowledgements, and uses the @code{MAP_ERROR_ACK} to report
-these errors.  These errors retain the state of the SDTS interface the same as it was before the MAP provider
-received the primitive that was in error.  Syntax errors and rule violations are reported via the non-fatal error
-handling facility.
+These are errors that do not change the state of the SDTS interface as seen by the SDTS user and
+provide the user with the option of reissuing the SDT primitive with the corrected options
+specification.  The non-fatal error handling is provided only to those primitives that require
+acknowledgements, and uses the @prim{LMI_@-ERROR_@-ACK} to report these errors.  These errors retain the
+state of the SDTS interface the same as it was before the SDT provider received the primitive that
+was in error.  Syntax errors and rule violations are reported via the non-fatal error handling
+facility.
 
 @section Fatal Error Handling Facility
 
-These errors are issued by the MAP provider when it detects errors that are not correctable by the MAP user, or if it is
-unable to report a correctible error to the SDTS user.  Fatal errors are indicated via the STREAMS message type
-@code{M_ERROR} with the UNIX system error @code{EPROTO}.  The @code{M_ERROR} STREAMS message type will result in the
-failure of all the UNIX system calls on the stream.  The SDTS user can recover from a fatal error by having all
-the processes close the files associated with the stream, and then reopening them for processing.
+These errors are issued by the SDT provider when it detects errors that are not correctable by the
+SDT user, or if it is unable to report a correctible error to the SDTS user.  Fatal errors are
+indicated via the STREAMS message type @code{M_ERROR} with the UNIX system error @code{EPROTO}.  The
+@code{M_ERROR} STREAMS message type will result in the failure of all the UNIX system calls on the
+stream.  The SDTS user can recover from a fatal error by having all the processes close the files
+associated with the stream, and then reopening them for processing.
 
-@node References
-@chapter References
+@ignore
+@node Addendum for ITU-T Q.703 Conformance
+@unnumbered Addendum for ITU-T Q.703 Conformance
 
-@enumerate
-@item CCITT X.213, (Geneva, 1986), ``Network Service Definition for Open Systems Interconnection (OSI) for CCITT Applications,'' (Grey Book).
-@item ISO 8348 --- ``Information Processing Systems --- Data Communications --- Newtork Service Definition,'' 4/15/87
-@item ISO 8348/AD --- ``Information Processing Systems --- Data Communications --- Newtork Service Definition --- Addendum 1: Connectionless Mode Transmission,'' 4/15/87
-@item ISO 8373 --- ``Information Processing Systems --- Data Communicatoins Protocol for Providing the Connectionless Mode Network Service,'' SC6 N4542
-@item ISO 8208 --- ``Information Processing Systems --- X.25 Packet Level Protocol for Data Terminal Equipment,'' 9/1/87
-@item ISO 8878 --- ``Information Processing Systems --- Data Communications --- Use of X.25 to Provide the OSI Connection-Mode Network Service,'' 9/1/87
-@item System V Interface Definition, Issue 2 -- Volume 3
-@item CCITT X.210, (Geneva 1984), ``Open Systems Interconnection (OSI) Layer Service Definition Conventions,'' (Red Book)
-@end enumerate
+@node Addendum for ANSI T1.111.3 Conformance
+@unnumbered Addendum for ANSI T1.111.3 Conformance
 
-@node Addendum for 3GPP Conformance
-@unnumbered Addendum for 3GPP Conformance
+@node Addendum for ETSI ETS 300 008-1 Conformance
+@unnumbered Addendum for ETSI ETS 300 008-1 Conformance
 
-@node Mapping SDTI Primitives to 3GPP TS 29.002
-@appendix Mapping SDTI Primitives to 3GPP TS 29.002
+@node Mapping of SDTI Primitives to ITU-T Q.703
+@appendix Mapping of SDTI Primitives to ITU-T Q.703
 
-Table A-1 shows the mapping of the SDTI primitives to the SDTS definition primitives listed in 3GPP TS 29.002
-Release 6.6.0.
+@node Mapping of SDTI Primitives to ANSI T1.111.3
+@appendix Mapping of SDTI Primitives to ANSI T1.111.3
 
 @node State/Event Tables
 @appendix State/Event Tables
 
 @node Primitive Precedence Tables
 @appendix Primitive Precedence Tables
+@end ignore
+
+@node LMI Header File Listing
+@appendix LMI Header File Listing
+
+@smallformat
+@verbatim
+/*****************************************************************************
+
+ @(#) lmi.h,v 0.9.2.8 2007/03/25 18:59:12 brian Exp
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified 2007/03/25 18:59:12 by brian
+
+ -----------------------------------------------------------------------------
+
+ lmi.h,v
+ Revision 0.9.2.8  2007/03/25 18:59:12  brian
+ - changes to support 2.6.20-1.2307.fc5 kernel
+
+ Revision 0.9.2.7  2007/01/28 01:09:50  brian
+ - updated test programs and working up m2ua-as driver
+
+ *****************************************************************************/
+
+#ifndef __LMI_H__
+#define __LMI_H__
+
+#ident "@(#) lmi.h,v openss7-0_9_2_F(0.9.2.8) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
+/* This file can be processed by doxygen(1). */
+
+#define LMI_PROTO_BASE            16L
+
+#define LMI_DSTR_FIRST          ( 1L + LMI_PROTO_BASE )
+#define LMI_INFO_REQ            ( 1L + LMI_PROTO_BASE )
+#define LMI_ATTACH_REQ          ( 2L + LMI_PROTO_BASE )
+#define LMI_DETACH_REQ          ( 3L + LMI_PROTO_BASE )
+#define LMI_ENABLE_REQ          ( 4L + LMI_PROTO_BASE )
+#define LMI_DISABLE_REQ         ( 5L + LMI_PROTO_BASE )
+#define LMI_OPTMGMT_REQ         ( 6L + LMI_PROTO_BASE )
+#define LMI_DSTR_LAST           ( 6L + LMI_PROTO_BASE )
+
+#define LMI_USTR_LAST           (-1L - LMI_PROTO_BASE )
+#define LMI_INFO_ACK            (-1L - LMI_PROTO_BASE )
+#define LMI_OK_ACK              (-2L - LMI_PROTO_BASE )
+#define LMI_ERROR_ACK           (-3L - LMI_PROTO_BASE )
+#define LMI_ENABLE_CON          (-4L - LMI_PROTO_BASE )
+#define LMI_DISABLE_CON         (-5L - LMI_PROTO_BASE )
+#define LMI_OPTMGMT_ACK         (-6L - LMI_PROTO_BASE )
+#define LMI_ERROR_IND           (-7L - LMI_PROTO_BASE )
+#define LMI_STATS_IND           (-8L - LMI_PROTO_BASE )
+#define LMI_EVENT_IND           (-9L - LMI_PROTO_BASE )
+#define LMI_USTR_FIRST          (-9L - LMI_PROTO_BASE )
+
+#define LMI_UNATTACHED          1L      /* No PPA attached, awating LMI_ATTACH_REQ */
+#define LMI_ATTACH_PENDING      2L      /* Waiting for attach */
+#define LMI_UNUSABLE            3L      /* Device cannot be used, STREAM in hung state */
+#define LMI_DISABLED            4L      /* PPA attached, awaiting LMI_ENABLE_REQ */
+#define LMI_ENABLE_PENDING      5L      /* Waiting to send LMI_ENABLE_CON */
+#define LMI_ENABLED             6L      /* Ready for use, awaiting primtiive exchange */
+#define LMI_DISABLE_PENDING     7L      /* Waiting to send LMI_DISABLE_CON */
+#define LMI_DETACH_PENDING      8L      /* Waiting for detach */
+
+/*
+ *  LMI_ERROR_ACK and LMI_ERROR_IND reason codes
+ */
+#define LMI_UNSPEC              0x00000000      /* Unknown or unspecified */
+#define LMI_BADADDRESS          0x00010000      /* Address was invalid */
+#define LMI_BADADDRTYPE         0x00020000      /* Invalid address type */
+#define LMI_BADDIAL             0x00030000      /* (not used) */
+#define LMI_BADDIALTYPE         0x00040000      /* (not used) */
+#define LMI_BADDISPOSAL         0x00050000      /* Invalid disposal parameter */
+#define LMI_BADFRAME            0x00060000      /* Defective SDU received */
+#define LMI_BADPPA              0x00070000      /* Invalid PPA identifier */
+#define LMI_BADPRIM             0x00080000      /* Unrecognized primitive */
+#define LMI_DISC                0x00090000      /* Disconnected */
+#define LMI_EVENT               0x000a0000      /* Protocol-specific event ocurred */
+#define LMI_FATALERR            0x000b0000      /* Device has become unusable */
+#define LMI_INITFAILED          0x000c0000      /* Link initialization failed */
+#define LMI_NOTSUPP             0x000d0000      /* Primitive not supported by this device */
+#define LMI_OUTSTATE            0x000e0000      /* Primitive was issued from invalid state */
+#define LMI_PROTOSHORT          0x000f0000      /* M_PROTO block too short */
+#define LMI_SYSERR              0x00100000      /* UNIX system error */
+#define LMI_WRITEFAIL           0x00110000      /* Unitdata request failed */
+#define LMI_CRCERR              0x00120000      /* CRC or FCS error */
+#define LMI_DLE_EOT             0x00130000      /* DLE EOT detected */
+#define LMI_FORMAT              0x00140000      /* Format error detected */
+#define LMI_HDLC_ABORT          0x00150000      /* Aborted frame detected */
+#define LMI_OVERRUN             0x00160000      /* Input overrun */
+#define LMI_TOOSHORT            0x00170000      /* Frame too short */
+#define LMI_INCOMPLETE          0x00180000      /* Partial frame received */
+#define LMI_BUSY                0x00190000      /* Telephone was busy */
+#define LMI_NOANSWER            0x001a0000      /* Connection went unanswered */
+#define LMI_CALLREJECT          0x001b0000      /* Connection rejected */
+#define LMI_HDLC_IDLE           0x001c0000      /* HDLC line went idle */
+#define LMI_HDLC_NOTIDLE        0x001d0000      /* HDLC link no longer idle */
+#define LMI_QUIESCENT           0x001e0000      /* Line being reassigned */
+#define LMI_RESUMED             0x001f0000      /* Line has been reassigned */
+#define LMI_DSRTIMEOUT          0x00200000      /* Did not see DSR in time */
+#define LMI_LAN_COLLISIONS      0x00210000      /* LAN excessive collisions */
+#define LMI_LAN_REFUSED         0x00220000      /* LAN message refused */
+#define LMI_LAN_NOSTATION       0x00230000      /* LAN no such station */
+#define LMI_LOSTCTS             0x00240000      /* Lost Clear to Send signal */
+#define LMI_DEVERR              0x00250000      /* Start of device-specific error codes */
+
+typedef signed int lmi_long;
+typedef unsigned int lmi_ulong;
+typedef unsigned short lmi_ushort;
+typedef unsigned char lmi_uchar;
+
+/*
+ *  LOCAL MANAGEMENT PRIMITIVES
+ */
+
+/*
+   LMI_INFO_REQ, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_INFO_REQ */
+} lmi_info_req_t;
+
+/*
+   LMI_INFO_ACK, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_INFO_ACK */
+        lmi_ulong lmi_version;
+        lmi_ulong lmi_state;
+        lmi_ulong lmi_max_sdu;
+        lmi_ulong lmi_min_sdu;
+        lmi_ulong lmi_header_len;
+        lmi_ulong lmi_ppa_style;
+        lmi_uchar lmi_ppa_addr[0];
+} lmi_info_ack_t;
+
+/*
+ *  LMI provider style.
+ *
+ *  The LMI provider style which determines whether a provider requires an
+ *  LMI_ATTACH_REQ to inform the provider which PPA user messages should be
+ *  sent/received on.
+ */
+#define LMI_STYLE1      0x00    /* PPA is implicitly bound by open(2) */
+#define LMI_STYLE2      0x01    /* PPA must be explicitly bound via STD_ATTACH_REQ */
+
+/*
+   LMI_ATTACH_REQ, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_ATTACH_REQ */
+        lmi_uchar lmi_ppa[0];
+} lmi_attach_req_t;
+
+/*
+   LMI_DETACH_REQ, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_DETACH_REQ */
+} lmi_detach_req_t;
+
+/*
+   LMI_ENABLE_REQ, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_ENABLE_REQ */
+        lmi_uchar lmi_rem[0];
+} lmi_enable_req_t;
+
+/*
+   LMI_DISABLE_REQ, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_DISABLE_REQ */
+} lmi_disable_req_t;
+
+/*
+   LMI_OK_ACK, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_OK_ACK */
+        lmi_long lmi_correct_primitive;
+        lmi_ulong lmi_state;
+} lmi_ok_ack_t;
+
+/*
+   LMI_ERROR_ACK, M_CTL 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_ERROR_ACK */
+        lmi_ulong lmi_errno;
+        lmi_ulong lmi_reason;
+        lmi_long lmi_error_primitive;
+        lmi_ulong lmi_state;
+} lmi_error_ack_t;
+
+/*
+   LMI_ENABLE_CON, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_ENABLE_CON */
+        lmi_ulong lmi_state;
+} lmi_enable_con_t;
+
+/*
+   LMI_DISABLE_CON, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_DISABLE_CON */
+        lmi_ulong lmi_state;
+} lmi_disable_con_t;
+
+/*
+   LMI_OPTMGMT_REQ, M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_OPTMGMT_REQ */
+        lmi_ulong lmi_opt_length;
+        lmi_ulong lmi_opt_offset;
+        lmi_ulong lmi_mgmt_flags;
+} lmi_optmgmt_req_t;
+
+/*
+   LMI_OPTMGMT_ACK, M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_OPMGMT_ACK */
+        lmi_ulong lmi_opt_length;
+        lmi_ulong lmi_opt_offset;
+        lmi_ulong lmi_mgmt_flags;
+} lmi_optmgmt_ack_t;
+
+#undef LMI_DEFAULT
+
+#define LMI_NEGOTIATE           0x0004
+#define LMI_CHECK               0x0008
+#define LMI_DEFAULT             0x0010
+#define LMI_SUCCESS             0x0020
+#define LMI_FAILURE             0x0040
+#define LMI_CURRENT             0x0080
+#define LMI_PARTSUCCESS         0x0100
+#define LMI_READONLY            0x0200
+#define LMI_NOTSUPPORT          0x0400
+
+/*
+   LMI_ERROR_IND, M_PROTO or M_PCPROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_ERROR_IND */
+        lmi_ulong lmi_errno;
+        lmi_ulong lmi_reason;
+        lmi_ulong lmi_state;
+} lmi_error_ind_t;
+
+/*
+   LMI_STATS_IND, M_PROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_STATS_IND */
+        lmi_ulong lmi_interval;
+        lmi_ulong lmi_timestamp;
+} lmi_stats_ind_t;
+
+/*
+   LMI_EVENT_IND, M_PROTO 
+ */
+
+typedef struct {
+        lmi_long lmi_primitive;         /* LMI_EVENT_IND */
+        lmi_ulong lmi_objectid;
+        lmi_ulong lmi_timestamp;
+        lmi_ulong lmi_severity;
+} lmi_event_ind_t;
+
+union LMI_primitive {
+        lmi_long lmi_primitive;
+        lmi_ok_ack_t ok_ack;
+        lmi_error_ack_t error_ack;
+        lmi_error_ind_t error_ind;
+        lmi_stats_ind_t stats_ind;
+        lmi_event_ind_t event_ind;
+};
+
+union LMI_primitives {
+        lmi_long lmi_primitive;
+        lmi_info_req_t info_req;
+        lmi_info_ack_t info_ack;
+        lmi_attach_req_t attach_req;
+        lmi_detach_req_t detach_req;
+        lmi_enable_req_t enable_req;
+        lmi_disable_req_t disable_req;
+        lmi_ok_ack_t ok_ack;
+        lmi_error_ack_t error_ack;
+        lmi_enable_con_t enable_con;
+        lmi_disable_con_t disable_con;
+        lmi_error_ind_t error_ind;
+        lmi_stats_ind_t stats_ind;
+        lmi_event_ind_t event_ind;
+};
+
+#define LMI_INFO_REQ_SIZE       sizeof(lmi_info_req_t)
+#define LMI_INFO_ACK_SIZE       sizeof(lmi_info_ack_t)
+#define LMI_ATTACH_REQ_SIZE     sizeof(lmi_attach_req_t)
+#define LMI_DETACH_REQ_SIZE     sizeof(lmi_detach_req_t)
+#define LMI_ENABLE_REQ_SIZE     sizeof(lmi_enable_req_t)
+#define LMI_DISABLE_REQ_SIZE    sizeof(lmi_disable_req_t)
+#define LMI_OK_ACK_SIZE         sizeof(lmi_ok_ack_t)
+#define LMI_ERROR_ACK_SIZE      sizeof(lmi_error_ack_t)
+#define LMI_ENABLE_CON_SIZE     sizeof(lmi_enable_con_t)
+#define LMI_DISABLE_CON_SIZE    sizeof(lmi_disable_con_t)
+#define LMI_ERROR_IND_SIZE      sizeof(lmi_error_ind_t)
+#define LMI_STATS_IND_SIZE      sizeof(lmi_stats_ind_t)
+#define LMI_EVENT_IND_SIZE      sizeof(lmi_event_ind_t)
+
+typedef struct lmi_opthdr {
+        lmi_ulong level;
+        lmi_ulong name;
+        lmi_ulong length;
+        lmi_ulong status;
+        lmi_uchar value[0];
+        /*
+           followed by option value 
+         */
+} lmi_opthdr_t;
+
+#define LMI_LEVEL_COMMON        '\0'
+#define LMI_LEVEL_SDL           'd'
+#define LMI_LEVEL_SDT           't'
+#define LMI_LEVEL_SL            'l'
+#define LMI_LEVEL_SLS           's'
+#define LMI_LEVEL_MTP           'M'
+#define LMI_LEVEL_SCCP          'S'
+#define LMI_LEVEL_ISUP          'I'
+#define LMI_LEVEL_TCAP          'T'
+
+#define LMI_OPT_PROTOCOL        1       /* use struct lmi_option */
+#define LMI_OPT_STATISTICS      2       /* use struct lmi_sta */
+
+#endif                          /* __LMI_H__ */
+@end verbatim
+@end smallformat
 
 @node SDTI Header File Listing
 @appendix SDTI Header File Listing
+
+@smallformat
+@verbatim
+/*****************************************************************************
+
+ @(#) sdti.h,v 0.9.2.4 2007/06/17 01:56:02 brian Exp
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 2 of the License.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified 2007/06/17 01:56:02 by brian
+
+ -----------------------------------------------------------------------------
+
+ sdti.h,v
+ Revision 0.9.2.4  2007/06/17 01:56:02  brian
+ - updates for release, remove any later language
+
+ *****************************************************************************/
+
+#ifndef __SS7_SDTI_H__
+#define __SS7_SDTI_H__
+
+#ident "@(#) sdti.h,v openss7-0_9_2_F(0.9.2.4) Copyright (c) 2001-2007 OpenSS7 Corporation."
+
+/* This file can be processed by doxygen(1). */
+
+ /*
+  * The purpose of the SDT interface is to provide a separation between
+  * the SL (Signalling Link) interface which provides SS7 Level 2 (LINK)
+  * state machine services and the underlying driver which provides
+  * essentially HDLC capablities.  In SS7 the entity providing HDLC
+  * services is called the Signalling Data Terminal (SDT).  An SDTI
+  * implements the AERM/SUERM/EIM and DAEDR/DAEDT capabilities and
+  * communicates upstream to the Signalling Link using the primitives
+  * provided here.
+  *
+  * The SDT interface also recognizes Local Management Interface (LMI)
+  * primitives defined elsewhere <sys/ss7/lmi.h>.
+  */
+
+typedef lmi_long sdt_long;
+typedef lmi_ulong sdt_ulong;
+typedef lmi_ushort sdt_ushort;
+typedef lmi_uchar sdt_uchar;
+
+#define SDT_PROTO_BASE				 48L
+
+#define SDT_DSTR_FIRST				( 1L + SDT_PROTO_BASE)
+#define SDT_DAEDT_TRANSMISSION_REQ		( 1L + SDT_PROTO_BASE)
+#define SDT_DAEDT_START_REQ			( 2L + SDT_PROTO_BASE)
+#define SDT_DAEDR_START_REQ			( 3L + SDT_PROTO_BASE)
+#define SDT_AERM_START_REQ			( 4L + SDT_PROTO_BASE)
+#define SDT_AERM_STOP_REQ			( 5L + SDT_PROTO_BASE)
+#define SDT_AERM_SET_TI_TO_TIN_REQ		( 6L + SDT_PROTO_BASE)
+#define SDT_AERM_SET_TI_TO_TIE_REQ		( 7L + SDT_PROTO_BASE)
+#define SDT_SUERM_START_REQ			( 8L + SDT_PROTO_BASE)
+#define SDT_SUERM_STOP_REQ			( 9L + SDT_PROTO_BASE)
+#define SDT_DSTR_LAST				( 9L + SDT_PROTO_BASE)
+
+#define SDT_USTR_LAST				(-1L - SDT_PROTO_BASE)
+#define SDT_RC_SIGNAL_UNIT_IND			(-1L - SDT_PROTO_BASE)
+#define SDT_RC_CONGESTION_ACCEPT_IND		(-2L - SDT_PROTO_BASE)
+#define SDT_RC_CONGESTION_DISCARD_IND		(-3L - SDT_PROTO_BASE)
+#define SDT_RC_NO_CONGESTION_IND		(-4L - SDT_PROTO_BASE)
+#define SDT_IAC_CORRECT_SU_IND			(-5L - SDT_PROTO_BASE)
+#define SDT_IAC_ABORT_PROVING_IND		(-6L - SDT_PROTO_BASE)
+#define SDT_LSC_LINK_FAILURE_IND		(-7L - SDT_PROTO_BASE)
+#define SDT_TXC_TRANSMISSION_REQUEST_IND	(-8L - SDT_PROTO_BASE)
+#define SDT_USTR_FIRST				(-8L - SDT_PROTO_BASE)
+
+/*
+ *  SDT_RC_SIGNAL_UNIT_IND, M_DATA or M_PROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_RC_SIGNAL_UNIT_IND */
+	sdt_ulong sdt_count;
+} sdt_rc_signal_unit_ind_t;
+
+/*
+ *  SDT_DAEDT_TRANSMISSION_REQ, M_DATA or M_PROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_DAEDT_TRANSMISSION_REQ */
+} sdt_daedt_transmission_req_t;
+
+/*
+ *  SDT_DAEDT_START_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_DAEDT_START_REQ */
+} sdt_daedt_start_req_t;
+
+/*
+ *  SDT_DAEDR_START_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_DAEDR_START_REQ */
+} sdt_daedr_start_req_t;
+
+/*
+ *  SDT_IAC_CORRECT_SU_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_IAC_CORRECT_SU_IND */
+} sdt_iac_correct_su_ind_t;
+
+/*
+ *  SDT_AERM_START_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_AERM_START_REQ */
+} sdt_aerm_start_req_t;
+
+/*
+ *  SDT_AERM_STOP_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_AERM_STOP_REQ */
+} sdt_aerm_stop_req_t;
+
+/*
+ *  SDT_AERM_SET_TI_TO_TIN_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_AERM_SET_TI_TO_TIN_REQ */
+} sdt_aerm_set_ti_to_tin_req_t;
+
+/*
+ *  SDT_AERM_SET_TI_TO_TIE_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_AERM_SET_TI_TO_TIE_REQ */
+} sdt_aerm_set_ti_to_tie_req_t;
+
+/*
+ *  SDT_IAC_ABORT_PROVING_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_IAC_ABORT_PROVING_IND */
+} sdt_iac_abort_proving_ind_t;
+
+/*
+ *  SDT_SUERM_START_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_SUERM_START_REQ */
+} sdt_suerm_start_req_t;
+
+/*
+ *  SDT_SUERM_STOP_REQ, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_SUERM_STOP_REQ */
+} sdt_suerm_stop_req_t;
+
+/*
+ *  SDT_LSC_LINK_FAILURE_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_LSC_LINK_FAILURE_IND */
+} sdt_lsc_link_failure_ind_t;
+
+/*
+ *  SDT_RC_CONGESTION_ACCEPT_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_RC_CONGESTION_ACCEPT_IND */
+} sdt_rc_congestion_accept_ind_t;
+
+/*
+ *  SDT_RC_CONGESTION_DISCARD_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_RC_CONGESTION_DISCARD_IND */
+} sdt_rc_congestion_discard_ind_t;
+
+/*
+ *  SDT_RC_NO_CONGESTION_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_RC_NO_CONGESTION_IND */
+} sdt_rc_no_congestion_ind_t;
+
+/*
+ *  SDT_TXC_TRANSMISSION_REQUEST_IND, M_PROTO or M_PCPROTO
+ */
+typedef struct {
+	sdt_long sdt_primitive;		/* SDT_TXC_TRANSMISSION_REQUEST_IND */
+} sdt_txc_transmission_request_ind_t;
+
+union SDT_primitives {
+	sdt_long sdt_primitive;
+	sdt_daedt_transmission_req_t daedt_transmission_req;
+	sdt_daedt_start_req_t daedt_start_req;
+	sdt_daedr_start_req_t daedr_start_req;
+	sdt_aerm_start_req_t aerm_start_req;
+	sdt_aerm_stop_req_t aerm_stop_req;
+	sdt_aerm_set_ti_to_tin_req_t aerm_set_ti_to_tin_req;
+	sdt_aerm_set_ti_to_tie_req_t aerm_set_ti_to_tie_req;
+	sdt_suerm_start_req_t suerm_start_req;
+	sdt_suerm_stop_req_t suerm_stop_req;
+	sdt_rc_signal_unit_ind_t rc_signal_unit_ind;
+	sdt_rc_congestion_accept_ind_t rc_congestion_accept_ind;
+	sdt_rc_congestion_discard_ind_t rc_congestion_discard_ind;
+	sdt_rc_no_congestion_ind_t rc_no_congestion_ind;
+	sdt_iac_correct_su_ind_t iac_correct_su_ind;
+	sdt_iac_abort_proving_ind_t iac_abort_proving_ind;
+	sdt_lsc_link_failure_ind_t lsc_link_failure_ind;
+	sdt_txc_transmission_request_ind_t txc_transmission_request_ind;
+};
+
+#define SDT_DAEDT_TRANSMISSION_REQ_SIZE		sizeof(sdt_daedt_transmission_req_t)
+#define SDT_DAEDR_START_REQ_SIZE		sizeof(sdt_daedr_start_req_t)
+#define SDT_DAEDT_START_REQ_SIZE		sizeof(sdt_daedt_start_req_t)
+#define SDT_AERM_START_REQ_SIZE			sizeof(sdt_aerm_start_req_t)
+#define SDT_AERM_STOP_REQ_SIZE			sizeof(sdt_aerm_stop_req_t)
+#define SDT_AERM_SET_TI_TO_TIN_REQ_SIZE		sizeof(sdt_aerm_set_ti_to_tin_req_t)
+#define SDT_AERM_SET_TI_TO_TIE_REQ_SIZE		sizeof(sdt_aerm_set_ti_to_tie_req_t)
+#define SDT_SUERM_START_REQ_SIZE		sizeof(sdt_suerm_start_req_t)
+#define SDT_SUERM_STOP_REQ_SIZE			sizeof(sdt_suerm_stop_req_t)
+#define SDT_RC_SIGNAL_UNIT_IND_SIZE		sizeof(sdt_rc_signal_unit_ind_t)
+#define SDT_RC_CONGESTION_ACCEPT_IND_SIZE	sizeof(sdt_rc_congestion_accept_ind_t)
+#define SDT_RC_CONGESTION_DISCARD_IND_SIZE	sizeof(sdt_rc_congestion_discard_ind_t)
+#define SDT_RC_NO_CONGESTION_IND_SIZE		sizeof(sdt_rc_no_congestion_ind_t)
+#define SDT_IAC_CORRECT_SU_IND_SIZE		sizeof(sdt_iac_correct_su_ind_t)
+#define SDT_IAC_ABORT_PROVING_IND_SIZE		sizeof(sdt_iac_abort_proving_ind_t)
+#define SDT_LSC_LINK_FAILURE_IND_SIZE		sizeof(sdt_lsc_link_failure_ind_t)
+#define SDT_TXC_TRANSMISSION_REQUEST_IND_SIZE	sizeof(sdt_txc_transmission_request_ind_t)
+
+#endif				/* __SS7_SDTI_H__ */
+@end verbatim
+@end smallformat
 
 @node License
 @unnumbered License
@@ -516,9 +5323,6 @@ Release 6.6.0.
 
 @include texi/fdl.texi
 
-@node SDTI Header File
-@chapter SDTI Header File
-
 @node Glossary
 @unnumbered Glossary
 
@@ -526,27 +5330,28 @@ Release 6.6.0.
 
 @item Signalling Data Terminal Service Data Unit
 
-A grouping of SDT user data whose boundaries are preserved from one end of the signalling data terminal connection to the
-other.
+A grouping of SDT user data whose boundaries are preserved from one end of the signalling data terminal
+connection to the other.
 
 @item Data transfer
 
-The phase in connection and connectionless modes that supports the transfer of data between to signalling data terminal
-users.
+The phase in connection and connectionless modes that supports the transfer of data between to
+signalling data terminal users.
 
 @item SDT provider
 
-The signalling data terminal layer protocol that provides the services of the signalling data terminal interface.
+The signalling data terminal layer protocol that provides the services of the signalling data terminal
+interface.
 
 @item SDT user
 
-The user-level application or user-level or kernel-level protocol that accesses the services of the signalling data terminal
-layer.
+The user-level application or user-level or kernel-level protocol that accesses the services of the
+signalling data terminal layer.
 
 @item Local management
 
-The phase in connection and connectionless modes in which a SDT user initializes a stream and attaches a PPA address to
-the stream.  Primitives in this phase generate local operations only.
+The phase in connection and connectionless modes in which a SDT user initializes a stream and
+attaches a PPA address to the stream.  Primitives in this phase generate local operations only.
 
 @item PPA
 
@@ -560,12 +5365,33 @@ An identifier of a particular physical medium over which communication transpire
 @node Acronyms
 @unnumbered Acronyms
 
-@multitable {SDT SDU}{International Telecommunication Union - Telecom Sector}
-@item SDTI @tab Signalling Data Terminal Interface
-@item SDT @tab Signalling Data Terminal
-@item SDT SDU @tab Signalling Data Terminal Service Data Unit
+@multitable {LMS Provider}{International Telecommunication Union - Telecom Sector}
+@item AERM @tab Alignment Error Rate Monitor
+@item CC @tab Congestion Control
+@item DAEDR @tab Delimitation Alignment and Error Detection (Receive)
+@item DAEDT @tab Delimitation Alignment and Error Detection (Transmit)
+@item EIM @tab Errored Interval Monitor
+@item IAC @tab Initial Alignment Control
 @item ITU-T @tab International Telecommunications Union - Telecom Sector
+@item LMS Provider @tab A provider of Local Management Services
+@item LMS @tab Local Management Service
+@item LMS User @tab A user of Local Management Services
+@item LM @tab Local Management
+@item LSC @tab Link State Control
 @item PPA @tab Physical Point of Attachment
+@item RC @tab Reception Control
+@item SDLI @tab Signalling Data Link Interface
+@item SDL SDU @tab Signalling Data Link Service Data Unit
+@item SDLS @tab Signalling Data Link Service
+@item SDL @tab Signalling Data Link
+@item SDTI @tab Signalling Data Terminal Interface
+@item SDTS @tab Signalling Data Terminal Service
+@item SDT @tab Signalling Data Terminal
+@item SLI @tab Signalling Link Interface
+@item SLS @tab Signalling Link Service
+@item SL @tab Signalling Link
+@item SS7 @tab Signalling System No. 7
+@item TXC @tab Transmission Control
 @end multitable
 
 @node References
@@ -597,11 +5423,12 @@ An identifier of a particular physical medium over which communication transpire
 @c * Option Index::
 @c * Author Index::
 * Primitive Index::
-@c * Primitive Value Index::
+* Primitive Value Index::
 * Protocol State Index::
+* Protocol Error Index::
+* Manual Page Index::
 @end menu
 
-@page
 @node Concept Index
 @section Concept Index
 
@@ -649,17 +5476,29 @@ An identifier of a particular physical medium over which communication transpire
 
 @printindex pr
 
-@c @page
-@c @node Primitive Value Index
-@c @section Primitive Value Index
+@page
+@node Primitive Value Index
+@section Primitive Value Index
 
-@c @printindex pv
+@printindex pv
 
 @page
 @node Protocol State Index
 @section Protocol State Index
 
 @printindex st
+
+@page
+@node Protocol Error Index
+@section Protocol Error Index
+
+@printindex pe
+
+@page
+@node Manual Page Index
+@section Manual Page Index
+
+@printindex mp
 
 
 @page
