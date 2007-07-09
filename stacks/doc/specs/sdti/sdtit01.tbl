@@ -1,0 +1,93 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cbw(1.0in)|cbw(1.0in)|cbw(3.0in)
+l|l|l.
+Phase:Service:Primitives
+=
+T{
+.hy 0
+.ad l
+Local Management
+T}:T{
+.hy 0
+.ad l
+Acknowledgement
+T}:T{
+.hy 0
+.ad l
+LMI_OK_ACK, LMI_ERROR_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Information Reporting
+T}:T{
+.hy 0
+.ad l
+LMI_INFO_REQ, LMI_INFO_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+PPA Attachment
+T}:T{
+.hy 0
+.ad l
+LMI_ATTACH_REQ, LMI_DETACH_REQ, LMI_OK_ACK
+T}
+:_:_
+:Initialization:T{
+.hy 0
+.ad l
+LMI_ENABLE_REQ, LMI_ENABLE_CON, LMI_DISABLE_REQ, LMI_DISABLE_CON
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Options Management
+T}:T{
+.hy 0
+.ad l
+LMI_OPTMGMT_REQ, LMI_OPTMGMT_ACK
+T}
+:_:_
+:T{
+.hy 0
+.ad l
+Event Reporting
+T}:T{
+.hy 0
+.ad l
+LMI_ERROR_IND, LMI_STATS_IND, LMI_EVENT_IND
+T}
+.TE
