@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/04 08:24:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/09 09:23:04 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/07/04 08:24:57 $ by $Author: brian $
+## Last Modified $Date: 2007/07/09 09:23:04 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,7 +57,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		= sdli.texi
+info_TEXINFOS		+= sdli.texi
 
 sdli_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -80,8 +80,41 @@ EXTRA_info_TEXINFOS	= \
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		=
-TBL_TBLS		=
+FIG_FIGS		= \
+			  lmi02.fig \
+			  lmi03.fig \
+			  lmi04.fig \
+			  lmi05.fig \
+			  lmi06.fig \
+			  lmi07.fig \
+			  lmi08.fig \
+			  lmi09.fig \
+			  lmi10.fig \
+			  lmi11.fig \
+			  lmi13.fig \
+			  lmi15.fig \
+			  lmi16.fig \
+			  sdli01.fig \
+			  sdli02.fig \
+			  sdli03.fig \
+			  sdli04.fig \
+			  sdli05.fig \
+			  sdli06.fig \
+			  sdli07.fig \
+			  sdli08.fig \
+			  sdli09.fig \
+			  sdli10.fig \
+			  sdli11.fig \
+			  sdli12.fig \
+			  sdli13.fig \
+			  sdli14.fig \
+			  sdli15.fig \
+			  sdli16.fig
+
+TBL_TBLS		= \
+			  lmit01.tbl \
+			  sdlit01.tbl \
+			  sdlit02.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -95,6 +128,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2007/07/09 09:23:04  brian
+## - working up SDLI specification
+##
 ## Revision 0.9.2.1  2007/07/04 08:24:57  brian
 ## - added new files
 ##
