@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/04 08:24:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/09 09:04:51 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/07/04 08:24:58 $ by $Author: brian $
+## Last Modified $Date: 2007/07/09 09:04:51 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -80,8 +80,59 @@ EXTRA_info_TEXINFOS	= \
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		=
-TBL_TBLS		=
+FIG_FIGS		= \
+			lmi02.fig \
+			lmi03.fig \
+			lmi04.fig \
+			lmi05.fig \
+			lmi06.fig \
+			lmi07.fig \
+			lmi08.fig \
+			lmi09.fig \
+			lmi10.fig \
+			lmi11.fig \
+			lmi13.fig \
+			lmi15.fig \
+			lmi16.fig \
+			sli01.fig \
+			sli02.fig \
+			sli03.fig \
+			sli04.fig \
+			sli05.fig \
+			sli06.fig \
+			sli07.fig \
+			sli08.fig \
+			sli09.fig \
+			sli10.fig \
+			sli11.fig \
+			sli12.fig \
+			sli13.fig \
+			sli14.fig \
+			sli15.fig \
+			sli16.fig \
+			sli17.fig \
+			sli18.fig \
+			sli19.fig \
+			sli20.fig \
+			sli21.fig \
+			sli22.fig \
+			sli23.fig \
+			sli24.fig \
+			sli25.fig \
+			sli26.fig \
+			sli27.fig \
+			sli28.fig \
+			sli29.fig \
+			sli30.fig \
+			sli31.fig \
+			sli32.fig \
+			sli33.fig \
+			sli34.fig
+
+TBL_TBLS		= \
+			lmit01.tbl \
+			slit01.tbl \
+			slit02.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -95,6 +146,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2007/07/09 09:04:51  brian
+## - working up SLI specification
+##
 ## Revision 0.9.2.1  2007/07/04 08:24:58  brian
 ## - added new files
 ##
