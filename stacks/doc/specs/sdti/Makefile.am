@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/04 08:24:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/09 09:12:59 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,7 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/07/04 08:24:57 $ by $Author: brian $
+## Last Modified $Date: 2007/07/09 09:12:59 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,7 +57,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		= sdti.texi
+info_TEXINFOS		+= sdti.texi
 
 sdti_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/macros.texi \
@@ -80,8 +80,41 @@ EXTRA_info_TEXINFOS	= \
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-FIG_FIGS		=
-TBL_TBLS		=
+FIG_FIGS		= \
+			lmi02.fig \
+			lmi03.fig \
+			lmi04.fig \
+			lmi05.fig \
+			lmi06.fig \
+			lmi07.fig \
+			lmi08.fig \
+			lmi09.fig \
+			lmi10.fig \
+			lmi11.fig \
+			lmi13.fig \
+			lmi15.fig \
+			lmi16.fig \
+			sdti01.fig \
+			sdti02.fig \
+			sdti03.fig \
+			sdti04.fig \
+			sdti05.fig \
+			sdti06.fig \
+			sdti07.fig \
+			sdti08.fig \
+			sdti09.fig \
+			sdti10.fig \
+			sdti11.fig \
+			sdti12.fig \
+			sdti13.fig \
+			sdti14.fig \
+			sdti15.fig \
+			sdti16.fig
+
+TBL_TBLS		= \
+			lmit01.tbl \
+			sdtit01.tbl \
+			sdtit02.tbl
 
 ## PKG_BUILD_INDEP
 endif
@@ -95,6 +128,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.2  2007/07/09 09:12:59  brian
+## - working up SDTI specification
+##
 ## Revision 0.9.2.1  2007/07/04 08:24:57  brian
 ## - added new files
 ##
