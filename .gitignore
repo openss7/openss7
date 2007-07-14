@@ -120,7 +120,6 @@ netperf/LSM
 netperf/m4/Makefile.in
 netperf/Makefile.in
 netperf/MANUAL
-netperf/manual/.am4903
 netperf/manual/Makefile.in
 netperf/manual/netperf.info
 netperf/manual/netperf.info-1
@@ -185,7 +184,6 @@ sctp/libltdl/*
 sctp/LICENSES
 sctp/LSM
 sctp/m4/Makefile.in
-sctp/#Makefile.am#
 sctp/Makefile.in
 sctp/MANUAL
 sctp/PROBLEMS
@@ -606,6 +604,9 @@ stacks/doc/specs/npi/npi.info-5
 stacks/doc/specs/npi/npi.info-6
 stacks/doc/specs/npi/npi.info-7
 stacks/doc/specs/npi/npi.info-8
+stacks/doc/specs/sdli/sdli.info
+stacks/doc/specs/sdti/sdti.info
+stacks/doc/specs/sli/sli.info
 stacks/doc/specs/tci/Makefile.in
 stacks/doc/specs/tci/tci.info
 stacks/doc/specs/tpi/Makefile.in
@@ -788,7 +789,6 @@ streams/doc/html
 streams/doc/latex
 streams/doc/Makefile.in
 streams/doc/man/Makefile.in
-streams/doc/manual/.am20332
 streams/doc/manual/Makefile.in
 streams/doc/manual/porting.info
 streams/doc/manual/porting.info-1
@@ -1654,7 +1654,6 @@ strsctp/src/Makefile.in
 strsctp/tags
 strsctp/tests/Makefile.in
 strsctp/TODO
-strsctp/#TODO#
 strsock/ABOUT-NLS
 strsock/aclocal.m4
 strsock/AUTHORS
@@ -1979,7 +1978,7 @@ strxns/doc/manual/Makefile.in
 strxns/doc/manual/strxns.info
 strxns/doc/manual/strxns.info-1
 strxns/doc/manual/strxns.info-2
-strxns/doc/specs/dlpi/.am32621
+strxns/doc/specs/cdi/cdi.info
 strxns/doc/specs/dlpi/dlpi.info
 strxns/doc/specs/dlpi/dlpi.info-1
 strxns/doc/specs/dlpi/dlpi.info-2
