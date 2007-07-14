@@ -1,3 +1,9 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/sdt_pmod.4.man: added new file
+	* src/modules/sdl/sdl_pmod.c: added new file
+	* src/modules/sdt/sdt_pmod.c: added new file
+
 2007-07-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/cnam.texi: documentation updates

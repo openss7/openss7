@@ -1,0 +1,64 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.fm 0.0i
+.hm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr FM 0.0i
+.nr HM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr FM 0.0i
+.nr HM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|l.
+FSM EVENT:DESCRIPTION:SERVICE
+::TYPE
+_
+BIND_ACK:CD_BIND_ACK primitive:ALL
+SUBS_BIND_ACK:CD_SUBS_BIND_ACK primitive:ALL
+UNITDATA_IND:CD_UNITDATA_IND primitive:CD_CLCDS
+UDERROR_IND:CD_UDERROR_IND primitive:CD_CLCDS
+CONNECT_IND:CD_CONNECT_IND primitive:CD_COCDS
+CONNECT_CON:CD_CONNECT_CON primitive:CD_COCDS
+DISCON_IND1:CD_DISCONNECT_IND primitive:CD_COCDS
+:when outcnt == 0:
+DISCON_IND2:CD_DISCONNECT_IND primitive:CD_COCDS
+:when outcnt == 1:
+DISCON_IND3:CD_DISCONNECT_IND primitive:CD_COCDS
+:when outcnt > 1:
+DATA_IND:CD_DATA_IND primitive:CD_COCDS
+RESET_IND:CD_RESET_IND primitive:CD_COCDS
+RESET_CON:CD_RESET_CON primitive:CD_COCDS
+OK_ACK1:CD_OK_ACK primitive:ALL
+:when outcnt == 0:
+OK_ACK2:CD_OK_ACK primitive:CD_COCDS
+:when outcnt == 1 and token == 0:
+OK_ACK3:CD_OK_ACK primitive:CD_COCDS
+:when outcnt == 1 and token != 0:
+OK_ACK4:CD_OK_ACK primitive:CD_COCDS
+:when outcnt > 1 and token != 0:
+ERROR_ACK:CD_ERROR_ACK:ALL
+DATA_ACK_IND:CD_DATA_ACK_IND:ACLCDS
+DATA_ACK_STATUS_IND:CD_DATA_ACK_STATUS_IND:ACLCDS
+REPLY_IND:CD_REPLY_IND:ACLCDS
+REPLY_STATUS_IND:CD_REPLY_STATUS_IND:ACLCDS
+REPLY_UPDATE_STATUS_IND:CD_REPLY_UPDATE_STATUS_IND:ACLCDS
+.TE

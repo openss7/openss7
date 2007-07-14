@@ -1,0 +1,54 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.fm 0.0i
+.hm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr FM 0.0i
+.nr HM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr FM 0.0i
+.nr HM 0.0i
+.\}
+.TS
+box center tab(:);
+cb|cb|cb
+cb|cb|cb
+l|l|l.
+FSM EVENT:DESCRIPTION:SERVICE
+::TYPE
+_
+ATTACH_REQ:CD_ATTACH_REQ primitive:ALL
+DETACH_REQ:CD_DETACH_REQ primitive:ALL
+BIND_REQ:CD_BIND_REQ primitive:ALL
+SUBS_BIND_REQ:CD_SUBS_BIND_REQ primitive:ALL
+UNBIND_REQ:CD_UNBIND_REQ primitive:ALL
+SUBS_UNBIND_REQ:CD_SUBS_UNBIND_REQ primitive:ALL
+UNITDATA_REQ:CD_UNITDATA_REQ primitive:CD_CLCDS
+UDQOS_REQ:CD_UDQOS_REQ primitive:CD_CLCDS
+CONNECT_REQ:CD_CONNECT_REQ primitive:CD_COCDS
+CONNECT_RES:CD_CONNECT_RES primitive:CD_COCDS
+PASS_CONN:Received a passed connection:CD_COCDS
+:from a CD_CONNECT_RES primitive:
+DISCON_REQ:CD_DISCONNECT_REQ primitive:CD_COCDS
+DATA_REQ:CD_DATA_REQ primitive:CD_COCDS
+RESET_REQ:CD_RESET_REQ primitive:CD_COCDS
+RESET_RES:CD_RESET_RES primitive:CD_COCDS
+DATA_ACK_REQ:CD_DATA_ACK_REQ primitive:CD_ACLCDS
+REPLY_REQ:CD_REPLY_REQ primitive:CD_ACLCDS
+REPLY_UPDATE_REQ:CD_REPLY_UPDATE_REQ primitive:CD_ACLCDS
+.TE

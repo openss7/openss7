@@ -1,0 +1,63 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+r1|c1|c1|c1|c1|c1|c1|c
+c1|c1|c1|c1|c1|c1|c1|c
+l1|c1|c1|c1|c1|c1|c1|c.
+STATUS:IDLE:OUTCON:INCON:CONN_RES:DATA:DISCON8:DISCON9
+::PEND:PEND:PEND:XFER:PEND:PEND
+EVENTS:6:8:9:10:11:15:16
+_
+CONNECT_REQ:8:\-:\-:\-:\-:\-:\-
+CONNECT_RES:\-:\-:10:\-:\-:\-:\-
+DISCON_REQ:\-:15:16:\-:\-:\-:\-
+PASS_CONN:11:\-:\-:\-:\-:\-:\-
+CONNECT_IND:9[1]:\-:9[1]:\-:\-:\-:\-
+CONNECT_CON:\-:11:\-:\-:\-:\-:\-
+_
+DISCON_IND1:\-:6:\-:\-:6:\-:\-
+(outcnt == 0):
+DISCON_IND2:\-:\-:6[2]:\-:\-:\-:\-
+(outcnt == 1):
+DISCON_IND3:\-:\-:9[2]:\-:\-:\-:\-
+(outcnt > 1):
+_
+OK_ACK1:\-:\-:\-:\-:\-:6:\-
+(outcnt == 0):
+OK_ACK2:\-:\-:\-:11[2]:\-:\-:6[2]
+(outcnt == 1:
+ token == 0):
+OK_ACK3:\-:\-:\-:6[2,3]:\-:\-:6[2]
+(outcnt == 1:
+ token != 0):
+OK_ACK4:\-:\-:\-:9[2,3]:\-:\-:9[2]
+(outcnt > 1:
+ token != 0):
+ERROR_ACK:\-:6:\-:9:\-:8:9
+.TE
