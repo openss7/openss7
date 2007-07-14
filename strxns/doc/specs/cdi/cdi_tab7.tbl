@@ -1,0 +1,75 @@
+.ie '\*(.T'ps' \{\
+\X'ps: pagesize letter'
+.in 0.0i
+.ll 6.0i
+.lt 6.0i
+.po 0.0i
+.hm 0.0i
+.fm 0.0i
+.nr LL 6.0i
+.nr LT 6.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.pl 11.0i
+.\}
+.el \{\
+.in 0n
+.pl 11.0i
+.ll 8.0i
+.lt 8.0i
+.po 0.0i
+.nr LL 8.0i
+.nr LT 8.0i
+.nr PO 0.0i
+.nr HM 0.0i
+.nr FM 0.0i
+.\}
+.TS
+box center tab(:);
+cb1|cb1|cb1|cb
+l1|l1|l1|l.
+STATE:CDI STATE:DESCRIPTION:SERVICE
+:::TYPE
+_
+15) DiSCON 8 PEND:CD_DISCON8_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_DISCONNECT_REQ issued
+from the CD_OUTCON_PENDING state
+T}:CD_COCDS
+16) DISCON 9 PEND:CD_DISCON9_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_DISCONNECT_REQ issued
+from the CD_INCON_PENDING state
+T}:CD_COCDS
+17) DISCON 11 PEND:CD_DISCON11_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_DISCONNECT_REQ issued
+from the CD_DATAXFER state
+T}:CD_COCDS
+18) DISCON 12 PEND:CD_DISCON12_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_DISCONNECT_REQ issued
+from the CD_USER_RESET_PENDING state
+T}:CD_COCDS
+19) DISCON 13 PEND:CD_DISCON13_PENDING:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_DISCONNECT_REQ issued
+from the CD_PROV_RESET_PNEDING state
+T}:CD_COCDS
+20) SUBS_BIND PEND:CD_SUBS_BIND_PND:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_SUBS_BIND_REQ
+T}:ALL
+21) SUBS_UNBIND REQ:CD_SUBS_UNBIND_REQ:T{
+.hy 0
+.ad l
+The CDS user is waiting for an acknowledgement of a CD_SUBS_UNBIND_REQ
+T}:ALL
+.TE
