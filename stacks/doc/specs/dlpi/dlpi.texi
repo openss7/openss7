@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=120
 % =========================================================================
 %
-% @(#) $Id: dlpi.texi,v 0.9.2.12 2007/06/27 08:42:08 brian Exp $
+% @(#) $Id: dlpi.texi,v 0.9.2.13 2007/07/14 01:37:14 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/27 08:42:08 $ by $Author: brian $
+% Last Modified $Date: 2007/07/14 01:37:14 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -413,7 +413,7 @@ information that describes the protocol-specific behavior of that provider.
 Currently, there are plans to come up with a set of implementor's
 agreements/guidelines for common data link providers.  These agreements will
 address issues such as DLSAP address space, subsequent addresses, PPA access and
-control, QOS, supported services etc.
+control, QOS, supported services, etc.
 
 This specification assumes the reader is familiar with OSI Reference Model[4]
 terminology, OSI Data Link Services, and STREAMS.
@@ -422,47 +422,51 @@ terminology, OSI Data Link Services, and STREAMS.
 
 This specification is organized as follows:
 
-* @ref{Model of the Data Link Layer},
+@itemize @bullet
+
+@item @ref{Model of the Data Link Layer},
 presents background on the structure of the data link layer of the OSI Reference
 Model, and explains the intended architecture in the STREAMS environment.
 Data link addressing concepts are also presented.
 
-* @ref{DLPI Services},
+@item @ref{DLPI Services},
 presents an overview of the services provided by DLPI.
 
-* @ref{DLPI Primitives},
+@item @ref{DLPI Primitives},
 describes the detailed syntax and semantics of each DLPI primitive that crosses
 the data link interface.
 
-* @ref{Quality of Data Link Service},
+@item @ref{Quality of Data Link Service},
 describes the quality-of-service parameters supported by DLPI and the rules for
 negotiating/selecting the values of those parameters.
 
-* @ref{Optional Primitives to perform Essential Management Functions},
+@item @ref{Optional Primitives to perform Essential Management Functions},
 optional primitives to perform certain essential management functions.
 
-* @ref{Allowable Sequence of DLPI Primitives},
+@item @ref{Allowable Sequence of DLPI Primitives},
 describes the allowable sequence of DLPI primitives that may be issued across
 the interface.
 
-* @ref{Precedence of DLPI Primitives},
+@item @ref{Precedence of DLPI Primitives},
 presents a summary of the precedence of DLPI primitives as they are queued by the
 DLS provider and/or DLS user.
 
-* @ref{Glossary of DLPI Terms and Acronyms},
+@item @ref{Glossary of DLPI Terms and Acronyms},
 presents a Glossary of DLPI Terms and Acronyms.
 
-* @ref{Guidelines for Protocol Independent DLS Users},
+@item @ref{Guidelines for Protocol Independent DLS Users},
 summarizes guidelines a DLS user implementation must follow to be fully
 protocol-independent.
 
-* @ref{Required Information for DLS Provider-Specific Addenda},
+@item @ref{Required Information for DLS Provider-Specific Addenda},
 presents the information that should be documented for each DLS provider
 implementation.
 
-* @ref{DLPI Header File},
+@item @ref{DLPI Header File},
 presents the header file containing DLPI structure and constant definitions
 needed by a DLS user or provider implemented to use the interface.
+
+@end itemize
 
 @node Model of the Data Link Layer
 @chapter Model of the Data Link Layer
