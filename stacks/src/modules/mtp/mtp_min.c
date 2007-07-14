@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/18 00:00:50 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 00:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 0.9.2.17  2007/07/14 01:34:40  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.16  2007/05/18 00:00:50  brian
  - check for nf_reset
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/18 00:00:50 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/18 00:00:50 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -98,11 +101,11 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/xti_mtp.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/05/18 00:00:50 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_MIN_LICENSE		"GPL"
+#define MTP_MIN_LICENSE		"GPL v2"
 #define MTP_MIN_BANNER		MTP_MIN_DESCRIP		"\n" \
 				MTP_MIN_REVISION	"\n" \
 				MTP_MIN_COPYRIGHT	"\n" \

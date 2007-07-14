@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:18 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.12  2007/07/14 01:35:56  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.11  2007/03/25 19:01:18  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -86,9 +89,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:56 $"
 
-static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $";
+static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:56 $";
 
 
 /*
@@ -117,10 +120,10 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/03/25 19:01:18 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:56 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define BUFMOD_LICENSE		"GPL"
+#define BUFMOD_LICENSE		"GPL v2"
 #define BUFMOD_BANNER		BUFMOD_DESCRIP		"\n" \
 				BUFMOD_COPYRIGHT	"\n" \
 				BUFMOD_REVISION		"\n" \

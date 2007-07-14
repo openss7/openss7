@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:20 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.8  2007/07/14 01:36:47  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.7  2007/03/25 19:02:20  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -85,9 +88,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -136,10 +139,10 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/25 19:02:20 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SOCKSYS_LICENSE		"GPL"
+#define SOCKSYS_LICENSE		"GPL v2"
 #define SOCKSYS_BANNER		SOCKSYS_DESCRIP		"\n" \
 				SOCKSYS_COPYRIGHT	"\n" \
 				SOCKSYS_REVISION	"\n" \

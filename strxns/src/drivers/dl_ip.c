@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:37:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:46 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 0.9.2.6  2007/07/14 01:37:19  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.5  2007/03/25 19:02:46  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $"
+#ident "@(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:37:19 $"
 
 static char const ident[] =
-    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $";
+    "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:37:19 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -97,10 +100,10 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:46 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:37:19 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DL_LICENSE	"GPL"
+#define DL_LICENSE	"GPL v2"
 #define DL_BANNER	DL_DESCRIP	"\n" \
 			DL_EXTRA	"\n" \
 			DL_COPYRIGHT	"\n" \

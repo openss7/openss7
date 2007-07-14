@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/04/12 20:07:06 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:07:06 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.31  2007/07/14 01:37:10  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.30  2007/04/12 20:07:06  brian
  - changes from performance testing and misc bug fixes
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/04/12 20:07:06 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/04/12 20:07:06 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $";
 
 #include <sys/os7/compat.h>
 
@@ -88,10 +91,10 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/04/12 20:07:06 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TIRDWR_LICENSE		"GPL"
+#define TIRDWR_LICENSE		"GPL v2"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_REVISION		"\n" \

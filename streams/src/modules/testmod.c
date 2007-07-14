@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/04/12 20:06:16 $
+ @(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:36:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:06:16 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testmod.c,v $
+ Revision 0.9.2.19  2007/07/14 01:36:00  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.18  2007/04/12 20:06:16  brian
  - changes from performance testing and misc bug fixes
 
@@ -107,10 +110,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/04/12 20:06:16 $"
+#ident "@(#) $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:36:00 $"
 
 static char const ident[] =
-    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/04/12 20:06:16 $";
+    "$RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:36:00 $";
 
 /*
  * This is TESTMOD a STREAMS test module that provides some specialized input-output controls meant
@@ -139,10 +142,10 @@ static char const ident[] =
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TESTMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/04/12 20:06:16 $"
+#define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:36:00 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TESTMOD_LICENSE		"GPL"
+#define TESTMOD_LICENSE		"GPL v2"
 #define TESTMOD_BANNER		TESTMOD_DESCRIP		"\n" \
 				TESTMOD_COPYRIGHT	"\n" \
 				TESTMOD_REVISION	"\n" \

@@ -61,7 +61,7 @@ extern lis_spin_lock_t intmod_lock;
 extern spinlock_t intmod_lock;
 #endif
 MODULE_AUTHOR("Intel");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("Dialogic Bulk Data Module");
 
 #ifdef LFS

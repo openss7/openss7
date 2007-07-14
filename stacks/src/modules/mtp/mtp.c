@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:34:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 00:00:44 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.20  2007/07/14 01:34:33  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.19  2007/05/18 00:00:44  brian
  - check for nf_reset
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:34:33 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:34:33 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -123,11 +126,11 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/05/18 00:00:44 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:34:33 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_LICENSE	"GPL"
+#define MTP_LICENSE	"GPL v2"
 #define MTP_BANNER	MTP_DESCRIP	"\n" \
 			MTP_REVISION	"\n" \
 			MTP_COPYRIGHT	"\n" \
@@ -20687,7 +20690,7 @@ mtp_copyin2(queue_t *q, struct mtp *mtp, mblk_t *mp, mblk_t *dp)
 
 	if (!(bp = mi_copyout_alloc(q, mp, NULL, dp->b_wptr - dp->b_rptr, false)))
 		goto enobufs;
-	bcopy(dp->b_rptr, bp->b_wptr, dp->b_wptr - dp->b_rptr);
+	bcopy(dp->b_rptr, bp->b_rptr, dp->b_wptr - dp->b_rptr);
 
 	switch (_IOC_NR(((struct copyresp *) mp->b_rptr)->cp_cmd)) {
 	case _IOC_NR(MTP_IOCGOPTION):

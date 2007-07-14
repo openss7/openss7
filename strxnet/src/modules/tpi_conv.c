@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:39 $
+ @(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:39 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi_conv.c,v $
+ Revision 0.9.2.3  2007/07/14 01:37:10  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2007/03/25 19:02:39  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:39 $"
+#ident "@(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:10 $"
 
-static char const ident[] = "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:39 $";
+static char const ident[] = "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:10 $";
 
 /*
  *  TPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -77,10 +80,10 @@ static char const ident[] = "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2
 
 #define TPI_CONV_DESCRIP	"TPI ENDIAN CONVERSION (TPI-CONV) FOR LINUX FAST-STREAMS"
 #define TPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:39 $"
+#define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:10 $"
 #define TPI_CONV_DEVICE		"SVR 4.2 TPI Endian Conversion (TPI-CONV) for STREAMS"
 #define TPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TPI_CONV_LICENSE	"GPL"
+#define TPI_CONV_LICENSE	"GPL v2"
 #define TPI_CONV_BANNER		TPI_CONV_DESCRIP	"\n" \
 				TPI_CONV_COPYRIGHT	"\n" \
 				TPI_CONV_REVISION	"\n" \

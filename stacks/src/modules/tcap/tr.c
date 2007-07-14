@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/17 01:56:35 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:35 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:16 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/17 01:56:35 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/17 01:56:35 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -68,11 +68,11 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date"
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TR_LICENSE	"GPL"
+#define TR_LICENSE	"GPL v2"
 #define TR_BANNER	TR_DESCRIP	"\n" \
 			TR_REVISION	"\n" \
 			TR_COPYRIGHT	"\n" \

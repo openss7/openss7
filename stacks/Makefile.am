@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.91 $) $Date: 2007/06/20 07:53:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2007/07/14 01:33:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/20 07:53:22 $ by $Author: brian $
+# Last Modified $Date: 2007/07/14 01:33:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.92  2007/07/14 01:33:47  brian
+# - make license explicit, add documentation
+#
 # Revision 0.9.2.91  2007/06/20 07:53:22  brian
 # - updates for Fedora 7 and 2.6.21
 #
@@ -404,7 +407,9 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
+				  src/modules/sdl/sdl_pmod.c \
 				  src/modules/sdt/sdt.c \
+				  src/modules/sdt/sdt_pmod.c \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
 				  src/modules/sl/sm_mod.c \
@@ -748,7 +753,9 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
+				  src/modules/sdl/sdl_pmod.c \
 				  src/modules/sdt/sdt.c \
+				  src/modules/sdt/sdt_pmod.c \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
 				  src/modules/sl/sm_mod.c \

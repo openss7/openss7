@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:15:30 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.10  2007/07/14 01:33:36  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.9  2007/05/18 12:15:30  brian
  - careful not to flush timers
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -187,11 +190,11 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/05/18 12:15:30 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define UA_AS_LICENSE	"GPL"
+#define UA_AS_LICENSE	"GPL v2"
 #define UA_AS_BANNER	UA_AS_DESCRIP	"\n" \
 			UA_AS_REVISION	"\n" \
 			UA_AS_COPYRIGHT	"\n" \

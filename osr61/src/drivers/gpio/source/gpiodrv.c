@@ -66,7 +66,7 @@ typedef VOID *  Q_PTR;
 
 extern lis_spin_lock_t inthw_lock;	/* mutex for Span hardware interrupts */
 MODULE_AUTHOR("Intel");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("Dialogic Generic Port I/O Device Driver");
 
 #ifdef LFS

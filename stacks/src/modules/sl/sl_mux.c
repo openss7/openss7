@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.23  2007/07/14 01:35:06  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.22  2007/03/25 19:00:15  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:06 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:06 $";
 
 #include <sys/os7/compat.h>
 
@@ -81,11 +84,11 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/03/25 19:00:15 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:06 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SL_MUX_LICENSE		"GPL"
+#define SL_MUX_LICENSE		"GPL v2"
 #define SL_MUX_BANNER		SL_MUX_DESCRIP		"\n" \
 				SL_MUX_REVISION		"\n" \
 				SL_MUX_COPYRIGHT	"\n" \

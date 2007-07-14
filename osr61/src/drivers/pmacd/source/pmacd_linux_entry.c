@@ -71,7 +71,7 @@ module_param(pmacd_buffers_per_stream,long,0444);
 module_param(pmacd_stream_buffer_size,long,0444);
 #endif
 MODULE_PARM_DESC(pmacd_driver_name, "PMAC driver name");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #ifdef LFS
 #ifdef MODULE_ALIAS
 MODULE_ALIAS("pmacd");

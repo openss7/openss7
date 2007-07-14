@@ -5,6 +5,23 @@
 	* src/modules/ch_pmod.c: added new file
 	* src/modules/mx_pmod.c: added new file
 
+	* Makefile.am: add new files
+	* src/drivers/ch.c: make license explicit
+	* src/drivers/hdlc.c: make license explicit
+	* src/drivers/mg.c: make license explicit
+	* src/drivers/mx.c: make license explicit
+	* src/drivers/v401p.c: make license explicit
+	* src/include/sys/mxi.h: make license explicit
+	* src/include/sys/mxi_ioctl.h: make license explicit
+	* src/modules/cd.c: make license explicit
+	* src/modules/cd_daed.c: make license explicit
+	* src/modules/cd_hdlc.c: make license explicit
+	* src/modules/cd_old.c: make license explicit
+	* src/modules/ch.c: make license explicit
+	* src/modules/Config.in: make license explicit
+	* src/modules/lapb.c: make license explicit
+	* src/modules/zaptel.c: make license explicit
+
 2007-07-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/Makefile.am: added new files

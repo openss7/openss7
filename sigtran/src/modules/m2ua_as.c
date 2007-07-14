@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:37 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:33:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:55:37 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.9  2007/07/14 01:33:44  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.8  2007/05/17 22:55:37  brian
  - use mi_timer requeue to requeue mi timers
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:37 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:33:44 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:37 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:33:44 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -154,11 +157,11 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/05/17 22:55:37 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:33:44 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define M2UA_AS_LICENSE		"GPL"
+#define M2UA_AS_LICENSE		"GPL v2"
 #define M2UA_AS_BANNER		M2UA_AS_DESCRIP		"\n" \
 				M2UA_AS_REVISION	"\n" \
 				M2UA_AS_COPYRIGHT	"\n" \

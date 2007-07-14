@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 19:00:45 $
+ @(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:35:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:45 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400p_mx.c,v $
+ Revision 0.9.2.22  2007/07/14 01:35:27  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.21  2007/03/25 19:00:45  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 19:00:45 $"
+#ident "@(#) $RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:35:27 $"
 
 static char const ident[] =
-    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 19:00:45 $";
+    "$RCSfile: x400p_mx.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:35:27 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -117,11 +120,11 @@ static char const ident[] =
 
 #define MX_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define MX_X400P_EXTRA		"Part of the OpenSS7 Stack for Linx Fast-STREAMS."
-#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/03/25 19:00:45 $"
+#define MX_X400P_REVISION	"OpenSS7 $RCSfile: x400p_mx.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:35:27 $"
 #define MX_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define MX_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MX_X400P_LICENSE	"GPL"
+#define MX_X400P_LICENSE	"GPL v2"
 #define MX_X400P_BANNER		MX_X400P_DESCRIP	"\n" \
 				MX_X400P_EXTRA		"\n" \
 				MX_X400P_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/04/12 20:06:09 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:06:09 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 0.9.2.18  2007/07/14 01:35:45  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.17  2007/04/12 20:06:09  brian
  - changes from performance testing and misc bug fixes
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/04/12 20:06:09 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:45 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/04/12 20:06:09 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:45 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -94,10 +97,10 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/04/12 20:06:09 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:45 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LOOP_LICENSE	"GPL"
+#define LOOP_LICENSE	"GPL v2"
 #define LOOP_BANNER	LOOP_DESCRIP	"\n" \
 			LOOP_COPYRIGHT	"\n" \
 			LOOP_REVISION	"\n" \

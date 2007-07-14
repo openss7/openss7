@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/03 22:51:42 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:51:42 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.13  2007/07/14 01:36:23  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.12  2007/05/03 22:51:42  brian
  - corrections for test compile
 
@@ -113,10 +116,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/03 22:51:42 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/05/03 22:51:42 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $";
 
 /*
  *  This is an X.233 CLNS driver.  This is an NPI driver that can be pushed over or link a DLPI
@@ -169,10 +172,10 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/05/03 22:51:42 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CLNS_LICENSE	"GPL"
+#define CLNS_LICENSE	"GPL v2"
 #define CLNS_BANNER	CLNS_DESCRIP	"\n" \
 			CLNS_EXTRA	"\n" \
 			CLNS_COPYRIGHT	"\n" \

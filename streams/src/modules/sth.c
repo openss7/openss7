@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/23 23:56:52 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.191  2007/07/14 01:35:57  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.190  2007/06/23 23:56:52  brian
  - minor correction of compiler warning
 
@@ -229,10 +232,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -334,10 +337,10 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.190 $) $Date: 2007/06/23 23:56:52 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define STH_LICENSE	"GPL"
+#define STH_LICENSE	"GPL v2"
 #define STH_BANNER	STH_DESCRIP	"\n" \
 			STH_COPYRIGHT	"\n" \
 			STH_REVISION	"\n" \

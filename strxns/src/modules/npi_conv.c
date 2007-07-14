@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $
+ @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:50 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_conv.c,v $
+ Revision 0.9.2.3  2007/07/14 01:37:32  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2007/03/25 19:02:50  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $"
+#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:32 $"
 
-static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $";
+static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:32 $";
 
 /*
  *  NPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -74,10 +77,10 @@ static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:02:50 $"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:32 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NPI_CONV_LICENSE	"GPL"
+#define NPI_CONV_LICENSE	"GPL v2"
 #define NPI_CONV_BANNER		NPI_CONV_DESCRIP	"\n" \
 				NPI_CONV_COPYRIGHT	"\n" \
 				NPI_CONV_REVISION	"\n" \

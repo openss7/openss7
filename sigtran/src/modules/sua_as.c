@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:33:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:08 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.4  2007/07/14 01:33:46  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.3  2007/03/25 18:59:08  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:33:46 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:33:46 $";
 
 /*
  *  This is the AS side of SUA implemented as a pushable module that pushes over an SCTP NPI
@@ -143,11 +146,11 @@ static char const ident[] =
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 18:59:08 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:33:46 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SUA_AS_LICENSE		"GPL"
+#define SUA_AS_LICENSE		"GPL v2"
 #define SUA_AS_BANNER		SUA_AS_DESCRIP		"\n" \
 				SUA_AS_REVISION		"\n" \
 				SUA_AS_COPYRIGHT	"\n" \

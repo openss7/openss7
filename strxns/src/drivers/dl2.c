@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $
+ @(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:37:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:46 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl2.c,v $
+ Revision 0.9.2.4  2007/07/14 01:37:18  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.3  2007/03/25 19:02:46  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $"
+#ident "@(#) $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:37:18 $"
 
-static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $";
+static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:37:18 $";
 
 /*
  *  This is a multiplexing driver use to support linking DL streams.  When DL streams are linked
@@ -103,11 +106,11 @@ static char const ident[] = "$RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.3 $)
 
 #define ND_DESCRIP	"NETDEV (DL) STREAMS MULTIPLEXING DRIVER."
 #define ND_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:46 $"
+#define ND_REVISION	"OpenSS7 $RCSfile: dl2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:37:18 $"
 #define ND_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define ND_DEVICE	"Supports Linux HDLC devices."
 #define ND_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ND_LICENSE	"GPL"
+#define ND_LICENSE	"GPL v2"
 #define ND_BANNER	ND_DESCRIP	"\n" \
 			ND_EXTRA	"\n" \
 			ND_REVISION	"\n" \

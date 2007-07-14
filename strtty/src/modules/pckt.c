@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $
+ @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:25 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pckt.c,v $
+ Revision 0.9.2.6  2007/07/14 01:36:53  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.5  2007/03/25 19:02:25  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $"
+#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $"
 
 static char const ident[] =
-    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $";
+    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $";
 
 /*
  * This is the pckt(4) STREAMS module, a Packet Mode module to be pushed on the
@@ -252,10 +255,10 @@ static char const ident[] =
 
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:02:25 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define PCKT_LICENSE		"GPL"
+#define PCKT_LICENSE		"GPL v2"
 #define PCKT_BANNER		PCKT_DESCRIP	"\n" \
 				PCKT_COPYRIGHT	"\n" \
 				PCKT_REVISION	"\n" \

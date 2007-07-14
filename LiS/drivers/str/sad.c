@@ -495,7 +495,7 @@ module_exit(sad_cleanup_module);
 
 #if defined(LINUX)		/* linux kernel */
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("Ole Husgaard (sparre@login.dknet.dk");

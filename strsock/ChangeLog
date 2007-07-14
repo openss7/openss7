@@ -1,3 +1,8 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/socksys.c: make license explicit
+	* src/modules/sockmod.c: make license explicit
+
 2007-06-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/bsdnet.fig: change orientation to portrait

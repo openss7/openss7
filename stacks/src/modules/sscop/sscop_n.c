@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:22 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:22 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n.c,v $
+ Revision 0.9.2.16  2007/07/14 01:35:12  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.15  2007/03/25 19:00:22  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,19 +70,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:22 $"
+#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:22 $";
+    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:22 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSCOP_NPI_LICENSE	"GPL"
+#define SSCOP_NPI_LICENSE	"GPL v2"
 #define SSCOP_NPI_BANNER	SSCOP_NPI_DESCRIP	"\n" \
 				SSCOP_NPI_REIVISION	"\n" \
 				SSCOP_NPI_COPYRIGHT	"\n" \

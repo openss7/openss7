@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 12:15:17 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:15:17 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.7  2007/07/14 01:33:20  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.6  2007/05/18 12:15:17  brian
  - careful not to flush timers
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 12:15:17 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:20 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 12:15:17 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:20 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -147,11 +150,11 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/05/18 12:15:17 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:20 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ISUA_AS_LICENSE	"GPL"
+#define ISUA_AS_LICENSE	"GPL v2"
 #define ISUA_AS_BANNER	ISUA_AS_DESCRIP	"\n" \
 			ISUA_AS_REVISION	"\n" \
 			ISUA_AS_COPYRIGHT	"\n" \

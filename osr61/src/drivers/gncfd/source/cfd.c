@@ -57,7 +57,7 @@
 
 static int gncfd_major = 0;
 MODULE_AUTHOR("Intel");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("Dialogic Configuration Driver");
 
 #ifdef LFS

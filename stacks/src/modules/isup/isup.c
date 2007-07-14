@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:28 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.19  2007/07/14 01:34:12  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.18  2007/03/25 18:59:28  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -103,11 +106,11 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 18:59:28 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ISUP_LICENSE	"GPL"
+#define ISUP_LICENSE	"GPL v2"
 #define ISUP_BANNER	ISUP_DESCRIP	"\n" \
 			ISUP_REVISION	"\n" \
 			ISUP_COPYRIGHT	"\n" \

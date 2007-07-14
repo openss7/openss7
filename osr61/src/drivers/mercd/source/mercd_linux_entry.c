@@ -56,7 +56,7 @@ MODULE_PARM(dm3_feature,"i");
 module_param(dm3_feature,int,0444);
 module_param(mercd_string,charp,0444);
 MODULE_PARM_DESC(mercd_string, "Mercd driver name");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #endif
 #ifdef LFS
 #ifdef MODULE_ALIAS

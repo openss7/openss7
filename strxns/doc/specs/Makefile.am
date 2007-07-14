@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/03/06 11:39:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:37:17 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/06 11:39:19 $ by $Author: brian $
+# Last Modified $Date: 2007/07/14 01:37:17 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2007/07/14 01:37:17  brian
+# - make license explicit, add documentation
+#
 # Revision 0.9.2.5  2006/03/06 11:39:19  brian
 # - updated headers
 #
@@ -57,6 +60,6 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = dlpi npi
+SUBDIRS = cdi dlpi npi
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

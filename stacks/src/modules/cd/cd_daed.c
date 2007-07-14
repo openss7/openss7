@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:14 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_daed.c,v $
+ Revision 0.9.2.15  2007/07/14 01:33:53  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.14  2007/03/25 18:59:14  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $";
 
 #include <sys/os7/compat.h>
 
@@ -83,10 +86,10 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define CD_DAED_LICENSE		"GPL"
+#define CD_DAED_LICENSE		"GPL v2"
 #define CD_DAED_BANNER		CD_DAED_DESCRIP		"\n" \
 				CD_DAED_COPYRIGHT	"\n" \
 				CD_DAED_REVISION	"\n" \

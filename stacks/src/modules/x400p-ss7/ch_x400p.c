@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:38 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.18  2007/07/14 01:35:21  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.17  2007/03/25 19:00:38  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $";
 
 #include <sys/os7/compat.h>
 
@@ -86,11 +89,11 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/03/25 19:00:38 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define CH_SDL_LICENSE		"GPL"
+#define CH_SDL_LICENSE		"GPL v2"
 #define CH_SDL_BANNER		CH_SDL_DESCRIP		"\n" \
 				CH_SDL_EXTRA		"\n" \
 				CH_SDL_REVISION		"\n" \

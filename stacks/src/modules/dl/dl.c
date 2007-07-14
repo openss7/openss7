@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:55 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:15 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.17  2007/07/14 01:33:55  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.16  2007/03/25 18:59:15  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:55 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:55 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -77,12 +80,12 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.16 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:15 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.17 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:55 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DL_LICENSE	"GPL"
+#define DL_LICENSE	"GPL v2"
 #define DL_BANNER	DL_DESCRIP	"\n" \
 			DL_REVISION	"\n" \
 			DL_COPYRIGHT	"\n" \

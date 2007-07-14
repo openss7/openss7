@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2007/06/20 06:36:54 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/20 06:36:54 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.72  2007/07/14 01:36:27  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.71  2007/06/20 06:36:54  brian
  - updates for Fedora 7 and 2.6.21 kernel
 
@@ -148,10 +151,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2007/06/20 06:36:54 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2007/06/20 06:36:54 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -169,11 +172,11 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.71 $) $Date: 2007/06/20 06:36:54 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SCTP_LICENSE	"GPL"
+#define SCTP_LICENSE	"GPL v2"
 #define SCTP_BANNER	SCTP_DESCRIP	"\n" \
 			SCTP_EXTRA	"\n" \
 			SCTP_REVISION	"\n" \

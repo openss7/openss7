@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:25 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:15:25 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.8  2007/07/14 01:33:31  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.7  2007/05/18 12:15:25  brian
  - careful not to flush timers
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:25 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:25 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $";
 
 /*
  *  This is an SUA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -181,11 +184,11 @@ static char const ident[] =
 /* ============================== */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP AS SCCP STREAMS MULTIPLEXING DRIVER."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:25 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SUA_AS_LICENSE		"GPL"
+#define SUA_AS_LICENSE		"GPL v2"
 #define SUA_AS_BANNER		SUA_AS_DESCRIP		"\n" \
 				SUA_AS_REVISION		"\n" \
 				SUA_AS_COPYRIGHT	"\n" \

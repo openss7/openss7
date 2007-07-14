@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:24 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aixcompat.c,v $
+ Revision 0.9.2.30  2007/07/14 01:35:40  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.29  2007/03/30 11:59:24  brian
  - heavy rework of MP syncrhonization
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $"
 
-static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $";
+static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -90,10 +93,10 @@ static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/03/30 11:59:24 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define AIXCOMP_LICENSE		"GPL"
+#define AIXCOMP_LICENSE		"GPL v2"
 #define AIXCOMP_BANNER		AIXCOMP_DESCRIP		"\n" \
 				AIXCOMP_COPYRIGHT	"\n" \
 				AIXCOMP_REVISION	"\n" \

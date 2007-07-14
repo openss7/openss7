@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:45 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.10  2007/07/14 01:37:18  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.9  2007/03/25 19:02:45  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $";
 
 /*
  *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
@@ -116,10 +119,10 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/03/25 19:02:45 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DL_LICENSE	"GPL"
+#define DL_LICENSE	"GPL v2"
 #define DL_BANNER	DL_DESCRIP	"\n" \
 			DL_EXTRA	"\n" \
 			DL_COPYRIGHT	"\n" \

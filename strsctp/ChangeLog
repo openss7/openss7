@@ -1,3 +1,9 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/sctp2.c: make license explicit
+	* src/drivers/sctp.c: make license explicit
+	* src/modules/tpiperf.c: make license explicit
+
 2007-06-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/papers/sctp.fig: change orientation to portrait

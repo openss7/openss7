@@ -438,7 +438,7 @@ module_exit(mtdrv_cleanup_module);
 #endif
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("David Grothe");

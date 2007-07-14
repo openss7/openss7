@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:36:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:10:56 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp.c,v $
+ Revision 0.9.2.12  2007/07/14 01:36:42  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.11  2006/10/27 23:10:56  brian
  - changes for 2.6.18 kernel
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:36:42 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:36:42 $";
 
 #if defined LIS && !defined _LIS_SOURCE
 #define _LIS_SOURCE
@@ -175,11 +178,11 @@ struct sockaddr_storage {
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2006/10/27 23:10:56 $"
+#define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:36:42 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp. All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SCTP_LICENSE	"GPL"
+#define SCTP_LICENSE	"GPL v2"
 #define SCTP_BANNER	SCTP_DESCRIP	"\n" \
 			SCTP_REVISION	"\n" \
 			SCTP_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:35:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 00:01:17 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.5  2007/07/14 01:35:06  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.4  2007/05/18 00:01:17  brian
  - check for nf_reset
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:35:06 $"
 
-static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $";
+static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:35:06 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -103,11 +106,11 @@ static char const ident[] = "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4
 #include <ss7/sli_ioctl.h>
 
 #define SLPMOD_DESCRIP		"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/05/18 00:01:17 $"
+#define SLPMOD_REVISION		"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:35:06 $"
 #define SLPMOD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SLPMOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SLPMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SLPMOD_LICENSE		"GPL"
+#define SLPMOD_LICENSE		"GPL v2"
 #define SLPMOD_BANNER		SLPMOD_DESCRIP		"\n" \
 				SLPMOD_REVISION		"\n" \
 				SLPMOD_COPYRIGHT	"\n" \

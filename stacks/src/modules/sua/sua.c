@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:24 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:24 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua.c,v $
+ Revision 0.9.2.15  2007/07/14 01:35:13  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.14  2007/03/25 19:00:24  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:24 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:13 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:24 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:13 $";
 
 #include <sys/os7/compat.h>
 
@@ -92,7 +95,7 @@ static char const ident[] =
 #define SUA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SUA_LICENSE	"GPL"
+#define SUA_LICENSE	"GPL v2"
 #define SUA_BANNER	SUA_DESCRIP	"\n" \
 			SUA_COPYRIGHT	"\n" \
 			SUA_DEVICE	"\n" \

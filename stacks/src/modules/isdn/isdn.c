@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $
+ @(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:25 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdn.c,v $
+ Revision 0.9.2.22  2007/07/14 01:34:08  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.21  2007/03/25 18:59:25  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $"
+#ident "@(#) $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:08 $"
 
 static char const ident[] =
-    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $";
+    "$RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:08 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -96,11 +99,11 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/03/25 18:59:25 $"
+#define ISDN_REVISION	"LfS $RCSfile: isdn.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:08 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ISDN_LICENSE	"GPL"
+#define ISDN_LICENSE	"GPL v2"
 #define ISDN_BANNER	ISDN_DESCRIP	"\n" \
 			ISDN_REVISION	"\n" \
 			ISDN_COPYRIGHT	"\n" \

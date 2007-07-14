@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/06/20 07:53:27 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/20 07:53:27 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 0.9.2.29  2007/07/14 01:35:25  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.28  2007/06/20 07:53:27  brian
  - updates for Fedora 7 and 2.6.21
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/06/20 07:53:27 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/06/20 07:53:27 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -112,11 +115,11 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.28 $) $Date: 2007/06/20 07:53:27 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define X100P_LICENSE		"GPL"
+#define X100P_LICENSE		"GPL v2"
 #define X100P_BANNER		X100P_DESCRIP		"\n" \
 				X100P_EXTRA		"\n" \
 				X100P_REVISION		"\n" \

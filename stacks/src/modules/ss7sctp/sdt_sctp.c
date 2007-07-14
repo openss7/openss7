@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:20 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.19  2007/07/14 01:35:10  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.18  2007/03/25 19:00:20  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $";
 
 #include <sys/os7/compat.h>
 
@@ -87,11 +90,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/25 19:00:20 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_SCTP_LICENSE	"GPL"
+#define SDT_SCTP_LICENSE	"GPL v2"
 #define SDT_SCTP_BANNER		SDT_SCTP_DESCRIP	"\n" \
 				SDT_SCTP_REVISION	"\n" \
 				SDT_SCTP_COPYRIGHT	"\n" \

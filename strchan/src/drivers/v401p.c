@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/25 12:19:53 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:19:53 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.10  2007/07/14 01:35:33  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.9  2007/05/25 12:19:53  brian
  - check for pm_message_t
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/25 12:19:53 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/25 12:19:53 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -282,11 +285,11 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/25 12:19:53 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MX_V400P_LICENCE	"GPL"
+#define MX_V400P_LICENSE	"GPL v2"
 #define MX_V400P_BANNER		MX_V400P_DESCRIP	"\n" \
 				MX_V400P_EXTRA	"\n" \
 				MX_V400P_REVISION	"\n" \

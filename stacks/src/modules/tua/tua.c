@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:37 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua.c,v $
+ Revision 0.9.2.15  2007/07/14 01:35:20  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.14  2007/03/25 19:00:37  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:20 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:20 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -103,11 +106,11 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/03/25 19:00:37 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:20 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TUA_LICENSE	"GPL"
+#define TUA_LICENSE	"GPL v2"
 #define TUA_BANNER	TUA_DESCRIP	"\n" \
 			TUA_EXTRA	"\n" \
 			TUA_REVISION	"\n" \

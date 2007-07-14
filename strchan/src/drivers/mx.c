@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:51 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 0.9.2.6  2007/07/14 01:35:33  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.5  2007/03/25 19:00:51  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $"
+#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $"
 
 static char const ident[] =
-    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $";
+    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -93,11 +96,11 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:51 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MX_MUX_LICENSE		"GPL"
+#define MX_MUX_LICENSE		"GPL v2"
 #define MX_MUX_BANNER		MX_MUX_DESCRIP		"\n" \
 				MX_MUX_REVISION		"\n" \
 				MX_MUX_COPYRIGHT	"\n" \

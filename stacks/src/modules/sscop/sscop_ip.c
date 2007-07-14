@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $
+ @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:13:21 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_ip.c,v $
+ Revision 0.9.2.9  2007/07/14 01:35:12  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.8  2006/03/07 01:13:21  brian
  - updated headers
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $"
+#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $"
 
-static char const ident[] = "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $";
+static char const ident[] = "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
@@ -67,11 +70,11 @@ static char const ident[] = "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2
 #include <sys/os7/compat.h>
 
 #define SSCOP_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2006/03/07 01:13:21 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSCOP_LICENSE	"GPL"
+#define SSCOP_LICENSE	"GPL v2"
 #define SSCOP_BANNER	SSCOP_DESCRIP	"\n"	\
 			SSCOP_REVISION	"\n"	\
 			SSCOP_COPYRIGHT	"\n"	\

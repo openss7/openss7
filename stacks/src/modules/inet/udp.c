@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:34:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 00:00:38 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.7  2007/07/14 01:34:05  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.6  2007/05/18 00:00:38  brian
  - check for nf_reset
 
@@ -215,10 +218,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:34:05 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:34:05 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -300,10 +303,10 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/18 00:00:38 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:34:05 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define UDP_LICENSE	"GPL"
+#define UDP_LICENSE	"GPL v2"
 #define UDP_BANNER	UDP_DESCRIP	"\n" \
 			UDP_EXTRA	"\n" \
 			UDP_REVISION	"\n" \

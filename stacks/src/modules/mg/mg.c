@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 18:59:39 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:39 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.18  2007/07/14 01:34:32  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.17  2007/03/25 18:59:39  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 18:59:39 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 18:59:39 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $";
 
 #include <sys/os7/compat.h>
 
@@ -85,11 +88,11 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/25 18:59:39 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MG_LICENSE	"GPL"
+#define MG_LICENSE	"GPL v2"
 #define MG_BANNER	MG_DESCRIP	"\n" \
 			MG_REVISION	"\n" \
 			MG_COPYRIGHT	"\n" \
