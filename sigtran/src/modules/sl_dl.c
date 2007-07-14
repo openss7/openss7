@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $
+ @(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:07 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_dl.c,v $
+ Revision 0.9.2.3  2007/07/14 01:33:45  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2007/03/25 18:59:07  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $"
+#ident "@(#) $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:45 $"
 
-static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $";
+static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:45 $";
 
 /*
  * This is a simple SL to DL conversion module that converst between the
@@ -74,12 +77,12 @@ static char const ident[] = "$RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 
 #include <sys/os7/compat.h>
 
 #define SL_DL_DESCRIP		"SIGNALLING LINK (SL) DATA LINK (DL) STREAMS MODULE"
-#define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 18:59:07 $"
+#define SL_DL_REVISION		"OpenSS7 $RCSfile: sl_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:45 $"
 
 #define SL_DL_COPYRIGHT		"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define SL_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SL_DL_LICENSE		"GPL"
+#define SL_DL_LICENSE		"GPL v2"
 #define SL_DL_BANNER		SL_DL_DESCRIP		"\n" \
 				SL_DL_REVISION	"\n" \
 				SL_DL_COPYRIGHT	"\n" \

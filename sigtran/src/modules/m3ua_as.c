@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:55:37 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.7  2007/07/14 01:33:44  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.6  2007/05/17 22:55:37  brian
  - use mi_timer requeue to requeue mi timers
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -154,11 +157,11 @@ static char const ident[] =
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/17 22:55:37 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define M3UA_AS_LICENSE		"GPL"
+#define M3UA_AS_LICENSE		"GPL v2"
 #define M3UA_AS_BANNER		M3UA_AS_DESCRIP		"\n" \
 				M3UA_AS_REVISION	"\n" \
 				M3UA_AS_COPYRIGHT	"\n" \

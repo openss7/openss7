@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:15 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.21  2007/07/14 01:35:06  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.20  2007/03/25 19:00:15  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -94,11 +97,11 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/03/25 19:00:15 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SL_LICENSE	"GPL"
+#define SL_LICENSE	"GPL v2"
 #define SL_BANNER	SL_DESCRIP	"\n" \
 			SL_REVISION	"\n" \
 			SL_COPYRIGHT	"\n" \

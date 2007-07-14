@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.6  2007/07/14 01:35:36  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.5  2007/03/25 19:00:54  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $";
+static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -110,10 +113,10 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CD_LICENSE	"GPL"
+#define CD_LICENSE	"GPL v2"
 #define CD_BANNER	CD_DESCRIP	"\n" \
 			CD_COPYRIGHT	"\n" \
 			CD_REVISION	"\n" \

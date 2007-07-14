@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/17 01:56:22 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:22 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:01 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/17 01:56:22 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/17 01:56:22 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -77,11 +77,11 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/06/17 01:56:22 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDLM_LICENSE	"GPL"
+#define SDLM_LICENSE	"GPL v2"
 #define SDLM_BANNER	SDLM_DESCRIP	"\n" \
 			SDLM_REVISION	"\n" \
 			SDLM_COPYRIGHT	"\n" \

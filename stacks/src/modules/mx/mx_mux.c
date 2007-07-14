@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $
+ @(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:51 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_mux.c,v $
+ Revision 0.9.2.5  2007/07/14 01:34:44  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.4  2007/03/25 18:59:51  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $"
+#ident "@(#) $RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:44 $"
 
-static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $";
+static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:44 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -85,11 +88,11 @@ static char const ident[] = "$RCSfile: mx_mux.c,v $ $Name:  $($Revision: 0.9.2.4
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/03/25 18:59:51 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx_mux.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:44 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MX_MUX_LICENSE		"GPL"
+#define MX_MUX_LICENSE		"GPL v2"
 #define MX_MUX_BANNER		MX_MUX_DESCRIP		"\n" \
 				MX_MUX_REVISION		"\n" \
 				MX_MUX_COPYRIGHT	"\n" \

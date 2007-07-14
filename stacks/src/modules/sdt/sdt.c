@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/06/17 01:56:24 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:24 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:04 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/06/17 01:56:24 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:04 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/06/17 01:56:24 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:04 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -74,11 +74,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/06/17 01:56:24 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:04 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_LICENSE	"GPL"
+#define SDT_LICENSE	"GPL v2"
 #define SDT_BANNER	SDT_DESCRIP	"\n" \
 			SDT_REVISION	"\n" \
 			SDT_COPYRIGHT	"\n" \

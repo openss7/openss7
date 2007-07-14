@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $
+ @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:25 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldterm.c,v $
+ Revision 0.9.2.4  2007/07/14 01:36:53  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.3  2007/03/25 19:02:25  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $"
+#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:53 $"
 
 static char const ident[] =
-    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $";
+    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:53 $";
 
 /*
  * This is ldterm (line discipline terminal) module.
@@ -159,10 +162,10 @@ static char const ident[] =
 
 #define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:02:25 $"
+#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:53 $"
 #define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define LDTERM_LICENSE		"GPL"
+#define LDTERM_LICENSE		"GPL v2"
 #define LDTERM_BANNER		LDTERM_DESCRIP		"\n" \
 				LDTERM_COPYRIGHT	"\n" \
 				LDTERM_REVISION		"\n" \

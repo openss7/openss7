@@ -49,7 +49,7 @@
 #endif
 
 // Licensing 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Intel Corp. (c) 2005");
 MODULE_DESCRIPTION("Driver Kernel Interface Modlue.");
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.6  2007/07/14 01:35:38  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.5  2007/03/25 19:00:54  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $"
 
 static char const ident[] =
-    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $";
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -84,7 +87,7 @@ static char const ident[] =
  *  This module is originally intended for use with the HDLC module, but can
  *  be used with any appropriate CDI device.
  *
- *  THis module can also present a pseudo-device driver interface to provide
+ *  This module can also present a pseudo-device driver interface to provide
  *  access to LAPB device driver implementations in the Linux kernel.  Also,
  *  CDI HDLC streams can be linked under the pseudo-device driver and then
  *  addressed by interface (multiplex) identifier from the upper multiplex.
@@ -97,10 +100,10 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 19:00:54 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LAPB_LICENSE	"GPL"
+#define LAPB_LICENSE	"GPL v2"
 #define LAPB_BANNER	LAPB_DESCRIP	"\n" \
 			LAPB_COPYRIGHT	"\n" \
 			LAPB_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:13 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.52  2007/07/14 01:35:46  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.51  2007/03/25 19:01:13  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -113,10 +116,10 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/03/25 19:01:13 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SAD_LICENSE	"GPL"
+#define SAD_LICENSE	"GPL v2"
 #define SAD_BANNER	SAD_DESCRIP	"\n" \
 			SAD_COPYRIGHT	"\n" \
 			SAD_REVISION	"\n" \

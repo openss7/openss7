@@ -268,7 +268,7 @@ igrab(struct inode *inode)
 ************************************************************************/
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("David Grothe <dave@gcom.com>");

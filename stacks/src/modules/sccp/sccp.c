@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:15:37 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.22  2007/07/14 01:34:46  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.21  2007/05/18 12:15:37  brian
  - careful not to flush timers
 
@@ -73,9 +76,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -112,11 +115,11 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/05/18 12:15:37 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SCCP_LICENSE	"GPL"
+#define SCCP_LICENSE	"GPL v2"
 #define SCCP_BANNER	SCCP_DESCRIP	"\n" \
 			SCCP_REVISION	"\n" \
 			SCCP_COPYRIGHT	"\n" \

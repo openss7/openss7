@@ -1,3 +1,31 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/isua_as.c: make license explicit
+	* src/drivers/m2ua_as.c: make license explicit
+	* src/drivers/m2ua.c: make license explicit
+	* src/drivers/m3ua_as.c: make license explicit
+	* src/drivers/m3ua.c: make license explicit
+	* src/drivers/m3ua_sg.c: make license explicit
+	* src/drivers/sua_as.c: make license explicit
+	* src/drivers/sua.c: make license explicit
+	* src/drivers/tali.c: make license explicit
+	* src/drivers/tua_as.c: make license explicit
+	* src/drivers/tua.c: make license explicit
+	* src/drivers/ua_as.c: make license explicit
+	* src/drivers/ua.c: make license explicit
+	* src/modules/m2pa_dl.c: make license explicit
+	* src/modules/m2pa_sl.c: make license explicit
+	* src/modules/m2tp.c: make license explicit
+	* src/modules/m2ua_as.c: make license explicit
+	* src/modules/m3ua_as.c: make license explicit
+	* src/modules/sdl_sctp.c: make license explicit
+	* src/modules/sdt_sctp.c: make license explicit
+	* src/modules/sdt_tpi.c: make license explicit
+	* src/modules/sl_dl.c: make license explicit
+	* src/modules/sl_tpi.c: make license explicit
+	* src/modules/sua_as.c: make license explicit
+	* src/modules/tua_as.c: make license explicit
+
 2007-07-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/modules/m2pa_sl.c: ignore LSA in ALIGNED-READY state (w/o proving)

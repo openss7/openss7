@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:09 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:09 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:52 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:09 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:09 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -78,11 +78,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/06/17 01:56:09 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ACB56_LICENSE	"GPL"
+#define ACB56_LICENSE	"GPL v2"
 #define ACB56_BANNER	ACB56_DESCRIP	"\n" \
 			ACB56_REVISION	"\n" \
 			ACB56_COPYRIGHT	"\n" \

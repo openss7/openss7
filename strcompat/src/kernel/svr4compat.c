@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:24 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 0.9.2.37  2007/07/14 01:35:42  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.36  2007/03/30 11:59:24  brian
  - heavy rework of MP syncrhonization
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $"
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $";
+static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -87,10 +90,10 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/03/30 11:59:24 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SVR4COMP_LICENSE	"GPL"
+#define SVR4COMP_LICENSE	"GPL v2"
 #define SVR4COMP_BANNER		SVR4COMP_DESCRIP	"\n" \
 				SVR4COMP_COPYRIGHT	"\n" \
 				SVR4COMP_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:54 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.3  2007/07/14 01:35:37  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2007/03/25 19:00:54  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:37 $"
 
-static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $";
+static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:37 $";
 
 /*
  *  This is a CH module.  The purpose of the module is for it to be pushed over a (circuit-based) MX
@@ -100,10 +103,10 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 
 #define CH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:54 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:37 $"
 #define CH_DEVICE	"SVR 4.2 STREAMS Channel Module (CH)"
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CH_LICENSE	"GPL"
+#define CH_LICENSE	"GPL v2"
 #define CH_BANNER	CH_DESCRIP	"\n" \
 			CH_COPYRIGHT	"\n" \
 			CH_REVISION	"\n" \
@@ -286,9 +289,27 @@ static const uint16_t v40xp_chanmap[] = {
  *  through 127.  "Span Number" is a span on the card(s).  0x00 means all spans, 0xff means masked
  *  spans.  0x01 through 0x7f are spans 1 through 127.  Tormenta II and Tormenta III cards only
  *  support 4 spans, 1-4.  "Timeslot Number" is a timeslot number within the selected spans.  0x00
- *  means all timeslots, 0xff means masked time slots.  0x00 through 0x7f select span 1 through 127.
- *  T1/J1 spans have 24 timeslots numbered 1 through 24.  E1 spans have 31 timeslots numbered 1
- *  through 31.
+ *  means all timeslots, 0xff means masked time slots.  0x00 through 0x7f select time slot 1 through
+ *  127.  T1/J1 spans have 24 timeslots numbered 1 through 24.  E1 spans have 31 timeslots numbered
+ *  1 through 31.  T3's are addressed by the T1 tributary.  The low order 2 bits of the span number
+ *  is the tributary T1 number.  T3's has tributarys 1 through 28.  The high order 3 bits of the
+ *  span number are the DS3 span.  Cards can have DS3 spans 1 through 63.
+ *
+ *     3                   2                   1                   0
+ *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |   Card Type   |  Card Number  |     Span Number     | TS Numb |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |   Card Type   |  Card Number  |  OC3  | E3  |E2 |E1 |   TS    |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *  |   Card Type   |  Card Number  |  OC3  |DS3|    T1   |   TS    |
+ *  +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ *
+ *  T1 = 24 timeslots			    1ms frame is  192 bytes minimum  256 bytes nominal
+ *  E1 = 31 timeslots			    1ms frame is  248 bytes minimum  256 bytes nominal
+ *  E2 = 4 x E1s = 124 timeslots	    1ms frame is  992 bytes minimum 1024 bytes nominal
+ *  E3 = 4 x E2s = 16 x E1s = 496 timeslots 1ms frame is 3968 bytes minimum 4096 bytes nominal
+ *  T3 = 28 x T1s = 672 timeslots	    1ms frame is 5376 bytes minimum 8192 bytes nominal
  *
  *  When a span or timeslot number field is masked, the address is extended by one 32-bit mask for
  *  the span, and one 32-bit mask for timeslots in each span selected.  Therefore, ppa 0x0001ff00,

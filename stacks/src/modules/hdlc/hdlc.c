@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:19 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.17  2007/07/14 01:34:00  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.16  2007/03/25 18:59:19  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -96,11 +99,11 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 18:59:19 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define HDLC_LICENSE	"GPL"
+#define HDLC_LICENSE	"GPL v2"
 #define HDLC_BANNER	HDLC_DESCRIP	"\n" \
 			HDLC_REVISION	"\n" \
 			HDLC_COPYRIGHT	"\n" \

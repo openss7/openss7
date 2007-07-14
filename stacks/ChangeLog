@@ -4,6 +4,87 @@
 	* src/modules/sdl/sdl_pmod.c: added new file
 	* src/modules/sdt/sdt_pmod.c: added new file
 
+	* configure.ac: add files
+	* doc/specs/Makefile.am: add files
+	* doc/specs/sdti/sdti.texi: add files
+	* Makefile.am: add files
+
+	* src/modules/acb56/sdl_acb56.c: make license explicit
+	* src/modules/acb56/sdt_acb56.c: make license explicit
+	* src/modules/cd/cd.c: make license explicit
+	* src/modules/cd/cd_daed.c: make license explicit
+	* src/modules/cd/cd_hdlc.c: make license explicit
+	* src/modules/dl/dl.c: make license explicit
+	* src/modules/dl/dl_lapd.c: make license explicit
+	* src/modules/dl/dl_sl.c: make license explicit
+	* src/modules/h225/h225.c: make license explicit
+	* src/modules/hdlc/hdlc.c: make license explicit
+	* src/modules/inet/inet.c: make license explicit
+	* src/modules/inet/rawip.c: make license explicit
+	* src/modules/inet/tcp.c: make license explicit
+	* src/modules/inet/udp.c: make license explicit
+	* src/modules/isdn/isdn.c: make license explicit
+	* src/modules/isup/isup.c: make license explicit
+	* src/modules/m2pa/m2pa_sl.c: make license explicit
+	* src/modules/m2tp/m2tp.c: make license explicit
+	* src/modules/m2ua/m2ua.c: make license explicit
+	* src/modules/m3ua/m3ua_as.c: make license explicit
+	* src/modules/m3ua/m3ua.c: make license explicit
+	* src/modules/m3ua/m3ua_sg.c: make license explicit
+	* src/modules/mg/mg.c: make license explicit
+	* src/modules/mtp/mtp.c: make license explicit
+	* src/modules/mtp/mtp_min.c: make license explicit
+	* src/modules/mtp/mtp_npi.c: make license explicit
+	* src/modules/mtp/mtp_tpi.c: make license explicit
+	* src/modules/mx/mx_mux.c: make license explicit
+	* src/modules/mx/mx_sdl.c: make license explicit
+	* src/modules/rtp/rtp.c: make license explicit
+	* src/modules/sccp/sccp.c: make license explicit
+	* src/modules/sctp/sctp2.c: make license explicit
+	* src/modules/sctp/sctp.c: make license explicit
+	* src/modules/sdl/cdi_mod.c: make license explicit
+	* src/modules/sdl/lis.conf: make license explicit
+	* src/modules/sdl/sdl.c: make license explicit
+	* src/modules/sdl/sdlm.c: make license explicit
+	* src/modules/sdl/spm.c: make license explicit
+	* src/modules/sdt/lis.conf: make license explicit
+	* src/modules/sdt/sdt.c: make license explicit
+	* src/modules/sdt/sdtmux.c: make license explicit
+	* src/modules/sl/sl.c: make license explicit
+	* src/modules/sl/slm.c: make license explicit
+	* src/modules/sl/sl_mux.c: make license explicit
+	* src/modules/sl/slpmod.c: make license explicit
+	* src/modules/sl/sm_mod.c: make license explicit
+	* src/modules/ss7ip/sdt_tpi.c: make license explicit
+	* src/modules/ss7ip/sl_tpi.c: make license explicit
+	* src/modules/ss7sctp/sdl_sctp.c: make license explicit
+	* src/modules/ss7sctp/sdt_sctp.c: make license explicit
+	* src/modules/sscop/sscop2.c: make license explicit
+	* src/modules/sscop/sscop.c: make license explicit
+	* src/modules/sscop/sscop_ip.c: make license explicit
+	* src/modules/sscop/sscop_n2.c: make license explicit
+	* src/modules/sscop/sscop_n.c: make license explicit
+	* src/modules/sscop/sscop_t.c: make license explicit
+	* src/modules/sua/sua.c: make license explicit
+	* src/modules/tali/tali.c: make license explicit
+	* src/modules/tcap/tcap.c: make license explicit
+	* src/modules/tcap/tc.c: make license explicit
+	* src/modules/tcap/tr.c: make license explicit
+	* src/modules/ti/timod.c: make license explicit
+	* src/modules/ti/tirdwr.c: make license explicit
+	* src/modules/tua/tua.c: make license explicit
+	* src/modules/x400p-ss7/ch_x400p.c: make license explicit
+	* src/modules/x400p-ss7/mx_x400p.c: make license explicit
+	* src/modules/x400p-ss7/sdl_x400p.c: make license explicit
+	* src/modules/x400p-ss7/sdt_x400p.c: make license explicit
+	* src/modules/x400p-ss7/sl_v400p.c: make license explicit
+	* src/modules/x400p-ss7/sl_x100p.c: make license explicit
+	* src/modules/x400p-ss7/sl_x400p.c: make license explicit
+	* src/modules/x400p-ss7/x100p-ss7.c: make license explicit
+	* src/modules/x400p-ss7/x400p_mx.c: make license explicit
+	* src/modules/x400p-ss7/x400p-ss7.c: make license explicit
+	* src/modules/zaptel/zaptel.c: make license explicit
+
 2007-07-04  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/cnam.texi: documentation updates

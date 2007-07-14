@@ -1,3 +1,13 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ctimod/ctimod.c: make license explicit
+	* src/drivers/dlgn/source/dlgn.c: make license explicit
+	* src/drivers/dvbm/source/dvbm.c: make license explicit
+	* src/drivers/gncfd/source/cfd.c: make license explicit
+	* src/drivers/gpio/source/gpiodrv.c: make license explicit
+	* src/drivers/mercd/source/mercd_linux_entry.c: make license explicit
+	* src/drivers/pmacd/source/pmacd_linux_entry.c: make license explicit
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release numbers

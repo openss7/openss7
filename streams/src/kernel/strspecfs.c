@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/07/14 01:35:55 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:15 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.79  2007/07/14 01:35:55  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.78  2007/03/25 19:01:15  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/07/14 01:35:55 $"
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/07/14 01:35:55 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -114,10 +117,10 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/03/25 19:01:15 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/07/14 01:35:55 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SPECFS_LICENSE		"GPL"
+#define SPECFS_LICENSE		"GPL v2"
 #define SPECFS_BANNER		SPECFS_DESCRIP		"\n" \
 				SPECFS_COPYRIGHT	"\n" \
 				SPECFS_REVISION		"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/02 10:04:06 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:06 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: irixcompat.c,v $
+ Revision 0.9.2.18  2007/07/14 01:35:41  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.17  2007/03/02 10:04:06  brian
  - updates to common build process and versions for all exported symbols
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/02 10:04:06 $"
+#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $"
 
-static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/02 10:04:06 $";
+static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -81,10 +84,10 @@ static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/02 10:04:06 $"
+#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define IRIXCOMP_LICENSE	"GPL"
+#define IRIXCOMP_LICENSE	"GPL v2"
 #define IRIXCOMP_BANNER		IRIXCOMP_DESCRIP	"\n" \
 				IRIXCOMP_COPYRIGHT	"\n" \
 				IRIXCOMP_REVISION	"\n" \

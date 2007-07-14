@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:38 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:34:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:38 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.c,v $
+ Revision 0.9.2.15  2007/07/14 01:34:31  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.14  2007/03/25 18:59:38  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:38 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:34:31 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:38 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:34:31 $";
 
 #include <sys/os7/compat.h>
 
@@ -89,11 +92,11 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:38 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:34:31 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define M3UA_LICENSE	"GPL"
+#define M3UA_LICENSE	"GPL v2"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
 			M3UA_REVISION	"\n" \
 			M3UA_COPYRIGHT	"\n" \

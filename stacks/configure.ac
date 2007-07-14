@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/06/27 08:42:02 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/07/14 01:33:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/27 08:42:02 $ by $Author: brian $
+# Last Modified $Date: 2007/07/14 01:33:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.44 $) $Date: 2007/06/27 08:42:02 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.45 $) $Date: 2007/07/14 01:33:47 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -190,6 +190,9 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/mapi/Makefile
 		 doc/specs/cci/Makefile
 		 doc/specs/mtpi/Makefile
+		 doc/specs/sli/Makefile
+		 doc/specs/sdli/Makefile
+		 doc/specs/sdti/Makefile
 		 src/modules/ti/lis.conf
 		 src/modules/inet/lis.conf
 		 src/modules/sctp/lis.conf
@@ -213,6 +216,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.45  2007/07/14 01:33:47  brian
+# - make license explicit, add documentation
+#
 # Revision 0.9.2.44  2007/06/27 08:42:02  brian
 # - added MTPI spec document
 #

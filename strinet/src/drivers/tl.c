@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $
+ @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:56 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tl.c,v $
+ Revision 0.9.2.3  2007/07/14 01:36:10  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2007/06/17 01:56:56  brian
  - updates for release, remove any later language
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $"
+#ident "@(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $"
 
-static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $";
+static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $";
 
 /*
  *  This driver provides transport interface loopback streams TICLTS, TICOTS
@@ -102,10 +105,10 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 #define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TI_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 01:56:56 $"
+#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $"
 #define TI_DEVICE	"SVR 4.2 STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TI_LICENSE	"GPL"
+#define TI_LICENSE	"GPL v2"
 #define TI_BANNER	TI_DESCRIP	"\n" \
 			TI_EXTRA	"\n" \
 			TI_REVISION	"\n" \

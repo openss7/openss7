@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:25 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:06 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $"
 
 static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $";
+    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also
@@ -96,11 +96,11 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/06/17 01:56:25 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SLM_LICENSE	"GPL"
+#define SLM_LICENSE	"GPL v2"
 #define SLM_BANNER	SLM_DESCRIP	"\n" \
 			SLM_REVISION	"\n" \
 			SLM_COPYRIGHT	"\n" \

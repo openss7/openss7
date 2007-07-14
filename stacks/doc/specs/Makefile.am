@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/27 08:42:03 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:49 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/27 08:42:03 $ by $Author: brian $
+# Last Modified $Date: 2007/07/14 01:33:49 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.8  2007/07/14 01:33:49  brian
+# - make license explicit, add documentation
+#
 # Revision 0.9.2.7  2007/06/27 08:42:03  brian
 # - added MTPI spec document
 #
@@ -60,6 +63,6 @@
 
 include ../../am/openss7.am
 
-SUBDIRS = cci tri tci mapi mtpi
+SUBDIRS = cci tri tci mapi mtpi sli sdli sdti
 
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

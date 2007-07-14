@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 12:15:27 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.8  2007/07/14 01:33:33  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.7  2007/05/18 12:15:27  brian
  - careful not to flush timers
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -150,11 +153,11 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/05/18 12:15:27 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TUA_AS_LICENSE		"GPL"
+#define TUA_AS_LICENSE		"GPL v2"
 #define UA_AS_BANNER		TUA_AS_DESCRIP		"\n" \
 				TUA_AS_REVISION		"\n" \
 				TUA_AS_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:44 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:07 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 0.9.2.6  2007/07/14 01:33:44  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.5  2007/03/25 18:59:07  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:44 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/25 18:59:07 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:44 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -95,11 +98,11 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.5 $
 //#include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define M2TP_LICENSE	"GPL"
+#define M2TP_LICENSE	"GPL v2"
 #define M2TP_BANNER	M2TP_DESCRIP	"\n" \
 			M2TP_REVISION	"\n" \
 			M2TP_COPYRIGHT	"\n" \

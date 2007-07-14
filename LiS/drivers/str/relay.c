@@ -333,7 +333,7 @@ module_init(relay3_init_module);
 module_exit(relay3_cleanup_module);
 #endif
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #endif
 
 #endif				/* !defined __NO_VERSION__ */

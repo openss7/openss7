@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.4 2006/12/06 11:26:11 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.5 2007/07/14 01:35:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:26:11 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.5  2007/07/14 01:35:35  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.4  2006/12/06 11:26:11  brian
  - current development updates
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_MXI_H__
 #define __SYS_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -239,6 +242,7 @@ union MX_parms {
 #define MX_RATE_192000		192000	/* T1 */
 #define MX_RATE_240000		240000	/* 30B */
 #define MX_RATE_248000		248000	/* E1 */
+#define MX_RATE_5376000		5376000	/* T3 */
 
 /*
  *  MX_OPTMGMT_REQ
@@ -447,9 +451,9 @@ typedef struct MX_disconnect_con {
  *  -------------------------------------------------------------------------
  */
 typedef struct MX_event_ind {
-	ch_ulong ch_primitive;		/* always MX_EVENT_IND */
-	ch_ulong ch_event;		/* event */
-	ch_ulong ch_slot;		/* slot within multiplex for event */
+	mx_ulong mx_primitive;		/* always MX_EVENT_IND */
+	mx_ulong mx_event;		/* event */
+	mx_ulong mx_slot;		/* slot within multiplex for event */
 } MX_event_ind_t;
 
 #define MX_EVT_DCD_ASSERT		 0

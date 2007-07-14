@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.125 $) $Date: 2007/06/24 12:10:30 $
+# @(#) $RCSfile: strxns.spec.in,v $ $Name:  $($Revision: 0.9.2.126 $) $Date: 2007/07/14 01:37:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/24 12:10:30 $ by $Author: brian $
+# Last Modified $Date: 2007/07/14 01:37:12 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -98,7 +98,7 @@
 #global preloads    
 #global libraries   
 %global tools       %{base}_mknod ldlconfig ldltest
-%global infofiles   %{base} dlpi npi
+%global infofiles   %{base} cdi dlpi npi
 %global initfiles   %{base}
 %global conffiles   %{name}.conf
 
@@ -1906,9 +1906,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: strxns.spec.in,v $
-# Revision 0.9.2.125  2007/06/24 12:10:30  brian
-# - recognize EL4 and EL5 for kernel-develop
+# Revision 0.9.2.126  2007/07/14 01:37:12  brian
+# - make license explicit, add documentation
 #
+
+* Sun Jun 24 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 0.9.2.125  2007/06/24 12:10:30  brian
+- recognize EL4 and EL5 for kernel-develop
 
 * Wed Jun 20 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 0.9.2.124  2007/06/20 09:28:02  brian

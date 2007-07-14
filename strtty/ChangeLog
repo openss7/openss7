@@ -1,3 +1,11 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/pty.c: make license explicit
+	* src/modules/ldterm.c: make license explicit
+	* src/modules/pckt.c: make license explicit
+	* src/modules/ptem.c: make license explicit
+	* src/modules/ttcompat.c: make license explicit
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release numbers

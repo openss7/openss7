@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/02 12:01:47 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.38  2007/07/14 01:37:20  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.37  2007/04/02 12:01:47  brian
  - fixed bugs in ldl
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -115,10 +118,10 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.37 $) $Date: 2007/04/02 12:01:47 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LDL_LICENSE	"GPL"
+#define LDL_LICENSE	"GPL v2"
 #define LDL_BANNER	LDL_DESCRIP	"\n" \
 			LDL_EXTRA	"\n" \
 			LDL_REVISION	"\n" \

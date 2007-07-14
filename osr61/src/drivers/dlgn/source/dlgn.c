@@ -349,7 +349,7 @@ MODULE_PARM(r4_feature, "i");
 MODULE_PARM(dlgn_opencount, "i");
 #endif
 MODULE_AUTHOR("Intel");
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 MODULE_DESCRIPTION("Dialogic Generic Device Driver");
 
 #ifdef LFS

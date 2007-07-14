@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.3 2006/12/06 11:26:11 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.4 2007/07/14 01:35:35 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:26:11 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl.h,v $
+ Revision 0.9.2.4  2007/07/14 01:35:35  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.3  2006/12/06 11:26:11  brian
  - current development updates
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_MXI_IOCTL_H__
 #define __SYS_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -87,6 +90,7 @@ typedef struct mx_config {
 	mx_ulong opt_flags;		/* options flags */
 } mx_config_t;
 
+#if 0
 typedef struct mx_ifconfig {
 	mx_ulong ifaddr;		/* ppa (card,span,channel) */
 	volatile mx_ulong ifflags;	/* interface flags */
@@ -208,6 +212,7 @@ typedef struct mx_ifconfig {
 	mx_ulong ifsync;
 	mx_ulong ifsyncsrc[MX_SYNCS];
 } mx_ifconfig_t;
+#endif
 
 #define MX_IOCGCONFIG	_IOR(	MX_IOC_MAGIC,	2,  mx_config_t	    )
 #define MX_IOCSCONFIG	_IOWR(	MX_IOC_MAGIC,	3,  mx_config_t	    )

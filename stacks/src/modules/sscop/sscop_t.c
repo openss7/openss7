@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:23 $
+ @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:23 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_t.c,v $
+ Revision 0.9.2.16  2007/07/14 01:35:12  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.15  2007/03/25 19:00:23  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -67,19 +70,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:23 $"
+#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:23 $";
+    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/03/25 19:00:23 $"
+#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $"
 #define SSCOP_TPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSCOP_TPI_LICENSE	"GPL"
+#define SSCOP_TPI_LICENSE	"GPL v2"
 #define SSCOP_TPI_BANNER	SSCOP_TPI_DESCRIP	"\n" \
 				SSCOP_TPI_REVISION	"\n" \
 				SSCOP_TPI_COPYRIGHT	"\n" \

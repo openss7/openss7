@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 06:00:33 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 0.9.2.5  2007/07/14 01:36:25  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.4  2007/03/25 06:00:33  brian
  - flush corrections
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $"
+#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $"
 
 static char const ident[] =
-    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $";
+    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $";
 
 /*
  *  ISO Transport over TCP (ITOT)
@@ -93,10 +96,10 @@ static char const ident[] =
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/25 06:00:33 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ITOT_LICENSE	"GPL"
+#define ITOT_LICENSE	"GPL v2"
 #define ITOT_BANNER	ITOT_DESCRIP	"\n" \
 			ITOT_COPYRIGHT	"\n" \
 			ITOT_REVISION	"\n" \

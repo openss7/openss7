@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $
+ @(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:14 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:33:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_hdlc.c,v $
+ Revision 0.9.2.15  2007/07/14 01:33:53  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.14  2007/03/25 18:59:14  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $"
+#ident "@(#) $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $"
 
 static char const ident[] =
-    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $";
+    "$RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -95,11 +98,11 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define CD_HDLC_DESCRIP		"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/25 18:59:14 $"
+#define CD_HDLC_REVISION	"OpenSS7 $RCSfile: cd_hdlc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $"
 #define CD_HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CD_HDLC_DEVICES		"Supports OpenSS7 Channel Drivers."
 #define CD_HDLC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define CD_HDLC_LICENSE		"GPL"
+#define CD_HDLC_LICENSE		"GPL v2"
 #define CD_HDLC_BANNER		CD_HDLC_DESCRIP		"\n" \
 				CD_HDLC_COPYRIGHT	"\n" \
 				CD_HDLC_REVISION	"\n" \

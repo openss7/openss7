@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/02 10:04:08 $
+ @(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/02 10:04:08 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr3compat.c,v $
+ Revision 0.9.2.17  2007/07/14 01:35:42  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.16  2007/03/02 10:04:08  brian
  - updates to common build process and versions for all exported symbols
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/02 10:04:08 $"
+#ident "@(#) $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:42 $"
 
-static char const ident[] = "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/02 10:04:08 $";
+static char const ident[] = "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:42 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -81,10 +84,10 @@ static char const ident[] = "$RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9
 
 #define SVR3COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR3COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/02 10:04:08 $"
+#define SVR3COMP_REVISION	"LfS $RCSfile: svr3compat.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:42 $"
 #define SVR3COMP_DEVICE		"UNIX(R) SVR 3.2 Compatibility"
 #define SVR3COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SVR3COMP_LICENSE	"GPL"
+#define SVR3COMP_LICENSE	"GPL v2"
 #define SVR3COMP_BANNER		SVR3COMP_DESCRIP	"\n" \
 				SVR3COMP_COPYRIGHT	"\n" \
 				SVR3COMP_REVISION	"\n" \

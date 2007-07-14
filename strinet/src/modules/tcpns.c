@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:01:36 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:36 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.4  2007/07/14 01:36:15  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.3  2007/03/25 19:01:36  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:01:36 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $"
 
-static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:01:36 $";
+static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -92,10 +95,10 @@ static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.3 
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2996 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:01:36 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TCPNS_LICENSE	"GPL"
+#define TCPNS_LICENSE	"GPL v2"
 #define TCPNS_BANNER	TCPNS_DESCRIP	"\n" \
 			TCPNS_COPYRIGHT	"\n" \
 			TCPNS_REVISION	"\n" \

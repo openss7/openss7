@@ -1,3 +1,8 @@
+2007-07-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/h225.c: make license explicit
+	* src/modules/rtp.c: make license explicit
+
 2007-06-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/carrier/overview.fig: change orientation to portrait

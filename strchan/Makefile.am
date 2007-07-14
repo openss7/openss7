@@ -1,6 +1,6 @@
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/13 06:17:04 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -45,11 +45,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/03/13 06:17:04 $ by $Author: brian $
+## Last Modified $Date: 2007/07/14 01:35:31 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.6  2007/07/14 01:35:31  brian
+## - make license explicit, add documentation
+##
 ## Revision 0.9.2.5  2007/03/13 06:17:04  brian
 ## - suppress errors when building 32-bit libs
 ##
@@ -146,7 +149,10 @@ noinst_LIBRARIES		= libCHANlink.a libCHANmods.a libCHANdrvs.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 EXTRA_libCHANlink_a_SOURCES	= 
-libCHANlink_a_SOURCES		= 
+libCHANlink_a_SOURCES		= \
+				  src/modules/ch_pmod.c \
+				  src/modules/mx_pmod.c \
+				  config.h strconf.h
 libCHANlink_a_DEPENDENCIES	= $(STRCONF_MODCONF) $(MODVERSIONS_H) $(CONFIG_HEADER) $(STRCONF_CONFIG)
 libCHANlink_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libCHANlink_a_CFLAGS		= $(KERNEL_CFLAGS)

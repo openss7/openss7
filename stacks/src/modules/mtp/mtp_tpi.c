@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 18:59:49 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:49 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:34:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_tpi.c,v $
+ Revision 0.9.2.25  2007/07/14 01:34:42  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.24  2007/03/25 18:59:49  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 18:59:49 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:42 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 18:59:49 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:42 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -111,11 +114,11 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/03/25 18:59:49 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:42 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_TPI_LICENSE		"GPL"
+#define MTP_TPI_LICENSE		"GPL v2"
 #define MTP_TPI_BANNER		MTP_TPI_DESCRIP		"\n" \
 				MTP_TPI_REVISION	"\n" \
 				MTP_TPI_COPYRIGHT	"\n" \

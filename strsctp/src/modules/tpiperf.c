@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:16 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.7  2007/07/14 01:36:45  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.6  2007/03/25 19:02:16  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $"
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $";
+static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -92,10 +95,10 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/25 19:02:16 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TPIPERF_LICENSE		"GPL"
+#define TPIPERF_LICENSE		"GPL v2"
 #define TPIPERF_BANNER		TPIPERF_DESCRIP		"\n" \
 				TPIPERF_COPYRIGHT	"\n" \
 				TPIPERF_REVISION	"\n" \

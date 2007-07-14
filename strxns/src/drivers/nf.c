@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/14 06:34:31 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:37:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 0.9.2.3  2007/07/14 01:37:21  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2006/05/14 06:34:31  brian
  - corrected buffer leaks
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $"
+#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $"
 
-static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $";
+static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -103,10 +106,10 @@ static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/05/14 06:34:31 $"
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $"
 #define NF_DEVICE	"SVR 4.2 STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NF_LICENSE	"GPL"
+#define NF_LICENSE	"GPL v2"
 #define NF_BANNER	NF_DESCRIP	"\n" \
 			NF_EXTRA	"\n" \
 			NF_REVISION	"\n" \

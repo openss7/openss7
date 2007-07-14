@@ -129,6 +129,27 @@
 	* doc/specs/cdi/.cvsignore: added new file
 	* doc/specs/cdi/Makefile.am: added new file
 
+	* configure.ac: add documentation
+	* doc/specs/dlpi/dlpi.texi: add documentation
+	* doc/specs/dlpi/Makefile.am: add documentation
+	* doc/specs/Makefile.am: add documentation
+	* src/drivers/cd.c: make license explicit
+	* src/drivers/dl2.c: make license explicit
+	* src/drivers/dl.c: make license explicit
+	* src/drivers/dl_ip.c: make license explicit
+	* src/drivers/hdlc.c: make license explicit
+	* src/drivers/ip.c: make license explicit
+	* src/drivers/ip_to_dlpi.c: make license explicit
+	* src/drivers/ldl.c: make license explicit
+	* src/drivers/nf.c: make license explicit
+	* src/drivers/np.c: make license explicit
+	* src/drivers/np_ip.c: make license explicit
+	* src/modules/cdi_conv.c: make license explicit
+	* src/modules/dlpi_conv.c: make license explicit
+	* src/modules/ip_strm_mod.c: make license explicit
+	* src/modules/npi_conv.c: make license explicit
+	* strxns.spec.in: add documentation
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release numbers

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:29 $
+ @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/14 01:35:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/14 06:37:29 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zaptel.c,v $
+ Revision 0.9.2.2  2007/07/14 01:35:38  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.1  2006/10/14 06:37:29  brian
  - added manpages, module, drivers, headers from strss7 package
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:29 $"
+#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/14 01:35:38 $"
 
-static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:29 $";
+static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/14 01:35:38 $";
 
 /*
  *  This module pushes over an OpenSS7 MX Stream and provides a zaptel drvier
@@ -93,11 +96,11 @@ static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/zap_ioctl.h>
 
 #define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
-#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.1 $) $Date: 2006/10/14 06:37:29 $"
+#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.2 $) $Date: 2007/07/14 01:35:38 $"
 #define ZAP_MX_COPYRIGHT    "Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
-#define ZAP_MX_LICENCE	"GPL"
+#define ZAP_MX_LICENSE	"GPL v2"
 #define ZAP_MX_BANNER	ZAP_MX_DESCRIP		"\n" \
 			ZAP_MX_REVISION		"\n" \
 			ZAP_MX_COPYRIGHT	"\n" \

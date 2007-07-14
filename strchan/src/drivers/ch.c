@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:51 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.3  2007/07/14 01:35:32  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.2  2007/03/25 19:00:51  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $"
 
-static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $";
+static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $";
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH
@@ -90,11 +93,11 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) 
 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/03/25 19:00:51 $"
+#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CHMUX_LICENSE	"GPL"
+#define CHMUX_LICENSE	"GPL v2"
 #define CHMUX_BANNER	CHMUX_DESCRIP	"\n" \
 			CHMUX_EXTRA	"\n" \
 			CHMUX_REVISION	"\n" \

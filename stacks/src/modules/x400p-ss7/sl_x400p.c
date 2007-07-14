@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 07:53:24 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/20 07:53:24 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.43  2007/07/14 01:35:23  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.42  2007/06/20 07:53:24  brian
  - updates for Fedora 7 and 2.6.21
 
@@ -136,10 +139,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 07:53:24 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 07:53:24 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -194,11 +197,11 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/06/20 07:53:24 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SL_X400P_LICENSE	"GPL"
+#define SL_X400P_LICENSE	"GPL v2"
 #define SL_X400P_BANNER		SL_X400P_DESCRIP	"\n" \
 				SL_X400P_EXTRA		"\n" \
 				SL_X400P_REVISION	"\n" \

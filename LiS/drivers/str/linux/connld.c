@@ -412,7 +412,7 @@ module_exit(connld_cleanup_module);
 #define __attribute_used__
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL v2");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("John Boyd <jaboydjr@protologos.net>");

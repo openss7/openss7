@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:36:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:02:29 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:36:59 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:36:59 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:36:59 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -83,10 +83,10 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/25 19:02:29 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:36:59 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SAD_LICENSE	"GPL"
+#define SAD_LICENSE	"GPL v2"
 #define SAD_BANNER	SAD_DESCRIP	"\n" \
 			SAD_COPYRIGHT	"\n" \
 			SAD_REVISION	"\n" \

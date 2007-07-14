@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:32:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:58:11 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:32:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 0.9.2.13  2007/07/14 01:32:56  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.12  2007/03/25 18:58:11  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:32:56 $"
 
-static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $";
+static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:32:56 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -95,10 +98,10 @@ static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/03/25 18:58:11 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:32:56 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MUX_LICENSE	"GPL"
+#define MUX_LICENSE	"GPL v2"
 #define MUX_BANNER	MUX_DESCRIP	"\n" \
 			MUX_COPYRIGHT	"\n" \
 			MUX_REVISION	"\n" \

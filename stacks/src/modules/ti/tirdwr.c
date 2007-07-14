@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:36 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:36 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.17  2007/07/14 01:35:18  brian
+ - make license explicit, add documentation
+
  Revision 0.9.2.16  2007/03/25 19:00:36  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:36 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:18 $"
 
-static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:36 $";
+static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:18 $";
 
 #include <sys/os7/compat.h>
 
@@ -84,10 +87,10 @@ static char const ident[] = "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.1
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/03/25 19:00:36 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:35:18 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TIRDWR_LICENSE		"GPL"
+#define TIRDWR_LICENSE		"GPL v2"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_REVISION		"\n" \

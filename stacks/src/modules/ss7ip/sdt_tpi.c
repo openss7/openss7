@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/06/17 01:56:26 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:26 $ by $Author: brian $
+ Last Modified $Date: 2007/07/14 01:35:08 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/06/17 01:56:26 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/06/17 01:56:26 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -88,10 +88,10 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/06/17 01:56:26 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_TPI_LICENSE	"GPL"
+#define SDT_TPI_LICENSE	"GPL v2"
 #define SDT_TPI_BANNER	SDT_TPI_DESCRIP	"\n" \
 			SDT_TPI_COPYRIGHT	"\n" \
 			SDT_TPI_REVISION	"\n" \
