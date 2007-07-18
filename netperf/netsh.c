@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.15 $) $Date: 2006/05/23 22:43:30 $
+ @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2007/07/18 17:12:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 22:43:30 $ by $Author: brian $
+ Last Modified $Date: 2007/07/18 17:12:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netsh.c,v $
+ Revision 1.1.1.16  2007/07/18 17:12:37  brian
+ - fix long_options termination bug, support ipaddress and port for XTI tests
+
  Revision 1.1.1.15  2006/05/23 22:43:30  brian
  - updated copyright headers
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.15 $) $Date: 2006/05/23 22:43:30 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2007/07/18 17:12:37 $"
 
-static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.15 $) $Date: 2006/05/23 22:43:30 $";
+static char const ident[] = "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.16 $) $Date: 2007/07/18 17:12:37 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -457,7 +460,7 @@ void
 print_netperf_usage(int argc, char *argv[])
 {
 	fprintf(stderr, "\
-Usgae:\n\
+Usage:\n\
     %1$s [-t, --testname=TESTNAME] [global opts] -- [test opts]\n\
     %1$s [-t, --testname=TESTNAME] -- {-h, --help}\n\
     %1$s {-h, --help}\n\
@@ -470,7 +473,7 @@ void
 print_netperf_help(int argc, char *argv[])
 {
         fprintf(stdout, "\
-Usgae:\n\
+Usage:\n\
     %1$s [-t, --testname=TESTNAME] [options] -- [test options]\n\
     %1$s [-t, --testname=TESTNAME] -- {-h, --help}\n\
     %1$s {-h, --help}\n\
@@ -953,6 +956,7 @@ scan_cmd_line(int argc, char *argv[])
 	{"copying",	no_argument,		NULL, 'L'},
 	{"ipv4",	no_argument,		NULL, '4'},
 	{"ipv6",	no_argument,		NULL, '6'},
+	{0,}
   };
 #endif /* _GNU_SOURCE */
   

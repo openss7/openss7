@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/05/25 12:18:09 $
+ @(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/07/18 17:12:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:18:09 $ by $Author: brian $
+ Last Modified $Date: 2007/07/18 17:12:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/05/25 12:18:09 $"
+#ident "@(#) $RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/07/18 17:12:37 $"
 
-static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/05/25 12:18:09 $";
+static char const ident[] = "$RCSfile: nettest_bsd.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/07/18 17:12:37 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -281,10 +281,10 @@ SCTP/TCP/UDP BSD Sockets Test Options:\n\
     -D [L][,R]        Set (SCTP|TCP)_NODELAY locally and/or remotely (SCTP_*|TCP_*)\n\
     -h                Display this text\n\
     -I local[,remote] Set the local/remote IP addresses for the data socket\n\
+    -P local[,remote] Set the local/remote port for the data socket\n\
     -m bytes          Set the send size (SCTP_STREAM, TCP_STREAM, UDP_STREAM)\n\
     -M bytes          Set the recv size (SCTP_STREAM, TCP_STREAM, UDP_STREAM)\n\
     -p min[,max]      Set the min/max port numbers for (SCTP|TCP)_CRR, (SCTP|TCP)_TRR\n\
-    -P local[,remote] Set the local/remote port for the data socket\n\
     -r req,[rsp]      Set request/response sizes (SCTP_RR, TCP_RR, UDP_RR)\n\
     -s send[,recv]    Set local socket send/recv buffer sizes\n\
     -S send[,recv]    Set remote socket send/recv buffer sizes\n\
@@ -19075,6 +19075,7 @@ scan_sockets_args(int argc, char *argv[])
 	{"rcv-width",	required_argument,	NULL, 'w'},
 	{"snd-width",	required_argument,	NULL, 'W'},
 	{"dummy",	no_argument,		NULL, 'z'},
+	{0,}
   };
 #endif				/* _GNU_SOURCE */
   

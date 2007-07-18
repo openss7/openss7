@@ -3763,6 +3763,7 @@ void
 	{ "sap",	    required_argument,	NULL, 's' },
 	{ "rem-window",	    required_argument,	NULL, 'W' },
 	{ "loc-window",	    required_argument,	NULL, 'w' },
+	{0,}
   };
 #endif /* _GNU_SOURCE */
   

@@ -7584,6 +7584,7 @@ scan_ipv6_args(int argc, char *argv[])
 	{ "copyavoid",		no_argument,		NULL, 'V' },
 	{ "rcv-width",		required_argument,	NULL, 'w' },
 	{ "snd-width",		required_argument,	NULL, 'W' },
+	{ 0, }
   };
 #endif /* _GNU_SOURCE */
   
