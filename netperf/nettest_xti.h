@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: nettest_xti.h,v 1.1.1.5 2006/05/23 22:43:32 brian Exp $
+ @(#) $Id: nettest_xti.h,v 1.1.1.6 2007/07/18 17:12:39 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 22:43:32 $ by $Author: brian $
+ Last Modified $Date: 2007/07/18 17:12:39 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -81,6 +81,12 @@ struct	xti_sctp_stream_request_struct {
 			/* should be made dirty before calling recv? */  
   int   clean_count;    /* how many integers should be read from the */
 			/* recv buffer before calling recv? */ 
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -126,6 +132,12 @@ struct	xti_sctp_rr_request_struct {
   int	so_rcvavoid;    /* do we want the remote to avoid receive */
 			/* copies? */ 
   int	so_sndavoid;    /* do we want the remote to avoid send copies? */
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -171,6 +183,12 @@ struct	xti_sctp_conn_rr_request_struct {
   int	so_rcvavoid;    /* do we want the remote to avoid receive */
 			/* copies? */ 
   int	so_sndavoid;    /* do we want the remote to avoid send copies? */
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -225,6 +243,12 @@ struct	xti_tcp_stream_request_struct {
 			/* should be made dirty before calling recv? */  
   int   clean_count;    /* how many integers should be read from the */
 			/* recv buffer before calling recv? */ 
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -270,6 +294,12 @@ struct	xti_tcp_rr_request_struct {
   int	so_rcvavoid;    /* do we want the remote to avoid receive */
 			/* copies? */ 
   int	so_sndavoid;    /* do we want the remote to avoid send copies? */
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -315,6 +345,12 @@ struct	xti_tcp_conn_rr_request_struct {
   int	so_rcvavoid;    /* do we want the remote to avoid receive */
 			/* copies? */ 
   int	so_sndavoid;    /* do we want the remote to avoid send copies? */
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -357,6 +393,12 @@ struct	xti_udp_stream_request_struct {
   int	so_rcvavoid;    /* do we want the remote to avoid receive */
 			/* copies? */ 
   int	so_sndavoid;    /* do we want the remote to avoid send copies? */
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */
@@ -400,6 +442,12 @@ struct	xti_udp_rr_request_struct {
   int	so_rcvavoid;    /* do we want the remote to avoid receive */
 			/* copies? */ 
   int	so_sndavoid;    /* do we want the remote to avoid send copies? */
+  int   port;           /* the port to which the recv side should bind
+			   to allow netperf to run through those evil
+			   firewall things */
+  int   ipaddress;      /* the IP address to which the recv side
+			   should bind to allow netperf to run through
+			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
 			/* is used to put it into the proper order on */
 			/* @#$% byte-swapped boxes... */

@@ -924,6 +924,7 @@ scan_dns_args(int argc, char *argv[])
 	{ "help",	no_argument,		NULL, 'h' },
 	{ "filename",	required_argument,	NULL, 'f' },
 	{ "hostname",	required_argument,	NULL, 'H' },
+	{ 0, }
   };
 #endif
 

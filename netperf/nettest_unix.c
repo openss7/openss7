@@ -3410,6 +3410,7 @@ scan_unix_args(int argc, char *argv[])
 	{ "rrsize",		required_argument,	NULL, 'r' },
 	{ "loc-bufsize",	required_argument,	NULL, 's' },
 	{ "rem-bufsize",	required_argument,	NULL, 'S' },
+	{ 0, }
   };
 #endif /* _GNU_SOURCE */
   

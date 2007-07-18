@@ -1,3 +1,17 @@
+2007-07-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* nettest_xti.c:
+	  - getopts termination fixed
+	  - support --ipaddr and --portnum options
+	* nettest_xti.h: add ipaddress and port to requests
+	* netserver.c: getopts termination fixed
+	* netsh.c: getopts termination fixed
+	* nettest_bsd.c: getopts termination fixed
+	* nettest_dlpi.c: getopts termination fixed
+	* nettest_dns.c: getopts termination fixed
+	* nettest_ipv6.c: getopts termination fixed
+	* nettest_unix.c: getopts termination fixed
+
 2007-06-25  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgrelease: bumped release numbers
