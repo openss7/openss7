@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:27 $ by $Author: brian $
+ Last Modified $Date: 2007/07/18 17:02:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.73  2007/07/18 17:02:19  brian
+ - correct NETIF_F_HW_CSUM, XTI_SNDBUF and XTI_RCVBUF
+
  Revision 0.9.2.72  2007/07/14 01:36:27  brian
  - make license explicit, add documentation
 
@@ -151,10 +154,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -172,7 +175,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/07/14 01:36:27 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4828,7 +4831,7 @@ sctp_avail(sctp_t * sp, struct sctp_daddr *sd)
 
 	cwnd = sd->cwnd + sd->mtu + 1;
 	cwnd = (cwnd > sd->in_flight) ? cwnd - sd->in_flight : 0;
-	rwnd = sp->p_rwnd;
+	rwnd = sp->p_rwnd < sp->sndbuf ? sp->p_rwnd : sp->sndbuf;
 	rwnd = (rwnd > sp->in_flight) ? rwnd - sp->in_flight : 0;
 	swnd = (cwnd < rwnd) ? cwnd : rwnd;
 	awnd = (sp->in_flight) ? swnd : cwnd;
@@ -5316,6 +5319,21 @@ sctp_queue_xmit(struct sk_buff *skb)
 #endif
 
 /*
+ *  Unfortunately Linux misreports the ability to do hardware checksum.  Hardware checksum reported
+ *  with NETIF_F_HW_CSUM is for TCP and UDP only and does not include SCTP in most cases.  Network
+ *  drivers reporting this flag should emulate SCTP checksum if they do not truly support it in
+ *  hardware.  As it is we are faced with the ineffciency here.  If the checksum was performed while
+ *  transferring data to the hardware or by the firmware of the card itself, SCTP performance would
+ *  be increased.
+ */
+#if 0
+#define SCTP_NO_CSUM (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)
+#else
+#define SCTP_NO_CSUM (NETIF_F_NO_CSUM)
+#endif
+
+
+/*
  *  XMIT OOTB (Disconnect Send with no Listening Socket or STREAM).
  *  -------------------------------------------------------------------------
  *  This sends disconnected without a socket or stream.  All that is needed is a destination address
@@ -5393,7 +5411,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			/* TODO:- For STREAMS it would be better to combine copying the buffer
 			   segments above with performing the checking below.  */
 			sh->check = 0;
-			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+			if (!(dev->features & (SCTP_NO_CSUM)))
 				sh->check = htonl(cksum_generate(sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
 #ifdef HAVE_KFUNC_DST_OUTPUT
@@ -5509,7 +5527,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			/* TODO:- For STREAMS it would be better to combine copying the buffer
 			   segments above with performing the checking below.  */
 			sh->check = 0;
-			if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+			if (!(dev->features & (SCTP_NO_CSUM)))
 				sh->check = htonl(cksum(sp, sh, plen));
 			SCTP_INC_STATS(SctpOutSCTPPacks);
 #ifdef HAVE_KFUNC_DST_OUTPUT
@@ -5703,7 +5721,7 @@ sctp_send_msg(struct sctp *sp, struct sctp_daddr *sd, mblk_t *mp)
 		   there is probably little use there either.  It might be better, however, to
 		   combine checksumming below with copying above for efficiency. */
 		sh->check = 0;
-		if (!(dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM)))
+		if (!(dev->features & (SCTP_NO_CSUM)))
 			sh->check = htonl(cksum(sp, sh, plen));
 		SCTP_INC_STATS(SctpOutSCTPPacks);
 #ifdef HAVE_KFUNC_DST_OUTPUT
@@ -13767,6 +13785,11 @@ sctp_init_struct(struct sctp *sp)
 #endif				/* SCTP_CONFIG_THROTTLE_HEARTBEATS */
 	/* start in closed state */
 	sctp_change_state(sp, SCTP_CLOSED);
+	/* xti defaults */
+	sp->rcvbuf = sysctl_rmem_default << 1;
+	sp->rcvlowat = sctp_defaults.xti.rcvlowat;
+	sp->sndbuf = sysctl_wmem_default << 1;
+	sp->sndlowat = sctp_defaults.xti.sndlowat;
 	/* ip defaults */
 	sp->inet.tos = sctp_defaults.ip.tos;
 #if 1
@@ -13787,7 +13810,7 @@ sctp_init_struct(struct sctp *sp)
 	sp->priority = sctp_defaults.ip.priority;
 #endif
 	/* association defaults */
-	sp->a_rwnd = sctp_defaults.xti.rcvbuf;
+	sp->a_rwnd = sysctl_rmem_default;
 	sp->max_istr = sctp_defaults.sctp.istreams;
 	sp->req_ostr = sctp_defaults.sctp.ostreams;
 	sp->max_inits = sctp_defaults.sctp.max_init_retries;
@@ -17595,6 +17618,7 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 				if (*valp < SOCK_MIN_RCVBUF / 2)
 					*valp = SOCK_MIN_RCVBUF / 2;
 				sp->rcvbuf = *valp * 2;
+				sp->a_rwnd = *valp;
 				continue;
 			}
 			case XTI_RCVLOWAT:
@@ -21292,7 +21316,7 @@ t_build_default_options(const struct sctp *t, const unsigned char *ip, size_t il
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_RCVBUF;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.rcvbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_rmem_default;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -21312,7 +21336,7 @@ t_build_default_options(const struct sctp *t, const unsigned char *ip, size_t il
 				oh->level = XTI_GENERIC;
 				oh->name = XTI_SNDBUF;
 				oh->status = T_SUCCESS;
-				*((t_uscalar_t *) T_OPT_DATA(oh)) = t_defaults.xti.sndbuf;
+				*((t_uscalar_t *) T_OPT_DATA(oh)) = sysctl_wmem_default;
 				if (ih->name != T_ALLOPT)
 					continue;
 				if (!(oh = _T_OPT_NEXTHDR_OFS(op, *olen, oh, 0)))
@@ -24435,7 +24459,7 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				{
 					if (ih->name == T_ALLOPT) {
-						*valp = t_defaults.xti.rcvbuf;
+						*valp = sysctl_rmem_default;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if (*valp > sysctl_rmem_max) {
@@ -24452,6 +24476,8 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 					}
 					t->options.xti.rcvbuf = *valp;
 					t->rcvbuf = *valp << 1;
+					t->a_rwnd = *valp;
+					sctp_send_sack(t);
 				}
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -24503,7 +24529,7 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 				bcopy(T_OPT_DATA(ih), T_OPT_DATA(oh), optlen);
 				{
 					if (ih->name == T_ALLOPT) {
-						*valp = t_defaults.xti.sndbuf;
+						*valp = sysctl_wmem_default;
 					} else {
 						*valp = *((typeof(valp)) T_OPT_DATA(ih));
 						if (*valp > sysctl_rmem_max) {
@@ -24553,6 +24579,7 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 						}
 					}
 					t->options.xti.sndlowat = *valp;
+					t->sndlowat = *valp;
 				}
 				if (ih->name != T_ALLOPT)
 					continue;
@@ -29462,7 +29489,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	}
 	/* perform the stream-specific checksum */
 	skb->csum = ntohl(sh->check);
-	if (!(skb->dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM))) {
+	if (!(skb->dev->features & (SCTP_NO_CSUM))) {
 		sh->check = 0;
 		if (!cksum_sp_verify(sp, skb->csum, sh, skb->len + sizeof(*sh))) {
 			sh->check = htonl(skb->csum);
@@ -29490,7 +29517,7 @@ sctp_v4_rcv(struct sk_buff *skb)
 	ptrace(("ERROR: No stream\n"));
 	/* perform the default checksum */
 	skb->csum = ntohl(sh->check);
-	if (!(skb->dev->features & (NETIF_F_NO_CSUM | NETIF_F_HW_CSUM))) {
+	if (!(skb->dev->features & (SCTP_NO_CSUM))) {
 		sh->check = 0;
 		if (!cksum_verify(skb->csum, sh, skb->len + sizeof(*sh))) {
 			sh->check = htonl(skb->csum);
