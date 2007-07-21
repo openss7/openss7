@@ -1,3 +1,13 @@
+2007-07-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/ch-pmod.4.man: added manpage
+	* doc/man/man4/mx-pmod.4.man: added manpage
+	* doc/man/Makefile.am: added manpages
+	* doc/man/man4/mx.4.man: updated manpage
+	* src/drivers/ch.c: corrections
+	* src/drivers/mx.c: corrections
+	* src/include/sys/chi.h: 64-bit corrections
+
 2007-07-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/projects/.cvsignore: added new file

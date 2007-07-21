@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/21 20:43:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:32 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:43:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.4  2007/07/21 20:43:47  brian
+ - added manual pages, corrections
+
  Revision 0.9.2.3  2007/07/14 01:35:32  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/21 20:43:47 $"
 
-static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $";
+static char const ident[] =
+    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/21 20:43:47 $";
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH
@@ -93,7 +97,7 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) 
 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:35:32 $"
+#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/21 20:43:47 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -151,9 +155,6 @@ struct ch;
 struct mx;
 
 struct ch {
-	int mid;			/* module id */
-	int sid;			/* instance id */
-	dev_t dev;			/* device number */
 	queue_t *oq;
 	queue_t *iq;
 	ch_ulong i_state;		/* interface state */
@@ -188,9 +189,6 @@ struct ch {
 };
 
 struct mx {
-	int mid;			/* module id */
-	int sid;			/* instance id */
-	int index;			/* multiplex index */
 	queue_t *oq;
 	queue_t *iq;
 	mx_ulong i_state;		/* interface state */
@@ -317,6 +315,7 @@ ch_attach(queue_t *q, ch_ulong ppa, ch_ulong style)
 	ch->info.ch_version = CH_VERSION;
 	ch_set_state(ch, CHS_ATTACHED);
 }
+
 /**
  * ch_enable: enable a CH stream
  * @ch: CH private structure
@@ -342,15 +341,12 @@ ch_enable(struct ch *ch)
 	ch_set_state(ch, CHS_ENABLED);
 }
 
-
 static __unlikely void
 ch_init_priv(queue_t *q, dev_t dev, cred_t *crp)
 {
 	struct ch *ch = CH_PRIV(q);
 
 	bzero(ch, sizeof(*ch));
-	ch->mid = getmajor(dev);
-	ch->sid = getminor(dev);
 
 	ch->a.next = NULL;
 	ch->a.prev = &ch->a.next;
@@ -390,11 +386,11 @@ ch_term_priv(queue_t *q)
 	default:
 		/* don't know, run them anyway */
 	case CHS_CONNECTED:
-		ch_disconnect(ch, true); /* forced */
+		ch_disconnect(ch, true);	/* forced */
 	case CHS_ENABLED:
-		ch_disable(ch, true); /* forced */
+		ch_disable(ch, true);	/* forced */
 	case CHS_ATTACHED:
-		ch_detach(ch, true); /* forced */
+		ch_detach(ch, true);	/* forced */
 	case CHS_DETACHED:
 		break;
 	}
@@ -406,8 +402,6 @@ mx_init_priv(queue_t *q, int index, cred_t *crp)
 	struct mx *mx = CH_PRIV(q);
 
 	bzero(mx, sizeof(*mx));
-	mx->mid = CMAJOR_0;
-	mx->sid = index;
 
 	mx->info.mx_primitive = MX_INFO_ACK;
 	mx->info.mx_addr_length = 0;
@@ -440,129 +434,14 @@ mx_term_priv(queue_t *q)
 	default:
 		/* don't know, run them anyway */
 	case MXS_CONNECTED:
-		mx_disconnect(mx, true); /* forced */
+		mx_disconnect(mx, true);	/* forced */
 	case MXS_ENABLED:
-		mx_disable(mx, true); /* forced */
+		mx_disable(mx, true);	/* forced */
 	case MXS_ATTACHED:
-		mx_detach(mx, true); /* forced */
+		mx_detach(mx, true);	/* forced */
 	case MXS_DETACHED:
 		break;
 	}
-}
-
-/*
- *  Locking.
- */
-/**
- * ch_trylock: - try to lock an CH queue pair
- * @ch: CH private structure
- * @q: active queue (not necessarily in CH queue pair)
- *
- * Note that if we always run (at least initially) from a service procedure, there is no need to
- * suppress interrupts while holding the lock.  This simple lock will do because the service
- * procedure is guaranteed single threaded on UP machines.  Also, because interrupts do not need to
- * be supressed while holding the lock, the current task pointer identifies the thread and the
- * thread can be allowed to recurse on the lock.  When a queue procedure fails to acquire the lock,
- * it is marked to have its service procedure scheduled later, but we only remember one queue, so if
- * there are two waiting, the second one is reenabled.
- */
-static inline fastcall bool
-ch_trylock(struct ch *ch, queue_t *q)
-{
-	bool rtn = false;
-	unsigned long flags;
-
-	spin_lock_irqsave(&ch->qlock, flags);
-	if (ch->users == 0 && (q->q_flag & QSVCBUSY)) {
-		rtn = true;
-		ch->users = 1;
-		ch->owner = current;
-	} else if (ch->users != 0 && ch->owner == current) {
-		rtn = true;
-		ch->users++;
-	} else if (!ch->waitq) {
-		ch->waitq = q;
-	} else if (ch->waitq != q) {
-		qenable(q);
-	}
-	spin_unlock_irqrestore(&ch->qlock, flags);
-	return (rtn);
-}
-static inline fastcall void
-ch_unlock(struct ch *ch)
-{
-	unsigned long flags;
-
-	spin_lock_irqsave(&ch->qlock, flags);
-	if (--ch->users == 0 && ch->waitq) {
-		qenable(ch->waitq);
-		ch->waitq = NULL;
-	}
-	spin_unlock_irqrestore(&ch->qlock, flags);
-}
-
-/**
- * mi_allocb: - allocate a message block
- * @q: active queue (instance data allocated with mi_open)
- * @size: size of message block
- * @priority: priority for allocation
- */
-static fastcall mblk_t *
-mi_allocb(queue_t *q, size_t size, int priority)
-{
-	mblk_t *mp;
-
-	if (unlikely(!(mp = allocb(size, priority))))
-		mi_bufcall(q, size, priority);
-	return (mp);
-}
-
-/**
- * mx_trylock: - try to lock an MX queue pair
- * @mx: MX private structure
- * @q: active queue (not necessarily in MX queue pair)
- *
- * Note that if we always run (at least initially) from a service procedure, there is no need to
- * suppress interrupts while holding the lock.  This simple lock will do because the service
- * procedure is guaranteed single threaded on UP machines.  Also, because interrupts do not need to
- * be supressed while holding the lock, the current task pointer identifies the thread and the
- * thread can be allowed to recurse on the lock.  When a queue procedure fails to acquire the lock,
- * it is marked to have its service procedure scheduled later, but we only remember one queue, so if
- * there are two waiting, the second one is reenabled.
- */
-static inline fastcall bool
-mx_trylock(struct mx *mx, queue_t *q)
-{
-	bool rtn = false;
-	unsigned long flags;
-
-	spin_lock_irqsave(&mx->qlock, flags);
-	if (mx->users == 0 && (q->q_flag & QSVCBUSY)) {
-		rtn = true;
-		mx->users = 1;
-		mx->owner = current;
-	} else if (mx->users != 0 && mx->owner == current) {
-		rtn = true;
-		mx->users++;
-	} else if (!mx->waitq) {
-		mx->waitq = q;
-	} else if (mx->waitq != q) {
-		qenable(q);
-	}
-	spin_unlock_irqrestore(&mx->qlock, flags);
-	return (rtn);
-}
-static inline fastcall void
-mx_unlock(struct mx *mx)
-{
-	unsigned long flags;
-
-	spin_lock_irqsave(&mx->qlock, flags);
-	if (--mx->users == 0 && mx->waitq) {
-		qenable(mx->waitq);
-		mx->waitq = NULL;
-	}
-	spin_unlock_irqrestore(&mx->qlock, flags);
 }
 
 /*
@@ -734,7 +613,7 @@ mx_info_req(struct mx *mx, queue_t *q, mblk_t *msg)
 		p->mx_primitive = MX_INFO_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_INFO_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_INFO_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -766,7 +645,7 @@ mx_optmgmt_req(struct mx *mx, queue_t *q, mblk_t *msg, caddr_t optr, size_t olen
 		bcopy(optr, mp->b_wptr, olen);
 		mp->b_wptr += olen;
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_OPTMGMT_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_OPTMGMT_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -797,7 +676,7 @@ mx_attach_req(struct mx *mx, queue_t *q, mblk_t *msg, caddr_t aptr, size_t alen)
 		mp->b_wptr += alen;
 		mx_set_state(mx, MXS_WACK_AREQ);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_ATTACH_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_ATTACH_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -822,7 +701,7 @@ mx_enable_req(struct mx *mx, queue_t *q, mblk_t *msg)
 		mp->b_wptr += sizeof(*p);
 		mx_set_state(mx, MXS_WACK_EREQ);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_ENABLE_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_ENABLE_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -851,7 +730,7 @@ mx_connect_req(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong flags, mx_ulong 
 		mp->b_wptr += sizeof(*p);
 		mx_set_state(mx, MXS_WACK_CREQ);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_CONNECT_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_CONNECT_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -949,7 +828,7 @@ mx_disconnect_req(struct mx *mx, queue_t *q, mblk_t *msg, mx_ulong flags, mx_ulo
 		mp->b_wptr += sizeof(*p);
 		mx_set_state(mx, MXS_WACK_DREQ);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_DISCONNECT_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_DISCONNECT_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -974,7 +853,7 @@ mx_disable_req(struct mx *mx, queue_t *q, mblk_t *msg)
 		mp->b_wptr += sizeof(*p);
 		mx_set_state(mx, MXS_WACK_RREQ);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_DISABLE_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_DISABLE_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -999,7 +878,7 @@ mx_detach_req(struct mx *mx, queue_t *q, mblk_t *msg)
 		mp->b_wptr += sizeof(*p);
 		mx_set_state(mx, MXS_WACK_UREQ);
 		freemsg(msg);
-		strlog(mx->mid, mx->sid, CHLOGTX, SL_TRACE, "MX_DETACH_REQ ->");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "MX_DETACH_REQ ->");
 		putnext(mx->oq, mp);
 		return (0);
 	}
@@ -1037,7 +916,7 @@ ch_info_ack(struct ch *ch, queue_t *q, mblk_t *msg)
 		bcopy(pptr, mp->b_wptr, plen);
 		mp->b_wptr += plen;
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_INFO_ACK");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_INFO_ACK");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1070,7 +949,7 @@ ch_optmgmt_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, size_t ol
 		bcopy(optr, mp->b_wptr, olen);
 		mp->b_wptr += olen;
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_OPTMGMT_ACK");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_OPTMGMT_ACK");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1102,7 +981,7 @@ ch_ok_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong prim, ch_ulong state)
 		mp->b_wptr += sizeof(*p);
 		ch_set_state(ch, state);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1134,7 +1013,7 @@ ch_error_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong prim, ch_ulong typ
 		mp->b_wptr += sizeof(*p);
 		ch_set_state(ch, state);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_ERROR_ACK");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_ERROR_ACK");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1163,7 +1042,7 @@ ch_attach_ack(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong ppa)
 		mp->b_wptr += sizeof(*p);
 		ch_attach(ch, ppa, CH_STYLE2);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1198,10 +1077,10 @@ ch_enable_ack_con(struct ch *ch, queue_t *q, mblk_t *msg)
 			mp2->b_wptr += sizeof(*p2);
 
 			freemsg(msg);
-			strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
+			mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
 			putnext(ch->oq, mp2);
 			ch_enable(ch);
-			strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_ENABLE_CON");
+			mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_ENABLE_CON");
 			putnext(ch->oq, mp);
 			return (0);
 		}
@@ -1229,7 +1108,7 @@ ch_enable_con(struct ch *ch, queue_t *q, mblk_t *msg)
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		ch_enable(ch);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_ENABLE_CON");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_ENABLE_CON");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1257,7 +1136,7 @@ ch_data_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong slot)
 		mp->b_wptr += sizeof(*p);
 		mp->b_cont = XCHG(&msg->b_cont, NULL);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGDA, SL_TRACE, "<- CH_DATA_IND");
+		mi_strlog(q, CHLOGDA, SL_TRACE, "<- CH_DATA_IND");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1289,7 +1168,7 @@ ch_disconnect_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch_ulo
 		p->ch_cause = cause;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_DISCONNECT_IND");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_DISCONNECT_IND");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1319,7 +1198,7 @@ ch_disconnect_con(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong flags, ch_ulo
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		ch_disconnect(ch);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_DISCONNECT_CON");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_DISCONNECT_CON");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1348,7 +1227,7 @@ ch_disable_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong cause)
 		ch_disable(ch);
 		ch_set_state(ch, CHS_ATTACHED);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_DISABLE_IND");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_DISABLE_IND");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1383,10 +1262,10 @@ ch_disable_ack_con(struct ch *ch, queue_t *q, mblk_t *msg)
 			mp2->b_wptr += sizeof(*p2);
 
 			freemsg(msg);
-			strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
+			mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
 			putnext(ch->oq, mp2);
 			ch_disable(ch, false);
-			strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_DISABLE_CON");
+			mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_DISABLE_CON");
 			putnext(ch->oq, mp);
 			return (0);
 		}
@@ -1414,7 +1293,7 @@ ch_disable_con(struct ch *ch, queue_t *q, mblk_t *msg)
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		ch_disable(ch);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_DISABLE_CON");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_DISABLE_CON");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1443,7 +1322,7 @@ ch_detach_ack(struct ch *ch, queue_t *q, mblk_t *msg)
 
 		freemsg(msg);
 		ch_detach(ch, false);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_OK_ACK");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1472,7 +1351,7 @@ ch_event_ind(struct ch *ch, queue_t *q, mblk_t *msg, ch_ulong event, ch_ulong sl
 		p->ch_slot = slot;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		strlog(ch->mid, ch->sid, CHLOGTX, SL_TRACE, "<- CH_EVENT_IND");
+		mi_strlog(q, CHLOGTX, SL_TRACE, "<- CH_EVENT_IND");
 		putnext(ch->oq, mp);
 		return (0);
 	}
@@ -1703,7 +1582,7 @@ ch_detach_req(struct ch *ch, queue_t *q, mblk_t *mp)
 static inline fastcall int
 ch_w_data(queue_t *q, mblk_t *mp)
 {
-	struct ch *ch = CH_PRIV(q);
+	struct ch *ch;
 	struct mx *mx = ch->mx;
 	int err;
 
@@ -1712,7 +1591,7 @@ ch_w_data(queue_t *q, mblk_t *mp)
 		goto error;
 
 	err = -EDEADLK;
-	if (!ch_trylock(ch, q))
+	if ((ch = (struct ch *) mi_trylock(q)) == NULL)
 		goto error;
 
 	err = 0;
@@ -1723,9 +1602,11 @@ ch_w_data(queue_t *q, mblk_t *mp)
 	if (!(mx = ch->mx))
 		goto ch_unlock_error;
 
+#if 0
 	err = -EDEADLK;
-	if (!mx_trylock(mx, q))
+	if (!mi_trylock(q))
 		goto ch_unlock_error;
+#endif
 
 	err = 0;
 	if (mx_get_state(mx) != MXS_CONNECTED)
@@ -1756,10 +1637,12 @@ ch_w_data(queue_t *q, mblk_t *mp)
 		goto mx_unlock_error;
 
 	err = 0;
+#if 0
       mx_unlock_error:
-	mx_unlock(mx);
+	mi_unlock(priv);
+#endif
       ch_unlock_error:
-	ch_unlock(ch);
+	mi_unlock((caddr_t) ch);
       error:
 	if (err == 0)
 		freemsg(mp);
@@ -1780,57 +1663,57 @@ ch_w_data_slow(queue_t *q, mblk_t *mp)
 static fastcall int
 ch_w_proto(queue_t *q, mblk_t *mp)
 {
-	struct ch *ch = CH_PRIV(q);
+	struct ch *ch;
 	int rtn = -EDEADLK;
 
-	if (ch_trylock(ch, q)) {
+	if ((ch = (struct ch *) mi_trylock(q))) {
 		ch_ulong oldstate = ch_get_state(ch);
 
 		switch (*(ch_ulong *) mp->b_rptr) {
 		case CH_INFO_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_INFO_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_INFO_REQ");
 			rtn = ch_info_req(ch, q, mp);
 			break;
 		case CH_OPTMGMT_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_OPTMGMT_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_OPTMGMT_REQ");
 			rtn = ch_optmgmt_req(ch, q, mp);
 			break;
 		case CH_ATTACH_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_ATTACH_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_ATTACH_REQ");
 			rtn = ch_attach_req(ch, q, mp);
 			break;
 		case CH_ENABLE_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_ENABLE_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_ENABLE_REQ");
 			rtn = ch_enable_req(ch, q, mp);
 			break;
 		case CH_CONNECT_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_CONNECT_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_CONNECT_REQ");
 			rtn = ch_connect_req(ch, q, mp);
 			break;
 		case CH_DATA_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_DATA_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_DATA_REQ");
 			rtn = ch_data_req(ch, q, mp);
 			break;
 		case CH_DISCONNECT_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_DISCONNECT_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_DISCONNECT_REQ");
 			rtn = ch_disconnect_req(ch, q, mp);
 			break;
 		case CH_DISABLE_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_DISABLE_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_DISABLE_REQ");
 			rtn = ch_disable_req(ch, q, mp);
 			break;
 		case CH_DETACH_REQ:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_DETACH_REQ");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_DETACH_REQ");
 			rtn = ch_detach_req(ch, q, mp);
 			break;
 		default:
-			strlog(ch->mid, ch->sid, 0, SL_TRACE, "-> CH_????_???");
+			mi_strlog(q, 0, SL_TRACE, "-> CH_????_???");
 			rtn = ch_other_req(ch, q, mp);
 			break;
 		}
 		if (rtn)
 			ch_set_state(ch, oldstate);
-		ch_unlock(ch);
+		mi_unlock((caddr_t) ch);
 	}
 	return (rtn);
 }
@@ -1843,87 +1726,87 @@ ch_w_ioctl(queue_t *q, mblk_t *mp)
 
 	switch (ioc->ioc_cmd) {
 	case CH_IOCGCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGCONFIG)");
 		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(ch->config)))) {
 			bcopy(&ch->config, dp->b_rptr, sizeof(ch->config));
 			mi_copyout(q, mp);
 		}
 		break;
 	case CH_IOCSCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCSCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCSCONFIG)");
 		/* fall through */
 	case CH_IOCTCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCTCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCTCONFIG)");
 		/* fall through */
 	case CH_IOCCCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCCONFIG)");
 		mi_copyin(q, mp, NULL, sizeof(ch->config));
 		break;
 	case CH_IOCGSTATEM:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGSTATEM)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGSTATEM)");
 		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(ch->statem)))) {
 			bcopy(&ch->statem, dp->b_rptr, sizeof(ch->statem));
 			mi_copyout(q, mp);
 		}
 		break;
 	case CH_IOCCMRESET:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCMRESET)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCMRESET)");
 		/* reset state machine */
 		mi_copy_set_rval(mp, 0);
 		mi_copy_done(q, mp, 0);
 		break;
 	case CH_IOCGSTATSP:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGSTATSP)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGSTATSP)");
 		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(ch->statsp)))) {
 			bcopy(&ch->statsp, dp->b_rptr, sizeof(ch->statsp));
 			mi_copyout(q, mp);
 		}
 		break;
 	case CH_IOCSSTATSP:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCSSTATSP)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCSSTATSP)");
 		mi_copyin(q, mp, NULL, sizeof(ch->statsp));
 		break;
 	case CH_IOCGSTATS:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGSTATS)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGSTATS)");
 		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(ch->stats)))) {
 			bcopy(&ch->stats, dp->b_rptr, sizeof(ch->stats));
 			mi_copyout(q, mp);
 		}
 		break;
 	case CH_IOCCSTATS:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCSTATS)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCSTATS)");
 		/* clear statistics */
 		bzero(&ch->stats, sizeof(ch->stats));
 		mi_copy_set_rval(mp, 0);
 		mi_copy_done(q, mp, 0);
 		break;
 	case CH_IOCGNOTIFY:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGNOTIFY)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCGNOTIFY)");
 		if ((dp = mi_copyout_alloc(q, mp, 0, sizeof(ch->events)))) {
 			bcopy(&ch->events, dp->b_rptr, sizeof(ch->events));
 			mi_copyout(q, mp);
 		}
 		break;
 	case CH_IOCSNOTIFY:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCSNOTIFY)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCSNOTIFY)");
 		mi_copyin(q, mp, NULL, sizeof(ch->events));
 		break;
 	case CH_IOCCNOTIFY:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCNOTIFY)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(CH_IOCCNOTIFY)");
 		/* clear events */
 		bzero(&ch->events, sizeof(ch->events));
 		mi_copy_set_rval(mp, 0);
 		mi_copy_done(q, mp, 0);
 		break;
 	case I_PLINK:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_PLINK)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_PLINK)");
 		if (!drv_priv(ioc->ioc_cr)) {
 			mi_copy_done(q, mp, EPERM);
 			break;
 		}
 		goto link;
 	case I_LINK:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_LINK)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_LINK)");
 	      link:
 		if (!(mx = mi_open_alloc(sizeof(*mx)))) {
 			mi_copy_done(q, mp, ENOMEM);
@@ -1938,14 +1821,14 @@ ch_w_ioctl(queue_t *q, mblk_t *mp)
 		mx_link(mx);
 		break;
 	case I_PUNLINK:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_PUNLINK)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_PUNLINK)");
 		if (!drv_priv(ioc->ioc_cr)) {
 			mi_copy_done(q, mp, EPERM);
 			break;
 		}
 		goto unlink;
 	case I_UNLINK:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_UNLINK)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCTL(I_UNLINK)");
 	      unlink:
 		for (mx = mi_first_ptr(&mx_links); mx && mx->sid != l->l_index;
 		     mx = mi_next_ptr(&mx_links, (caddr_t) mx)) ;
@@ -1970,19 +1853,19 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 
 	switch (ioc->ioc_cmd) {
 	case CH_IOCGCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGCONFIG)");
 		goto get_done;
 	case CH_IOCGSTATEM:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGSTATEM)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGSTATEM)");
 		goto get_done;
 	case CH_IOCGSTATSP:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGSTATSP)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGSTATSP)");
 		goto get_done;
 	case CH_IOCGSTATS:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGSTATS)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGSTATS)");
 		goto get_done;
 	case CH_IOCGNOTIFY:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGNOTIFY)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCGNOTIFY)");
 	      get_done:
 		switch (mi_copy_state(q, mp, &dp)) {
 		case -1:
@@ -1994,7 +1877,7 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case CH_IOCSCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCSCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCSCONFIG)");
 		switch (mi_copy_state(q, mp, &dp)) {
 		case -1:
 			break;
@@ -2019,7 +1902,7 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case CH_IOCTCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCTCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCTCONFIG)");
 		switch (mi_copy_state(q, mp, &dp)) {
 		case -1:
 			break;
@@ -2044,7 +1927,7 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case CH_IOCCCONFIG:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCONFIG)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCONFIG)");
 		switch (mi_copy_state(q, mp, &dp)) {
 		case -1:
 			break;
@@ -2069,11 +1952,11 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case CH_IOCCMRESET:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCMRESET)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCMRESET)");
 		/* should not happen */
 		break;
 	case CH_IOCSSTATSP:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCSSTATSP)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCSSTATSP)");
 		switch (mi_copy_state(q, mp, &dp)) {
 		case -1:
 			break;
@@ -2098,11 +1981,11 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case CH_IOCCSTATS:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCSTATS)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCSTATS)");
 		/* should not happen */
 		break;
 	case CH_IOCSNOTIFY:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCSNOTIFY)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCSNOTIFY)");
 		switch (mi_copy_state(q, mp, &dp)) {
 		case -1:
 			break;
@@ -2127,7 +2010,7 @@ ch_w_iocdata(queue_t *q, mblk_t *mp)
 		}
 		break;
 	case CH_IOCCNOTIFY:
-		strlog(ch->mid, ch->sid, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCNOTIFY)");
+		mi_strlog(q, CHLOGIO, SL_TRACE, "-> M_IOCDATA(CH_IOCCNOTIFY)");
 		/* should not happen */
 		break;
 	}
@@ -2574,10 +2457,10 @@ mx_other_ind(struct mx *mx, queue_t *q, mblk_t *mp)
 static inline fastcall int
 mx_r_data(queue_t *q, mblk_t *mp)
 {
-	struct mx *mx = MX_PRIV(q);
+	struct mx *mx;
 	struct ch *ch;
 
-	if (unlikely(mx_trylock(mx, q)))
+	if (unlikely((mx = (struct mx *) mi_trylock(q)) == NULL))
 		goto edeadlk;
 
 	if (unlikely(mp->b_wptr < mp->b_rptr + mx->blocksize))
@@ -2606,12 +2489,12 @@ mx_r_data(queue_t *q, mblk_t *mp)
 	}
 	/* could likely be more efficient than this: i.e. transferring only necessary channels */
 	bcopy(mp->b_rptr, mx->tx.buf, mx->blocksize);
-	mx_unlock(mx);
+	mi_unlock(mx);
 	qreply(q, mp);
 	return (0);
 
       discard:
-	mx_unlock(mx);
+	mi_unlock((caddr_t) mx);
 	freemsg(mp);
 	return (0);
       edeadlk:
@@ -2627,73 +2510,73 @@ mx_r_data_slow(queue_t *q, mblk_t *mp)
 static fastcall int
 mx_r_proto(queue_t *q, mblk_t *mp)
 {
-	struct mx *mx = MX_PRIV(q);
+	struct mx *mx;
 	int rtn = -EDEADLK;
 
-	if (mx_trylock(mx, q)) {
+	if ((mx = (struct mx *) mi_trylock(q)) != NULL) {
 		mx_ulong oldstate = mx_get_state(mx);
 
 		switch (*(mx_ulong *) mp->b_rptr) {
 		case MX_INFO_ACK:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_INFO_ACK <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_INFO_ACK <-");
 			rtn = mx_info_ack(mx, q, mp);
 			break;
 		case MX_OPTMGMT_ACK:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_OPTMGMT_ACK <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_OPTMGMT_ACK <-");
 			rtn = mx_optmgmt_ack(mx, q, mp);
 			break;
 		case MX_OK_ACK:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_OK_ACK <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_OK_ACK <-");
 			rtn = mx_ok_ack(mx, q, mp);
 			break;
 		case MX_ERROR_ACK:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_ERROR_ACK <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_ERROR_ACK <-");
 			rtn = mx_error_ack(mx, q, mp);
 			break;
 		case MX_ENABLE_CON:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_ENABLE_CON <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_ENABLE_CON <-");
 			rtn = mx_enable_con(mx, q, mp);
 			break;
 		case MX_CONNECT_CON:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_CONNECT_CON <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_CONNECT_CON <-");
 			rtn = mx_connect_con(mx, q, mp);
 			break;
 		case MX_DATA_IND:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_DATA_IND <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_DATA_IND <-");
 			rtn = mx_data_ind(mx, q, mp);
 			break;
 		case MX_SIG_IND:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_SIG_IND <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_SIG_IND <-");
 			rtn = mx_sig_ind(mx, q, mp);
 			break;
 		case MX_DISCONNECT_IND:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_DISCONNECT_IND <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_DISCONNECT_IND <-");
 			rtn = mx_disconnect_ind(mx, q, mp);
 			break;
 		case MX_DISCONNECT_CON:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_DISCONNECT_CON <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_DISCONNECT_CON <-");
 			rtn = mx_disconnect_con(mx, q, mp);
 			break;
 		case MX_DISABLE_IND:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_DISABLE_IND <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_DISABLE_IND <-");
 			rtn = mx_disable_ind(mx, q, mp);
 			break;
 		case MX_DISABLE_CON:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_DISABLE_CON <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_DISABLE_CON <-");
 			rtn = mx_disable_con(mx, q, mp);
 			break;
 		case MX_EVENT_IND:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_EVENT_IND <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_EVENT_IND <-");
 			rtn = mx_event_ind(mx, q, mp);
 			break;
 		default:
-			strlog(mx->mid, mx->sid, 0, SL_TRACE, "MX_????_??? <-");
+			mi_strlog(q, 0, SL_TRACE, "MX_????_??? <-");
 			rtn = mx_other_ind(mx, q, mp);
 			break;
 		}
 		if (rtn)
 			mx_set_state(mx, oldstate);
-		mx_unlock(mx);
+		mi_unlock((caddr_t) mx);
 	}
 	return (rtn);
 }
@@ -2872,7 +2755,7 @@ ch_rput(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 
-	strlog(ch->mid, ch->sid, 0, SL_ERROR, "software error: %s", __FUNCTION__);
+	mi_strlog(q, 0, SL_ERROR, "software error: %s", __FUNCTION__);
 	putnext(q, mp);
 	return (0);
 }
@@ -2882,7 +2765,7 @@ mx_wput(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 
-	strlog(mx->mid, mx->sid, 0, SL_ERROR, "software error: %s", __FUNCTION__);
+	mi_strlog(q, 0, SL_ERROR, "software error: %s", __FUNCTION__);
 	putnext(q, mp);
 	return (0);
 }
@@ -3008,8 +2891,7 @@ chmuxinit(void)
 	int err;
 
 	if ((err = register_strdev(&ch_cdev, major)) < 0) {
-		strlog(modid, 0, 0, SL_CONSOLE | SL_FATAL,
-		       "could not register STREAMS device, err = %d", err);
+		cmn_err(CE_WARN, "could not register STREAMS device, err = %d", err);
 		return (err);
 	}
 	if (major == 0)
@@ -3022,8 +2904,7 @@ chmuxexit(void)
 	int err;
 
 	if ((err = unregsiter_strdev(&ch_cdev, major)) < 0)
-		strlog(modid, 0, 0, SL_CONSOLE | SL_FATAL,
-		       "could not register STREAMS device, err = %d", err);
+		cmn_err(CE_WARN, "could not register STREAMS device, err = %d", err);
 	return;
 }
 

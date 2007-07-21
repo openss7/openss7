@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/21 20:43:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:33 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:43:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 0.9.2.7  2007/07/21 20:43:47  brian
+ - added manual pages, corrections
+
  Revision 0.9.2.6  2007/07/14 01:35:33  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $"
+#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/21 20:43:47 $"
 
 static char const ident[] =
-    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $";
+    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/21 20:43:47 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -96,7 +99,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:33 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/07/21 20:43:47 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -293,6 +296,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 			goto ack;
 		}
 		}
+	}
 	case I_UNLINK:
 	case I_PUNLINK:
 	{
@@ -357,6 +361,7 @@ mx_uwput(queue_t *q, mblk_t *mp)
 	{
 	}
 	default:
+	{
 		ptrace(("Error path taken!\n"));
 		if (mx->other)
 			goto passmsg;
@@ -809,12 +814,13 @@ mx_w_iocdata(queue_t *q, mblk_t *mp)
 		case M_COPY_STATE(MI_COPY_IN, 1):
 			struct mx *mx2;
 
-			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *) dp->b_rptr)->id))) {
 				mi_copy_done(q, mp, EINVAL);
 				break;
 			}
 			/* must be privileged to set some other configuration */
-			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr)
+			    && ioc->ioc_cr->euid != mx2->crp->euid) {
 				mi_copy_done(q, mp, EPERM);
 				break;
 			}
@@ -832,12 +838,13 @@ mx_w_iocdata(queue_t *q, mblk_t *mp)
 		case M_COPY_STATE(MI_COPY_IN, 1):
 			struct mx *mx2;
 
-			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *) dp->b_rptr)->id))) {
 				mi_copy_done(q, mp, EINVAL);
 				break;
 			}
 			/* must be privileged to set some other configuration */
-			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr)
+			    && ioc->ioc_cr->euid != mx2->crp->euid) {
 				mi_copy_done(q, mp, EPERM);
 				break;
 			}
@@ -855,12 +862,13 @@ mx_w_iocdata(queue_t *q, mblk_t *mp)
 		case M_COPY_STATE(MI_COPY_IN, 1):
 			struct mx *mx2;
 
-			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *) dp->b_rptr)->id))) {
 				mi_copy_done(q, mp, EINVAL);
 				break;
 			}
 			/* must be privileged to set some other configuration */
-			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr)
+			    && ioc->ioc_cr->euid != mx2->crp->euid) {
 				mi_copy_done(q, mp, EPERM);
 				break;
 			}
@@ -881,12 +889,13 @@ mx_w_iocdata(queue_t *q, mblk_t *mp)
 		case M_COPY_STATE(MI_COPY_IN, 1):
 			struct mx *mx2;
 
-			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *) dp->b_rptr)->id))) {
 				mi_copy_done(q, mp, EINVAL);
 				break;
 			}
 			/* must be privileged to set some other configuration */
-			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr)
+			    && ioc->ioc_cr->euid != mx2->crp->euid) {
 				mi_copy_done(q, mp, EPERM);
 				break;
 			}
@@ -907,12 +916,13 @@ mx_w_iocdata(queue_t *q, mblk_t *mp)
 		case M_COPY_STATE(MI_COPY_IN, 1):
 			struct mx *mx2;
 
-			if (!(mx2 = mx_find_id(mx, ((struct mx_config *)dp->b_rptr)->id))) {
+			if (!(mx2 = mx_find_id(mx, ((struct mx_config *) dp->b_rptr)->id))) {
 				mi_copy_done(q, mp, EINVAL);
 				break;
 			}
 			/* must be privileged to set some other configuration */
-			if (mx2 != mx && !drv_priv(ioc->ioc_cr) && ioc->ioc_cr->euid != mx2->crp->euid) {
+			if (mx2 != mx && !drv_priv(ioc->ioc_cr)
+			    && ioc->ioc_cr->euid != mx2->crp->euid) {
 				mi_copy_done(q, mp, EPERM);
 				break;
 			}

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 0.9.2.3 2006/11/30 13:05:26 brian Exp $
+ @(#) $Id: chi.h,v 0.9.2.4 2007/07/21 20:43:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/30 13:05:26 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:43:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi.h,v $
+ Revision 0.9.2.4  2007/07/21 20:43:48  brian
+ - added manual pages, corrections
+
  Revision 0.9.2.3  2006/11/30 13:05:26  brian
  - checking in working copies
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_CHI_H__
 #define __SYS_CHI_H__
 
-#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -73,48 +76,48 @@ typedef uint32_t ch_ulong;
 typedef uint16_t ch_ushort;
 typedef uint8_t ch_uchar;
 
-#define CH_INFO_REQ		 1UL
-#define CH_OPTMGMT_REQ		 2UL
-#define CH_ATTACH_REQ		 3UL
-#define CH_ENABLE_REQ		 4UL
-#define CH_CONNECT_REQ		 5UL
-#define CH_DATA_REQ		 6UL
-#define CH_DISCONNECT_REQ	 7UL
-#define CH_DISABLE_REQ		 8UL
-#define CH_DETACH_REQ		 9UL
+#define CH_INFO_REQ		 1U
+#define CH_OPTMGMT_REQ		 2U
+#define CH_ATTACH_REQ		 3U
+#define CH_ENABLE_REQ		 4U
+#define CH_CONNECT_REQ		 5U
+#define CH_DATA_REQ		 6U
+#define CH_DISCONNECT_REQ	 7U
+#define CH_DISABLE_REQ		 8U
+#define CH_DETACH_REQ		 9U
 
-#define CH_INFO_ACK		10UL
-#define CH_OPTMGMT_ACK		11UL
-#define CH_OK_ACK		12UL
-#define CH_ERROR_ACK		13UL
-#define CH_ENABLE_CON		14UL
-#define CH_CONNECT_CON		15UL
-#define CH_DATA_IND		16UL
-#define CH_DISCONNECT_IND	17UL
-#define CH_DISCONNECT_CON	18UL
-#define CH_DISABLE_IND		19UL
-#define CH_DISABLE_CON		20UL
-#define CH_EVENT_IND		21UL
+#define CH_INFO_ACK		10U
+#define CH_OPTMGMT_ACK		11U
+#define CH_OK_ACK		12U
+#define CH_ERROR_ACK		13U
+#define CH_ENABLE_CON		14U
+#define CH_CONNECT_CON		15U
+#define CH_DATA_IND		16U
+#define CH_DISCONNECT_IND	17U
+#define CH_DISCONNECT_CON	18U
+#define CH_DISABLE_IND		19U
+#define CH_DISABLE_CON		20U
+#define CH_EVENT_IND		21U
 
 /*
  *  CH STATES
  */
-#define CHS_UNINIT		-2UL
-#define CHS_UNUSABLE		-1UL
-#define CHS_DETACHED		 0UL
-#define CHS_WACK_AREQ		 1UL
-#define CHS_WACK_UREQ		 2UL
-#define CHS_ATTACHED		 3UL
-#define CHS_WACK_EREQ		 4UL
-#define CHS_WCON_EREQ		 5UL
-#define CHS_WACK_RREQ		 6UL
-#define CHS_WCON_RREQ		 7UL
-#define CHS_ENABLED		 8UL
-#define CHS_WACK_CREQ		 9UL
-#define CHS_WCON_CREQ		10UL
-#define CHS_WACK_DREQ		11UL
-#define CHS_WCON_DREQ		12UL
-#define CHS_CONNECTED		13UL
+#define CHS_UNINIT		-2U
+#define CHS_UNUSABLE		-1U
+#define CHS_DETACHED		 0U
+#define CHS_WACK_AREQ		 1U
+#define CHS_WACK_UREQ		 2U
+#define CHS_ATTACHED		 3U
+#define CHS_WACK_EREQ		 4U
+#define CHS_WCON_EREQ		 5U
+#define CHS_WACK_RREQ		 6U
+#define CHS_WCON_RREQ		 7U
+#define CHS_ENABLED		 8U
+#define CHS_WACK_CREQ		 9U
+#define CHS_WCON_CREQ		10U
+#define CHS_WACK_DREQ		11U
+#define CHS_WCON_DREQ		12U
+#define CHS_CONNECTED		13U
 
 /*
  *  CH STATE FLAGS
@@ -236,6 +239,10 @@ union CH_parms {
 #define CH_RATE_192000		192000	/* T1 */
 #define CH_RATE_240000		240000	/* 30B */
 #define CH_RATE_248000		248000	/* E1 */
+#define CH_RATE_768000		768000	/* T2 */
+#define CH_RATE_992000		992000	/* E2 */
+#define CH_RATE_3968000		3968000	/* E3 */
+#define CH_RATE_5376000		5376000	/* T3 */
 
 /*
  *  CH_OPTMGMT_REQ

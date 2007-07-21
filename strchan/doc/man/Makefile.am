@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/01/08 16:23:14 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/21 20:43:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/01/08 16:23:14 $ by $Author: brian $
+# Last Modified $Date: 2007/07/21 20:43:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2007/07/21 20:43:46  brian
+# - added manual pages, corrections
+#
 # Revision 0.9.2.6  2007/01/08 16:23:14  brian
 # - final updates for release
 #
@@ -83,6 +86,7 @@ man_MANS = \
 	man4/cd_hdlc.4 \
 	man4/ch.4 \
 	man4/ch_ioctl.4 \
+	man4/ch-pmod.4 \
 	man4/chi_ioctl.4 \
 	man4/MG.4 \
 	man4/mg.4 \
@@ -91,6 +95,7 @@ man_MANS = \
 	man4/mg-lm.4 \
 	man4/mx.4 \
 	man4/mx_ioctl.4 \
+	man4/mx-pmod.4 \
 	man4/mxi_ioctl.4 \
 	man4/mx_sdl.4 \
 	man4/v401p.4 \
@@ -333,6 +338,7 @@ dist_noinst_MANS = \
 	man4/cd_hdlc.4.man \
 	man4/ch.4.man \
 	man4/ch_ioctl.4.man \
+	man4/ch-pmod.4.man \
 	man4/chi_ioctl.4.man \
 	man4/MG.4.man \
 	man4/mg.4.man \
@@ -341,6 +347,7 @@ dist_noinst_MANS = \
 	man4/mg-lm.4.man \
 	man4/mx.4.man \
 	man4/mx_ioctl.4.man \
+	man4/mx-pmod.4.man \
 	man4/mxi_ioctl.4.man \
 	man4/mx_sdl.4.man \
 	man4/v401p.4.man \
