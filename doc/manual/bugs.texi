@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/06/27 18:52:22 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.5 2007/07/21 23:38:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,18 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/27 18:52:22 $ by $Author: brian $
+@c Last Modified $Date: 2007/07/21 23:38:10 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 002.  2007-07-21T17:26:01-0600
+
+It was reported that validation test suites for XEN kernels are failing.  XEN kernels are,
+therefore, not supported.  (Thanks to Bryan Shupe at Flying J for reporting this bug.)
+
+@emph{*noted*} in @command{openss7-0.9.2.G}
+
 @item 001.  2007-06-27T08:53:51+0000
 
 A report was made by Chris from Sandia that the build process choked on building 32-bit libraries
