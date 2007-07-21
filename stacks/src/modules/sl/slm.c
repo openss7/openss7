@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -45,37 +45,38 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:06 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:09:52 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: slm.c,v $
+ Revision 0.9.2.15  2007/07/21 20:09:52  brian
+ - added pass structure
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $"
 
-static char const ident[] =
-    "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $";
+static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $";
 
 /*
- *  This is an SLM (Signalling Link Management) multiplexing driver which also
- *  supports M2UA.  It has two purposes: 1) to act as an MTP Level 2
- *  signalling link management layer for OpenSS7 MTP2 drivers; and, 2) to
- *  implement the M2UA protocol for the OpenSS7 stack.
+ *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It
+ *  has two purposes: 1) to act as an MTP Level 2 signalling link management layer for OpenSS7 MTP2
+ *  drivers; and, 2) to implement the M2UA protocol for the OpenSS7 stack.
  *
- *  The SLM multiplexing driver is opened by the SS7 Configuration Daemon and
- *  OpenSS7 Signalling Link (SL) drivers are opened and I_PLINKed under the
- *  multiplexor.  In addition, the ss7d opens transport streams and forms the
- *  necessary associations and I_PLINKs them under the multiplexor.  Transport
- *  streams can either be client streams (going to an M2UA ASP), server
- *  streams (going to an M2UA SG), or peer streams (going to a peer AS or SG).
- *  Transport streams are normally SCTP streams but can also be TCP, SSCOP-MCE
- *  streams, or any stream recognizing TPI connection oriented data primtives
- *  (e.g, a pipe with a suitable module).  Users of the M2UA multiplexing
- *  driver may open user streams on the driver and use them in an identical
- *  fashion to an OpenSS7 MTP2 Signalling Link.
+ *  The SLM multiplexing driver is opened by the SS7 Configuration Daemon and OpenSS7 Signalling
+ *  Link (SL) drivers are opened and I_PLINKed under the multiplexor.  In addition, the ss7d opens
+ *  transport streams and forms the necessary associations and I_PLINKs them under the multiplexor.
+ *  Transport streams can either be client streams (going to an M2UA ASP), server streams (going to
+ *  an M2UA SG), or peer streams (going to a peer AS or SG).  Transport streams are normally SCTP
+ *  streams but can also be TCP, SSCOP-MCE streams, or any stream recognizing TPI connection
+ *  oriented data primtives (e.g, a pipe with a suitable module).  Users of the M2UA multiplexing
+ *  driver may open user streams on the driver and use them in an identical fashion to an OpenSS7
+ *  MTP2 Signalling Link.
  *
- *  All SL (Signalling Link) user streams opened on the multiplexing driver
- *  are Style 2 drivers.  That is, they must be attached to a specific
- *  SDTI/SDLI (Signalling Data Terminal Identifier/Signalling Data Link
- *  Identifier) before being enabled.
+ *  All SL (Signalling Link) user streams opened on the multiplexing driver are Style 2 drivers.
+ *  That is, they must be attached to a specific SDTI/SDLI (Signalling Data Terminal
+ *  Identifier/Signalling Data Link Identifier) before being enabled.
  */
 #include <sys/os7/compat.h>
 
@@ -96,7 +97,7 @@ static char const ident[] =
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:35:06 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

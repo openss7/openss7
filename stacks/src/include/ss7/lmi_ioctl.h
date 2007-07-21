@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi_ioctl.h,v 0.9.2.4 2007/06/17 01:56:01 brian Exp $
+ @(#) $Id: lmi_ioctl.h,v 0.9.2.5 2007/07/21 20:09:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:01 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:09:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lmi_ioctl.h,v $
+ Revision 0.9.2.5  2007/07/21 20:09:43  brian
+ - added pass structure
+
  Revision 0.9.2.4  2007/06/17 01:56:01  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __LMI_IOCTL_H__
 #define __LMI_IOCTL_H__
 
-#ident "@(#) $RCSfile: lmi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lmi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -190,11 +193,23 @@ typedef struct lmi_notify {
 #define LMI_IOCCNOTIFY	_IOW(  LMI_IOC_MAGIC, 14, lmi_notify_t )
 
 /*
+ *  PASS
+ */
+
+typedef struct lmi_pass {
+	lmi_long index; /* lower multiplex index */
+	lmi_ulong cmd; /* embedded input-output control command */
+	/* followed by cmd specific structure */
+} lmi_pass_t;
+
+#define LMI_IOCCPASS	_IOWR(  LMI_IOC_MAGIC, 15, lmi_pass_t  )
+
+/*
  *  COMMON IOCTL NUMBERS
  */
 
 #define LMI_IOC_FIRST		 0
-#define LMI_IOC_LAST		14
+#define LMI_IOC_LAST		15
 #define LMI_IOC_PRIVATE		32
 
 #endif				/* __LMI_IOCTL_H__ */

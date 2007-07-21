@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.11 2007/06/17 01:56:01 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.12 2007/07/21 20:09:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:01 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:09:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdli_ioctl.h,v $
+ Revision 0.9.2.12  2007/07/21 20:09:43  brian
+ - added pass structure
+
  Revision 0.9.2.11  2007/06/17 01:56:01  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -114,6 +117,10 @@ typedef struct sdl_config {
 #	define	SDL_RATE_T1		1544000
 #	define	SDL_RATE_J1		1544000
 #	define	SDL_RATE_E1		2048000
+#	define	SDL_RATE_T2		6312000
+#	define	SDL_RATE_E2		8488000
+#	define	SDL_RATE_E3		0
+#	define	SDL_RATE_T3		44736000
 	sdl_ulong ifgtype;		/* group type */
 #	define	SDL_GTYPE_NONE		0	/* */
 #	define	SDL_GTYPE_T1		1	/* */
@@ -126,11 +133,27 @@ typedef struct sdl_config {
 #	define	SDL_GTYPE_TCP		8	/* */
 #	define	SDL_GTYPE_RTP		9	/* */
 #	define	SDL_GTYPE_SCTP		10	/* */
+#	define	SDL_GTYPE_T2		11	/* */
+#	define	SDL_GTYPE_E2		12	/* */
+#	define	SDL_GTYPE_E3		13	/* */
+#	define	SDL_GTYPE_T3		14	/* */
+#	define	SDL_GTYPE_OC3		15	/* */
+#	define	SDL_GTYPE_OC12		16	/* */
+#	define	SDL_GTYPE_OC48		17	/* */
+#	define	SDL_GTYPE_OC192		18	/* */
 	sdl_ulong ifgrate;		/* interface group rate */
 #	define	SDL_GRATE_NONE		0
 #	define	SDL_GRATE_T1		1544000
 #	define	SDL_GRATE_J1		1544000
 #	define	SDL_GRATE_E1		2048000
+#	define	SDL_GRATE_T2		6312000
+#	define	SDL_GRATE_E2		8488000
+#	define	SDL_GRATE_E3		0
+#	define	SDL_GRATE_T3		44736000
+#	define	SDL_GRATE_OC3		0
+#	define	SDL_GRATE_OC12		0
+#	define	SDL_GRATE_OC48		0
+#	define	SDL_GRATE_OC192		0
 	sdl_ulong ifmode;		/* interface mode */
 #	define	SDL_MODE_NONE		0	/* */
 #	define	SDL_MODE_DSU		1	/* */
@@ -283,11 +306,22 @@ typedef struct sdl_notify {
 #define	SDL_IOCSNOTIFY	_IOW(	SDL_IOC_MAGIC,	13,	sdl_notify_t	)
 #define	SDL_IOCCNOTIFY	_IOW(	SDL_IOC_MAGIC,	14,	sdl_notify_t	)
 
-#define	SDL_IOCCDISCTX	_IO(	SDL_IOC_MAGIC,	15	)
-#define	SDL_IOCCCONNTX	_IO(	SDL_IOC_MAGIC,	16	)
+/*
+ *  PASS
+ */
+typedef struct sdl_pass {
+	sdl_long index;		/* lower multiplex index */
+	sdl_ulong cmd;			/* embedded input-output control comand */
+	/* followed by cmd specific structure */
+} sdl_pass_t;
+
+#define	SDL_IOCCPASS	_IOWR(	SDL_IOC_MAGIC,	15,	sdl_pass_t	)
+
+#define	SDL_IOCCDISCTX	_IO(	SDL_IOC_MAGIC,	16	)
+#define	SDL_IOCCCONNTX	_IO(	SDL_IOC_MAGIC,	17	)
 
 #define	SDL_IOC_FIRST	 0
-#define	SDL_IOC_LAST	16
+#define	SDL_IOC_LAST	17
 #define	SDL_IOC_PRIVATE	32
 
 #endif				/* __SDLI_IOCTL_H__ */

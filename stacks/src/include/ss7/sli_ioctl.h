@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sli_ioctl.h,v 0.9.2.7 2007/06/17 01:56:02 brian Exp $
+ @(#) $Id: sli_ioctl.h,v 0.9.2.8 2007/07/21 20:09:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:02 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:09:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sli_ioctl.h,v $
+ Revision 0.9.2.8  2007/07/21 20:09:43  brian
+ - added pass structure
+
  Revision 0.9.2.7  2007/06/17 01:56:02  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SLI_IOCTL_H__
 #define __SLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -345,8 +348,20 @@ typedef struct sl_notify {
 #define SL_IOCSNOTIFY	_IOW(  SL_IOC_MAGIC, 13, sl_notify_t )
 #define SL_IOCCNOTIFY	_IOW(  SL_IOC_MAGIC, 14, sl_notify_t )
 
+/*
+ *  PASS
+ */
+
+typedef struct sl_pass {
+	sl_long muxid;			/* lower multiplex index */
+	sl_ulong cmd;			/* embedded input-output control command */
+	/* followed by cmd specific structure */
+} sl_pass_t;
+
+#define SL_IOCCPASS	_IOWR(  SL_IOC_MAGIC, 15, sl_pass_t )
+
 #define SL_IOC_FIRST     0
-#define SL_IOC_LAST     14
+#define SL_IOC_LAST     15
 #define SL_IOC_PRIVATE  32
 
 #endif				/* __SLI_IOCTL_H__ */

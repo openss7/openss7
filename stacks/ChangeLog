@@ -1,3 +1,15 @@
+2007-07-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: added sdl_ch driver
+	* src/include/ss7/lmi_ioctl.h: added pass structure
+	* src/include/ss7/sdli_ioctl.h: added pass structure and higher rates
+	* src/include/ss7/sdti_ioctl.h: added pass structure
+	* src/include/ss7/sli_ioctl.h: added pass structure
+	* src/include/ss7/sl_mux.h: added ioctls
+	* src/modules/sdl/lis.conf: added sdl_ch driver
+	* src/modules/sdl/sdl_pmod.c: updates
+	* src/modules/sl/slm.c: updates
+
 2007-07-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/sdt_pmod.4.man: added new file

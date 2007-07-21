@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdti_ioctl.h,v 0.9.2.7 2007/06/17 01:56:02 brian Exp $
+ @(#) $Id: sdti_ioctl.h,v 0.9.2.8 2007/07/21 20:09:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:02 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:09:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdti_ioctl.h,v $
+ Revision 0.9.2.8  2007/07/21 20:09:43  brian
+ - added pass structure
+
  Revision 0.9.2.7  2007/06/17 01:56:02  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SDTI_IOCTL_H__
 #define __SDTI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdti_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sdti_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -199,12 +202,23 @@ typedef struct sdt_notify {
 #define SDT_IOCCNOTIFY	_IOW(  SDT_IOC_MAGIC, 14, sdt_notify_t )
 
 /*
+ *  PASS
+ */
+typedef struct sdt_pass {
+	sdt_long index;		/* lower multiplex index */
+	sdt_ulong cmd;			/* embedded input-output control command */
+	/* followed by cmd specific structure */
+} sdt_pass_t;
+
+#define	SDT_IOCCPASS	_IOWR(  SDT_IOC_MAGIC, 15, sdt_pass_t  )
+
+/*
    for testing only 
  */
-#define SDT_IOCCABORT	_IO(   SDT_IOC_MAGIC, 15 )
+#define SDT_IOCCABORT	_IO(   SDT_IOC_MAGIC, 16 )
 
 #define SDT_IOC_FIRST    0
-#define SDT_IOC_LAST    15
+#define SDT_IOC_LAST    16
 #define SDT_IOC_PRIVATE 32
 
 #endif				/* __SDTI_IOCTL_H__ */
