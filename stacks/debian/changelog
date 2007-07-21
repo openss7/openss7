@@ -1,6 +1,6 @@
-strss7 (0.9a.7-0) experimental; urgency=low
+strss7 (0.9a.7.rc1-0) experimental; urgency=low
 
-  * Eighth public release.
+  * Eighth public release, first release candidate.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon, 25 Jun 2007 13:22:17 -0600
 
