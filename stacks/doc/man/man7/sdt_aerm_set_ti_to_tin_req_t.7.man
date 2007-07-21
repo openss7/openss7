@@ -1,0 +1,1 @@
+.so man7/SDT_AERM_SET_TI_TO_TIN_REQ.7.man

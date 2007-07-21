@@ -1,0 +1,309 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: LMI_INFO_REQ.7.man,v 0.9.2.1 2007/07/21 20:15:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:15:12 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: LMI_INFO_REQ.7.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:15:12  brian
+.\" - added documentation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH LMI_INFO_REQ 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Local Management Interface (LMI)"
+.\"
+.\"
+.SH NAME
+.B LMI_INFO_REQ, lmi_info_req_t
+\- information request primitive
+.\"
+.\"
+.SH SYNOPSIS
+The primitive consists of one
+.BR M_PROTO "(9) or " M_PCPROTO (9)
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    lmi_ulong lmi_primitive;
+} lmi_info_req_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This LMS user originated primitive is issued by the LMS user to request that
+the LMS provider return information concerning the capabilities and state of
+the LMS provider.
+.\"
+.\"
+.SS Parameters
+The service primitive contains the following parameters:
+.\"
+.\"
+.TP
+.I lmi_primitive
+Specifies the service primitive type.  Always
+.BR LMI_INFO_REQ .
+.\"
+.\"
+.SS State
+This primitive may be issued in any state but only when a local acknowledgement
+is not pending.
+.\"
+.\"
+.SS "New State"
+The new state remains unchanged.
+.\"
+.\"
+.SS Modes
+This primitive is issued in all modes.
+.\"
+.\"
+.SS Originator
+This primitive is issued by the LMS User.
+.\"
+.\"
+.SS Response
+This primitive requires the LMS provider to acknowledge receipt of the
+primitive as follows:
+.IP \(en \w'\(en\(em'u
+.B Successful:
+The LMS provider is required to acknowledge receipt of the primitive and
+provide the requested information using the
+.BR LMI_INFO_ACK (7)
+primitive.
+.IP \(en
+.B Unsuccessful (non-fatal errors):
+The LMS provider is required to negatively acknowledge the primitive using the
+.BR LMI_ERROR_ACK (7)
+primitive, and include the reason for failure in the primitive.
+.\"
+.\"
+.SS Errors
+.B Non-Fatal Errors:
+applicable non-fatal errors are as follows:
+.TP \w'\fBLMI_LAN_COLLISIONS\fR\(em'u
+.B LMI_UNSPEC
+Unknown or unspecified.
+.PD 0
+.TP
+.B LMI_BADADDRESS
+Address was invalid.
+.TP
+.B LMI_BADADDRTYPE
+Invalid address type.
+.TP
+.B LMI_BADDIAL
+(Not used.)
+.TP
+.B LMI_BADDIALTYPE
+(Not used.)
+.TP
+.B LMI_BADDISPOSAL
+Invalid disposal parameter.
+.TP
+.B LMI_BADFRAME
+Defective SDU received.
+.TP
+.B LMI_BADPPA
+Invalid PPA identifier.
+.TP
+.B LMI_BADPRIM
+Unrecognized primitive.
+.TP
+.B LMI_DISC
+Disconnected.
+.TP
+.B LMI_EVENT
+Protocol-specific event occurred.
+.TP
+.B LMI_FATALERR
+Device has become unusable.
+.TP
+.B LMI_INITFAILED
+Link initialization failed.
+.TP
+.B LMI_NOTSUPP
+Primitive not supported by this device.
+.TP
+.B LMI_OUTSTATE
+Primitive was issued from invalid state.
+.TP
+.B LMI_PROTOSHORT
+.BR M_PROTO (9)
+block too short.
+.TP
+.B LMI_SYSERR
+UNIX system error.
+.TP
+.B LMI_WRITEFAIL
+Unitdata request failed.
+.TP
+.B LMI_CRCERR
+CRC or FCS error.
+.TP
+.B LMI_DLE_EOT
+DLE EOT detected.
+.TP
+.B LMI_FORMAT
+Format error detected.
+.TP
+.B LMI_HDLC_ABORT
+Aborted frame detected.
+.TP
+.B LMI_OVERRUN
+Input overrun.
+.TP
+.B LMI_TOOSHORT
+Frame too short.
+.TP
+.B LMI_INCOMPLETE
+Partial frame received.
+.TP
+.B LMI_BUSY
+Telephone was busy.
+.TP
+.B LMI_NOANSWER
+Connection went unanswered.
+.TP
+.B LMI_CALLREJECT
+Connection rejected.
+.TP
+.B LMI_HDLC_IDLE
+HDLC line went idle.
+.TP
+.B LMI_HDLC_NOTIDLE
+HDLC link no longer idle.
+.TP
+.B LMI_QUIESCENT
+Line being reassigned.
+.TP
+.B LMI_RESUMED
+Line has been reassigned.
+.TP
+.B LMI_DSRTIMEOUT
+Did not see DSR in time.
+.TP
+.B LMI_LAN_COLLISIONS
+LAN excessive collisions.
+.TP
+.B LMI_LAN_REFUSED
+LAN message refused.
+.TP
+.B LMI_LAN_NOSTATION
+LAN no such station.
+.TP
+.B LMI_LOSTCTS
+Lost Clear to Send signal.
+.TP
+.B LMI_DEVERR
+Start of device-specific error codes.
+.PD
+.RE
+.\"
+.\"
+.SH NOTES
+The Local Management Interface
+.[
+lmi
+.]
+is not subject to conformance.
+.\"
+.\"
+.SH FILES
+.BR <ss7/lmi.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR LMI_INFO_ACK (7),
+.BR lmi (7).
+.\"
+.\"
+.SH VERIONS
+This manpage was written for
+.BR @PACKAGE@-@VERSION@ .
+The Local Management Interface (LMI) is specific to
+.B OpenSS7
+and first appeared on
+.BR strss7-0.8.2 .
+This is Version 1 of the LMI interface.
+.\"
+.\"
+.XX
+.[
+lmi
+.]
+.[
+$LIST$
+.]
+.TI
+

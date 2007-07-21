@@ -1,0 +1,1 @@
+.so man7/LMI_OPTMGMT_ACK.7.man

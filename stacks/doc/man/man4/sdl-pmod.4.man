@@ -1,0 +1,344 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sdl-pmod.4.man,v 0.9.2.1 2007/07/21 20:15:10 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:15:10 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sdl-pmod.4.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:15:10  brian
+.\" - added documentation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SDL-PMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sdl-pmod
+\- SS7 Q.702 Signalling Data Link module for STREAMS-basd Pipes
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sdli.h>
+.br
+.B #include <ss7/sdli_ioctl.h>
+.HP
+.BI "int " retval " = pipe(" streams "[], " flags );
+.HP
+.BI "int " retval " = ioctl(" streams "[0], " \fRI_PUSH\fI ", " \fR\*(lqsdl-pmod\*(rq\fI );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B SDL-PMOD
+is an implementation of the Signalling System No. 7 (SS7) Signalling Data Link (SDL) as specified in
+ITU-T Recommendation Q.702,
+.[
+q702
+.]
+but for STREAMS-based pipes instead of a syncrhonous communications channel.
+.PP
+.B SDL-PMOD
+is implemented as a pushable
+.IR STREAMS (4)
+module.  The
+.B SDL-PMOD
+module can be pused over a STREAMS-based
+.BR pipe (4).
+The
+.B SDL-PMOD
+module provide data link access to the byte stream from the STREAMS-based pipe provided by the
+.BR pipe (4)
+stream below it.
+.PP
+The upper service interface provided by the
+.B SDL-PMOD
+module, to both sides of the pipe, is the Signalling Data Link Interface (SDLI)
+.[
+sdli
+.]
+as described in
+.BR sdli (7).
+That is, regardless of the fact that the
+.B SDL-PMOD
+module is only pushed on one side of the pipe, both sides of the pipe exhibt the SDLI service
+interface to a connected pair of SDLS users, one user at each end of the pipe.
+.PP
+.B SDL-PMOD
+streams can have
+.BR sdt (4)
+and
+.BR sl (4)
+modules pushed (on
+.I both
+sides of the pipe) to provide a complete SS7 Signalling Link, each side of the pipe which can then
+be linked under an
+.BR mtp (4)
+or
+.BR m2ua (4)
+driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+commands of
+.BR streamio (7),
+to provide Signalling Link services to the Level 3 protocol.
+.PP
+In this way, entire signalling networks can be emulated internal to a single host.
+Quite complex configurations are possible.
+(Complex configuraion is normally performed, as required, by the SS7 Configuration Daemon,
+.BR ss7confd (8).)
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR sdt "(4) and " sl (4)
+have been implemented as pushable modules to ease the development fo SS7 Signalling Link drivers for
+various cards. All that is required is transparent access to a channel and the implementation of the
+simplistic Channel Interface (CHI) or Signalling Data Link Interface (SDLI) and it is possble to
+push the 
+.BR sdt "(4) and " sl (4)
+modules over the data link to result in a fully conformant SS7 Signalling Link.  To facilitate
+testing of the
+.BR sdt "(4) and " sl (4)
+pushable modules, both the SDL-PMOD and
+.BR sdt-pmod (4)
+modules were developed to permit transforming a STREAMS-based pipe into a connected signalling data
+link or signalling data terminal.  This permits controlled testing of the pushable modules that make
+up the remainder of the SS7 Signalling Link without using a real driver.
+.PP
+Therefore, one of the primary purposes of this module was for using STREAMS-based pipes to test the
+other modules
+.RB ( sl "(4) and " sdt (4))
+pushed on the Stream.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B SDL-PMOD
+is implemented internally as a wrapper around a STREAMS-based pipe.
+.PP
+.B SDL-PMOD
+does not implement a synchronous data link in the same manner as a real driver:
+.B SDL-PMOD
+simply passes data blocks through the STREAMS-based pipe.  To avoid usurping all of the system's
+resources on passing idle bits throught the link, a throttling technique is used to limit the
+bandwidth of the pipe to emulate a synchronous facility.  The throttling technique uses an interval
+and a timer.  If the number of bytes passed during the interval exceeds the throttle rate, the pipe
+is stalled and the time set.  The pipe is then restarted when the timer expires.  By proper choice
+of the threshold and the timer, the effective bandwidth can be limited to an arbitrarily limit.  The
+effective bandwidth can be selected by setting the bandwidth of the facility using SDL input-output
+controls,
+.BR sdli_ioctl (4).
+.\"
+.\"
+.SH USAGE
+.PP
+.B SDL-PMOD
+modules are not normally pushed or accessed directly by user-level programs.
+The
+.B SDL-PMOD
+module is used directly by some test and monitoring programs.  The following steps are taken to
+establish this pseudo-data link facility:
+.IP 1. \w'0.\(em'u
+Open a STREAMS-based pipe using the
+.BR pipe (2s)
+STREAMS library call.
+.IP 2.
+Push the
+.B sdl-pmod
+module on one side of the pipe.  It is not necessary to push
+.BR pipemod (4)
+as the
+.B SDL-PMOD
+module performs the necessary flush bit reversal.
+.IP 3.
+Set the rate (effective bandwidth) for the transmit (write) direction on each end of the facility
+using the
+.B SDL_IOCSCONFIG
+input-output controls.  (The default is 64000 bits per second.)
+.IP 4.
+Push modules as necessary on both ends of the pipe.
+.IP ""
+For example, the Q.781 conformance test program
+will push an
+.BR sdt (4)
+module on both ends of the pipe, both implementation under test and protocol tester, and the
+.BR sl (4)
+module on the implementation under test side of the pipe.  The Q.781 conformance test program then
+uses the SDTI interface on the PT side to test the SLI interface and implementation on the IUT side.
+.IP ""
+For an emulated signalling link, both the
+.BR sdt (4)
+and
+.BR sl (4)
+modules would be pushed on both sides of the pipe.  Each end of the signalling link could then be
+linked under a separate
+.BR mtp (4)
+signalling point.  This approach is used by the Q.782 test program for testing
+.BR mtp (4)
+in complex configurations.
+.PP
+All-in-all, for virtual signalling link configurations, the
+.BR sdt-pmod (4)
+module is a better choice than the
+.B SDL-PMOD
+module, because the
+.BR sdt-pmod (4)
+module does not need to throttle the link.
+The major purpose of the
+.B SDL-PMOD
+module is for testing the
+.BR sdt (4)
+module.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B SDL-PMOD
+module responds to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+IO controls as interpreted for
+.B SDL-PMOD
+operation as described in
+.BR sdli_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/lmi.h> ,
+.BR <ss7/lmi_ioctl.h> ,
+.BR <ss7/sdli.h> ,
+.BR <ss7/sdli_ioctl.h> .
+.\"
+.\"
+.SH MODULES
+.TP
+.B streams-sdl_pmod.o
+Implements the
+.B SDL-PMOD
+module named
+.RI \(lq sdl-pmod \(rq.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SS7 (4),
+.BR pipe (4),
+.BR sl (4),
+.BR sdt (4),
+.BR sdt_pmod (4),
+.BR sdli (7),
+.BR sdli_ioctl (4),
+.BR ss7confd (8).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B SDL-PMOD
+module conforms to the SDLI Specification, Revsion 0.8.2.
+.PP
+The
+.B SDL-PMOD
+module first appeared in
+.B strss7
+release 0.7.8.
+.PP
+In earlier releases of
+.BR strss7 ,
+the
+.B SDL
+module only provided AERM, SUERM and EIM functions over an
+.B SDL
+module that conformed roughly to the CDI sepcification (see
+.BR cdi (7)).
+Earlier release specifications and approaches are incompatible with the
+current
+.BR strss7
+release 0.8.4 approach.  This only impacts driver development.
+.\"
+.\"
+.XX
+.[
+q702
+.]
+.[
+t1.111
+.]
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
+
