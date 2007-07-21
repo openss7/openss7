@@ -1,0 +1,274 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: ch-pmod.4.man,v 0.9.2.1 2007/07/21 20:43:44 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:43:44 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ch-pmod.4.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:43:44  brian
+.\" - added manual pages, corrections
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strchan.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strchan.macros
+.\"
+.\"
+.TH CH-PMOD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Modules"
+.SH NAME
+.B ch-pmod, ch_pmod
+\- Channel (CH) Pipe Module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <ss7/chi.h>
+.br
+.B #include <ss7/chi_ioctl.h>
+.HP
+.BI "int " retval " = pipe(" streams "[2]);
+.HP
+.BI "int " retval " = ioctl(" streams "[0], " \fRI_PUSH\fP ", " \fR\(lqch-pmod\(rq\fP );
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B CH-PMOD
+is an simulation of a local channel control for devices conforming to the to the
+.BR chi (7)
+interface.
+.B CH-PMOD
+provides for the control of the channel and underlying interfaces and communications facilities.
+.PP
+.B CH-PMOD
+is implemented as a STREAMS pushable module.
+.B CH-PMOD
+can be pushed over one end of a STREAMS-based
+.BR pipe (4).
+The result is two Streams, each corresponding to the file descriptor returned for each end of the
+pipe, each presenting the Channel Interface (CHI) to CH User Streams above.  The result is a
+simulated, connected channel facility.
+.PP
+.B CH-PMOD
+Streams, from both sides, can have
+.BR cd (4)
+modules pushed to provide a complete data link facility.  In this way, facilities based drivers
+can be emulated internal to a single host.  Quite complex configurations are possible.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B CH-PMOD
+module is used as follows:
+.IP 1. \w'0.\(em'u
+Open a STREAMS-based pipe using the
+.BR pipe (2s)
+library call from the STREAMS library.
+.IP 2.
+Push the
+.I \(lqch-pmod\(rq
+module over one end of the pipe.  There is no need to push
+.BR pipemod (4)
+as the
+.B CH-PMOD
+module properly reverses the send of flush bits across the pipe twist when it is pushed directly
+over a pipe end.
+.IP 3.
+Configure the channel on each end of the pipe using the CH input-output controls described in
+.BR chi_ioctl (4)
+and used normally with CH device drivers.
+.IP 4.
+Link the CH Streams under CD or MG multiplexing drivers, or push CD or SDL modules, in the same
+fashion as other CH driver Streams.
+.\"
+.\"
+.SH INTERFACE
+.PP
+The service interface provided on each file descriptor of the STREAMS-based pipe is the Channel
+Interface (CHI) described in
+.BR chi (7).
+.\"
+.\"
+.SH ADDRESSES
+.PP
+The
+.B CH-PMOD
+presents a
+.I Style 1
+device, in that it is implicitly associated with a Physical Point of Attachment; therefore,
+.B CH-PMOD
+does not require a Physical Point of Attachment addressing scheme.
+.\"
+.\"
+.SH IOCTLS
+The
+.B CH-PMOD
+provides the same set of input-output controls that are provided for standard CH Streams, as
+described in
+.BR chi_ioctl (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.BR cd (4)
+and
+.BR mg (4)
+have been implemented as multiplexing drivers to ease the development of matrix switching drivers
+for various cards.  All that is required is transparent access to a group facility and the
+implementation of the simplistic Multiplex Interface (CHI) and it is possible to link Streams under
+the
+.BR cd (4)
+and
+.BR mg (4)
+multiplexing drivers to form a complete switching matrix with channelized access and multiplex
+capabilities.  To facilitate testing of the
+.BR cd (4)
+and
+.BR mg (4)
+multiplexing drivers, both the
+.BR ch-pmod (4)
+and
+.B CH-PMOD
+modules were developed to permit tranforming STREAMS-based pipes into a connected group carrier or
+channel facility.  This permits controlled testing of the multiplexing drivers that make up the
+remainder of the switching matrix without using a real driver.
+.PP
+Therefore, one of the primary purposes of this module was for using STREAMS-based pipes to test the
+other multiplexing drivers
+.RB ( cd "(4) and " mg "(4))
+with the Stream linked.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B CH-PMOD
+is implemented internally as a wrapper around a STREAMS-based pipe.
+.PP
+.B CH-PMOD
+does not implement a syncrhonous facilitiy in the same manner as a real driver:
+.B CH-PMOD
+simply passes data blocks through the STREAMS-based pipe.  To avoid usurping all of the system's
+resources on passing idle bits through the emulated facility, a throttlin technique is used to limit
+the bandwidth of the pipe to emulate a synchronous facility.  The throttling technique uses an
+interval and a timer.  If the number of frames passed during the interval exceeds the throttle rate,
+the pipe is stalled and the timer set.  The pipe is then restarted when the timer expires.  By
+proper choice of the threshold and the timer, the effective bandwidth can be limited to an arbitrary
+limit.  The effective bandwidth can be selected by setting the bandwidth of the facility using CH
+input-output controls, as described in
+.BR chi_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/chi.h> ,
+.BR <ss7/chi_ioctl.h> ,
+.BR <ss7/ch_ioctl.h> .
+.\"
+.\"
+.SH MODULES
+.PP
+.B CH-PMOD
+is a STREAMS pushable modules named
+.IR \(lqch-pmod\(rq .
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B CH-PMOD
+module has no known bugs.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR CH (4),
+.BR chconfd (8),
+.BR chi (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B CH
+interface is specific to the
+.BR OpenSS7
+MG stack.  This is Version 1 of the interface.
+.PP
+CHI interfaces are consistent with CHI Revision 0.9.2.
+.PP
+The
+.B CH
+driver does not appear until
+.B strss7
+release 0.9.2.
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
