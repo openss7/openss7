@@ -1,5 +1,9 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/modules/sdl/sdl_ch.c: added channel modules
+	* src/modules/sdt/sdt_ch.c: added channel modules
+	* src/modules/sl/sl-mux.c: added channel modules
+
 	* doc/man/man4/sdl_pmod.4.man: added documentation
 	* doc/man/man4/sdl-pmod.4.man: added documentation
 	* doc/man/man4/sdt-pmod.4.man: added documentation
