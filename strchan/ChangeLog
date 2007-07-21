@@ -1,5 +1,8 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* .pkgrelease: bumped for release candidate
+	* debian/changelog: bumped for release candidate
+
 	* doc/man/man4/ch-pmod.4.man: added manpage
 	* doc/man/man4/mx-pmod.4.man: added manpage
 	* doc/man/Makefile.am: added manpages
