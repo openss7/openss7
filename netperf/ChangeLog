@@ -1,3 +1,24 @@
+2007-07-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* netperf_sctp_range: add ability to set bind
+	* netperf_sctp_stream: add ability to set bind
+	* netperf_tcp_range: add ability to set bind
+	* netperf_tcp_stream: add ability to set bind
+	* netperf_udp_range: add ability to set bind
+	* netperf_udp_stream: add ability to set bind
+	* nettest_xti.c: add ability to set bind
+	* nettest_xti.h: add ability to set bind
+	* man1/netperf.man: document ability to set bind
+	* man1/netperf_sctp_range.man: document ability to set bind
+	* man1/netperf_sctp_rr.man: document ability to set bind
+	* man1/netperf_sctp_stream.man: document ability to set bind
+	* man1/netperf_tcp_range.man: document ability to set bind
+	* man1/netperf_tcp_rr.man: document ability to set bind
+	* man1/netperf_tcp_stream.man: document ability to set bind
+	* man1/netperf_udp_range.man: document ability to set bind
+	* man1/netperf_udp_rr.man: document ability to set bind
+	* man1/netperf_udp_stream.man: document ability to set bind
+
 2007-07-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* nettest_xti.c:

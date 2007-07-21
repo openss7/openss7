@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netperf_sctp_range.man,v 0.9.2.6 2006/04/05 09:42:50 brian Exp $
+.\" @(#) $Id: netperf_sctp_range.man,v 0.9.2.7 2007/07/21 19:34:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/07/21 19:34:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netperf_sctp_range.man,v $
+.\" Revision 0.9.2.7  2007/07/21 19:34:31  brian
+.\" - add ability to set bind
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:42:50  brian
 .\" - moved .so line and updated headers
 .\"
@@ -88,6 +91,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .HP 8
 \fBsctp_range_script\fR\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
+.PD 0
 .HP 8
 \fBnetperf_sctp_range\fR\ [\fIoptions\fR]\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
 .HP 8
@@ -96,6 +100,7 @@ sort-adjacent-labels
 \fBnetperf_sctp_range\fR\ {\ \fB-V\fR\ |\ \fB--version\fR\ }
 .HP 8
 \fBnetperf_sctp_range\fR\ {\ \fB-C\fR\ |\ \fB--copying\fR\ }
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -113,7 +118,8 @@ shell script front-end to
 .B netperf_sctp_range
 performs
 .IR SCTP_STREAM " or " XTI_SCTP_STREAM
-tests.  It performs this test on a range of send sizes.
+tests.  It performs this test on a range of
+send sizes.
 This test is intended as a benchmark test for SCTP bulk data transfer behavior
 at a range of data points.
 (See
@@ -171,7 +177,17 @@ increment to send side on each test [\fIDefault:\fR \fB0\fR]
 multiplier to apply to send size on each test [\fIDefault:\fR \fB4\fR]
 .TP
 \fB-x\fR, \fB--xti=\fR[\fIDEVICE\fR]
-use XTI interface instead of Sockets [\fIDefault:\fR no:\fB/dev/sctp\fR]
+use XTI
+.[
+xti
+.]
+interface instead of Sockets [\fIDefault:\fR no:\fB/dev/sctp\fR]
+.TP
+\fB-N\fR, \fB--nodelay\fR
+disable Nagle algorithm [\fIDefault:\fR no]
+.TP
+\fB-I\fR, \fB--binds=\fR[\fILOCALIP\fR[:\fILOCALIP\fR]*][,][\fIREMOTEIP\fR[:\fIREMOTEIP\fR]*]
+bind to local or remote IP addresses [\fIDefault:\fR wildcard]
 .TP
 \fB-n\fR, \fB--dry-run\fR
 do not execute but verify actions [\fIDefault:\fR run]
@@ -265,47 +281,56 @@ Netperf netperf_sctp_range script started at Wed Aug 11 17:49:45 MDT 2004
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 1 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 1 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 4 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 4 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 16 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 16 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 64 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 64 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 256 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 256 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 1024 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 1024 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 4096 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 4096 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 16384 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 16384 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 65536 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 65536 -s 32768 -S 32768
 
 Tests completed at Wed Aug 11 17:49:45 MDT 2004
 

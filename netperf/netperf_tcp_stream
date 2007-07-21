@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/12 20:05:32 $
+# @(#) $RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/21 19:34:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -60,11 +60,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/04/12 20:05:32 $ by $Author: brian $
+# Last Modified $Date: 2007/07/21 19:34:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: netperf_tcp_stream,v $
+# Revision 0.9.2.13  2007/07/21 19:34:29  brian
+# - add ability to set bind
+#
 # Revision 0.9.2.12  2007/04/12 20:05:32  brian
 # - changes from performance testing and misc bug fixes
 #
@@ -135,7 +138,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 0.9.2.12 $)'
+ident='$RCSfile: netperf_tcp_stream,v $ $Name:  $($Revision: 0.9.2.13 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -193,16 +196,17 @@ default_netperf=${NETPERF_CMD:=netperf}
 default_calibrate=no
 default_testtime=${NETPERF_TIME:=60}
 default_port=${NETPERF_PORT:=}
-default_bufsizes=${NETPERF_SKTS:='57344 32768 8192'}
+default_bufsizes=${NETPERF_SKTS:='16M 1M 64K 57344'}
 default_stats=${NETPERF_STATS:='-i 10,2 -I 99,5'}
 default_hostname='localhost'
 default_device='/dev/tcp'
 default_xti=no
-default_headers='-P 0'
+default_headers='-P 1'
 default_calibrate=no
-default_sndsizes='4096 8192 32768'
+default_nodelay=no
+default_sndsizes='64 1024 1452 4096 8952 32768'
 
-defaults='command debug verbose run netperf calibrate testtime port hostname device xti stats headers calibrate bufsizes sndsizes'
+defaults='command debug verbose run netperf calibrate testtime port hostname device xti nodelay stats headers calibrate bufsizes sndsizes'
 
 function version()
 {
@@ -265,6 +269,10 @@ Options:
 	specify the list of send sizes to test [Default: '$default_sndsizes']
     -x, --xti=[DEVICE]
 	use XTI interface instead of Sockets [Default: $default_xti:$default_device]
+    -N, --nodelay
+	disable Nagle algorithm [Default: $default_nodelay]
+    -I, --binds=[LOCALIP][,][REMOTEIP]
+        bind to local or remote IP addresses [Default: wildcard]
     -n, --dry-run
 	do not execute but verify actions [Default: run]
     -q, --quiet
@@ -421,7 +429,8 @@ do
 	--hostname=* | --hostnam=* | --hostna=* | --hostn=* | --host=* | --hos=* | --ho=* | --h=* | \
 	--testtime=* | --testime=* | --testtim=* | --testim=* | --time=* | --t=* | \
 	--bufsizes=* | --bufsize=* | --bufsiz=* | --bufsi=* | --bufs=* | --buf=* | --bu=* | --b=* | \
-	--sndsizes=* | --sndsize=* | --sndsiz=* | --sndsi=* | --snds=* | --snd=* | --sn=* | --s=*)
+	--sndsizes=* | --sndsize=* | --sndsiz=* | --sndsi=* | --snds=* | --snd=* | --sn=* | --s=* | \
+	--binds=* | --bind=* | --bin=* | --bi=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
 	--*=*)
 	    option_noarg $arg ;;
@@ -432,10 +441,10 @@ do
 	    more=`$ECHO "X$arg" | $Xsed -e 's/-[cnqDvhVC]//'`
 	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
 	    ;;
-	-[xtHbBsSp])
+	-[xtHbBsSpI])
 	    optarg= ;;
-	-[xtHbBsSp]*)
-	    optarg=`$ECHO "X$arg" | $Xsed -e 's/-[xtHbBsSp]//'` ;;
+	-[xtHbBsSpI]*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's/-[xtHbBsSpI]//'` ;;
 	*)
 	    optarg= ;;
     esac
@@ -448,7 +457,7 @@ do
 		    debug | verbose) eval "(($prev++))" ;;
 		    device) ;;
 		    # these have required arguments
-		    port | hostname | bufsize | bufsizes | sndsize | sndsizes | testtime)
+		    port | hostname | bufsize | bufsizes | sndsize | sndsizes | testtime | binds)
 			option_needarg $prevopt ;;
 		esac
 		prev= ; prevopt=
@@ -524,6 +533,12 @@ do
 	    xti=yes ; prevopt="$arg" ; prev=device ;;
 	--xti=* | --xt=* | --x=* | -x*)
 	    xti=yes ; device="$optarg" ;;
+	--nodelay | --nodela | --nodel | --node | --nod | -N)
+	    nodelay=yes ;;
+	--binds | --bind | --bin | --bi | -I)
+	    prevopt="$arg" ; prev=binds ;;
+	--binds=* | --bind=* | --bin=* | --bi=* | -I*)
+	    binds="$optarg" ;;
 	--) # end of options
 	    more_options=no ;;
 	-* | \+*)
@@ -539,7 +554,7 @@ case $prev in
     debug | verbose) eval "(($prev++))" ;;
     device) ;;
     # these have required arguments
-    port | hostname | bufsize | bufsizes | sndsize | sndsizes | testtime)
+    port | hostname | bufsize | bufsizes | sndsize | sndsizes | testtime | binds)
 	option_needarg $prevopt ;;
 esac
 
@@ -742,16 +757,21 @@ function netperf_tcp_test()
 	testcase='XTI_TCP_STREAM'
 	tcpdev="${device:+ -X $device}"
     fi
+    if test :${nodelay:-no} = :no ; then
+	delay=
+    else
+	delay='--nodelay'
+    fi
     for bufsize in $bufsizes ; do
 	for sndsize in $sndsizes ; do
 	    if test ${verbose:-1} -gt 0 ; then
 		$ECHO
 		$ECHO "------------------------------------"
 		$ECHO
-		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $tcpdev"
+		$ECHO "$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $delay ${binds:+-I $binds} $tcpdev"
 	    fi
 	    if test :${run:-yes} != :no ; then
-		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $tcpdev
+		$netperf ${port:+-p }$port $stats $headers -l $testtime -t $testcase -H $hostname $calibration -- -m $sndsize -s $bufsize -S $bufsize $delay ${binds:+-I $binds} $tcpdev
 	    fi
 	    if test ${verbose:-1} -gt 0 ; then
 		$ECHO

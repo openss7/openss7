@@ -114,7 +114,7 @@ sort-adjacent-labels
 [\fB-CDVz\fR]
 .br
 [\fB-b\fR\ \fIBURST-SIZE\fR]
-[\fB-I\fR\ [\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]]
+[\fB-I\fR\ [\fILOC-IP-ADDR\fR[:\fILOC-IP-ADDR\fR]*][\fB,\fR[\fIREM-IP-ADDR\fR][:\fIREM-IP-ADDR\fR]*]]
 [\fB-m\fR\ \fILOC-MSG-SIZE\fR]
 [\fB-M\fR\ \fIREM-MSG-SIZE\fR]
 [\fB-p\fR\ [\fIMIN-PORTNUM\fR][\fB,\fR][\fIMAX-PORTNUM\fR]]
@@ -130,7 +130,7 @@ sort-adjacent-labels
 [--
 [\fB-DV\fR]
 .br
-[\fB-I\fR\ [\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]]
+[\fB-I\fR\ [\fILOC-IP-ADDR\fR[:\fILOC-IP-ADDR\fR]*][\fB,\fR[\fIREM-IP-ADDR\fR][:\fIREM-IP-ADDR\fR]*]]
 [\fB-m\fR\ \fILOC-MSG-SIZE\fR]
 [\fB-M\fR\ \fIREM-MSG-SIZE\fR]
 [\fB-r\fR\ [\fIREQ-SIZE\fR][\fB,\fR][\fIRSP-SIZE\fR]]
@@ -951,12 +951,12 @@ use option
 to suppress the Nagle algorithm with (or without) Minshall modifications.
 .\" -------------------------------------------------------------------------
 .TP
-\fB-I\fR,\ \fB--ipaddr=\fR[\fILOC-IP-ADDR\fR][\fB,\fR][\fIREM-IP-ADDR\fR]
-Specify the IP address of the local
+\fB-I\fR,\ \fB--ipaddr=\fR[\fILOC-IP-ADDR\fR[:\fILOC-IP-ADDR\fR]*][\fB,\fR[\fIREM-IP-ADDR\fR][:\fIREM-IP-ADDR\fR]*]
+Specify the IP address(es) of the local
 .RI ( LOC-IP-ADDR )
 or remote
 .RI ( REM-IP-ADDR )
-host.  This address is used in a request to
+host.  These addresses are used in a request to
 .BR bind (2)
 or
 .BR t_bind (3)
@@ -966,11 +966,17 @@ At least one of
 or
 .I REM-IP-ADDR
 must be specified.
-If no comma (`,') is specified  in the option argument, then the IP address
-applies to both the local and remote IP address.
+If no comma (`,') is specified  in the option argument, then the IP addresses
+apply to both the local and remote.
 The default is
 .B INADDR_ANY
 for both the local and remote addresses.
+.IP ""
+Multiple addresses separated by a colon (`:') can be specified for transport
+providers that accept multiple IP addresses to the bind (such as SCTP).  If
+multiple addresses are specified and the transport provider does not accept
+mutliple addresses to the bind (such as TCP), only the first address will be
+used and additional addresses specified after the colon (`:') are ignored.
 .\" -------------------------------------------------------------------------
 .TP
 \fB-m\fR,\ \fB--loc-msgsize=\fILOC-MSG-SIZE\fR
@@ -1145,6 +1151,34 @@ Prints a usage statement for the specified test and exits.
 use option
 .IR T_TCP_NODELAY " or " T_SCTP_NODELAY
 to suppress the Nagle algorithm with (or without) Minshall modifications.
+.\" -------------------------------------------------------------------------
+.TP
+\fB-I\fR,\ \fB--ipaddr=\fR[\fILOC-IP-ADDR\fR[:\fILOC-IP-ADDR\fR]*][\fB,\fR[\fIREM-IP-ADDR\fR][:\fIREM-IP-ADDR\fR]*]
+Specify the IP address(es) of the local
+.RI ( LOC-IP-ADDR )
+or remote
+.RI ( REM-IP-ADDR )
+host.  These addresses are used in a request to
+.BR bind (2)
+or
+.BR t_bind (3)
+on the local or remote machine before the connection is established.
+At least one of
+.I LOC-IP-ADDR
+or
+.I REM-IP-ADDR
+must be specified.
+If no comma (`,') is specified  in the option argument, then the IP addresses
+apply to both the local and remote.
+The default is
+.B INADDR_ANY
+for both the local and remote addresses.
+.IP ""
+Multiple addresses separated by a colon (`:') can be specified for transport
+providers that accept multiple IP addresses to the bind (such as SCTP).  If
+multiple addresses are specified and the transport provider does not accept
+mutliple addresses to the bind (such as TCP), only the first address will be
+used and additional addresses specified after the colon (`:') are ignored.
 .\" -------------------------------------------------------------------------
 .TP
 \fB-m\fR,\ \fB--loc-msgsize=\fILOC-MSG-SIZE\fR

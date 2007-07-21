@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: nettest_xti.h,v 1.1.1.6 2007/07/18 17:12:39 brian Exp $
+ @(#) $Id: nettest_xti.h,v 1.1.1.7 2007/07/21 19:34:30 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/18 17:12:39 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 19:34:30 $ by $Author: brian $
 
  *****************************************************************************/
 
@@ -84,7 +84,7 @@ struct	xti_sctp_stream_request_struct {
   int   port;           /* the port to which the recv side should bind
 			   to allow netperf to run through those evil
 			   firewall things */
-  int   ipaddress;      /* the IP address to which the recv side
+  int   ipaddresses[8]; /* the IP addresses to which the recv side
 			   should bind to allow netperf to run through
 			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
@@ -135,7 +135,7 @@ struct	xti_sctp_rr_request_struct {
   int   port;           /* the port to which the recv side should bind
 			   to allow netperf to run through those evil
 			   firewall things */
-  int   ipaddress;      /* the IP address to which the recv side
+  int   ipaddresses[8]; /* the IP addresses to which the recv side
 			   should bind to allow netperf to run through
 			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */
@@ -186,7 +186,7 @@ struct	xti_sctp_conn_rr_request_struct {
   int   port;           /* the port to which the recv side should bind
 			   to allow netperf to run through those evil
 			   firewall things */
-  int   ipaddress;      /* the IP address to which the recv side
+  int   ipaddresses[8]; /* the IP addresses to which the recv side
 			   should bind to allow netperf to run through
 			   those evil firewall things */
   int   dev_name_len;   /* the length of the device name string. this */

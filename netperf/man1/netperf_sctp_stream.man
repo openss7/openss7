@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netperf_sctp_stream.man,v 0.9.2.6 2006/04/05 09:42:50 brian Exp $
+.\" @(#) $Id: netperf_sctp_stream.man,v 0.9.2.7 2007/07/21 19:34:31 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/07/21 19:34:31 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netperf_sctp_stream.man,v $
+.\" Revision 0.9.2.7  2007/07/21 19:34:31  brian
+.\" - add ability to set bind
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:42:50  brian
 .\" - moved .so line and updated headers
 .\"
@@ -88,6 +91,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .HP 8
 \fBsctp_stream_script\fR\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
+.PD 0
 .HP 8
 \fBnetperf_sctp_stream\fR\ [\fIoptions\fR]\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
 .HP 8
@@ -96,19 +100,7 @@ sort-adjacent-labels
 \fBnetperf_sctp_stream\fR\ {\ \fB-V\fR\ |\ \fB--version\fR\ }
 .HP 8
 \fBnetperf_sctp_stream\fR\ {\ \fB-C\fR\ |\ \fB--copying\fR\ }
-.\"
-.\"
-.SH ARGUMENTS
-.TP
-.I
-HOSTNAME
-name of
-.BR netserver (8)
-host [\fIDefault:\fR \fBlocalhost\fR]
-.TP
-.B
-CPU
-calibrate CPU [\fIDefault:\fR no]
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -135,19 +127,35 @@ at several interesting data points.
 for more information on these tests.)
 .\"
 .\"
+.SH ARGUMENTS
+.TP
+.I
+HOSTNAME
+name of
+.BR netserver (8)
+host [\fIDefault:\fR \fBlocalhost\fR]
+.TP
+.B
+CPU
+calibrate CPU [\fIDefault:\fR no]
+.\"
+.\"
 .SH OPTIONS
 .TP
 \fB-c\fR, \fB--calibrate\fR
 calibrate CPU [\fIDefault:\fR no]
 .TP
 \fB-H\fR, \fB--hostname=\fIHOSTNAME\fR
-name or address of netserver host [\fIDefault:\fR \fBlocalhost\fR]
+name or address of
+.BR netserver (8)
+host [\fIDefault:\fR \fBlocalhost\fR]
 .TP
 \fB-p\fR, \fB--port=\fIPORTNUM\fR
-netserver port number [\fIDefault:\fR \fB12865\fR]
+.BR netserver (8)
+port number [\fIDefault:\fR \fB12865\fR]
 .TP
 \fB-t\fR, \fB--testtime=\fISECONDS\fR
-duration of each test in seconds [\fIDefault:\fR 60]
+duration of each test in seconds [\fIDefault:\fR \fB60\fR]
 .TP
 \fB-b\fR, \fB--bufsize=\fISIZE\fR
 add an additional buffer size to the list
@@ -167,6 +175,12 @@ use XTI
 xti
 .]
 interface instead of Sockets [\fIDefault:\fR no:\fB/dev/sctp\fR]
+.TP
+\fB-N\fR, \fB--nodelay\fR
+disable Nagle algorithm [\fIDefault:\fR no]
+.TP
+\fB-I\fR, \fB--binds=\fR[\fILOCALIP\fR[:\fILOCALIP\fR]*][,][\fIREMOTEIP\fR[:\fIREMOTEIP\fR]*]
+bind to local or remote IP addresses [\fIDefault:\fR wildcard]
 .TP
 \fB-n\fR, \fB--dry-run\fR
 do not execute but verify actions [\fIDefault:\fR run]
@@ -260,47 +274,56 @@ Netperf netperf_sctp_stream script started at Wed Aug 11 17:18:48 MDT 2004
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 4096 -s 57344 -S 57344
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 4096 -s 57344 -S 57344
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 8192 -s 57344 -S 57344
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 8192 -s 57344 -S 57344
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 32768 -s 57344 -S 57344
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 32768 -s 57344 -S 57344
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 4096 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 4096 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 8192 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 8192 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 32768 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 32768 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 4096 -s 8192 -S 8192
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 4096 -s 8192 -S 8192
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 8192 -s 8192 -S 8192
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 8192 -s 8192 -S 8192
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM  -H localhost  -- -m 32768 -s 8192 -S 8192
+netperf -v 1   -i 10,2 -I 99,5 -P 1 -l 60 -t SCTP_STREAM \\
+	-H localhost  -- -m 32768 -s 8192 -S 8192
 
 Tests completed at Wed Aug 11 17:18:48 MDT 2004
 
