@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: netperf_udp_rr.man,v 0.9.2.6 2006/04/05 09:42:50 brian Exp $
+.\" @(#) $Id: netperf_udp_rr.man,v 0.9.2.7 2007/07/21 19:34:32 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:42:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/07/21 19:34:32 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: netperf_udp_rr.man,v $
+.\" Revision 0.9.2.7  2007/07/21 19:34:32  brian
+.\" - add ability to set bind
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:42:50  brian
 .\" - moved .so line and updated headers
 .\"
@@ -86,6 +89,7 @@ sort-adjacent-labels
 .SH SYNOPSIS
 .HP 8
 \fBudp_rr_script\fR\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
+.PD 0
 .HP 8
 \fBnetperf_udp_rr\fR\ [\fIoptions\fR]\ [\fIHOSTNAME\fR\ [\fBCPU\fR]]
 .HP 8
@@ -94,17 +98,7 @@ sort-adjacent-labels
 \fBnetperf_udp_rr\fR\ {\ \fB-V\fR\ |\ \fB--version\fR\ }
 .HP 8
 \fBnetperf_udp_rr\fR\ {\ \fB-C\fR\ |\ \fB--copying\fR\ }
-.\"
-.\"
-.SH ARGUMENTS
-.TP
-.I
-HOSTNAME
-name of remote host [\fIDefault:\fR \fBlocalhost\fR]
-.TP
-.B
-CPU
-calibrate CPU [\fIDefault:\fR no]
+.PD
 .\"
 .\"
 .SH DESCRIPTION
@@ -131,16 +125,33 @@ several interesting data points.
 for more information on these tests.)
 .\"
 .\"
+.SH ARGUMENTS
+.TP
+.I
+HOSTNAME
+name of
+.BR netserver (8)
+host [\fIDefault:\fR \fBlocalhost\fR]
+.TP
+.B
+CPU
+calibrate CPU [\fIDefault:\fR no]
+.\"
+.\"
 .SH OPTIONS
 .TP
 \fB-c\fR, \fB--calibrate\fR
 calibrate CPU [\fIDefault:\fR no]
 .TP
 \fB-H\fR, \fB--hostname=\fIHOSTNAME\fR
-name or address of netserver host [\fIDefault:\fR \fBlocalhost\fR]
+name or address of
+.BR netserver (8)
+host [\fIDefault:\fR \fBlocalhost\fR]
 .TP
 \fB-p\fR, \fB--port=\fIPORTNUM\fR
-netserver port number [\fIDefault:\fR \fB12865\fR]
+port number of
+.BR netserver (8)
+[\fIDefault:\fR \fB12865\fR]
 .TP
 \fB-t\fR, \fB--testtime=\fISECONDS\fR
 duration of each test in seconds [\fIDefault:\fR \fB60\fR]
@@ -159,6 +170,12 @@ specify the list of r/r sizes to test [\fIDefault:\fR '\fB1,1 64,64 100,200 1024
 .TP
 \fB-x\fR, \fB--xti=[\fIDEVICE\fR]
 use XTI interface instead of Sockets [\fIDefault:\fR no:\fB/dev/udp\fR]
+.TP
+\fB-N\fR, \fB--nodelay\fR
+disable Nagle algorithm [\fIDefault:\fR no]
+.TP
+\fB-I\fR, \fB--binds=\fR[\fILOCALIP\fR[:\fILOCALIP\fR]*][,][\fIREMOTEIP\fR[:\fIREMOTEIP\fR]*]
+bind to local or remote IP addresses [\fIDefault:\fR wildcard]
 .TP
 \fB-n\fR, \fB--dry-run\fR
 do not execute but verify actions [\fIDefault:\fR run]
@@ -252,22 +269,26 @@ Netperf netperf_udp_rr script started at Wed Aug 11 18:06:23 MDT 2004
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR  -H localhost  -- -r 1,1 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR \\
+	-H localhost  -- -r 1,1 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR  -H localhost  -- -r 64,64 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR \\
+	-H localhost  -- -r 64,64 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR  -H localhost  -- -r 100,200 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR \\
+	-H localhost  -- -r 100,200 -s 32768 -S 32768
 
 
 ------------------------------------
 
-netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR  -H localhost  -- -r 1024,1024 -s 32768 -S 32768
+netperf -v 1   -i 10,2 -I 99,10 -P 1 -l 60 -t UDP_RR \\
+	-H localhost  -- -r 1024,1024 -s 32768 -S 32768
 
 Tests completed at Wed Aug 11 18:06:23 MDT 2004
 

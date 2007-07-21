@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.25 $) $Date: 2007/07/18 17:12:38 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.26 $) $Date: 2007/07/21 19:34:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/18 17:12:38 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 19:34:29 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.25 $) $Date: 2007/07/18 17:12:38 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.26 $) $Date: 2007/07/21 19:34:29 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.25 $) $Date: 2007/07/18 17:12:38 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.26 $) $Date: 2007/07/21 19:34:29 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -215,8 +215,8 @@ static  char  remote_cpu_method;
    end-to-end breaking things known as firewalls */
 static int local_data_port = 0;
 static int remote_data_port = 0;
-static in_addr_t local_data_ip = INADDR_ANY;
-static in_addr_t remote_data_ip = INADDR_ANY;
+static in_addr_t  local_data_ips[8] = { INADDR_ANY, };
+static in_addr_t remote_data_ips[8] = { INADDR_ANY, };
 
  /* different options for the xti				*/
 
@@ -227,8 +227,6 @@ static int
   loc_rcvavoid,		/* avoid recv copies locally		*/
   rem_sndavoid,		/* avoid send copies remotely		*/
   rem_rcvavoid;		/* avoid recv_copies remotely		*/
-
-static struct t_info info_struct;
 
 #ifdef HISTOGRAM
 #ifdef HAVE_GETHRTIME
@@ -284,9 +282,108 @@ comma.\n";
  /* for that reason, a second routine may be created that can be */
  /* called outside of the timing loop */
 void
-get_xti_info(int socket, struct t_info info_struct)
+get_xti_info(int socket, t_scalar_t level, int *mss)
 {
+  struct t_optmgmt *opt_req;
+  struct t_optmgmt *opt_ret;
+  struct myoption {
+    struct t_opthdr myopthdr;
+    t_scalar_t value;
+  } *myoption;
 
+  if ((opt_req = (struct t_optmgmt *) t_alloc(socket, T_OPTMGMT, T_ALL)) == NULL) {
+    fprintf(where, "netperf: get_xti_info: t_alloc: opt_req t_errno %d, errno %d\n",
+	    t_errno, errno);
+    fflush(where);
+    exit(1);
+  }
+  if (debug) {
+    fprintf(where,
+	    "get_xti_info: opt_req->opt.buf %p maxlen %d len %d\n",
+	    opt_req->opt.buf, opt_req->opt.maxlen, opt_req->opt.len);
+
+    fflush(where);
+  }
+  if ((opt_ret = (struct t_optmgmt *) t_alloc(socket, T_OPTMGMT, T_ALL)) == NULL) {
+    fprintf(where, "netperf: get_xti_info: t_alloc: opt_ret errno %d\n", errno);
+    fflush(where);
+    exit(1);
+  }
+
+  if (debug) {
+    fprintf(where,
+	    "get_xti_info: opt_ret->opt.buf %p maxlen %d len %d\n",
+	    opt_ret->opt.buf, opt_ret->opt.maxlen, opt_ret->opt.len);
+    fflush(where);
+  }
+
+  switch (level) {
+  case T_INET_TCP:
+#if 0
+#ifdef T_TCP_MAXSEG
+    opt_req->flags = T_CURRENT;
+    myoption = (struct myoption *) opt_req->opt.buf;
+    myoption->myopthdr.level = T_INET_TCP;
+    myoption->myopthdr.name = T_TCP_MAXSEG;
+    myoption->myopthdr.len = sizeof(struct myoption);
+    myoption->value = 0;
+    myoption = (struct myoption *) opt_ret->opt.buf;
+    if (t_optmgmt(socket, opt_req, opt_ret) == -1) {
+      fprintf(where, "netperf: get_xti_info: T_TCP_MAXSEG option: t_errno %d\n", t_errno);
+      fflush(where);
+      exit(1);
+    }
+
+    if (myoption->myopthdr.status == T_SUCCESS) {
+      *mss = myoption->value;
+    } else {
+      fprintf(where, "get_xti_info: T_TCP_MAXSEG option status 0x%.4x", myoption->myopthdr.status);
+      fprintf(where, " value %ld\n", myoption->value);
+      fflush(where);
+      *mss = -1;
+    }
+#else
+    *mss = -1;
+#endif
+#else
+    *mss = -1;
+#endif
+    break;
+  case T_INET_SCTP:
+#if 0
+#ifdef T_SCTP_MAXSEG
+    opt_req->flags = T_CURRENT;
+    myoption = (struct myoption *) opt_req->opt.buf;
+    myoption->myopthdr.level = T_INET_SCTP;
+    myoption->myopthdr.name = T_SCTP_MAXSEG;
+    myoption->myopthdr.len = sizeof(struct myoption);
+    myoption->value = 0;
+    myoption = (struct myoption *) opt_ret->opt.buf;
+    if (t_optmgmt(socket, opt_req, opt_ret) == -1) {
+      fprintf(where, "netperf: get_xti_info: T_SCTP_MAXSEG option: t_errno %d\n", t_errno);
+      fflush(where);
+      exit(1);
+    }
+
+    if (myoption->myopthdr.status == T_SUCCESS) {
+      *mss = myoption->value;
+    } else {
+      fprintf(where, "get_xti_info: T_SCTP_MAXSEG option status 0x%.4x", myoption->myopthdr.status);
+      fprintf(where, " value %ld\n", myoption->value);
+      fflush(where);
+      *mss = -1;
+    }
+#else
+    *mss = -1;
+#endif
+#else
+    *mss = -1;
+#endif
+    break;
+  default:
+    *mss = -1;
+    break;
+  }
 }
 
 
@@ -310,7 +407,7 @@ create_xti_endpoint(char *name, int level)
   /* it ends up being about as clear as mud. raj 2/95 */
   struct sock_option {
     struct t_opthdr myopthdr;
-    long value;
+    t_scalar_t value;
   } *sock_option;
 
   if (debug) {
@@ -754,7 +851,8 @@ Size (bytes)\n\
   struct	sockaddr_in	server;
   unsigned      int             addr;
 
-  struct sockaddr_in myaddr_in;
+  struct sockaddr_in myaddr_in[8];
+  int                myaddr_num;
   struct t_bind bind_req, bind_resp;
 
   struct t_call server_call;
@@ -885,17 +983,27 @@ Size (bytes)\n\
     /* Added a proper bind of the Stream. bb */
 
     bzero((char *)&myaddr_in, sizeof(myaddr_in));
-    myaddr_in.sin_family      = AF_INET;
-    myaddr_in.sin_addr.s_addr = local_data_ip;
-    myaddr_in.sin_port        = htons(local_data_port);
+    {
+      int i;
 
-    bind_req.addr.maxlen  = sizeof(struct sockaddr_in);
-    bind_req.addr.len     = sizeof(struct sockaddr_in);
+      myaddr_in[0].sin_family      = AF_INET;
+      myaddr_in[0].sin_addr.s_addr = local_data_ips[0];
+      myaddr_in[0].sin_port        = htons(local_data_port);
+      for (i = 1; i < 8 && local_data_ips[i]; i++) {
+        myaddr_in[i].sin_family      = AF_INET;
+        myaddr_in[i].sin_addr.s_addr = local_data_ips[i];
+        myaddr_in[i].sin_port        = htons(local_data_port);
+      }
+      myaddr_num = i;
+    }
+
+    bind_req.addr.maxlen  = myaddr_num * sizeof(struct sockaddr_in);
+    bind_req.addr.len     = myaddr_num * sizeof(struct sockaddr_in);
     bind_req.addr.buf     = (char *)&myaddr_in;
     bind_req.qlen         = 0;
 
-    bind_resp.addr.maxlen = sizeof(struct sockaddr_in);
-    bind_resp.addr.len    = sizeof(struct sockaddr_in);
+    bind_resp.addr.maxlen = 8 * sizeof(struct sockaddr_in);
+    bind_resp.addr.len    = 8 * sizeof(struct sockaddr_in);
     bind_resp.addr.buf    = (char *)&myaddr_in;
     bind_resp.qlen        = 0;
 
@@ -905,14 +1013,18 @@ Size (bytes)\n\
     }
 
     if (debug) {
+      int i;
+
       fprintf(where,"%s: Address bound:\n", __FUNCTION__);
-      fprintf(where,"Address family: %d (AF_INET = %d)\n", (int) myaddr_in.sin_family, (int) AF_INET);
-      fprintf(where,"Address port:   %d\n", (int) ntohs(myaddr_in.sin_port));
-      fprintf(where,"Address:        %d.%d.%d.%d\n",
-		      (int) ((myaddr_in.sin_addr.s_addr >>  0) & 0xff),
-		      (int) ((myaddr_in.sin_addr.s_addr >>  8) & 0xff),
-		      (int) ((myaddr_in.sin_addr.s_addr >> 16) & 0xff),
-		      (int) ((myaddr_in.sin_addr.s_addr >> 24) & 0xff));
+      for (i = 0; i < 8; i++) {
+        fprintf(where,"Address family: %d (AF_INET = %d)\n", (int) myaddr_in[i].sin_family, (int) AF_INET);
+        fprintf(where,"Address port:   %d\n", (int) ntohs(myaddr_in[i].sin_port));
+        fprintf(where,"Address:        %d.%d.%d.%d\n",
+		      (int) ((myaddr_in[i].sin_addr.s_addr >>  0) & 0xff),
+		      (int) ((myaddr_in[i].sin_addr.s_addr >>  8) & 0xff),
+		      (int) ((myaddr_in[i].sin_addr.s_addr >> 16) & 0xff),
+		      (int) ((myaddr_in[i].sin_addr.s_addr >> 24) & 0xff));
+      }
       fflush(where);
     }
       
@@ -997,7 +1109,12 @@ Size (bytes)\n\
     xti_sctp_stream_request->so_rcvavoid    = rem_rcvavoid;
     xti_sctp_stream_request->so_sndavoid    = rem_sndavoid;
 
-    xti_sctp_stream_request->ipaddress	    = remote_data_ip;
+    {
+      int i;
+
+      for (i = 0; i < 8; i++)
+        xti_sctp_stream_request->ipaddresses[i] = remote_data_ips[i];
+    }
     xti_sctp_stream_request->port	    = (int)remote_data_port;
 
     strcpy(xti_sctp_stream_request->xti_device, rem_xti_sctp_device);
@@ -1258,7 +1375,7 @@ Size (bytes)\n\
     /* the SCTP maximum segment_size was (if possible) */
     if (verbosity > 1) {
       sctp_mss = -1;
-      get_xti_info(send_socket,info_struct);
+      get_xti_info(send_socket,T_INET_SCTP,&sctp_mss);
     }
     
     if (t_sndrel(send_socket) == -1) {
@@ -1330,8 +1447,8 @@ Size (bytes)\n\
 						      0);
       }
       else {
-        local_cpu_utilization   = -1.0;
-        local_service_demand    = -1.0;
+        local_cpu_utilization   = (float) -1.0;
+        local_service_demand    = (float) -1.0;
       }
       
       if (remote_cpu_usage) {
@@ -1343,17 +1460,17 @@ Size (bytes)\n\
 						      xti_sctp_stream_result->num_cpus);
       }
       else {
-        remote_cpu_utilization = -1.0;
-        remote_service_demand  = -1.0;
+        remote_cpu_utilization = (float) -1.0;
+        remote_service_demand  = (float) -1.0;
       }
     }    
     else {
       /* we were not measuring cpu, for the confidence stuff, we */
       /* should make it -1.0 */
-      local_cpu_utilization  = -1.0;
-      local_service_demand   = -1.0;
-      remote_cpu_utilization = -1.0;
-      remote_service_demand  = -1.0;
+      local_cpu_utilization  = (float) -1.0;
+      local_service_demand   = (float) -1.0;
+      remote_cpu_utilization = (float) -1.0;
+      remote_service_demand  = (float) -1.0;
     }
 
     /* at this point, we want to calculate the confidence information. */
@@ -1522,7 +1639,8 @@ void
 recv_xti_sctp_stream()
 {
   
-  struct sockaddr_in myaddr_in, peeraddr_in[8];
+  struct sockaddr_in myaddr_in[8], peeraddr_in[8];
+  int                myaddr_num;
   struct t_bind      bind_req, bind_resp;
   struct t_call      call_req;
 
@@ -1596,9 +1714,19 @@ recv_xti_sctp_stream()
   
   bzero((char *)&myaddr_in,
 	sizeof(myaddr_in));
-  myaddr_in.sin_family      = AF_INET;
-  myaddr_in.sin_addr.s_addr = xti_sctp_stream_request->ipaddress;
-  myaddr_in.sin_port        = htons(xti_sctp_stream_request->port);
+  {
+    int i;
+
+    myaddr_in[0].sin_family      = AF_INET;
+    myaddr_in[0].sin_addr.s_addr = xti_sctp_stream_request->ipaddresses[0];
+    myaddr_in[0].sin_port        = htons(xti_sctp_stream_request->port);
+    for (i = 1; i < 8 && xti_sctp_stream_request->ipaddresses[i]; i++) {
+      myaddr_in[i].sin_family      = AF_INET;
+      myaddr_in[i].sin_addr.s_addr = xti_sctp_stream_request->ipaddresses[i];
+      myaddr_in[i].sin_port        = htons(xti_sctp_stream_request->port);
+    }
+    myaddr_num = i;
+  }
   
   /* Grab a socket to listen on, and then listen on it. */
   
@@ -1657,13 +1785,13 @@ recv_xti_sctp_stream()
   /* multi-connection situation, but for now, we'll ignore the issue */
   /* and concentrate on single connection testing. */
   
-  bind_req.addr.maxlen = sizeof(struct sockaddr_in);
-  bind_req.addr.len    = sizeof(struct sockaddr_in);
+  bind_req.addr.maxlen = myaddr_num * sizeof(struct sockaddr_in);
+  bind_req.addr.len    = myaddr_num * sizeof(struct sockaddr_in);
   bind_req.addr.buf    = (char *)&myaddr_in;
   bind_req.qlen        = 1;
 
-  bind_resp.addr.maxlen = sizeof(struct sockaddr_in);
-  bind_resp.addr.len    = sizeof(struct sockaddr_in);
+  bind_resp.addr.maxlen = 8 * sizeof(struct sockaddr_in);
+  bind_resp.addr.len    = 8 * sizeof(struct sockaddr_in);
   bind_resp.addr.buf    = (char *)&myaddr_in;
   bind_resp.qlen        = 1;
 
@@ -1678,16 +1806,20 @@ recv_xti_sctp_stream()
   }
 
   if (debug) {
+    int i;
+
     fprintf(where,
 	    "recv_xti_sctp_stream: t_bind complete port %d\n",
-	    ntohs(myaddr_in.sin_port));
-    fprintf(where,"  Address family = %d\n", (int) myaddr_in.sin_family);
-    fprintf(where,"  Address port   = %d\n", (int) ntohs(myaddr_in.sin_port));
-    fprintf(where,"  Address        = %d.%d.%d.%d\n",
-		    (int) ((myaddr_in.sin_addr.s_addr >>  0) & 0xff),
-		    (int) ((myaddr_in.sin_addr.s_addr >>  8) & 0xff),
-		    (int) ((myaddr_in.sin_addr.s_addr >> 16) & 0xff),
-		    (int) ((myaddr_in.sin_addr.s_addr >> 24) & 0xff));
+	    ntohs(myaddr_in[0].sin_port));
+    for (i = 0; i < 8; i++) {
+      fprintf(where,"  Address family = %d\n", (int) myaddr_in[i].sin_family);
+      fprintf(where,"  Address port   = %d\n", (int) ntohs(myaddr_in[i].sin_port));
+      fprintf(where,"  Address        = %d.%d.%d.%d\n",
+		      (int) ((myaddr_in[i].sin_addr.s_addr >>  0) & 0xff),
+		      (int) ((myaddr_in[i].sin_addr.s_addr >>  8) & 0xff),
+		      (int) ((myaddr_in[i].sin_addr.s_addr >> 16) & 0xff),
+		      (int) ((myaddr_in[i].sin_addr.s_addr >> 24) & 0xff));
+    }
     fflush(where);
   }
   
@@ -1735,7 +1867,7 @@ recv_xti_sctp_stream()
   /* returned to the sender also implicitly telling the sender that the */
   /* socket buffer sizing has been done. */
   
-  xti_sctp_stream_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  xti_sctp_stream_response->data_port_number = (int) ntohs(myaddr_in[0].sin_port);
   if (debug) {
     fprintf(where,"%s: telling the remote to call me at %d\n", __FUNCTION__,
 	    xti_sctp_stream_response->data_port_number);
@@ -2301,7 +2433,11 @@ Send   Recv    Send   Recv\n\
       xti_sctp_rr_request->test_length	=	test_trans * -1;
     }
 
-    xti_sctp_rr_request->ipaddress	=	remote_data_ip;
+    {
+      int i;
+      for (i = 0; i < 8; i++)
+        xti_sctp_rr_request->ipaddresses[i] = remote_data_ips[i];
+    }
     xti_sctp_rr_request->port		=	(int)remote_data_port;
 
     strcpy(xti_sctp_rr_request->xti_device, rem_xti_sctp_device);
@@ -3071,7 +3207,7 @@ Size (bytes)\n\
     xti_tcp_stream_request->so_rcvavoid    = rem_rcvavoid;
     xti_tcp_stream_request->so_sndavoid    = rem_sndavoid;
 
-    xti_tcp_stream_request->ipaddress		=	remote_data_ip;
+    xti_tcp_stream_request->ipaddress		=	remote_data_ips[0];
     xti_tcp_stream_request->port		=	(int)remote_data_port;
 
     strcpy(xti_tcp_stream_request->xti_device, rem_xti_tcp_device);
@@ -3266,6 +3402,8 @@ Size (bytes)\n\
 		errno,
 		t_errno,
 		t_look(send_socket));
+	fprintf(where, "%s: send_size = %d\n", __FUNCTION__, (int) send_size);
+	fprintf(where, "%s: len       = %d\n", __FUNCTION__, (int) len);
 	fflush(where);
         exit(1);
       }
@@ -3319,7 +3457,7 @@ Size (bytes)\n\
     /* the TCP maximum segment_size was (if possible) */
     if (verbosity > 1) {
       tcp_mss = -1;
-      get_xti_info(send_socket,info_struct);
+      get_xti_info(send_socket,T_INET_TCP,&tcp_mss);
     }
     
     if (t_sndrel(send_socket) == -1) {
@@ -3890,6 +4028,7 @@ recv_xti_tcp_stream()
   /* hokey to me, but then I'm a BSD biggot still. raj 2/95 */
 
 #define SEPARATE_STREAM 1
+#undef SEPARATE_STREAM
 
 #ifdef SEPARATE_STREAM
   s_data = create_xti_endpoint(xti_tcp_stream_request->xti_device, T_INET_TCP);
@@ -4360,7 +4499,7 @@ Send   Recv    Send   Recv\n\
     else {
       xti_tcp_rr_request->test_length	=	test_trans * -1;
     }
-    xti_tcp_rr_request->ipaddress	=	remote_data_ip;
+    xti_tcp_rr_request->ipaddress	=	remote_data_ips[0];
     xti_tcp_rr_request->port		=	(int)remote_data_port;
 
     strcpy(xti_tcp_rr_request->xti_device, rem_xti_tcp_device);
@@ -5075,7 +5214,7 @@ bytes   bytes    secs            #      #   %s/sec %% %c%c     us/KB\n\n";
     xti_udp_stream_request->so_rcvavoid    = rem_rcvavoid;
     xti_udp_stream_request->so_sndavoid    = rem_sndavoid;
     
-    xti_udp_stream_request->ipaddress		=	remote_data_ip;
+    xti_udp_stream_request->ipaddress		=	remote_data_ips[0];
     xti_udp_stream_request->port		=	(int)remote_data_port;
 
     strcpy(xti_udp_stream_request->xti_device, rem_xti_udp_device);
@@ -6185,7 +6324,7 @@ bytes  bytes  bytes   bytes  secs.   per sec  %% %c    %% %c    us/Tr   us/Tr\n\
       xti_udp_rr_request->test_length	= test_trans * -1;
     }
     
-    xti_udp_rr_request->ipaddress	=	remote_data_ip;
+    xti_udp_rr_request->ipaddress	=	remote_data_ips[0];
     xti_udp_rr_request->port		=	(int)remote_data_port;
 
     strcpy(xti_udp_rr_request->xti_device, rem_xti_udp_device);
@@ -7039,7 +7178,8 @@ recv_xti_sctp_rr()
   struct ring_elt *send_ring;
   struct ring_elt *recv_ring;
 
-  struct sockaddr_in  myaddr_in,  peeraddr_in;
+  struct sockaddr_in  myaddr_in[8],  peeraddr_in[8];
+  int                 myaddr_num;
   struct t_bind bind_req, bind_resp;
   struct t_call call_req;
 
@@ -7128,9 +7268,19 @@ recv_xti_sctp_rr()
   
   bzero((char *)&myaddr_in,
 	sizeof(myaddr_in));
-  myaddr_in.sin_family      = AF_INET;
-  myaddr_in.sin_addr.s_addr = xti_sctp_rr_request->ipaddress;
-  myaddr_in.sin_port        = htons(xti_sctp_rr_request->port);
+  {
+    int i;
+
+    myaddr_in[0].sin_family      = AF_INET;
+    myaddr_in[0].sin_addr.s_addr = xti_sctp_rr_request->ipaddresses[0];
+    myaddr_in[0].sin_port        = htons(xti_sctp_rr_request->port);
+    for (i = 1; i < 8 && xti_sctp_rr_request->ipaddresses[i]; i++) {
+      myaddr_in[i].sin_family      = AF_INET;
+      myaddr_in[i].sin_addr.s_addr = xti_sctp_rr_request->ipaddresses[i];
+      myaddr_in[i].sin_port        = htons(xti_sctp_rr_request->port);
+    }
+    myaddr_num = i;
+  }
   
   /* Grab a socket to listen on, and then listen on it. */
   
@@ -7190,13 +7340,13 @@ recv_xti_sctp_rr()
   /* multi-connection situation, but for now, we'll ignore the issue */
   /* and concentrate on single connection testing. */
 
-  bind_req.addr.maxlen = sizeof(struct sockaddr_in);
-  bind_req.addr.len    = sizeof(struct sockaddr_in);
+  bind_req.addr.maxlen = myaddr_num * sizeof(struct sockaddr_in);
+  bind_req.addr.len    = myaddr_num * sizeof(struct sockaddr_in);
   bind_req.addr.buf    = (char *)&myaddr_in;
   bind_req.qlen        = 1;
 
-  bind_resp.addr.maxlen = sizeof(struct sockaddr_in);
-  bind_resp.addr.len    = sizeof(struct sockaddr_in);
+  bind_resp.addr.maxlen = 8 * sizeof(struct sockaddr_in);
+  bind_resp.addr.len    = 8 * sizeof(struct sockaddr_in);
   bind_resp.addr.buf    = (char *)&myaddr_in;
   bind_resp.qlen        = 1;
 
@@ -7213,7 +7363,7 @@ recv_xti_sctp_rr()
   if (debug) {
     fprintf(where,
 	    "recv_xti_sctp_rr: t_bind complete port %d\n",
-	    ntohs(myaddr_in.sin_port));
+	    ntohs(myaddr_in[0].sin_port));
     fflush(where);
   }
   
@@ -7221,7 +7371,7 @@ recv_xti_sctp_rr()
   /* returned to the sender also implicitly telling the sender that the */
   /* socket buffer sizing has been done. */
   
-  xti_sctp_rr_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  xti_sctp_rr_response->data_port_number = (int) ntohs(myaddr_in[0].sin_port);
   if (debug) {
     fprintf(where,"%s: telling the remote to call me at %d\n", __FUNCTION__,
 	    xti_sctp_rr_response->data_port_number);
@@ -7258,8 +7408,8 @@ recv_xti_sctp_rr()
   /* the t_listen call is blocking by default - this is different */
   /* semantics from BSD - probably has to do with being able to reject */
   /* a call before an accept */
-  call_req.addr.maxlen = sizeof(struct sockaddr_in);
-  call_req.addr.len    = sizeof(struct sockaddr_in);
+  call_req.addr.maxlen = 8 * sizeof(struct sockaddr_in);
+  call_req.addr.len    = 8 * sizeof(struct sockaddr_in);
   call_req.addr.buf    = (char *)&peeraddr_in;
   call_req.opt.maxlen  = 0;
   call_req.opt.len     = 0;
@@ -7309,8 +7459,8 @@ recv_xti_sctp_rr()
 	    t_look(s_data));
     fprintf(where,
 	    " remote is %s port %d\n",
-	    inet_ntoa(*(struct in_addr *)&peeraddr_in.sin_addr),
-	    ntohs(peeraddr_in.sin_port));
+	    inet_ntoa(*(struct in_addr *)&peeraddr_in[0].sin_addr),
+	    ntohs(peeraddr_in[0].sin_port));
     fflush(where);
   }
   
@@ -7664,7 +7814,12 @@ Send   Recv    Send   Recv\n\
   else {
     xti_sctp_conn_rr_request->test_length	=	test_trans * -1;
   }
-  xti_sctp_conn_rr_request->ipaddress		=	remote_data_ip;
+
+  {
+    int i;
+    for (i = 0; i < 8; i++)
+      xti_sctp_conn_rr_request->ipaddresses[i]  =	remote_data_ips[i];
+  }
   xti_sctp_conn_rr_request->port		=	(int)remote_data_port;
   
   if (debug > 1) {
@@ -8056,8 +8211,8 @@ recv_xti_sctp_conn_rr()
 {
   
   char  *message;
-  struct	sockaddr_in        myaddr_in,
-  peeraddr_in;
+  struct sockaddr_in myaddr_in[8], peeraddr_in[8];
+  int                myaddr_num;
   SOCKET s_listen,s_data;
   unsigned int 	addrlen;
   char	*recv_message_ptr;
@@ -8167,9 +8322,18 @@ recv_xti_sctp_conn_rr()
   
   bzero((char *)&myaddr_in,
 	sizeof(myaddr_in));
-  myaddr_in.sin_family      = AF_INET;
-  myaddr_in.sin_addr.s_addr = xti_sctp_conn_rr_request->ipaddress;
-  myaddr_in.sin_port        = htons(xti_sctp_conn_rr_request->port);
+  {
+    int i;
+    myaddr_in[0].sin_family      = AF_INET;
+    myaddr_in[0].sin_addr.s_addr = xti_sctp_conn_rr_request->ipaddresses[0];
+    myaddr_in[0].sin_port        = htons(xti_sctp_conn_rr_request->port);
+    for (i = 1; i < 8 && xti_sctp_conn_rr_request->ipaddresses[i]; i++) {
+      myaddr_in[i].sin_family      = AF_INET;
+      myaddr_in[i].sin_addr.s_addr = xti_sctp_conn_rr_request->ipaddresses[i];
+      myaddr_in[i].sin_port        = htons(xti_sctp_conn_rr_request->port);
+    }
+    myaddr_num = i;
+  }
   
   s_listen = create_xti_endpoint(loc_xti_sctp_device, T_INET_SCTP);
   
@@ -8191,7 +8355,7 @@ recv_xti_sctp_conn_rr()
   
   if (bind(s_listen,
 	   (struct sockaddr *)&myaddr_in,
-	   sizeof(myaddr_in)) == SOCKET_ERROR) {
+	   myaddr_num * sizeof(myaddr_in)) == SOCKET_ERROR) {
     netperf_response.content.serv_errno = errno;
     close(s_listen);
     send_response();
@@ -8233,7 +8397,7 @@ recv_xti_sctp_conn_rr()
   /* returned to the sender also implicitly telling the sender that the */
   /* socket buffer sizing has been done. */
   
-  xti_sctp_conn_rr_response->data_port_number = (int) ntohs(myaddr_in.sin_port);
+  xti_sctp_conn_rr_response->data_port_number = (int) ntohs(myaddr_in[0].sin_port);
   if (debug) {
     fprintf(where,"%s: telling the remote to call me at %d\n", __FUNCTION__,
 	    xti_sctp_conn_rr_response->data_port_number);
@@ -9052,7 +9216,7 @@ Send   Recv    Send   Recv\n\
   else {
     xti_tcp_conn_rr_request->test_length	=	test_trans * -1;
   }
-  xti_tcp_conn_rr_request->ipaddress		=	remote_data_ip;
+  xti_tcp_conn_rr_request->ipaddress		=	remote_data_ips[0];
   xti_tcp_conn_rr_request->port			=	(int)remote_data_port;
   
   if (debug > 1) {
@@ -9872,10 +10036,25 @@ scan_xti_args(int argc, char *argv[])
       break;
     case 'I':
       break_args(optarg,arg1,arg2);
-      if (arg1[0])
-	local_data_ip = inet_addr(arg1);
-      if (arg2[0])
-	remote_data_ip = inet_addr(arg2);
+      if (arg1[0]) {
+	char *beg, *nxt; int i;
+	for (i = 0, beg = arg1; i < 8 && (nxt = strchr(beg,':')); i++, beg = nxt) {
+		*nxt++ = '\0';
+		local_data_ips[i] = inet_addr(beg);
+	}
+	if (i < 8 && beg[0] != '\0')
+		local_data_ips[i] = inet_addr(beg);
+      }
+      if (arg2[0]) {
+	char *beg, *nxt; int i;
+	for (i = 0, beg = arg2; i < 8 && (nxt = strchr(beg,':')); i++, beg = nxt) {
+		*nxt++ = '\0';
+		remote_data_ips[i] = inet_addr(beg);
+	}
+	if (i < 8 && beg[0] != '\0')
+		remote_data_ips[i] = inet_addr(beg);
+      }
+      break;
     case 's':
       /* set local socket sizes */
       break_args(optarg,arg1,arg2);
