@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sli.7.man,v 0.9.2.5 2006/04/05 09:43:21 brian Exp $
+.\" @(#) $Id: sli.7.man,v 0.9.2.6 2007/07/21 20:24:09 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:21 $ by $Author: brian $
+.\" Last Modified $Date: 2007/07/21 20:24:09 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sli.7.man,v $
+.\" Revision 0.9.2.6  2007/07/21 20:24:09  brian
+.\" - updated manpages
+.\"
 .\" Revision 0.9.2.5  2006/04/05 09:43:21  brian
 .\" - moved .so line and updated headers
 .\"
@@ -205,28 +208,28 @@ Except where otherwise noted, \fIbuf\fR contains only the \fBsl_primitive\fR
 field which is set to the value of the primitive.
 
 .TP
-.B SL_PDU_REQ
+.BR SL_PDU_REQ (7)
 Transmit a Protocol Data Unit (PDU).  This primitive must be sent with an
 accompanying \fBM_DATA\fR block which is pointed to by the \fIdataptr\fR in a
 \fBputmsg\fR(2) or is the buffer which is the argument of a \fBwrite\fR(2) on
 the stream file descriptor.
 .TP
-.B SL_EMERGENCY_REQ
+.BR SL_EMERGENCY_REQ (7)
 Set emergency alignment procedures on the signalling link.
 .TP
-.B SL_EMERGENCY_CEASES_REQ
+.BR SL_EMERGENCY_CEASES_REQ (7)
 Set normal alignment procedures on the signalling link.
 .TP
-.B SL_START_REQ
+.BR SL_START_REQ (7)
 Start the signalling link.
 .TP
-.B SL_STOP_REQ
+.BR SL_STOP_REQ (7)
 Stop the signalling link.
 .TP
-.B SL_RETRIEVE_BSNT_REQ
+.BR SL_RETRIEVE_BSNT_REQ (7)
 Retreive the BSNT value for buffer updating.
 .TP
-.B SL_RETREIVAL_REQUEST_AND_FSNC_REQ
+.BR SL_RETREIVAL_REQUEST_AND_FSNC_REQ (7)
 Retreive the buffers from the TB/RTB up to and including FSNC.  This
 primitive uses a \fBsl_retrieval_request_and_fsnc_t\fB structure which
 includes the \fIsl_fsnc\fR value in addition to the \fIsl_primitive\fR as
@@ -241,7 +244,8 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_RETRIEVAL_REQ_AND_FSNC_REQ\fR.
+Contains the primitive
+.BR SL_RETRIEVAL_REQ_AND_FSNC_REQ (7).
 .TP
 .I sl_fsnc
 Contains the last Forward Sequence Number (FSNC) which was successfully
@@ -249,25 +253,25 @@ received by the far end.  Buffers in the RTB with FSN up to and including this
 value should be cleared as part of the retrieval.
 .RE
 .TP
-.B SL_RESUME_REQ
+.BR SL_RESUME_REQ (7)
 Recover from local processor outage.
 .TP
-.B SL_CLEAR_BUFFERS_REQ
+.BR SL_CLEAR_BUFFERS_REQ (7)
 Clear signalling link buffers.
 .TP
-.B SL_LOCAL_PROCESSOR_OUTAGE_REQ
+.BR SL_LOCAL_PROCESSOR_OUTAGE_REQ (7)
 Institute local processor outage procedures.
 .TP
-.B SL_CONGESTION_DISCARD_REQ
+.BR SL_CONGESTION_DISCARD_REQ (7)
 Set congestion discard on the signalling link.
 .TP
-.B SL_CONGESTION_ACCEPT_REQ
+.BR SL_CONGESTION_ACCEPT_REQ (7)
 Set congestion accept on the signalling link.
 .TP
-.B SL_NO_CONGESTION_REQ
+.BR SL_NO_CONGESTION_REQ (7)
 Indicate cessation of congestion to the signalling link.
 .TP
-.B SL_POWER_ON_REQ
+.BR SL_POWER_ON_REQ (7)
 Power on the signalling link.
 
 .PP
@@ -279,13 +283,13 @@ otherwise noted, \fIbuf\fR contains only the \fBsl_primitive\fR field which
 is set to the value of the primitive.
 
 .TP
-.B SL_PDU_IND
+.BR SL_PDU_IND (7)
 Receive a Protocol Data Unit (PDU).  This primitive is received with an
 accompanying \fBM_DATA\fR block which is pointed to by the \fBdataptr\fR in a
 \fBgetmsg\fR(2) or is the buffer which is returned from a \fBread\fR(2) on the
 stream file descriptor.
 .TP
-.B SL_LINK_CONGESTED_IND
+.BR SL_LINK_CONGESTED_IND (7)
 Indicates that the signalling link is congested.  This primitive indicates
 addtional information in the \fBsl_link_cong_ind_t\fR structure as follows:
 .sp
@@ -300,7 +304,8 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_LINK_CONGESTED_IND\fR.
+Contains the primitive
+.BR SL_LINK_CONGESTED_IND (7).
 .TP
 .I sl_timestamp
 Contains the timestamp (system time) that this event occured for the purpose
@@ -313,7 +318,7 @@ Contains the current congestion status for this link.
 Contains the current discard status for this link.
 .RE
 .TP
-.B SL_LINK_CONGESTION_CEASED_IND
+.BR SL_LINK_CONGESTION_CEASED_IND (7)
 Indicates that signalling link congestion has ceased.  This primitive
 indicates additional information in the \fBsl_cong_ceased_ind_t\fR structure
 as follows:
@@ -329,7 +334,8 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_LINK_CONGESTION_CEASED_IND\fR.
+Contains the primitive
+.BR SL_LINK_CONGESTION_CEASED_IND (7).
 .TP
 .I sl_timestamp
 Contains the timestamp (system time) that this event occured for the purpose
@@ -342,18 +348,19 @@ Contains the current congestion status for this link.
 Contains the current discard status for this link.
 .RE
 .TP
-.B SL_RETREIVED_MESSAGE_IND
+.BR SL_RETREIVED_MESSAGE_IND (7)
 Indicates one retreived message during buffer retreival.
 .TP
-.B SL_RETREIVAL_COMPLETE_IND
+.BR SL_RETREIVAL_COMPLETE_IND (7)
 Indicates that buffer retrieval is complete and not to expect further
 retrieved messages.
 .TP
-.B SL_RB_CLEARED_IND
+.BR SL_RB_CLEARED_IND (7)
 Indicates that the Receive Buffer (RB) has been cleared.
 .TP
-.B SL_BSNT_IND
-Indicates the value of BSNT which was requested by a \fBSL_RETRIEV_BSNT_REQ\fR.
+.BR SL_BSNT_IND (7)
+Indicates the value of BSNT which was requested by a
+.BR SL_RETRIEV_BSNT_REQ (7).
 This primitive indicates additional information in the \fBsl_bsnt_ind_t\fR
 structure as follows:
 .sp
@@ -366,7 +373,8 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_BSNT_IND\fR.
+Contains the primitive
+.BR SL_BSNT_IND (7).
 .TP
 .I sl_bsnt
 Contains the Backward Sequence Number (BSN) for transmission (BSNT) which
@@ -375,10 +383,10 @@ received MSU.  This is the SN of the last successfully received MSU for use in
 changeover procedures and buffer updating.
 .RE
 .TP
-.B SL_IN_SERVICE_IND
+.BR SL_IN_SERVICE_IND (7)
 Indicates that the signalling link is in service and ready to accept traffic.
 .TP
-.B SL_OUT_OF_SERVICE_IND
+.BR SL_OUT_OF_SERVICE_IND (7)
 Indicates that the signalling link is out of service and can no longer accept
 traffic.  This primitive indicates additional information in the
 \fBsl_out_of_service_t\fR structure as follows:
@@ -393,7 +401,8 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_IN_SERVICE_IND\fR.
+Contains the primitive
+.BR SL_IN_SERVICE_IND (7).
 .TP
 .I sl_timestamp
 Contains the timestamp (system time) that this event occured for the purpose
@@ -438,14 +447,15 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_REMOTE_PROCESSOR_OUTAGE_IND\fR.
+Contains the primitive
+.BR SL_REMOTE_PROCESSOR_OUTAGE_IND (7).
 .TP
 .I sl_timestamp
 Contains the timestamp (system time) that this event occured for the purpose
 of event reporting.
 .RE
 .TP
-.B SL_REMOTE_PROCESSOR_RECOVERED_IND
+.BR SL_REMOTE_PROCESSOR_RECOVERED_IND (7)
 Indicates that the remote side of the link has re-established communications
 with its L3 processor.
 This primitive indicates additional information for event
@@ -460,14 +470,15 @@ typedef struct {
 .fi
 .TP 14
 .I sl_primitive
-Contains the primitive \fBSL_REMOTE_PROCESSOR_RECOVERED_IND\fR.
+Contains the primitive
+.BR SL_REMOTE_PROCESSOR_RECOVERED_IND (7).
 .TP
 .I sl_timestamp
 Contains the timestamp (system time) that this event occured for the purpose
 of event reporting.
 .RE
 .TP
-.B SL_RTB_CLEARED_IND
+.BR SL_RTB_CLEARED_IND (7)
 Indicates that the Re-Transmission Buffer (RTB) has been cleared.
 
 .SH "PROTOCOL MANAGEMENT INTERFACE"

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sl-mux.4.man,v 0.9.2.2 2007/01/21 20:22:38 brian Exp $
+.\" @(#) $Id: sl-mux.4.man,v 0.9.2.3 2007/07/21 20:24:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/01/21 20:22:38 $ by $Author: brian $
+.\" Last Modified $Date: 2007/07/21 20:24:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sl-mux.4.man,v $
+.\" Revision 0.9.2.3  2007/07/21 20:24:07  brian
+.\" - updated manpages
+.\"
 .\" Revision 0.9.2.2  2007/01/21 20:22:38  brian
 .\" - working up drivers
 .\"
@@ -101,24 +104,23 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 .B sl-mux
-is a Signalling Link multiplexing driver.  The purpose of the driver is to
-consolidate signalling link streams from a wide range of drivers and provide
-common naming, addressing and management procedures for signalling links.
+is a Signalling Link multiplexing driver.  The purpose of the driver is to consolidate signalling
+link streams from a wide range of drivers and provide common naming, addressing, management and
+monitoring procedures for signalling links.
 .PP
 .B sl-mux
-is used in conjunction with a Signalling Link configuration utility and the
-Signalling Link configuration daemon,
+is used in conjunction with a Signalling Link configuration utility and the Signalling Link
+configuration daemon,
 .BR slconfd (8).
 .PP
-The configuration utility is responsible for opening, configuring, and
-attaching Signalling Link streams from an associated drivers and linking them
-under the
+The configuration utility is responsible for opening, configuring, and attaching Signalling Link
+streams from an associated drivers and linking them under the
 .B sl-mux
-multiplexing driver.  This makes signalling links from a number of drivers
-available for use through the single
+multiplexing driver.  This makes signalling links from a number of drivers available for use through
+the single
 .B sl-mux
-multiplexing driver.  Configuration utilities exist for each type of
-Signalling Link provider.  For example, the
+multiplexing driver.  Configuration utilities exist for each type of Signalling Link provider.  For
+example, the
 .BR x400p-ss7 (4)
 driver uses a configuration utility called
 .BR x400pconf (8);
@@ -128,8 +130,8 @@ etc.
 .PP
 The Signalling Link configuration daemon,
 .BR slconfd (8),
-is responsible for the general configuration of Signalling Links and performing
-common administration (such as configuration, statistics collection and event
+is responsible for the general configuration of Signalling Links and performing common
+administration (such as management, configuration, monitoring, statistics collection and event
 reporting).
 .PP
 The facilities provided by the
@@ -191,7 +193,7 @@ under the
 driver using the
 .IR I_PLINK (7)
 input-output control.  It then uses the
-.B SL_SETPPA
+.B SLM_IOCSPPA
 input-output control to associate a global PPA and CLEI with the linked
 stream.  The daemon does this for each and every signalling link stream that
 is to be linked under the driver.
@@ -310,14 +312,16 @@ signalling link.  This is accomplished by opening a specialized minor device
 number on the driver,
 .IR /dev/sl-mon ,
 and attaching it using the
-.BR LMI_ATTACH_REQ (7)
-primitive to a specific signalling link by global PPA or CLEI.  The stream may
-also be attached to all lower streams using a null PPA.  Once attached,
-attached streams will deliver a copy of each and every STREAMS message that is
-passed between an upper SL-user and the monitored signalling link(s),
-regardless of whether the primitive is an SL-user to SL-provider primitive, or
-an SL-provider to SL-user primitive.  The STREAMS message will be
-encapsulated as follows:
+.BR SLM_IOCSMON " and " SLM_IOCCMON
+input-output controls to specify the Signalling Links by lower multiplex
+index, gloabl PPA or CLEI that the monitoring Stream wishes to monitor.
+The stream may also monitor all lower stream by using a zero lower multipelx
+index, zero global PPA and null CLEI.  Once activated for monitoring, lower
+streams will deliver a copy of each and every STREAMS message that is passed
+between an upper SL-user and the monitored signalling link(s), regardless
+of whether the primiitve is an SL-user to SL-provider primitive or an
+SL-provider to SL-user primitive.  The STREAMS message will be encapsulated
+as follows:
 .PP
 The control part of the message will be copied and encapsulated in a band zero
 (0)
@@ -404,13 +408,13 @@ Monitoring of signalling links is performed using the
 utility.  The utility opens a
 .I /dev/sl-mon
 stream, and associates it with a specific signalling link using the
-.BR LMI_ATTACH_REQ (7)
-primitive.  Once attached, primitives that traverse the SL-user to SL-provider
-interface are delivered to the stream.  The monitor disassociates with the
-signalling link using the
-.BR LMI_DETACH_REQ (7)
-primitive, or by simply closing the stream.  The stream will also respond to
-SL input-output controls,
+.BR SLM_IOCSMON
+input-output control.  Once set for monitoring, primitives that traverse the
+SL-user to SL-provider interface are delivered to the stream.  The monitor
+disassociates with the signalling link using the
+.BR SLM_IOCCMON
+input-output control, or by simply closing the stream.  The stream will also
+respond to SL input-output controls,
 .BR sli_ioctl (4),
 from the monitoring stream.  The monitoring process must have root privilege
 to open the
@@ -457,7 +461,7 @@ controls are defined in the
 .RB < ss7/sl_mux.h >
 header file, and are described in the subsections that follow:
 .\"
-.SS SLMUX_IOCSPPA
+.SS SLM_IOCSPPA
 .PP
 This input-output controls is responsible for setting information associated
 with lower multiplex Signalling Links.
@@ -519,7 +523,7 @@ version of the input-output control be used.
 The input-output control returns zero (0) on success and minus one (-1) on
 failure.
 .\"
-.SS SLMUX_IOCGPPA
+.SS SLM_IOCGPPA
 This input-output control is responsible for retrieving information associated
 with a lower multiplex Signalling Link.
 .I arg
@@ -545,7 +549,7 @@ version of the input-output control be used.
 The input-output control returns zero (0) on success and minus one (-1) on
 failure.
 .\"
-.SS SLMUX_IOCLPPA
+.SS SLM_IOCLPPA
 .PP
 This input-output control is responsible for listing information associated
 with lower multiplex Signalling Links.
@@ -616,7 +620,124 @@ available, the return value from the input-output control operation will be
 less than
 .IR slm_list_num.
 .\"
-.\".SS SLMUX_IOCCLINK
+.SS SLM_IOCSMON
+.PP
+This input-output control is responsible for setting monitoring of a specified
+lower multiplex Signalling Link.
+.I arg
+is a pointer to a
+.B slmux_ppa
+structure.  The
+.B slmux_ppa
+struture is defined in the
+.RB < ss7/sl_mux.h >
+header file and is formatted shown above under
+.RI \(lq SLM_IOCSPPA .\(rq
+The caller populates the
+.IR slm_index ", " slm_ppa ", or " slm_clei
+members of the structure.  Unused members are populated with zero.  The first
+non-zero member will be used to locate the lower multiplex Signalling Link
+stream that will be assigned for monitoring.
+.PP
+This input-output control can be invoked as either an
+.IR I_STR (7)
+input-output control or a
+.B TRANSPARENT
+input-output control, bit is is recommended that the
+.IR I_STR (7)
+version of the input-output control be used.  The input-output control returns
+zero (0) on success and minus one (-1) on failure and sets
+.RI errno (3)
+appropriately.  Some errors returned by this input-output control are as
+follows:
+.TP 12
+.RB [ EINVAL ]
+An argument was invalid, or did not specify an existing lower Stream.
+.PD 0
+.TP
+.RB [ EALREADY ]
+The Stream identified by the
+.B slm_ppa
+structure is already being monitored.
+.TP
+.RB [ EBUSY ]
+The Stream identified by the
+.B slm_ppa
+structure is being monitored by another control Stream.
+.TP
+.RB [ EPERM ]
+The user does not have sufficient privileges to perform monitoring.
+.TP
+.RB [ ENOMEM ]
+Memory required to complete the operation was not immediately available.
+.TP
+.RB [ ENOBUFS ]
+Buffers required to complete the operation were not immediately available.
+.PD
+.PP
+Upon successful completion of the input-output control, the specified Stream
+will be marked for monitoring and will start delivering messages to the
+invoking upper Stream as described in
+.RI \(lq Monitoring ,\(rq
+above.
+.\"
+.SS SLM_IOCCMON
+.PP
+This input-output control is responsible for clearing monitoring of a
+specified lower multiplex Signalling Link.
+.I arg
+is a pointer to a
+.B slmux_ppa
+structure.  The
+.B slmux_ppa
+structre is defined in the
+.RB < ss7/sl_mux.h >
+header file and is formatted as shown above under
+.RI \(lq SLM_IOCSPPA .\(rq
+The caller populates the
+.IR slm_index ", " slm_ppa ", or " slm_clei
+members of the structure.  Unused members are populated with zero.  The first
+non-zero member will be used to locate the lower multiplex Signalling Link
+stream that will be cleared from monitoring.
+.PP
+This input-output control can be invoked as either an
+.IR I_STR (7)
+input-output control or a
+.B TRANSPARENT
+input-output control, bit is is recommended that the
+.IR I_STR (7)
+version of the input-output control be used.  The input-output control returns
+zero (0) on success and minus one (-1) on failure and sets
+.RI errno (3)
+appropriately.  Some errors returned by this input-output control are as
+follows:
+.TP 12
+.RB [ EINVAL ]
+An argument was invalid, or did not specify an existing lower Stream.
+.PD 0
+.TP
+.RB [ EPERM ]
+The user does not have sufficient privileges to clear monitoring of a Stream.
+.TP
+.RB [ EBUSY ]
+The Stream identified by the
+.B slm_ppa
+structure is being monitored by another control Stream.
+.TP
+.RB [ ENOMEM ]
+Memory required to complete the operation was not immediately available.
+.TP
+.RB [ ENOBUFS ]
+Buffers required to complete the operation were not immediately available.
+.PD
+.PP
+Upon successful completion of the input-output control, the specified Stream
+will be removed for monitoring and will stop delivering messages to the
+invoking upper Stream as described in
+.RI \(lq Monitoring ,\(rq
+above.
+.\"
+.\".SS SLM_IOCCLINK
 .\".PP
 .\"The input-output control is used for encapsulating other input-output
 .\"controls, from the
@@ -706,7 +827,7 @@ using the
 primitive, or linked using the
 .IR I_LINK (7)
 input-output control and configured using the
-.B SLMUX_IOCSPPA
+.B SLM_IOCSPPA
 input-output control.
 .TP
 .I /dev/sl-admin

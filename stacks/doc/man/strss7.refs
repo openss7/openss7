@@ -88,6 +88,50 @@
 %I Gcom, Inc.
 %D March 1999
 
+%L LMI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Local Management Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/lmi.pdf
+
+%L SLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Signalling Link Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/sli.pdf
+
+%L SDTI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Signalling Data Terminal Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/sdti.pdf
+
+%L SDLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Signalling Data Link Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/sdli.pdf
+
 %K xxx
 %A X Programmer's Group
 %L XXX
