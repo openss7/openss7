@@ -1,5 +1,13 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: updated manpages
+	* doc/man/man4/sdt.4.man: updated manpages
+	* doc/man/man4/sdt_pmod.4.man: updated manpages
+	* doc/man/man4/sl-mux.4.man: updated manpages
+	* doc/man/man7/lmi.7.man: updated manpages
+	* doc/man/man7/sli.7.man: updated manpages
+	* doc/man/strss7.refs: updated manpages
+
 	* src/modules/sdl/sdl_ch.c: added channel modules
 	* src/modules/sdt/sdt_ch.c: added channel modules
 	* src/modules/sl/sl-mux.c: added channel modules

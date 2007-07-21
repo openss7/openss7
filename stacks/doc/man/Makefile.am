@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/03/06 21:26:10 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/21 20:24:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/06 21:26:10 $ by $Author: brian $
+# Last Modified $Date: 2007/07/21 20:24:05 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.41  2007/07/21 20:24:05  brian
+# - updated manpages
+#
 # Revision 0.9.2.40  2007/03/06 21:26:10  brian
 # - final updates and corrections to build process for release
 #
@@ -150,15 +153,19 @@ ss7_man_MANS = \
 	man4/sdl-acb56.4 \
 	man4/sdl_eth.4 \
 	man4/sdl_ioctl.4 \
+	man4/sdl_pmod.4 \
 	man4/sdlm.4 \
 	man4/sdlm-lm.4 \
 	man4/sdl-mux.4 \
+	man4/sdl-pmod.4 \
 	man4/sdl_rtp.4 \
 	man4/sdl_x400p.4 \
 	man4/sdt.4 \
 	man4/sdt-acb56.4 \
 	man4/sdt_ioctl.4 \
+	man4/sdt_pmod.4 \
 	man4/sdt_x400p.4 \
+	man4/sdt-pmod.4 \
 	man4/sl.4 \
 	man4/sl-acb56.4 \
 	man4/sl_ioctl.4 \
@@ -220,6 +227,36 @@ ss7_man_MANS = \
 	man7/isupi.7 \
 	man7/isup_socket.7 \
 	man7/lmi.7 \
+	man7/lmi_attach_req_t.7 \
+	man7/lmi_detach_req_t.7 \
+	man7/lmi_disable_con_t.7 \
+	man7/lmi_disable_req_t.7 \
+	man7/lmi_enable_con_t.7 \
+	man7/lmi_enable_req_t.7 \
+	man7/lmi_error_ack_t.7 \
+	man7/lmi_error_ind_t.7 \
+	man7/lmi_event_ind_t.7 \
+	man7/lmi_info_ack_t.7 \
+	man7/lmi_info_req_t.7 \
+	man7/lmi_ok_ack_t.7 \
+	man7/lmi_optmgmt_ack_t.7 \
+	man7/lmi_optmgmt_req_t.7 \
+	man7/lmi_stats_ind_t.7 \
+	man7/LMI_ATTACH_REQ.7 \
+	man7/LMI_DETACH_REQ.7 \
+	man7/LMI_DISABLE_CON.7 \
+	man7/LMI_DISABLE_REQ.7 \
+	man7/LMI_ENABLE_CON.7 \
+	man7/LMI_ENABLE_REQ.7 \
+	man7/LMI_ERROR_ACK.7 \
+	man7/LMI_ERROR_IND.7 \
+	man7/LMI_EVENT_IND.7 \
+	man7/LMI_INFO_ACK.7 \
+	man7/LMI_INFO_REQ.7 \
+	man7/LMI_OK_ACK.7 \
+	man7/LMI_OPTMGMT_ACK.7 \
+	man7/LMI_OPTMGMT_REQ.7 \
+	man7/LMI_STATS_IND.7 \
 	man7/mtp.7 \
 	man7/MTP_ADDR_ACK.7 \
 	man7/MTP_ADDR_REQ.7 \
@@ -252,8 +289,124 @@ ss7_man_MANS = \
 	man7/sccp_socket.7 \
 	man7/sdli_2.7 \
 	man7/sdli.7 \
+	man7/SDL_BITS_FOR_TRANSMISSION_REQ.7 \
+	man7/sdl_bits_for_transmission_req_t.7 \
+	man7/SDL_CONNECT_REQ.7 \
+	man7/sdl_connect_req_t.7 \
+	man7/SDL_DISCONNECT_IND.7 \
+	man7/sdl_disconnect_ind_t.7 \
+	man7/SDL_DISCONNECT_REQ.7 \
+	man7/sdl_disconnect_req_t.7 \
+	man7/SDL_RECEIVED_BITS_IND.7 \
+	man7/sdl_received_bits_ind_t.7 \
 	man7/sdti.7 \
+	man7/SDT_AERM_SET_TI_TO_TIE_REQ.7 \
+	man7/sdt_aerm_set_ti_to_tie_req_t.7 \
+	man7/SDT_AERM_SET_TI_TO_TIN_REQ.7 \
+	man7/sdt_aerm_set_ti_to_tin_req_t.7 \
+	man7/SDT_AERM_START_REQ.7 \
+	man7/sdt_aerm_start_req_t.7 \
+	man7/SDT_AERM_STOP_REQ.7 \
+	man7/sdt_aerm_stop_req_t.7 \
+	man7/SDT_DAEDR_START_REQ.7 \
+	man7/sdt_daedr_start_req_t.7 \
+	man7/SDT_DAEDT_START_REQ.7 \
+	man7/sdt_daedt_start_req_t.7 \
+	man7/SDT_DAEDT_TRANSMISSION_REQ.7 \
+	man7/sdt_daedt_transmission_req_t.7 \
+	man7/SDT_IAC_ABORT_PROVING_IND.7 \
+	man7/sdt_iac_abort_proving_ind_t.7 \
+	man7/SDT_IAC_CORRECT_SU_IND.7 \
+	man7/sdt_iac_correct_su_ind_t.7 \
+	man7/SDT_LSC_LINK_FAILURE_IND.7 \
+	man7/sdt_lsc_link_failure_ind_t.7 \
+	man7/SDT_RC_CONGESTION_ACCEPT_IND.7 \
+	man7/sdt_rc_congestion_accept_ind_t.7 \
+	man7/SDT_RC_CONGESTION_DISCARD_IND.7 \
+	man7/sdt_rc_congestion_discard_ind_t.7 \
+	man7/SDT_RC_NO_CONGESTION_IND.7 \
+	man7/sdt_rc_no_congestion_ind_t.7 \
+	man7/SDT_RC_SIGNAL_UNIT_IND.7 \
+	man7/sdt_rc_signal_unit_ind_t.7 \
+	man7/SDT_SUERM_START_REQ.7 \
+	man7/sdt_suerm_start_req_t.7 \
+	man7/SDT_SUERM_STOP_REQ.7 \
+	man7/sdt_suerm_stop_req_t.7 \
+	man7/SDT_TXC_TRANSMISSION_REQUEST_IND.7 \
+	man7/sdt_txc_transmission_request_ind_t.7 \
 	man7/sli.7 \
+	man7/sl_bsnt_ind_t.7 \
+	man7/sl_bsnt_not_retr_ind_t.7 \
+	man7/sl_clear_buffers_req_t.7 \
+	man7/sl_clear_rtb_req_t.7 \
+	man7/sl_cong_accept_req_t.7 \
+	man7/sl_cong_discard_req_t.7 \
+	man7/sl_continue_req_t.7 \
+	man7/sl_emergency_ceases_req_t.7 \
+	man7/sl_emergency_req_t.7 \
+	man7/sl_in_service_ind_t.7 \
+	man7/sl_link_cong_ceased_ind_t.7 \
+	man7/sl_link_cong_ind_t.7 \
+	man7/sl_local_proc_outage_req_t.7 \
+	man7/sl_loc_proc_out_ind_t.7 \
+	man7/sl_loc_proc_recovered_ind_t.7 \
+	man7/sl_no_cong_req_t.7 \
+	man7/sl_notify_ind_t.7 \
+	man7/sl_notify_req_t.7 \
+	man7/sl_optmgmt_ack_t.7 \
+	man7/sl_optmgmt_req_t.7 \
+	man7/sl_out_of_service_ind_t.7 \
+	man7/sl_pdu_ind_t.7 \
+	man7/sl_pdu_req_t.7 \
+	man7/sl_power_on_req_t.7 \
+	man7/sl_rb_cleared_ind_t.7 \
+	man7/sl_rem_proc_out_ind_t.7 \
+	man7/sl_rem_proc_recovered_ind_t.7 \
+	man7/sl_resume_req_t.7 \
+	man7/sl_retrieval_comp_ind_t.7 \
+	man7/sl_retrieval_not_poss_ind_t.7 \
+	man7/sl_retrieval_req_and_fsnc_t.7 \
+	man7/sl_retrieve_bsnt_req_t.7 \
+	man7/sl_retrieved_msg_ind_t.7 \
+	man7/sl_rtb_cleared_ind_t.7 \
+	man7/sl_start_req_t.7 \
+	man7/sl_stop_req_t.7 \
+	man7/SL_BSNT_IND.7 \
+	man7/SL_BSNT_NOT_RETRIEVABLE_IND.7 \
+	man7/SL_CLEAR_BUFFERS_REQ.7 \
+	man7/SL_CLEAR_RTB_REQ.7 \
+	man7/SL_CONGESTION_ACCEPT_REQ.7 \
+	man7/SL_CONGESTION_DISCARD_REQ.7 \
+	man7/SL_CONTINUE_REQ.7 \
+	man7/SL_EMERGENCY_CEASES_REQ.7 \
+	man7/SL_EMERGENCY_REQ.7 \
+	man7/SL_IN_SERVICE_IND.7 \
+	man7/SL_LINK_CONGESTED_IND.7 \
+	man7/SL_LINK_CONGESTION_CEASED_IND.7 \
+	man7/SL_LOCAL_PROCESSOR_OUTAGE_IND.7 \
+	man7/SL_LOCAL_PROCESSOR_OUTAGE_REQ.7 \
+	man7/SL_LOCAL_PROCESSOR_RECOVERED_IND.7 \
+	man7/SL_NO_CONGESTION_REQ.7 \
+	man7/SL_NOTIFY_IND.7 \
+	man7/SL_NOTIFY_REQ.7 \
+	man7/SL_OPTMGMT_ACK.7 \
+	man7/SL_OPTMGMT_REQ.7 \
+	man7/SL_OUT_OF_SERVICE_IND.7 \
+	man7/SL_PDU_IND.7 \
+	man7/SL_PDU_REQ.7 \
+	man7/SL_POWER_ON_REQ.7 \
+	man7/SL_RB_CLEARED_IND.7 \
+	man7/SL_REMOTE_PROCESSOR_OUTAGE_IND.7 \
+	man7/SL_REMOTE_PROCESSOR_RECOVERED_IND.7 \
+	man7/SL_RESUME_REQ.7 \
+	man7/SL_RETRIEVAL_COMPLETE_IND.7 \
+	man7/SL_RETRIEVAL_NOT_POSSIBLE_IND.7 \
+	man7/SL_RETRIEVAL_REQUEST_AND_FSNC_REQ.7 \
+	man7/SL_RETRIEVE_BSNT_REQ.7 \
+	man7/SL_RETRIEVED_MESSAGE_IND.7 \
+	man7/SL_RTB_CLEARED_IND.7 \
+	man7/SL_START_REQ.7 \
+	man7/SL_STOP_REQ.7 \
 	man7/slsi.7 \
 	man7/smi.7 \
 	man7/ss7.7 \
@@ -1641,6 +1794,8 @@ ss7_dist_noinst_MANS = \
 	man4/sdlm.4.man \
 	man4/sdlm-lm.4.man \
 	man4/sdl-mux.4.man \
+	man4/sdl-pmod.4.man \
+	man4/sdl_pmod.4.man \
 	man4/sdl_rtp.4.man \
 	man4/sdl_sctp.4.man \
 	man4/sdl_tcp.4.man \
@@ -1649,6 +1804,8 @@ ss7_dist_noinst_MANS = \
 	man4/sdt.4.man \
 	man4/sdt-acb56.4.man \
 	man4/sdt_ioctl.4.man \
+	man4/sdt-pmod.4.man \
+	man4/sdt_pmod.4.man \
 	man4/sdt_sctp.4.man \
 	man4/sdt_tpi.4.man \
 	man4/sdt_x400p.4.man \
@@ -1738,6 +1895,36 @@ ss7_dist_noinst_MANS = \
 	man7/isupi.7.man \
 	man7/isup_socket.7.man \
 	man7/lmi.7.man \
+	man7/lmi_attach_req_t.7.man \
+	man7/lmi_detach_req_t.7.man \
+	man7/lmi_disable_con_t.7.man \
+	man7/lmi_disable_req_t.7.man \
+	man7/lmi_enable_con_t.7.man \
+	man7/lmi_enable_req_t.7.man \
+	man7/lmi_error_ack_t.7.man \
+	man7/lmi_error_ind_t.7.man \
+	man7/lmi_event_ind_t.7.man \
+	man7/lmi_info_ack_t.7.man \
+	man7/lmi_info_req_t.7.man \
+	man7/lmi_ok_ack_t.7.man \
+	man7/lmi_optmgmt_ack_t.7.man \
+	man7/lmi_optmgmt_req_t.7.man \
+	man7/lmi_stats_ind_t.7.man \
+	man7/LMI_ATTACH_REQ.7.man \
+	man7/LMI_DETACH_REQ.7.man \
+	man7/LMI_DISABLE_CON.7.man \
+	man7/LMI_DISABLE_REQ.7.man \
+	man7/LMI_ENABLE_CON.7.man \
+	man7/LMI_ENABLE_REQ.7.man \
+	man7/LMI_ERROR_ACK.7.man \
+	man7/LMI_ERROR_IND.7.man \
+	man7/LMI_EVENT_IND.7.man \
+	man7/LMI_INFO_ACK.7.man \
+	man7/LMI_INFO_REQ.7.man \
+	man7/LMI_OK_ACK.7.man \
+	man7/LMI_OPTMGMT_ACK.7.man \
+	man7/LMI_OPTMGMT_REQ.7.man \
+	man7/LMI_STATS_IND.7.man \
 	man7/mtp.7.man \
 	man7/MTP_ADDR_ACK.7.man \
 	man7/MTP_ADDR_REQ.7.man \
@@ -1770,8 +1957,124 @@ ss7_dist_noinst_MANS = \
 	man7/sccp_socket.7.man \
 	man7/sdli_2.7.man \
 	man7/sdli.7.man \
+	man7/SDL_BITS_FOR_TRANSMISSION_REQ.7.man \
+	man7/sdl_bits_for_transmission_req_t.7.man \
+	man7/SDL_CONNECT_REQ.7.man \
+	man7/sdl_connect_req_t.7.man \
+	man7/SDL_DISCONNECT_IND.7.man \
+	man7/sdl_disconnect_ind_t.7.man \
+	man7/SDL_DISCONNECT_REQ.7.man \
+	man7/sdl_disconnect_req_t.7.man \
+	man7/SDL_RECEIVED_BITS_IND.7.man \
+	man7/sdl_received_bits_ind_t.7.man \
 	man7/sdti.7.man \
+	man7/SDT_AERM_SET_TI_TO_TIE_REQ.7.man \
+	man7/sdt_aerm_set_ti_to_tie_req_t.7.man \
+	man7/SDT_AERM_SET_TI_TO_TIN_REQ.7.man \
+	man7/sdt_aerm_set_ti_to_tin_req_t.7.man \
+	man7/SDT_AERM_START_REQ.7.man \
+	man7/sdt_aerm_start_req_t.7.man \
+	man7/SDT_AERM_STOP_REQ.7.man \
+	man7/sdt_aerm_stop_req_t.7.man \
+	man7/SDT_DAEDR_START_REQ.7.man \
+	man7/sdt_daedr_start_req_t.7.man \
+	man7/SDT_DAEDT_START_REQ.7.man \
+	man7/sdt_daedt_start_req_t.7.man \
+	man7/SDT_DAEDT_TRANSMISSION_REQ.7.man \
+	man7/sdt_daedt_transmission_req_t.7.man \
+	man7/SDT_IAC_ABORT_PROVING_IND.7.man \
+	man7/sdt_iac_abort_proving_ind_t.7.man \
+	man7/SDT_IAC_CORRECT_SU_IND.7.man \
+	man7/sdt_iac_correct_su_ind_t.7.man \
+	man7/SDT_LSC_LINK_FAILURE_IND.7.man \
+	man7/sdt_lsc_link_failure_ind_t.7.man \
+	man7/SDT_RC_CONGESTION_ACCEPT_IND.7.man \
+	man7/sdt_rc_congestion_accept_ind_t.7.man \
+	man7/SDT_RC_CONGESTION_DISCARD_IND.7.man \
+	man7/sdt_rc_congestion_discard_ind_t.7.man \
+	man7/SDT_RC_NO_CONGESTION_IND.7.man \
+	man7/sdt_rc_no_congestion_ind_t.7.man \
+	man7/SDT_RC_SIGNAL_UNIT_IND.7.man \
+	man7/sdt_rc_signal_unit_ind_t.7.man \
+	man7/SDT_SUERM_START_REQ.7.man \
+	man7/sdt_suerm_start_req_t.7.man \
+	man7/SDT_SUERM_STOP_REQ.7.man \
+	man7/sdt_suerm_stop_req_t.7.man \
+	man7/SDT_TXC_TRANSMISSION_REQUEST_IND.7.man \
+	man7/sdt_txc_transmission_request_ind_t.7.man \
 	man7/sli.7.man \
+	man7/sl_bsnt_ind_t.7.man \
+	man7/sl_bsnt_not_retr_ind_t.7.man \
+	man7/sl_clear_buffers_req_t.7.man \
+	man7/sl_clear_rtb_req_t.7.man \
+	man7/sl_cong_accept_req_t.7.man \
+	man7/sl_cong_discard_req_t.7.man \
+	man7/sl_continue_req_t.7.man \
+	man7/sl_emergency_ceases_req_t.7.man \
+	man7/sl_emergency_req_t.7.man \
+	man7/sl_in_service_ind_t.7.man \
+	man7/sl_link_cong_ceased_ind_t.7.man \
+	man7/sl_link_cong_ind_t.7.man \
+	man7/sl_local_proc_outage_req_t.7.man \
+	man7/sl_loc_proc_out_ind_t.7.man \
+	man7/sl_loc_proc_recovered_ind_t.7.man \
+	man7/sl_no_cong_req_t.7.man \
+	man7/sl_notify_ind_t.7.man \
+	man7/sl_notify_req_t.7.man \
+	man7/sl_optmgmt_ack_t.7.man \
+	man7/sl_optmgmt_req_t.7.man \
+	man7/sl_out_of_service_ind_t.7.man \
+	man7/sl_pdu_ind_t.7.man \
+	man7/sl_pdu_req_t.7.man \
+	man7/sl_power_on_req_t.7.man \
+	man7/sl_rb_cleared_ind_t.7.man \
+	man7/sl_rem_proc_out_ind_t.7.man \
+	man7/sl_rem_proc_recovered_ind_t.7.man \
+	man7/sl_resume_req_t.7.man \
+	man7/sl_retrieval_comp_ind_t.7.man \
+	man7/sl_retrieval_not_poss_ind_t.7.man \
+	man7/sl_retrieval_req_and_fsnc_t.7.man \
+	man7/sl_retrieve_bsnt_req_t.7.man \
+	man7/sl_retrieved_msg_ind_t.7.man \
+	man7/sl_rtb_cleared_ind_t.7.man \
+	man7/sl_start_req_t.7.man \
+	man7/sl_stop_req_t.7.man \
+	man7/SL_BSNT_IND.7.man \
+	man7/SL_BSNT_NOT_RETRIEVABLE_IND.7.man \
+	man7/SL_CLEAR_BUFFERS_REQ.7.man \
+	man7/SL_CLEAR_RTB_REQ.7.man \
+	man7/SL_CONGESTION_ACCEPT_REQ.7.man \
+	man7/SL_CONGESTION_DISCARD_REQ.7.man \
+	man7/SL_CONTINUE_REQ.7.man \
+	man7/SL_EMERGENCY_CEASES_REQ.7.man \
+	man7/SL_EMERGENCY_REQ.7.man \
+	man7/SL_IN_SERVICE_IND.7.man \
+	man7/SL_LINK_CONGESTED_IND.7.man \
+	man7/SL_LINK_CONGESTION_CEASED_IND.7.man \
+	man7/SL_LOCAL_PROCESSOR_OUTAGE_IND.7.man \
+	man7/SL_LOCAL_PROCESSOR_OUTAGE_REQ.7.man \
+	man7/SL_LOCAL_PROCESSOR_RECOVERED_IND.7.man \
+	man7/SL_NO_CONGESTION_REQ.7.man \
+	man7/SL_NOTIFY_IND.7.man \
+	man7/SL_NOTIFY_REQ.7.man \
+	man7/SL_OPTMGMT_ACK.7.man \
+	man7/SL_OPTMGMT_REQ.7.man \
+	man7/SL_OUT_OF_SERVICE_IND.7.man \
+	man7/SL_PDU_IND.7.man \
+	man7/SL_PDU_REQ.7.man \
+	man7/SL_POWER_ON_REQ.7.man \
+	man7/SL_RB_CLEARED_IND.7.man \
+	man7/SL_REMOTE_PROCESSOR_OUTAGE_IND.7.man \
+	man7/SL_REMOTE_PROCESSOR_RECOVERED_IND.7.man \
+	man7/SL_RESUME_REQ.7.man \
+	man7/SL_RETRIEVAL_COMPLETE_IND.7.man \
+	man7/SL_RETRIEVAL_NOT_POSSIBLE_IND.7.man \
+	man7/SL_RETRIEVAL_REQUEST_AND_FSNC_REQ.7.man \
+	man7/SL_RETRIEVE_BSNT_REQ.7.man \
+	man7/SL_RETRIEVED_MESSAGE_IND.7.man \
+	man7/SL_RTB_CLEARED_IND.7.man \
+	man7/SL_START_REQ.7.man \
+	man7/SL_STOP_REQ.7.man \
 	man7/slsi.7.man \
 	man7/smi.7.man \
 	man7/ss7.7.man \
