@@ -1,0 +1,263 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: SDT_RC_SIGNAL_UNIT_IND.7.man,v 0.9.2.1 2007/07/21 20:15:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:15:12 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: SDT_RC_SIGNAL_UNIT_IND.7.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:15:12  brian
+.\" - added documentation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SDT_RC_SIGNAL_UNIT_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Signalling Data Terminal Interface (SDTI)"
+.SH NAME
+.B SDT_RC_SIGNAL_UNIT_IND, sdt_rc_signal_unit_ind_t
+\- signal unit indication primitive
+\"
+\"
+.SH SYNOPSIS
+.PP
+The RC signal unit indication service primtive consists of one optional
+.BR M_PROTO (9)
+message block followed by one or more
+.BR M_DATA (9)
+message blocks containing the
+receive signal unit.  The
+.BR M_PROTO (9)
+message block, when present, is structured
+as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    sdt_long sdt_primitive;
+    sdt_ulong sdt_count;
+} sdt_rc_signal_unit_ind_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The RC signal unit indication service primitive is issued by the SDTS provider
+when a signal unit arrives on the signalling data link and passes error
+detection.  The primitive is named the
+.I RC
+signal unit indication because this signal is normally sent to reception
+control (RC) within the SS7 Level 2 state machine.  This primitive is an
+indication from the DAEDR function in the SDTS provider to the Reception
+Control (RC) function in the SDTS user.
+.\"
+.SS Parameters
+.PP
+The RC signal unit indication service primtive contains the following
+parameters:
+.TP
+.I sdt_primitive
+Indicates the service primitive type.  Always
+.BR SDT_RC_SIGNAL_UNIT_IND .
+.TP
+.I sdt_count
+When signal unit compression is in effect, this field contains a count of the
+number of compressed identical signal units (not counting the original).  When
+signal unit compression is not in effect, or the signal unit was not
+compressed (it was not repeated on the line), this field is set to the value
+0.
+.\"
+.SS State
+.PP
+This primitive is only issued from the
+.B LMI_ENABLED
+management state.
+.\"
+.SS "New State"
+.PP
+The state remains unchanged.
+.\"
+.SS Modes
+.PP
+This primitive is issued in all modes.
+.\"
+.SS Originator
+.PP
+This primitive is issued by the SDTS Provider.
+.\"
+.SS Rules
+.PP
+The SDTS provider observes the following rules when generating the RC signal
+unit indication primitive:
+.IP \(em \w'\(em\(em'u
+The primitive is only issued when the signalling data terminal is in the
+.B LMI_ENABLED
+management state.
+.IP \(em
+Received signal units are indicated only after the receivers have been enabled
+using the
+.BR SDT_DAEDR_START_REQ (7)
+command and the DAEDR is in the
+.B IN-SERVICE
+state.
+.IP \(em
+Once the SDTS user is receiving signal units, it will continue to do so until
+a fatal error occurs, the stream is closed, or the signalling data terminal is
+disabled with the
+.BR LMI_DISABLE_REQ (7)
+primitive.
+.IP \(em
+The
+.BR M_PROTO (9)
+message block is optional and is only really required for
+indicating the count of compressed signal units.  When signal unit compression
+is not in effect, or when a signal unit is not compressed (i.e. has a
+.I sdt_count
+of zero), the
+.BR M_PROTO (9)
+message block is unnecessary and SDTS providers are encouraged to not include
+it.  When the
+.BR M_PROTO (9)
+message block is not included, the signal unit is delivered simply as a chain
+of one or more
+.BR M_DATA (9)
+message blocks to the SDTS user.  The SDTS user must be prepared to receive RC
+signal unit indications consisting of only
+.BR M_DATA (9)
+message blocks.
+.IP \(em
+Most narrowband SS7 SDTS providers provider for signal unit compression.
+Under this scheme, the first non-identical signal unit is indicated with a
+.I sdt_count
+of zero.  Should additional identical signal units be received, the will be
+counted until another non-identical signal unit is received.  At that point,
+an RC signal unit indication with a
+.I sdt_count
+indicating the number of compressed signal units is indicated followed by an
+indication of the new non-identical signal unit with a
+.I sdt_count
+of zero.  And the cycle repeats.
+.IP ""
+To support this feature, SDTS users must be prepared to accept a compressed
+frame representing all of the contiguous identical signalling units in this
+fashion.  For example, the SDTS user cannot rely by its design on the third
+identical signal unit causing a state transsition in a timely manner.
+.IP \(em
+Invocation and applicability of a signal unit compression feature is
+provider-specific.  So, for example, Q.703 drivers use FISU and LSSU
+compression techniques, whereas, M2PA (RFC 4165) does not require them.
+.\"
+.SS Response
+.PP
+This primitive does not require a response from the SDTS user.
+.\"
+.\"
+.SH NOTES
+.PP
+.\"
+.SS "Rules for Q.702 Conformance"
+.PP
+.\"
+.SS "Rules for ANSI T1.111.2 Conformance"
+.PP
+.\"
+.SS "Rules for ETSI ETS 300 008-1 Conformance"
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sdti.h> ,
+.BR <ss7/sdti_ioctl.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sdti (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for
+.BR "@PACKAGE@-@VERSION@" .
+The Signalling Data Terminal Interface (SDTI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.2 .
+This is
+.I Version 1
+of the SDTI interface.
+.[
+sdti
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

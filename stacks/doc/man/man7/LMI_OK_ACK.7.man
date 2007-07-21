@@ -1,0 +1,214 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: LMI_OK_ACK.7.man,v 0.9.2.1 2007/07/21 20:15:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:15:12 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: LMI_OK_ACK.7.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:15:12  brian
+.\" - added documentation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH LMI_OK_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Local Management Interface (LMI)"
+.\"
+.\"
+.SH NAME
+.B LMI_OK_ACK, lmi_ok_ack_t
+\- positive acknowledgement primitive
+.\"
+.\"
+.SH SYNOPSIS
+This primitive consists of one
+.BR M_PCPROTO (9)
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_long lmi_correct_primitive;
+    lmi_ulong lmi_state;
+} lmi_ok_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This primitive is used to acknowledge receipt and successful service completion
+for primitives requiring acknowledgement that have no confirmation primitive.
+.\"
+.\"
+.SS Parameters
+The service primitive contains the following parameters:
+.\"
+.\"
+.TP
+.I lmi_primitive
+Indicates the service primitive type.  Always
+.BR LMI_OK_ACK .
+.TP
+.I lmi_correct_primitive
+Indicates the service primitive that was received and serviced correctly.
+This field can be one of the following values:
+.sp
+.RS
+.TP \w'\fBLMI_ATTACH_REQ\fR\(em'u
+.B LMI_ATTACH_REQ
+Attach request.
+.PD 0
+.TP
+.B LMI_DETACH_REQ
+Detach request.
+.PD
+.RE
+.TP
+.I lmi_state
+Indicates the current state of the LMS provider at the time that the primitive
+was issued.  This field can be one of the following values:
+.sp
+.RS
+.TP \w'\fBLMI_UNATTACHED\fR\(em'u
+.B LMI_UNATTACHED
+No PPA attached, awaiting
+.BR LMI_ATTACH_REQ (7).
+.PD 0
+.TP
+.B LMI_UNUSABLE
+Device cannot be used, STREAM in hung state.
+.TP
+.B LMI_DISABLED
+PPA attached, awaiting
+.BR LMI_ENABLE_REQ (7).
+.TP
+.B LMI_ENABLED
+Ready for use, awaiting primitive exchange.
+.PD
+.RE
+.\"
+.\"
+.SS State
+This primitive is issued by the LMS provider in the
+.B LMI_ATTACH_PENDING
+or
+.B LMI_DETACH_PENDING
+state.
+.\"
+.\"
+.SS "New State"
+The new state is
+.BR LMI_UNATTACHED " or " LMI_DISABLED ,
+depending on thee primitive to which the message is responding.
+.\"
+.\"
+.SS Modes
+This primitive is issued in all modes.
+.\"
+.\"
+.SS Originator
+This primitive is issued by the LMS Provider.
+.\"
+.\"
+.SH NOTES
+The Local Management Interface
+.[
+lmi
+.]
+is not subject to conformance.
+.\"
+.\"
+.SH FILES
+.BR <ss7/lmi.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR LMI_ATTACH_REQ (7),
+.BR LMI_DETACH_REQ (7),
+.BR LMI_ERROR_ACK (7),
+.BR lmi (7).
+.\"
+.\"
+.SH VERIONS
+This manpage was written for
+.BR @PACKAGE@-@VERSION@ .
+The Local Management Interface (LMI) is specific to
+.B OpenSS7
+and first appeared on
+.BR strss7-0.8.2 .
+This is Version 1 of the LMI interface.
+.XX
+.[
+lmi
+.]
+.[
+$LIST$
+.]
+.TI
+

@@ -1,0 +1,207 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: SL_LOCAL_PROCESSOR_RECOVERED_IND.7.man,v 0.9.2.1 2007/07/21 20:15:13 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:15:13 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: SL_LOCAL_PROCESSOR_RECOVERED_IND.7.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:15:13  brian
+.\" - added documentation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SL_LOCAL_PROCESSOR_RECOVERED_IND 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Signalling Link Interface (SLI)"
+.SH NAME
+.B SL_LOCAL_PROCESSOR_RECOVERED_IND, sl_loc_proc_recovered_ind_t
+\- local processor recovered indication primitive
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The local processor recovered indication service primitive consists of one
+.BR M_PROTO (9)
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    sl_long sl_primitive;
+    sl_ulong sl_timestamp;
+} sl_loc_proc_recovered_ind_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The local processor recovered indication service primitive is originated by the
+SLS provider when it detects a remote processor recovery condition.
+.\"
+.SS Parameters
+.PP
+The local processor recovered indication service primitive contains the
+following parameters:
+.TP
+.I sl_primitive
+Indicates the service primitive type.  Always
+.BR SL_LOCAL_PROCESSOR_RECOVERED_IND .
+.TP
+.I sl_timestamp
+Indicates the time at which the detection of local processor recovery
+occurred.  This is UNIX time from epoch timestamp in milliseconds.
+.\"
+.SS State
+.PP
+This primitive is only issued by the SLS provider in the
+.B LMI_ENABLED
+management state and the link state of
+.B SL_STATE_PROCESSOR_OUTAGE
+with local outage asserted by the SLS provider.
+.\"
+.SS "New State"
+.PP
+The new state is
+.B SL_STATE_IN_SERVICE
+provided that no other processor outage condition (SLS user local, or remote)
+exists.
+.\"
+.SS Modes
+.PP
+This primitive is issued in all modes.
+.\"
+.SS Originator
+.PP
+This primitive is issued by the SLS Provider.
+.\"
+.SS Rules
+.PP
+The SLS provider observes the following rules when issuing a local processor
+recovered indication service primitive:
+.IP \(em \w'\(em\(em'u
+The primitive is only issued in the
+.B LMI_ENABLED
+management state.
+.IP \(em
+The SLS provider will only issue this primitive after it has issued a
+.BR SL_LOCAL_PROCESSOR_OUTAGE_IND (7)
+primitive and when the local processor outage condition is no longer in
+effect.
+.\"
+.SS Response
+.PP
+This primitive does not require a respnose from the SLS user, nevertheless, the
+SLS user will typically attempt to continue on the link or restore it using
+restoration service primitives.
+.\"
+.\"
+.SH NOTES
+.PP
+.\"
+.SS "Rules for Q.703 Conformance"
+.PP
+.\"
+.SS "Rules for ANSI T1.111.3 Conformance"
+.PP
+.\"
+.SS "Rules for ETSI ETS 300 008-1 Conformance"
+.PP
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sli.h> ,
+.BR <ss7/sli_ioctl.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR sli (7).
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for
+.BR "@PACKAGE@-@VERSION@" .
+The Signalling Link Interface (SLI) is specific to
+.B OpenSS7
+and first appeared in
+.BR strss7-0.8.2 .
+This is
+.I Version 1
+of the SLI interface.
+.[
+sli
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

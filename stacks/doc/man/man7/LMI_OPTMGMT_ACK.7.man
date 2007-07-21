@@ -1,0 +1,247 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: LMI_OPTMGMT_ACK.7.man,v 0.9.2.1 2007/07/21 20:15:12 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/07/21 20:15:12 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: LMI_OPTMGMT_ACK.7.man,v $
+.\" Revision 0.9.2.1  2007/07/21 20:15:12  brian
+.\" - added documentation
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH LMI_OPTMGMT_ACK 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Local Management Interface (LMI)"
+.\"
+.\"
+.SH NAME
+.B LMI_OPTMGMT_ACK, lmi_optmgmt_ack_t
+\- options management acknowledgement primitive
+.\"
+.\"
+.SH SYNOPSIS
+The option management acknowledgement service primitive consists of one
+.BR M_PCPROTO (9)
+message block, structured as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct {
+    lmi_long lmi_primitive;
+    lmi_ulong lmi_opt_length;
+    lmi_ulong lmi_opt_offset;
+    lmi_ulong lmi_mgmt_flags;
+} lmi_optmgmt_ack_t;
+\fR\s+1
+.fi
+.\"
+.\"
+.SH DESCRIPTION
+This LMS provider originated primitive is issued by the LMS provider upon
+successful completion of the options management service.  It indicates the
+outcome of the options management operation requested by the LMS user in a
+.BR LMI_OPTMGMT_REQ (7)
+primitive.
+.\"
+.\"
+.SS Parameters
+The option management acknowledgement service primitive contains the following
+parameters:
+.\"
+.\"
+.TP
+.I lmi_primitive
+Indicates the service primitive type.  Always
+.BR LMI_OPTMGMT_ACK .
+.TP
+.I lmi_opt_length
+Indicates the length of the returned options.
+.TP
+.I lmi_opt_offset
+Indicates the offset of the returned options from the start of the
+.BR M_PCPROTO (9)
+message block.
+.TP
+.I lmi_mgmt_flags
+Indicates the returned management flags.  These flags indicate the overall
+success of the options management service.  This field can assume one of
+the following values:
+.sp
+.RS
+.TP \w'\fBLMI_PARTSUCCESS\fR\(em'u
+.B LMI_SUCCESS
+The LMS provider succeeded in negotiating or returning all of the
+options specified by the LMS user in the
+.BR LMI_OPTMGMT_REQ (7)
+primitive.
+.TP
+.B LMI_FAILURE
+The LMS provider failed to negotiate one or more of the options
+specified by the LMS user.
+.TP
+.B LMI_PARTSUCCESS
+The LMS provider negotiated a value of lower quality for one or more
+of the options specified by the LMS user.
+.TP
+.B LMI_READONLY
+The LMS provider failed to negotiate one ore more of the options
+specified by the LMS user because the option is treated as read-only
+by the LMS provider.
+.TP
+.B LMI_NOTSUPPORT
+The LMS provider failed to recognize one or more of the options
+specified by the LMS user.
+.RE
+.\"
+.\"
+.SS State
+This primitive is issued by the LMS provider in direct response to an
+.BR LMI_OPTMGMT_REQ (7)
+primitive.
+.\"
+.\"
+.SS "New State"
+The new state remains unchanged.
+.\"
+.\"
+.SS Modes
+This primitive is issued in all modes.
+.\"
+.\"
+.SS Originator
+This primitive is issued by the LMS Provider.
+.\"
+.\"
+.SS Rules
+The LMS provider follows the following rules when processing option management
+service requests:
+.IP \(em \w'\(em\(em'u
+When the
+.I lmi_mgmt_flags
+field in the
+.BR LMI_OPTMGMT_REQ (7)
+primitive is set to
+.BR LMI_NEGOTIATE ,
+the LMS provider will attempt to negotiate a value for each of the options
+specified in the request.
+.IP \(em
+When the flags are
+.BR LMI_DEFAULT ,
+the LMS provider will return the default values of the specified options, or
+the default values of all options known to the LMS provider if no options were
+specified.
+.IP \(em
+When the flags are
+.BR LMI_CURRENT ,
+the LMS provider will return the current values of the specified options, or
+all options.
+.IP \(em
+When the flags are
+.BR LMI_CHECK ,
+the LMS provider will attempt to negotiate a value for each of the options
+specified in the request and return the resulg of the negotiation, but will
+not affect the current value of the option.
+.\"
+.\"
+.SH NOTES
+The Local Management Interface
+.[
+lmi
+.]
+is not subject to conformance.
+.\"
+.\"
+.SH FILES
+.BR <ss7/lmi.h> .
+.\"
+.\"
+.SH "SEE ALSO"
+.BR LMI_OPTMGMT_REQ (7),
+.BR lmi (7).
+.\"
+.\"
+.SH VERIONS
+This manpage was written for
+.BR @PACKAGE@-@VERSION@ .
+The Local Management Interface (LMI) is specific to
+.B OpenSS7
+and first appeared on
+.BR strss7-0.8.2 .
+This is Version 1 of the LMI interface.
+.\"
+.\"
+.XX
+.[
+lmi
+.]
+.[
+$LIST$
+.]
+.TI
+
