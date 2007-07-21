@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.92 $) $Date: 2007/07/14 01:33:47 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2007/07/21 20:09:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/14 01:33:47 $ by $Author: brian $
+# Last Modified $Date: 2007/07/21 20:09:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.93  2007/07/21 20:09:42  brian
+# - added pass structure
+#
 # Revision 0.9.2.92  2007/07/14 01:33:47  brian
 # - make license explicit, add documentation
 #
@@ -408,6 +411,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
 				  src/modules/sdl/sdl_pmod.c \
+				  src/modules/sdl/sdl_ch.c \
 				  src/modules/sdt/sdt.c \
 				  src/modules/sdt/sdt_pmod.c \
 				  src/modules/sl/sl.c \
@@ -754,6 +758,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
 				  src/modules/sdl/sdl_pmod.c \
+				  src/modules/sdl/sdl_ch.c \
 				  src/modules/sdt/sdt.c \
 				  src/modules/sdt/sdt_pmod.c \
 				  src/modules/sl/sl.c \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:34 $
+ @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:13:34 $ by $Author: brian $
+ Last Modified $Date: 2007/07/21 20:09:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_pmod.c,v $
+ Revision 0.9.2.2  2007/07/21 20:09:51  brian
+ - added pass structure
+
  Revision 0.9.2.1  2007/07/14 01:13:34  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:34 $"
+#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:34 $";
+    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $";
 
 #define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
@@ -86,8 +89,8 @@ static char const ident[] =
 #include <ss7/sdli.h>
 #include <ss7/sdli_ioctl.h>
 
-#define SDL_DESCRIP	"SS7/SDL: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:34 $"
+#define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS PIPE MODULE."
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -166,12 +169,18 @@ struct sdl_pair;
 struct sdl {
 	struct sdl_pair *pair;		/* thread pointer to pair */
 	struct sdl *other;		/* other private structure in pair */
+	queue_t *q;			/* queue for this side */
+	unsigned long timestamp;	/* tick interval timestamp */
+	unsigned long bytecount;	/* count of bytes so far */
+	unsigned long threshold;	/* threshould count for interval */
+	toid_t ticktimer;		/* tick timer */
 	uint max_sdu;			/* maximum SDU size */
 	uint min_sdu;			/* minimum SDU size */
 	uint header_len;		/* size of Level 1 header */
 	uint ppa_style;			/* PPA style */
 	uint hlen;			/* level 2 header length */
 	uint mlen;			/* mask for length indicator */
+	uint flags;			/* direction flags */
 	uint m_state;			/* management state */
 	uint m_oldstate;		/* previous state */
 	struct lmi_option option;	/* LMI protocol and variant options */
@@ -182,9 +191,6 @@ struct sdl {
 		struct sdl_stats statsp;	/* SDL statistics periods */
 		struct sdl_stats stats;		/* SDL statistics */
 	} sdl;
-	unsigned long ts;		/* throttle timestamp */
-	uint no;			/* throttle count */
-	uint tim;			/* throttle timer */
 };
 
 struct sdl_pair {
@@ -203,6 +209,55 @@ struct sdl_pair {
 #define STRLOGTX	4	/* log Stream primitives issued */
 #define STRLOGTE	5	/* log Stream timer events */
 #define STRLOGDA	6	/* log Stream data */
+
+static inline const char *
+sdl_primname(sdl_ulong prim)
+{
+	switch (prim) {
+	case LMI_INFO_REQ:
+		return ("LMI_INFO_REQ");
+	case LMI_ATTACH_REQ:
+		return ("LMI_ATTACH_REQ");
+	case LMI_DETACH_REQ:
+		return ("LMI_DETACH_REQ");
+	case LMI_ENABLE_REQ:
+		return ("LMI_ENABLE_REQ");
+	case LMI_DISABLE_REQ:
+		return ("LMI_DISABLE_REQ");
+	case LMI_OPTMGMT_REQ:
+		return ("LMI_OPTMGMT_REQ");
+	case LMI_INFO_ACK:
+		return ("LMI_INFO_ACK");
+	case LMI_OK_ACK:
+		return ("LMI_OK_ACK");
+	case LMI_ERROR_ACK:
+		return ("LMI_ERROR_ACK");
+	case LMI_ENABLE_CON:
+		return ("LMI_ENABLE_CON");
+	case LMI_DISABLE_CON:
+		return ("LMI_DISABLE_CON");
+	case LMI_OPTMGMT_ACK:
+		return ("LMI_OPTMGMT_ACK");
+	case LMI_ERROR_IND:
+		return ("LMI_ERROR_IND");
+	case LMI_STATS_IND:
+		return ("LMI_STATS_IND");
+	case LMI_EVENT_IND:
+		return ("LMI_EVENT_IND");
+	case SDL_BITS_FOR_TRANSMISSION_REQ:
+		return ("SDL_BITS_FOR_TRANSMISSION_REQ");
+	case SDL_CONNECT_REQ:
+		return ("SDL_CONNECT_REQ");
+	case SDL_DISCONNECT_REQ:
+		return ("SDL_DISCONNECT_REQ");
+	case SDL_RECEIVED_BITS_IND:
+		return ("SDL_RECEIVED_BITS_IND");
+	case SDL_DISCONNECT_IND:
+		return ("SDL_DISCONNECT_IND");
+	default:
+		return ("(Unknown Primitive)");
+	}
+}
 
 /**
  * sdl_statename: display LMI state name
@@ -246,20 +301,31 @@ sdl_get_m_state(struct sdl *sdl)
 /**
  * sdl_set_m_state: - set management state for private structure
  * @sdl: private structure
- * @q: active queue
  * @newstate: new state
  */
 static int
-sdl_set_m_state(struct sdl *sdl, queue_t *q, int newstate)
+sdl_set_m_state(struct sdl *sdl, int newstate)
 {
 	int oldstate = sdl->m_state;
 
 	if (newstate != oldstate) {
 		sdl->m_state = newstate;
-		mi_strlog(q, STRLOGST, SL_TRACE, "%s <- %s", sdl_statename(newstate),
+		mi_strlog(sdl->q, STRLOGST, SL_TRACE, "%s <- %s", sdl_statename(newstate),
 			  sdl_statename(oldstate));
 	}
 	return (newstate);
+}
+
+static int
+sdl_save_m_state(struct sdl *sdl)
+{
+	return ((sdl->m_oldstate = sdl_get_m_state(sdl)));
+}
+
+static int
+sdl_restore_m_state(struct sdl *sdl)
+{
+	return sdl_set_m_state(sdl, sdl->m_oldstate);
 }
 
 /*
@@ -328,7 +394,6 @@ lmi_info_ack(struct sdl *s, queue_t *q, mblk_t *msg)
 	return (-ENOBUFS);
 }
 
-#if 0
 /**
  * lmi_ok_ack: - generate LMI_OK_ACK primitive
  * @s: private structure
@@ -349,10 +414,10 @@ lmi_ok_ack(struct sdl *s, queue_t *q, mblk_t *msg, int prim)
 		p->lmi_correct_primitive = prim;
 		switch (sdl_get_m_state(s)) {
 		case LMI_ATTACH_PENDING:
-			p->lmi_state = sdl_set_m_state(s, q, LMI_UNATTACHED);
+			p->lmi_state = sdl_set_m_state(s, LMI_UNATTACHED);
 			break;
 		case LMI_DETACH_PENDING:
-			p->lmi_state = sdl_set_m_state(s, q, LMI_DISABLED);
+			p->lmi_state = sdl_set_m_state(s, LMI_DISABLED);
 			break;
 		default:
 			p->lmi_state = sdl_get_m_state(s);
@@ -366,7 +431,6 @@ lmi_ok_ack(struct sdl *s, queue_t *q, mblk_t *msg, int prim)
 	}
 	return (-ENOBUFS);
 }
-#endif
 
 /**
  * lmi_error_ack: - generate LMI_ERROR_ACK primitive
@@ -389,7 +453,7 @@ lmi_error_ack(struct sdl *s, queue_t *q, mblk_t *msg, int prim, int error)
 		p->lmi_errno = error < 0 ? LMI_SYSERR : error;
 		p->lmi_reason = error < 0 ? -error : 0;
 		p->lmi_error_primitive = prim;
-		p->lmi_state = sdl_set_m_state(s, q, s->m_oldstate);
+		p->lmi_state = sdl_restore_m_state(s);
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ERROR_ACK");
@@ -432,7 +496,7 @@ lmi_enable_con(struct sdl *s, queue_t *q, mblk_t *msg)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ENABLE_CON;
-		p->lmi_state = sdl_set_m_state(s, q, LMI_ENABLED);
+		p->lmi_state = sdl_set_m_state(s, LMI_ENABLED);
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ENABLE_CON");
@@ -458,7 +522,7 @@ lmi_disable_con(struct sdl *s, queue_t *q, mblk_t *msg)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_DISABLE_CON;
-		p->lmi_state = sdl_set_m_state(s, q, LMI_DISABLED);
+		p->lmi_state = sdl_set_m_state(s, LMI_DISABLED);
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_DISABLE_CON");
@@ -520,7 +584,7 @@ lmi_error_ind(struct sdl *s, queue_t *q, mblk_t *msg, int error, uint state)
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_errno = error < 0 ? LMI_SYSERR : error;
 		p->lmi_reason = error < 0 ? -error : 0;
-		p->lmi_state = sdl_set_m_state(s, q, state);
+		p->lmi_state = sdl_set_m_state(s, state);
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ERROR_IND");
@@ -875,6 +939,101 @@ sdt_txc_transmission_request_ind(struct sdt *sdt, queue_t *q, queue_t *oq, mblk_
  *  ========================================================================
  */
 
+static inline int
+sdl_attach(struct sdl *sdl, queue_t *q, mblk_t *msg)
+{
+	int err;
+	sdl_set_m_state(sdl, LMI_ATTACH_PENDING);
+	err = lmi_ok_ack(sdl, q, msg, LMI_ATTACH_REQ);
+	return (err);
+}
+
+static inline int
+sdl_enable(struct sdl *sdl, queue_t *q, mblk_t *msg)
+{
+	int err;
+	sdl_set_m_state(sdl, LMI_ENABLE_PENDING);
+	err = lmi_enable_con(sdl, q, msg);
+	return (err);
+}
+
+static inline int
+sdl_connect(struct sdl *sdl, queue_t *q, mblk_t *msg, int flags)
+{
+	sdl->flags |= flags;
+	/* Under CHI, connect requests are confirmed.  Not under SDL. */
+	freemsg(msg);
+	return (0);
+}
+
+static streamscall void
+sdl_tickdone(caddr_t arg)
+{
+	struct sdl *sdl = (typeof(sdl)) arg;
+
+	if (xchg(&sdl->ticktimer, 0))
+		qenable(sdl->q);
+}
+
+static inline int
+sdl_layer1_bits_for_transmission(struct sdl *sdl, queue_t *q, mblk_t *dp)
+{
+	size_t bytecount;
+
+	/* Here we do throttling. */
+	/* First, check if the clock ticked over.  If the clock ticked over then clear the byte
+	 * count. */
+	if (sdl->timestamp != jiffies) {
+		sdl->timestamp = jiffies;
+		sdl->bytecount = 0;
+	}
+	bytecount = msgdsize(dp);
+	if (sdl->bytecount == 0 || sdl->bytecount + bytecount > sdl->threshold) {
+		if (sdl->ticktimer)
+			return (-EBUSY);
+		if ((sdl->ticktimer = timeout(&sdl_tickdone, (caddr_t) sdl, 1)) != 0)
+			return (-EBUSY);
+	}
+	if ((sdl->flags & SDL_TX_DIRECTION) && (sdl->other->flags & SDL_RX_DIRECTION)) {
+		if (!bcanputnext(q, dp->b_band))
+			return (-EBUSY);
+		putnext(q, dp);
+		return (0);
+	}
+	freemsg(dp);
+	return (0);
+}
+
+static inline int
+sdl_disconnect(struct sdl *sdl, queue_t *q, mblk_t *msg, int flags)
+{
+	sdl->flags &= ~flags;
+	/* Under CHI, disconnect requests are confirmed.  Not under SDL. */
+	freemsg(msg);
+	return (0);
+}
+
+static inline int
+sdl_disable(struct sdl *sdl, queue_t *q, mblk_t *msg)
+{
+	int err;
+
+	sdl_set_m_state(sdl, LMI_DISABLE_PENDING);
+	err = lmi_disable_con(sdl, q, msg);
+	return (err);
+}
+
+static inline int
+sdl_detach(struct sdl *sdl, queue_t *q, mblk_t *msg)
+{
+	int err;
+
+	sdl_set_m_state(sdl, LMI_DETACH_PENDING);
+	err = lmi_ok_ack(sdl, q, msg, LMI_DETACH_REQ);
+	return (err);
+}
+
+
 #if 0
 /*
  *  M_DATA Handling
@@ -977,13 +1136,15 @@ lmi_attach_req(struct sdl *s, queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto tooshort;
-	if (sdl_get_m_state(s) != LMI_UNATTACHED && sdl_get_m_state(s) != LMI_DISABLED)
+	p = (typeof(p)) mp->b_rptr;
+	if (sdl_get_m_state(s) != LMI_UNATTACHED
+	    && (sdl_get_m_state(s) != LMI_DISABLED || mp->b_wptr == mp->b_rptr + sizeof(*p)))
 		goto outstate;
-	sdl_set_m_state(s, q, LMI_ATTACH_PENDING);
-	goto notsupp;
-      notsupp:
-	err = LMI_NOTSUPP;
-	goto error;
+	/* Note that we do not need to support LMI_ATTACH_REQ because this is a style 1 drier only,
+	   but if the address is null, simply move to the appropriate state. */
+	if ((err = sdl_attach(s, q, mp)) != 0)
+		goto error;
+	return (0);
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;
@@ -1013,11 +1174,9 @@ lmi_detach_req(struct sdl *s, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sdl_get_m_state(s) != LMI_UNATTACHED && sdl_get_m_state(s) != LMI_DISABLED)
 		goto outstate;
-	sdl_set_m_state(s, q, LMI_DETACH_PENDING);
-	goto notsupp;
-      notsupp:
-	err = LMI_NOTSUPP;
-	goto error;
+	if ((err = sdl_detach(s, q, mp)) != 0)
+		goto error;
+	return (0);
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;
@@ -1047,8 +1206,7 @@ lmi_enable_req(struct sdl *s, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sdl_get_m_state(s) != LMI_DISABLED && sdl_get_m_state(s) != LMI_ENABLED)
 		goto outstate;
-	sdl_set_m_state(s, q, LMI_ENABLE_PENDING);
-	if ((err = lmi_enable_con(s, q, mp)) != 0)
+	if ((err = sdl_enable(s, q, mp)) != 0)
 		goto error;
 	return (0);
       outstate:
@@ -1080,8 +1238,7 @@ lmi_disable_req(struct sdl *s, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sdl_get_m_state(s) != LMI_DISABLED && sdl_get_m_state(s) != LMI_ENABLED)
 		goto outstate;
-	sdl_set_m_state(s, q, LMI_DISABLE_PENDING);
-	if ((err = lmi_disable_con(s, q, mp)) != 0)
+	if ((err = sdl_disable(s, q, mp)) != 0)
 		goto error;
 	return (0);
       outstate:
@@ -1118,8 +1275,6 @@ lmi_optmgmt_req(struct sdl *s, queue_t *q, mblk_t *mp)
       error:
 	return lmi_error_reply(s, q, mp, LMI_OPTMGMT_REQ, err);
 }
-
-int sdl_layer1_bits_for_transmission(struct sdl *, queue_t *, mblk_t *);
 
 #if 1
 /**
@@ -1158,8 +1313,6 @@ sdl_bits_for_transmission_req(struct sdl *s, queue_t *q, mblk_t *mp)
 	return lmi_error_reply(s, q, mp, SDL_BITS_FOR_TRANSMISSION_REQ, err);
 }
 
-int sdl_connect(struct sdl *, queue_t *, mblk_t *);
-
 /**
  * sdl_connect_req: - process SDL_CONNECT_REQ primitive
  * @s: private structure
@@ -1176,9 +1329,18 @@ sdl_connect_req(struct sdl *s, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sdl_get_m_state(s) != LMI_ENABLED)
 		goto outstate;
-	if ((err = sdl_connect(s, q, mp)) != 0)
+	p = (typeof(p)) mp->b_rptr;
+	if ((p->sdl_flags & ~(SDL_TX_DIRECTION | SDL_RX_DIRECTION)) ||
+	    ((p->sdl_flags & (SDL_TX_DIRECTION | SDL_RX_DIRECTION)) == 0))
+		goto badflag;
+	if (((s->flags ^ p->sdl_flags) & p->sdl_flags) == 0)
+		goto outstate;
+	if ((err = sdl_connect(s, q, mp, p->sdl_flags)) != 0)
 		goto error;
 	return (0);
+      badflag:
+	err = LMI_UNSPEC;
+	goto error;
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;
@@ -1188,8 +1350,6 @@ sdl_connect_req(struct sdl *s, queue_t *q, mblk_t *mp)
       error:
 	return lmi_error_reply(s, q, mp, SDL_CONNECT_REQ, err);
 }
-
-int sdl_disconnect(struct sdl *, queue_t *, mblk_t *);
 
 /**
  * sdl_disconnect_req: - process SDL_DISCONNECT_REQ primitive
@@ -1207,9 +1367,18 @@ sdl_disconnect_req(struct sdl *s, queue_t *q, mblk_t *mp)
 		goto tooshort;
 	if (sdl_get_m_state(s) != LMI_ENABLED)
 		goto outstate;
-	if ((err = sdl_disconnect(s, q, mp)) != 0)
+	p = (typeof(p)) mp->b_rptr;
+	if ((p->sdl_flags & ~(SDL_TX_DIRECTION | SDL_RX_DIRECTION)) &&
+	    ((p->sdl_flags & (SDL_RX_DIRECTION | SDL_RX_DIRECTION)) == 0))
+		goto badflag;
+	if (((s->flags ^ ~p->sdl_flags) & p->sdl_flags) == 0)
+		goto outstate;
+	if ((err = sdl_disconnect(s, q, mp, p->sdl_flags)) != 0)
 		goto error;
 	return (0);
+      badflag:
+	err = LMI_UNSPEC;
+	goto error;
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;
@@ -2208,7 +2377,7 @@ sdl_m_proto(struct sdl *s, queue_t *q, mblk_t *mp)
 	if ((priv = mi_trylock(q)) == NULL)
 		return (-EDEADLK);
 
-	s->m_oldstate = sdl_get_m_state(s);
+	sdl_save_m_state(s);
 
 	switch (*(lmi_ulong *) mp->b_rptr) {
 	case LMI_INFO_REQ:
@@ -2293,7 +2462,7 @@ sdl_m_proto(struct sdl *s, queue_t *q, mblk_t *mp)
 #endif
 	}
 	if (rtn)
-		sdl_set_m_state(s, q, s->m_oldstate);
+		sdl_restore_m_state(s);
 	mi_unlock(priv);
 	return (rtn);
 }
@@ -2579,13 +2748,16 @@ sdl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 
 	sp->r_priv.pair = sp;
 	sp->r_priv.other = &sp->w_priv;
+	sp->r_priv.q = RD(q);
+	sp->r_priv.timestamp = jiffies;
+	sp->r_priv.bytecount = 0;
+	sp->r_priv.ticktimer = 0;
+	sp->r_priv.threshold = 8000 / HZ;
 	sp->r_priv.max_sdu = FASTBUF;
 	sp->r_priv.min_sdu = FASTBUF;
 	sp->r_priv.header_len = 0;
 	sp->r_priv.ppa_style = LMI_STYLE1;
-	sp->r_priv.ts = jiffies;
-	sp->r_priv.no = 0;
-	sp->r_priv.tim = 0;
+	sp->r_priv.flags = 0;
 	sp->r_priv.m_state = LMI_DISABLED;
 
 	sp->r_priv.option.pvar = SS7_PVAR_ITUT_00;
@@ -2628,13 +2800,16 @@ sdl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 
 	sp->w_priv.pair = sp;
 	sp->w_priv.other = &sp->r_priv;
+	sp->w_priv.q = WR(q);
+	sp->w_priv.timestamp = jiffies;
+	sp->w_priv.bytecount = 0;
+	sp->w_priv.ticktimer = 0;
+	sp->w_priv.threshold = 8000 / HZ;
 	sp->w_priv.max_sdu = FASTBUF;
 	sp->w_priv.min_sdu = FASTBUF;
 	sp->w_priv.header_len = 0;
 	sp->w_priv.ppa_style = LMI_STYLE1;
-	sp->w_priv.ts = jiffies;
-	sp->w_priv.no = 0;
-	sp->w_priv.tim = 0;
+	sp->w_priv.flags = 0;
 	sp->w_priv.m_state = LMI_DISABLED;
 
 	sp->w_priv.option.pvar = SS7_PVAR_ITUT_00;
@@ -2688,6 +2863,11 @@ sdl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 STATIC streamscall int
 sdl_qclose(queue_t *q, int oflags, cred_t *crp)
 {
+	struct sdl *sdl = SDL_PRIV(q);
+	toid_t t;
+
+	if ((t = xchg(&sdl->ticktimer, 0)))
+		untimeout(t);
 	qprocsoff(q);
 	mi_close_comm(&sdl_opens, q);
 	return (0);
