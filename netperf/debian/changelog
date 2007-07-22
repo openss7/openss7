@@ -1,6 +1,6 @@
-netperf (2.3.7-0) experimental; urgency=low
+netperf (2.3.7.rc1-0) experimental; urgency=low
 
-  * Seventh public release.
+  * Seventh public release, first release candidate.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon, 25 Jun 2007 13:21:11 -0600
 

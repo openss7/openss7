@@ -1,6 +1,6 @@
-strcompat (0.9.2.7-0) experimental; urgency=low
+strcompat (0.9.2.7.rc1-0) experimental; urgency=low
 
-  * Seventh public release.
+  * Seventh public release, first release candidate.
 
  -- Brian F. G. Bidulock <bidulock@openss7.org>  Mon, 25 Jun 2007 13:23:09 -0600
 
