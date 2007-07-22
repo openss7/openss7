@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.6 2006/12/08 05:08:23 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.7 2007/07/22 01:10:24 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:23 $ by $Author: brian $
+ Last Modified $Date: 2007/07/22 01:10:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.7  2007/07/22 01:10:24  brian
+ - corrections for RHAS4 irq_handler_t and XEN paddr_t
+
  Revision 0.9.2.6  2006/12/08 05:08:23  brian
  - some rework resulting from testing and inspection
 
@@ -73,7 +76,7 @@
 #ifndef __SYS_UW7_STREAM_H__
 #define __SYS_UW7_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/uw7/stream.h directly, include sys/stream.h instead."
@@ -99,7 +102,9 @@
 
 #if defined CONFIG_STREAMS_COMPAT_UW7 || defined CONFIG_STREAMS_COMPAT_UW7_MODULE
 
+#ifndef HAVE_KTYPE_PADDR_T
 typedef unsigned long paddr_t;
+#endif
 typedef struct physreq {
 	paddr_t phys_align;
 	paddr_t phys_boundary;
