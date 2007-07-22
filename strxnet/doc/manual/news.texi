@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.31 2007/06/26 18:15:57 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.32 2007/07/22 04:05:11 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/26 18:15:57 $ by $Author: brian $
+@c Last Modified $Date: 2007/07/22 04:05:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -104,6 +104,7 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+Made kernel modules license explicit GPL v2.
 
 @end itemize
 

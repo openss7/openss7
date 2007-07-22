@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.1 2006/08/27 12:02:20 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.2 2007/07/22 04:04:36 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,12 +53,18 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2006/08/27 12:02:20 $ by $Author: brian $
+@c Last Modified $Date: 2007/07/22 04:04:36 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
-@item (no items)
+@item 001.  2007-07-21T20:50:14-0600
+
+It was discovered that the long_options arrays were not zero terminated causing the netperf program
+to segfault when issued a non-existent option.
+
+@emph{*fixed*} in @command{netperf-2.3.7}.
+
 @end table
 
 
