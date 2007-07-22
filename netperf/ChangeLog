@@ -1,5 +1,7 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* nettest_xti.c: correction
+
 	* pkgrelease: bumped for release candidate
 	* debian/changelog: bumped for release candidate
 
