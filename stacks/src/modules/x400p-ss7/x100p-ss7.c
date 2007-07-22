@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/22 01:10:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:25 $ by $Author: brian $
+ Last Modified $Date: 2007/07/22 01:10:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 0.9.2.30  2007/07/22 01:10:18  brian
+ - corrections for RHAS4 irq_handler_t and XEN paddr_t
+
  Revision 0.9.2.29  2007/07/14 01:35:25  brian
  - make license explicit, add documentation
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $"
+#ident "@(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/22 01:10:18 $"
 
 static char const ident[] =
-    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $";
+    "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/22 01:10:18 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -115,7 +118,7 @@ static char const ident[] =
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:25 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 0.9.2.30 $) $Date: 2007/07/22 01:10:18 $"
 #define X100P_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -8490,7 +8493,7 @@ xp_overflow(struct cd *cd)
  *  -----------------------------------
  */
 STATIC irqreturn_t
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_e1_interrupt(int irq, void *dev_id)
 #else
 xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
@@ -8608,7 +8611,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  -----------------------------------
  */
 STATIC irqreturn_t
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_t1_interrupt(int irq, void *dev_id)
 #else
 xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)

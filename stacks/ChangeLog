@@ -1,5 +1,12 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* acinclude.m4: corrections for RHAS4 irq_handler_t
+	* doc/manual/bugs.texi: corrections for RHAS4 irq_handler_t
+	* src/modules/x400p-ss7/sl_x100p.c: corrections for RHAS4 irq_handler_t
+	* src/modules/x400p-ss7/sl_x400p.c: corrections for RHAS4 irq_handler_t
+	* src/modules/x400p-ss7/x100p-ss7.c: corrections for RHAS4 irq_handler_t
+	* src/modules/x400p-ss7/x400p-ss7.c: corrections for RHAS4 irq_handler_t
+
 	* .pkgrelease: bumped for release candidate
 	* debian/changelog: bumped for release candidate
 

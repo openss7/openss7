@@ -18,7 +18,7 @@
 #include "pmacd.h"
 #include "pmacd_board.h"
 
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 irqreturn_t pmacd_handleInterrupt(int irq, void *pBoard);
 #else
 #ifdef HAVE_KTYPE_IRQRETURN_T

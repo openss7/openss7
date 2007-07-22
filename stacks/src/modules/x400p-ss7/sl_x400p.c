@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:23 $ by $Author: brian $
+ Last Modified $Date: 2007/07/22 01:10:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.44  2007/07/22 01:10:16  brian
+ - corrections for RHAS4 irq_handler_t and XEN paddr_t
+
  Revision 0.9.2.43  2007/07/14 01:35:23  brian
  - make license explicit, add documentation
 
@@ -139,10 +142,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -197,7 +200,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:35:23 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9966,7 +9969,7 @@ xp_e1_txrx_burst(struct cd *cd)
  *  languages.
  */
 STATIC __hot irqreturn_t
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_e400_interrupt(int irq, void *dev_id)
 #else
 xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
@@ -10092,7 +10095,7 @@ xp_e400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  operation is key in controlling the DS2155 with higher order languages.  
  */
 STATIC __hot irqreturn_t
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_e401_interrupt(int irq, void *dev_id)
 #else
 xp_e401_interrupt(int irq, void *dev_id, struct pt_regs * regs)
@@ -10275,7 +10278,7 @@ xp_t1_txrx_burst(struct cd *cd)
  *  languages.
  */
 STATIC __hot irqreturn_t
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_t400_interrupt(int irq, void *dev_id)
 #else
 xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
@@ -10435,7 +10438,7 @@ xp_t400_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  operation is key in controlling the DS2155 with higher order languages.  
  */
 STATIC __hot irqreturn_t
-#ifdef HAVE_KTYPE_IRQ_HANDLER_T
+#ifdef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 xp_t401_interrupt(int irq, void *dev_id)
 #else
 xp_t401_interrupt(int irq, void *dev_id, struct pt_regs * regs)

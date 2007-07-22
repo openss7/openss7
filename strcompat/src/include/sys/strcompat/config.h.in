@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 0.9.2.5 2007/03/25 19:01:03 brian Exp $
+ @(#) $Id: config.h.in,v 0.9.2.6 2007/07/22 01:10:23 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:01:03 $ by $Author: brian $
+ Last Modified $Date: 2007/07/22 01:10:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 0.9.2.6  2007/07/22 01:10:23  brian
+ - corrections for RHAS4 irq_handler_t and XEN paddr_t
+
  Revision 0.9.2.5  2007/03/25 19:01:03  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -74,7 +77,7 @@
 #ifndef __SYS_STRCOMPAT_CONFIG_H__
 #define __SYS_STRCOMPAT_CONFIG_H__
 
-#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: config.h.in,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /*
  * @configure_input@
@@ -162,11 +165,17 @@
 /* Define to 1 if you have the <linux/utsrelease.h> header file. */
 #undef HAVE_KINC_LINUX_UTSRELEASE_H
 
+/* Define to 1 if the system has the type 'paddr_t'. */
+#undef HAVE_KTYPE_PADDR_T
+
 /* Define to 1 if the system has the type 'irqreturn_t'. */
 #undef HAVE_KTYPE_IRQRETURN_T
 
 /* Define to 1 if the system has the type 'irq_handler_t'. */
 #undef HAVE_KTYPE_IRQ_HANDLER_T
+
+/* Define to 1 if 'irq_handler_t' takes 2 arguments. */
+#undef HAVE_KTYPE_IRQ_HANDLER_2ARGS
 
 /* Define if do_settimeofday takes struct timespec and returns int. */
 #undef HAVE_TIMESPEC_DO_SETTIMEOFDAY

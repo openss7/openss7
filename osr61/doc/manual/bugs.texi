@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.3 2007/02/28 06:30:25 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.4 2007/07/22 01:09:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,9 +53,25 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/02/28 06:30:25 $ by $Author: brian $
+@c Last Modified $Date: 2007/07/22 01:09:45 $ by $Author: brian $
 @c
 @c =========================================================================
+
+@table @code
+@item 001.  2007-07-21T17:15:02-0600
+
+It was discovered that recent kernel on RHAS4 are defining irq_handler_t but
+have the old 3 argument function template for irq handlers.  The detection
+logic assumed that if irq_hander_t existed, that the newer 2 argument function
+template for irq handlers were in effect.  This caused builds to fail on these
+RHAS4 kernels.
+
+@emph{*fixed*} in @command{osr61-0.9.3.rc1}.
+
+A check was added to the configure script to test whether the irq_handler_t
+has the newer 2 argument template.
+
+@end table
 
 Note that, while converting these drivers to @cite{Linux Fast-STREAMS}, I notices several bugs from
 inspection and compiler warnings.

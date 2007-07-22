@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/03/25 19:00:56 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/22 01:10:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 19:00:56 $ by $Author: brian $
+# Last Modified $Date: 2007/07/22 01:10:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -780,7 +780,7 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #include <asm/uaccess.h>
 #endif
 ])
-    _LINUX_CHECK_TYPES([irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
+    _LINUX_CHECK_TYPES([paddr_t, irqreturn_t, irq_handler_t, bool, kmem_cache_t *], [:], [:], [
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -814,6 +814,60 @@ AC_DEFUN([_COMPAT_CONFIG_KERNEL], [dnl
 #endif
 #include <linux/time.h>		/* for struct timespec */
 ])
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel irq_handler_t has 2 arguments], [linux_cv_type_irq_handler_t_2args], [dnl
+	    if test :$linux_cv_type_irq_handler_t = :yes ; then
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */
+]],
+		    [[
+irq_handler_t my_autoconf_function_pointer1 = NULL;
+irqreturn_t (*my_autoconf_function_pointer2)(int, void *) = NULL;
+my_autoconf_function_pointer1 = my_autoconf_function_pointer2;
+]]) ],
+		    [linux_cv_type_irq_handler_t_2args='yes'],
+		    [linux_cv_type_irq_handler_t_2args='no'])
+	    else
+		linux_cv_type_irq_handler_t_2args='no'
+	    fi
+	])
+	if test :$linux_cv_type_irq_handler_t_2args = :yes ; then
+	    AC_DEFINE([HAVE_KTYPE_IRQ_HANDLER_2ARGS], [1], [Define if
+		       'irq_handler_t' takes 2 arguments.])
+	fi
+    ])
     AH_TEMPLATE([kmem_cachep_t], [This kmem_cache_t is deprecated in recent
 	2.6.20 kernels.  When it is deprecated, define this to struct
 	kmem_cache *.])
