@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 0.9.2.7 2007/06/23 01:38:25 brian Exp $
+@c @(#) $Id: bugs.texi,v 0.9.2.8 2007/07/22 04:04:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,11 +53,33 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/23 01:38:25 $ by $Author: brian $
+@c Last Modified $Date: 2007/07/22 04:04:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
 @table @code
+@item 007.  2007-07-21T21:06:48-0600
+
+It was discovered that many network devices were claiming to have hardware checksum capability by
+setting the @var{NETIF_HW_CSUM} flag, but did not support SCTP checksum offload.
+
+@emph{*workaround*} in @command{strsctp-0.9.2.8}
+
+The workaround is to ignore the flag for now.  Either Linux network drivers need to start supporting
+SCTP checksum when they set the @var{NETIF_HW_CSUM} flag, or there needs to be some flag provided
+for SCTP.  The workaround is to not believe that the driver does SCTP checksum offload when
+@var{NETIF_HW_CSUM} is set.
+
+@item 006.  2007-07-21T21:05:10-0600
+
+It was detected that the @var{XTI_SNDBUF} and @var{XTI_RCVBUF} options were not being set correctly
+(in fact, not being set at all).
+
+@emph{*fixed*} in @command{strsctp-0.9.2.8}
+
+@var{XTI_SNDBUF} now limits the maximum available send window.  @var{XTI_RCVBUF} now alters the
+advertized receive window.
+
 @item 005.  2007-05-18T07:06:33+0000
 
 Found the most obnoxious of bugs.  When testing on loopback, more than 255 calls

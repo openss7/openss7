@@ -1,5 +1,7 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: release notes update
+
 	* scripts/texi/compat.texi: noted problem with XEN kernels
 	* doc/manual/bugs.texi: noted problem with XEN kernels
 	* iperf/doc/manual/compat.texi: noted problem with XEN kernels

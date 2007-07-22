@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 0.9.2.31 2007/06/25 19:48:48 brian Exp $
+@c @(#) $Id: news.texi,v 0.9.2.32 2007/07/22 04:04:55 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/25 19:48:48 $ by $Author: brian $
+@c Last Modified $Date: 2007/07/22 04:04:55 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -89,6 +89,16 @@ Major features since the last public release are as follows:
 
 @itemize -
 @item
+Minor documentation corrections.
+
+@item
+Made kernel modules license explicit GPL v2.
+
+@item
+Work-around for incorrect driver use of @var{NETIF_HW_CSUM}.
+
+@item
+Proper setting of @var{XTI_SNDBUF} and @var{XTI_RCVBUF}.
 
 @end itemize
 

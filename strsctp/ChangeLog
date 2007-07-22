@@ -1,5 +1,8 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: release notes update
+	* doc/manual/bugs.texi: release notes update
+
 	* pkgrelease: bumped for release candidate
 	* debian/changelog: bumped for release candidate
 

@@ -1,5 +1,7 @@
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/manual/news.texi: release notes update
+
 	* acinclude.m4: corrections for RHAS4 irq_handler_t
 	* doc/manual/bugs.texi: corrections for RHAS4 irq_handler_t
 	* src/include/sys/strcompat/config.h.in: corrections for RHAS4 irq_handler_t
