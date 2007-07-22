@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.26 $) $Date: 2007/07/21 19:34:29 $
+ @(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.27 $) $Date: 2007/07/22 01:05:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 19:34:29 $ by $Author: brian $
+ Last Modified $Date: 2007/07/22 01:05:57 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.26 $) $Date: 2007/07/21 19:34:29 $"
+#ident "@(#) $RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.27 $) $Date: 2007/07/22 01:05:57 $"
 
-static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.26 $) $Date: 2007/07/21 19:34:29 $";
+static char const ident[] = "$RCSfile: nettest_xti.c,v $ $Name:  $($Revision: 1.1.1.27 $) $Date: 2007/07/22 01:05:57 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -284,6 +284,8 @@ comma.\n";
 void
 get_xti_info(int socket, t_scalar_t level, int *mss)
 {
+#if 0
+#if defined T_TCP_MAXSEG || defined T_SCTP_MAXSEG
   struct t_optmgmt *opt_req;
   struct t_optmgmt *opt_ret;
   struct myoption {
@@ -316,6 +318,8 @@ get_xti_info(int socket, t_scalar_t level, int *mss)
 	    opt_ret->opt.buf, opt_ret->opt.maxlen, opt_ret->opt.len);
     fflush(where);
   }
+#endif
+#endif
 
   switch (level) {
   case T_INET_TCP:
@@ -534,7 +538,7 @@ create_xti_endpoint(char *name, int level)
     fprintf(where,"create_xti_endpoint: XTI_SNDBUF option status 0x%.4x",
 	    sock_option->myopthdr.status);
     fprintf(where," value %ld\n",
-	    sock_option->value);
+	    (long) sock_option->value);
     fflush(where);
     lss_size = -1;
   }
