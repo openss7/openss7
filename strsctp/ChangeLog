@@ -1,3 +1,8 @@
+2007-07-21  Brian Bidulock  <bidulock@openss7.org>
+
+	* pkgrelease: bumped for release candidate
+	* debian/changelog: bumped for release candidate
+
 2007-07-18  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/sctp2.c:
