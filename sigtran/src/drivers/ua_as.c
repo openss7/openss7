@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:34:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.11  2007/08/03 13:34:42  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.10  2007/07/14 01:33:36  brian
  - make license explicit, add documentation
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:42 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:42 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -132,9 +135,6 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
-
-#undef DB_TYPE
-#define DB_TYPE(mp) mp->b_datap->db_type
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -190,7 +190,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:36 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:42 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

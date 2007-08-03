@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:33 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:34:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.9  2007/08/03 13:34:38  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.8  2007/07/14 01:33:33  brian
  - make license explicit, add documentation
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:38 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:38 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -95,9 +98,6 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
-
-#undef DB_TYPE
-#define DB_TYPE(mp) mp->b_datap->db_type
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -153,7 +153,7 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:33 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:38 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:28 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:34:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.11  2007/08/03 13:34:29  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.10  2007/07/14 01:33:28  brian
  - make license explicit, add documentation
 
@@ -127,10 +130,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:28 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:29 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:28 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:29 $";
 
 /*
  *  This is an M3UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -177,9 +180,6 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
-
-#undef DB_TYPE
-#define DB_TYPE(mp) mp->b_datap->db_type
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -235,7 +235,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:33:28 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/03 13:34:29 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2036,29 +2036,6 @@ sp_lm_release(struct up *lm)
  *  =========================================================================
  */
 
-static streamscall void ua_qenable(long data)
-{
-	queue_t *q = (queue_t *) data;
-	qenable(q);
-}
-
-static mblk_t *
-ua_allocb(queue_t *q, size_t len, int priority)
-{
-	mblk_t *mp;
-
-	if (unlikely((mp = allocb(len, priority)) == NULL)) {
-		struct bc *bc = BC_PRIV(q);
-		bcid_t bid, *bidp = (q->q_flag & QREADR) ? &bc->rbid : &bc->wbid;
-
-		if ((bid = bufcall(len, priority, &ua_qenable, (long) q)))
-			unbufcall(xchg(bidp, bid));
-		else
-			qenable(q);
-	}
-	return (mp);
-}
-
 noinline fastcall int
 m_hangup(struct up *up, queue_t *q, mblk_t *msg)
 {
@@ -2068,7 +2045,7 @@ m_hangup(struct up *up, queue_t *q, mblk_t *msg)
 		freemsg(msg);
 		return (0);
 	}
-	if ((mp = ua_allocb(q, 0, BPRI_MED))) {
+	if ((mp = mi_allocb(q, 0, BPRI_MED))) {
 		DB_TYPE(mp) = M_HANGUP;
 		freemsg(msg);
 		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- M_HANGUP");
@@ -2088,7 +2065,7 @@ m_unhangup(struct up *up, queue_t *q, mblk_t *msg)
 		freemsg(msg);
 		return (0);
 	}
-	if ((mp = ua_allocb(q, 0, BPRI_MED))) {
+	if ((mp = mi_allocb(q, 0, BPRI_MED))) {
 		DB_TYPE(mp) = M_UNHANGUP;
 		freemsg(msg);
 		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- M_HANGUP");
@@ -2104,7 +2081,7 @@ m_error(struct up *up, queue_t *q, mblk_t *msg, uchar rerr, uchar werr)
 {
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, 2, BPRI_MED))) {
+	if ((mp = mi_allocb(q, 2, BPRI_MED))) {
 		DB_TYPE(mp) = M_ERROR;
 		*mp->b_wptr++ = rerr;
 		*mp->b_wptr++ = werr;
@@ -3375,7 +3352,7 @@ ua_sctp_ind(struct tp *tp, queue_t *q, mblk_t *dp)
 		struct UA_sctp_ind *p;
 		mblk_t *mp;
 
-		if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+		if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 			if (pcmsg(DB_TYPE(dp)) || bcanputnext(q, dp->b_band)) {
 				DB_TYPE(mp) = (DB_TYPE(dp) == M_PCPROTO) ? M_PCPROTO : M_PROTO;
 				mp->b_band = dp->b_band;
@@ -3474,7 +3451,7 @@ ua_aspup_con(struct up *lm, queue_t *q, mblk_t *msg, struct gp *gp)
 	struct UA_aspup_con *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		struct sp *sp = gp->sg.sg->sp.sp;
 
 		DB_TYPE(mp) = M_PROTO;
@@ -3535,7 +3512,7 @@ ua_aspdn_con(struct gp *gp, queue_t *q, mblk_t *msg)
 			struct UA_aspdn_con *p;
 			mblk_t *mp;
 
-			if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+			if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 				if (canputnext(lm->rq)) {
 					DB_TYPE(mp) = M_PROTO;
 					p = (typeof(p)) mp->b_wptr;
@@ -3579,7 +3556,7 @@ ua_aspdn_ind(struct gp *gp, queue_t *q, mblk_t *msg, uint reason)
 	if ((lm = sp_lm_acquire(gp->sg.sg->sp.sp, q, &err))) {
 		mblk_t *mp;
 
-		if ((mp = ua_allocb(q, sizeof(struct UA_aspdn_ind), BPRI_MED))) {
+		if ((mp = mi_allocb(q, sizeof(struct UA_aspdn_ind), BPRI_MED))) {
 			if (canputnext(lm->rq)) {
 				DB_TYPE(mp) = M_PROTO;
 				if (gp_get_m_state(gp) == ASP_WACK_ASPDN) {
@@ -3901,7 +3878,7 @@ lmi_info_ack(struct up *up, queue_t *q, mblk_t *msg)
 	lmi_info_ack_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + sizeof(uint32_t), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + sizeof(uint32_t), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_ACK;
@@ -3949,7 +3926,7 @@ lmi_ok_ack(struct up *up, queue_t *q, mblk_t *msg, lmi_long prim)
 	lmi_ok_ack_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_OK_ACK;
@@ -3989,7 +3966,7 @@ lmi_error_ack(struct up *up, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long er
 
 	if (err == 0)
 		return lmi_ok_ack(up, q, msg, prim);
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ERROR_ACK;
@@ -4032,7 +4009,7 @@ lmi_enable_con(struct up *up, queue_t *q, mblk_t *msg)
 	lmi_enable_con_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ENABLE_CON;
@@ -4059,7 +4036,7 @@ lmi_disable_con(struct up *up, queue_t *q, mblk_t *msg)
 	lmi_disable_con_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_DISABLE_CON;
@@ -4087,7 +4064,7 @@ lmi_optmgmt_ack(struct up *up, queue_t *q, mblk_t *msg)
 	lmi_optmgmt_ack_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
@@ -4115,7 +4092,7 @@ lmi_error_ind(struct up *up, queue_t *q, mblk_t *msg, lmi_long err, lmi_long sta
 	lmi_error_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ERROR_IND;
@@ -4144,7 +4121,7 @@ lmi_stats_ind(struct up *up, queue_t *q, mblk_t *msg)
 	lmi_stats_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4175,7 +4152,7 @@ lmi_event_ind(struct up *up, queue_t *q, mblk_t *msg)
 	lmi_event_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4206,7 +4183,7 @@ sl_pdu_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong pri)
 	sl_pdu_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4238,7 +4215,7 @@ sl_link_congested_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong cong, sl_
 	sl_link_cong_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4274,7 +4251,7 @@ sl_link_congestion_ceased_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong c
 	sl_link_cong_ceased_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4310,7 +4287,7 @@ sl_retrieved_message_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong pri)
 	sl_retrieved_msg_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4342,7 +4319,7 @@ sl_retrieval_complete_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong pri, 
 	sl_retrieval_comp_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4373,7 +4350,7 @@ sl_rb_cleared_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_rb_cleared_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4404,7 +4381,7 @@ sl_bsnt_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong bsnt)
 	sl_bsnt_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4434,7 +4411,7 @@ sl_in_service_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_in_service_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4464,7 +4441,7 @@ sl_out_of_service_ind(struct up *up, queue_t *q, mblk_t *msg, sl_ulong reason)
 	sl_out_of_service_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4495,7 +4472,7 @@ sl_remote_processor_outage_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_rem_proc_out_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4526,7 +4503,7 @@ sl_remote_processor_recovered_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_rem_proc_recovered_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4557,7 +4534,7 @@ sl_rtb_cleared_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_rtb_cleared_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4588,7 +4565,7 @@ sl_retrieval_not_possible_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_retrieval_not_poss_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4619,7 +4596,7 @@ sl_bsnt_not_retrievable_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_bsnt_not_retr_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4650,7 +4627,7 @@ sl_optmgmt_ack(struct up *up, queue_t *q, mblk_t *msg)
 	sl_optmgmt_ack_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_OPTMGMT_ACK;
@@ -4677,7 +4654,7 @@ sl_notify_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_notify_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4707,7 +4684,7 @@ sl_local_processor_outage_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_loc_proc_out_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4738,7 +4715,7 @@ sl_local_processor_recovered_ind(struct up *up, queue_t *q, mblk_t *msg)
 	sl_loc_proc_recovered_ind_t *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4777,7 +4754,7 @@ mtp_ok_ack(struct up *up, queue_t *q, mblk_t *msg, mtp_long prim)
 	struct MTP_ok_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_OK_ACK;
@@ -4805,7 +4782,7 @@ mtp_error_ack(struct up *up, queue_t *q, mblk_t *msg, mtp_long prim, mtp_long er
 	struct MTP_error_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_ERROR_ACK;
@@ -4836,7 +4813,7 @@ mtp_bind_ack(struct up *up, queue_t *q, mblk_t *msg, caddr_t aptr, size_t alen, 
 	struct MTP_bind_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + alen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + alen, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_BIND_ACK;
@@ -4871,7 +4848,7 @@ mtp_addr_ack(struct up *up, queue_t *q, mblk_t *msg, caddr_t lptr, size_t llen, 
 	struct MTP_addr_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + llen + rlen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + llen + rlen, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_ADDR_ACK;
@@ -4907,7 +4884,7 @@ mtp_info_ack(struct up *up, queue_t *q, mblk_t *msg, caddr_t aptr, size_t alen)
 	struct MTP_info_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + alen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + alen, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_INFO_ACK;
@@ -4944,7 +4921,7 @@ mtp_optmgmt_ack(struct up *up, queue_t *q, mblk_t *msg, caddr_t optr, size_t ole
 	struct MTP_optmgmt_ack *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + olen, BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + olen, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_OPTMGMT_ACK;
@@ -4979,7 +4956,7 @@ mtp_transfer_ind(struct up *up, queue_t *q, mblk_t *msg, struct mtp_addr *srce, 
 	struct MTP_transfer_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + sizeof(*srce), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + sizeof(*srce), BPRI_MED))) {
 		if (canputnext(up->rq)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5016,7 +4993,7 @@ mtp_pause_ind(struct up *up, queue_t *q, mblk_t *msg, struct mtp_addr *addr)
 	struct MTP_pause_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + sizeof(*addr), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + sizeof(*addr), BPRI_MED))) {
 		if (bcanputnext(up->rq, 3)) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 3;
@@ -5051,7 +5028,7 @@ mtp_resume_ind(struct up *up, queue_t *q, mblk_t *msg, struct mtp_addr *addr)
 	struct MTP_resume_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + sizeof(*addr), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + sizeof(*addr), BPRI_MED))) {
 		if (bcanputnext(up->rq, 3)) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 3;
@@ -5089,7 +5066,7 @@ mtp_status_ind(struct up *up, queue_t *q, mblk_t *msg, struct mtp_addr *addr, mt
 	struct MTP_status_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p) + sizeof(*addr), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p) + sizeof(*addr), BPRI_MED))) {
 		if (bcanputnext(up->rq, 3)) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 3;
@@ -5125,7 +5102,7 @@ mtp_restart_begins_ind(struct up *up, queue_t *q, mblk_t *msg)
 	struct MTP_restart_begins_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (bcanputnext(up->rq, 3)) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 3;
@@ -5155,7 +5132,7 @@ mtp_restart_complete_ind(struct up *up, queue_t *q, mblk_t *msg)
 	struct MTP_restart_complete_ind *p;
 	mblk_t *mp;
 
-	if ((mp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		if (bcanputnext(up->rq, 3)) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 3;
@@ -5193,7 +5170,7 @@ n_conn_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong seq, np_ulong flags,
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + dlen + slen + qlen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5239,7 +5216,7 @@ n_conn_con(struct up *up, queue_t *q, mblk_t *msg, np_ulong flags, caddr_t rptr,
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + rlen + qlen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5280,7 +5257,7 @@ n_discon_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong seq, np_ulong orig
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + rlen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5318,7 +5295,7 @@ n_data_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong flags, mblk_t *dp)
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(bcanputnext(up->rq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5350,7 +5327,7 @@ n_exdata_ind(struct up *up, queue_t *q, mblk_t *msg, mblk_t *dp)
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(bcanputnext(up->rq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5390,7 +5367,7 @@ n_info_ack(struct up *up, queue_t *q, mblk_t *msg)
 	if (mlen < up->up.info.sccp.PROTOID_offset + up->up.info.sccp.PROTOID_length)
 		mlen = up->up.info.sccp.PROTOID_offset + up->up.info.sccp.PROTOID_length;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_INFO_ACK;
@@ -5449,7 +5426,7 @@ n_bind_ack(struct up *up, queue_t *q, mblk_t *msg, np_ulong coninds, np_ulong to
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + alen + plen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_BIND_ACK;
@@ -5487,7 +5464,7 @@ n_error_ack(struct up *up, queue_t *q, mblk_t *msg, np_ulong prim, np_long error
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_ERROR_ACK;
@@ -5516,7 +5493,7 @@ n_ok_ack(struct up *up, queue_t *q, mblk_t *msg, np_long prim)
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_OK_ACK;
@@ -5544,7 +5521,7 @@ n_unitdata_ind(struct up *up, queue_t *q, mblk_t *msg, np_long error, caddr_t dp
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(bcanputnext(up->rq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5584,7 +5561,7 @@ n_uderror_ind(struct up *up, queue_t *q, mblk_t *msg, caddr_t dptr, size_t dlen,
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(bcanputnext(up->rq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5620,7 +5597,7 @@ n_datack_ind(struct up *up, queue_t *q, mblk_t *msg)
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5650,7 +5627,7 @@ n_reset_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong orig, np_ulong reas
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5682,7 +5659,7 @@ n_reset_con(struct up *up, queue_t *q, mblk_t *msg)
 	mblk_t *mp;
 	size_t mlen = sizeof(*p);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5713,7 +5690,7 @@ n_notice_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong cause, caddr_t dpt
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + dlen + slen + qlen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5756,7 +5733,7 @@ n_inform_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong reason, caddr_t qp
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + qlen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5791,7 +5768,7 @@ n_coord_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong smi, caddr_t aptr, 
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + alen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5826,7 +5803,7 @@ n_coord_con(struct up *up, queue_t *q, mblk_t *msg, np_ulong smi, caddr_t aptr, 
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + alen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5862,7 +5839,7 @@ n_state_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong status, np_ulong sm
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + alen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5898,7 +5875,7 @@ n_pcstate_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong status, caddr_t a
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + alen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5933,7 +5910,7 @@ n_traffic_ind(struct up *up, queue_t *q, mblk_t *msg, np_ulong mix, caddr_t aptr
 	mblk_t *mp;
 	size_t mlen = sizeof(*p) + alen;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		if (likely(canputnext(up->rq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -5984,7 +5961,7 @@ t_conn_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	size_t dlen = tp->xp.options.rem_len;
 	size_t olen = 3 * (sizeof(*oh) + sizeof(t_uscalar_t));
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p) + dlen + olen, BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p) + dlen + olen, BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, 2))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 2;
@@ -6050,7 +6027,7 @@ t_conn_res(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t sequence)
 	struct t_opthdr *oh;
 	size_t olen = sizeof(*oh) + sizeof(t_uscalar_t);
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, 2))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 2;
@@ -6094,7 +6071,7 @@ t_discon_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t sequence)
 	struct T_discon_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, 2))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 2;
@@ -6144,7 +6121,7 @@ t_data_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp)
 	struct T_data_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, 0))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -6177,7 +6154,7 @@ t_exdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t more, mblk_t *dp
 	struct T_exdata_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, 1))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = 1;
@@ -6209,7 +6186,7 @@ t_info_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	struct T_info_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_INFO_REQ;
@@ -6236,7 +6213,7 @@ t_bind_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	caddr_t aptr = (caddr_t) &tp->xp.options.loc_add;
 	size_t alen = tp->xp.options.loc_len;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p) + alen, BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p) + alen, BPRI_MED)))) {
 		if (likely(canputnext(tp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -6271,7 +6248,7 @@ t_unbind_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	struct T_unbind_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		if (likely(canputnext(tp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -6307,7 +6284,7 @@ t_unitdata_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t dlen, caddr_t dptr
 	struct T_unitdata_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p) + dlen + olen, BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p) + dlen + olen, BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = dp->b_band;
@@ -6349,7 +6326,7 @@ t_optmgmt_req(struct tp *tp, queue_t *q, mblk_t *msg, size_t olen, caddr_t optr,
 	struct T_optmgmt_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
 		if (likely(canputnext(tp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -6385,7 +6362,7 @@ t_ordrel_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	struct T_ordrel_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		if (likely(canputnext(tp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -6427,7 +6404,7 @@ t_optdata_req(struct tp *tp, queue_t *q, mblk_t *msg, t_scalar_t flag, t_uscalar
 	struct t_opthdr *oh;
 	size_t olen = 2 * (sizeof(*oh) + sizeof(t_uscalar_t));
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p) + olen, BPRI_MED)))) {
 		if (likely(bcanputnext(tp->wq, dp->b_band))) {
 			DB_TYPE(mp) = M_PROTO;
 			mp->b_band = dp->b_band;
@@ -6477,7 +6454,7 @@ t_addr_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	struct T_addr_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		if (likely(canputnext(tp->wq))) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -6506,7 +6483,7 @@ t_capability_req(struct tp *tp, queue_t *q, mblk_t *msg)
 	struct T_capability_req *p;
 	mblk_t *mp;
 
-	if (likely(!!(mp = ua_allocb(q, sizeof(*p), BPRI_MED)))) {
+	if (likely(!!(mp = mi_allocb(q, sizeof(*p), BPRI_MED)))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_CAPABILITY_REQ;
@@ -6543,7 +6520,7 @@ gp_send_mgmt_err(struct gp *gp, queue_t *q, mblk_t *msg, uint32_t ecode, caddr_t
 	size_t mlen = UA_MHDR_SIZE +
 	    UA_SIZE(UA_PARM_ECODE) + dlen ? UA_SIZE(UA_PARM_DIAG) + UA_PAD4(dlen) : 0;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_MGMT_ERR;
@@ -6602,7 +6579,7 @@ gp_send_asps_aspup_req(struct gp *gp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 		mlen += olen;
 	}
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_ASPUP_REQ;
@@ -6670,7 +6647,7 @@ gp_send_asps_aspdn_req(struct gp *gp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 	    sp->sp.options.aspid ? UA_SIZE(UA_PARM_ASPID) : 0 +
 	    ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_ASPDN_REQ;
@@ -6723,7 +6700,7 @@ gp_send_asps_hbeat_req(struct gp *gp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + (hlen ? UA_PHDR_SIZE + UA_PAD4(hlen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_HBEAT_REQ;
@@ -6779,7 +6756,7 @@ rp_send_asps_hbeat_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 #endif
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_HBEAT_REQ;
@@ -6842,7 +6819,7 @@ tp_send_asps_hbeat_ack(struct tp *tp, queue_t *q, mblk_t *msg, caddr_t hptr, siz
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + (hlen ? UA_PHDR_SIZE + UA_PAD4(hlen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_HBEAT_ACK;
@@ -6889,7 +6866,7 @@ rp_send_asps_hbeat_ack(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, ca
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + (hlen ? UA_PHDR_SIZE + UA_PAD4(hlen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPS_HBEAT_ACK;
@@ -6941,7 +6918,7 @@ rp_send_aspt_aspac_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 #endif
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPT_ASPAC_REQ;
@@ -7020,7 +6997,7 @@ rp_send_aspt_aspac_ack(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 	    (tlen != 0 ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    (ilen != 0 ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPT_ASPIA_REQ;
@@ -7107,7 +7084,7 @@ tp_send_aspt_aspia_req(struct tp *tp, queue_t *q, mblk_t *msg, uint32_t *asid,
 	    (asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (tptr ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) + (iptr ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPT_ASPIA_REQ;
@@ -7171,7 +7148,7 @@ rp_send_aspt_aspia_req(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 #endif
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPT_ASPIA_REQ;
@@ -7241,7 +7218,7 @@ rp_send_aspt_aspia_ack(struct rp *rp, queue_t *q, mblk_t *msg, caddr_t iptr, siz
 #endif
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_ASPT_ASPIA_ACK;
@@ -7298,7 +7275,7 @@ rp_send_rkmm_reg_req(struct rp *rp, queue_t *q, mblk_t *msg)
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_LINK_KEY);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 		struct tp *tp = rp->gp.gp->xp.xp;
 		struct as *as = rp->as.as;
@@ -7350,7 +7327,7 @@ rp_send_rkmm_dereg_req(struct rp *rp, queue_t *q, mblk_t *msg)
 #endif
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 		struct tp *tp = rp->gp.gp->xp.xp;
 		struct as *as = rp->as.as;
@@ -7407,7 +7384,7 @@ as_send_maup_data1(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) + UA_PHDR_SIZE;
 
-	if (unlikely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (unlikely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_DATA;
@@ -7455,7 +7432,7 @@ as_send_maup_data2(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, mblk_t
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_PHDR_SIZE + 1;
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_DATA;
@@ -7500,7 +7477,7 @@ as_send_maup_estab_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg)
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_ESTAB_REQ;
@@ -7544,7 +7521,7 @@ as_send_maup_rel_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg)
 	    (up->as.as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_REL_REQ;
@@ -7611,7 +7588,7 @@ as_send_maup_state_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg,
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_SIZE(M2UA_PARM_STATE_REQUEST);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_STATE_REQ;
@@ -7661,7 +7638,7 @@ as_send_maup_retr_req(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, uin
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_SIZE(M2UA_PARM_ACTION) + (fsnc ? UA_SIZE(M2UA_PARM_SEQNO) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_RETR_REQ;
@@ -7715,7 +7692,7 @@ as_send_maup_data_ack(struct up *up, struct tp *tp, queue_t *q, mblk_t *msg, uin
 	    (up->as.as->as.addr.m2ua.iid_text[0] ? UA_PHDR_SIZE + UA_PAD4(tlen) : 0) +
 	    UA_SIZE(M2UA_PARM_CORR_ID_ACK);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)) != NULL)) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)) != NULL)) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = M2UA_MAUP_DATA_ACK;
@@ -7771,7 +7748,7 @@ rp_send_xfer_data(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, struct 
 
 	if (rp_get_state(rp) != AS_ACTIVE)
 		goto discard;
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)))) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_XFER_DATA;
@@ -7825,7 +7802,7 @@ rp_send_snmm_duna(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    UA_PHDR_SIZE + sizeof(uint32_t) + (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)))) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_SNMM_DAUD;
@@ -7880,7 +7857,7 @@ rp_send_snmm_scon(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
 	    (cong ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely(mp = ua_allocb(q, mlen, BPRI_MED))) {
+	if (likely(mp = mi_allocb(q, mlen, BPRI_MED))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_SNMM_SCON;
@@ -7972,7 +7949,7 @@ rp_send_snmm_daud(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    UA_PHDR_SIZE + sizeof(uint32_t) + (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)))) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_SNMM_DAUD;
@@ -8027,7 +8004,7 @@ rp_send_snmm_scon(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
 	    (cong ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely(mp = ua_allocb(q, mlen, BPRI_MED))) {
+	if (likely(mp = mi_allocb(q, mlen, BPRI_MED))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_SNMM_SCON;
@@ -8103,7 +8080,7 @@ as_send_snmm_daud(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
 	    (as->as.asid ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    UA_PHDR_SIZE + sizeof(uint32_t) + (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely((mp = ua_allocb(q, mlen, BPRI_MED)))) {
+	if (likely((mp = mi_allocb(q, mlen, BPRI_MED)))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_SNMM_DAUD;
@@ -8159,7 +8136,7 @@ rp_send_snmm_scon(struct rp *rp, struct tp *tp, queue_t *q, mblk_t *msg, uint32_
 	    (cong ? UA_PHDR_SIZE + sizeof(uint32_t) : 0) +
 	    (ilen ? UA_PHDR_SIZE + UA_PAD4(ilen) : 0);
 
-	if (likely(mp = ua_allocb(q, mlen, BPRI_MED))) {
+	if (likely(mp = mi_allocb(q, mlen, BPRI_MED))) {
 		register uint32_t *p = (typeof(p)) mp->b_wptr;
 
 		p[0] = UA_SNMM_SCON;
@@ -13952,7 +13929,7 @@ lm_i_link(struct up *lm, queue_t *q, mblk_t *mp)
 	mblk_t *rp = NULL;
 	int err;
 
-	if (!(rp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if (!(rp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		err = -ENOBUFS;
 		goto error;
 	}
@@ -14128,7 +14105,7 @@ lm_i_plink(struct up *lm, queue_t *q, mblk_t *mp)
 	mblk_t *rp = NULL;
 	int err;
 
-	if (!(rp = ua_allocb(q, sizeof(*p), BPRI_MED))) {
+	if (!(rp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		err = -ENOBUFS;
 		goto error;
 	}

@@ -1,5 +1,70 @@
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am:
+	  - add q784 test file
+	  - add mtp sccp isup and tcap to public release
+	  - add mtp_mod, sccp_mod, tr_mod and tc_mod minimal modules
+	  - add newer sl-mux driver
+	* doc/man/strss7.refs: update references
+	* doc/man/man4/mtp.4.man: update documentation
+	* doc/man/man4/sccp.4.man: update documentation
+	* doc/man/man4/tcap.4.man: update documentation
+	* doc/man/man4/tcap_ioctl.4.man: update documentation
+	* doc/manual/news.texi: correct node names
+	* doc/manual/strss7.texi: remove things from other packages
+	* doc/projects/Makefile.am: add cnam figures
+	* doc/projects/cnam.texi: update cnam project doc
+	* doc/projects/cnam_iface.fig: update cnam project doc
+	* doc/projects/cnam_m2ua.fig: update cnam project doc
+	* doc/projects/cnam_m3ua.fig: update cnam project doc
+	* doc/projects/cnam_netarch.fig: update cnam project doc
+	* doc/projects/cnam_soap.fig: update cnam project doc
+	* doc/projects/cnam_sua.fig: update cnam project doc
+	* doc/projects/cnam_tua.fig: update cnam project doc
+	* doc/specs/sli/sli.texi: correction
+	* doc/specs/tci/tci.texi: fixups
+	* doc/specs/tci/tci_fi10.fig: corrections
+	* doc/specs/tci/tci_fi11.fig: corrections
+	* doc/specs/tci/tci_fi12.fig: corrections
+	* doc/specs/tci/tci_fi13.fig: corrections
+	* doc/specs/tci/tci_fi14.fig: corrections
+	* doc/specs/tci/tci_fi15.fig: corrections
+	* doc/specs/tci/tci_fi16.fig: corrections
+	* doc/specs/tci/tci_fig1.fig: corrections
+	* doc/specs/tci/tci_fig2.fig: corrections
+	* doc/specs/tci/tci_fig3.fig: corrections
+	* doc/specs/tci/tci_fig4.fig: corrections
+	* doc/specs/tci/tci_fig5.fig: corrections
+	* doc/specs/tci/tci_fig6.fig: corrections
+	* doc/specs/tci/tci_fig7.fig: corrections
+	* doc/specs/tci/tci_fig8.fig: corrections
+	* doc/specs/tci/tci_fig9.fig: corrections
+	* doc/specs/tri/tri.texi: updates and corrections
+	* src/include/ss7/mtpi.h: changed comments
+	* src/include/ss7/mtpi_ioctl.h: corrections
+	* src/include/ss7/sccpi_ioctl.h: updates
+	* src/include/ss7/sl_mux.h: correction
+	* src/include/ss7/sli.h: correction
+	* src/include/ss7/tc.h: updates
+	* src/include/ss7/tcap_ioctl.h: updates
+	* src/include/ss7/tr.h: updates
+	* src/include/sys/xti_tcap.h: correction
+	* src/modules/isup/isup.c: corrections for compile
+	* src/modules/mtp/lis.conf: added modules
+	* src/modules/mtp/mtp.c: corrections for compile
+	* src/modules/mtp/mtp_min.c: corrections for compile
+	* src/modules/mtp/mtp_npi.c: removed DB_TYPE definition
+	* src/modules/mtp/mtp_tpi.c: removed DB_TYPE definition
+	* src/modules/sccp/lis.conf: added modules
+	* src/modules/sccp/sccp.c: corrections for compile
+	* src/modules/sdl/sdl_pmod.c: removed DB_TYPE definition
+	* src/modules/sdt/sdt_pmod.c: removed DB_TYPE definition
+	* src/modules/sl/sl-mux.c: corrections for compile
+	* src/modules/tcap/ANSI_TCAP.asn: minor corrections
+	* src/modules/tcap/lis.conf: added modules
+	* src/modules/tcap/tc.c: corrections
+	* src/modules/tcap/tcap.c: corrections for compile
+
 	* doc/man/man8/tcapconf.8.man:
 	* doc/projects/cnam_a.fig: added figures for cnam project
 	* doc/projects/cnam_b.fig: added figures for cnam project

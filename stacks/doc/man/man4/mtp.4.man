@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mtp.4.man,v 0.9.2.7 2006/04/05 09:43:04 brian Exp $
+.\" @(#) $Id: mtp.4.man,v 0.9.2.8 2007/08/03 13:34:49 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:04 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/03 13:34:49 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mtp.4.man,v $
+.\" Revision 0.9.2.8  2007/08/03 13:34:49  brian
+.\" - manual updates, put ss7 modules in public release
+.\"
 .\" Revision 0.9.2.7  2006/04/05 09:43:04  brian
 .\" - moved .so line and updated headers
 .\"
@@ -100,18 +103,27 @@ is an implementation of the Signalling System No. 7
 Message Transfer Part
 .RB ( MTP )
 defined in
-.I ITU-T Recommendation Q.704
+.I ITU-T Recommendation Q.704,
 .[
 q704
 .]
-and
-.IR "ANSI T1.111.4" ".
+.I ETSI ETS 300 008-1,
+.[
+mtpv1
+.]
+.IR "ANSI T1.111.4" ,
 .[
 t1.111
 .]
+and other
+.[
+jtq704
+.]
+national standards.
+.PP
 .B MTP
 provides reliable sequenced or unsequenced delivery of packets over a
-connectionless transport between two
+connectionless or pseudo-connection-mode transport between two
 .B MTP
 endpoints.
 .B MTP
@@ -144,50 +156,69 @@ Once linked, the streams must be configured using
 .BR mtp_ioctl (4).
 .PP
 .B MTP
-provides the following stream types:
+is also implemented as a
+.IR STREAMS (4)
+pushable module.  For more information on the pushable module, see
+.BR mtp-mod (4).
+.SS "Device Names"
+.PP
+Each
+.B MTP
+device name presents a different service primitive interface to the user
+program as follows:
 .TP
-.I /dev/mtp
+.IR /dev/mtp ", " mtp-mtpi
 This device provides the
 .B MTP
-protocol service interface using the M-primitives of the Message Transfer Part
-Interface described in
+protocol service interface using the M-primitives of the
+Message Transfer Part Interface (MTPI)
+.[
+mtpi revision 0.9.2
+.]
+described in
 .BR mtpi (7).
+The
+.BR mtpi (7).
+service interface is suitable for use with other OpenSS7 SS7 and
+SIGTRAN modules and drivers, such as the
+.BR m3ua-sg (4)
+multiplexing driver.
 .TP
-.IR /dev/mtp-npi-cl ", " /dev/mtp-npi-co
+.IR /dev/mtp-npi-cl ", " mtp-npi-co
 This device provides the
 .B MTP
 protocol service interface using the N-primitives of the
-.I Network Provider Interface
+Network Provider Interface (NPI)
 .[
 NPI
 .]
-.BR npi (7)
+described in
+.BR npi (7),
 used for the Message Transfer Part as described in
 .BR npi_mtp (7).
 The
 .BR npi (7)
-interface provided on a stream opening this device is suitable for use with the
-.BR sockets (3)
-library and provides the MTP interface using sockets as described in
-.BR mtp_socket (7).
+interface provided on a stream openin this device is suitable for use directly
+by a user program.
 .I mtp-npi-cl
 provides a connectionless
 .B N_CLNS
 network service provider;
 .I mtp-npi-co
-provides a pseudo-connection-oriented
+provides a pseudo-connection-mode
 .B N_CONS
 network service provider.
 .TP
-.IR /dev/mtp-tpi-cl ", " /dev/mtp-tpi-co
+.IR /dev/mtp-tpi-cl ", " mtp-tpi-co
 This device provides the
 .B MTP
 protocol service interface using the T-primitives of the
-.I Transport Provider Interface
+Transport Provider Interface (TPI)
 .[
 TPI Revision 2.0.0
 .]
-.BR tpi (7)
+described in
+.BR tpi (7),
 used for the Message Transfer Part as described in
 .BR tpi_mtp (7).
 The
@@ -201,14 +232,15 @@ library and provides the MTP interface using XTI as described in
 .BR xti_mtp (3).
 .I mtp-tpi-cl
 provides a connectionless
-.B N_CLNS
+.B T_CLTS
 transport service provider;
 .I mtp-tpi-co
-provides a pseudo-connection-oriented
-.B N_CONS
+provides a pseudo-connection-mode
+.B T_COTS
 transport service provider.
 .\"
 .\"
+.SS "Socket Types"
 .PP
 .B MTP
 provides two socket types used by the
@@ -237,7 +269,7 @@ transport service provider.
 .\"
 .TP
 .B SOCK_SEQPACKET
-Provides a pseudo-connection-oriented packet service with reliable delivery
+Provides a pseudo-connection-mode packet service with reliable delivery
 including retransmission.  Message boundaries are preserved.  Messages can be
 sent and received in order, if requested.  This socket uses the underlying
 .I /dev/mtp-tpi-co
@@ -261,6 +293,38 @@ For additional information, see
 .BR protosw (5).
 .\"
 .\"
+.SH USAGE
+.PP
+The
+.B MTP
+.IR STREAMS (4)
+multiplexing driver provides a number of device names that can be opened by user
+programs with the
+.BR open (2s)
+system call (see above under
+.RI \(lq "Device Names" \(rq).
+The
+.BR open (2s)
+system call returns a file descriptor,
+.IR fd ,
+that can be used to make other system
+calls on the open
+.B MTP
+Stream.
+Each
+.B MTP
+Stream provides a service primitive interface that implements the MTP protocol.
+The system call,
+.BR putpmsg (2s),
+can be called to issue service primitives on the interface;
+.BR getpmsg (2s),
+to receive primitives.
+.BR ioctl (2s)
+as described in
+.BR streamio (7)
+and
+.BR mtp_ioctl (7)
+can be used to manage the Stream and the MTP provider.
 .\"
 .\"
 .SH IOCTLS
@@ -271,6 +335,34 @@ system calls on the
 .IR mtp_stream ", " mtp_xtistr " or " mtp_socket .
 These management controls are documented in
 .BR mtp_ioctl (4).
+.\"
+.\"
+.SH NOTICES
+.PP
+.B MTP
+does not provide a true connection-mode network service, only a
+pseudo-connection-mode network service where ther first message sent is
+considered a connection request and the first message received is considered a
+connection indication with data for the source address or connection
+confirmation with data.  Pseudo-connection mode is useful for MTP users that
+rely heavily on the insequence delivery within a signalling link selection
+between pairs of signalling end points in quasi-associated mode.  An example
+of such an MTP user is ISUP.  ISUP communicate with regard to circuit
+identification codes between switching centers with SS7 ISUP messages between
+signalling end points corresponding to these pairs of switching centers.  For
+this reason, it is conventient to consider the signalling end point and
+switching center pairs as 'connected'.
+.PP
+For another example, an Service Control Point (SCP) in the SS7 network serves a
+number of Service Switching Points (SSPs).  Each of the SSPs is considered to
+be a concerned signalling point for the Service Control Point (SCP).  From
+the viewpoint of both the SCP and individual SSP, the signalling relation between
+the SCP and SSP can be considered to be a 'connection'.
+.PP
+In general, whenever a signalling relation exists between two MTP users, that
+signalling relation can be considered as a 'connection'.
+.\"
+.\"
 .SH "SEE ALSO"
 .PP
 .BR SS7 (4),
@@ -282,6 +374,8 @@ These management controls are documented in
 .BR sockets (3),
 .BR xnet (3),
 .BR mtp_ioctl (4).
+.\"
+.\"
 .SH FILES
 .PP
 .BR <ss7/mtpi.h> ,
@@ -294,6 +388,57 @@ These management controls are documented in
 .BR <sys/tpi_mtp.h> ,
 .BR <xti.h> ,
 .BR <xti_mtp.h> .
+.\"
+.\"
+.SH DEVICES
+.HP
+.IR /dev/mtp ,
+.IR mtp-mtpi .
+These device names are two names for the same device.  The device provides a
+clone or auto-clone Stream providing the MTPI
+.[
+mtpi revision 0.9.2
+.]
+interface, not associated with a Signalling Point.  This device can also be
+opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/mtp/mtp .
+Additional
+.BR specfs (5)
+device entries,
+.IR /dev/streams/mtp/mtp01 " through " mtp31 ,
+may be opened to obtain a Stream associated with Signalling Points 1 throu 31,
+depending on the minor device number.
+.HP
+.IR /dev/mtp-npi-cl ,
+.IR mtp-npi-co .
+These devices provide an auto-clone Stream providing the NPI
+.[
+npi revision 2.0.0
+.]
+.BR N_CLNS " or " N_CONS
+interface, not assocaited with a Signalling Point.
+These devices can also be opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/mtp/npcl " or " npco .
+Additional
+.BR specfs (5)
+device entries,
+.IR /dev/streams/mtp/npcl01 " through " npcl31 ", and " npco01 " through " npco31 ,
+may be opened to obtain a Stream associated with Signalling Point 1 thorugh 32,
+depending on the minor device number.
+.HP
+.IR /dev/mtp-mgmt .
+This device provides an auto-clone Stream providing the management interface,
+not associated with a Signalling Point.
+This device can also be opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/mtp/lm .
+.\"
+.\"
 .SH VERSIONS
 .PP
 The MTP interface is specific to the
@@ -301,20 +446,5 @@ The MTP interface is specific to the
 SS7 stack.
 This is Version 2 of the interface.
 .\"
-.\"
-.XX
-.[
-q704
-.]
-.[
-t1.111
-.]
-.[
-jtq704
-.]
-.\"
-.[
-$LIST$
-.]
 .\"
 .TI

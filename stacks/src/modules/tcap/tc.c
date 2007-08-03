@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/03 13:35:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:16 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc.c,v $
+ Revision 0.9.2.13  2007/08/03 13:35:43  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.12  2007/07/14 01:35:16  brian
  - make license explicit, add documentation
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/03 13:35:43 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/03 13:35:43 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -126,6 +129,7 @@ static int tc_debug = 2;
 
 #ifndef TC_DRV_ID
 #define TC_DRV_ID ('s'<<24|'s'<<16|'7'<<8|TC_IOC_MAGIC)
+#endif
 
 /*
  *  =========================================================================

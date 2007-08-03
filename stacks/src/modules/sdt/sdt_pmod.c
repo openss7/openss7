@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:35 $
+ @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,28 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:13:35 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_pmod.c,v $
+ Revision 0.9.2.2  2007/08/03 13:35:40  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.1  2007/07/14 01:13:35  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:35 $"
+#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:40 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:35 $";
+    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:40 $";
 
-#define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
+#define _SVR4_SOURCE 1
+#define _MPS_SOURCE 1
+#define _SUN_SOURCE 1
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -89,7 +94,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:35 $A"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:40 $A"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2810,10 +2815,6 @@ sdt_m_iocdata(struct sdt *s, queue_t *q, mblk_t *mp)
 	mi_unlock(priv);
 	return (err);
 }
-
-#ifndef DB_TYPE
-#define DB_TYPE(mp) (mp->b_datap->db_type)
-#endif
 
 /**
  * sdt_m_other: - process other message

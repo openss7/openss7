@@ -1,3 +1,9 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strxnet.refs: updated references
+	* src/modules/timod.c: fix exposed syntax error
+	* src/modules/tirdwr.c: fix exposed syntax error
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

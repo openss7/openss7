@@ -1,3 +1,16 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/sigtran.refs: update references
+	* doc/man/man8/m2uaconf.8.man: correction
+	* src/drivers/isua_as.c: remove unused DB_TYPE definition
+	* src/drivers/m2ua_as.c: remove unused DB_TYPE definition
+	* src/drivers/m3ua_as.c: use mi_allocb instead of ua_allocb
+	* src/drivers/sua_as.c: remove unused DB_TYPE definition
+	* src/drivers/tua_as.c: remove unused DB_TYPE definition
+	* src/drivers/ua_as.c: remove unused DB_TYPE definition
+	* src/modules/m2ua_as.c: remove unused DB_TYPE definition
+	* src/modules/m3ua_as.c: remove unused DB_TYPE definition
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

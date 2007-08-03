@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sl_mux.h,v 0.9.2.3 2007/07/21 20:09:43 brian Exp $
+ @(#) $Id: sl_mux.h,v 0.9.2.4 2007/08/03 13:35:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 20:09:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.h,v $
+ Revision 0.9.2.4  2007/08/03 13:35:01  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.3  2007/07/21 20:09:43  brian
  - added pass structure
 
@@ -64,7 +67,7 @@
 #ifndef __SS7_SL_MUX_H__
 #define __SS7_SL_MUX_H__
 
-#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #define SLMUX_CLEI_MAX	    32
 
@@ -92,7 +95,7 @@ struct slmux_mon {
 
 #define SLM_IOC_MAGIC	    'x'
 
-#define SLM_IOCSPPA	_IORW(	SLM_IOC_MAGIC,	 1,	struct slmux_ppa	)
+#define SLM_IOCSPPA	_IOWR(	SLM_IOC_MAGIC,	 1,	struct slmux_ppa	)
 #define SLM_IOCGPPA	_IOR(	SLM_IOC_MAGIC,	 2,	struct slmux_ppa	)
 #define SLM_IOCLPPA	_IOR(	SLM_IOC_MAGIC,	 3,	struct slmux_ppa_list	)
 #define SLM_IOCSMON	_IOR(	SLM_IOC_MAGIC,	 4,	struct slmux_ppa	)

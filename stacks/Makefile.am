@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.93 $) $Date: 2007/07/21 20:09:42 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.94 $) $Date: 2007/08/03 13:34:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/21 20:09:42 $ by $Author: brian $
+# Last Modified $Date: 2007/08/03 13:34:47 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.94  2007/08/03 13:34:47  brian
+# - manual updates, put ss7 modules in public release
+#
 # Revision 0.9.2.93  2007/07/21 20:09:42  brian
 # - added pass structure
 #
@@ -301,11 +304,11 @@ test_udps_LDFLAGS		= $(STREAMS_LDFLAGS)
 test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 test_udps_CFLAGS		= $(USER_CFLAGS)
 
-#test_q784_SOURCES		= src/test/isup/test-q784.c
-#test_q784_LDADD    		= $(STREAMS_LDADD)
-#test_q784_LDFLAGS		= $(STREAMS_LDFLAGS)
-#test_q784_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
-#test_q784_CFLAGS		= $(USER_CFLAGS)
+test_q784_SOURCES		= src/test/isup/test-q784.c
+test_q784_LDADD    		= $(STREAMS_LDADD)
+test_q784_LDFLAGS		= $(STREAMS_LDFLAGS)
+test_q784_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_q784_CFLAGS		= $(USER_CFLAGS)
 
 test_m2pa_SOURCES		= src/test/m2pa/test-m2pa.c
 test_m2pa_LDADD			= $(STREAMS_LDADD)
@@ -405,8 +408,17 @@ noinst_LIBRARIES		= libSS7mods.a $(ADDON_LIBS)
 EXTRA_LIBRARIES			+= 
 
 nodist_EXTRA_libSS7mods_a_SOURCES	= \
+				  src/modules/mtp/mtp.c \
+				  src/modules/mtp/mtp_min.c \
+				  src/modules/mtp/mtp_mod.c \
 				  src/modules/mtp/mtp_npi.c \
 				  src/modules/mtp/mtp_tpi.c \
+				  src/modules/isup/isup.c \
+				  src/modules/sccp/sccp.c \
+				  src/modules/sccp/sccp_mod.c \
+				  src/modules/tcap/tcap.c \
+				  src/modules/tcap/tr_mod.c \
+				  src/modules/tcap/tc_mod.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
@@ -416,6 +428,7 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sdt/sdt_pmod.c \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
+				  src/modules/sl/sl-mux.c \
 				  src/modules/sl/sm_mod.c \
 				  src/modules/sl/slpmod.c \
 				  src/modules/x400p-ss7/x400p-ss7.c \
@@ -433,17 +446,14 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 
 
 #nodist_EXTRA_libSS7mods_a_SOURCES	= \
+#				  src/modules/tcap/tc.c \
+#				  src/modules/tcap/tr.c \
 #				  src/modules/isdn/isdn.c \
-#				  src/modules/isup/isup.c \
 #				  src/modules/lm/lm.c \
 #				  src/modules/lm/lm.h \
 #				  src/modules/m2ua/m2ua.c \
 #				  src/modules/mg/mg.c \
-#				  src/modules/mtp/mtp.c \
-#				  src/modules/mtp/mtp_npi.c \
-#				  src/modules/mtp/mtp_tpi.c \
 #				  src/modules/mx/mx_sdl.c \
-#				  src/modules/sccp/sccp.c \
 #				  src/modules/x400p-ss7/sl_x400p.c \
 #				  src/modules/x400p-ss7/sl_x100p.c \
 #				  src/modules/x400p-ss7/sdt_x400p.c \
@@ -473,16 +483,12 @@ nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 #				  src/modules/acb56/sl_acb56.c \
 #				  src/modules/h225/h225.c \
 #				  src/modules/m2tp/m2tp.c \
-#				  src/modules/mtp/mtp_min.c \
 #				  src/modules/sdl/cdi.c \
 #				  src/modules/sdl/cdi_mod.c \
 #				  src/modules/sdt/sdtmux.c \
 #				  src/modules/sl/slm.c \
 #				  src/modules/sscop/sscop.c \
 #				  src/modules/sscop/sscop2.c \
-#				  src/modules/tcap/tcap.c \
-#				  src/modules/tcap/tc.c \
-#				  src/modules/tcap/tr.c \
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h
@@ -750,10 +756,13 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/m2ua/m2ua.c \
 				  src/modules/mg/mg.c \
 				  src/modules/mtp/mtp.c \
+				  src/modules/mtp/mtp_min.c \
+				  src/modules/mtp/mtp_mod.c \
 				  src/modules/mtp/mtp_npi.c \
 				  src/modules/mtp/mtp_tpi.c \
 				  src/modules/mx/mx_sdl.c \
 				  src/modules/sccp/sccp.c \
+				  src/modules/sccp/sccp_mod.c \
 				  src/modules/sdl/sdl.c \
 				  src/modules/sdl/sdlm.c \
 				  src/modules/sdl/spm.c \
@@ -763,12 +772,16 @@ nodist_EXTRA_libSS7mods_a_SOURCES	= \
 				  src/modules/sdt/sdt_pmod.c \
 				  src/modules/sl/sl.c \
 				  src/modules/sl/sl_mux.c \
+				  src/modules/sl/sl-mux.c \
 				  src/modules/sl/sm_mod.c \
 				  src/modules/sl/slpmod.c \
 				  src/modules/ss7ip/sdt_tpi.c \
 				  src/modules/ss7ip/sl_tpi.c \
 				  src/modules/ss7sctp/sdt_sctp.c \
 				  src/modules/ss7sctp/sdl_sctp.c \
+				  src/modules/tcap/tcap.c \
+				  src/modules/tcap/tr_mod.c \
+				  src/modules/tcap/tc_mod.c \
 				  src/modules/x400p-ss7/x400p-ss7.c \
 				  src/modules/x400p-ss7/x100p-ss7.c \
 				  src/modules/x400p-ss7/sl_x400p.c \
@@ -797,21 +810,19 @@ mods_source_FILES		= $(nodist_EXTRA_libSS7mods_a_SOURCES)
 nodist_libSS7mods_a_SOURCES	= $(mods_source_FILES)
 
 #nodist_EXTRA_libSS7mods_a_SOURCES	= \
+#				  src/modules/tcap/tc.c \
+#				  src/modules/tcap/tr.c \
 #				  src/modules/acb56/sdl_acb56.c \
 #				  src/modules/acb56/sdt_acb56.c \
 #				  src/modules/acb56/sl_acb56.c \
 #				  src/modules/h225/h225.c \
 #				  src/modules/m2tp/m2tp.c \
-#				  src/modules/mtp/mtp_min.c \
 #				  src/modules/sdl/cdi.c \
 #				  src/modules/sdl/cdi_mod.c \
 #				  src/modules/sdt/sdtmux.c \
 #				  src/modules/sl/slm.c \
 #				  src/modules/sscop/sscop.c \
 #				  src/modules/sscop/sscop2.c \
-#				  src/modules/tcap/tcap.c \
-#				  src/modules/tcap/tc.c \
-#				  src/modules/tcap/tr.c \
 #				  src/modules/x400p-ss7/crc.c
 
 libSS7mods_a_DEPENDENCIES	= config.h strconf.h

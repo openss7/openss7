@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:38 $
+ @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:13:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_pmod.c,v $
+ Revision 0.9.2.2  2007/08/03 13:35:52  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.1  2007/07/14 01:13:38  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:38 $"
+#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:52 $"
 
-static char const ident[] = "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:38 $";
+static char const ident[] = "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:52 $";
 
 /*
  *  This is MX-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -67,6 +70,8 @@ static char const ident[] = "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
+#define _SVR4_SOURCE 1
+#define _SUN_SOURCE 1
 
 #include <sys/os7/compat.h>
 
@@ -74,7 +79,7 @@ static char const ident[] = "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/mxi_ioctl.h>
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
-#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/14 01:13:38 $"
+#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:52 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1681,10 +1686,6 @@ mx_m_rse(struct mx *mx, queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
 }
-
-#ifndef DB_TYPE
-#define DB_TYPE(mp) (mp->b_datap->db_type)
-#endif
 
 /**
  * mx_m_other: - process other STREAMS message

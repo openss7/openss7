@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/18 21:17:56 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/03 13:35:54 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/18 21:17:56 $ by $Author: brian $
+# Last Modified $Date: 2007/08/03 13:35:54 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.29  2007/08/03 13:35:54  brian
+# - manual updates, put ss7 modules in public release
+#
 # Revision 0.9.2.28  2007/05/18 21:17:56  brian
 # - updated manual pages for check target
 #
@@ -186,7 +189,9 @@ mps_compat_pages = \
 	man9/mi_bcmp.9 \
 	man9/mi_bufcall.9 \
 	man9/mi_close_comm.9 \
+	man9/mi_close_comm_cache.9 \
 	man9/mi_close_detached.9 \
+	man9/mi_close_detached_cache.9 \
 	man9/mi_close_free.9 \
 	man9/mi_close_free_cache.9 \
 	man9/mi_close_obj.9 \
@@ -214,7 +219,9 @@ mps_compat_pages = \
 	man9/mi_open_alloc_cache.9 \
 	man9/mi_open_alloc_sleep.9 \
 	man9/mi_open_comm.9 \
+	man9/mi_open_comm_cache.9 \
 	man9/mi_open_detached.9 \
+	man9/mi_open_detached_cache.9 \
 	man9/mi_open_link.9 \
 	man9/mi_open_obj.9 \
 	man9/mi_open_size.9 \
@@ -1267,7 +1274,9 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_bcmp.9.man \
 	man9/mi_bufcall.9.man \
 	man9/mi_close_comm.9.man \
+	man9/mi_close_comm_cache.9.man \
 	man9/mi_close_detached.9.man \
+	man9/mi_close_detached_cache.9.man \
 	man9/mi_close_free.9.man \
 	man9/mi_close_free_cache.9.man \
 	man9/mi_close_obj.9.man \
@@ -1295,7 +1304,9 @@ dist_noinst_mps_compat_pages = \
 	man9/mi_open_alloc_cache.9.man \
 	man9/mi_open_alloc_sleep.9.man \
 	man9/mi_open_comm.9.man \
+	man9/mi_open_comm_cache.9.man \
 	man9/mi_open_detached.9.man \
+	man9/mi_open_detached_cache.9.man \
 	man9/mi_open_link.9.man \
 	man9/mi_open_obj.9.man \
 	man9/mi_open_size.9.man \

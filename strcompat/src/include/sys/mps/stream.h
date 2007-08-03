@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.20 2007/05/17 22:50:32 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.21 2007/08/03 13:35:58 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:50:32 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.21  2007/08/03 13:35:58  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.20  2007/05/17 22:50:32  brian
  - extensive rework of mi_timer functions
 
@@ -115,7 +118,7 @@
 #ifndef __SYS_MPS_STREAM_H__
 #define __SYS_MPS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.21 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/mps/stream.h directly, include sys/stream.h instead."
@@ -188,8 +191,6 @@ mi_open_comm(caddr_t *mi_head, size_t size, queue_t *q, dev_t *devp, int flag, i
 	caddr_t ptr;
 	int err;
 
-	if (q->q_ptr != NULL)
-		return (0);	/* already open */
 	if (sflag == MODOPEN) {
 		if (!WR(q)->q_next)
 			return (EIO);
@@ -225,6 +226,61 @@ mi_close_comm(caddr_t *mi_head, queue_t *q)
 
 	mi_detach(q, ptr);
 	mi_close_detached(mi_head, ptr);
+	return (0);
+}
+
+__MPS_EXTERN_INLINE caddr_t
+mi_open_detached_cache(caddr_t *mi_head, kmem_cachep_t cachep, dev_t *devp)
+{
+	caddr_t ptr;
+	int err;
+
+	if (!(ptr = mi_open_alloc_cache(cachep, GFP_KERNEL)))
+		return (NULL);
+	if (!(err = mi_open_link(mi_head, ptr, devp, 0, DRVOPEN, NULL)))
+		return (ptr);
+	mi_close_free_cache(cachep, ptr);
+	return (NULL);
+}
+
+__MPS_EXTERN_INLINE int
+mi_open_comm_cache(caddr_t *mi_head, kmem_cachep_t cachep, queue_t *q, dev_t *devp,
+		   int flag, int sflag, cred_t *credp)
+{
+	caddr_t ptr;
+	int err;
+
+	if (sflag == MODOPEN) {
+		if (!WR(q)->q_next)
+			return (EIO);
+	} else {
+		if (WR(q)->q_next && SAMESTR(q))
+			return (EIO);
+	}
+	if (!(ptr = mi_open_alloc_cache(cachep, GFP_KERNEL)))
+		return (EAGAIN);
+	if (!(err = mi_open_link(mi_head, ptr, devp, flag, sflag, credp))) {
+		mi_attach(q, ptr);
+		return (0);
+	}
+	mi_close_free_cache(cachep, ptr);
+	return (err);
+}
+
+__MPS_EXTERN_INLINE void
+mi_close_detached_cache(caddr_t *mi_head, kmem_cachep_t cachep, caddr_t ptr)
+{
+	mi_close_unlink(mi_head, ptr);
+	mi_close_free_cache(cachep, ptr);
+}
+
+__MPS_EXTERN_INLINE int
+mi_close_comm_cache(caddr_t *mi_head, kmem_cachep_t cachep, queue_t *q)
+{
+	caddr_t ptr = q->q_ptr;
+
+	mi_detach(q, ptr);
+	mi_close_detached_cache(mi_head, cachep, ptr);
 	return (0);
 }
 

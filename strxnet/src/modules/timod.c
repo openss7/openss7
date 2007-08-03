@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:09 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/03 13:36:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:36:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.33  2007/08/03 13:36:47  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.32  2007/07/14 01:37:09  brian
  - make license explicit, add documentation
 
@@ -95,10 +98,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:09 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/03 13:36:47 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:09 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/03 13:36:47 $";
 
 /*
  *  This is TIMOD an XTI library interface module for TPI Version 2 transport
@@ -128,7 +131,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:09 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/03 13:36:47 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL v2"
@@ -1089,7 +1092,7 @@ timod_pop(queue_t *q)
 	}
 #   if defined M_UNHANGUP
 	if ((priv->flags & TIMOD_HANGUP)) {
-		if ((mp = allocb(0, BRPI_WAITOK))) {
+		if ((mp = allocb(0, BPRI_WAITOK))) {
 			mp->b_datap->db_type = M_UNHANGUP;
 			putnext(q, mp);
 		}

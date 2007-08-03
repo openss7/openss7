@@ -1,3 +1,8 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* man/lis.refs: reference updates
+	* include/sys/strmsg.h: macro define oddball message types
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

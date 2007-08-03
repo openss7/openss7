@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcap.4.man,v 0.9.2.6 2006/04/05 09:43:05 brian Exp $
+.\" @(#) $Id: tcap.4.man,v 0.9.2.7 2007/08/03 13:34:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/04/05 09:43:05 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/03 13:34:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcap.4.man,v $
+.\" Revision 0.9.2.7  2007/08/03 13:34:50  brian
+.\" - manual updates, put ss7 modules in public release
+.\"
 .\" Revision 0.9.2.6  2006/04/05 09:43:05  brian
 .\" - moved .so line and updated headers
 .\"
@@ -118,7 +121,8 @@ sort-adjacent-labels
 .PP
 .B TCAP
 is an implementation of the Signalling System No. 7 (SS7) Transaction
-Capabilities Application Part (TCAP) defined in ITU-T Recommendation Q.77X
+Capabilities Application Part (TCAP) defined in ITU-T Recommendation Q.771 to
+Q.775,
 .[
 q771
 .]
@@ -134,6 +138,13 @@ q774
 .[
 q775
 .]
+ETSI TCAP Version 1 and 2,
+.[
+tcapv1
+.]
+.[
+tcapv2
+.]
 and
 ANSI T1.114.
 .[
@@ -145,12 +156,19 @@ connectionless transport between two
 .B TCAP
 endpoints.
 .B TCAP
-provides stong assurances that the data arrives in order on a stream, if
+provides stong assurances that the data arrives in order on a Stream, if
 requested, and maintains sequencing of packets in the face of most network
 failures.
 .B TCAP
-uses the services of the
-Signalling Connection Control Part (see
+is the roughly the equivalent of a remote procedure call for SS7 and is based
+closely on the Remote Operations Service Execution (ROSE) X.219.
+.[
+x.219
+.]
+Unlike ROSE, which uses a connection-mode transport provider,
+.B TCAP
+uses the connectionless mode network services of the Signalling Connection
+Control Part (see
 .BR sccp (4))
 or SCCP User Adaptation Layer (see
 .BR sua (4))
@@ -162,45 +180,85 @@ to transfer packets.
 is implemented as a
 .IR STREAMS (4)
 multiplexing driver.
-.BR sccp "(4) or " sua (4)
-streams are linked under the
+.BR sccp "(4), " sua (4)
+or other compatible network provider Streams are bound and linked under the
 .B TCAP
 multiplexing driver using the
 .IR I_LINK " or " I_PLINK
 commands of
-.BR streamio (7),
-to provide network services to
+.BR streamio (7).
+These linked Streams provide network services to
 .BR TCAP .
-Once linked, the streams must be configured using
+Once linked, the Streams must be configured using
 .BR tcap_ioctl (4).
 .\"
 .\"
+.SS "Device Names"
 .PP
 .B TCAP
-provides the following stream types.  To select one of these stream types,
+provides the following Stream types.  To select one of these Stream types,
 .I device
 can be one of the following:
 .\"
 .\"
 .TP
-.I /dev/tcap
-This device provides the
+.IR /dev/tcap ", " /dev/tcap-tci ", " /dev/tcap-tri
+These devices provide the
 .B TCAP 
-protocol services interface using the TR- and TC-primitives of the Transaction
-Component Interface (TCI) described in
-.BR tcapi (7).
-This interface is suitable for use with other SS7 modules and drivers.
+protocol services interface using the TC-primitives of the Transaction
+Component Interface (TCI)
+.[
+tci revision 0.9.2
+.]
+described in
+.BR tci (7),
+or using the TR-primtiive of the Transaction Interface (TRI)
+.[
+tri revision 0.9.2
+.]
+described in
+.BR tri (7).
+The service interfaces provided on a Stream opening these devices is suitable
+for use with other SS7 modules and drivers.
+.RS
+.HP
+.IR /dev/tcap-tci
+provides the
+.B TCAP 
+protocol services interface using the TC-primitives of the Transaction
+Component Interface (TCI)
+.[
+tci revision 0.9.2
+.]
+described in
+.BR tci (7).
+.HP
+.IR /dev/tcap-tri
+provides the
+.B TCAP 
+protocol services interface using the TR-primitives of the Transaction
+Interface (TRI)
+.[
+tri revision 0.9.2
+.]
+described in
+.BR tri (7).
+.RE
 .\"
 .\"
 .TP
 .IR /dev/tcap-tpi-cl ", " /dev/tcap-tpi-co
-This device provides the
+These device provides the
 .B TCAP
 protocol service interface using the T-primitives of the Transport Provider
-Interface
-.BR tpi (7)
-interface provided on a stream opening this device is a suitable device for
-use with
+Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+described in
+.BR tpi "(7) and " tpi_tcap (7).
+The service interface provided on a Stream opening this device is suitable for
+use with the
 .BR xnet (3)
 or
 .BR xti (3)
@@ -212,7 +270,8 @@ interface using XTI as described in
 .BR xti_tcap (3).
 .\"
 .\"
-.sp
+.RS
+.HP
 .I /dev/tcap-tpi-co
 provides a connection-oriented
 .B T_COTS
@@ -221,9 +280,7 @@ transport service provider supporting operations classes 1, 2 and 3;
 provides a connectionless
 .B T_CLTS
 transport service provider supporting operations class 4.
-.\"
-.\"
-.sp
+.HP
 .I /dev/tcap-tpi-cl
 provides a connectionless
 .B T_CLTS
@@ -232,8 +289,10 @@ transport service provider supporting operation class 1;
 provides a connection-oriented
 .B T_COTS
 transport service provider supporting operation class 2, 3 and 4.
+.RE
 .\"
 .\"
+.SS "Socket Types"
 .PP
 .B TCAP
 provides two socket types used by the
@@ -294,6 +353,296 @@ and
 .BR protosw (5).
 .\"
 .\"
+.SH USAGE
+.PP
+The
+.B SCCP
+.IR STREAMS (4)
+multiplexing driver provides a number of device names that can be opened by user programs with the
+.BR open (2s)
+system call (see above under
+.RI \(lq "Device Names" \(rq).
+The
+.BR open (2s)
+system call returns a file descriptor,
+.IR fd ,
+that can be used ot make other system calls on the open
+.B TCAP
+Stream.
+Each
+.B TCAP
+Stream provides a service primitive interface that implements the TCAP protocol 
+The ssytem call,
+.BR putpmsg (2s),
+can be called to issue service primitives on the interface;
+.BR getpmsg (2s),
+to receive primitives.
+.BR ioctl (2s)
+as described in
+.BR streamio (7)
+and
+.BR mtp_ioctl (7)
+can be used to manage the Stream and the TCAP provider.
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+When the TCAP driver is configured, SCCP Streams are opened and linked under
+the multiplexing driver.  Each SCCP Stream represents a connection between a
+local TCAP Entity and remote peer TCAP Entities.  Input-output controls are
+used to configure each lower multiplex Stream.  SCCP Streams must be bound for
+connectionless operation before being linked, however, until they are
+configured, incoming transactions will be aborted.
+.PP
+Once configured, TCAP User Streams can be opened on the upper multiplex.
+These TCAP User Streams are not associated with a TCAP Entity until they are
+bound.  When the
+.BR TC_BIND_REQ (7)
+primitive is issued, the address contained in the request is a TCAP address.
+A TCAP address consists of an SCCP address or TCAP Entity identifier, and an
+Application Context.  This information is sufficient for the TCAP driver to
+determine the TCAP Entity with which to associate the TCAP User Stream and to
+bind the TCAP User to an Application Context.
+.PP
+Configuration is performed using the TCAP driver configuration utility.  This
+utility reads a configuration file used to define the objects necessary for
+configuration.  The configuration file contains entries that define the SCCP
+provider and TCAP Entity relationships as follows:
+.nf
+.sp
+.RI < teid "> <" variant "> <" version "> <" options "> <" sap ">
+.fi
+.TP
+.I teid
+An integer number, assigned locally, from 1 to 31, identifying the TCAP
+entity, or a Object Identifier (OID) used to globally identify the the TCAP
+entity application.  A global OID is the portion of the Application Context
+that identifies the overall Application, in numbers and dots notation.  When
+both the integer and OID TCAP Entity identifiers are specified, they are
+separated by a comma
+.RB ( , )
+with no intervening whitespace.
+.TP
+.I variant
+Specifies the variant of the TCAP protocol supported by the TCAP Entity.
+The protocol variant can be a single dash
+.RB ( - ),
+specifying that the default should be used, or one of the following text
+strings:
+.RS
+.TP
+.B itut
+ITU-T protocol variant: ITU-T recommendation Q.771 to Q.775.
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+.PD 0
+.TP
+.B etsi
+ETSI protocol variant: TCAP Version 1 or 2.
+.[
+tcapv1
+.]
+.[
+tcapv2
+.]
+.TP
+.B ansi
+ANSI protocol variant: ANSI T1.114.
+.[
+t1.114
+.]
+.TP
+.B jttc
+TTC protocol variant: JQ.771 to JQ.775.
+.TP
+.B chin
+Chinese protocol variant.
+.TP
+.B sing
+Singapore protocol variant.
+.TP
+.B span
+Spain protocol variant.
+.PD
+.RE
+.TP
+.I version
+Specifies the version of the TCAP protocol supported by the TCAP Entity.  The
+protocol version can be a single dash
+.RB ( - ),
+specifying that the default should be used, or a decimal number indicating the
+year of the specification.
+.TP
+.I options
+Specifies the options for the TCAP protocol supported by the TCAP Entity.  The
+protocol options can be a single dash
+.RB ( - ),
+specifying that no protocol options are specified, or one, or a comma
+.RB ( , )
+separated list (with no intervening whitespace) of more than one of the
+following option strings:
+.RS
+.TP
+.B mplev
+MTP supports multiple priority levels.
+.PD 0
+.TP
+.B pcr
+MTP supports Preventative Cyclic Retransmission.
+.TP
+.B hsl
+MTP supports High-Speed Links.
+.TP
+.B xsn
+MTP supports extended sequence numbers.
+.TP
+.B nopr
+MTP supports alignment of signalling links without proving.
+.TP
+.B tfr
+MTP supports the Transfer Restricted procedures.
+.TP
+.B tfrb
+MTP supports the Transfer Restricted procedures (broadcast).
+.TP
+.B tfrr
+MTP supports the Transfer Restricted procedures (responsive).
+.TP
+.B mcsta
+MTP supports multiple congestion states.
+.PD
+.RE
+.TP
+.I sap
+Specifies the SCCP SAP (Service Access Points) associated with the TCAP
+Entity.  The SCCP SAP can be a single dash
+.RB ( - ),
+specifying that the default SCCP SAPs for the Application OID should be used,
+or a comma
+.RB ( , )
+separated list of SCCP SAP specifications.  A single SCCP SAP specification
+consists of a non-GT SCCP address specification which consists of an SS7 point
+code and subsystem number in numbers and dots notation,
+.RS
+.nf
+.sp
+\fR[\fIA\fB.\fR]\fIN\fB.\fIC\fB.\fIM\fB.\fIS\fR[\fB,\fR[\fIA\fB.\fR]\fIN\fB.\fIC\fB.\fIM\fB.\fIS\fR]*
+.sp
+.fi
+where the fields are defined as follows:
+.TP \w'\fIM\fR\(em'u
+.I A
+Optionally specifies the network appearance that defines the protocol variant,
+network indicator, form of the SS7 signalling point code, and interpretation of
+the subsystem number.  When this field is not included, the default protocol
+variant and network indicator will be used.  When included, this field can be
+one of the values configured against the Message Transfer Part (see
+.BR mtp (4)).
+.TP
+.I N
+Specifies the network number portion of the SS7 signalling point code as a
+decimal, octal, or hexidecimal number in shell notation.  (This can be a 4-bit
+(0-15) or 8-bit (0-255) field depending upon the protocol variant.)
+.TP
+.I C
+Specifies the cluster number portion of the SS7 signalling point code as a
+decimal, octal, or hexidecimal number in shell notation.  (This can be a 6-bit
+(0-63) or 8-bit (0-255) field depending upon the protocol variant.)
+.TP
+.I M
+Specifies the member number portion of the SS7 signalling point code as a
+decimal, octal, or hexidecimal number in shell notation.  (This can be a 4-bit
+(0-15) or 8-bit (0-255) field depending upon the protocol variant.)
+.TP
+.I S
+Specifes the SCCP subsystem number as a decimal, octal, or hexidecimal number
+in shell notation.
+.RE
+.PP
+The configuration utility reads this configuration file and performs the
+following steps for each entry in the file:
+.IP 1. \w'0.\(em'u
+The utility opens a Stream on the TCAP driver using the
+.B /dev/tcap-mgmt
+device.
+.IP 2.
+The utility creates a new TCAP Entity or alters an existing TCAP Entity as
+specified by the
+.I teid
+field and fills out the protocol variant, version and options information
+associated with the TCAP Entity.
+The
+.I TCAP_IOCSCONFIG
+.BR tcap_ioctl (4)
+command for the
+.I TCAP_OBJ_TYPE_TE
+object
+is used.
+.IP 3.
+For each
+.I sap
+entry, the utility creates a new SCCP SAP object or alters an existing SCCP
+SAP object and associates it with the TCAP entity using the
+.I TCAP_IOCSCONFIG
+.BR tcap_ioctl (4)
+command for the
+.I TCAP_OBJ_TYPE_SP
+object.
+The SCCP SAP is assigned the SS7 signalling point code and Subsystem Number
+specified in the configuration file field.
+.IP 4.
+For each
+.I sap
+entry, the utility opens an SCCP Stream by opening the
+.B /dev/sccp
+device and links the SCCP Stream under the TCAP multiplexing driver using the
+.IR I_PLINK (7)
+.BR streamio (7)
+input-output control.
+The utility can optionally bind the SCCP Stream to the SCCP SAP before
+linking.  When bound in advance, the linking operation discovers the allocated
+SCCP SAP object and associates the SCCP Stream with the SCCP SAP.
+.IP 5.
+When the SCCP Stream is not bound before linking, the utility associates the
+SCCP Stream with an SCCP SAP using the
+.I TCAP_IOCSCONFIG
+.BR tcap_ioctl (4)
+command for the
+.I TCAP_OBJ_TYPE_SC
+object.
+.IP 6.
+The TCAP Entity configuraiton is complete and the next line of the
+configuration file is processed by the configuration utility starting at Step 2.
+.\"
+.\"
+.SH NOTICES
+.PP
+Note that, although the SCCP normally supports binding of SCCP SAPs that
+include a restrictive global title range, the TCAP device configuration
+utility only supports binding of SCCP Streams to entire subsystems.
+.PP
+Note also that the protocol variant for the TCAP Entity, as described in the
+.IR variant ", " version " and " options
+fields, can be different from the protocol variant used for the
+SCCP SAP in the
+.I sap
+field.  This is to support the widespread practice in North America for
+transporting ETSI TCAP over ANSI SCCP.
+.\"
+.\"
 .SH IOCTLS
 .PP
 All interfaces support a set of management IO controls using
@@ -325,25 +674,92 @@ file descriptor or socket.  These management controls are documented in
 .\"
 .\"
 .SH DEVICES
-.PP
+.HP
 .IR /dev/tcap ,
+.IR /dev/tcap-tci .
+These device names are two names for the same device.  The device provides a
+clone or auto-clone Stream providing the TCI interface, not associated with a
+TCAP Entity.
+This device can also be opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/tcap/tc .
+Additional
+.BR specfs (5)
+device entries,
+.IR /dev/streams/tcap/tc01 " through " /dev/streams/tcap/tc31 ,
+may be opened to obtain a Stream associated with TCAP Entities 1 through 31,
+depending on the minor device number.
+.HP
+.IR /dev/tcap-tri .
+This device provides an auto-clone Stream providing the TRI interface, not
+assocaited witha TCAP Entity.
+This device can also be opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/tcap/tr .
+Additional
+.BR specfs (5)
+device entries,
+.IR /dev/streams/tcap/tr01 " through " /dev/streams/tcap/tr31 ,
+may be opened to obtain a Stream associated with TCAP Entities 1 through 31,
+depending on the minor device number.
+.HP
 .IR /dev/tcap-tpi-cl ,
 .IR /dev/tcap-tpi-co .
+These devices provide an auto-clone Stream providing the TPI T_CLTS or T_COTS
+interface, not associated with TCAP Entity.
+These devices can also be opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/tcap/tpcl " or " /dev/streams/tcap/tpco .
+Additional
+.BR specfs (5)
+device entries,
+.IR /dev/streams/tcap/tpcl01 " through " /dev/streams/tcap/tpcl31 ", and " /dev/streams/tcap/tpco01 " through " /dev/streams/tcap/tpco31 ,
+may be opened to obtain a Stream associated with TCAP Entities 1 through 31,
+depending on the minor device number.
+.HP
+.IR /dev/tcap-mgmt .
+This device provides an auto-clone Stream providing the management interface,
+not associated with a TCAP Entity.
+This device can also be opened using the
+.BR specfs (5)
+entry,
+.IR /dev/streams/tcap/lm .
 .\"
 .\"
 .SH VERSIONS
 .PP
 The
-.B TCAP
-interface is specific to the
+.B TCI
+and
+.B TRI
+interfaces are specific to the
 .B OpenSS7
-SS7 stack.  This is Version 2 of the interface.
-.\"
-.\"
-.PP
+SS7 stack.
+.IP \(bu \w'\(bu\(em'u
+TCI interfaces are consistent with TCI Revision 0.9.2.
+.[
+tci revision 0.9.2
+.]
+.PD 0
+.IP \(bu
+TRI interfaces are consistent with TRI Revision 0.9.2.
+.[
+tri revision 0.9.2
+.]
+.IP \(bu
 XTI interfaces are consistent with XNS 5.2 Revision 2.
-.PP
-TPI interfaces are consistent with TPI Revision 1.5, Draft 2.
+.[
+xns 5.2
+.]
+.IP \(bu
+TPI interfaces are consistent with TPI Revision 2.0.0, Draft 2.
+.[
+tpi revision 2.0.0
+.]
+.PD
 .\"
 .[
 $LIST$

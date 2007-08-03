@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 0.9.2.15 2007/06/22 00:18:20 brian Exp $
+% @(#) $Id: openss7.texi,v 0.9.2.16 2007/08/03 13:33:57 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/22 00:18:20 $ by $Author: brian $
+% Last Modified $Date: 2007/08/03 13:33:57 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -217,7 +217,7 @@ release @value{PACKAGE_RELEASE} of the @value{PACKAGE_TITLE} package.
 * Quick Start Guide::		Quick Installation Instructions
 
 * Introduction::		Introduction to the package
-* Objective::			Objective of the package
+* Overview::			Overview of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -243,11 +243,14 @@ Preface
 
 Introduction
 
-* Overview::			Overview
+* Objective::			Objective
 * Organization::		Organization
 * Conventions::			Conventions
 
-Objective
+Overview
+
+* Background::			Background of the project
+* Package Contents::		Basic contents of the master package.
 
 Reference
 
@@ -402,6 +405,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: openss7.texi,v $
+Revision 0.9.2.16  2007/08/03 13:33:57  brian
+- manual updates, put ss7 modules in public release
+
 Revision 0.9.2.15  2007/06/22 00:18:20  brian
 - mostly documentation updates for release, some netconfig workaround
 
@@ -579,7 +585,7 @@ schedule of the @cite{@value{PACKAGE_TITLE}} package.
 @c ----------------------------------------------------------------------------
 
 @menu
-* Overview::			Overview
+* Objective::			Objective
 * Organization::		Organization
 * Conventions::			Conventions
 @end menu
@@ -601,9 +607,9 @@ released under different terms.  Please consult the manual contained in each sub
 information.
 @end ignore
 
-@node Overview
-@section Overview
-@cindex overview
+@node Objective
+@section Objective
+@cindex objective
 
 This manual documents the design, implementation, installation, operation and future development of
 the @cite{@value{PACKAGE_TITLE}} package.
@@ -617,7 +623,7 @@ This manual is organized (loosely) into several sections as follows:
 @ifnottex
 @menu
   Introduction::		This introduction
-* Objective::			Objective of the package
+* Overview::			Overview of the package
 * Reference::			Contents of the package
 * Conformance::			Conformance of the package
 * Releases::			Releases of the package
@@ -629,8 +635,8 @@ This manual is organized (loosely) into several sections as follows:
 @multitable @columnfractions .50 .50
 @item @ref{Introduction}.
 @tab This introduction
-@item @ref{Objective}.
-@tab Objective of the package
+@item @ref{Overview}.
+@tab Overview of the package
 @item @ref{Reference}.
 @tab Contents of the package
 @item @ref{Conformance}.
@@ -647,8 +653,8 @@ This manual is organized (loosely) into several sections as follows:
 @multitable @columnfractions .50 .50
 @item @cite{Introduction}.
 @tab This introduction
-@item @cite{Objective}.
-@tab Objective of the package
+@item @cite{Overview}.
+@tab Overview of the package
 @item @cite{Reference}.
 @tab Contents of the package
 @item @cite{Conformance}.
@@ -672,9 +678,57 @@ This manual uses @cite{texinfo} typographic conventions.
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
-@node Objective
-@chapter Objective
-@cindex objective
+@node Overview
+@chapter Overview
+@cindex overview
+
+@menu
+* Background::			Background of the project
+* Package Contents::		Basic contents of the master package.
+@end menu
+
+@node Background
+@section Background
+@cindex background
+
+@uref{http://www.openss7.org/, The OpenSS7 Project} was started in 1996 an made it Web debut in
+2000.  The initial objectives of the OpenSS7 Project were to provide an SS7 stack implementation for
+Linux.  Initial work on development of the SS7 stack attempted to integrate the SS7 protocol
+elements into Linux's BSD-like Sockets based networking system.  Early on this approach became
+problematic.  Although the true BSD sockets networking system is somewhat ameniable to a wider range
+of protocols that just the TCP/IP protocol suite, as evidenced by the early adoption of OSI
+protocols into BSD 4.3 , the incarnation of the system present in Linux deviates largely from the
+BSD module in that there is no clean separation between the socket layer and the protocol layer, and
+that the protocol layer cannot actually be stacked in the same fashion as is possible in BSD.  Thes
+and other difficulties led the project, in 2001, to persue the STREAMS approach to networking.
+
+At the time (in 2000), there was an implemetnation for STREAMS for Linux, called Linux STREAMS, or
+@cite{LiS} for short.  The OpenSS7 Project worked extensively with enhancing the @cite{LiS} package
+for use with SS7 and SIGTRAN protocols.  The versions of @cite{LiS} that were available for the
+Linux 2.2 series kernels available at the time were quite stable.@footnote{Linux 2.2 series kernels
+did @emph{not} support symmetrical multi-processing (SMP) making it similar to SVR 4.0.}  The
+versions of @cite{LiS} that were available for the Linux 2.4 series kernels attempted to support SMP
+using the same SVR 4.0-like STREAMS model.  These versions of @cite{LiS} were incredibly difficult
+to stabilize on Linux 2.4 series kernels.  Much of the problems with @cite{LiS} appeared to be
+related to a poor coding style, and the attempt to maintain portablity to systems other than Linux,
+(even though it appears that ports were not even popular).
+
+Therefore, in 2003, the OpenSS7 Project decided to replace @cite{LiS} with a completely new
+implementation of STREAMS for Linux based, on SVR 4.2 documentation, called @cite{Linux
+Fast-STREAMS}, or @cite{LfS}.  The OpenSS7 Project also decided to support a fork of @cite{LiS} in
+the meantime to developing @cite{Linux Fast-STREAMS} to production grade.  The project maintained a
+fork of @cite{LiS-2.16} for the Linux 2.4 kernel series, and later a fork of @cite{LiS-2.18} for the
+Linux 2.6 kernel series.  The development of @cite{Linux Fast-STREAMS} culminated with the first
+production grade release for Linux 2.4 and 2.6 kernel services at the beginning of 2006, after which
+the OpenSS7 forks of @cite{LiS} were completely deprecated.
+
+Beginning in 2001, the OpenSS7 Project has developed STREAMS components over a wide range of
+applications, not just SS7.  These components are divided into groups of components that are
+released within separate sub-packages of the OpenSS7 Master Package.
+
+@node Package Contents
+@section Package Contents
+@cindex package contents
 
 @menu
 * STREAMS Packages::		STREAMS packages in the master package
@@ -690,7 +744,7 @@ and install all available OpenSS7 Project packages without concern or considerat
 dependencies between packages.
 
 @node STREAMS Packages
-@section STREAMS Packages
+@subsection STREAMS Packages
 @cindex STREAMS packages
 
 Because OpenSS7 packages first built with @dfn{Linux STREAMS (LiS)} but now build with the superior
@@ -703,7 +757,7 @@ longer supported in the master package.  @dfn{LiS} @emph{2.18.3} was the final p
 @dfn{LiS} from the OpenSS7 Project.
 
 @node Other Packages
-@section Other Packages
+@subsection Other Packages
 @cindex other packages
 
 The other packages in the @value{PACKAGE_TITLE} normally depend upon one of the @dfn{STREAMS}

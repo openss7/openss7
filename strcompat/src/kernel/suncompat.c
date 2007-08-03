@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/07/14 01:35:42 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:36:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.35  2007/08/03 13:36:01  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.34  2007/07/14 01:35:42  brian
  - make license explicit, add documentation
 
@@ -67,9 +70,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/07/14 01:35:42 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $"
 
-static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/07/14 01:35:42 $";
+static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -90,7 +93,7 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/07/14 01:35:42 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL v2"
@@ -540,33 +543,43 @@ extern int ddi_unmap_regs(void);
 /*
  *  Solaris helper functions from sys/strsun.h
  */
+#undef DB_BASE
 __SUN_EXTERN_INLINE unsigned char *DB_BASE(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_BASE);
+#undef DB_LIM
 __SUN_EXTERN_INLINE unsigned char *DB_LIM(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_LIM);
+#undef DB_REF
 __SUN_EXTERN_INLINE size_t DB_REF(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_REF);
+#undef DB_TYPE
 __SUN_EXTERN_INLINE int DB_TYPE(mblk_t *mp);
 
 EXPORT_SYMBOL(DB_TYPE);
+#undef MBLKL
 __SUN_EXTERN_INLINE long MBLKL(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKL);
+#undef MBLKSIZE
 __SUN_EXTERN_INLINE long MBLKSIZE(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKSIZE);
+#undef MBLKHEAD
 __SUN_EXTERN_INLINE long MBLKHEAD(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKHEAD);
+#undef MBLKTAIL
 __SUN_EXTERN_INLINE long MBLKTAIL(mblk_t *mp);
 
 EXPORT_SYMBOL(MBLKTAIL);
+#undef MBLKIN
 __SUN_EXTERN_INLINE long MBLKIN(mblk_t *mp, ssize_t off, size_t len);
 
 EXPORT_SYMBOL(MBLKIN);
+#undef OFFSET
 __SUN_EXTERN_INLINE long OFFSET(void *p, void *base);
 
 EXPORT_SYMBOL(OFFSET);

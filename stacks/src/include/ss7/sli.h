@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sli.h,v 0.9.2.5 2007/06/17 01:56:02 brian Exp $
+ @(#) $Id: sli.h,v 0.9.2.6 2007/08/03 13:35:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sli.h,v $
+ Revision 0.9.2.6  2007/08/03 13:35:01  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.5  2007/06/17 01:56:02  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_SLI_H__
 #define __SS7_SLI_H__
 
-#ident "@(#) $RCSfile: sli.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sli.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -67,49 +70,49 @@ typedef lmi_ulong sl_ulong;
 typedef lmi_ushort sl_ushort;
 typedef lmi_uchar sl_uchar;
 
-#define SL_PROTO_BASE				  64L
+#define SL_PROTO_BASE				  64
 
-#define SL_DSTR_FIRST				(  1L + SL_PROTO_BASE)
-#define SL_PDU_REQ				(  1L + SL_PROTO_BASE)
-#define SL_EMERGENCY_REQ			(  2L + SL_PROTO_BASE)
-#define SL_EMERGENCY_CEASES_REQ			(  3L + SL_PROTO_BASE)
-#define SL_START_REQ				(  4L + SL_PROTO_BASE)
-#define SL_STOP_REQ				(  5L + SL_PROTO_BASE)
-#define SL_RETRIEVE_BSNT_REQ			(  6L + SL_PROTO_BASE)
-#define SL_RETRIEVAL_REQUEST_AND_FSNC_REQ	(  7L + SL_PROTO_BASE)
-#define SL_CLEAR_BUFFERS_REQ			(  8L + SL_PROTO_BASE)
-#define SL_CLEAR_RTB_REQ			(  9L + SL_PROTO_BASE)
-#define SL_CONTINUE_REQ				( 10L + SL_PROTO_BASE)
-#define SL_LOCAL_PROCESSOR_OUTAGE_REQ		( 11L + SL_PROTO_BASE)
-#define SL_RESUME_REQ				( 12L + SL_PROTO_BASE)
-#define SL_CONGESTION_DISCARD_REQ		( 13L + SL_PROTO_BASE)
-#define SL_CONGESTION_ACCEPT_REQ		( 14L + SL_PROTO_BASE)
-#define SL_NO_CONGESTION_REQ			( 15L + SL_PROTO_BASE)
-#define SL_POWER_ON_REQ				( 16L + SL_PROTO_BASE)
-#define SL_OPTMGMT_REQ				( 17L + SL_PROTO_BASE)
-#define SL_NOTIFY_REQ				( 18L + SL_PROTO_BASE)
-#define SL_DSTR_LAST				( 18L + SL_PROTO_BASE)
+#define SL_DSTR_FIRST				(  1 + SL_PROTO_BASE)
+#define SL_PDU_REQ				(  1 + SL_PROTO_BASE)
+#define SL_EMERGENCY_REQ			(  2 + SL_PROTO_BASE)
+#define SL_EMERGENCY_CEASES_REQ			(  3 + SL_PROTO_BASE)
+#define SL_START_REQ				(  4 + SL_PROTO_BASE)
+#define SL_STOP_REQ				(  5 + SL_PROTO_BASE)
+#define SL_RETRIEVE_BSNT_REQ			(  6 + SL_PROTO_BASE)
+#define SL_RETRIEVAL_REQUEST_AND_FSNC_REQ	(  7 + SL_PROTO_BASE)
+#define SL_CLEAR_BUFFERS_REQ			(  8 + SL_PROTO_BASE)
+#define SL_CLEAR_RTB_REQ			(  9 + SL_PROTO_BASE)
+#define SL_CONTINUE_REQ				( 10 + SL_PROTO_BASE)
+#define SL_LOCAL_PROCESSOR_OUTAGE_REQ		( 11 + SL_PROTO_BASE)
+#define SL_RESUME_REQ				( 12 + SL_PROTO_BASE)
+#define SL_CONGESTION_DISCARD_REQ		( 13 + SL_PROTO_BASE)
+#define SL_CONGESTION_ACCEPT_REQ		( 14 + SL_PROTO_BASE)
+#define SL_NO_CONGESTION_REQ			( 15 + SL_PROTO_BASE)
+#define SL_POWER_ON_REQ				( 16 + SL_PROTO_BASE)
+#define SL_OPTMGMT_REQ				( 17 + SL_PROTO_BASE)
+#define SL_NOTIFY_REQ				( 18 + SL_PROTO_BASE)
+#define SL_DSTR_LAST				( 18 + SL_PROTO_BASE)
 
-#define SL_USTR_LAST				( -1L - SL_PROTO_BASE)
-#define SL_PDU_IND				( -1L - SL_PROTO_BASE)
-#define SL_LINK_CONGESTED_IND			( -2L - SL_PROTO_BASE)
-#define SL_LINK_CONGESTION_CEASED_IND		( -3L - SL_PROTO_BASE)
-#define SL_RETRIEVED_MESSAGE_IND		( -4L - SL_PROTO_BASE)
-#define SL_RETRIEVAL_COMPLETE_IND		( -5L - SL_PROTO_BASE)
-#define SL_RB_CLEARED_IND			( -6L - SL_PROTO_BASE)
-#define SL_BSNT_IND				( -7L - SL_PROTO_BASE)
-#define SL_IN_SERVICE_IND			( -8L - SL_PROTO_BASE)
-#define SL_OUT_OF_SERVICE_IND			( -9L - SL_PROTO_BASE)
-#define SL_REMOTE_PROCESSOR_OUTAGE_IND		(-10L - SL_PROTO_BASE)
-#define SL_REMOTE_PROCESSOR_RECOVERED_IND	(-11L - SL_PROTO_BASE)
-#define SL_RTB_CLEARED_IND			(-12L - SL_PROTO_BASE)
-#define SL_RETRIEVAL_NOT_POSSIBLE_IND		(-13L - SL_PROTO_BASE)
-#define SL_BSNT_NOT_RETRIEVABLE_IND		(-14L - SL_PROTO_BASE)
-#define SL_OPTMGMT_ACK				(-15L - SL_PROTO_BASE)
-#define SL_NOTIFY_IND				(-16L - SL_PROTO_BASE)
-#define SL_LOCAL_PROCESSOR_OUTAGE_IND		(-17L - SL_PROTO_BASE)
-#define SL_LOCAL_PROCESSOR_RECOVERED_IND	(-18L - SL_PROTO_BASE)
-#define SL_USTR_FIRST				(-18L - SL_PROTO_BASE)
+#define SL_USTR_LAST				( -1 - SL_PROTO_BASE)
+#define SL_PDU_IND				( -1 - SL_PROTO_BASE)
+#define SL_LINK_CONGESTED_IND			( -2 - SL_PROTO_BASE)
+#define SL_LINK_CONGESTION_CEASED_IND		( -3 - SL_PROTO_BASE)
+#define SL_RETRIEVED_MESSAGE_IND		( -4 - SL_PROTO_BASE)
+#define SL_RETRIEVAL_COMPLETE_IND		( -5 - SL_PROTO_BASE)
+#define SL_RB_CLEARED_IND			( -6 - SL_PROTO_BASE)
+#define SL_BSNT_IND				( -7 - SL_PROTO_BASE)
+#define SL_IN_SERVICE_IND			( -8 - SL_PROTO_BASE)
+#define SL_OUT_OF_SERVICE_IND			( -9 - SL_PROTO_BASE)
+#define SL_REMOTE_PROCESSOR_OUTAGE_IND		(-10 - SL_PROTO_BASE)
+#define SL_REMOTE_PROCESSOR_RECOVERED_IND	(-11 - SL_PROTO_BASE)
+#define SL_RTB_CLEARED_IND			(-12 - SL_PROTO_BASE)
+#define SL_RETRIEVAL_NOT_POSSIBLE_IND		(-13 - SL_PROTO_BASE)
+#define SL_BSNT_NOT_RETRIEVABLE_IND		(-14 - SL_PROTO_BASE)
+#define SL_OPTMGMT_ACK				(-15 - SL_PROTO_BASE)
+#define SL_NOTIFY_IND				(-16 - SL_PROTO_BASE)
+#define SL_LOCAL_PROCESSOR_OUTAGE_IND		(-17 - SL_PROTO_BASE)
+#define SL_LOCAL_PROCESSOR_RECOVERED_IND	(-18 - SL_PROTO_BASE)
+#define SL_USTR_FIRST				(-18 - SL_PROTO_BASE)
 
 /*
  *  SLI PROTOCOL PRIMITIVES

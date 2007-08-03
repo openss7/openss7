@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: m2uaconf.8.man,v 0.9.2.3 2007/03/14 00:54:32 brian Exp $
+.\" @(#) $Id: m2uaconf.8.man,v 0.9.2.4 2007/08/03 13:34:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/03/14 00:54:32 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/03 13:34:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: m2uaconf.8.man,v $
+.\" Revision 0.9.2.4  2007/08/03 13:34:20  brian
+.\" - manual updates, put ss7 modules in public release
+.\"
 .\" Revision 0.9.2.3  2007/03/14 00:54:32  brian
 .\" - manpages for check maintenance target
 .\"
@@ -111,12 +114,12 @@ sort-adjacent-labels
 .SH DESCRIPTION
 .PP
 .B m2uaconf
-is a configuration tuiltiy for the M2UA-AS driver,
+is a configuration utility for the M2UA-AS driver,
 .BR m2ua_as (4),
-and the SL-MUX multiplexing river,
+and the SL-MUX multiplexing driver,
 .BR sl-mux (4).
 Its purpose is to form Signalling Link Streams using the M2UA-AS driver, connect the M2UA link
-configure the link, and links the SL stream under the SL-mUX multiplexing driver, configure the
+configure the link, and link the SL stream under the SL-MUX multiplexing driver, configure the
 lower SL Stream, and then wait in the background watching for updates to the configuration file and
 apply updates as they occur.
 .PP
@@ -145,7 +148,7 @@ provides the following command-line options:
 One of the following mutually exclusive command options must be specified.  If no command options
 are specified,
 .B m2uaconf
-will act as thorugh the
+will act as though the
 .B -g
 option was specified and print the configuration for all M2UA PPAs.
 .TP
@@ -160,6 +163,9 @@ links, as well as providing the ablity to regenerate the
 entries in the
 .BR slconf (5)
 configuration file.
+(See
+.RI \(lq EXAMPLES ,\(rq
+below.)
 .RS
 .PP
 Arguments consist of a whitespace separated list of one or more of the following arguments:

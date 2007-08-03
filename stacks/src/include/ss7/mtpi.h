@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi.h,v 0.9.2.5 2007/02/13 14:05:28 brian Exp $
+ @(#) $Id: mtpi.h,v 0.9.2.6 2007/08/03 13:35:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpi.h,v $
+ Revision 0.9.2.6  2007/08/03 13:35:00  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.5  2007/02/13 14:05:28  brian
  - corrected ulong and long for 32-bit compat
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_MTPI_H__
 #define __SS7_MTPI_H__
 
-#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtpi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -271,7 +274,7 @@ typedef struct MTP_transfer_req {
 } MTP_transfer_req_t;
 
 /*
- *  MTP_TRANSFER_IND, M_PROTO
+ *  MTP_TRANSFER_IND, M_PROTO (band 0)
  */
 typedef struct MTP_transfer_ind {
 	mtp_ulong mtp_primitive;	/* always MTP_TRANSFER_IND */
@@ -282,7 +285,7 @@ typedef struct MTP_transfer_ind {
 } MTP_transfer_ind_t;
 
 /*
- *  MTP_PAUSE_IND, M_PCPROTO
+ *  MTP_PAUSE_IND, M_PROTO (band 1)
  */
 typedef struct MTP_pause_ind {
 	mtp_ulong mtp_primitive;	/* always MTP_PAUSE_IND */
@@ -291,7 +294,7 @@ typedef struct MTP_pause_ind {
 } MTP_pause_ind_t;
 
 /*
- *  MTP_RESUME_IND, M_PCPROTO
+ *  MTP_RESUME_IND, M_PROTO (band 1)
  */
 typedef struct MTP_resume_ind {
 	mtp_ulong mtp_primitive;	/* always MTP_RESUME_IND */
@@ -300,7 +303,7 @@ typedef struct MTP_resume_ind {
 } MTP_resume_ind_t;
 
 /*
- *  MTP_STATUS_IND, M_PCPROTO
+ *  MTP_STATUS_IND, M_PROTO (band 1)
  */
 typedef struct MTP_status_ind {
 	mtp_ulong mtp_primitive;	/* always MTP_STATUS_IND */

@@ -1,5 +1,18 @@
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
+	* doc/man/Makefile.am: add manual pages
+	* doc/man/strcompat.refs: updated references
+	* doc/man/man9/mi_close_comm.9.man: added to manual page
+	* doc/man/man9/mi_close_detached.9.man: added to manual page
+	* doc/man/man9/mi_open_comm.9.man: added to manual page
+	* doc/man/man9/mi_open_detached.9.man: added to manual page
+	* src/include/sys/mps/stream.h: add mi_open cache functions
+	* src/include/sys/sun/strsun.h: define DB_TYPE and the like as macros
+	* src/kernel/mpscompat.c: add mi_open cache functions
+	* src/kernel/suncompat.c: undef DB_TYPE and the like
+
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
 	* doc/man/man9/mi_close_comm_cache.9.man: add mans for cachce allocation
 	* doc/man/man9/mi_close_detached_cache.9.man: add mans for cachce allocation
 	* doc/man/man9/mi_open_comm_cache.9.man: add mans for cachce allocation

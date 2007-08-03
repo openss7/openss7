@@ -88,6 +88,50 @@
 %I Gcom, Inc.
 %D March 1999
 
+%L LMI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Local Management Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/lmi.pdf
+
+%L SLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Signalling Link Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/sli.pdf
+
+%L SDTI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Signalling Data Terminal Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/sdti.pdf
+
+%L SDLI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R strss7-0.9.2
+%N Draft 2
+%T Signalling Data Link Interface Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/sdli.pdf
+
 %K xxx
 %A X Programmer's Group
 %L XXX
@@ -251,7 +295,7 @@
 %T Digial cellular telecommunications system (Phase 2+) \(em Signalling transport mechanism specification for the \(em Base Station System \(em Mobile-services Switching Center (BSS \(em MSC) interface
 %D May 2000
 %N 3GPP TS 08.06 Version 8.0.1 Release 1999
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %I European Telecommunications Standards Institute
 %Q ETSI Secretariat
 %U http://www.etsi.org/
@@ -298,7 +342,7 @@
 %D September 2000
 %T Integrated Services Digital Network (ISDN); Signalling System No. 7; Protocol Specification
 %O (ITU-T Recommendations Q.701, Q.702, Q.703, Q.704, Q.705, Q.706, Q.707 and Q.708, modified)
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %G REN/SPAN-01074-1
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -312,7 +356,7 @@
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection;
 Part 1: Protocol Specification
 %O (ITU-T Recommendations Q.711 to Q.716 (1996) modified)
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %G REN/SPAN-01063-1
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -326,7 +370,7 @@ Part 1: Protocol Specification
 %D September 1996
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection; Part 1: Protocol Specification
 %O (ITU-T Recommendations Q.711 to Q.714 and Q.716 (1993) modified)
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %G RE/SPS-02018-1
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -339,7 +383,7 @@ Part 1: Protocol Specification
 %N Second Edition
 %D January 1995
 %T Intergrated Services Digital Network (ISDN); Signalling System No. 7; Signalling Connection Control Part (SCCP); [Connectionless and Connection-Oriented] to Support International Interconnection
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %G RE/SPS-02003
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -352,10 +396,24 @@ Part 1: Protocol Specification
 %T Integrated Serivces Digital Network (ISDN); Signalling System No. 7 (SS7); ISDN User Part (ISUP) Version 4 for the International Interface; Part 1: Basic Services
 %D July 2001
 %N ISUP Version 4
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %I European Telecommunications Standards Institute
 %O (ITU-T Rcommendations Q.761 to Q.764 (1999) modified)
 %U http://www.etsi.org/
+
+%K tcapv1
+%L ETS 300 134
+%A ETSI
+%R ETSI ETS 300 134
+%T Integrated Services Digital Network (ISDN); CCITT Signalling System No. 7; Transaction Capabilities Application Part (TCAP)
+%D December 1992
+%N TCAP Version 1
+%C Sophia Antipolis, Valbonne
+%G T/S 43-05
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+%O (ITU-T Recommendations Q.771 to Q.775 (1988) modified)
 
 %K tcapv2
 %L ETS 300 287
@@ -364,12 +422,26 @@ Part 1: Protocol Specification
 %T Integrated Services Digital Network (ISDN); Signalling System No. 7 (SS7); Transaction Capabilities Application Part (TCAP)
 %D 1993
 %N TCAP Version 2
-%C Cedex
+%C Sophia Antipolis, Valbonne
 %G RE/SPS-02003
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
 %U http://www.etsi.org/
-%O (ITU-T Rcommendations Q.771 to Q.774 (1993) modified)
+%O (ITU-T Rcommendations Q.771 to Q.775 (1993) modified)
+
+%K tcaptest
+%L ETS 300 344
+%A ETSI
+%R ETSI ETS 300 344
+%T Integrated Services Digital Network (ISDN); Signalling System No. 7; Transaction Capabilities Application Part (TCAP); Test Specification
+%D August 1994
+%N TCAP Version 1
+%C Sophia Antipolis, Valbonne
+%G DE/SPS-6005
+%Q ETSI Secretariat
+%I European Telecommunications Standards Institute
+%U http://www.etsi.org/
+%O (ITU-T Recommendation Q.787 (1988) modified)
 
 %K rfc3788
 %K sigsec
@@ -464,7 +536,7 @@ Part 1: Protocol Specification
 %T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Message transfer part 2 User Adaptation layer (M2UA)
 %D May 2003
 %O (Endorsement of RFC 3331 (2002), modified)
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/SPAN-130262
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -476,7 +548,7 @@ Part 1: Protocol Specification
 %R ETSI TS 102 380-V1.1.1 (2004-12)
 %T Methods for Testing and Specification (MTS); Message Transfer Part 2 - User Adaptation Layer (M2UA); Test Suite Structure and Test Purposes (TSS&TP)
 %D December 2004
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/MTS-00093
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -739,7 +811,7 @@ Part 1: Protocol Specification
 %T Universal Mobile Telecommunications System (UMTS); Signalling System No. 7 (SS7) signalling transport in core network; Stage 3
 %D December 2004
 %O (3GPP TS 29.202 version 6.0.0 Release 6)
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G RTS/TSGN-0429292v600
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -752,7 +824,7 @@ Part 1: Protocol Specification
 %T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Message transfer part 3 User Adaptation layer (M3UA)
 %D May 2003
 %O (Endorsement of RFC 3332 (2002), modified)
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/SPAN-130263
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -764,7 +836,7 @@ Part 1: Protocol Specification
 %R ETSI TS 102 381-V1.1.1 (2004-12)
 %T Methods for Testing and Specification (MTS); Message Transfer Part 3 - User Adaptation Layer (IETF RFC 3332); Test Suite Structure and Test Purposes (TSS&TP)
 %D December 2004
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/MTS-00087
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -794,7 +866,7 @@ Part 1: Protocol Specification
 %T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Signalling connection control part User Adaptation layer (SUA)
 %D May 2003
 %O (Endorsement of SIGTRAN-SUA-14 (Decenber 2002), modified)
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/SPAN-130264
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -1791,6 +1863,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K rfc4165
 %K M2PArfc
@@ -2180,6 +2253,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q701
 %L Q.701
@@ -2191,6 +2265,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q702
 %L Q.702
@@ -2202,6 +2277,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q703
 %L Q.703
@@ -2213,6 +2289,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q704
 %L Q.704
@@ -2224,6 +2301,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K jtq703
 %L JT-Q\)703
@@ -2253,6 +2331,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q711
 %L Q.711
@@ -2264,6 +2343,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K jtq711
 %L JT-Q\)711
@@ -2285,6 +2365,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K jtq712
 %L JT-Q\)712
@@ -2306,6 +2387,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K jtq713
 %L JT-Q\)713
@@ -2327,6 +2409,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K jtq714
 %L JT-Q\)714
@@ -2348,6 +2431,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q716
 %L Q.716
@@ -2359,6 +2443,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q721
 %L Q.721
@@ -2370,6 +2455,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q722
 %L Q.722
@@ -2381,6 +2467,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q723
 %L Q.723
@@ -2392,6 +2479,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q724
 %L Q.724
@@ -2403,39 +2491,151 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q750
+%L Q.750
+%R ITU-T Recommendation Q.750
+%Q ITU
+%T Speicifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Overview of Signalling System No. 7 Management
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q751.1
 %L Q.751.1
 %R ITU-T Recommendation Q.751.1
 %Q ITU
-%T Specification of Signalling System No. 7 \(em Network Element Management Information Model for the Message Transfer Part (MTP)
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Network Element Management Information Model for the Message Transfer Part (MTP)
 %D October 1995
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q751.2
 %L Q.751.2
 %R ITU-T Recommendation Q.751.2
 %Q ITU
-%T Specification of Signalling System No. 7 \(em Network Element Management Information Model for the Signalling Connection Control Part (SCCP)
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Network Element Management Information Model for the Signalling Connection Control Part (SCCP)
 %D June 1997
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q751.3
+%L Q.751.3
+%R ITU-T Recommendation Q.751.3
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Network Element Information Model for MTP Accounting
+%D September 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q751.4
+%L Q.751.4
+%R ITU-T Recommendation Q.751.4
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Network Element Information Model for SCCP Accounting and Accounting Verification
+%D May 1998
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q752
 %L Q.752
 %R ITU-T Recommendation Q.752
 %Q ITU
-%T Specification of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Monitoring and Measurements for Signalling System No.  7 Networks
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Monitoring and Measurements for Signalling System No. 7 Networks
 %D June 1997
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q753
+%L Q.753
+%R ITU-T Recommendation Q.753
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Signalling System No. 7 Management Functions MRVT, SRVT and CVT and Definition fo the OMASE-User
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q754
+%L Q.754
+%R ITU-T Recommendation Q.754
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Signalling System No. 7 Management Application Service Element (ASE) Definitions
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q755
+%L Q.755
+%R ITU-T Recommendation Q.755
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Signalling System No. 7 Protocol Tests
+%D March 1993
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q755.1
+%L Q.755.1
+%R ITU-T Recommendation Q.755.1
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em MTP Protocol Tester
+%D May 1998
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q755.2
+%L Q.755.2
+%R ITU-T Recommendation Q.755.2
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Transaction Capabilities Test Responder
+%D September 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q756
+%L Q.756
+%R ITU-T Recommendation Q.756
+%Q ITU
+%T Specifications of Signalling System No. 7 \(em Signalling System No. 7 Management \(em Guidebook to Operations, Maintenance and Administration Part (OMAP)
+%D June 1997
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q761
 %L Q.761
@@ -2447,6 +2647,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q762
 %L Q.762
@@ -2458,6 +2659,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q763
 %L Q.763
@@ -2469,6 +2671,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q764
 %L Q.764
@@ -2480,6 +2683,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q766
 %L Q.766
@@ -2491,6 +2695,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q767
 %L Q.767
@@ -2502,6 +2707,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q771
 %L Q.771
@@ -2513,6 +2719,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q772
 %L Q.772
@@ -2524,6 +2731,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q773
 %L Q.773
@@ -2535,6 +2743,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q774
 %L Q.774
@@ -2546,6 +2755,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q775
 %L Q.775
@@ -2557,6 +2767,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q780
 %L Q.780
@@ -2568,19 +2779,43 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q781
 %L Q.781
 %A ITU
 %R ITU-T Recommendation Q.781
 %T Signalling System No. 7 \(em MTP Level 2 Test Specification
-%D March 1993
+%D April 2004
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%U http://www.itu.int/
+
+%K q78193
+%L Q.781
+%A ITU
+%R ITU-T Recommendation Q.781
+%T Signalling System No. 7 \(em MTP Level 2 Test Specification
+%D April 1993
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q782
+%L Q.782
+%A ITU
+%R ITU-T Recommendation Q.782
+%T Specifications of Signalling System No. 7 \(em Test Specification \(em MTP Level 3 Test Specification
+%D April 2002
+%C Geneva
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%U http://www.itu.int/
+
+%K q78296
 %L Q.782
 %A ITU
 %R ITU-T Recommendation Q.782
@@ -2590,6 +2825,29 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q786
+%L Q.786
+%A ITU
+%R ITU-T Recommendation Q.786
+%T Specifications of Signalling System No. 7 \(em Test Specification \(em SCCP Test Specification
+%D March 1993
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
+
+%K q787
+%L Q.787
+%A ITU
+%R ITU-T Recommendation Q.787
+%T Specifications of Signalling System No. 7 \(em Test Specification \(em Transaction Capabilities (TC) Test Specification
+%D September 1997
+%I ITU-T Telecommunication Standardization Sector of ITU
+%Q International Telecommunication Union
+%O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q920
 %L Q.920
@@ -2601,6 +2859,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q921
 %L Q.921
@@ -2612,6 +2871,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q921bis
 %L Q.921 bis
@@ -2623,6 +2883,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q922
 %L Q.922
@@ -2634,6 +2895,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q930
 %L Q.930
@@ -2645,6 +2907,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q931
 %L Q.931
@@ -2656,6 +2919,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q932
 %L Q.932
@@ -2667,6 +2931,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q1902
 %L Q.1902
@@ -2677,6 +2942,7 @@ Part 1: Protocol Specification
 %C Geneva
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
+%U http://www.itu.int/
 
 %K t1bicc
 %K bicc
@@ -2762,6 +3028,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q2111
 %L Q.2111
@@ -2773,6 +3040,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q2210
 %L Q.2210
@@ -2784,6 +3052,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K q2140
 %L Q.2140
@@ -2795,6 +3064,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K 802.1X
 %L 802.1X
@@ -2907,6 +3177,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x75
 %L X.75
@@ -2918,6 +3189,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x121
 %L X.121
@@ -2929,6 +3201,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K iso8208
 %L ISO/IEC 8208
@@ -2972,6 +3245,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x681
 %L X.681
@@ -2983,6 +3257,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x682
 %L X.682
@@ -2994,6 +3269,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x683
 %L X.683
@@ -3005,6 +3281,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x690
 %L X.690
@@ -3016,6 +3293,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x691
 %L X.691
@@ -3027,6 +3305,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x200
 %L X.200
@@ -3038,6 +3317,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x208
 %L X.208
@@ -3049,6 +3329,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x210
 %L X.210
@@ -3060,6 +3341,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x213
 %L X.213
@@ -3071,6 +3353,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x214
 %L X.214
@@ -3082,6 +3365,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x215
 %L X.215
@@ -3093,6 +3377,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x216
 %L X.216
@@ -3104,6 +3389,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x217
 %L X.217
@@ -3115,6 +3401,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x219
 %L X.219
@@ -3126,6 +3413,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standardization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x223
 %L X.223
@@ -3137,6 +3425,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x224
 %L X.224
@@ -3148,6 +3437,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x225
 %L X.225
@@ -3159,6 +3449,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x226
 %L X.226
@@ -3170,6 +3461,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x227
 %L X.227
@@ -3181,6 +3473,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x229
 %L X.229
@@ -3192,6 +3485,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x233
 %L X.233
@@ -3203,6 +3497,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x234
 %L X.234
@@ -3214,6 +3509,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x235
 %L X.235
@@ -3225,6 +3521,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x236
 %L X.236
@@ -3236,6 +3533,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x237
 %L X.237
@@ -3247,6 +3545,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x264
 %L X.264
@@ -3258,6 +3557,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x622
 %L X.622
@@ -3269,6 +3569,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x623
 %L X.623
@@ -3280,6 +3581,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x625
 %L X.625
@@ -3291,6 +3593,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x637
 %L X.637
@@ -3302,6 +3605,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x638
 %L X.638
@@ -3313,6 +3617,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x639
 %L X.639
@@ -3324,6 +3629,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K x650
 %L X.650
@@ -3335,6 +3641,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU, International Organization for Standarization
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K h225.0
 %L H.225.0
@@ -3347,6 +3654,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K h245
 %L H.245
@@ -3359,16 +3667,18 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K h248.1
 %L H.248.1
 %A ITU
 %Q International Telecommunication Union
-%R ITU Recommendation H.248.1
+%R ITU-T Recommendation H.248.1
 %T Gateway Control Protocol Version 1
 %D March 2002
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
+%U http://www.itu.int/
 
 %k h323
 %L H.323
@@ -3381,6 +3691,7 @@ Part 1: Protocol Specification
 %I ITU-T Telecommunication Standardization Sector of ITU
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
+%U http://www.itu.int/
 
 %K t1.111
 %L T1.111
@@ -5429,7 +5740,7 @@ Part 1: Protocol Specification
 %T Services and Protocols for Advanced Networks (SPAN) \(em MTP/SCCP/SSCOP and SIGTRAN (Transport of SS7 over IP) \(em Stream Control Transmission Protocol (SCTP)
 %D May 2003
 %O (Endorsement of RFC 2060 and RFC 3309, modified)
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/SPAN-130265
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute
@@ -5441,7 +5752,7 @@ Part 1: Protocol Specification
 %R ETSI TS 102 369-V1.1.1 (2004-11)
 %T Methods for Testing and Specification (MTS); Stream Control Transmission Protocol (SCTP); Test Suite Structure and Test Purposes (TSS&TP)
 %D November 2004
-%C Sophia Antipolis Cedex
+%C Sophia Antipolis, Valbonne
 %G DTS/MTS-00086
 %Q ETSI Secretariat
 %I European Telecommunications Standards Institute

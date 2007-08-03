@@ -126,6 +126,7 @@ typedef enum msg_type {
 	M_BREAK = 0x08,			/* v S U O(0x10) A H M L(0x02) */
 	M_PASSFP = 0x09,		/* | S U O(0x11) A H M L(0x06) */
 	M_EVENT = 0x0a,			/* ? S */
+#define M_EVENT M_EVENT
 	M_SIG = 0x0b,			/* ^ S U O(0x13) A H M L(0x09) */
 	M_DELAY = 0x0c,			/* v S U O(0x14) A H M L(0x04) */
 	M_CTL = 0x0d,			/* | S U O(0x15) A H M L(0x03) */
@@ -133,7 +134,9 @@ typedef enum msg_type {
 	M_SETOPTS = 0x10,		/* ^ S U O(0x20) A H M L(0x08) */
 	M_RSE = 0x11,			/* | S U O(0x21) A H M L(0x07) */
 	M_TRAIL = 0x12,			/* ^ U H */
+#define M_TRAIL M_TRAIL
 	M_BACKWASH = 0x13,		/* v A */
+#define M_BACKWASH M_BACKWASH
 	QPCTL = 0x80,			/* - S U O A H M L(0x0a) */
 	M_IOCACK = 0x81,		/* ^ S U O A H M L(0x0f) */
 	M_IOCNAK = 0x82,		/* ^ S U O A H M L(0x10) */
@@ -156,14 +159,23 @@ typedef enum msg_type {
 	   renumbered so that at least they don't overlap */
 
 	M_PCCTL = 0x91,			/* | U */
+#define M_PCCTL M_PCCTL
 	M_PCSETOPTS = 0x92,		/* ^ U */
+#define M_PCSETOPTS M_PCSETOPTS
 	M_PCEVENT = 0x93,		/* ? S(0x91) */
+#define M_PCEVENT M_PCEVENT
 	M_UNHANGUP = 0x94,		/* ^ S(0x92) O */
+#define M_UNHANGUP M_UNHANGUP
 	M_NOTIFY = 0x95,		/* ^ O(0x93) H(0x93) */
+#define M_NOTIFY M_NOTIFY
 	M_HPDATA = 0x96,		/* ^ H(0x8c) M(0x93) */
+#define M_HPDATA M_HPDATA
 	M_LETSPLAY = 0x97,		/* ^ A */
+#define M_LETSPLAY M_LETSPLAY
 	M_DONTPLAY = 0x98,		/* v A */
+#define M_DONTPLAY M_DONTPLAY
 	M_BACKDONE = 0x99,		/* v A */
+#define M_BACKDONE M_BACKDONE
 
 } msg_type_t;
 

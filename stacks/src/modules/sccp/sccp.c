@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:46 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.23  2007/08/03 13:35:28  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.22  2007/07/14 01:34:46  brian
  - make license explicit, add documentation
 
@@ -76,9 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $"
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $";
+static char const ident[] =
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -99,12 +103,12 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 
 #include <ss7/mtpi.h>
 #include <ss7/mtpi_ioctl.h>
 
-#include <ss7/sccpi.h>
-#include <ss7/sccpi_ioctl.h>
 #include <sys/npi.h>
 #include <sys/npi_ss7.h>
 #include <sys/npi_mtp.h>
 #include <sys/npi_sccp.h>
+#include <ss7/sccpi.h>
+#include <ss7/sccpi_ioctl.h>
 #include <sys/tihdr.h>
 // #include <sys/tpi.h>
 // #include <sys/tpi_ss7.h>
@@ -115,7 +119,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/07/14 01:34:46 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -170,6 +174,14 @@ MODULE_ALIAS("streams-sccp");
 #define DRV_BANNER	SCCP_SPLASH
 #endif				/* MODULE */
 
+#define STRLOGNO    0
+#define STRLOGST    1
+#define STRLOGRX    2
+#define STRLOGTX    3
+#define STRLOGTO    4
+#define STRLOGTE    5
+#define STRLOGDA    6
+
 /*
  *  =========================================================================
  *
@@ -179,7 +191,7 @@ MODULE_ALIAS("streams-sccp");
  */
 
 #ifndef PAD4
-#define PAD4(_a) (((_a)+sizeof(ulong)-1) & ~(sizeof(ulong)-1))
+#define PAD4(_a) (((_a)+sizeof(uint32_t)-1) & ~(sizeof(uint32_t)-1))
 #endif
 
 typedef struct sccp_options {
@@ -204,26 +216,31 @@ typedef struct sc {
 	SLIST_LINKAGE (ss, sc, ss);	/* bound/listen subsystem linkage */
 	SLIST_LINKAGE (sp, sc, sp);	/* connected local signalling point */
 	SLIST_LINKAGE (sr, sc, sr);	/* connected remote signalling point */
-	ulong token;			/* token for this stream */
-	ulong conind;			/* max connection inds */
-	ulong outcnt;			/* out connection inds */
-	ulong pcl;			/* protocol class */
-	ulong ret;			/* return on error */
-	ulong slr;			/* src local reference */
-	ulong dlr;			/* dst local reference */
+	np_ulong token;			/* token for this stream */
+	np_ulong conind;		/* max connection inds */
+	np_ulong outcnt;		/* out connection inds */
+	np_ulong pcl;			/* protocol class */
+	np_ulong ret;			/* return on error */
+	np_ulong slr;			/* src local reference */
+	np_ulong dlr;			/* dst local reference */
 	struct sccp_addr src;		/* bound src address */
 	uint8_t saddr[SCCP_MAX_ADDR_LENGTH];
 	struct sccp_addr dst;		/* bound dst address */
 	uint8_t daddr[SCCP_MAX_ADDR_LENGTH];
-	ulong sls;			/* SLS value (seq. control) */
-	ulong mp;			/* MP value (message prior.) */
-	ulong imp;			/* SCCP importance */
-	ulong credit;			/* window */
-	ulong p_cred;			/* peer window */
-	ulong ps;			/* send sequence number */
-	ulong pr;			/* recv sequence number */
-	ulong datinds;			/* unacked data inds */
-	ulong mtu;			/* maximum transfer unit */
+	uint8_t pro;			/* MTP SI for SCCP (3) */
+	N_qos_sel_conn_sccp_t cqos;	/* connection QOS parameters */
+	N_qos_sel_info_sccp_t iqos;	/* information QOS parameters */
+	N_qos_range_info_sccp_t iqor;	/* information QOS range */
+	N_info_ack_t info;		/* information */
+	np_ulong sls;			/* SLS value (seq. control) */
+	np_ulong mp;			/* MP value (message prior.) */
+	np_ulong imp;			/* SCCP importance */
+	np_ulong credit;		/* window */
+	np_ulong p_cred;		/* peer window */
+	np_ulong ps;			/* send sequence number */
+	np_ulong pr;			/* recv sequence number */
+	np_ulong datinds;		/* unacked data inds */
+	np_ulong mtu;			/* maximum transfer unit */
 	bufq_t conq;			/* connection indication queue */
 	bufq_t sndq;			/* send buffer */
 	bufq_t urgq;			/* expedited data send buffer */
@@ -243,8 +260,8 @@ typedef struct sc {
 
 static struct sc *sccp_alloc_priv(queue_t *, struct sc **, dev_t *, cred_t *, minor_t);
 static struct sc *sccp_get(struct sc *);
-static struct sc *sccp_lookup(ulong);
-static ulong sccp_get_id(ulong);
+static struct sc *sccp_lookup(uint);
+static uint sccp_get_id(uint);
 static void sccp_free_priv(struct sc *);
 static void sccp_put(struct sc *);
 
@@ -275,10 +292,10 @@ static void sccp_put(struct sc *);
 /*
  *  NA - Network Appearance
  *  -----------------------------------
- *  The NA structure defines a network appearance.  A network appearance is a combination of protocol variant,
- *  protocol options and point code format.  The network appearance identifies a point code numbering space and
- *  defines the service indicators within that numbering space.  Signalling points belong to a single network
- *  appearance.
+ *  The NA structure defines a network appearance.  A network appearance is a combination of
+ *  protocol variant, protocol options and point code format.  The network appearance identifies a
+ *  point code numbering space and defines the service indicators within that numbering space.
+ *  Signalling points belong to a single network appearance.
  */
 typedef struct na {
 	HEAD_DECLARATION (struct na);	/* head declaration */
@@ -292,37 +309,39 @@ typedef struct na {
 	struct sccp_notify_na notify;	/* network appearance notifications */
 } na_t;
 
-static struct na *sccp_alloc_na(ulong, struct lmi_option *);
+static struct na *sccp_alloc_na(uint, struct lmi_option *);
 static void sccp_free_na(struct na *);
-static struct na *na_lookup(ulong);
-static ulong na_get_id(ulong);
+static struct na *na_lookup(uint);
+static uint na_get_id(uint);
 static struct na *na_get(struct na *);
 static void na_put(struct na *);
 
 /*
- *  These structures define a single concerned signalling point.  These structures are listed against an equipped
- *  subsystem.  They can be added and removed with IOCTLs on either the management stream or any stream bound to the
- *  associated subsystem.
+ *  These structures define a single concerned signalling point.  These structures are listed
+ *  against an equipped subsystem.  They can be added and removed with IOCTLs on either the
+ *  management stream or any stream bound to the associated subsystem.
  *
- *  When MTP-PAUSE, RESUME or STATUS primitives are received by SCCP with respect to a remote singalling point, we
- *  scan the list of equipped subsystems and concerned signalling points associated with the MTP-provider on which
- *  these primitves were recieved.  If there is an equipped and bound subsystem with the local signalling point as a
- *  concerned signalling point, we deliver the N-PCSTATE primitive to any protocol class 0 or 1 SCCP-Users as an
- *  N_UDERROR_IND/T_UDERROR_IND.  Otherwise, we do not inform the SCCP-User using N-PCSTATE for remote point codes
- *  which are not concerned, nor for protocol classes 2 and 3.  (For protocol classes 2 and 3 we simply generate an
- *  error when an attempt is made to connect or send to the remote point code.) FIXME: we should send
- *  N_DISCON_IND/T_DISCON_IND with appropriate reason.
+ *  When MTP-PAUSE, RESUME or STATUS primitives are received by SCCP with respect to a remote
+ *  singalling point, we scan the list of equipped subsystems and concerned signalling points
+ *  associated with the MTP-provider on which these primitves were recieved.  If there is an
+ *  equipped and bound subsystem with the local signalling point as a concerned signalling point, we
+ *  deliver the N-PCSTATE primitive to any protocol class 0 or 1 SCCP-Users as an
+ *  N_UDERROR_IND/T_UDERROR_IND.  Otherwise, we do not inform the SCCP-User using N-PCSTATE for
+ *  remote point codes which are not concerned, nor for protocol classes 2 and 3.  (For protocol
+ *  classes 2 and 3 we simply generate an error when an attempt is made to connect or send to the
+ *  remote point code.) FIXME: we should send N_DISCON_IND/T_DISCON_IND with appropriate reason.
  *
- *  If we receive a subsystem allowed, prohibited or subsystem congestion indication for a concerned susbsystem, if
- *  there is an equipped subsystem that has the affected susbsystem as a concerned subsystem, we deliver the N-STATE
- *  primitive to any protocol class 0 or 1 SCCP-Users as a N_UDERROR_IND/T_UDERROR_IND.  Otherwise, we do not inform
- *  the SCCP-User using N-STATE for remote subsystems which are not concenred, nor for protocol classes 2 and 3.
- *  (For protocol classes 2 and 3 we simply generate an error when an attempt is made to connect to the remote
- *  subsystem.)  For protocol variants (e.g, SS7_PVAR_JTTC) that do not support SCCP management, remote concerned
+ *  If we receive a subsystem allowed, prohibited or subsystem congestion indication for a concerned
+ *  susbsystem, if there is an equipped subsystem that has the affected susbsystem as a concerned
+ *  subsystem, we deliver the N-STATE primitive to any protocol class 0 or 1 SCCP-Users as a
+ *  N_UDERROR_IND/T_UDERROR_IND.  Otherwise, we do not inform the SCCP-User using N-STATE for remote
+ *  subsystems which are not concenred, nor for protocol classes 2 and 3.  (For protocol classes 2
+ *  and 3 we simply generate an error when an attempt is made to connect to the remote subsystem.)
+ *  For protocol variants (e.g, SS7_PVAR_JTTC) that do not support SCCP management, remote concerned
  *  subsystems are always considered available.
  *
- *  If an SCCP-User attempts to send to or connect to a non-concerned remote signalling point or subsystem, we add
- *  the signalling point or subsystem to the lists automagically.
+ *  If an SCCP-User attempts to send to or connect to a non-concerned remote signalling point or
+ *  subsystem, we add the signalling point or subsystem to the lists automagically.
  */
 
 /*
@@ -333,20 +352,20 @@ static void na_put(struct na *);
 typedef struct cp {
 	HEAD_DECLARATION (struct cp);	/* head declaration */
 	SLIST_LINKAGE (sp, cp, sp);	/* local signalling point linkage */
-	ulong pcl;			/* protocol class */
+	np_ulong pcl;			/* protocol class */
 	struct {
 		struct sr *sr;		/* remote signalling point */
-		ulong slr;		/* source local reference */
-		ulong dlr;		/* destination local reference */
-		ulong sls;		/* SLS value (seq. control) */
-		ulong mp;		/* MP value (message priority) */
-		ulong imp;		/* SCCP importance */
-		ulong credit;		/* credit */
-		ulong p_cred;		/* peer window */
-		ulong ps;		/* send sequence number */
-		ulong pr;		/* recv sequence number */
-		ulong datinds;		/* unacked data inds */
-		ulong mtu;		/* maximum transfer unit */
+		np_ulong slr;		/* source local reference */
+		np_ulong dlr;		/* destination local reference */
+		np_ulong sls;		/* SLS value (seq. control) */
+		np_ulong mp;		/* MP value (message priority) */
+		np_ulong imp;		/* SCCP importance */
+		np_ulong credit;	/* credit */
+		np_ulong p_cred;	/* peer window */
+		np_ulong ps;		/* send sequence number */
+		np_ulong pr;		/* recv sequence number */
+		np_ulong datinds;	/* unacked data inds */
+		np_ulong mtu;		/* maximum transfer unit */
 		bufq_t sndq;		/* send buffer */
 		bufq_t urgq;		/* expedited data send buffer */
 		bufq_t ackq;		/* recv awaiting ack buffer */
@@ -361,14 +380,14 @@ typedef struct cp {
 } cp_t;
 
 #if 0
-static struct cp *sccp_alloc_cp(ulong, struct sp *, ulong, ulong);
+static struct cp *sccp_alloc_cp(uint, struct sp *, uint, uint);
 static struct cp *cp_get(struct cp *);
 #endif
-static struct cp *cp_lookup(ulong);
+static struct cp *cp_lookup(uint);
 
 #if 0
-static struct cp *sccp_lookup_cp(struct sp *, ulong, const int);
-static ulong cp_get_id(ulong);
+static struct cp *sccp_lookup_cp(struct sp *, uint, const int);
+static uint cp_get_id(uint);
 #endif
 static void sccp_free_cp(struct cp *);
 static void cp_put(struct cp *);
@@ -384,10 +403,10 @@ typedef struct ss {
 	SLIST_HEAD (sc, co);		/* bound CO SCCP users */
 	SLIST_HEAD (sc, cr);		/* listening SCCP users */
 	SLIST_HEAD (rs, rs);		/* affected subsystem list */
-	ulong ssn;			/* subsystem number */
-	ulong smi;			/* subsystem multiplicity indicator */
-	ulong level;			/* subsystem congestion level */
-	ulong count;			/* count of congestion messages */
+	np_ulong ssn;			/* subsystem number */
+	np_ulong smi;			/* subsystem multiplicity indicator */
+	np_ulong level;			/* subsystem congestion level */
+	np_ulong count;			/* count of congestion messages */
 	struct lmi_option proto;	/* ss protocol variant and options */
 	struct sccp_notify_ss notify;	/* ss notifications */
 	struct sccp_timers_ss timers;	/* ss timers */
@@ -403,11 +422,11 @@ typedef struct ss {
 #define SS_STATUS_BLOCKED	3	/* subsystem is management blocked */
 #define SS_STATUS_UNEQUIPPED	4	/* subsystem is unequipped */
 
-static struct ss *sccp_alloc_ss(ulong, struct sp *, ulong);
+static struct ss *sccp_alloc_ss(uint, struct sp *, uint);
 static struct ss *ss_get(struct ss *);
-static struct ss *ss_lookup(ulong);
-static struct ss *sccp_lookup_ss(struct sp *, ulong, const int);
-static ulong ss_get_id(ulong);
+static struct ss *ss_lookup(uint);
+static struct ss *sccp_lookup_ss(struct sp *, uint, const int);
+static uint ss_get_id(uint);
 static void sccp_free_ss(struct ss *);
 static void ss_put(struct ss *);
 
@@ -419,10 +438,10 @@ typedef struct rs {
 	HEAD_DECLARATION (struct rs);	/* head declaration */
 	SLIST_LINKAGE (sr, rs, sr);	/* affected signalling point */
 	SLIST_LINKAGE (ss, rs, ss);	/* concerned subsystem linkage */
-	ulong ssn;			/* subsystem number */
-	ulong smi;			/* subsystem multiplicity indicator */
-	ulong level;			/* subsystem congestion level */
-	ulong count;			/* count of congestion messages */
+	np_ulong ssn;			/* subsystem number */
+	np_ulong smi;			/* subsystem multiplicity indicator */
+	np_ulong level;			/* subsystem congestion level */
+	np_ulong count;			/* count of congestion messages */
 	struct lmi_option proto;	/* rs protocol variant and options */
 	struct sccp_notify_rs notify;	/* rs notifications */
 	struct sccp_timers_rs timers;	/* rs timers */
@@ -438,11 +457,11 @@ typedef struct rs {
 #define RS_STATUS_BLOCKED	3	/* subsystem is management blocked */
 #define RS_STATUS_UNEQUIPPED	4	/* subsystem is unequipped */
 
-static struct rs *sccp_alloc_rs(ulong, struct sr *, ulong);
+static struct rs *sccp_alloc_rs(uint, struct sr *, uint);
 static struct rs *rs_get(struct rs *);
-static struct rs *rs_lookup(ulong);
-static struct rs *sccp_lookup_rs(struct sr *, ulong ssn, const int);
-static ulong rs_get_id(ulong);
+static struct rs *rs_lookup(uint);
+static struct rs *sccp_lookup_rs(struct sr *, uint ssn, const int);
+static uint rs_get_id(uint);
 static void sccp_free_rs(struct rs *);
 static void rs_put(struct rs *);
 
@@ -457,8 +476,8 @@ typedef struct sr {
 	SLIST_HEAD (sc, sc);		/* SCCP users connected to this remote signalling point */
 	struct mtp_addr add;		/* SS7 address associated with remote signalling point */
 	struct mt *mt;			/* MTP if linked at SR */
-	ulong level;			/* affected signalling point level */
-	ulong count;			/* count for congestion dropping */
+	np_ulong level;			/* affected signalling point level */
+	np_ulong count;			/* count for congestion dropping */
 	struct lmi_option proto;	/* sr protocol variant and options */
 	struct sccp_notify_sr notify;	/* sr notifications */
 	struct sccp_timers_sr timers;	/* sr timers */
@@ -473,11 +492,11 @@ typedef struct sr {
 #define SR_STATUS_CONGESTED	2	/* sr is congested */
 #define SR_STATUS_BLOCKED	3	/* sr is management blocked */
 
-static struct sr *sccp_alloc_sr(ulong, struct sp *, ulong);
+static struct sr *sccp_alloc_sr(uint, struct sp *, uint);
 static struct sr *sr_get(struct sr *);
-static struct sr *sr_lookup(ulong);
-static struct sr *sccp_lookup_sr(struct sp *, ulong, const int);
-static ulong sr_get_id(ulong);
+static struct sr *sr_lookup(uint);
+static struct sr *sccp_lookup_sr(struct sp *, uint, const int);
+static uint sr_get_id(uint);
 static void sccp_free_sr(struct sr *);
 static void sr_put(struct sr *);
 
@@ -491,6 +510,10 @@ static void sr_put(struct sr *);
 #define SCCP_CP_HASH_SIZE   64	/* connection-oriented coupling slots */
 typedef struct sp {
 	HEAD_DECLARATION (struct sp);	/* head declaration */
+	struct {
+		spinlock_t lock;
+		uint users;
+	} sq;
 	SLIST_HEAD (sr, sr);		/* signalling relation list */
 	SLIST_HEAD (ss, ss);		/* concerned subsystem list */
 	SLIST_HEAD (sc, sc);		/* bound, connected or listening users */
@@ -499,11 +522,11 @@ typedef struct sp {
 	struct mtp_addr add;		/* MTP address associated with local signalling point */
 	struct mt *mt;			/* MTP if linked at SP */
 	SLIST_LINKAGE (na, sp, na);	/* network appearance linkage */
-	ulong sccp_next_cl_sls;		/* rotate SLS values */
-	ulong sccp_next_co_sls;		/* rotate SLS values */
-	ulong sccp_next_slr;		/* rotate SLR values */
-	ulong level;			/* congestion level */
-	ulong count;			/* count for congestion dropping */
+	np_ulong sccp_next_cl_sls;	/* rotate SLS values */
+	np_ulong sccp_next_co_sls;	/* rotate SLS values */
+	np_ulong sccp_next_slr;		/* rotate SLR values */
+	np_ulong level;			/* congestion level */
+	np_ulong count;			/* count for congestion dropping */
 	struct sc *sccp_cl_hash[SCCP_CL_HASH_SIZE];	/* hash of connectionless binds */
 	struct sc *sccp_cr_hash[SCCP_CR_HASH_SIZE];	/* hash of connection request listeners */
 	struct sc *sccp_co_hash[SCCP_CO_HASH_SIZE];	/* hash of connection-oriented connections */
@@ -517,11 +540,11 @@ typedef struct sp {
 	struct sccp_stats_sp stats;	/* sp statistics */
 } sp_t;
 
-static struct sp *sccp_alloc_sp(ulong, struct na *, mtp_addr_t *);
+static struct sp *sccp_alloc_sp(uint, struct na *, mtp_addr_t *);
 static struct sp *sp_get(struct sp *);
-static struct sp *sp_lookup(ulong);
-static struct sp *sccp_lookup_sp(ulong ni, ulong pc, const int);
-static ulong sp_get_id(ulong);
+static struct sp *sp_lookup(uint);
+static struct sp *sccp_lookup_sp(uint ni, uint pc, const int);
+static uint sp_get_id(uint);
 static void sccp_free_sp(struct sp *);
 static void sp_put(struct sp *);
 
@@ -535,9 +558,9 @@ typedef struct mt {
 	struct sr *sr;			/* signalling relation */
 	// SLIST_LINKAGE (sp, mt, sp); /* signalling point list linkage */
 	// SLIST_LINKAGE (sr, mt, sr); /* signalling relation list linkage */
-	ulong psdu;			/* pSDU size */
-	ulong pidu;			/* pIDU size */
-	ulong podu;			/* pODU size */
+	np_ulong psdu;			/* pSDU size */
+	np_ulong pidu;			/* pIDU size */
+	np_ulong podu;			/* pODU size */
 	struct mtp_addr loc;		/* local signalling point */
 	struct mtp_addr rem;		/* remote signalling point */
 	struct lmi_option proto;	/* mt protocol variant and options */
@@ -551,10 +574,10 @@ typedef struct mt {
 
 #define MTP_PRIV(__q) ((struct mt *)(__q)->q_ptr)
 
-static struct mt *sccp_alloc_link(queue_t *, struct mt **, ulong, cred_t *);
+static struct mt *sccp_alloc_link(queue_t *, struct mt **, uint, cred_t *);
 static struct mt *mtp_get(struct mt *);
-static struct mt *mtp_lookup(ulong);
-static ulong mtp_get_id(ulong);
+static struct mt *mtp_lookup(uint);
+static uint mtp_get_id(uint);
 static void sccp_free_link(struct mt *);
 static void mtp_put(struct mt *);
 
@@ -589,7 +612,7 @@ static struct df master;
  *  =========================================================================
  */
 typedef struct sccp_opts {
-	ulong flags;			/* success flags */
+	np_ulong flags;			/* success flags */
 	t_uscalar_t *pcl;
 	t_uscalar_t *ret;
 	t_uscalar_t *imp;
@@ -1009,9 +1032,45 @@ sccp_opt_negotiate(struct sc *sc, struct sccp_opts *ops)
 #define SSF_BOTH_RESET	(1<<SS_BOTH_RESET	)
 #define SSF_WCON_CREQ2	(1<<SS_WCON_CREQ2	)
 
-#ifdef _DEBUG
 static const char *
-sccp_n_state(ulong state)
+mtp_state(uint state)
+{
+	switch (state) {
+	case MTPS_UNBND:
+		return ("MTPS_UNBND");
+	case MTPS_WACK_BREQ:
+		return ("MTPS_WACK_BREQ");
+	case MTPS_IDLE:
+		return ("MTPS_IDLE");
+	case MTPS_WACK_CREQ:
+		return ("MTPS_WACK_CREQ");
+	case MTPS_WCON_CREQ:
+		return ("MTPS_WCON_CREQ");
+	case MTPS_CONNECTED:
+		return ("MTPS_CONNECTED");
+	case MTPS_WACK_UREQ:
+		return ("MTPS_WACK_UREQ");
+	case MTPS_WACK_DREQ6:
+		return ("MTPS_WACK_DREQ6");
+	case MTPS_WACK_DREQ9:
+		return ("MTPS_WACK_DREQ9");
+	case MTPS_WACK_OPTREQ:
+		return ("MTPS_WACK_OPTREQ");
+	case MTPS_WREQ_ORDREL:
+		return ("MTPS_WREQ_ORDREL");
+	case MTPS_WIND_ORDREL:
+		return ("MTPS_WIND_ORDREL");
+	case MTPS_WRES_CIND:
+		return ("MTPS_WRES_CIND");
+	case MTPS_UNUSABLE:
+		return ("MTPS_UNUSABLE");
+	default:
+		return ("(unknown)");
+	}
+}
+
+static const char *
+sccp_n_state(uint state)
 {
 	switch (state) {
 	case NS_UNBND:
@@ -1053,7 +1112,7 @@ sccp_n_state(ulong state)
 	}
 }
 static const char *
-sccp_t_state(ulong state)
+sccp_t_state(uint state)
 {
 	switch (state) {
 	case TS_UNBND:
@@ -1095,7 +1154,7 @@ sccp_t_state(ulong state)
 	}
 }
 static const char *
-sccp_state(ulong state)
+sccp_state(uint state)
 {
 	switch (state) {
 	case SS_UNBND:
@@ -1146,92 +1205,82 @@ sccp_state(ulong state)
 		return ("(unknown)");
 	}
 }
-#endif
 
 static void
-sccp_set_state(struct sc *sc, ulong newstate)
+sccp_set_state(struct sc *sc, uint newstate)
 {
-	ulong oldstate = sc->state;
+	uint oldstate = sc->state;
 
 	if (newstate != oldstate) {
-		mi_strlog(sc->rq, STRLOGST, SL_TRACE, "%s <- %s", sccp_state(newstate),
+		mi_strlog(sc->oq, STRLOGST, SL_TRACE, "%s <- %s", sccp_state(newstate),
 			  sccp_state(oldstate));
 		sc->state = newstate;
 	}
 }
-static ulong
+static uint
 sccp_get_state(struct sc *sc)
 {
 	return sc->state;
 }
 static void
-sccp_set_n_state(struct sc *sc, ulong newstate)
+sccp_set_n_state(struct sc *sc, uint newstate)
 {
-	ulong oldstate = sc->i_state;
+	uint oldstate = sc->i_state;
 
 	if (newstate != oldstate) {
-		mi_strlog(sc->rq, STRLOGST, SL_TRACE, "%s <- %s", sccp_n_state(newstate),
+		mi_strlog(sc->oq, STRLOGST, SL_TRACE, "%s <- %s", sccp_n_state(newstate),
 			  sccp_n_state(oldstate));
 		sc->i_state = newstate;
 	}
 }
-static ulong
+static uint
 sccp_get_n_state(struct sc *sc)
 {
 	return sc->i_state;
 }
-static void
-sccp_set_t_state(struct sc *sc, ulong newstate)
+static inline uint
+sccp_chk_n_state(struct sc *sc, uint mask)
 {
-	ulong oldstate = sc->i_state;
+	return ((1 << sccp_get_n_state(sc)) & mask);
+}
+static void
+sccp_set_t_state(struct sc *sc, uint newstate)
+{
+	uint oldstate = sc->i_state;
 
 	if (newstate != oldstate) {
-		mi_strlog(sc->rq, STRLOGST, SL_TRACE, "%s <- %s", sccp_t_state(newstate),
+		mi_strlog(sc->oq, STRLOGST, SL_TRACE, "%s <- %s", sccp_t_state(newstate),
 			  sccp_t_state(oldstate));
 		sc->i_state = newstate;
 	}
 }
-static ulong
+static uint
 sccp_get_t_state(struct sc *sc)
 {
 	return sc->i_state;
 }
+static inline uint
+sccp_chk_t_state(struct sc *sc, uint mask)
+{
+	return ((1 << sccp_get_t_state(sc)) & mask);
+}
 
-#if 0
-static ulong
+static uint
 mtp_get_state(struct mt *mt)
 {
 	return mt->state;
 }
 static void
-mtp_set_state(struct mt *mt, ulong newstate)
+mtp_set_state(struct mt *mt, uint newstate)
 {
-	ulong oldstate = mt->state;
+	uint oldstate = mt->state;
 
 	if (newstate != oldstate) {
-		mi_strlog(mt->rq, STRLOGST, SL_TRACE, "%s <- %s", mtp_state(newstate),
+		mi_strlog(mt->iq, STRLOGST, SL_TRACE, "%s <- %s", mtp_state(newstate),
 			  mtp_state(oldstate));
 		mt->state = newstate;
 	}
 }
-
-static ulong
-mtp_get_i_state(struct mt *mt)
-{
-	return mt->i_state;
-}
-static void
-mtp_set_i_state(struct mt *mt, ulong newstate)
-{
-	ulong oldstate = mt->i_state;
-
-	if (newstate != oldstate) {
-		mi_strlog(mt->rq, STRLOGST, SL_TRACE, "%s <- %s", mtp_i_state(newstate),
-			  mtp_i_state(oldstate));
-		mt->i_state = newstate;
-	}
-}
-#endif
 
 /*
  *  TLI interface state flags
@@ -1540,87 +1589,204 @@ mtp_set_i_state(struct mt *mt, ulong newstate)
 
 union nids {
 	struct {
-		uint8_t network __attribute__ ((packed));
-		uint8_t cluster __attribute__ ((packed));
-	} nid __attribute__ ((packed));
+		uint8_t network;
+		uint8_t cluster;
+	} nid;
 	uint16_t nsi __attribute__ ((packed));
 };
 
 typedef struct sccp_var {
-	ulong len;
+	np_ulong len;
 	uchar *ptr;
-	// ulong val;
+	// np_ulong val;
 	mblk_t *buf;
 } sccp_var_t;
 
 typedef struct sccp_isni {
-	ulong mi;			/* mark for identification indicator */
-	ulong iri;			/* ISNI routing indicator */
-	ulong ti;			/* type indicator */
-	ulong count;			/* counter */
-	ulong ns;			/* network specific (type 2 only) */
+	np_ulong mi;			/* mark for identification indicator */
+	np_ulong iri;			/* ISNI routing indicator */
+	np_ulong ti;			/* type indicator */
+	np_ulong count;			/* counter */
+	np_ulong ns;			/* network specific (type 2 only) */
 	size_t nids;			/* number of network ids */
 	union nids u[7];		/* up to 7 network ids */
 } sccp_isni_t;
 
 typedef struct sccp_ins {
-	ulong itype;			/* information type indicator */
-	ulong rtype;			/* type of routing */
-	ulong count;			/* conter */
+	np_ulong itype;			/* information type indicator */
+	np_ulong rtype;			/* type of routing */
+	np_ulong count;			/* conter */
 	size_t nids;			/* number of network ids */
 	union nids u[2];		/* up to 2 network ids */
 } sccp_ins_t;
 
 typedef struct sccp_sgmt {
-	ulong first;			/* first bit */
-	ulong pcl;			/* stored protocol class */
-	ulong rem;			/* remaining segments */
-	ulong slr;			/* source local reference */
+	np_ulong first;			/* first bit */
+	np_ulong pcl;			/* stored protocol class */
+	np_ulong rem;			/* remaining segments */
+	np_ulong slr;			/* source local reference */
 } sccp_sgmt_t;
 
 typedef struct sccp_msg {
-	ulong flags;			/* translation result flags */
+	np_ulong flags;			/* translation result flags */
 	mblk_t *bp;			/* identd (also unique GTT xaction id */
 	queue_t *eq;			/* queue to write errors to */
 	queue_t *xq;			/* queue to write results to */
 	struct sc *sc;			/* SCCP-User to which this message belongs */
 	struct mt *mt;			/* MTP-User to which this message belongs */
-	ulong timestamp;		/* jiffie clock timestamp */
-	ulong pvar;			/* protocol variant */
+	np_ulong timestamp;		/* jiffie clock timestamp */
+	np_ulong pvar;			/* protocol variant */
 	struct {
-		ulong opc;		/* origination point code */
-		ulong dpc;		/* destination point code */
-		ulong sls;		/* signalling link selection */
-		ulong mp;		/* message priority */
+		np_ulong opc;		/* origination point code */
+		np_ulong dpc;		/* destination point code */
+		np_ulong sls;		/* signalling link selection */
+		np_ulong mp;		/* message priority */
 	} rl;				/* routing label */
-	ulong type;			/* message type */
+	np_ulong type;			/* message type */
 	uint32_t parms;			/* parameter mask */
-	ulong pcl;
-	ulong ret;
-	ulong slr;
-	ulong dlr;
-	ulong seg;
-	ulong rsn;
-	ulong ps;
-	ulong more;
-	ulong pr;
-	ulong mti;
+	np_ulong pcl;
+	np_ulong ret;
+	np_ulong slr;
+	np_ulong dlr;
+	np_ulong seg;
+	np_ulong rsn;
+	np_ulong ps;
+	np_ulong more;
+	np_ulong pr;
+	np_ulong mti;
 	sccp_ins_t ins;
 	sccp_isni_t isni;
 	struct sccp_addr cdpa;
 	struct sccp_addr cgpa;
-	ulong cred;
-	ulong cause;
+	np_ulong cred;
+	np_ulong cause;
 	struct sccp_sgmt sgmt;
-	ulong hopc;
-	ulong imp;
+	np_ulong hopc;
+	np_ulong imp;
 	struct sccp_var data;
-	ulong fi;
-	ulong assn;
-	ulong apc;
-	ulong smi;
-	ulong cong;
+	np_ulong fi;
+	np_ulong assn;
+	np_ulong apc;
+	np_ulong smi;
+	np_ulong cong;
 } sccp_msg_t;
+
+/*
+ *  =========================================================================
+ *
+ *  LOCKING
+ *
+ *  =========================================================================
+ */
+static rwlock_t sccp_mux_lock = RW_LOCK_UNLOCKED;
+
+static bool
+sc_trylock(struct sc *sc, queue_t *q)
+{
+	return (mi_trylock(q) != NULL);
+}
+static void
+sc_unlock(struct sc *sc)
+{
+	mi_unlock((caddr_t) sc);
+}
+static bool
+sp_trylock(struct sp *sp, queue_t *q)
+{
+	unsigned long flags;
+	bool result;
+
+	spin_lock_irqsave(&sp->sq.lock, flags);
+	if (sp->sq.users == 0) {
+		sp->sq.users = 1;
+		result = true;
+	} else {
+		result = false;
+	}
+	spin_unlock_irqrestore(&sp->sq.lock, flags);
+	return (result);
+}
+static void
+sp_unlock(struct sp *sp)
+{
+	unsigned long flags;
+
+	spin_lock_irqsave(&sp->sq.lock, flags);
+	sp->sq.users = 0;
+	spin_unlock_irqrestore(&sp->sq.lock, flags);
+}
+static bool
+mt_trylock(struct mt *mt, queue_t *q)
+{
+	return (mi_trylock(q) != NULL);
+}
+static void
+mt_unlock(struct mt *mt)
+{
+	mi_unlock((caddr_t) mt);
+}
+static struct sc *
+sc_acquire(queue_t *q)
+{
+	struct sp *sp;
+	struct sc *sc;
+
+	read_lock(&sccp_mux_lock);
+	if (!(sc = SCCP_PRIV(q)) || !sc_trylock(sc, q)) {
+		sc = NULL;
+	} else if ((sp = sc->sp.sp) && !sp_trylock(sp, q)) {
+		sc_unlock(sc);
+		sc = NULL;
+	}
+	read_unlock(&sccp_mux_lock);
+	return (sc);
+}
+static void
+sc_release(struct sc *sc)
+{
+	struct sp *sp;
+
+	if ((sp = sc->sp.sp))
+		sp_unlock(sp);
+	sc_unlock(sc);
+}
+
+/**
+ * mt_acquire: - try to acquire a pointer to the MT structure from a MT queue procedure
+ * @q: the upper queue
+ *
+ * Check the MT queue private pointer for NULL under mux read lock.  This is because unlinking lower
+ * Streams can cause their private structures to be deallocated before their put and service
+ * procedures are replaced.  Then walk the structures to the SP.
+ *
+ * Lower multiplex private structure can disappear btewen I_UNLINK/I_PUNLINK M_IOCTL and setq(9)
+ * back  to the Stream head.
+ */
+static struct mt *
+mt_acquire(queue_t *q)
+{
+	struct mt *mt;
+	struct sp *sp;
+
+	read_lock(&sccp_mux_lock);
+	if (!(mt = MTP_PRIV(q)) || !mt_trylock(mt, q)) {
+		mt = NULL;
+	} else if ((sp = mt->sp) && !sp_trylock(sp, q)) {
+		mt_unlock(mt);
+		mt = NULL;
+	}
+	read_unlock(&sccp_mux_lock);
+	return (mt);
+}
+static void
+mt_release(struct mt *mt)
+{
+	struct sp *sp;
+
+	if ((sp = mt->sp))
+		sp_unlock(sp);
+	mt_unlock(mt);
+}
 
 /*
  *  =========================================================================
@@ -1641,12 +1807,12 @@ typedef struct sccp_msg {
  *  M_FLUSH
  *  -----------------------------------
  */
-static int
+static inline int
 m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 {
 	mblk_t *mp;
 
-	if (likely((mp = mi_allocb(q, 2, BPRI_MED))) != NULL) {
+	if (likely((mp = mi_allocb(q, 2, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_FLUSH;
 		*mp->b_wptr++ = flags | (band ? FLUSHBAND : 0);
 		*mp->b_wptr++ = band;
@@ -1661,7 +1827,7 @@ m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
  *  M_ERROR
  *  -----------------------------------
  */
-static int
+static inline int
 m_error(struct sc *sc, queue_t *q, mblk_t *bp, int error)
 {
 	mblk_t *mp;
@@ -1704,269 +1870,249 @@ m_error(struct sc *sc, queue_t *q, mblk_t *bp, int error)
  *  NPI Primitives
  *  -------------------------------------------------------------------------
  */
-/*
- *  N_CONN_IND
- *  -----------------------------------
+
+/**
+ * n_conn_ind: - issue N_CONN_IND primitive
+ * @sc: SCCP user private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @cp: connection pointer
+ * @dp: user data
+ *
+ * FIXME: need to handle user data properly.
  */
 static int
-n_conn_ind(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *cp)
+n_conn_ind(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *cp, mblk_t *dp)
 {
-	mblk_t *mp;
-	N_conn_ind_t *p;
-	N_qos_sel_conn_sccp_t qos;
-	size_t dst_len = sizeof(sc->dst) + sc->dst.alen;
-	size_t src_len = sizeof(sc->src) + sc->src.alen;
-	size_t qos_len = sizeof(qos);
-	size_t msg_len = sizeof(*p) + dst_len + src_len + qos_len;
+	if (likely(canputnext(sc->oq))) {
+		N_conn_ind_t *p;
+		mblk_t *mp;
 
-	if (likely(sccp_chk_n_state(sc, (NSF_IDLE | NSF_WRES_CIND)))) {
+		size_t dst_len = sizeof(sc->dst) + sc->dst.alen;
+		size_t src_len = sizeof(sc->src) + sc->src.alen;
+		size_t qos_len = sizeof(sc->cqos);
+		size_t msg_len = sizeof(*p) + PAD4(dst_len) + PAD4(src_len) + qos_len;
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_CONN_IND;
-				p->DEST_length = dst_len;
-				p->DEST_offset = sizeof(*p);
-				p->SRC_length = src_len;
-				p->SRC_offset = sizeof(*p) + dst_len;
-				p->SEQ_number = (ulong) cp;
-				p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
-				p->QOS_length = qos_len;
-				p->QOS_offset = sizeof(*p) + dst_len + src_len;
-				mp->b_wptr += sizeof(*p);
-				fixme(("Need to take this from the cp not sc structure\n"));
-				bcopy(&sc->dst, mp->b_wptr, dst_len);
-				mp->b_wptr += dst_len;
-				fixme(("Need to take this from the cp not sc structure\n"));
-				bcopy(&sc->src, mp->b_wptr, dst_len);
-				mp->b_wptr += src_len;
-				qos.n_qos_type = N_QOS_SEL_CONN_SCCP;
-				qos.protocol_class = sc->pcl;
-				bcopy(&qos, mp->b_wptr, qos_len);
-				mp->b_wptr += qos_len;
-				bufq_queue(&sc->conq, cp);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_CONN_IND");
-				sccp_set_n_state(sc, NS_WRES_CIND);
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_CONN_IND;
+			p->DEST_length = dst_len;
+			p->DEST_offset = sizeof(*p);
+			p->SRC_length = src_len;
+			p->SRC_offset = p->DEST_offset + PAD4(p->DEST_length);
+			p->SEQ_number = (np_ulong) (ulong) cp;
+			p->CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
+			p->QOS_length = qos_len;
+			p->QOS_offset = p->SRC_offset + PAD4(p->SRC_length);
+			mp->b_wptr += sizeof(*p);
+			fixme(("Need to take this from the cp not sc structure\n"));
+			bcopy(&sc->dst, mp->b_wptr, dst_len);
+			mp->b_wptr += PAD4(dst_len);
+			fixme(("Need to take this from the cp not sc structure\n"));
+			bcopy(&sc->src, mp->b_wptr, src_len);
+			mp->b_wptr += PAD4(src_len);
+			bcopy(&sc->cqos, mp->b_wptr, qos_len);
+			mp->b_wptr += qos_len;
+			mp->b_cont = dp;
+			if (cp->b_cont == dp)
+				cp->b_cont = NULL;
+			if (msg && msg->b_cont == cp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			bufq_queue(&sc->conq, cp);
+			sccp_set_n_state(sc, NS_WRES_CIND);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_CONN_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
-/*
- *  N_CONN_CON
- *  -----------------------------------
+/**
+ * n_conn_con: - issue N_CONN_CON primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @flags: connection flags
+ * @res: responding address
+ * @dp: user data
  */
 static int
-n_conn_con(struct sc *sc, queue_t *q, mblk_t *bp, ulong pcl, ulong flags, struct sccp_addr *res,
+n_conn_con(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, struct sccp_addr *res,
 	   mblk_t *dp)
 {
-	mblk_t *mp;
-	N_conn_con_t *p;
-	N_qos_sel_conn_sccp_t *qos;
-	size_t res_len = res ? sizeof(*res) + res->alen : 0;
-	size_t qos_len = sizeof(*qos);
-	size_t msg_len = sizeof(*p) + PAD4(res_len) + qos_len;
+	if (likely(bcanputnext(sc->oq, 1))) {
+		N_conn_con_t *p;
+		mblk_t *mp;
 
-	if (likely(sccp_get_n_state(sc) == NS_WCON_CREQ)) {
+		size_t res_len = res ? sizeof(*res) + res->alen : 0;
+		size_t qos_len = sizeof(sc->cqos);
+		size_t msg_len = sizeof(*p) + PAD4(res_len) + qos_len;
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(bcanputnext(sc->oq, 1))) {
-				DB_TYPE(mp) = M_PROTO;
-				mp->b_band = 1;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_CONN_CON;
-				p->RES_length = res_len;
-				p->RES_offset = sizeof(*p);
-				p->CONN_flags = flags;
-				p->QOS_length = qos_len;
-				p->QOS_offset = sizeof(*p) + PAD4(res_len);
-				mp->b_wptr += sizeof(*p);
-				bcopy(res, mp->b_wptr, res_len);
-				mp->b_wptr += res_len;
-				qos = (typeof(qos)) mp->b_wptr;
-				mp->b_wptr += sizeof(*qos);
-				qos->n_qos_type = N_QOS_SEL_CONN_SCCP;
-				qos->protocol_class = pcl;
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_CONN_CON");
-				sccp_set_n_state(sc, NS_DATA_XFER);
-				putnext(sc->oq, mp);
-				return (QR_DONE);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 1;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_CONN_CON;
+			p->RES_length = res_len;
+			p->RES_offset = sizeof(*p);
+			p->CONN_flags = flags;
+			p->QOS_length = qos_len;
+			p->QOS_offset = p->RES_offset + PAD4(p->RES_length);
+			mp->b_wptr += sizeof(*p);
+			bcopy(res, mp->b_wptr, res_len);
+			mp->b_wptr += PAD4(res_len);
+			bcopy(&sc->cqos, mp->b_wptr, qos_len);
+			mp->b_wptr += qos_len;
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_CONN_CON");
+			sccp_set_n_state(sc, NS_DATA_XFER);
+			putnext(sc->oq, mp);
+			return (QR_DONE);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected confirmation for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
-/*
- *  N_DISCON_IND
- *  -----------------------------------
+/**
+ * n_discon_ind: - issue N_DISCON_IND primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @orig: origin of disconnect
+ * @reason: reason for disconnect
+ * @res: responding address
+ * @cp: connection indication pointer
+ * @dp: user data
  */
 static int
-n_discon_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong orig, long reason, struct sccp_addr *res,
-	     mblk_t *seq, mblk_t *dp)
+n_discon_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong orig, np_long reason,
+	     struct sccp_addr *res, mblk_t *cp, mblk_t *dp)
 {
-	mblk_t *mp;
-	N_discon_ind_t *p;
-	size_t res_len = res ? sizeof(*res) + res->alen : 0;
-	size_t msg_len = sizeof(*p) + PAD4(res_len);
+	if (likely(canputnext(sc->oq))) {
+		N_discon_ind_t *p;
+		mblk_t *mp;
 
-	if (likely(sccp_chk_n_state(sc, (NSF_WCON_CREQ | NSF_WRES_CIND |
-					 NSF_DATA_XFER | NSF_WCON_RREQ | NSF_WRES_RIND)))) {
+		size_t res_len = res ? sizeof(*res) + res->alen : 0;
+		size_t msg_len = sizeof(*p) + PAD4(res_len);
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_DISCON_IND;
-				p->DISCON_orig = orig;
-				p->DISCON_reason = reason;
-				p->RES_length = res_len;
-				p->RES_offset = sizeof(*p);
-				p->SEQ_number = (ulong) seq;
-				mp->b_wptr += sizeof(*p);
-				bcopy(res, mp->b_wptr, res_len);
-				mp->b_wptr += res_len;
-				mp->b_cont = dp;
-				if (seq) {
-					bufq_unlink(&sc->conq, seq);
-					freemsg(seq);
-				}
-				if (!bufq_length(&sc->conq))
-					sccp_set_n_state(sc, NS_IDLE);
-				else
-					sccp_set_n_state(sc, NS_WRES_CIND);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_DISCON_IND");
-				putnext(sc->oq, mp);
-				return (QR_DONE);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DISCON_IND;
+			p->DISCON_orig = orig;
+			p->DISCON_reason = reason;
+			p->RES_length = res_len;
+			p->RES_offset = sizeof(*p);
+			p->SEQ_number = (np_ulong) (ulong) cp;
+			mp->b_wptr += sizeof(*p);
+			bcopy(res, mp->b_wptr, res_len);
+			mp->b_wptr += PAD4(res_len);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			if (cp) {
+				bufq_unlink(&sc->conq, cp);
+				freemsg(cp);
 			}
-			freeb(mp);
-			return (-EBUSY);
+			sccp_set_n_state(sc, bufq_length(&sc->conq) ? NS_WRES_CIND : NS_IDLE);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_DISCON_IND");
+			putnext(sc->oq, mp);
+			return (QR_DONE);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
-/*
- *  N_DATA_IND
- *  -----------------------------------
+/**
+ * n_data_ind: - issue a N_DATA_IND primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @more: more data in NSDU
+ * @qos: QOS parameters for data
+ * @dp: user data
  */
 static int
-n_data_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong more, mblk_t *dp)
+n_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data_sccp_t *qos,
+	   mblk_t *dp)
 {
-	mblk_t *mp;
-	N_data_ind_t *p;
-	N_qos_sel_data_sccp_t *qos;
-	size_t qos_len = sizeof(*qos);
-	size_t msg_len = sizeof(*p) + qos_len;
+	if (likely(canputnext(sc->oq))) {
+		N_data_ind_t *p;
+		mblk_t *mp;
 
-	if (likely(sccp_get_n_state(sc) == NS_DATA_XFER)) {
+		size_t qos_len = qos ? sizeof(*qos) : 0;
+		size_t msg_len = sizeof(*p) + qos_len;
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_DATA_IND;
-				p->DATA_xfer_flags = (more ? N_MORE_DATA_FLAG : 0);
-				mp->b_wptr += sizeof(*p);
-				qos = (typeof(qos)) mp->b_wptr;
-				mp->b_wptr += sizeof(*qos);
-				qos->n_qos_type = N_QOS_SEL_DATA_SCCP;
-				qos->protocol_class = sc->pcl;	/* FIXME */
-				qos->option_flags = sc->flags;	/* FIXME */
-				qos->importance = sc->imp;	/* FIXME */
-				qos->sequence_selection = sc->sls;	/* FIXME */
-				qos->message_priority = sc->mp;	/* FIXME */
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_DATA_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DATA_IND;
+			p->DATA_xfer_flags = (more ? N_MORE_DATA_FLAG : 0);
+			mp->b_wptr += sizeof(*p);
+			bcopy(qos, mp->b_wptr, qos_len);
+			mp->b_wptr += qos_len;
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_DATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
-/*
- *  N_EXDATA_IND
- *  -----------------------------------
+/**
+ * n_exdata_ind: - issue a N_EXDATA_IND primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @more: more data in ENSDU
+ * @qos: QOS parameters for data
+ * @dp: user data
  */
 static int
-n_exdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong more, mblk_t *dp)
+n_exdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data_sccp_t *qos,
+	     mblk_t *dp)
 {
-	mblk_t *mp;
-	N_exdata_ind_t *p;
-	N_qos_sel_data_sccp_t *qos;
-	size_t qos_len = sizeof(*qos);
-	size_t msg_len = sizeof(*p) + qos_len;
+	if (likely(bcanputnext(sc->oq, 1))) {
+		N_exdata_ind_t *p;
+		mblk_t *mp;
 
-	if (likely(sccp_get_n_state(sc) == NS_DATA_XFER)) {
+		size_t qos_len = qos ? sizeof(*qos) : 0;
+		size_t msg_len = sizeof(*p) + qos_len;
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(bcanputnext(sc->oq, 1))) {
-				DB_TYPE(mp) = M_PROTO;
-				mp->b_band = 1;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_EXDATA_IND;
-				mp->b_wptr += sizeof(*p);
-				qos = (typeof(qos)) mp->b_wptr;
-				mp->b_wptr += sizeof(*qos);
-				qos->n_qos_type = N_QOS_SEL_DATA_SCCP;
-				qos->protocol_class = sc->pcl;	/* FIXME */
-				qos->option_flags = sc->flags;	/* FIXME */
-				qos->importance = sc->imp;	/* FIXME */
-				qos->sequence_selection = sc->sls;	/* FIXME */
-				qos->message_priority = sc->mp;	/* FIXME */
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_EXDATA_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 1;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_EXDATA_IND;
+			mp->b_wptr += sizeof(*p);
+			bcopy(qos, mp->b_wptr, qos_len);
+			mp->b_wptr += qos_len;
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_EXDATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -1974,66 +2120,41 @@ n_exdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong more, mblk_t *dp)
  *  -----------------------------------
  */
 static int
-n_info_ack(struct sc *sc, queue_t *q, mblk_t *bp)
+n_info_ack(struct sc *sc, queue_t *q, mblk_t *msg)
 {
-	mblk_t *mp;
 	N_info_ack_t *p;
-	N_qos_sel_info_sccp_t *qos;
-	N_qos_range_info_sccp_t *qor;
-	struct sccp_addr *add, *ss = &sc->src;
-	uint32_t *pro;
-	size_t add_len = ss ? sizeof(*ss) + ss->alen : 0;
-	size_t qos_len = sizeof(*qos);
-	size_t qor_len = sizeof(*qor);
-	size_t pro_len = sizeof(*pro);
-	size_t msg_len = sizeof(*p) + add_len + qos_len + qor_len + pro_len;
+	mblk_t *mp;
+
+	size_t add_len = sizeof(sc->src) + sc->src.alen;
+	size_t qos_len = sizeof(sc->iqos);
+	size_t qor_len = sizeof(sc->iqor);
+	size_t pro_len = sizeof(sc->pro);
+	size_t msg_len = sizeof(*p) + PAD4(add_len) + qos_len + qor_len + PAD4(pro_len);
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
+		*p = sc->info;
 		p->PRIM_type = N_INFO_ACK;
-		p->NSDU_size = -1;	/* no limit on NSDU size */
-		p->ENSDU_size = -1;	/* no limit on ENSDU size */
-		p->CDATA_size = -1;	/* no limit on CDATA size */
-		p->DDATA_size = -1;	/* no limit on DDATA size */
-		p->ADDR_size = sizeof(struct sccp_addr) + SCCP_MAX_ADDR_LENGTH;
 		p->ADDR_length = add_len;
 		p->ADDR_offset = sizeof(*p);
 		p->QOS_length = qos_len;
-		p->QOS_offset = sizeof(*p) + add_len;
+		p->QOS_offset = p->ADDR_offset + PAD4(p->ADDR_length);
 		p->QOS_range_length = qor_len;
-		p->QOS_range_offset = sizeof(*p) + add_len + qos_len;
-		p->OPTIONS_flags = REC_CONF_OPT | EX_DATA_OPT |
-		    ((sc->flags & SCCPF_DEFAULT_RC_SEL) ? DEFAULT_RC_SEL : 0);
-		p->NIDU_size = -1;
-		p->SERV_type = N_CONS | N_CLNS;
+		p->QOS_range_offset = p->QOS_offset + p->QOS_length;
 		p->CURRENT_state = sccp_get_n_state(sc);
-		p->PROVIDER_type = N_SUBNET;
-		p->NODU_size = 254;
 		p->PROTOID_length = pro_len;
 		p->PROTOID_offset = sizeof(*p) + add_len + qos_len + qor_len;
-		p->NPI_version = N_CURRENT_VERSION;
 		mp->b_wptr += sizeof(*p);
-		if (ss) {
-			add = (typeof(add)) mp->b_wptr;
-			bcopy(ss, add, sizeof(*ss) + ss->alen);
-			mp->b_wptr += add_len;
-		}
-		qos = (typeof(qos)) mp->b_wptr;
-		mp->b_wptr += sizeof(*qos);
-		qos->n_qos_type = N_QOS_SEL_INFO_SCCP;
-		qos->protocol_class = sc->pcl;
-		qos->option_flags = sc->flags;
-		qor = (typeof(qor)) mp->b_wptr;
-		mp->b_wptr += sizeof(*qor);
-		qor->n_qos_type = N_QOS_RANGE_INFO_SCCP;
-		qor->protocol_classes = sc->pcl;
-		qor->sequence_selection = sc->sls;
-		pro = (typeof(pro)) mp->b_wptr;
-		mp->b_wptr += sizeof(*pro);
-		*pro = 3;	/* SI value for SCCP */
-		if (bp)
-			freeb(bp);
+		bcopy(&sc->src, mp->b_wptr, add_len);
+		mp->b_wptr += PAD4(add_len);
+		bcopy(&sc->iqos, mp->b_wptr, qos_len);
+		mp->b_wptr += qos_len;
+		bcopy(&sc->iqor, mp->b_wptr, qor_len);
+		mp->b_wptr += qor_len;
+		bcopy(&sc->pro, mp->b_wptr, pro_len);
+		mp->b_wptr += PAD4(pro_len);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_INFO_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -2046,7 +2167,7 @@ n_info_ack(struct sc *sc, queue_t *q, mblk_t *bp)
  *  -----------------------------------
  */
 static int
-n_bind_ack(struct sc *sc, queue_t *q, mblk_t *bp)
+n_bind_ack(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	N_bind_ack_t *p;
@@ -2056,40 +2177,32 @@ n_bind_ack(struct sc *sc, queue_t *q, mblk_t *bp)
 	size_t pro_len = sizeof(*pro);
 	size_t msg_len = sizeof(*p) + add_len + pro_len;
 
-	if (sccp_get_n_state(sc) == NS_UNBND) {
-		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			DB_TYPE(mp) = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = N_BIND_ACK;
-			p->ADDR_length = add_len;
-			p->ADDR_offset = add_len ? sizeof(*p) : 0;
-			p->CONIND_number = sc->conind;
-			p->TOKEN_value = (ulong) sc->oq;
-			p->PROTOID_length = pro_len;
-			p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
-			mp->b_wptr += sizeof(*p);
-			if (ss) {
-				add = (typeof(add)) mp->b_wptr;
-				bcopy(ss, add, sizeof(*ss) + ss->alen);
-				mp->b_wptr += add_len;
-			}
-			pro = (typeof(pro)) mp->b_wptr;
-			mp->b_wptr += sizeof(*pro);
-			*pro = 3;	/* SI value for SCCP */
-			sccp_set_n_state(sc, NS_IDLE);
-			if (bp)
-				freeb(bp);
-			mi_strlog(q, SLLOGRX, SL_TRACE, "<- N_BIND_ACK");
-			putnext(sc->oq, mp);
-			return (0);
+	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = N_BIND_ACK;
+		p->ADDR_length = add_len;
+		p->ADDR_offset = add_len ? sizeof(*p) : 0;
+		p->CONIND_number = sc->conind;
+		p->TOKEN_value = (np_ulong) (ulong) sc->oq;
+		p->PROTOID_length = pro_len;
+		p->PROTOID_offset = pro_len ? sizeof(*p) + add_len : 0;
+		mp->b_wptr += sizeof(*p);
+		if (ss) {
+			add = (typeof(add)) mp->b_wptr;
+			bcopy(ss, add, sizeof(*ss) + ss->alen);
+			mp->b_wptr += add_len;
 		}
-		return (-ENOBUFS);
+		pro = (typeof(pro)) mp->b_wptr;
+		mp->b_wptr += sizeof(*pro);
+		*pro = 3;	/* SI value for SCCP */
+		sccp_set_n_state(sc, NS_IDLE);
+		freemsg(msg);
+		mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_BIND_ACK");
+		putnext(sc->oq, mp);
+		return (0);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-ENOBUFS);
 }
 
 /*
@@ -2097,7 +2210,7 @@ n_bind_ack(struct sc *sc, queue_t *q, mblk_t *bp)
  *  -----------------------------------
  */
 static int
-n_error_ack(struct sc *sc, queue_t *q, const long prim, int err)
+n_error_ack(struct sc *sc, queue_t *q, const np_long prim, int err)
 {
 	mblk_t *mp;
 	N_error_ack_t *p;
@@ -2155,8 +2268,6 @@ n_error_ack(struct sc *sc, queue_t *q, const long prim, int err)
 			   to an N_OPTMGMT_REQ in other than the NS_IDLE state. */
 			break;
 		}
-		if (bp)
-			freeb(bp);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_ERROR_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -2169,7 +2280,7 @@ n_error_ack(struct sc *sc, queue_t *q, const long prim, int err)
  *  -----------------------------------
  */
 static int
-n_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, long prim, ulong seq, ulong tok)
+n_ok_ack(struct sc *sc, queue_t *q, mblk_t *msg, np_long prim, np_ulong seq, np_ulong tok)
 {
 	mblk_t *mp;
 	N_ok_ack_t *p;
@@ -2192,7 +2303,7 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, long prim, ulong seq, ulong tok)
 			break;
 		case NS_WACK_CRES:
 		{
-			queue_t *aq = (queue_t *) tok;
+			queue_t *aq = (queue_t *) (ulong) tok;	/* FIXME: look up instead */
 			struct sc *ap = SCCP_PRIV(aq);
 
 			if (ap) {
@@ -2204,8 +2315,9 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, long prim, ulong seq, ulong tok)
 #endif
 			}
 			if (seq) {
-				bufq_unlink(&sc->conq, (mblk_t *) seq);
-				freemsg((mblk_t *) seq);
+				bufq_unlink(&sc->conq, (mblk_t *) (ulong) seq);	/* FIXME: look up
+										   instead */
+				freemsg((mblk_t *) (ulong) seq);	/* FIXME: look up instead */
 			}
 			if (aq != sc->oq) {
 				if (bufq_length(&sc->conq))
@@ -2217,7 +2329,8 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, long prim, ulong seq, ulong tok)
 		}
 		case NS_WACK_DREQ7:
 			if (seq)
-				bufq_unlink(&sc->conq, (mblk_t *) seq);
+				bufq_unlink(&sc->conq, (mblk_t *) (ulong) seq);	/* FIXME: look up
+										   instead */
 		case NS_WACK_DREQ6:
 		case NS_WACK_DREQ9:
 		case NS_WACK_DREQ10:
@@ -2233,8 +2346,7 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, long prim, ulong seq, ulong tok)
 			   the NS_IDLE state. */
 			break;
 		}
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_OK_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -2247,7 +2359,7 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, long prim, ulong seq, ulong tok)
  *  -----------------------------------
  */
 static int
-n_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *src, struct sccp_addr *dst,
+n_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *src, struct sccp_addr *dst,
 	       mblk_t *dp)
 {
 	mblk_t *mp;
@@ -2256,39 +2368,32 @@ n_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *src, str
 	size_t dst_len = dst ? sizeof(*dst) + dst->alen : 0;
 	size_t msg_len = sizeof(*p) + PAD4(src_len) + PAD4(dst_len);
 
-	if (likely(sccp_get_n_state(sc) == NS_IDLE)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_UNITDATA_IND;
-				p->SRC_length = src_len;
-				p->SRC_offset = sizeof(*p);
-				p->DEST_length = dst_len;
-				p->DEST_offset = sizeof(*p) + PAD4(src_len);
-				p->ERROR_type = 0;
-				mp->b_wptr += sizeof(*p);
-				bcopy(src, mp->b_wptr, src_len);
-				mp->b_wptr += PAD4(src_len);
-				bcopy(dst, mp->b_wptr, dst_len);
-				mp->b_wptr += PAD4(dst_len);
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_UNITDATA_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_UNITDATA_IND;
+			p->SRC_length = src_len;
+			p->SRC_offset = sizeof(*p);
+			p->DEST_length = dst_len;
+			p->DEST_offset = sizeof(*p) + PAD4(src_len);
+			p->ERROR_type = 0;
+			mp->b_wptr += sizeof(*p);
+			bcopy(src, mp->b_wptr, src_len);
+			mp->b_wptr += PAD4(src_len);
+			bcopy(dst, mp->b_wptr, dst_len);
+			mp->b_wptr += PAD4(dst_len);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_UNITDATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -2301,43 +2406,37 @@ n_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *src, str
  *  of the primitive.  Here we attache the returned message in the M_DATA portion.
  */
 static int
-n_uderror_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *dst, mblk_t *dp, ulong etype)
+n_uderror_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *dst, mblk_t *dp,
+	      np_ulong etype)
 {
 	mblk_t *mp;
 	N_uderror_ind_t *p;
 	size_t dst_len = dst ? sizeof(*dst) + dst->alen : 0;
 	size_t msg_len = sizeof(*p) + PAD4(dst_len);
 
-	if (likely(sccp_get_n_state(sc) == NS_IDLE)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_UNITDATA_IND;
-				p->DEST_length = dst_len;
-				p->DEST_offset = sizeof(*p);
-				p->RESERVED_field = 0;
-				p->ERROR_type = etype;
-				mp->b_wptr += sizeof(*p);
-				bcopy(dst, mp->b_wptr, dst_len);
-				mp->b_wptr += PAD4(dst_len);
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_UDERROR_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_UNITDATA_IND;
+			p->DEST_length = dst_len;
+			p->DEST_offset = sizeof(*p);
+			p->RESERVED_field = 0;
+			p->ERROR_type = etype;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dst, mp->b_wptr, dst_len);
+			mp->b_wptr += PAD4(dst_len);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_UDERROR_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -2345,7 +2444,7 @@ n_uderror_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *dst, mblk
  *  -----------------------------------
  */
 static int
-n_datack_ind(struct sc *sc, queue_t *q, mblk_t *bp)
+n_datack_ind(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	N_datack_ind_t *p;
@@ -2353,37 +2452,28 @@ n_datack_ind(struct sc *sc, queue_t *q, mblk_t *bp)
 	size_t qos_len = sizeof(*qos);
 	size_t msg_len = sizeof(*p) + qos_len;
 
-	if (likely(sccp_get_n_state(sc) == NS_DATA_XFER)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_DATACK_IND;
-				mp->b_wptr += sizeof(*p);
-				qos = (typeof(qos)) mp->b_wptr;
-				mp->b_wptr += sizeof(*qos);
-				qos->n_qos_type = N_QOS_SEL_DATA_SCCP;
-				qos->protocol_class = sc->pcl;	/* FIXME */
-				qos->option_flags = sc->flags;	/* FIXME */
-				qos->importance = sc->imp;	/* FIXME */
-				qos->sequence_selection = sc->sls;	/* FIXME */
-				qos->message_priority = sc->mp;	/* FIXME */
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_DATACK_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_DATACK_IND;
+			mp->b_wptr += sizeof(*p);
+			qos = (typeof(qos)) mp->b_wptr;
+			mp->b_wptr += sizeof(*qos);
+			qos->n_qos_type = N_QOS_SEL_DATA_SCCP;
+			qos->protocol_class = sc->pcl;	/* FIXME */
+			qos->option_flags = sc->flags;	/* FIXME */
+			qos->importance = sc->imp;	/* FIXME */
+			qos->sequence_selection = sc->sls;	/* FIXME */
+			qos->message_priority = sc->mp;	/* FIXME */
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- N_DATACK_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -2391,38 +2481,29 @@ n_datack_ind(struct sc *sc, queue_t *q, mblk_t *bp)
  *  -----------------------------------
  */
 static int
-n_reset_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong orig, ulong reason, mblk_t *cp)
+n_reset_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong orig, np_ulong reason, mblk_t *cp)
 {
 	mblk_t *mp;
 	N_reset_ind_t *p;
 
-	if (likely(sccp_get_n_state(sc) == NS_DATA_XFER)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_RESET_IND;
-				p->RESET_orig = orig;
-				p->RESET_reason = reason;
-				mp->b_wptr += sizeof(*p);
-				bufq_queue(&sc->conq, cp);
-				sccp_set_n_state(sc, NS_WRES_RIND);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RESET_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_RESET_IND;
+			p->RESET_orig = orig;
+			p->RESET_reason = reason;
+			mp->b_wptr += sizeof(*p);
+			bufq_queue(&sc->conq, cp);
+			sccp_set_n_state(sc, NS_WRES_RIND);
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RESET_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -2430,65 +2511,54 @@ n_reset_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong orig, ulong reason, mbl
  *  -----------------------------------
  */
 static int
-n_reset_con(struct sc *sc, queue_t *q, mblk_t *bp)
+n_reset_con(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	N_reset_con_t *p;
 
-	if (likely(sccp_get_n_state(sc) == NS_WCON_RREQ)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_RESET_CON;
-				mp->b_wptr += sizeof(*p);
-				sccp_set_n_state(sc, NS_DATA_XFER);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RESET_CON");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_RESET_CON;
+			mp->b_wptr += sizeof(*p);
+			sccp_set_n_state(sc, NS_DATA_XFER);
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RESET_CON");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
-#if NEVER
+#ifdef NEVER
 /*
  *  N_RECOVER_IND       29 - NC Recovery indication
  *  ---------------------------------------------------------
  */
 static int
-n_recover_ind(struct sc *sc, queue_t *q, mblk_t *bp)
+n_recover_ind(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	N_recover_ind_t *p;
 
-	if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_RECOVER_IND;
 			mp->b_wptr += sizeof(*p);
 			sccp_set_n_state(sc, NS_DATA_XFER);
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RECOVER_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
@@ -2496,36 +2566,27 @@ n_recover_ind(struct sc *sc, queue_t *q, mblk_t *bp)
  *  ---------------------------------------------------------
  */
 static int
-n_retrieve_ind(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *dp)
+n_retrieve_ind(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_retrieve_ind_t *p;
 
-	if (likely(sccp_get_n_state(sc) == NS_IDLE)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_RETREIVE_IND;
-				mp->b_wptr += sizeof(*p);
-				mp->b_cont = dp;
-				sccp_set_n_state(sc, NS_IDLE);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RETRIEVE_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_RETREIVE_IND;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			sccp_set_n_state(sc, NS_IDLE);
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RETRIEVE_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -2533,35 +2594,26 @@ n_retrieve_ind(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *dp)
  *  -----------------------------------------------------------
  */
 static int
-n_retrieve_con(struct sc *sc, queue_t *q, mblk_t *bp)
+n_retrieve_con(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	N_retrieve_con_t *p;
 
-	if (likely(sccp_get_n_state(sc) == NS_IDLE)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = N_RETRIEVE_CON;
-				mp->b_wptr += sizeof(*p);
-				sccp_set_n_state(sc, NS_IDLE);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RETRIEVE_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = N_RETRIEVE_CON;
+			mp->b_wptr += sizeof(*p);
+			sccp_set_n_state(sc, NS_IDLE);
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_RETRIEVE_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_n_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(dp);
-	return (0);
+	return (-EBUSY);
 }
 #endif
 
@@ -2572,9 +2624,9 @@ n_retrieve_con(struct sc *sc, queue_t *q, mblk_t *bp)
  *  There is really no orderly release for NPI, so we just echo an orderly
  *  releae request back.
  */
-static int sccp_ordrel_req(struct sc *sc, queue_t *q, mblk_t *bp);
+static int sccp_ordrel_req(struct sc *sc, queue_t *q, mblk_t *msg);
 static int
-n_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *bp)
+n_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	return sccp_ordrel_req(sc, q);
 }
@@ -2585,8 +2637,9 @@ n_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *bp)
  *  -----------------------------------------------------------------
  */
 static int
-n_notice_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong cause, struct sccp_addr *dst,
-	     struct sccp_addr *src, ulong pri, ulong seq, ulong pcl, ulong imp, mblk_t *dp)
+n_notice_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong cause, struct sccp_addr *dst,
+	     struct sccp_addr *src, np_ulong pri, np_ulong seq, np_ulong pcl, np_ulong imp,
+	     mblk_t *dp)
 {
 	mblk_t *mp;
 	N_notice_ind_t *p;
@@ -2596,8 +2649,8 @@ n_notice_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong cause, struct sccp_add
 	size_t qos_len = sizeof(*qos);
 	size_t msg_len = sizeof(*p) + PAD4(dst_len) + PAD4(src_len) + qos_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_NOTICE_IND;
@@ -2621,32 +2674,30 @@ n_notice_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong cause, struct sccp_add
 			qos->importance = imp;
 			qos->sequence_selection = seq;
 			qos->message_priority = pri;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_NOTICE_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
  *  N_INFORM_IND
  *  -----------------------------------------------------------------
  */
-static int
-n_inform_ind(struct sc *sc, queue_t *q, mblk_t *bp, N_qos_sel_infr_sccp_t * qos, ulong reason)
+static inline int
+n_inform_ind(struct sc *sc, queue_t *q, mblk_t *msg, N_qos_sel_infr_sccp_t * qos, np_ulong reason)
 {
 	mblk_t *mp;
 	N_inform_ind_t *p;
 	size_t qos_len = qos ? sizeof(*qos) : 0;
 	size_t msg_len = sizeof(*p) + qos_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_INFORM_IND;
@@ -2656,32 +2707,30 @@ n_inform_ind(struct sc *sc, queue_t *q, mblk_t *bp, N_qos_sel_infr_sccp_t * qos,
 			mp->b_wptr += sizeof(*p);
 			bcopy(qos, mp->b_wptr, qos_len);
 			mp->b_wptr += qos_len;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_INFORM_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
  *  N_COORD_IND
  *  -----------------------------------------------------------------
  */
-static int
-n_coord_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add)
+static inline int
+n_coord_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add)
 {
 	mblk_t *mp;
 	N_coord_ind_t *p;
 	size_t add_len = add ? sizeof(*add) + add->alen : 0;
 	size_t msg_len = sizeof(*p) + add_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_COORD_IND;
@@ -2690,32 +2739,30 @@ n_coord_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add)
 			mp->b_wptr += sizeof(*p);
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_INFORM_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
  *  N_COORD_CON
  *  -----------------------------------------------------------------
  */
-static int
-n_coord_con(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong smi)
+static inline int
+n_coord_con(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add, np_ulong smi)
 {
 	mblk_t *mp;
 	N_coord_con_t *p;
 	size_t add_len = add ? sizeof(*add) + add->alen : 0;
 	size_t msg_len = sizeof(*p) + add_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_COORD_CON;
@@ -2725,16 +2772,14 @@ n_coord_con(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong 
 			mp->b_wptr += sizeof(*p);
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_COORD_CON");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
@@ -2742,15 +2787,16 @@ n_coord_con(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong 
  *  -----------------------------------------------------------------
  */
 static int
-n_state_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong status, ulong smi)
+n_state_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add, np_ulong status,
+	    np_ulong smi)
 {
 	mblk_t *mp;
 	N_state_ind_t *p;
 	size_t add_len = add ? sizeof(*add) + add->alen : 0;
 	size_t msg_len = sizeof(*p) + add_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_STATE_IND;
@@ -2761,16 +2807,14 @@ n_state_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong 
 			mp->b_wptr += sizeof(*p);
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_STATE_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
@@ -2779,15 +2823,15 @@ n_state_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong 
  *  Indicate the state of a remote SCCP User or a remote Signalling Point (MTP).
  */
 static int
-n_pcstate_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct mtp_addr *add, ulong status)
+n_pcstate_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct mtp_addr *add, np_ulong status)
 {
 	mblk_t *mp;
 	N_pcstate_ind_t *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 	size_t msg_len = sizeof(*p) + add_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_PCSTATE_IND;
@@ -2797,16 +2841,14 @@ n_pcstate_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct mtp_addr *add, ulong
 			mp->b_wptr += sizeof(*p);
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_PCSTATE_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
@@ -2817,16 +2859,16 @@ n_pcstate_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct mtp_addr *add, ulong
  *  same type of information as the called address and calling address.  In the case of N-TRAFFIC primitive (see
  *  2.3.2.3.3), the parameter identifies the user from which a preferred subsystem is receiving backup traffic.
  */
-static int
-n_traffic_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulong tmix)
+static inline int
+n_traffic_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add, np_ulong tmix)
 {
 	mblk_t *mp;
 	N_traffic_ind_t *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 	size_t msg_len = sizeof(*p) + add_len;
 
-	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(sc->oq))) {
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = N_TRAFFIC_IND;
@@ -2836,16 +2878,14 @@ n_traffic_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulon
 			mp->b_wptr += sizeof(*p);
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- N_TRAFFIC_IND");
 			putnext(sc->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
@@ -2860,7 +2900,7 @@ n_traffic_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add, ulon
  *  the first mblk_t in the received CR message.
  */
 static int
-t_conn_ind(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *cp)
+t_conn_ind(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *cp, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct sccp_msg *m = (typeof(m)) cp->b_rptr;
@@ -2871,107 +2911,102 @@ t_conn_ind(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *cp)
 	size_t opt_len = sizeof(*oh) + sizeof(t_scalar_t);
 	size_t msg_len = sizeof(*p) + PAD4(src_len) + opt_len;
 
-	if (likely(sccp_chk_t_state(sc, (TSF_IDLE | TSF_WRES_CIND)))) {
-		if (likely(bufq_length(&sc->conq) < sc->conind)) {
+	if (likely(bufq_length(&sc->conq) < sc->conind)) {
+		if (likely(canputnext(sc->oq))) {
 			if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-				if (likely(canputnext(sc->oq))) {
-					DB_TYPE(mp) = M_PROTO;
-					p = (typeof(p)) mp->b_wptr;
-					p->PRIM_type = T_CONN_IND;
-					p->SRC_length = src_len;
-					p->SRC_offset = sizeof(*p);
-					p->OPT_length = opt_len;
-					p->OPT_offset = sizeof(*p) + PAD4(src_len);
-					p->SEQ_number = (ulong) cp;
-					mp->b_wptr += sizeof(*p);
-					bcopy(src, mp->b_wptr, src_len);
-					mp->b_wptr += PAD4(src_len);
-					oh = (typeof(oh)) mp->b_wptr;
-					mp->b_wptr += sizeof(*oh);
-					oh->len = opt_len;
-					oh->level = T_SS7_SCCP;
-					oh->name = T_SCCP_PCLASS;
-					oh->status = T_SUCCESS;
-					*(t_uscalar_t *) mp->b_wptr = m->pcl;
-					mp->b_wptr += sizeof(t_uscalar_t);
-					bufq_queue(&sc->conq, cp);
-					sccp_set_t_state(sc, TS_WRES_CIND);
-					if (bp)
-						freeb(bp);
-					mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_CONN_IND");
-					putnext(sc->oq, mp);
-					return (0);
-				}
-				freeb(mp);
-				return (-EBUSY);
-			}
-			return (-ENOBUFS);
-		}
-		noenable(q);
-		return (-ERESTART);
-	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
-}
-
-/*
- *  T_CONN_CON          12 - connection confirmation
- *  -----------------------------------------------------------------
- *  The only options with end-to-end significance that are negotiated is the protocol class.
- */
-static int
-t_conn_con(struct sc *sc, queue_t *q, mblk_t *bp, ulong pcl, ulong flgas, struct sccp_addr *res,
-	   mblk_t *dp)
-{
-	mblk_t *mp;
-	struct T_conn_con *p;
-	struct t_opthdr *oh;
-	size_t res_len = res ? sizeof(*res) + res->alen : 0;
-	size_t opt_len = sizeof(*oh) + sizeof(t_scalar_t);
-	size_t msg_len = sizeof(*p) + PAD4(res_len) + opt_len;
-
-	if (likely(sccp_get_t_state(sc) == TS_WCON_CREQ)) {
-		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
 				DB_TYPE(mp) = M_PROTO;
-				mp->b_band = 1;	/* expedite */
 				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = T_CONN_CON;
-				p->RES_length = res_len;
-				p->RES_offset = sizeof(*p);
+				p->PRIM_type = T_CONN_IND;
+				p->SRC_length = src_len;
+				p->SRC_offset = sizeof(*p);
 				p->OPT_length = opt_len;
-				p->OPT_offset = sizeof(*p) + PAD4(res_len);
+				p->OPT_offset = sizeof(*p) + PAD4(src_len);
+				p->SEQ_number = (np_ulong) (ulong) cp;
 				mp->b_wptr += sizeof(*p);
-				bcopy(res, mp->b_wptr, res_len);
-				mp->b_wptr += PAD4(res_len);
+				bcopy(src, mp->b_wptr, src_len);
+				mp->b_wptr += PAD4(src_len);
 				oh = (typeof(oh)) mp->b_wptr;
 				mp->b_wptr += sizeof(*oh);
 				oh->len = opt_len;
 				oh->level = T_SS7_SCCP;
 				oh->name = T_SCCP_PCLASS;
 				oh->status = T_SUCCESS;
-				*(t_uscalar_t *) mp->b_wptr = pcl;
+				*(t_uscalar_t *) mp->b_wptr = m->pcl;
 				mp->b_wptr += sizeof(t_uscalar_t);
-				sccp_set_t_state(sc, TS_DATA_XFER);
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_CONN_CON");
+				mp->b_cont = dp;
+				if (msg && msg->b_cont == dp)
+					msg->b_cont = NULL;
+				freemsg(msg);
+				bufq_queue(&sc->conq, cp);
+				sccp_set_t_state(sc, TS_WRES_CIND);
+				mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_CONN_IND");
 				putnext(sc->oq, mp);
 				return (0);
 			}
-			freeb(mp);
-			return (-EBUSY);
+			return (-ENOBUFS);
+		}
+		return (-EBUSY);
+	}
+	noenable(q);
+	return (-ERESTART);
+}
+
+/**
+ * t_conn_con: - issue a T_CONN_CON primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @flags: connection flags
+ * @res: responding address
+ * @dp: user data
+ *
+ * The only options with end-to-end significance that are negotiated is the protocol class.
+ */
+static int
+t_conn_con(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, struct sccp_addr *res,
+	   mblk_t *dp)
+{
+	struct T_conn_con *p;
+	struct t_opthdr *oh;
+	mblk_t *mp;
+
+	size_t res_len = res ? sizeof(*res) + res->alen : 0;
+	size_t opt_len = sizeof(*oh) + sizeof(t_scalar_t);
+	size_t msg_len = sizeof(*p) + PAD4(res_len) + opt_len;
+
+	if (likely(canputnext(sc->oq))) {
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 1;	/* expedite */
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_CONN_CON;
+			p->RES_length = res_len;
+			p->RES_offset = sizeof(*p);
+			p->OPT_length = opt_len;
+			p->OPT_offset = p->RES_offset + PAD4(p->RES_length);
+			mp->b_wptr += sizeof(*p);
+			bcopy(res, mp->b_wptr, res_len);
+			mp->b_wptr += PAD4(res_len);
+			oh = (typeof(oh)) mp->b_wptr;
+			mp->b_wptr += sizeof(*oh);
+			oh->len = opt_len;
+			oh->level = T_SS7_SCCP;
+			oh->name = T_SCCP_PCLASS;
+			oh->status = T_SUCCESS;
+			*(t_uscalar_t *) mp->b_wptr = sc->cqos.protocol_class;
+			mp->b_wptr += sizeof(t_uscalar_t);
+			sccp_set_t_state(sc, TS_DATA_XFER);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_CONN_CON");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -2982,124 +3017,204 @@ t_conn_con(struct sc *sc, queue_t *q, mblk_t *bp, ulong pcl, ulong flgas, struct
  *  connection indication bufq.
  */
 static int
-t_discon_ind(struct sc *sc, queue_t *q, mblk_t *bp, long reason, mblk_t *seq, mblk_t *dp)
+t_discon_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_long reason, mblk_t *seq, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_discon_ind *p;
 	size_t msg_len = sizeof(*p);
 
-	if (likely(sctp_chk_t_state(sc, TSF_WCON_CREQ | TSF_WRES_CIND |
-				    TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = T_DISCON_IND;
-				p->DISCON_reason = reason;
-				p->SEQ_number = (ulong) seq;
-				mp->b_wptr += sizeof(*p);
-				if (seq) {
-					bufq_unlink(&sc->conq, seq);
-					freemsg(seq);
-				}
-				if (!bufq_length(&sc->conq))
-					sccp_set_t_state(sc, TS_IDLE);
-				else
-					sccp_set_t_state(sc, TS_WRES_CIND);
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_DISCON_IND");
-				putnext(sc->oq, mp);
-				return (0);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_DISCON_IND;
+			p->DISCON_reason = reason;
+			p->SEQ_number = (np_ulong) (ulong) seq;
+			mp->b_wptr += sizeof(*p);
+			if (seq) {
+				bufq_unlink(&sc->conq, seq);
+				freemsg(seq);
 			}
-			freeb(mp);
-			return (-EBUSY);
+			if (!bufq_length(&sc->conq))
+				sccp_set_t_state(sc, TS_IDLE);
+			else
+				sccp_set_t_state(sc, TS_WRES_CIND);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_DISCON_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
 }
 
-/*
- *  T_DATA_IND          14 - data indication
- *  -----------------------------------------------------------------
+/**
+ * t_data_ind: - issued a T_DATA_IND primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @more: more data in ETSDU
+ * @dp: user data
  */
 static int
-t_data_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong more, mblk_t *dp)
+t_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, mblk_t *dp)
 {
-	mblk_t *mp;
-	struct T_data_ind *p;
-	size_t msg_len = sizeof(*p);
+	if (likely(canputnext(sc->oq))) {
+		struct T_data_ind *p;
+		mblk_t *mp;
 
-	if (likely(sccp_chk_t_state(sc, TSF_DATA_XFER | TSF_WIND_ORDREL))) {
+		size_t msg_len = sizeof(*p);
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = T_DATA_IND;
-				p->MORE_flag = more;
-				mp->b_wptr += sizeof(*p);
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_DATA_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_DATA_IND;
+			p->MORE_flag = more;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_DATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
 }
 
-/*
- *  T_EXDATA_IND        15 - expedited data indication
- *  -----------------------------------------------------------------
+/**
+ * t_exdata_ind: - issued a T_EXDATA_IND primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @more: more data in ETSDU
+ * @dp: user data
  */
 static int
-t_exdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong more, mblk_t *dp)
+t_exdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, mblk_t *dp)
 {
-	mblk_t *mp;
-	struct T_exdata_ind *p;
-	size_t msg_len = sizeof(*p);
 
-	if (likely(sccp_chk_t_state(sc, TSF_DATA_XFER | TSF_WIND_ORDREL))) {
+	if (likely(canputnext(sc->oq))) {
+		struct T_exdata_ind *p;
+		mblk_t *mp;
+
+		size_t msg_len = sizeof(*p);
+
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				mp->b_band = 1;	/* expedite */
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = T_EXDATA_IND;
-				p->MORE_flag = more;
-				mp->b_wptr += sizeof(*p);
-				mp->b_cont = dp;
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_EXDATA_IND");
-				putnext(sc->oq, mp);
-				return (0);
-			}
-			freeb(mp);
-			return (-EBUSY);
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 1;	/* expedite */
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_EXDATA_IND;
+			p->MORE_flag = more;
+			mp->b_wptr += sizeof(*p);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_EXDATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
+}
+
+/**
+ * t_optdata_ind: - issue a T_OPTDATA_IND primitive
+ * @sc: SCCP private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @exp: data is expedited
+ * @more: more data in ETSDU
+ * @qos: QOS parameters for data
+ * @dp: user data
+ */
+static int
+t_optdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, t_uscalar_t exp, t_uscalar_t more,
+	      N_qos_sel_data_sccp_t *qos, mblk_t *dp)
+{
+	uchar b_band = exp ? 1 : 0;
+
+	if (likely(bcanputnext(sc->oq, b_band))) {
+		struct T_optdata_ind *p;
+		struct t_opthdr *oh;
+		mblk_t *mp;
+
+		size_t qos_len = qos ? (5 * (sizeof(*oh) + sizeof(t_uscalar_t))) : 0;
+		size_t msg_len = sizeof(*p) + qos_len;
+
+		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = b_band;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_OPTDATA_IND;
+			p->DATA_flag = (exp ? T_ODF_EX : 0) | (more ? T_ODF_MORE : 0);
+			p->OPT_length = qos_len;
+			p->OPT_offset = sizeof(*p);
+			mp->b_wptr += sizeof(*p);
+
+			oh = (typeof(oh)) mp->b_wptr;
+			oh->len = sizeof(*oh) + sizeof(t_uscalar_t);
+			oh->level = T_SS7_SCCP;
+			oh->name = T_SCCP_SEQ_CTRL;
+			oh->status = T_SUCCESS;
+			mp->b_wptr += sizeof(*oh);
+			*(t_uscalar_t *) mp->b_wptr = qos->sequence_selection;
+			mp->b_wptr += sizeof(t_uscalar_t);
+
+			oh = (typeof(oh)) mp->b_wptr;
+			oh->len = sizeof(*oh) + sizeof(t_uscalar_t);
+			oh->level = T_SS7_SCCP;
+			oh->name = T_SCCP_PRIORITY;
+			oh->status = T_SUCCESS;
+			mp->b_wptr += sizeof(*oh);
+			*(t_uscalar_t *) mp->b_wptr = qos->message_priority;
+			mp->b_wptr += sizeof(t_uscalar_t);
+
+			oh = (typeof(oh)) mp->b_wptr;
+			oh->len = sizeof(*oh) + sizeof(t_uscalar_t);
+			oh->level = T_SS7_SCCP;
+			oh->name = T_SCCP_PCLASS;
+			oh->status = T_SUCCESS;
+			mp->b_wptr += sizeof(*oh);
+			*(t_uscalar_t *) mp->b_wptr = qos->protocol_class;
+			mp->b_wptr += sizeof(t_uscalar_t);
+
+			oh = (typeof(oh)) mp->b_wptr;
+			oh->len = sizeof(*oh) + sizeof(t_uscalar_t);
+			oh->level = T_SS7_SCCP;
+			oh->name = T_SCCP_IMPORTANCE;
+			oh->status = T_SUCCESS;
+			mp->b_wptr += sizeof(*oh);
+			*(t_uscalar_t *) mp->b_wptr = qos->importance;
+			mp->b_wptr += sizeof(t_uscalar_t);
+
+			oh = (typeof(oh)) mp->b_wptr;
+			oh->len = sizeof(*oh) + sizeof(t_uscalar_t);
+			oh->level = T_SS7_SCCP;
+			oh->name = T_SCCP_RET_ERROR;
+			oh->status = T_SUCCESS;
+			mp->b_wptr += sizeof(*oh);
+			*(t_uscalar_t *) mp->b_wptr = qos->option_flags;
+			mp->b_wptr += sizeof(t_uscalar_t);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_OPTDATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
+		}
+		return (-ENOBUFS);
+	}
+	return (-EBUSY);
 }
 
 /*
@@ -3107,33 +3222,32 @@ t_exdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong more, mblk_t *dp)
  *  -----------------------------------------------------------------
  */
 static int
-t_info_ack(struct sc *sc, queue_t *q, mblk_t *bp)
+t_info_ack(struct sc *sc, queue_t *q, mblk_t *msg)
 {
-	mblk_t *mp;
 	struct T_info_ack *p;
+	mblk_t *mp;
+
 	size_t msg_len = sizeof(*p);
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-		ulong serv = sc->pcl < 2 ? T_CLTS : T_COTS_ORD;
-		ulong etsdu = sc->pcl < 2 ? T_INVALID : sc->mtu;
+		t_uscalar_t serv = sc->pcl < 2 ? T_CLTS : T_COTS_ORD;
 
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		fixme(("Still some things to double-check here\n"));
 		p->PRIM_type = T_INFO_ACK;
-		p->TSDU_size = T_INFINITE;	/* no limit on TSDU size */
-		p->ETSDU_size = etsdu;	/* no concept of ETSDU size */
-		p->CDATA_size = sc->mtu;	/* no concept of CDATA size */
-		p->DDATA_size = sc->mtu;	/* no concept of DDATA size */
-		p->ADDR_size = sizeof(struct sccp_addr);	/* no limit on ADDR size */
+		p->TSDU_size = sc->info.NSDU_size;	/* no limit on TSDU size */
+		p->ETSDU_size = sc->info.ENSDU_size;	/* no limit on ETSDU size */
+		p->CDATA_size = sc->info.CDATA_size;	/* no limit on CDATA size */
+		p->DDATA_size = sc->info.DDATA_size;	/* no limit on DDATA size */
+		p->ADDR_size = sc->info.ADDR_size;	/* no limit on ADDR size */
 		p->OPT_size = T_INFINITE;	/* no limit on OPTIONS size */
-		p->TIDU_size = T_INFINITE;	/* no limit on TIDU size */
+		p->TIDU_size = sc->info.NIDU_size;	/* no limit on TIDU size */
 		p->SERV_type = serv;	/* COTS or CLTS */
 		p->CURRENT_state = sccp_get_t_state(sc);
 		p->PROVIDER_flag = XPG4_1 & ~T_SNDZERO;
 		mp->b_wptr += sizeof(*p);
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_INFO_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -3146,40 +3260,32 @@ t_info_ack(struct sc *sc, queue_t *q, mblk_t *bp)
  *  -----------------------------------------------------------------
  */
 static int
-t_bind_ack(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add)
+t_bind_ack(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add)
 {
 	mblk_t *mp;
 	struct T_bind_ack *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 	size_t msg_len = sizeof(*p) + add_len;
 
-	if (likely(sccp_get_t_state(sc) == TS_WACK_BREQ)) {
-		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			DB_TYPE(mp) = M_PCPROTO;
-			p = (typeof(p)) mp->b_wptr;
-			p->PRIM_type = T_BIND_ACK;
-			p->ADDR_length = add_len;
-			p->ADDR_offset = sizeof(*p);
-			p->CONIND_number = sc->conind;
-			mp->b_wptr += sizeof(*p);
-			if (add_len) {
-				bcopy(add, mp->b_wptr, add_len);
-				mp->b_wptr += add_len;
-			}
-			sccp_set_t_state(sc, TS_IDLE);
-			if (bp)
-				freeb(bp);
-			mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_BIND_ACK");
-			putnext(sc->oq, mp);
-			return (0);
+	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = T_BIND_ACK;
+		p->ADDR_length = add_len;
+		p->ADDR_offset = sizeof(*p);
+		p->CONIND_number = sc->conind;
+		mp->b_wptr += sizeof(*p);
+		if (add_len) {
+			bcopy(add, mp->b_wptr, add_len);
+			mp->b_wptr += add_len;
 		}
-		return (-ENOBUFS);
+		sccp_set_t_state(sc, TS_IDLE);
+		freemsg(msg);
+		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_BIND_ACK");
+		putnext(sc->oq, mp);
+		return (0);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-ENOBUFS);
 }
 
 /*
@@ -3187,7 +3293,7 @@ t_bind_ack(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *add)
  *  -----------------------------------------------------------------
  */
 static int
-t_error_ack(struct sc *sc, queue_t *q, mblk_t *bp, const ulong prim, long error)
+t_error_ack(struct sc *sc, queue_t *q, mblk_t *msg, const np_ulong prim, np_long error)
 {
 	int err = error;
 	mblk_t *mp;
@@ -3246,8 +3352,7 @@ t_error_ack(struct sc *sc, queue_t *q, mblk_t *bp, const ulong prim, long error)
 			   occurs normally when we send TOUTSTATE or TNOTSUPPORT or are responding
 			   to a T_OPTMGMT_REQ in other then TS_IDLE state. */
 		}
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_ERROR_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -3260,7 +3365,7 @@ t_error_ack(struct sc *sc, queue_t *q, mblk_t *bp, const ulong prim, long error)
  *  -----------------------------------------------------------------
  */
 static int
-t_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong prim, ulong seq, ulong tok)
+t_ok_ack(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong prim, np_ulong seq, np_ulong tok)
 {
 	mblk_t *mp;
 	struct T_ok_ack *p;
@@ -3281,7 +3386,7 @@ t_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong prim, ulong seq, ulong tok
 			break;
 		case TS_WACK_CRES:
 		{
-			queue_t *aq = (queue_t *) tok;
+			queue_t *aq = (queue_t *) (ulong) tok;	/* FIXME: look up instead */
 			struct sc *ap = SCCP_PRIV(aq);
 
 			if (ap) {
@@ -3290,8 +3395,9 @@ t_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong prim, ulong seq, ulong tok
 				// sccp_transmit_wakeup(q);
 			}
 			if (seq) {
-				bufq_unlink(&sc->conq, (mblk_t *) seq);
-				freemsg((mblk_t *) seq);
+				bufq_unlink(&sc->conq, (mblk_t *) (ulong) seq);	/* FIXME: look up
+										   instead */
+				freemsg((mblk_t *) (ulong) seq);	/* FIXME: look up instead */
 			}
 			if (aq != sc->oq) {
 				if (bufq_length(&sc->conq))
@@ -3303,7 +3409,8 @@ t_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong prim, ulong seq, ulong tok
 		}
 		case TS_WACK_DREQ7:
 			if (seq)
-				bufq_unlink(&sc->conq, (mblk_t *) seq);
+				bufq_unlink(&sc->conq, (mblk_t *) (ulong) seq);	/* FIXME: look up
+										   instead */
 		case TS_WACK_DREQ6:
 		case TS_WACK_DREQ9:
 		case TS_WACK_DREQ10:
@@ -3317,8 +3424,7 @@ t_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong prim, ulong seq, ulong tok
 			   occurs normally when we are responding to a T_OPTMGMT_REQ in other than
 			   the TS_IDLE state. */
 		}
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_OK_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -3331,7 +3437,7 @@ t_ok_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong prim, ulong seq, ulong tok
  *  -----------------------------------------------------------------
  */
 static int
-t_optmgmt_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong flags, struct sccp_opts *ops)
+t_optmgmt_ack(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, struct sccp_opts *ops)
 {
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
@@ -3352,8 +3458,7 @@ t_optmgmt_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong flags, struct sccp_op
 		if (sccp_get_t_state(sc) == TS_WACK_OPTREQ)
 			sccp_set_t_state(sc, TS_IDLE);
 #endif
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_OPTMGMT_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -3367,43 +3472,34 @@ t_optmgmt_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong flags, struct sccp_op
  *  -----------------------------------------------------------------
  */
 static int
-t_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *bp)
+t_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	struct T_ordrel_ind *p;
 	size_t msg_len = sizeof(*p);
 
-	if (likely(sctp_chk_t_state(sc, TSF_DATA_XFER | TSF_WIND_ORDREL))) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				mp->b_wptr += sizeof(*p);
-				p->PRIM_type = T_ORDREL_IND;
-				switch (sccp_get_t_state(sc)) {
-				case TS_DATA_XFER:
-					sccp_set_t_state(sc, TS_WREQ_ORDREL);
-					break;
-				case TS_WIND_ORDREL:
-					sccp_set_t_state(sc, TS_IDLE);
-					break;
-				}
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_ORDREL_IND");
-				putnext(sc->oq, mp);
-				return (0);
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
+			p->PRIM_type = T_ORDREL_IND;
+			switch (sccp_get_t_state(sc)) {
+			case TS_DATA_XFER:
+				sccp_set_t_state(sc, TS_WREQ_ORDREL);
+				break;
+			case TS_WIND_ORDREL:
+				sccp_set_t_state(sc, TS_IDLE);
+				break;
 			}
-			freeb(mp);
-			return (-EBUSY);
+			freemsg(msg);
+			mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_ORDREL_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
 }
 #endif
 
@@ -3412,7 +3508,7 @@ t_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *bp)
  *  -----------------------------------------------------------------
  */
 static int
-t_addr_ack(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *loc, struct sccp_addr *rem)
+t_addr_ack(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *loc, struct sccp_addr *rem)
 {
 	mblk_t *mp;
 	struct T_addr_ack *p;
@@ -3433,6 +3529,7 @@ t_addr_ack(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *loc, struct 
 		mp->b_wptr += loc_len;
 		bcopy(rem, mp->b_wptr, rem_len);
 		mp->b_wptr += rem_len;
+		freemsg(msg);
 		putnext(sc->oq, mp);
 		return (0);
 	}
@@ -3445,12 +3542,12 @@ t_addr_ack(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *loc, struct 
  *  -----------------------------------------------------------------
  */
 static int
-t_capability_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong caps)
+t_capability_ack(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong caps)
 {
 	mblk_t *mp;
 	struct T_capability_ack *p;
 	size_t msg_len = sizeof(*p);
-	ulong caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
+	np_ulong caps = (acceptor ? TC1_ACCEPTOR_ID : 0) | (info ? TC1_INFO : 0);
 
 	if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
@@ -3458,7 +3555,7 @@ t_capability_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong caps)
 		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = caps;
-		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) sc->oq : 0;
+		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (np_ulong) sc->oq : 0;
 		if (caps & TC1_INFO) {
 			p->INFO_ack.PRIM_type = T_INFO_ACK;
 			p->INFO_ack.TSDU_size = sc->tsdu;
@@ -3473,8 +3570,7 @@ t_capability_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong caps)
 			p->INFO_ack.PROVIDER_flag = sc->ptype;
 		} else
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGRX, SL_TRACE, "<- T_CAPABILITY_ACK");
 		putnext(sc->oq, mp);
 		return (0);
@@ -3491,8 +3587,8 @@ t_capability_ack(struct sc *sc, queue_t *q, mblk_t *bp, ulong caps)
  *  might not be a problem to the user.
  */
 static int
-t_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *src, ulong *seq,
-	       ulong *prior, ulong *pcl, ulong *imp, ulong *rerr, mblk_t *dp)
+t_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *src, np_ulong *seq,
+	       np_ulong *prior, np_ulong *pcl, np_ulong *imp, np_ulong *rerr, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct t_opthdr *oh;
@@ -3504,87 +3600,81 @@ t_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *src, ulo
 	    (rerr ? olen : 0);
 	size_t msg_len = sizeof(*p) + src_len + opt_len;
 
-	if (likely(sctp_get_t_state(sc) == TS_IDLE)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = T_UNITDATA_IND;
-				p->SRC_length = src_len;
-				p->SRC_offset = sizeof(*p);
-				p->OPT_length = opt_len;
-				p->OPT_offset = sizeof(*p) + src_len;
-				mp->b_wptr += sizeof(*p);
-				bcopy(src, mp->b_wptr, src_len);
-				mp->b_wptr += src_len;
-				if (opt_len) {
-					if (seq) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_SEQ_CTRL;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *seq;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (prior) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_PRIORITY;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *prior;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (pcl) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_PCLASS;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *pcl;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (imp) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_IMPORTANCE;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *imp;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (rerr) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_RET_ERROR;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *rerr;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
+			DB_TYPE(mp) = M_PROTO;
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_UNITDATA_IND;
+			p->SRC_length = src_len;
+			p->SRC_offset = sizeof(*p);
+			p->OPT_length = opt_len;
+			p->OPT_offset = sizeof(*p) + src_len;
+			mp->b_wptr += sizeof(*p);
+			bcopy(src, mp->b_wptr, src_len);
+			mp->b_wptr += src_len;
+			if (opt_len) {
+				if (seq) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_SEQ_CTRL;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *seq;
+					mp->b_wptr += sizeof(t_uscalar_t);
 				}
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_UNITDATA_IND");
-				putnext(sc->oq, mp);
-				return (0);
+				if (prior) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_PRIORITY;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *prior;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
+				if (pcl) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_PCLASS;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *pcl;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
+				if (imp) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_IMPORTANCE;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *imp;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
+				if (rerr) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_RET_ERROR;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *rerr;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
 			}
-			freeb(mp);
-			return (-EBUSY);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_UNITDATA_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -3594,8 +3684,8 @@ t_unitdata_ind(struct sc *sc, queue_t *q, mblk_t *bp, struct sccp_addr *src, ulo
  *  options produced an error.
  */
 static int
-t_uderror_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong etype, struct sccp_addr *dst, ulong *seq,
-	      ulong *pri, ulong *pcl, ulong *imp, ulong *ret, mblk_t *dp)
+t_uderror_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong etype, struct sccp_addr *dst,
+	      np_ulong *seq, np_ulong *pri, np_ulong *pcl, np_ulong *imp, np_ulong *ret, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct t_opthdr *oh;
@@ -3607,89 +3697,83 @@ t_uderror_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong etype, struct sccp_ad
 	    (ret ? olen : 0);
 	size_t msg_len = sizeof(*p) + dst_len;
 
-	if (likely(sctp_get_t_state(sc) == TS_IDLE)) {
+	if (likely(canputnext(sc->oq))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
-			if (likely(canputnext(sc->oq))) {
-				DB_TYPE(mp) = M_PROTO;
-				mp->b_band = 2;	/* XXX move ahead of data indications */
-				p = (typeof(p)) mp->b_wptr;
-				p->PRIM_type = T_UDERROR_IND;
-				p->DEST_length = dst_len;
-				p->DEST_offset = sizeof(*p);
-				p->OPT_length = opt_len;
-				p->OPT_offset = sizeof(*p) + dst_len;
-				p->ERROR_type = etype;
-				mp->b_wptr += sizeof(*p);
-				bcopy(dst, mp->b_wptr, dst_len);
-				mp->b_wptr += dst_len;
-				if (opt_len) {
-					if (seq) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_SEQ_CTRL;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *seq;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (pri) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_PRIORITY;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *pri;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (pcl) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_PCLASS;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *pcl;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (imp) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_IMPORTANCE;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *imp;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
-					if (ret) {
-						oh = (typeof(oh)) mp->b_wptr;
-						mp->b_wptr += sizeof(*oh);
-						oh->len = olen;
-						oh->level = T_SS7_SCCP;
-						oh->name = T_SCCP_RET_ERROR;
-						oh->status = T_SUCCESS;
-						*(t_uscalar_t *) mp->b_wptr = *ret;
-						mp->b_wptr += sizeof(t_uscalar_t);
-					}
+			DB_TYPE(mp) = M_PROTO;
+			mp->b_band = 2;	/* XXX move ahead of data indications */
+			p = (typeof(p)) mp->b_wptr;
+			p->PRIM_type = T_UDERROR_IND;
+			p->DEST_length = dst_len;
+			p->DEST_offset = sizeof(*p);
+			p->OPT_length = opt_len;
+			p->OPT_offset = sizeof(*p) + dst_len;
+			p->ERROR_type = etype;
+			mp->b_wptr += sizeof(*p);
+			bcopy(dst, mp->b_wptr, dst_len);
+			mp->b_wptr += dst_len;
+			if (opt_len) {
+				if (seq) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_SEQ_CTRL;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *seq;
+					mp->b_wptr += sizeof(t_uscalar_t);
 				}
-				if (bp)
-					freeb(bp);
-				mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_UDERROR_IND");
-				putnext(sc->oq, mp);
-				return (0);
+				if (pri) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_PRIORITY;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *pri;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
+				if (pcl) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_PCLASS;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *pcl;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
+				if (imp) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_IMPORTANCE;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *imp;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
+				if (ret) {
+					oh = (typeof(oh)) mp->b_wptr;
+					mp->b_wptr += sizeof(*oh);
+					oh->len = olen;
+					oh->level = T_SS7_SCCP;
+					oh->name = T_SCCP_RET_ERROR;
+					oh->status = T_SUCCESS;
+					*(t_uscalar_t *) mp->b_wptr = *ret;
+					mp->b_wptr += sizeof(t_uscalar_t);
+				}
 			}
-			freeb(mp);
-			return (-EBUSY);
+			mp->b_cont = dp;
+			if (msg && msg->b_cont == dp)
+				msg->b_cont = NULL;
+			freemsg(msg);
+			mi_strlog(q, STRLOGDA, SL_TRACE, "<- T_UDERROR_IND");
+			putnext(sc->oq, mp);
+			return (0);
 		}
 		return (-ENOBUFS);
 	}
-	mi_strlog(q, 0, SL_ERROR, "unexpected indication for state %u", sccp_get_t_state(sc));
-	if (bp)
-		freeb(bp);
-	freemsg(cp);
-	return (0);
+	return (-EBUSY);
 }
 
 /*
@@ -3699,13 +3783,13 @@ t_uderror_ind(struct sc *sc, queue_t *q, mblk_t *bp, ulong etype, struct sccp_ad
  *
  *  -------------------------------------------------------------------------
  */
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_BIND_REQ
  *  -----------------------------------
  */
 static int
-mtp_bind_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, struct mtp_addr *add)
+mtp_bind_req(struct mt *mt, queue_t *q, mblk_t *msg, np_ulong flags, struct mtp_addr *add)
 {
 	mblk_t *mp;
 	struct MTP_bind_req *p;
@@ -3721,8 +3805,7 @@ mtp_bind_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, struct mtp_addr
 		mp->b_wptr += sizeof(*p);
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_BIND_REQ ->");
 		putnext(mt->oq, mp);
 		return (0);
@@ -3731,13 +3814,13 @@ mtp_bind_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, struct mtp_addr
 }
 #endif
 
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_UNBIND_REQ
  *  -----------------------------------
  */
 static int
-mtp_unbind_req(struct mt *mt, queue_t *q, mblk_t *bp)
+mtp_unbind_req(struct mt *mt, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	struct MTP_unbind_req *p;
@@ -3747,8 +3830,7 @@ mtp_unbind_req(struct mt *mt, queue_t *q, mblk_t *bp)
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_UNBIND_REQ;
 		mp->b_wptr += sizeof(*p);
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_UNBIND_REQ ->");
 		puntext(mt->oq, mp);
 		return (0);
@@ -3757,13 +3839,13 @@ mtp_unbind_req(struct mt *mt, queue_t *q, mblk_t *bp)
 }
 #endif
 
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_CONN_REQ
  *  -----------------------------------
  */
 static int
-mtp_conn_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, struct mtp_addr *add)
+mtp_conn_req(struct mt *mt, queue_t *q, mblk_t *msg, np_ulong flags, struct mtp_addr *add)
 {
 	mblk_t *mp;
 	struct MTP_conn_req *p;
@@ -3779,8 +3861,7 @@ mtp_conn_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, struct mtp_addr
 		mp->b_wptr += sizeof(*p);
 		bcopy(add, mp->b_wptr, add_len);
 		mp->b_wptr += add_len;
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_CONN_REQ ->");
 		putnext(mt->oq, mp);
 		return (0);
@@ -3789,43 +3870,41 @@ mtp_conn_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, struct mtp_addr
 }
 #endif
 
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_DISCON_REQ
  *  -----------------------------------
  */
 static int
-mtp_discon_req(struct mt *mt, queue_t *q, mblk_t *bp)
+mtp_discon_req(struct mt *mt, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	struct MTP_discon_req *p;
 
-	if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
-		if (likely(canputnext(mt->oq))) {
+	if (likely(canputnext(mt->oq))) {
+		if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mtp_primitive = MTP_DISCON_REQ;
 			mp->b_wptr += sizeof(*p);
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_DISCON_REQ ->");
 			putnext(mt->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 #endif
 
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_ADDR_REQ
  *  -----------------------------------
  */
 static int
-mtp_addr_req(struct mt *mt, queue_t *q, mblk_t *bp)
+mtp_addr_req(struct mt *mt, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	struct MTP_addr_req *p;
@@ -3835,8 +3914,7 @@ mtp_addr_req(struct mt *mt, queue_t *q, mblk_t *bp)
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_ADDR_REQ;
 		mp->b_wptr += sizeof(*p);
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_ADDR_REQ ->");
 		putnext(mt->oq, mp);
 		return (0);
@@ -3845,13 +3923,13 @@ mtp_addr_req(struct mt *mt, queue_t *q, mblk_t *bp)
 }
 #endif
 
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_INFO_REQ
  *  -----------------------------------
  */
 static int
-mtp_info_req(struct mt *mt, queue_t *q, mblk_t *bp)
+mtp_info_req(struct mt *mt, queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	struct MTP_info_req *p;
@@ -3861,8 +3939,7 @@ mtp_info_req(struct mt *mt, queue_t *q, mblk_t *bp)
 		p = (typeof(p)) mp->b_wptr;
 		p->mtp_primitive = MTP_INFO_REQ;
 		mp->b_wptr += sizeof(*p);
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_INFO_REQ ->");
 		putnext(mt->oq, mp);
 		return (0);
@@ -3871,13 +3948,14 @@ mtp_info_req(struct mt *mt, queue_t *q, mblk_t *bp)
 }
 #endif
 
-#if NEVER
+#ifdef NEVER
 /*
  *  MTP_OPTMGMT_REQ
  *  -----------------------------------
  */
 static int
-mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, uchar *opt_ptr, size_t opt_len)
+mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *msg, np_ulong flags, uchar *opt_ptr,
+		size_t opt_len)
 {
 	mblk_t *mp;
 	struct MTP_optmgmt_req *p;
@@ -3892,8 +3970,7 @@ mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, uchar *opt_p
 		mp->b_wptr += sizeof(*p);
 		bcopy(opt_ptr, mp->b_wptr, opt_len);
 		mp->b_wptr += opt_len;
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_OPTMGMT_REQ ->");
 		putnext(mt->oq, mp);
 		return (0);
@@ -3906,16 +3983,16 @@ mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *bp, ulong flags, uchar *opt_p
  *  MTP_TRANSFER_REQ
  *  -----------------------------------
  */
-static int
-mtp_transfer_req(struct mt *mt, queue_t *q, mblk_t *bp, struct mtp_addr *add, ulong prior,
-		 ulong sls, mblk_t *dp)
+static inline int
+mtp_transfer_req(struct mt *mt, queue_t *q, mblk_t *msg, struct mtp_addr *add, np_ulong prior,
+		 np_ulong sls, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct MTP_transfer_req *p;
 	size_t add_len = add ? sizeof(*add) : 0;
 
-	if (likely((mp = mi_allocb(q, sizeof(*p) + add_len, BPRI_MED)) != NULL)) {
-		if (likely(canputnext(mt->oq))) {
+	if (likely(canputnext(mt->oq))) {
+		if (likely((mp = mi_allocb(q, sizeof(*p) + add_len, BPRI_MED)) != NULL)) {
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->mtp_primitive = MTP_TRANSFER_REQ;
@@ -3927,16 +4004,14 @@ mtp_transfer_req(struct mt *mt, queue_t *q, mblk_t *bp, struct mtp_addr *add, ul
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
 			mp->b_cont = dp;
-			if (bp)
-				freeb(bp);
+			freemsg(msg);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "MTP_TRANSFER_REQ ->");
 			putnext(mt->oq, mp);
 			return (0);
 		}
-		freeb(mp);
-		return (-EBUSY);
+		return (-ENOBUFS);
 	}
-	return (-ENOBUFS);
+	return (-EBUSY);
 }
 
 /*
@@ -3957,10 +4032,10 @@ size_one(void)
 	return (1);
 }
 static inline int
-pack_one(ulong val, register uchar **p)
+pack_one(np_ulong val, register uchar **p)
 {
 	**p = val;
-	*p++;
+	*p += 1;
 	return (1);
 }
 
@@ -4001,7 +4076,7 @@ size_lrn(void)
 	return (3);
 }
 static inline int
-pack_lrn(register uchar **p, ulong lrn)
+pack_lrn(register uchar **p, np_ulong lrn)
 {
 	*p[0] = (lrn >> 16) & 0xff;
 	*p[1] = (lrn >> 8) & 0xff;
@@ -4027,9 +4102,9 @@ unpack_dlr(register uchar *p, uchar *e, struct sccp_msg *m)
 
 		if (p + len <= e) {
 			m->dlr = 0;
-			m->dlr |= ((ulong) (p[0]) << 0);
-			m->dlr |= ((ulong) (p[1]) << 8);
-			m->dlr |= ((ulong) (p[2]) << 16);
+			m->dlr |= ((np_ulong) (p[0]) << 0);
+			m->dlr |= ((np_ulong) (p[1]) << 8);
+			m->dlr |= ((np_ulong) (p[2]) << 16);
 			m->parms |= SCCP_PTF_DLR;
 			return (len);
 		}
@@ -4060,9 +4135,9 @@ unpack_slr(register uchar *p, uchar *e, struct sccp_msg *m)
 
 		if (p + len <= e) {
 			m->slr = 0;
-			m->slr |= (((ulong) p[0]) << 0);
-			m->slr |= (((ulong) p[1]) << 8);
-			m->slr |= (((ulong) p[2]) << 16);
+			m->slr |= (((np_ulong) p[0]) << 0);
+			m->slr |= (((np_ulong) p[1]) << 8);
+			m->slr |= (((np_ulong) p[2]) << 16);
 			m->parms |= SCCP_PTF_SLR;
 			return (len);
 		}
@@ -4076,7 +4151,7 @@ unpack_slr(register uchar *p, uchar *e, struct sccp_msg *m)
  *  -------------------------------------------------------------------------
  */
 static int
-size_cpa(ulong pvar, struct sccp_addr *cpa)
+size_cpa(np_ulong pvar, struct sccp_addr *cpa)
 {
 	size_t len = 0;
 
@@ -4088,7 +4163,7 @@ size_cpa(ulong pvar, struct sccp_addr *cpa)
 	case SS7_PVAR_ANSI:
 		if (cpa->ni) {
 		      skip_ni:
-			if (cpa->pc != -1UL)
+			if (cpa->pc != -1)
 				len += 3;
 			// if ( cpa->ssn ) /* always code SSN */
 			len += 1;
@@ -4106,7 +4181,7 @@ size_cpa(ulong pvar, struct sccp_addr *cpa)
 			break;
 		}
 	default:
-		if (cpa->pc != -1UL)
+		if (cpa->pc != -1)
 			len += 2;
 		// if ( cpa->ssn ) /* always code SSN */
 		len += 1;
@@ -4132,11 +4207,11 @@ size_cpa(ulong pvar, struct sccp_addr *cpa)
 	return (len);
 }
 static int
-pack_cpa(ulong pvar, register uchar **p, struct sccp_addr *a)
+pack_cpa(np_ulong pvar, register uchar **p, struct sccp_addr *a)
 {
-	ulong len = 0;
-	ulong pci = (a->pc == -1UL) ? 0 : 1;
-	ulong ssni = (a->ssn == 0) ? 1 : 1;	/* always include ssn */
+	np_ulong len = 0;
+	np_ulong pci = (a->pc == -1) ? 0 : 1;
+	np_ulong ssni = (a->ssn == 0) ? 1 : 1;	/* always include ssn */
 
 	**p = 0;
 	**p |= (pci & 0x01) << 0;
@@ -4144,7 +4219,7 @@ pack_cpa(ulong pvar, register uchar **p, struct sccp_addr *a)
 	**p |= (a->gtt & 0x0f) << 2;
 	**p |= (a->ri & 0x01) << 6;
 	**p |= (a->ni & 0x01) << 7;
-	*p++;
+	*p += 1;
 	len++;
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_JTTC:
@@ -4162,7 +4237,7 @@ pack_cpa(ulong pvar, register uchar **p, struct sccp_addr *a)
 			}
 			if (ssni) {
 				*p[0] = a->ssn;
-				*p++;
+				*p += 1;
 				len++;
 			}
 			if (a->gtt) {
@@ -4177,7 +4252,7 @@ pack_cpa(ulong pvar, register uchar **p, struct sccp_addr *a)
 					break;
 				case 2:	/* 0010 */
 					*p[0] = a->tt;
-					*p++;
+					*p += 1;
 					len++;
 					break;
 				}
@@ -4195,19 +4270,19 @@ pack_cpa(ulong pvar, register uchar **p, struct sccp_addr *a)
 		}
 		if (ssni) {
 			*p[0] = a->ssn;
-			*p++;
+			*p += 1;
 			len++;
 		}
 		if (a->gtt) {
 			switch (a->gtt) {
 			case 1:	/* 0001 */
 				*p[0] = a->nai;
-				*p++;
+				*p += 1;
 				len++;
 				break;
 			case 2:	/* 0010 */
 				*p[0] = a->tt;
-				*p++;
+				*p += 1;
 				len++;
 				break;
 			case 3:	/* 0011 */
@@ -4236,9 +4311,9 @@ pack_cpa(ulong pvar, register uchar **p, struct sccp_addr *a)
 	return (len);
 }
 static int
-unpack_cpa(ulong pvar, register uchar *p, uchar *e, struct sccp_addr *a)
+unpack_cpa(np_ulong pvar, register uchar *p, uchar *e, struct sccp_addr *a)
 {
-	ulong oe = 0, pci, ssni, len = 0;
+	np_ulong oe = 0, pci, ssni, len = 0;
 
 	if (p + 1 > e)
 		return (-EMSGSIZE);
@@ -4266,7 +4341,7 @@ unpack_cpa(ulong pvar, register uchar *p, uchar *e, struct sccp_addr *a)
 				p += 3;
 				len += 3;
 			} else
-				a->pc = -1UL;
+				a->pc = -1;
 			if (ssni) {
 				if (p + 1 > e)
 					return (-EMSGSIZE);
@@ -4315,7 +4390,7 @@ unpack_cpa(ulong pvar, register uchar *p, uchar *e, struct sccp_addr *a)
 			p += 2;
 			len += 2;
 		} else
-			a->pc = -1UL;
+			a->pc = -1;
 		if (ssni) {
 			if (p + 1 > e)
 				return (-EMSGSIZE);
@@ -4599,8 +4674,8 @@ pack_relc(struct sccp_msg *m, register uchar **p)
 static inline int
 unpack_relc(register uchar *p, uchar *e, struct sccp_msg *m)
 {
-	if (!(m-> parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
-					SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
+	if (!(m->parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
+			  SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
 		int len = size_relc();
 
 		if (p + len <= e) {
@@ -4663,8 +4738,8 @@ pack_resc(struct sccp_msg *m, register uchar **p)
 static inline int
 unpack_resc(register uchar *p, uchar *e, struct sccp_msg *m)
 {
-	if (!  (m-> parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
-					SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
+	if (!(m->parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
+			  SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
 		int len = size_resc();
 
 		if (p + len <= e) {
@@ -4694,8 +4769,8 @@ pack_errc(struct sccp_msg *m, register uchar **p)
 static inline int
 unpack_errc(register uchar *p, uchar *e, struct sccp_msg *m)
 {
-	if (!  (m-> parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
-					SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
+	if (!(m->parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
+			  SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
 		int len = size_errc();
 
 		if (p + len >= e) {
@@ -4725,8 +4800,8 @@ pack_refc(struct sccp_msg *m, register uchar **p)
 static inline int
 unpack_refc(register uchar *p, uchar *e, struct sccp_msg *m)
 {
-	if (!  (m-> parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
-					SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
+	if (!(m->parms & (SCCP_PTF_RELC | SCCP_PTF_RETC | SCCP_PTF_RESC |
+			  SCCP_PTF_ERRC | SCCP_PTF_REFC))) {
 		int len = size_refc();
 
 		if (p + len <= e) {
@@ -4955,11 +5030,11 @@ pack_isni(struct sccp_msg *m, register uchar **p)
 	*p[0] |= (m->isni.iri & 0x03) << 1;
 	*p[0] |= (m->isni.ti & 0x01) << 4;
 	*p[0] |= (m->isni.count & 0x07) << 5;
-	*p++;
+	*p += 1;
 	len++;
 	if (m->isni.ti & 0x1) {
 		*p[0] = m->isni.ns & 0x3;
-		*p++;
+		*p += 1;
 		len++;
 	}
 	for (i = 0; i < 7 && i < m->isni.nids; i++) {
@@ -4974,7 +5049,7 @@ static int
 unpack_isni(register uchar *p, uchar *e, struct sccp_msg *m)
 {
 	if (!(m->parms & SCCP_PTF_ISNI)) {
-		ulong i, len = 0;
+		np_ulong i, len = 0;
 
 		if (p + 2 > e)
 			return (-EMSGSIZE);
@@ -5030,13 +5105,13 @@ size_ins(struct sccp_msg *m)
 static int
 pack_ins(struct sccp_msg *m, register uchar **p)
 {
-	ulong i, len = 0;
+	np_ulong i, len = 0;
 
 	*p[0] = 0;
 	*p[0] |= (m->ins.itype & 0x03) << 0;
 	*p[0] |= (m->ins.rtype & 0x03) << 2;
 	*p[0] |= (m->ins.count & 0x03) << 6;
-	*p++;
+	*p += 1;
 	len++;
 	for (i = 0; i < 2 && i < m->ins.nids; i++) {
 		*p[0] = m->ins.u[i].nid.network;
@@ -5050,7 +5125,7 @@ static int
 unpack_ins(register uchar *p, uchar *e, struct sccp_msg *m)
 {
 	if (!(m->parms & SCCP_PTF_INS)) {
-		ulong i, len = 0;
+		np_ulong i, len = 0;
 
 		if (p + 2 > e)
 			return (-EMSGSIZE);
@@ -5182,9 +5257,9 @@ unpack_apc(register uchar *p, uchar *e, struct sccp_msg *m)
 {
 	if (p + 1 <= e) {
 		m->apc = 0;
-		m->apc |= (((ulong) p[0]) << 0);
-		m->apc |= (((ulong) p[1]) << 8);
-		m->apc |= (((ulong) p[2]) << 16);
+		m->apc |= (((np_ulong) p[0]) << 0);
+		m->apc |= (((np_ulong) p[1]) << 8);
+		m->apc |= (((np_ulong) p[2]) << 16);
 		p += 3;
 		return (3);
 	}
@@ -6331,7 +6406,6 @@ sccp_pack_scmg(queue_t *q, mblk_t *msg)
 static int
 sccp_send_msg(struct mt *mt, queue_t *q, mblk_t *bp, mblk_t *msg)
 {
-	int err;
 	mblk_t *mp, *dp;
 	struct sccp_msg *m = (typeof(m)) msg->b_rptr;
 	struct mtp_addr *a;
@@ -6461,7 +6535,7 @@ sccp_send_msg(struct mt *mt, queue_t *q, mblk_t *bp, mblk_t *msg)
  */
 #if 0
 static int
-sccp_send(queue_t *q, struct sr *sr, ulong pri, ulong sls, mblk_t *dp)
+sccp_send(queue_t *q, struct sr *sr, np_ulong pri, np_ulong sls, mblk_t *dp)
 {
 	int err;
 	struct mt *mt;
@@ -6482,7 +6556,7 @@ sccp_send(queue_t *q, struct sr *sr, ulong pri, ulong sls, mblk_t *dp)
 #endif
 
 static struct sccp_msg *
-sccp_enc_msg(struct sp *sp, queue_t *q, ulong dpc, ulong pri, ulong sls)
+sccp_enc_msg(struct sp *sp, queue_t *q, np_ulong dpc, np_ulong pri, np_ulong sls)
 {
 	mblk_t *mp;
 	struct sccp_msg *m = NULL;
@@ -6507,7 +6581,7 @@ sccp_enc_msg(struct sp *sp, queue_t *q, ulong dpc, ulong pri, ulong sls)
 	return (m);
 }
 
-static int sccp_orte_msg(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp);
+static int sccp_orte_msg(struct sp *, queue_t *, mblk_t *, mblk_t *);
 
 /*
  *  SCCP_MT_CR    0x01 - Connection Request
@@ -6516,9 +6590,9 @@ static int sccp_orte_msg(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp);
  *  ASNI: F(SLR, PCLS), V(CDPA), O(CRED, CGPA, DATA, HOPC, EOP)
  */
 static int
-sccp_send_cr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong slr,
-	     ulong pcl, struct sccp_addr *cdpa, ulong *cred, struct sccp_addr *cgpa, mblk_t *data,
-	     ulong *hopc, ulong *imp)
+sccp_send_cr(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	     np_ulong slr, np_ulong pcl, struct sccp_addr *cdpa, np_ulong *cred,
+	     struct sccp_addr *cgpa, mblk_t *data, np_ulong *hopc, np_ulong *imp)
 {
 	struct sccp_msg *m;
 
@@ -6552,7 +6626,7 @@ sccp_send_cr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong 
 			m->parms |= SCCP_PTF_IMP;
 		} else
 			m->imp = SCCP_DI_CR;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6564,8 +6638,9 @@ sccp_send_cr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong 
  *  ANSI: F(DLR, SLR, PCLS), O(CRED, CDPA, DATA, EOP)
  */
 static int
-sccp_send_cc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong slr,
-	     ulong pcl, ulong *cred, struct sccp_addr *cdpa, mblk_t *data, ulong *imp)
+sccp_send_cc(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	     np_ulong slr, np_ulong pcl, np_ulong *cred, struct sccp_addr *cdpa, mblk_t *data,
+	     np_ulong *imp)
 {
 	struct sccp_msg *m;
 
@@ -6595,7 +6670,7 @@ sccp_send_cc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
 			m->parms |= SCCP_PTF_IMP;
 		} else
 			m->imp = SCCP_DI_CC;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6607,8 +6682,8 @@ sccp_send_cc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
  *  ANSI: F(DLR, REFC), O(CDPA, DATA, EOP)
  */
 static int
-sccp_send_cref(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong refc,
-	       struct sccp_addr *cdpa, mblk_t *data, ulong *imp)
+sccp_send_cref(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	       np_ulong refc, struct sccp_addr *cdpa, mblk_t *data, np_ulong *imp)
 {
 	struct sccp_msg *m;
 
@@ -6633,7 +6708,7 @@ sccp_send_cref(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulon
 			m->parms |= SCCP_PTF_IMP;
 		} else
 			m->imp = SCCP_DI_CREF;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6645,8 +6720,8 @@ sccp_send_cref(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulon
  *  ANSI: F(DLR, SLR, RELC), O(DATA, EOP)
  */
 static int
-sccp_send_rlsd(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong slr,
-	       ulong relc, mblk_t *data, ulong *imp)
+sccp_send_rlsd(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	       np_ulong slr, np_ulong relc, mblk_t *data, np_ulong *imp)
 {
 	struct sccp_msg *m;
 
@@ -6668,7 +6743,7 @@ sccp_send_rlsd(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulon
 			m->parms |= SCCP_PTF_IMP;
 		} else
 			m->imp = SCCP_DI_RLSD;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6680,7 +6755,8 @@ sccp_send_rlsd(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulon
  *  ANSI: F(DLR, SLR)
  */
 static int
-sccp_send_rlc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong slr)
+sccp_send_rlc(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	      np_ulong slr)
 {
 	struct sccp_msg *m;
 
@@ -6689,7 +6765,7 @@ sccp_send_rlc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
 		m->dlr = dlr;	/* DLR F */
 		m->slr = slr;	/* SLR F */
 		m->imp = SCCP_DI_RLC;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6700,9 +6776,9 @@ sccp_send_rlc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
  *  ITUT: F(DLR, SEG), V(DATA)
  *  ANSI: F(DLR, SEG), V(DATA)
  */
-static int
-sccp_send_dt1(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong dlr,
-	      ulong more, mblk_t *data)
+static inline int
+sccp_send_dt1(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	      np_ulong dlr, np_ulong more, mblk_t *data)
 {
 	struct sccp_msg *m;
 
@@ -6714,7 +6790,7 @@ sccp_send_dt1(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong
 		m->data.ptr = data->b_rptr;
 		m->data.len = msgdsize(data);
 		m->imp = SCCP_DI_DT1;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6725,9 +6801,9 @@ sccp_send_dt1(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong
  *  ITUT: F(DLR, SEQ), V(DATA)
  *  ANSI: F(DLR, SEQ), V(DATA)
  */
-static int
-sccp_send_dt2(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong dlr,
-	      ulong ps, ulong pr, ulong more, mblk_t *data)
+static inline int
+sccp_send_dt2(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	      np_ulong dlr, np_ulong ps, np_ulong pr, np_ulong more, mblk_t *data)
 {
 	struct sccp_msg *m;
 
@@ -6739,7 +6815,7 @@ sccp_send_dt2(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong
 		m->data.ptr = data->b_rptr;
 		m->data.len = msgdsize(data);
 		m->imp = SCCP_DI_DT2;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6751,8 +6827,8 @@ sccp_send_dt2(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong
  *  ANSI: F(DLR, RSN, CRED)
  */
 static int
-sccp_send_ak(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong dlr,
-	     ulong rsn, ulong cred)
+sccp_send_ak(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	     np_ulong dlr, np_ulong rsn, np_ulong cred)
 {
 	struct sccp_msg *m;
 
@@ -6762,7 +6838,7 @@ sccp_send_ak(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong 
 		m->rsn = rsn;	/* RSN F */
 		m->cred = cred;	/* CRED F */
 		m->imp = SCCP_DI_AK;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6773,9 +6849,10 @@ sccp_send_ak(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong 
  *  ITUT: F(PCLS), V(CDPA, CGPA, DATA[2-254])
  *  ANSI: F(PCLS), V(CDPA, CGPA, DATA[2-252])
  */
-static int
-sccp_send_udt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong pcl,
-	      ulong ret, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data)
+static inline int
+sccp_send_udt(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	      np_ulong pcl, np_ulong ret, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+	      mblk_t *data)
 {
 	struct sccp_msg *m;
 
@@ -6789,7 +6866,7 @@ sccp_send_udt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong
 		m->data.ptr = data->b_rptr;
 		m->data.len = msgdsize(data);
 		m->imp = SCCP_DI_UDT;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6801,8 +6878,8 @@ sccp_send_udt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong
  *  ANSI: F(RETC), V(CDPA, CGPA, DATA[2-251])
  */
 static int
-sccp_send_udts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong retc,
-	       struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data)
+sccp_send_udts(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	       np_ulong retc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data)
 {
 	struct sccp_msg *m;
 
@@ -6815,7 +6892,7 @@ sccp_send_udts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
 		m->data.ptr = data->b_rptr;
 		m->data.len = msgdsize(data);
 		m->imp = SCCP_DI_UDTS;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6827,7 +6904,8 @@ sccp_send_udts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
  *  ANSI: F(DLR), V(DATA)
  */
 static int
-sccp_send_ed(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, mblk_t *data)
+sccp_send_ed(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	     mblk_t *data)
 {
 	struct sccp_msg *m;
 
@@ -6838,7 +6916,7 @@ sccp_send_ed(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
 		m->data.ptr = data->b_rptr;
 		m->data.len = msgdsize(data);
 		m->imp = SCCP_DI_ED;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6850,7 +6928,7 @@ sccp_send_ed(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
  *  ANSI: F(DLR)
  */
 static int
-sccp_send_ea(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr)
+sccp_send_ea(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr)
 {
 	struct sccp_msg *m;
 
@@ -6858,7 +6936,7 @@ sccp_send_ea(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
 		m->type = SCCP_MT_ED;
 		m->dlr = dlr;	/* DLR F */
 		m->imp = SCCP_DI_EA;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6869,9 +6947,9 @@ sccp_send_ea(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
  *  ITUT: F(DLR, SLR, RESC)
  *  ANSI: F(DLR, SLR, RESC)
  */
-static int
-sccp_send_rsr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong slr,
-	      ulong resc)
+static inline int
+sccp_send_rsr(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	      np_ulong slr, np_ulong resc)
 {
 	struct sccp_msg *m;
 
@@ -6881,7 +6959,7 @@ sccp_send_rsr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
 		m->slr = slr;	/* SLR F */
 		m->cause = resc;	/* RESC F */
 		m->imp = SCCP_DI_RSR;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6893,7 +6971,8 @@ sccp_send_rsr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
  *  ANSI: F(DLR, SLR)
  */
 static int
-sccp_send_rsc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong slr)
+sccp_send_rsc(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	      np_ulong slr)
 {
 	struct sccp_msg *m;
 
@@ -6902,7 +6981,7 @@ sccp_send_rsc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
 		m->dlr = dlr;	/* DLR F */
 		m->slr = slr;	/* SLR F */
 		m->imp = SCCP_DI_RSC;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6914,7 +6993,8 @@ sccp_send_rsc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
  *  ANSI: F(DLR, ERRC)
  */
 static int
-sccp_send_err(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong errc)
+sccp_send_err(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	      np_ulong errc)
 {
 	struct sccp_msg *m;
 
@@ -6923,7 +7003,7 @@ sccp_send_err(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
 		m->dlr = dlr;	/* DLR F */
 		m->cause = errc;	/* ERRC F */
 		m->imp = SCCP_DI_ERR;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6935,8 +7015,8 @@ sccp_send_err(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong
  *  ANSI: F(DLR, SLR, PCLS, SEQ, CRED)
  */
 static int
-sccp_send_it(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong dlr, ulong slr,
-	     ulong pcl, ulong ps, ulong pr, ulong more, ulong cred)
+sccp_send_it(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong sls, np_ulong dlr,
+	     np_ulong slr, np_ulong pcl, np_ulong ps, np_ulong pr, np_ulong more, np_ulong cred)
 {
 	struct sccp_msg *m;
 
@@ -6950,7 +7030,7 @@ sccp_send_it(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
 		m->more = more;
 		m->cred = cred;	/* CRED F */
 		m->imp = SCCP_DI_IT;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -6961,10 +7041,11 @@ sccp_send_it(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong sls, ulong 
  *  ITUT: F(PCLS, HOPC), V(CDPA, CGPA, DATA[2-253]), O(SGMT, IMP, EOP)
  *  ANSI: F(PCLS, HOPC), V(CDPA, CGPA, DATA[2-251]), O(SGMT, ISNI, INS, MTI, EOP)
  */
-static int
-sccp_send_xudt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong pcl,
-	       ulong ret, ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data,
-	       sccp_sgmt_t * sgmt, ulong *imp, sccp_isni_t * isni, sccp_ins_t * ins, ulong *mti)
+static inline int
+sccp_send_xudt(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	       np_ulong pcl, np_ulong ret, np_ulong hopc, struct sccp_addr *cdpa,
+	       struct sccp_addr *cgpa, mblk_t *data, sccp_sgmt_t * sgmt, np_ulong *imp,
+	       sccp_isni_t * isni, sccp_ins_t * ins, np_ulong *mti)
 {
 	struct sccp_msg *m;
 
@@ -7003,7 +7084,7 @@ sccp_send_xudt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
 				m->parms |= SCCP_PTF_MTI;
 			}
 		}
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -7015,9 +7096,10 @@ sccp_send_xudt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
  *  ANSI: F(RETC, HOPC), V(CDPA, CGPA, DATA[2-251]), O(SGMT, INS, MTI, ISNI, EOP)
  */
 static int
-sccp_send_xudts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong retc,
-		ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data,
-		sccp_sgmt_t * sgmt, ulong *imp, sccp_ins_t * ins, ulong *mti, sccp_isni_t * isni)
+sccp_send_xudts(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+		np_ulong retc, np_ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+		mblk_t *data, sccp_sgmt_t * sgmt, np_ulong *imp, sccp_ins_t * ins, np_ulong *mti,
+		sccp_isni_t * isni)
 {
 	struct sccp_msg *m;
 
@@ -7054,7 +7136,7 @@ sccp_send_xudts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulo
 				m->parms |= SCCP_PTF_MTI;
 			}
 		}
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -7065,10 +7147,11 @@ sccp_send_xudts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulo
  *  ITUT: F(PCLS, HOPC), V(CDPA, CGPA, LDATA[3-3906]), O(SGMT, IMP, EOP)
  *  ANSI: F(PCLS, HOPC), V(CDPA, CGPA, LDATA[3-3904]), O(SGMT, ISNI, INS, EOP)
  */
-static int
-sccp_send_ludt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong pcl,
-	       ulong ret, ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data,
-	       sccp_sgmt_t * sgmt, ulong *imp, sccp_isni_t * isni, sccp_ins_t * ins)
+static inline int
+sccp_send_ludt(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	       np_ulong pcl, np_ulong ret, np_ulong hopc, struct sccp_addr *cdpa,
+	       struct sccp_addr *cgpa, mblk_t *data, sccp_sgmt_t * sgmt, np_ulong *imp,
+	       sccp_isni_t * isni, sccp_ins_t * ins)
 {
 	struct sccp_msg *m;
 
@@ -7103,7 +7186,7 @@ sccp_send_ludt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
 				m->parms |= SCCP_PTF_INS;
 			}
 		}
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -7115,9 +7198,10 @@ sccp_send_ludt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
  *  ANSI: F(RETC, HOPC), V(CDPA, CGPA, LDATA[3-3904]), O(SGMT, ISNI, INS, EOP)
  */
 static int
-sccp_send_ludts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls, ulong retc,
-		ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa, mblk_t *data,
-		sccp_sgmt_t * sgmt, ulong *imp, sccp_isni_t * isni, sccp_ins_t * ins)
+sccp_send_ludts(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+		np_ulong retc, np_ulong hopc, struct sccp_addr *cdpa, struct sccp_addr *cgpa,
+		mblk_t *data, sccp_sgmt_t * sgmt, np_ulong *imp, sccp_isni_t * isni,
+		sccp_ins_t * ins)
 {
 	struct sccp_msg *m;
 
@@ -7150,7 +7234,7 @@ sccp_send_ludts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulo
 				m->parms |= SCCP_PTF_INS;
 			}
 		}
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -7160,9 +7244,9 @@ sccp_send_ludts(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulo
  *  -------------------------------------------------------------------------
  */
 static int
-sccp_send_scmg(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulong sls,
-	       struct sccp_addr *cdpa, struct sccp_addr *cgpa, ulong scmgfi, ulong assn, ulong apc,
-	       ulong smi, ulong cong)
+sccp_send_scmg(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong pri, np_ulong sls,
+	       struct sccp_addr *cdpa, struct sccp_addr *cgpa, np_ulong scmgfi, np_ulong assn,
+	       np_ulong apc, np_ulong smi, np_ulong cong)
 {
 	struct sccp_msg *m;
 
@@ -7177,7 +7261,7 @@ sccp_send_scmg(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
 		m->apc = apc;
 		m->smi = smi;
 		m->cong = cong;
-		return sccp_orte_msg(sc, q, bp, m->bp);
+		return sccp_orte_msg(sp, q, bp, m->bp);
 	}
 	return (-ENOBUFS);
 }
@@ -7187,14 +7271,15 @@ sccp_send_scmg(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong pri, ulon
  *  -------------------------------------------------------------------------
  */
 static int
-sccp_send_ssa(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_ssa(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SSA, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SSA, assn, apc, smi, 0);
 }
-static int
-sccp_bcast_ssa(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_bcast_ssa(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, np_ulong assn, np_ulong apc,
+	       np_ulong smi)
 {
 	int err;
 	struct sr *sr;
@@ -7228,8 +7313,8 @@ sccp_bcast_ssa(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, ulong assn, ulo
  *  -------------------------------------------------------------------------
  */
 static int
-sccp_send_ssp(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+sccp_send_ssp(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SSP, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SSP, assn, apc, smi, 0);
@@ -7239,9 +7324,9 @@ sccp_send_ssp(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  SCMG_MT_SST     0x03 - Subsystem status test
  *  -------------------------------------------------------------------------
  */
-static int
-sccp_send_sst(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_send_sst(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SST, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SST, assn, apc, smi, 0);
@@ -7251,9 +7336,9 @@ sccp_send_sst(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  SCMG_MT_SOR     0x04 - Subsystem out of service request
  *  -------------------------------------------------------------------------
  */
-static int
-sccp_send_sor(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_send_sor(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SOR, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SOR, assn, apc, smi, 0);
@@ -7263,9 +7348,9 @@ sccp_send_sor(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  SCMG_MT_SOG     0x05 - Subsystem out of service grant
  *  -------------------------------------------------------------------------
  */
-static int
-sccp_send_sog(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_send_sog(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SOG, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SOG, assn, apc, smi, 0);
@@ -7276,8 +7361,8 @@ sccp_send_sog(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  -------------------------------------------------------------------------
  */
 static int
-sccp_send_ssc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi, ulong cong)
+sccp_send_ssc(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi, np_ulong cong)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SSC, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SSC, assn, apc, smi, cong);
@@ -7287,9 +7372,9 @@ sccp_send_ssc(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  SCMG_MT_SBR     0xfd - Subsystem backup routing
  *  -------------------------------------------------------------------------
  */
-static int
-sccp_send_sbr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_send_sbr(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SBR, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SBR, assn, apc, smi, 0);
@@ -7299,9 +7384,9 @@ sccp_send_sbr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  SCMG_MT_SNR     0xfe - Subsystem normal routing
  *  -------------------------------------------------------------------------
  */
-static int
-sccp_send_snr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_send_snr(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SNR, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SNR, assn, apc, smi, 0);
@@ -7311,9 +7396,9 @@ sccp_send_snr(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr
  *  SCMG_MT_SRT     0xff - Subsystem routing status test
  *  -------------------------------------------------------------------------
  */
-static int
-sccp_send_srt(struct sp *sp, queue_t *q, mblk_t *bp, ulong dpc, struct sccp_addr *cdpa,
-	      struct sccp_addr *cgpa, ulong assn, ulong apc, ulong smi)
+static inline int
+sccp_send_srt(struct sp *sp, queue_t *q, mblk_t *bp, np_ulong dpc, struct sccp_addr *cdpa,
+	      struct sccp_addr *cgpa, np_ulong assn, np_ulong apc, np_ulong smi)
 {
 	return sccp_send_scmg(sp, q, bp, dpc, SCMG_MP_SRT, sp->sccp_next_cl_sls++, cdpa, cgpa,
 			      SCMG_MT_SRT, assn, apc, smi, 0);
@@ -7384,7 +7469,7 @@ struct sc_timer {
  *  -------------------------------------------------------------------------
  */
 static void
-sccp_timer_stop(struct sc *sc, const ulong t)
+sccp_timer_stop(struct sc *sc, const uint t)
 {
 	int single = 1;
 
@@ -7449,38 +7534,38 @@ sccp_timer_stop(struct sc *sc, const ulong t)
 	}
 }
 static void
-sccp_timer_start(struct sc *sc, const ulong t)
+sccp_timer_start(struct sc *sc, const uint t)
 {
 	switch (t) {
 	case tcon:
-		mi_timer(sc->timers.tcon, sc->config.tcon);
+		mi_timer_MAC(sc->timers.tcon, sc->config.tcon);
 		break;
 	case tias:
-		mi_timer(sc->timers.tias, sc->config.tias);
+		mi_timer_MAC(sc->timers.tias, sc->config.tias);
 		break;
 	case tiar:
-		mi_timer(sc->timers.tiar, sc->config.tiar);
+		mi_timer_MAC(sc->timers.tiar, sc->config.tiar);
 		break;
 	case trel:
-		mi_timer(sc->timers.trel, sc->config.trel);
+		mi_timer_MAC(sc->timers.trel, sc->config.trel);
 		break;
 	case trel2:
-		mi_timer(sc->timers.trel2, sc->config.trel2);
+		mi_timer_MAC(sc->timers.trel2, sc->config.trel2);
 		break;
 	case tint:
-		mi_timer(sc->timers.tint, sc->config.tint);
+		mi_timer_MAC(sc->timers.tint, sc->config.tint);
 		break;
 	case tguard:
-		mi_timer(sc->timers.tguard, sc->config.tguard);
+		mi_timer_MAC(sc->timers.tguard, sc->config.tguard);
 		break;
 	case tres:
-		mi_timer(sc->timers.tres, sc->config.tres);
+		mi_timer_MAC(sc->timers.tres, sc->config.tres);
 		break;
 	case trea:
-		mi_timer(sc->timers.trea, sc->config.trea);
+		mi_timer_MAC(sc->timers.trea, sc->config.trea);
 		break;
 	case tack:
-		mi_timer(sc->timers.tack, sc->config.tack);
+		mi_timer_MAC(sc->timers.tack, sc->config.tack);
 		break;
 	default:
 		swerr();
@@ -7493,7 +7578,7 @@ sccp_timer_start(struct sc *sc, const ulong t)
  *  -------------------------------------------------------------------------
  */
 static void
-ss_timer_stop(struct ss *ss, const ulong t)
+ss_timer_stop(struct ss *ss, const uint t)
 {
 	int single = 1;
 
@@ -7517,15 +7602,15 @@ ss_timer_stop(struct ss *ss, const ulong t)
 		break;
 	}
 }
-static void
-ss_timer_start(struct ss *ss, const ulong t)
+static inline void
+ss_timer_start(struct ss *ss, const uint t)
 {
 	switch (t) {
 	case tisst:
-		mi_timer(ss->timers.tisst, ss->config.tisst);
+		mi_timer_MAC(ss->timers.tisst, ss->config.tisst);
 		break;
 	case twsog:
-		mi_timer(ss->timers.twsog, ss->config.twsog);
+		mi_timer_MAC(ss->timers.twsog, ss->config.twsog);
 		break;
 	default:
 		swerr();
@@ -7538,7 +7623,7 @@ ss_timer_start(struct ss *ss, const ulong t)
  *  -------------------------------------------------------------------------
  */
 static void
-rs_timer_stop(struct rs *rs, const ulong t)
+rs_timer_stop(struct rs *rs, const uint t)
 {
 	int single = 1;
 
@@ -7547,7 +7632,7 @@ rs_timer_stop(struct rs *rs, const ulong t)
 		single = 0;
 		/* fall through */
 	case trsst:
-		mi_timer_stop(rs->timers.trsst);
+		mi_timer_stop(rs->timers.tsst);
 		if (single)
 			break;
 		/* fall through */
@@ -7557,12 +7642,12 @@ rs_timer_stop(struct rs *rs, const ulong t)
 		break;
 	}
 }
-static void
-rs_timer_start(struct rs *rs, const ulong t)
+static inline void
+rs_timer_start(struct rs *rs, const uint t)
 {
 	switch (t) {
 	case trsst:
-		mi_timer(rs->timers.trsst, rs->config.trsst);
+		mi_timer_MAC(rs->timers.tsst, rs->config.tsst);
 		break;
 	default:
 		swerr();
@@ -7575,7 +7660,7 @@ rs_timer_start(struct rs *rs, const ulong t)
  *  -------------------------------------------------------------------------
  */
 static void
-sp_timer_stop(struct sp *sp, const ulong t)
+sp_timer_stop(struct sp *sp, const uint t)
 {
 	int single = 1;
 
@@ -7594,12 +7679,12 @@ sp_timer_stop(struct sp *sp, const ulong t)
 		break;
 	}
 }
-static void
-sp_timer_start(struct sp *sp, const ulong t)
+static inline void
+sp_timer_start(struct sp *sp, const uint t)
 {
 	switch (t) {
 	case tgtt:
-		mi_timer(sp->timers.tgtt, sp->config.tgtt);
+		mi_timer_MAC(sp->timers.tgtt, sp->config.tgtt);
 		break;
 	default:
 		swerr();
@@ -7612,7 +7697,7 @@ sp_timer_start(struct sp *sp, const ulong t)
  *  -------------------------------------------------------------------------
  */
 static void
-sr_timer_stop(struct sr *sr, const ulong t)
+sr_timer_stop(struct sr *sr, const uint t)
 {
 	int single = 1;
 
@@ -7647,20 +7732,20 @@ sr_timer_stop(struct sr *sr, const ulong t)
 	}
 }
 static void
-sr_timer_start(struct sr *sr, const ulong t)
+sr_timer_start(struct sr *sr, const uint t)
 {
 	switch (t) {
 	case tattack:
-		mi_timer(sr->timers.tattack, sr->config.tattack);
+		mi_timer_MAC(sr->timers.tattack, sr->config.tattack);
 		break;
 	case tdecay:
-		mi_timer(sr->timers.tdecay, sr->config.tdecay);
+		mi_timer_MAC(sr->timers.tdecay, sr->config.tdecay);
 		break;
 	case tstatinfo:
-		mi_timer(sr->timers.tstatinfo, sr->config.tstatinfo);
+		mi_timer_MAC(sr->timers.tstatinfo, sr->config.tstatinfo);
 		break;
 	case tsst:
-		mi_timer(sr->timers.tsst, sr->config.tsst);
+		mi_timer_MAC(sr->timers.tsst, sr->config.tsst);
 		break;
 	default:
 		swerr();
@@ -7682,75 +7767,83 @@ sr_timer_start(struct sr *sr, const ulong t)
  *  SCCP Interface Functions
  *
  *  -------------------------------------------------------------------------
- *  These interface functions adapt between user interface events requested by the state machine and the particular
- *  style of interface that is supported by the particular SCCP user stream.  Not all events are supported by all
- *  interface styles.  The most complete interface style is the SCCPI which is the NPI Version 2 interface with the
- *  extended N-primitives described in Q.711 and T1.112.1.
+ *  These interface functions adapt between user interface events requested by the state machine and
+ *  the particular style of interface that is supported by the particular SCCP user stream.  Not all
+ *  events are supported by all interface styles.  The most complete interface style is the SCCPI
+ *  which is the NPI Version 2 interface with the extended N-primitives described in Q.711 and
+ *  T1.112.1.
  */
 
 static int
-sccp_conn_ind(struct sc *sc, mblk_t *bp, queue_t *q, mblk_t *cp)
+sccp_conn_ind(struct sc *sc, mblk_t *msg, queue_t *q, mblk_t *cp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_conn_ind(sc, bp, q, cp);
+		return n_conn_ind(sc, q, msg, cp, NULL);
 	case SCCP_STYLE_TPI:
-		return t_conn_ind(sc, bp, q, cp);
+		return t_conn_ind(sc, q, msg, cp, NULL);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		freemsg(cp);
 		return (0);
 	}
 }
 
 static int
-sccp_conn_con(struct sc *sc, queue_t *q, mblk_t *bp, ulong pcl, ulong flags, struct sccp_addr *res,
+sccp_conn_con(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, struct sccp_addr *res,
 	      mblk_t *dp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_conn_con(sc, q, bp, pcl, flags, res, dp);
+		return n_conn_con(sc, q, msg, flags, res, dp);
 	case SCCP_STYLE_TPI:
-		return t_conn_con(sc, q, bp, pcl, flags, res, dp);
+		return t_conn_con(sc, q, msg, flags, res, dp);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
-		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		mi_strlog(q, 0, SL_ERROR | SL_TRACE, "%s: attempt to deliver to GTT or MGMT stream",
+			  __FUNCTION__);
 		freemsg(dp);
+		if (msg && msg->b_cont == dp)
+			msg->b_cont = NULL;
+		freemsg(msg);
 		return (0);
 	}
 }
 
 static int
-sccp_data_ind(struct sc *sc, queue_t *q, ulong exp, ulong more, mblk_t *dp)
+sccp_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong exp, np_ulong more,
+	      N_qos_sel_data_sccp_t *qos, mblk_t *dp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
 		if (exp)
-			return n_exdata_ind(sc, q, bp, more, dp);
+			return n_exdata_ind(sc, q, msg, more, qos, dp);
 		else
-			return n_data_ind(sc, q, bp, more, dp);
+			return n_data_ind(sc, q, msg, more, qos, dp);
 	case SCCP_STYLE_TPI:
-		if (exp)
-			return t_exdata_ind(sc, q, bp, more, dp);
-		else
-			return t_data_ind(sc, q, bp, more, dp);
+		if (qos == NULL) {
+			if (exp)
+				return t_exdata_ind(sc, q, msg, more, dp);
+			else
+				return t_data_ind(sc, q, msg, more, dp);
+		} else {
+			return t_optdata_ind(sc, q, msg, exp, more, qos, dp);
+		}
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
 		freemsg(dp);
+		if (msg && msg->b_cont == dp)
+			msg->b_cont = NULL;
+		freemsg(msg);
 		return (0);
 	}
 }
@@ -7761,7 +7854,7 @@ sccp_datack_ind(struct sc *sc, queue_t *q)
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_datack_ind(sc, q);
+		return n_datack_ind(sc, q, NULL);
 	case SCCP_STYLE_TPI:
 		/* could possibly use t_opdata_ind here */
 		return (-EOPNOTSUPP);
@@ -7769,20 +7862,17 @@ sccp_datack_ind(struct sc *sc, queue_t *q)
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
-		freemsg(dp);
 		return (0);
 	}
 }
 
 static int
-sccp_reset_ind(struct sc *sc, queue_t *q, ulong orig, ulong reason, mblk_t *cp)
+sccp_reset_ind(struct sc *sc, queue_t *q, np_ulong orig, np_ulong reason, mblk_t *cp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_reset_ind(sc, q, orig, reason, cp);
+		return n_reset_ind(sc, q, NULL, orig, reason, cp);
 	case SCCP_STYLE_TPI:
 		/* could possibly use t_opdata_ind here */
 		return (-EOPNOTSUPP);
@@ -7790,9 +7880,7 @@ sccp_reset_ind(struct sc *sc, queue_t *q, ulong orig, ulong reason, mblk_t *cp)
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
-		freemsg(dp);
+		freemsg(cp);
 		return (0);
 	}
 }
@@ -7804,36 +7892,32 @@ sccp_reset_con(struct sc *sc, queue_t *q)
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
 		/* could possibly use t_opdata_ind here */
-		return n_reset_con(sc, q);
+		return n_reset_con(sc, q, NULL);
 	case SCCP_STYLE_TPI:
 		return (-EOPNOTSUPP);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
-		freemsg(dp);
 		return (0);
 	}
 }
 
 static int
-sccp_discon_ind(struct sc *sc, queue_t *q, ulong orig, long reason, struct sccp_addr *res,
+sccp_discon_ind(struct sc *sc, queue_t *q, np_ulong orig, np_long reason, struct sccp_addr *res,
 		mblk_t *cp, mblk_t *dp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_discon_ind(sc, q, orig, reason, res, cp, dp);
+		return n_discon_ind(sc, q, NULL, orig, reason, res, cp, dp);
 	case SCCP_STYLE_TPI:
-		return t_discon_ind(sc, q, reason, cp, dp);
+		return t_discon_ind(sc, q, NULL, reason, cp, dp);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		freemsg(cp);
 		freemsg(dp);
 		return (0);
 	}
@@ -7841,20 +7925,19 @@ sccp_discon_ind(struct sc *sc, queue_t *q, ulong orig, long reason, struct sccp_
 
 #if 0
 static int
-sccp_ordrel_ind(struct sc *sc, queue_t *q)
+sccp_ordrel_ind(struct sc *sc, queue_t *q, mblk_t *msg)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_ordrel_ind(sc, q);
+		return n_ordrel_ind(sc, q, msg);
 	case SCCP_STYLE_TPI:
-		return t_ordrel_ind(sc, q);
+		return t_ordrel_ind(sc, q, msg);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		freemsg(dp);
 		return (0);
 	}
@@ -7863,43 +7946,39 @@ sccp_ordrel_ind(struct sc *sc, queue_t *q)
 
 static int
 sccp_unitdata_ind(struct sc *sc, queue_t *q, struct sccp_addr *dst, struct sccp_addr *src,
-		  ulong pcl, ulong opt, ulong imp, ulong seq, ulong pri, mblk_t *dp)
+		  np_ulong pcl, np_ulong opt, np_ulong imp, np_ulong seq, np_ulong pri, mblk_t *dp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_NPI:
-		return n_unitdata_ind(sc, q, src, dst, dp);
+		return n_unitdata_ind(sc, q, NULL, src, dst, dp);
 	case SCCP_STYLE_TPI:
-		return t_unitdata_ind(sc, q, src, &seq, &pri, &pcl, &imp, &opt, dp);
+		return t_unitdata_ind(sc, q, NULL, src, &seq, &pri, &pcl, &imp, &opt, dp);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
 		freemsg(dp);
 		return (0);
 	}
 }
 
 static int
-sccp_notice_ind(struct sc *sc, queue_t *q, ulong cause, struct sccp_addr *dst,
-		struct sccp_addr *src, ulong pcl, ulong ret, ulong imp, ulong seq, ulong pri,
-		mblk_t *dp)
+sccp_notice_ind(struct sc *sc, queue_t *q, np_ulong cause, struct sccp_addr *dst,
+		struct sccp_addr *src, np_ulong pcl, np_ulong ret, np_ulong imp, np_ulong seq,
+		np_ulong pri, mblk_t *dp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
-		return n_notice_ind(sc, q, cause, dst, src, pri, seq, pcl, imp, dp);
+		return n_notice_ind(sc, q, NULL, cause, dst, src, pri, seq, pcl, imp, dp);
 	case SCCP_STYLE_NPI:
-		return n_uderror_ind(sc, q, dst, dp, cause);
+		return n_uderror_ind(sc, q, NULL, dst, dp, cause);
 	case SCCP_STYLE_TPI:
-		return t_uderror_ind(sc, q, cause, dst, &seq, &pri, &pcl, &imp, &ret, dp);
+		return t_uderror_ind(sc, q, NULL, cause, dst, &seq, &pri, &pcl, &imp, &ret, dp);
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
 		freemsg(dp);
 		return (0);
 	}
@@ -7907,7 +7986,7 @@ sccp_notice_ind(struct sc *sc, queue_t *q, ulong cause, struct sccp_addr *dst,
 
 #if 0
 static int
-sccp_inform_ind(struct sc *sc, queue_t *q, N_qos_sel_infr_sccp_t * qos, ulong reason)
+sccp_inform_ind(struct sc *sc, queue_t *q, mblk_t *msg, N_qos_sel_infr_sccp_t * qos, np_ulong reason)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
@@ -7920,50 +7999,47 @@ sccp_inform_ind(struct sc *sc, queue_t *q, N_qos_sel_infr_sccp_t * qos, ulong re
 	case SCCP_STYLE_MGMT:
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		freemsg(dp);
 		return (0);
 	}
 }
 
 static int
-sccp_coord_ind(struct sc *sc, queue_t *q, struct sccp_addr *add)
+sccp_coord_ind(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_MGMT:
 	case SCCP_STYLE_GTT:
-		return n_coord_ind(sc, q, add);
+		return n_coord_ind(sc, q, msg, add);
 	case SCCP_STYLE_NPI:
 	case SCCP_STYLE_TPI:
 		swerr();
 		return (-EOPNOTSUPP);
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		freemsg(dp);
 		return (0);
 	}
 }
 
 static int
-sccp_coord_con(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong smi)
+sccp_coord_con(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_addr *add, np_ulong smi)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
-		return n_coord_con(sc, q, add, smi);
+		return n_coord_con(sc, q, msg, add, smi);
 	case SCCP_STYLE_NPI:
 	case SCCP_STYLE_TPI:
 		swerr();
 		return (-EOPNOTSUPP);
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
+		freemsg(msg);
 		freemsg(dp);
 		return (0);
 	}
@@ -7971,13 +8047,13 @@ sccp_coord_con(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong smi)
 #endif
 
 static int
-sccp_state_ind(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong status, ulong smi)
+sccp_state_ind(struct sc *sc, queue_t *q, struct sccp_addr *add, np_ulong status, np_ulong smi)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
-		return n_state_ind(sc, q, add, status, smi);
+		return n_state_ind(sc, q, NULL, add, status, smi);
 	case SCCP_STYLE_NPI:
 		/* could possibly use n_uderror_ind or n_reset_ind */
 	case SCCP_STYLE_TPI:
@@ -7986,9 +8062,6 @@ sccp_state_ind(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong status, u
 		return (-EOPNOTSUPP);
 	default:
 		mi_strlog(q, 0, SL_ERROR, "attempt to deliver to GTT or MGMT stream");
-		if (bp)
-			freeb(bp);
-		freemsg(dp);
 		return (0);
 	}
 }
@@ -7997,7 +8070,7 @@ sccp_state_ind(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong status, u
    local broadcast of N-STATE indication 
  */
 static int
-sccp_state_lbr(queue_t *q, struct sccp_addr *add, ulong status, ulong smi)
+sccp_state_lbr(queue_t *q, struct sccp_addr *add, np_ulong status, np_ulong smi)
 {
 	int err;
 	struct na *na;
@@ -8034,13 +8107,13 @@ sccp_state_lbr(queue_t *q, struct sccp_addr *add, ulong status, ulong smi)
 }
 
 static int
-sccp_pcstate_ind(struct sc *sc, queue_t *q, struct mtp_addr *add, ulong status)
+sccp_pcstate_ind(struct sc *sc, queue_t *q, struct mtp_addr *add, np_ulong status)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
 	case SCCP_STYLE_GTT:
 	case SCCP_STYLE_MGMT:
-		return n_pcstate_ind(sc, q, add, status);
+		return n_pcstate_ind(sc, q, NULL, add, status);
 	case SCCP_STYLE_NPI:
 		/* could possibly use n_uderror_ind or n_reset_ind */
 	case SCCP_STYLE_TPI:
@@ -8057,7 +8130,7 @@ sccp_pcstate_ind(struct sc *sc, queue_t *q, struct mtp_addr *add, ulong status)
    local broadcast of N-PCSTATE indication 
  */
 static int
-sccp_pcstate_lbr(queue_t *q, struct mtp_addr *add, ulong status)
+sccp_pcstate_lbr(queue_t *q, struct mtp_addr *add, np_ulong status)
 {
 	int err;
 	struct na *na;
@@ -8095,7 +8168,7 @@ sccp_pcstate_lbr(queue_t *q, struct mtp_addr *add, ulong status)
 
 #if 0
 static int
-sccp_traffic_ind(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong tmix)
+sccp_traffic_ind(struct sc *sc, queue_t *q, struct sccp_addr *add, np_ulong tmix)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
@@ -8202,7 +8275,7 @@ sccp_recv_cr(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg
 		   class and credit, send user an N_CONN_IND, move to the connection pending state. 
 		 */
 		/* FIXME: should send pcl and src address in options */
-		if ((err = sccp_conn_ind(sc, q, bp, msg)))
+		if ((err = sccp_conn_ind(sc, bp, q, msg)))
 			return (err);
 		sccp_set_state(sc, SS_WRES_CIND);
 		return (0);
@@ -8258,7 +8331,7 @@ sccp_recv_cc(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg
 
 	// mblk_t *mp;
 	struct sccp_addr *res = m->parms & SCCP_PTF_CDPA ? &m->cdpa : NULL;
-	ulong flags = m->pcl == 3 ? REC_CONF_OPT | EX_DATA_OPT : 0;
+	np_ulong flags = m->pcl == 3 ? REC_CONF_OPT | EX_DATA_OPT : 0;
 
 	switch (sccp_get_state(sc)) {
 	case SS_WCON_CREQ:
@@ -8268,7 +8341,8 @@ sccp_recv_cc(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg
 		   node of CC with connection section), send N_CONN_CON to user, and enter the data 
 		   transfer state. */
 		sccp_timer_stop(sc, tcon);
-		if ((err = sccp_conn_con(sc, q, bp, m->pcl, flags, res, msg->b_cont->b_cont)))
+		sc->cqos.protocol_class = m->pcl;
+		if ((err = sccp_conn_con(sc, q, bp, flags, res, msg->b_cont->b_cont)))
 			return (err);
 		sccp_timer_start(sc, tias);
 		sccp_timer_start(sc, tiar);
@@ -8369,14 +8443,14 @@ sccp_recv_cc(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg
  *  ANSI: F(DLR, REFC), O(CDPA, DATA, EOP)
  */
 static int
-sccp_recv_cref(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_cref(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* CDPA is completely optional and only identifies the ultimate refuser, the OPC of the
 	   message is used if the CDPA is absent, IMP is used for congestion control.  DLR is used
 	   to look up the stream in the NS_WCON_CREQ state.  This should result in a N_DISCON_IND
 	   primitive to the SCCP-User. */
 	int err;
-	ulong cause = 0x5000 | m->cause;
+	np_ulong cause = 0x5000 | m->cause;
 	struct sccp_addr *res = m->parms & SCCP_PTF_CDPA ? &m->cdpa : NULL;
 
 	switch (sccp_get_state(sc)) {
@@ -8452,7 +8526,7 @@ sccp_recv_cref(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SLR, RELC), O(DATA, EOP)
  */
 static int
-sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* DATA is optional, IMP is used for congestion control.  DLR is used to look up the stream 
 	   in the NS_DATA_XFER state.  This should result in a N_DISCON_IND primitive to the
@@ -8467,7 +8541,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		/* Figure 2A/T1.112.4-2000 1of4: Figure 2B/T1.112.4-2000 1of2: return a release
 		   complete. */
 		if ((err =
-		     sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
+		     sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
 			return (err);
 		/* Note: this case cannot happen.  We handle this case in the bottom end routing,
 		   so this should not happen. */
@@ -8485,7 +8559,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 			fixme(("Look up cc cp in connection list\n"));
 			sccp_release(sc);
 			if ((err =
-			     sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					   sc->slr)))
 				return (err);
 			if ((err =
@@ -8506,7 +8580,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		   inactivity timers, send RLC, and move to the IDLE state. */
 		sccp_release(sc);
 		if ((err =
-		     sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
+		     sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
 			return (err);
 		if ((err = sccp_discon_ind(sc, q, N_USER, 0x1000 | m->cause, res, cp, msg->b_cont)))
 			return (err);
@@ -8530,7 +8604,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		   local reference, and send N_DISCON_IND to the user. */
 		sccp_release(sc);
 		if ((err =
-		     sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
+		     sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
 			return (err);
 		if ((err = sccp_discon_ind(sc, q, N_USER, 0x1000 | m->cause, res, cp, msg->b_cont)))
 			return (err);
@@ -8543,7 +8617,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		   state. */
 		sccp_release(sc);
 		if ((err =
-		     sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
+		     sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
 			return (err);
 		sccp_set_state(sc, SS_IDLE);
 		return (QR_DONE);
@@ -8559,7 +8633,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		   reference, stop inactivity timers, send a RLC, and move to the Idle state. */
 		sccp_release(sc);
 		if ((err =
-		     sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
+		     sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, sc->slr)))
 			return (err);
 		if ((err = sccp_discon_ind(sc, q, N_USER, 0x1000 | m->cause, res, cp, msg->b_cont)))
 			return (err);
@@ -8579,7 +8653,7 @@ sccp_recv_rlsd(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SLR)
  */
 static int
-sccp_recv_rlc(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_rlc(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored.  DLR is used to look up
 	   the stream in the NS_WACK_DREQ or NS_IDLE state.  This should result in a N_OK_ACK
@@ -8683,7 +8757,7 @@ sccp_recv_rlc(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SEG), V(DATA)
  */
 static int
-sccp_recv_dt1(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_dt1(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   for protocol class 2.  DLR is used to look up the stream in the NS_DATA_XFER state.  SEG 
@@ -8707,7 +8781,7 @@ sccp_recv_dt1(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		   N_DATA_IND.  In either case, once we have a deliverable message we generate an
 		   N_DATA_IND to the user. */
 		sccp_timer_start(sc, tiar);
-		if ((err = sccp_data_ind(sc, q, bp, 0, m->seg, msg->b_cont)))
+		if ((err = sccp_data_ind(sc, q, NULL, 0, m->seg, NULL, msg->b_cont)))
 			return (err);
 		return (QR_DONE);
 	case SS_WRES_RIND:
@@ -8762,7 +8836,7 @@ sccp_recv_dt1(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SEQ), V(DATA)
  */
 static int
-sccp_recv_dt2(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_dt2(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   for protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  SEQ 
@@ -8798,7 +8872,7 @@ sccp_recv_dt2(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 		   protocol class 3.  To do this, we queue the message to an ack queue rather than
 		   performing the P(S) P(R) processing on it yet.  We postpone this processing until
 		   a data ack request is received from the user. */
-		if ((err = sccp_data_ind(sc, q, bp, 0, m->seg, msg->b_cont)))
+		if ((err = sccp_data_ind(sc, q, NULL, 0, m->seg, NULL, msg->b_cont)))
 			return (err);
 		return (QR_DONE);
 	case SS_WRES_RIND:
@@ -8853,7 +8927,7 @@ sccp_recv_dt2(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, RSN, CRED)
  */
 static int
-sccp_recv_ak(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_ak(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   for protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  RSN 
@@ -8939,7 +9013,7 @@ sccp_recv_ak(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR), V(DATA)
  */
 static int
-sccp_recv_ed(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_ed(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  This 
@@ -8960,7 +9034,7 @@ sccp_recv_ed(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
 			sc->flags &= ~SCCPF_REM_ED;
 			return (-EPROTO);
 		}
-		if ((err = sccp_data_ind(sc, q, bp, 1, 0, msg->b_cont)))
+		if ((err = sccp_data_ind(sc, q, NULL, 1, 0, NULL, msg->b_cont)))
 			return (err);
 		sc->flags |= SCCPF_REM_ED;
 		return (QR_DONE);
@@ -9016,7 +9090,7 @@ sccp_recv_ed(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR)
  */
 static int
-sccp_recv_ea(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_ea(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  No
@@ -9089,7 +9163,7 @@ sccp_recv_ea(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SLR, RESC)
  */
 static int
-sccp_recv_rsr(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_rsr(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  This 
@@ -9235,7 +9309,7 @@ sccp_recv_rsr(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SLR)
  */
 static int
-sccp_recv_rsc(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_rsc(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream in the NS_DATA_XFER state.  This 
@@ -9333,7 +9407,7 @@ sccp_recv_rsc(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, ERRC)
  */
 static int
-sccp_recv_err(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_err(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol class 3.  DLR is used to look up the stream.  This does not result in a
@@ -9460,7 +9534,7 @@ sccp_recv_err(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(DLR, SLR, PCLS, SEQ, CRED)
  */
 static int
-sccp_recv_it(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_it(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored.  DLR is used to look up
 	   the stream. This does not result in a primitive to the SCCP-User.  This is a heartbeat
@@ -9519,7 +9593,7 @@ sccp_recv_it(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(PCLS), V(CDPA, CGPA, DATA[2-252])
  */
 static int
-sccp_recv_udt(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_udt(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol classes 0 and 1.  CDPA and the DPC in the message is used to look up a
@@ -9573,7 +9647,7 @@ sccp_recv_udt(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(RETC), V(CDPA, CGPA, DATA[2-251])
  */
 static int
-sccp_recv_udts(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_udts(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* No optional parameters.  Optional parameters will be ignored. This message is only valid 
 	   in protocol classes 0 and 1.  CGPA and DPC in the message are used to look up a
@@ -9626,7 +9700,7 @@ sccp_recv_udts(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(PCLS, HOPC), V(CDPA, CGPA, DATA[2-251]), O(SGMT, ISNI, INS, MTI, EOP)
  */
 static int
-sccp_recv_xudt(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_xudt(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* PCLS is passed to the user.  HOPC is only used by a relay node. CDPA and CGPA and DATA
 	   are passed to the user.  SGMT is only used when segmentation of the XUDT message has
@@ -9685,7 +9759,7 @@ sccp_recv_xudt(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(RETC, HOPC), V(CDPA, CGPA, DATA[2-251]), O(SGMT, INS, MTI, ISNI, EOP)
  */
 static int
-sccp_recv_xudts(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_xudts(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* Same as XUDT but this is passed as a N_UDERROR_IND. */
 	int err;
@@ -9735,7 +9809,7 @@ sccp_recv_xudts(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(PCLS, HOPC), V(CDPA, CGPA, LDATA[3-3904]), O(SGMT, ISNI, INS, EOP)
  */
 static int
-sccp_recv_ludt(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_ludt(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* Same as XUDT but longer data and no MTI. */
 	int err;
@@ -9790,7 +9864,7 @@ sccp_recv_ludt(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
  *  ANSI: F(RETC, HOPC), V(CDPA, CGPA, LDATA[3-3904]), O(SGMT, ISNI, INS, EOP)
  */
 static int
-sccp_recv_ludts(struct sc *sc, queue_t *q, mblk_t *msg, struct sccp_msg *m)
+sccp_recv_ludts(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *msg, struct sccp_msg *m)
 {
 	/* Same as XUDTS but longer data and no MTI. */
 	int err;
@@ -10752,7 +10826,7 @@ sccp_grte_cr(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 {
 	int err, refc;
 	struct sp *dst;
-	ulong smi, cong;
+	np_ulong smi, cong;
 
 	/* translate and handle hop counter */
 	if (m->flags & SCCPF_HOPC_VIOLATION)
@@ -10926,7 +11000,7 @@ sccp_grte_cl(queue_t *q, struct sp *src, mblk_t *mp, struct sccp_msg *m)
 {
 	int err, retc;
 	struct sp *dst;
-	ulong smi, cong;
+	np_ulong smi, cong;
 
 	/* translate and handle hop counter */
 	if (m->flags & SCCPF_HOPC_VIOLATION)
@@ -11175,13 +11249,12 @@ sccp_grte_msg(queue_t *q, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 static int
-sccp_orte_cr(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
+sccp_orte_cr(struct sp *src, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
 {
 	int err, refc;
-	struct sp *src = sc->sp.sp;
-	ulong dpc, smi = 0, cong = 0;
+	np_ulong dpc, smi = 0, cong = 0;
 
-	if ((dpc = m->cdpa.pc) != -1UL || (dpc = m->rl.dpc) != -1UL) {
+	if ((dpc = m->cdpa.pc) != -1 || (dpc = m->rl.dpc) != -1) {
 		struct sp *dst;
 
 		if ((dst = sccp_lookup_sp(src->add.ni, dpc, 0))) {
@@ -11333,13 +11406,13 @@ sccp_orte_cr(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg 
 }
 
 static int
-sccp_orte_co(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
+sccp_orte_co(struct sp *src, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
 {
 	int err, relc = 0;
 	struct sr *sr;
 	struct mt *mt;
 
-	if (!(sr = sccp_lookup_sr(sc->sp.sp, sc->sp.sp->add.pc, 1)))
+	if (!(sr = sccp_lookup_sr(src, src->add.pc, 1)))
 		goto mtp_failure;
 	if (sr->flags & SCCPF_PROHIBITED)
 		goto mtp_failure;
@@ -11399,20 +11472,19 @@ sccp_orte_co(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg 
 	goto do_relc;
       do_relc:
 	if ((err =
-	     sccp_send_rlsd(sc->sp.sp, q, bp, m->rl.opc, sc->sls, sc->dlr, sc->slr, relc,
+	     sccp_send_rlsd(src, q, bp, m->rl.opc, m->rl.sls, m->slr, m->dlr, relc,
 			    mp->b_cont, (m->parms & SCCP_PTF_IMP) ? &m->imp : NULL)) < 0)
 		return (err);
 	return (QR_DONE);
 }
 
 static int
-sccp_orte_cl(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
+sccp_orte_cl(struct sp *src, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
 {
 	int err, retc;
-	struct sp *src = sc->sp.sp;
-	ulong dpc, smi = 0, cong = 0;
+	np_ulong dpc, smi = 0, cong = 0;
 
-	if ((dpc = m->cdpa.pc) != -1UL || (dpc = m->rl.dpc) != -1UL) {
+	if ((dpc = m->cdpa.pc) != -1 || (dpc = m->rl.dpc) != -1) {
 		struct sp *dst;
 
 		if ((dst = sccp_lookup_sp(src->add.ni, dpc, 0))) {
@@ -11608,18 +11680,17 @@ sccp_orte_cl(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg 
  *  This is in order of probability.
  */
 static int
-sccp_orte_msg(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp)
+sccp_orte_msg(struct sp *sp, queue_t *q, mblk_t *bp, mblk_t *mp)
 {
 	struct sccp_msg *m = (typeof(m)) mp->b_rptr;
-	struct sp *sp = sc->sp.sp;
 
 	if (sp) {
 		if ((1 << m->type) & (SCCP_MTM_CL))
-			return sccp_orte_cl(sc, q, bp, mp, m);
+			return sccp_orte_cl(sp, q, bp, mp, m);
 		if ((1 << m->type) & (SCCP_MTF_CR))
-			return sccp_orte_cr(sc, q, bp, mp, m);
+			return sccp_orte_cr(sp, q, bp, mp, m);
 		if ((1 << m->type) & (SCCP_MTM_CO))
-			return sccp_orte_co(sc, q, bp, mp, m);
+			return sccp_orte_co(sp, q, bp, mp, m);
 		mi_strlog(q, 0, SL_ERROR, "routing failure");
 		return (-EPROTO);
 	}
@@ -11632,18 +11703,18 @@ sccp_orte_msg(struct sc *sc, queue_t *q, mblk_t *bp, mblk_t *mp)
  *  -------------------------------------------------------------------------
  */
 static struct sc **
-sccp_cr_lookup(struct sp *sp, ulong ssn)
+sccp_cr_lookup(struct sp *sp, np_ulong ssn)
 {
 	swerr();
 	return (NULL);
 }
 static int
-sccp_irte_cr(struct sp *sp, queue_t *q, mblk_t *mp, struct sccp_msg *m)
+sccp_irte_cr(struct sp *sp, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
 {
 	int err, refc;
 	struct ss *ss;
 	struct sc *sc;
-	ulong smi, cong;
+	np_ulong smi, cong;
 
 	switch (m->cdpa.ri) {
 	case SCCP_RI_DPC_SSN:
@@ -11722,7 +11793,7 @@ sccp_irte_cr(struct sp *sp, queue_t *q, mblk_t *mp, struct sccp_msg *m)
  *  -------------------------------------------------------------------------
  */
 static struct sc **
-sccp_cl_lookup(struct sp *sp, ulong ssn)
+sccp_cl_lookup(struct sp *sp, np_ulong ssn)
 {
 	swerr();
 	return (NULL);
@@ -11733,7 +11804,7 @@ sccp_irte_cl(struct sp *sp, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg 
 	int err, retc;
 	struct ss *ss;
 	struct sc *sc;
-	ulong smi, cong;
+	np_ulong smi, cong;
 
 	switch (m->cdpa.ri) {
 	case SCCP_RI_DPC_SSN:
@@ -11864,13 +11935,13 @@ sccp_irte_cl(struct sp *sp, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg 
  *  -------------------------------------------------------------------------
  */
 static struct sc **
-sccp_co_lookup(struct sp *sp, ulong slr)
+sccp_co_lookup(struct sp *sp, np_ulong slr)
 {
 	swerr();
 	return (NULL);
 }
 static int
-sccp_irte_co(struct sp *sp, queue_t *q, mblk_t *mp, struct sccp_msg *m)
+sccp_irte_co(struct sp *sp, queue_t *q, mblk_t *bp, mblk_t *mp, struct sccp_msg *m)
 {
 	/* pass message to SCCP user */
 	return (QR_DONE);
@@ -11881,7 +11952,7 @@ static int
 sccp_irte_co(struct sp *sp, queue_t *q, mblk_t *mp, struct sccp_msg *m)
 {
 	int err;
-	ulong relc;
+	np_ulong relc;
 	struct sr *sr;
 	struct sc *sc, **scp;
 
@@ -11987,7 +12058,7 @@ sccp_irte_co(struct sp *sp, queue_t *q, mblk_t *mp, struct sccp_msg *m)
 		goto error;
 	goto discard;
       do_rlc:
-	if ((err = sccp_send_rlc(q, sc->sp.sp, bp, sc->sp.sp->add.pc, m->rl.sls, m->slr, m->dlr)))
+	if ((err = sccp_send_rlc(sc->sp.sp, q, bp, sc->sp.sp->add.pc, m->rl.sls, m->slr, m->dlr)))
 		goto error;
 	goto discard;
       enomem:
@@ -12046,7 +12117,7 @@ sccp_irte_msg(struct mt *mt, queue_t *q, mblk_t *bp, mblk_t *mp)
  *  filled and the upper stream linked into the lower stream's list.
  */
 static int
-sccp_bind_req(struct sc *sc, queue_t *q, struct sccp_addr *src, ulong cons)
+sccp_bind_req(struct sc *sc, queue_t *q, struct sccp_addr *src, np_ulong cons)
 {
 	int err;
 	struct sp *sp;
@@ -12159,8 +12230,8 @@ sccp_unbind_req(struct sc *sc, queue_t *q)
  */
 #define SCCP_SLR_MAX_TRIES	10
 static int
-sccp_conn_req(struct sc *sc, queue_t *q, struct sccp_addr *dst, ulong *sls, ulong *pri, ulong *pcl,
-	      ulong *imp, mblk_t *dp)
+sccp_conn_req(struct sc *sc, queue_t *q, struct sccp_addr *dst, np_ulong *sls, np_ulong *pri,
+	      np_ulong *pcl, np_ulong *imp, mblk_t *dp)
 {
 	int err = 0;
 	int tries;
@@ -12240,7 +12311,7 @@ sccp_conn_req(struct sc *sc, queue_t *q, struct sccp_addr *dst, ulong *sls, ulon
 		}
 		fixme(("Set selected slr\n"));
 		if ((err =
-		     sccp_send_cr(sp, q, bp, sp->add.pc, sc->mp, sc->sls, sc->slr, sc->pcl,
+		     sccp_send_cr(sp, q, NULL, sp->add.pc, sc->mp, sc->sls, sc->slr, sc->pcl,
 				  &sc->dst, &sc->credit, &sc->src, dp, NULL, imp)))
 			return (err);
 	} else {
@@ -12344,13 +12415,13 @@ sccp_conn_res(struct sc *sc, queue_t *q, mblk_t *cp, struct sc *ap, mblk_t *dp)
 	switch (ap->proto.pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
 		if ((err =
-		     sccp_send_cc(q, ap->sp.sp, bp, ap->sp.sp->add.pc, ap->sls, ap->dlr, ap->slr,
+		     sccp_send_cc(ap->sp.sp, q, NULL, ap->sp.sp->add.pc, ap->sls, ap->dlr, ap->slr,
 				  ap->pcl, &ap->credit, &ap->dst, dp, NULL)))
 			return (err);
 		break;
 	default:
 		if ((err =
-		     sccp_send_cc(q, ap->sp.sp, bp, ap->sp.sp->add.pc, ap->sls, ap->dlr, ap->slr,
+		     sccp_send_cc(ap->sp.sp, q, NULL, ap->sp.sp->add.pc, ap->sls, ap->dlr, ap->slr,
 				  ap->pcl, &ap->credit, &ap->dst, dp, &ap->imp)))
 			return (err);
 		break;
@@ -12385,9 +12456,9 @@ sccp_conn_res(struct sc *sc, queue_t *q, mblk_t *cp, struct sc *ap, mblk_t *dp)
 }
 
 static int
-sccp_data_req(struct sc *sc, queue_t *q, mblk_t *bp, ulong exp, ulong more, ulong rctp, mblk_t *dp)
+sccp_data_req(struct sc *sc, queue_t *q, mblk_t *bp, np_ulong exp, np_ulong more, np_ulong rctp,
+	      mblk_t *dp)
 {
-	int err;
 	mblk_t *mp;
 	struct sccp_msg *m;
 
@@ -12461,7 +12532,7 @@ sccp_data_req(struct sc *sc, queue_t *q, mblk_t *bp, ulong exp, ulong more, ulon
 }
 
 static int
-sccp_exdata_req(struct sc *sc, queue_t *q, ulong more, ulong rctp, mblk_t *dp)
+sccp_exdata_req(struct sc *sc, queue_t *q, np_ulong more, np_ulong rctp, mblk_t *dp)
 {
 	int err;
 
@@ -12474,7 +12545,8 @@ sccp_exdata_req(struct sc *sc, queue_t *q, ulong more, ulong rctp, mblk_t *dp)
 			bufq_queue(&sc->urgq, dp);
 			return (QR_TRIMMED);
 		}
-		if ((err = sccp_send_ed(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr, dp)))
+		if ((err =
+		     sccp_send_ed(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr, dp)))
 			return (err);
 		sccp_timer_start(sc, tias);
 		return (QR_TRIMMED);
@@ -12518,7 +12590,7 @@ sccp_datack_req(struct sc *sc, queue_t *q)
 			/* Figure C.5/Q.714 Sheet 1 of 2: Send and EA and restart the send
 			   inactivity timer. */
 			if ((err =
-			     sccp_send_ea(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr)))
+			     sccp_send_ea(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr)))
 				return (err);
 			sccp_timer_start(sc, tias);
 			sc->flags &= ~SCCPF_REM_ED;
@@ -12689,7 +12761,7 @@ sccp_discon_req(struct sc *sc, queue_t *q, mblk_t *cp, mblk_t *dp)
 		struct sccp_msg *m = (struct sccp_msg *) cp->b_rptr;
 
 		fixme(("Select sr, but don't set sc->sr.sr\n"));
-		sccp_send_cref(q, sc->sp.sp, bp, sc->sp.sp->add.pc, m->rl.sls, m->slr,
+		sccp_send_cref(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, m->rl.sls, m->slr,
 			       SCCP_REFC_END_USER_ORIGINATED, &sc->dst, dp,
 			       (m->parms & SCCP_PTF_IMP ? &m->imp : NULL));
 		sccp_set_state(sc, SS_IDLE);
@@ -12716,7 +12788,7 @@ sccp_discon_req(struct sc *sc, queue_t *q, mblk_t *cp, mblk_t *dp)
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
 			if ((err =
-			     sccp_send_rlsd(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlsd(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_END_USER_ORIGINATED, dp, NULL)))
 				return (err);
 			sccp_timer_start(sc, trel);
@@ -12724,7 +12796,7 @@ sccp_discon_req(struct sc *sc, queue_t *q, mblk_t *cp, mblk_t *dp)
 			break;
 		default:
 			if ((err =
-			     sccp_send_rlsd(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlsd(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_END_USER_ORIGINATED, dp, &sc->imp)))
 				return (err);
 			sccp_timer_start(sc, trel);
@@ -12747,8 +12819,8 @@ sccp_ordrel_req(struct sc *sc, queue_t *q)
 }
 
 static int
-sccp_unitdata_req(struct sc *sc, queue_t *q, struct sccp_addr *dst, ulong pcl, ulong opt, ulong imp,
-		  ulong seq, ulong pri, mblk_t *dp)
+sccp_unitdata_req(struct sc *sc, queue_t *q, struct sccp_addr *dst, np_ulong pcl, np_ulong opt,
+		  np_ulong imp, np_ulong seq, np_ulong pri, mblk_t *dp)
 {
 	/* Figure 3/T1.112.4-2000 1of2: assign an sls based on the sequence parameter in the
 	   N-UNITDATA Request, construct an [X/L]UDT message, deciding which message to use based
@@ -12765,7 +12837,7 @@ sccp_unitdata_req(struct sc *sc, queue_t *q, struct sccp_addr *dst, ulong pcl, u
 }
 
 static int
-sccp_inform_req(struct sc *sc, queue_t *q, N_qos_sel_infr_sccp_t * qos, ulong reason)
+sccp_inform_req(struct sc *sc, queue_t *q, N_qos_sel_infr_sccp_t * qos, np_ulong reason)
 {
 	fixme(("SWERR: write this function\n"));
 	return (-EFAULT);
@@ -12788,13 +12860,13 @@ sccp_coord_res(struct sc *sc, queue_t *q, struct sccp_addr *add)
 #define SSNF_IGNORE_SST_IN_PROGRESS	0x0001
 #define SSNF_WAIT_FOR_GRANT		0x0002
 static int
-sccp_state_req(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong status)
+sccp_state_req(struct sc *sc, queue_t *q, struct sccp_addr *add, np_ulong status)
 {
 	int err;
 	struct na *na;
 	struct sp *sp;
 	struct ss *ss;
-	ulong smi = 0;			/* FIXME */
+	np_ulong smi = 0;		/* FIXME */
 
 	if (!add->ni || !(na = na_lookup(add->ni)))
 		goto enoaddr;
@@ -12825,7 +12897,7 @@ sccp_state_req(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong status)
 				cgpa.gtt = 0;
 				cgpa.alen = 0;
 				if ((err =
-				     sccp_send_ssa(sc->sp.sp, q, bp, sc->sp.sp->add.pc, &cdpa,
+				     sccp_send_ssa(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, &cdpa,
 						   &cgpa, add->ssn, sp->add.pc, smi)) < 0)
 					goto error;
 			}
@@ -12865,7 +12937,7 @@ sccp_state_req(struct sc *sc, queue_t *q, struct sccp_addr *add, ulong status)
 				cgpa.gtt = 0;
 				cgpa.alen = 0;
 				if ((err =
-				     sccp_send_ssp(sc->sp.sp, q, bp, sc->sp.sp->add.pc, &cdpa,
+				     sccp_send_ssp(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, &cdpa,
 						   &cgpa, add->ssn, sp->add.pc, smi)) < 0)
 					goto error;
 			}
@@ -12956,8 +13028,8 @@ mtp_hangup(struct mt *mt)
  *  -----------------------------------
  */
 static int
-mtp_read(struct mt *mt, queue_t *q, struct mblk_t *bp, mblk_t *dp, struct sr *sr, ulong pri,
-	 ulong sls)
+mtp_read(struct mt *mt, queue_t *q, mblk_t *bp, mblk_t *dp, struct sr *sr, np_ulong pri,
+	 np_ulong sls)
 {
 	int err;
 	mblk_t *mp = NULL;
@@ -13080,6 +13152,10 @@ mtp_read(struct mt *mt, queue_t *q, struct mblk_t *bp, mblk_t *dp, struct sr *sr
       emsgsize:
 	err = -EMSGSIZE;
 	mi_strlog(q, 0, SL_TRACE, "message size deconding error");
+	goto error;
+      enobufs:
+	err = -ENOBUFS;
+	swerr();
 	goto error;
       efault:
 	err = -EFAULT;
@@ -13478,7 +13554,7 @@ mtp_pause_ind(struct mt *mt, queue_t *q, mblk_t *mp)
 		if (!sp)
 			sp = sr->sp.sp;
 		if (!(sr->flags & SCCPF_PROHIBITED)) {
-			ulong smi = 0;	/* FIXME */
+			np_ulong smi = 0;	/* FIXME */
 
 			/* local broadcast SP inactive (N-PCSTATE) */
 			if ((err =
@@ -13925,10 +14001,10 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	N_conn_req_t *p = ((typeof(p)) mp->b_rptr);
 	N_qos_sel_conn_sccp_t *qos = (typeof(qos)) (mp->b_rptr + p->QOS_offset);
 	struct sccp_addr *a;
-	ulong *sls = NULL;
-	ulong *pri = NULL;
-	ulong *pcl = NULL;
-	ulong *imp = NULL;
+	np_ulong *sls = NULL;
+	np_ulong *pri = NULL;
+	np_ulong *pcl = NULL;
+	np_ulong *imp = NULL;
 
 	if (sccp_get_n_state(sc) != NS_IDLE)
 		goto noutstate;
@@ -14023,13 +14099,14 @@ n_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
  *  Sequence numbers are only valid on the stream for which the connection indication is queued. 
  */
 static mblk_t *
-n_seq_check(struct sc *sc, ulong seq)
+n_seq_check(struct sc *sc, np_ulong seq)
 {
 	mblk_t *mp;
+	psw_t flags;
 
-	bufq_lock(&sc->conq);
-	for (mp = bufq_head(&sc->conq); mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
-	bufq_unlock(&sc->conq);
+	flags = bufq_lock(&sc->conq);
+	for (mp = bufq_head(&sc->conq); mp && (np_ulong) (ulong) mp != seq; mp = mp->b_next) ;
+	bufq_unlock(&sc->conq, flags);
 	usual(mp);
 	return (mp);
 }
@@ -14041,12 +14118,11 @@ n_seq_check(struct sc *sc, ulong seq)
  *  be accepted on an NPI stream. 
  */
 static struct sc *
-n_tok_check(struct sc *sc, ulong tok)
+n_tok_check(struct sc *sc, np_ulong tok)
 {
 	struct sc *ap;
-	queue_t *aq = (queue_t *) tok;
 
-	for (ap = master.sc.list; ap && ap->oq != aq; ap = ap->next) ;
+	for (ap = master.sc.list; ap && (np_ulong) (ulong) ap->oq != tok; ap = ap->next) ;
 	usual(ap);
 	return ((struct sc *) ap);
 }
@@ -14083,8 +14159,8 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (sc->cred.cr_uid != 0 && ap->cred.cr_uid == 0)
 		goto naccess;
 	{
-		ulong ap_oldstate = ap->i_state;
-		ulong ap_oldflags = ap->flags;
+		np_ulong ap_oldstate = ap->i_state;
+		np_ulong ap_oldflags = ap->flags;
 
 		ap->i_state = NS_DATA_XFER;
 		ap->flags &= ~(SCCPF_REC_CONF_OPT | SCCPF_EX_DATA_OPT);
@@ -14094,7 +14170,7 @@ n_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 			ap->flags |= SCCPF_EX_DATA_OPT;
 		if ((err = sccp_conn_res(sc, q, cp, ap, mp->b_cont)))
 			goto call_error;
-		if ((err = n_ok_ack(sc, q, N_CONN_RES, p->SEQ_number, p->TOKEN_value)))
+		if ((err = n_ok_ack(sc, q, NULL, N_CONN_RES, p->SEQ_number, p->TOKEN_value)))
 			goto call_error;
 		return (QR_TRIMMED);
 	      call_error:
@@ -14182,7 +14258,7 @@ n_discon_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	/* XXX: What to do with the disconnect reason? Nothing? */
 	if ((err = sccp_discon_req(sc, q, cp, mp->b_cont)))
 		goto error;
-	if ((err = n_ok_ack(sc, q, p->PRIM_type, p->SEQ_number, 0)))
+	if ((err = n_ok_ack(sc, q, NULL, p->PRIM_type, p->SEQ_number, 0)))
 		goto error;
 	return (QR_TRIMMED);
       nbadseq:
@@ -14275,9 +14351,9 @@ n_data_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((1 << sccp_get_n_state(sc)) & ~(NSF_DATA_XFER | NSF_WRES_RIND))
 		goto eproto;
 	{
-		ulong exp = 0;		/* FIXME */
-		ulong more = 0;		/* FIXME */
-		ulong rcpt = 0;		/* FIXME */
+		np_ulong exp = 0;	/* FIXME */
+		np_ulong more = 0;	/* FIXME */
+		np_ulong rcpt = 0;	/* FIXME */
 
 		return sccp_data_req(sc, q, mp, exp, more, rcpt, mp->b_cont);
 	}
@@ -14320,9 +14396,9 @@ n_exdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((1 << sccp_get_n_state(sc)) & ~(NSF_DATA_XFER | NSF_WRES_RIND))
 		goto eproto;
 	{
-		ulong exp = 0;		/* FIXME */
-		ulong more = 0;		/* FIXME */
-		ulong rcpt = 0;		/* FIXME */
+		np_ulong exp = 0;	/* FIXME */
+		np_ulong more = 0;	/* FIXME */
+		np_ulong rcpt = 0;	/* FIXME */
 
 		(void) sccp_exdata_req;
 		return sccp_data_req(sc, q, mp, exp, more, rcpt, mp->b_cont);
@@ -14351,7 +14427,7 @@ static int
 n_info_req(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	(void) mp;
-	return n_info_ack(sc, q);
+	return n_info_ack(sc, q, NULL);
 }
 
 /*
@@ -14383,7 +14459,7 @@ n_bind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto naccess;
 	if ((err = sccp_bind_req(sc, q, a, p->CONIND_number)))
 		goto error;
-	return n_bind_ack(sc, q);
+	return n_bind_ack(sc, q, NULL);
       naccess:
 	err = NACCESS;
 	mi_strlog(q, 0, SL_TRACE, "N_BIND_REQ: no permission for requested address");
@@ -14424,7 +14500,7 @@ n_unbind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	sccp_set_n_state(sc, NS_WACK_UREQ);
 	if ((err = sccp_unbind_req(sc, q)))
 		goto error;
-	return n_ok_ack(sc, q, p->PRIM_type, 0, 0);
+	return n_ok_ack(sc, q, NULL, p->PRIM_type, 0, 0);
       noutstate:
 	err = NOUTSTATE;
 	mi_strlog(q, 0, SL_TRACE, "N_UNBIND_REQ: would place interface out of state");
@@ -14496,11 +14572,11 @@ n_unitdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 			qos = NULL;
 	}
 	{
-		ulong pcl = qos ? qos->protocol_class : sc->pcl;
-		ulong ret = qos ? qos->option_flags : sc->flags;
-		ulong imp = qos ? qos->importance : sc->imp;
-		ulong seq = qos ? qos->sequence_selection : sc->sls;
-		ulong pri = qos ? qos->message_priority : sc->mp;
+		np_ulong pcl = qos ? qos->protocol_class : sc->pcl;
+		np_ulong ret = qos ? qos->option_flags : sc->flags;
+		np_ulong imp = qos ? qos->importance : sc->imp;
+		np_ulong seq = qos ? qos->sequence_selection : sc->sls;
+		np_ulong pri = qos ? qos->message_priority : sc->mp;
 
 		if ((err = sccp_unitdata_req(sc, q, dst, pcl, ret, imp, seq, pri, mp->b_cont)))
 			goto error;
@@ -14554,16 +14630,16 @@ n_optmgmt_req(struct sc *sc, queue_t *q, mblk_t *mp)
 			goto nbadopt2;
 		if (qos->protocol_class > 3)
 			goto nbadopt;
-		if (qos->protocol_class != -1UL)
+		if (qos->protocol_class != -1)
 			sc->pcl = qos->protocol_class;
-		if (qos->option_flags != -1UL)
+		if (qos->option_flags != -1)
 			sc->flags = qos->option_flags;
 	}
 	if (p->OPTMGMT_flags & DEFAULT_RC_SEL)
 		sc->flags |= SCCPF_DEFAULT_RC_SEL;
 	else
 		sc->flags &= ~SCCPF_DEFAULT_RC_SEL;
-	return n_ok_ack(sc, q, p->PRIM_type, 0, 0);
+	return n_ok_ack(sc, q, NULL, p->PRIM_type, 0, 0);
       nbadopt:
 	err = NBADOPT;
 	mi_strlog(q, 0, SL_TRACE, "N_OPTMGMT_REQ: bad protocol class");
@@ -14649,7 +14725,7 @@ n_reset_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	sccp_set_n_state(sc, NS_WACK_RRES);
 	if ((err = sccp_reset_res(sc, q)))
 		goto error;
-	return n_ok_ack(sc, q, p->PRIM_type, 0, 0);
+	return n_ok_ack(sc, q, NULL, p->PRIM_type, 0, 0);
       noutstate:
 	err = NOUTSTATE;
 	mi_strlog(q, 0, SL_TRACE, "N_RESET_RES: would place interface out of state");
@@ -14686,7 +14762,7 @@ n_inform_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	}
 	if ((err = sccp_inform_req(sc, q, qos, p->REASON)))
 		goto error;
-	return n_ok_ack(sc, q, N_INFORM_REQ, 0, 0);
+	return n_ok_ack(sc, q, NULL, N_INFORM_REQ, 0, 0);
       badqostype:
 	err = NBADQOSTYPE;
 	mi_strlog(q, 0, SL_TRACE, "N_INFORM_REQ: QOS structure type not supported");
@@ -14723,7 +14799,7 @@ n_coord_req(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if ((err = sccp_coord_req(sc, q, add)))
 		goto error;
-	return n_ok_ack(sc, q, N_COORD_REQ, 0, 0);
+	return n_ok_ack(sc, q, NULL, N_COORD_REQ, 0, 0);
       badaddr:
 	err = NBADADDR;
 	mi_strlog(q, 0, SL_TRACE, "N_COORD_REQ: bad address format");
@@ -14764,7 +14840,7 @@ n_coord_res(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if ((err = sccp_coord_res(sc, q, add)))
 		goto error;
-	return n_ok_ack(sc, q, N_COORD_RES, 0, 0);
+	return n_ok_ack(sc, q, NULL, N_COORD_RES, 0, 0);
       badaddr:
 	err = NBADADDR;
 	mi_strlog(q, 0, SL_TRACE, "N_COORD_RES: bad address format");
@@ -14805,7 +14881,7 @@ n_state_req(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	if ((err = sccp_state_req(sc, q, add, p->STATUS)))
 		goto error;
-	return n_ok_ack(sc, q, N_STATE_REQ, 0, 0);
+	return n_ok_ack(sc, q, NULL, N_STATE_REQ, 0, 0);
       badaddr:
 	err = NBADADDR;
 	mi_strlog(q, 0, SL_TRACE, "N_STATE_REQ: bad address format");
@@ -14838,10 +14914,10 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	struct sccp_addr *a;
 	uchar *op, *oe;
 	struct t_opthdr *oh;
-	ulong *sls = NULL;
-	ulong *pri = NULL;
-	ulong *pcl = NULL;
-	ulong *imp = NULL;
+	t_uscalar_t *sls = NULL;
+	t_uscalar_t *pri = NULL;
+	t_uscalar_t *pcl = NULL;
+	t_uscalar_t *imp = NULL;
 
 	if (sccp_get_t_state(sc) != TS_IDLE)
 		goto outstate;
@@ -14889,16 +14965,16 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 			case T_SS7_SCCP:
 				switch (oh->name) {
 				case T_SCCP_SEQ_CTRL:
-					sls = (ulong *) (oh + 1);
+					sls = (t_uscalar_t *) (oh + 1);
 					continue;
 				case T_SCCP_PRIORITY:
-					pri = (ulong *) (oh + 1);
+					pri = (t_uscalar_t *) (oh + 1);
 					continue;
 				case T_SCCP_PCLASS:
-					pcl = (ulong *) (oh + 1);
+					pcl = (t_uscalar_t *) (oh + 1);
 					continue;
 				case T_SCCP_IMPORTANCE:
-					imp = (ulong *) (oh + 1);
+					imp = (t_uscalar_t *) (oh + 1);
 					continue;
 				default:
 				case T_SCCP_PVAR:
@@ -14914,7 +14990,7 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	}
 	if ((err = sccp_conn_req(sc, q, a, sls, pri, pcl, imp, mp->b_cont)) < 0)
 		goto error;
-	if ((err = t_ok_ack(sc, q, p->PRIM_type, 0, 0)) < 0)
+	if ((err = t_ok_ack(sc, q, NULL, p->PRIM_type, 0, 0)) < 0)
 		goto error;
 	return (QR_TRIMMED);
       access:
@@ -14950,7 +15026,7 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_CONN_REQ: would place interface out of state");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_CONN_REQ, err);
+	return t_error_ack(sc, q, NULL, T_CONN_REQ, err);
 }
 
 /*
@@ -14958,7 +15034,7 @@ t_conn_req(struct sc *sc, queue_t *q, mblk_t *mp)
  *  -----------------------------------
  */
 static mblk_t *
-t_seq_check(struct sc *sc, ulong seq)
+t_seq_check(struct sc *sc, t_uscalar_t seq)
 {
 	/* IMPLEMENTATION NOTE:- Sequence numbers are actually the address of the mblk which
 	   contains the CR message and contains the contents of this message as a connection
@@ -14967,15 +15043,16 @@ t_seq_check(struct sc *sc, ulong seq)
 	   Sequence numbers are only valid on the stream for which the connection indication is
 	   queued. */
 	mblk_t *mp;
+	psw_t flags;
 
-	bufq_lock(&sc->conq);
-	for (mp = bufq_head(&sc->conq); mp && mp != (mblk_t *) seq; mp = mp->b_next) ;
-	bufq_unlock(&sc->conq);
+	flags = bufq_lock(&sc->conq);
+	for (mp = bufq_head(&sc->conq); mp && (t_uscalar_t) (ulong) mp != seq; mp = mp->b_next) ;
+	bufq_unlock(&sc->conq, flags);
 	usual(mp);
 	return (mp);
 }
 static struct sc *
-t_tok_check(struct sc *sc, ulong tok)
+t_tok_check(struct sc *sc, t_uscalar_t tok)
 {
 	/* IMPLEMENTATION NOTE:- Tokens are actually the address of the read queue.  To find if a
 	   particular token is valid, we walk the open list looking for an open device with a read
@@ -14983,9 +15060,8 @@ t_tok_check(struct sc *sc, ulong tok)
 	   same provider type.  (That is, a TPI connection indication cannot be accepted on an NPI
 	   stream. */
 	struct sc *ap;
-	queue_t *aq = (queue_t *) tok;
 
-	for (ap = master.sc.list; ap && ap->oq != aq; ap = ap->next) ;
+	for (ap = master.sc.list; ap && (t_uscalar_t) (ulong) ap->oq != tok; ap = ap->next) ;
 	usual(ap);
 	return ((struct sc *) ap);
 }
@@ -14998,7 +15074,7 @@ t_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	const struct T_conn_res *p = (typeof(p)) mp->b_rptr;
 	uchar *op, *oe;
 	struct t_opthdr *oh;
-	ulong ap_oldstate;
+	t_uscalar_t ap_oldstate;
 
 	if (sccp_get_t_state(sc) != TS_WRES_CIND)
 		goto outstate;
@@ -15074,7 +15150,9 @@ t_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	sccp_set_t_state(ap, TS_DATA_XFER);
 	if ((err = sccp_conn_res(sc, q, cp, ap, mp->b_cont)) < 0)
 		goto call_error;
-	if ((err = t_ok_ack(sc, q, p->PRIM_type, (ulong) cp, (ulong) ap)) < 0)
+	if ((err =
+	     t_ok_ack(sc, q, NULL, p->PRIM_type, (t_uscalar_t) (ulong) cp,
+		      (t_uscalar_t) (ulong) ap)) < 0)
 		goto call_error;
 	return (QR_TRIMMED);
       call_error:
@@ -15114,7 +15192,7 @@ t_conn_res(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_CONN_RES: would place interface out of state");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_CONN_RES, err);
+	return t_error_ack(sc, q, NULL, T_CONN_RES, err);
 }
 
 /*
@@ -15156,7 +15234,7 @@ t_discon_req(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badseq;
 	if ((err = sccp_discon_req(sc, q, cp, mp->b_cont)))
 		goto error;
-	if ((err = t_ok_ack(sc, q, p->PRIM_type, p->SEQ_number, 0)))
+	if ((err = t_ok_ack(sc, q, NULL, p->PRIM_type, p->SEQ_number, 0)))
 		goto error;
 	return (QR_TRIMMED);
       badseq:
@@ -15172,7 +15250,7 @@ t_discon_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_DISCON_REQ: would place interface out of state");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_DISCON_REQ, err);
+	return t_error_ack(sc, q, NULL, T_DISCON_REQ, err);
 }
 
 /*
@@ -15180,7 +15258,7 @@ t_discon_req(struct sc *sc, queue_t *q, mblk_t *mp)
  *  -----------------------------------
  */
 static int
-t_error_reply(struct sc *sc, queue_t *q, int err)
+t_error_reply(struct sc *sc, queue_t *q, mblk_t *msg, int err)
 {
 	mblk_t *mp;
 
@@ -15222,7 +15300,7 @@ t_write(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "M_DATA: ignoring in idle state");
 	goto error;
       error:
-	return t_error_reply(sc, q, err);
+	return t_error_reply(sc, q, NULL, err);
 }
 static int
 t_data_req(struct sc *sc, queue_t *q, mblk_t *mp)
@@ -15237,9 +15315,9 @@ t_data_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((1 << sccp_get_t_state(sc)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto eproto;
 	{
-		ulong exp = 0;		/* FIXME */
-		ulong more = 0;		/* FIXME */
-		ulong rcpt = 0;		/* FIXME */
+		t_uscalar_t exp = 0;	/* FIXME */
+		t_uscalar_t more = 0;	/* FIXME */
+		t_uscalar_t rcpt = 0;	/* FIXME */
 
 		return sccp_data_req(sc, q, mp, exp, more, rcpt, mp->b_cont);
 	}
@@ -15256,7 +15334,7 @@ t_data_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_DATA_REQ: ignore in idle state");
 	goto error;
       error:
-	return t_error_reply(sc, q, err);
+	return t_error_reply(sc, q, NULL, err);
 }
 
 /*
@@ -15276,9 +15354,9 @@ t_exdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if ((1 << sccp_get_t_state(sc)) & ~(TSF_DATA_XFER | TSF_WREQ_ORDREL))
 		goto eproto;
 	{
-		ulong exp = 0;		/* FIXME */
-		ulong more = 0;		/* FIXME */
-		ulong rcpt = 0;		/* FIXME */
+		t_uscalar_t exp = 0;	/* FIXME */
+		t_uscalar_t more = 0;	/* FIXME */
+		t_uscalar_t rcpt = 0;	/* FIXME */
 
 		return sccp_data_req(sc, q, mp, exp, more, rcpt, mp->b_cont);
 	}
@@ -15295,7 +15373,7 @@ t_exdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_EXDATA_REQ: ignore in idle state");
 	goto error;
       error:
-	return t_error_reply(sc, q, err);
+	return t_error_reply(sc, q, NULL, err);
 }
 
 /*
@@ -15306,7 +15384,7 @@ static int
 t_info_req(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	(void) mp;
-	return t_info_ack(sc, q);
+	return t_info_ack(sc, q, NULL);
 }
 
 /*
@@ -15337,7 +15415,7 @@ t_bind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto tacces;
 	if ((err = sccp_bind_req(sc, q, add, p->CONIND_number)))
 		goto error;
-	return t_bind_ack(sc, q, &sc->src);
+	return t_bind_ack(sc, q, NULL, &sc->src);
       tacces:
 	err = TACCES;
 	mi_strlog(q, 0, SL_TRACE, "T_BIND_REQ: no permission for address");
@@ -15359,7 +15437,7 @@ t_bind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_BIND_REQ: would place i/f out of state");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_BIND_REQ, err);
+	return t_error_ack(sc, q, NULL, T_BIND_REQ, err);
 }
 
 /*
@@ -15378,13 +15456,13 @@ t_unbind_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	sccp_set_t_state(sc, TS_WACK_UREQ);
 	if ((err = sccp_unbind_req(sc, q)))
 		goto error;
-	return t_ok_ack(sc, q, T_UNBIND_REQ, 0, 0);
+	return t_ok_ack(sc, q, NULL, T_UNBIND_REQ, 0, 0);
       toutstate:
 	err = TOUTSTATE;
 	mi_strlog(q, 0, SL_TRACE, "T_UNBIND_REQ: would place i/f out of state");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_UNBIND_REQ, err);
+	return t_error_ack(sc, q, NULL, T_UNBIND_REQ, err);
 }
 
 /*
@@ -15439,7 +15517,7 @@ t_unitdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	const struct T_unitdata_req *p = (typeof(p)) mp->b_rptr;
 	struct sccp_addr *dst;
 	const size_t dst_len = sizeof(*dst);
-	ulong seq, pri, pcl, imp, ret;
+	t_uscalar_t seq, pri, pcl, imp, ret;
 
 	if (dlen == 0 || dlen > sc->mtu)
 		goto tbaddata;
@@ -15551,7 +15629,7 @@ t_optmgmt_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + p->OPT_offset + p->OPT_length)
 		goto tbadopt1;
 	{
-		ulong flags = p->MGMT_flags;
+		t_uscalar_t flags = p->MGMT_flags;
 		size_t opt_len = p->OPT_length;
 		uchar *opt_ptr = mp->b_rptr + p->OPT_offset;
 		struct sccp_opts ops = { 0L, NULL, };
@@ -15565,16 +15643,16 @@ t_optmgmt_req(struct sc *sc, queue_t *q, mblk_t *mp)
 		switch (flags) {
 		case T_CHECK:
 			sccp_opt_check(sc, opsp);
-			return t_optmgmt_ack(sc, q, flags, opsp);
+			return t_optmgmt_ack(sc, q, NULL, flags, opsp);
 		case T_NEGOTIATE:
 			sccp_opt_negotiate(sc, opsp);
-			return t_optmgmt_ack(sc, q, flags, opsp);
+			return t_optmgmt_ack(sc, q, NULL, flags, opsp);
 		case T_DEFAULT:
 			sccp_opt_default(sc, opsp);
-			return t_optmgmt_ack(sc, q, flags, opsp);
+			return t_optmgmt_ack(sc, q, NULL, flags, opsp);
 		case T_CURRENT:
 			sccp_opt_current(sc, opsp);
-			return t_optmgmt_ack(sc, q, flags, opsp);
+			return t_optmgmt_ack(sc, q, NULL, flags, opsp);
 		default:
 			goto tbadflag;
 		}
@@ -15600,7 +15678,7 @@ t_optmgmt_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_OPTMGMT_REQ: invalid primitive format");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_OPTMGMT_REQ, err);
+	return t_error_ack(sc, q, NULL, T_OPTMGMT_REQ, err);
 }
 
 /*
@@ -15630,7 +15708,7 @@ t_ordrel_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_ORDREL_REQ: would place interface out of state");
 	goto error;
       error:
-	return t_error_ack(sc, q, T_ORDREL_REQ, err);
+	return t_error_ack(sc, q, NULL, T_ORDREL_REQ, err);
 }
 
 /*
@@ -15644,7 +15722,7 @@ t_optdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 	uchar *op, *oe;
 	struct t_opthdr *oh;
-	ulong exp, more, rcpt;
+	t_uscalar_t exp, more, rcpt;
 
 	if (sccp_get_t_state(sc) == TS_IDLE)
 		goto discard;
@@ -15713,7 +15791,7 @@ t_optdata_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	mi_strlog(q, 0, SL_TRACE, "T_OPTDATA_REQ: ignore in idle state");
 	goto error;
       error:
-	return t_error_reply(sc, q, err);
+	return t_error_reply(sc, q, NULL, err);
 }
 
 #ifdef T_ADDR_REQ
@@ -15728,12 +15806,12 @@ t_addr_req(struct sc *sc, queue_t *q, mblk_t *mp)
 	switch (sccp_get_t_state(sc)) {
 	case TS_UNBND:
 	case TS_WACK_BREQ:
-		return t_addr_ack(sc, q, NULL, NULL);
+		return t_addr_ack(sc, q, NULL, NULL, NULL);
 	case TS_WACK_UREQ:
 	case TS_IDLE:
-		return t_addr_ack(sc, q, &sc->src, NULL);
+		return t_addr_ack(sc, q, NULL, &sc->src, NULL);
 	}
-	return t_error_ack(sc, q, T_ADDR_REQ, TOUTSTATE);
+	return t_error_ack(sc, q, NULL, T_ADDR_REQ, TOUTSTATE);
 }
 #endif
 
@@ -15746,7 +15824,7 @@ static int
 t_capability_req(struct sc *sc, queue_t *q, mblk_t *mp)
 {
 	fixme(("Implement this function\n"));
-	return t_error_ack(sc, q, T_CAPABILITY_REQ, TNOTSUPPORT);
+	return t_error_ack(sc, q, NULL, T_CAPABILITY_REQ, TNOTSUPPORT);
 }
 #endif
 
@@ -15764,7 +15842,7 @@ t_capability_req(struct sc *sc, queue_t *q, mblk_t *mp)
  *  Delay to send an IT message on a connection section when there are no messages to send. (5 to 10 minutes)
  */
 static int
-sc_tcon_timeout(struct sc *sc, queue_t q)
+sc_tcon_timeout(struct sc *sc, queue_t *q)
 {
 	int err;
 
@@ -15775,7 +15853,7 @@ sc_tcon_timeout(struct sc *sc, queue_t q)
 		   the user. Move to the idle state. */
 		sccp_release(sc);
 		if ((err =
-		     sccp_discon_ind(sc, q, NULL, N_PROVIDER,
+		     sccp_discon_ind(sc, q, N_PROVIDER,
 				     SCCP_REFC_EXPIRATION_OF_NC_ESTAB_TIMER, NULL, NULL, NULL)))
 			return (err);
 		sccp_set_state(sc, SS_IDLE);
@@ -15803,7 +15881,7 @@ sc_tcon_timeout(struct sc *sc, queue_t q)
 static int
 sc_tias_timeout(struct sc *sc, queue_t *q)
 {
-	ulong more = 0;
+	np_ulong more = 0;
 
 	switch (sccp_get_state(sc)) {
 	case SS_DATA_XFER:
@@ -15847,8 +15925,7 @@ sc_tiar_timeout(struct sc *sc, queue_t *q)
 					    NULL)))
 				return (err);
 			fixme(("Figure out cause\n"));
-			if ((err =
-			     sccp_discon_ind(sc, q, NULL, N_PROVIDER, cause, NULL, NULL, NULL)))
+			if ((err = sccp_discon_ind(sc, q, N_PROVIDER, cause, NULL, NULL, NULL)))
 				return (err);
 			sccp_timer_start(sc, trel);
 			sccp_timer_start(sc, tint);
@@ -15863,7 +15940,7 @@ sc_tiar_timeout(struct sc *sc, queue_t *q)
 			   to disconnect pending state. */
 			sccp_release(sc);
 			if ((err =
-			     sccp_discon_ind(NULL, sc, N_PROVIDER,
+			     sccp_discon_ind(sc, q, N_PROVIDER,
 					     SCCP_RELC_EXPIRATION_OF_RECEIVE_INACTIVITY_TIMER, NULL,
 					     NULL, NULL)))
 				return (err);
@@ -16053,7 +16130,7 @@ sc_tres_timeout(struct sc *sc, queue_t *q)
 				   to the user, stop inactivity timers and move the idle state. */
 				sccp_release(sc);
 				if ((err =
-				     sccp_discon_ind(sc, q, NULL, N_PROVIDER,
+				     sccp_discon_ind(sc, q, N_PROVIDER,
 						     SCCP_RELC_EXPIRATION_OF_RESET_TIMER, NULL,
 						     NULL, NULL)))
 					return (err);
@@ -16154,7 +16231,7 @@ sr_tdecay_timeout(struct sr *sr, queue_t *q)
 {
 	fixme(("Write this function\n"));
 	swerr();
-	return ();
+	return (0);
 }
 
 /*
@@ -17158,7 +17235,7 @@ sccp_mgmt_blo_sr(queue_t *q, struct sr *sr)
 	return (-EOPNOTSUPP);
 }
 static int
-sccp_mgmt_blo_sp(queue_t, *q, struct sp *sp)
+sccp_mgmt_blo_sp(queue_t *q, struct sp *sp)
 {
 	todo(("Write this function\n"));
 	return (-EOPNOTSUPP);
@@ -18154,7 +18231,7 @@ sccp_iocgstats(queue_t *q, mblk_t *mp)
 }
 
 /*
- *  SCCP_IOCSSTATS
+ *  SCCP_IOCCSTATS
  *  -----------------------------------
  */
 static int
@@ -18922,8 +18999,8 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
 			printd(("%s: %p: -> SCCP_IOCGSTATS\n", DRV_NAME, sc));
 			ret = sccp_iocgstats(q, mp);
 			break;
-		case _IOC_NR(SCCP_IOCSSTATS):
-			printd(("%s: %p: -> SCCP_IOCSSTATS\n", DRV_NAME, sc));
+		case _IOC_NR(SCCP_IOCCSTATS):
+			printd(("%s: %p: -> SCCP_IOCCSTATS\n", DRV_NAME, sc));
 			ret = sccp_iocsstats(q, mp);
 			break;
 		case _IOC_NR(SCCP_IOCGNOTIFY):
@@ -18980,51 +19057,51 @@ sccp_w_ioctl(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int
+static inline int
 sccp_w_rse(queue_t *q, mblk_t *mp)
 {
 	struct sc *sc;
 	int err = -EAGAIN;
 
-	if ((sc = sccp_acquire(q))) {
-		err = sccp_orte_msg(sc, q, NULL, mp);
-		sccp_release(sc);
+	if ((sc = sc_acquire(q))) {
+		err = sccp_orte_msg(sc->sp.sp, q, NULL, mp);
+		sc_release(sc);
 	}
 	return (err);
 }
-static int
+static inline int
 sccp_r_rse(queue_t *q, mblk_t *mp)
 {
 	struct sc *sc;
 	int err = -EAGAIN;
 
-	if ((sc = sccp_acquire(q))) {
+	if ((sc = sc_acquire(q))) {
 		err = sccp_recv_msg(sc, q, NULL, mp);
-		sccp_release(sc);
+		sc_release(sc);
 	}
 	return (err);
 }
-static int
+static inline int
 mtp_w_rse(queue_t *q, mblk_t *mp)
 {
 	struct mt *mt;
 	int err = -EAGAIN;
 
-	if ((mt = mtp_acquire(q))) {
+	if ((mt = mt_acquire(q))) {
 		err = sccp_send_msg(mt, q, NULL, mp);
-		mtp_release(mt);
+		mt_release(mt);
 	}
 	return (err);
 }
-static int
+static inline int
 mtp_r_rse(queue_t *q, mblk_t *mp)
 {
 	struct mt *mt;
 	int err = -EAGAIN;
 
-	if ((mt = mtp_acquire(q))) {
+	if ((mt = mt_acquire(q))) {
 		err = sccp_irte_msg(mt, q, NULL, mp);
-		mtp_release(mt);
+		mt_release(mt);
 	}
 	return (err);
 }
@@ -19094,22 +19171,24 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 		return (0);
 	}
 
-	if (unlikely((mt = mtp_acquire(q)) == NULL))
+	if (unlikely((mt = mt_acquire(q)) == NULL))
 		return (-EAGAIN);
 
 	oldstate = mtp_get_state(mt);
 
 	if ((err = mtpi_r_proto(mt, q, mp)))
-		mtp_set_state(mtp, oldstate);
+		mtp_set_state(mt, oldstate);
 
-	mtp_release(mt);
+	mt_release(mt);
 	return (err);
 }
 
 static int
 sccpi_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	switch (*(np_ulong *) mp->b_rptr) {
+	np_ulong prim;
+
+	switch ((prim = *(np_ulong *) mp->b_rptr)) {
 	case N_CONN_REQ:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> N_CONN_REQ");
 		return n_conn_req(sc, q, mp);
@@ -19171,7 +19250,9 @@ sccpi_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 static int
 tpi_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	switch (*(t_scalar_t *) mp->b_rptr) {
+	t_scalar_t prim;
+
+	switch ((prim = *(t_scalar_t *) mp->b_rptr)) {
 	case T_CONN_REQ:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> T_CONN_REQ");
 		return t_conn_req(sc, q, mp);
@@ -19220,14 +19301,16 @@ tpi_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 #endif
 	default:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> N_????_???");
-		return t_error_ack(sc, q, prim, TNOTSUPPORT);
+		return t_error_ack(sc, q, NULL, prim, TNOTSUPPORT);
 	}
 }
 
 static int
-npi_w_proto(queue_t *q, mblk_t *mp)
+npi_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	switch ((prim = *(ulong *) mp->b_rptr)) {
+	np_ulong prim;
+
+	switch ((prim = *(np_ulong *) mp->b_rptr)) {
 	case N_CONN_REQ:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> N_CONN_REQ");
 		return n_conn_req(sc, q, mp);
@@ -19273,9 +19356,11 @@ npi_w_proto(queue_t *q, mblk_t *mp)
 }
 
 static int
-gtt_w_proto(queue_t *q, mblk_t *mp)
+gtt_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	switch ((prim = *(ulong *) mp->b_rptr)) {
+	np_ulong prim;
+
+	switch ((prim = *(np_ulong *) mp->b_rptr)) {
 	case N_BIND_REQ:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> N_BIND_REQ");
 		return n_bind_req(sc, q, mp);
@@ -19299,9 +19384,11 @@ gtt_w_proto(queue_t *q, mblk_t *mp)
 }
 
 static int
-mgm_w_proto(queue_t *q, mblk_t *mp)
+mgm_w_proto(struct sc *sc, queue_t *q, mblk_t *mp)
 {
-	switch ((prim = *(ulong *) mp->b_rptr)) {
+	np_ulong prim;
+
+	switch ((prim = *(np_ulong *) mp->b_rptr)) {
 	case N_INFORM_REQ:
 		mi_strlog(q, STRLOGTX, SL_TRACE, "-> N_INFORM_REQ");
 		return n_inform_req(sc, q, mp);
@@ -19325,13 +19412,13 @@ sccp_w_proto(queue_t *q, mblk_t *mp)
 	uint oldstate;
 	int err;
 
-	if (unlikely(mp->b_wtpr < mp->b_rptr + sizeof(uint32_t))) {
+	if (unlikely(mp->b_wptr < mp->b_rptr + sizeof(uint32_t))) {
 		mi_strlog(q, 0, SL_ERROR, "primitive too short");
 		freemsg(mp);
 		return (0);
 	}
 
-	if (unlikely((sc = sccp_acquire(q)) == NULL))
+	if (unlikely((sc = sc_acquire(q)) == NULL))
 		return (-EDEADLK);
 
 	oldstate = sccp_get_state(sc);
@@ -19360,7 +19447,7 @@ sccp_w_proto(queue_t *q, mblk_t *mp)
 	}
 	if (err)
 		sccp_set_state(sc, oldstate);
-	sccp_release(sc);
+	sc_release(sc);
 	return (err);
 }
 
@@ -19404,6 +19491,14 @@ mgm_w_data(queue_t *q, mblk_t *mp)
 	swerr();
 	return (-EFAULT);
 }
+
+#ifndef SCCP_TYPE_SCCPI
+#define SCCP_TYPE_SCCPI	1
+#define SCCP_TYPE_NPI	2
+#define SCCP_TYPE_TPI	3
+#define SCCP_TYPE_GTT	4
+#define SCCP_TYPE_MGM	5
+#endif
 static inline fastcall int
 sccp_w_data(queue_t *q, mblk_t *mp)
 {
@@ -19516,7 +19611,7 @@ sccp_w_sig(queue_t *q, mblk_t *mp)
 	uint oldstate;
 	int err = 0;
 
-	if (!(sc = sccp_acquire(q)))
+	if (!(sc = sc_acquire(q)))
 		return (mi_timer_requeue(mp) ? -EAGAIN : 0);
 
 	oldstate = sccp_get_state(sc);
@@ -19530,7 +19625,7 @@ sccp_w_sig(queue_t *q, mblk_t *mp)
 		}
 	}
 
-	sccp_release(sc);
+	sc_release(sc);
 	return (err);
 }
 static int
@@ -19540,7 +19635,7 @@ mtp_r_sig(queue_t *q, mblk_t *mp)
 	uint oldstate;
 	int err = 0;
 
-	if (!(mt = mtp_acquire(q)))
+	if (!(mt = mt_acquire(q)))
 		return (mi_timer_requeue(mp) ? -EAGAIN : 0);
 
 	oldstate = mtp_get_state(mt);
@@ -19554,7 +19649,7 @@ mtp_r_sig(queue_t *q, mblk_t *mp)
 		}
 	}
 
-	mtp_release(mt);
+	mt_release(mt);
 	return (err);
 }
 
@@ -19577,7 +19672,7 @@ mtp_r_error(queue_t *q, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
 }
-static int
+static inline int
 sccp_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -19595,14 +19690,14 @@ sccp_r_error(queue_t *q, mblk_t *mp)
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
 			if ((err =
-			     sccp_send_rlsd(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlsd(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_MTP_FAILURE, NULL, NULL)))
 				return (err);
 			break;
 		default:
 		case SS7_PVAR_ITUT:
 			if ((err =
-			     sccp_send_rlsd(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlsd(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_MTP_FAILURE, NULL, &sc->imp)))
 				return (err);
 			break;
@@ -19652,7 +19747,7 @@ mtp_r_hangup(queue_t *q, mblk_t *mp)
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
 }
-static int
+static inline int
 sccp_r_hangup(queue_t *q, mblk_t *mp)
 {
 	int err;
@@ -19670,14 +19765,14 @@ sccp_r_hangup(queue_t *q, mblk_t *mp)
 		switch (sc->proto.pvar & SS7_PVAR_MASK) {
 		case SS7_PVAR_ANSI:
 			if ((err =
-			     sccp_send_rlsd(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlsd(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_MTP_FAILURE, NULL, NULL)))
 				return (err);
 			break;
 		default:
 		case SS7_PVAR_ITUT:
 			if ((err =
-			     sccp_send_rlsd(sc->sp.sp, q, bp, sc->sp.sp->add.pc, sc->sls, sc->dlr,
+			     sccp_send_rlsd(sc->sp.sp, q, NULL, sc->sp.sp->add.pc, sc->sls, sc->dlr,
 					    sc->slr, SCCP_RELC_MTP_FAILURE, NULL, &sc->imp)))
 				return (err);
 			break;
@@ -19730,12 +19825,19 @@ sccp_w_msg_slow(queue_t *q, mblk_t *mp)
 		return sccp_w_sig(q, mp);
 	case M_IOCTL:
 		return sccp_w_ioctl(q, mp);
+#if 0
 	case M_IOCDATA:
 		return sccp_w_iocdata(q, mp);
+#endif
 	case M_FLUSH:
-		return sccp_w_flush(q, mp);
+		return ss7_w_flush(q, mp);
 	}
+#if 0
 	return sccp_w_other(q, mp);
+#else
+	freemsg(mp);
+	return (0);
+#endif
 }
 static inline fastcall int
 sccp_w_msg(queue_t *q, mblk_t *mp)
@@ -19757,20 +19859,27 @@ mtp_r_msg_slow(queue_t *q, mblk_t *mp)
 	case M_SIG:
 	case M_PCSIG:
 		return mtp_r_sig(q, mp);
+#if 0
 	case M_IOCACK:
 	case M_IOCNAK:
 	case M_COPYIN:
 	case M_COPYOUT:
 		return mtp_r_copy(q, mp);
+#endif
 	case M_FLUSH:
-		return mtp_r_flush(q, mp);
+		return ss7_r_flush(q, mp);
 	case M_ERROR:
 		return mtp_r_error(q, mp);
 	case M_HANGUP:
 	case M_UNHANGUP:
 		return mtp_r_hangup(q, mp);
 	}
+#if 0
 	return mtp_r_other(q, mp);
+#else
+	freemsg(mp);
+	return (0);
+#endif
 }
 static inline fastcall int
 mtp_r_msg(queue_t *q, mblk_t *mp)
@@ -20170,35 +20279,35 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, minor_t b
 		(sc->oq = RD(q))->q_ptr = sccp_get(sc);
 		(sc->iq = WR(q))->q_ptr = sccp_get(sc);
 		spin_lock_init(&sc->qlock);	/* "sc-queue-lock" */
-		sc->o_prim = &sccp_r_prim;
+		// sc->o_prim = &sccp_r_prim;
 		/* style of interface depends on bminor */
 		switch (bminor) {
 		case SCCP_STYLE_SCCPI:
-			sc->i_prim = &sccp_w_prim;
+			// sc->i_prim = &sccp_w_prim;
 			sc->i_state = NS_UNBND;
 			sc->i_style = bminor;
 			sc->i_version = N_CURRENT_VERSION;
 			break;
 		case SCCP_STYLE_TPI:
-			sc->i_prim = &tpi_w_prim;
+			// sc->i_prim = &tpi_w_prim;
 			sc->i_state = TS_UNBND;
 			sc->i_style = bminor;
 			sc->i_version = T_CURRENT_VERSION;
 			break;
 		case SCCP_STYLE_NPI:
-			sc->i_prim = &npi_w_prim;
+			// sc->i_prim = &npi_w_prim;
 			sc->i_state = NS_UNBND;
 			sc->i_style = bminor;
 			sc->i_version = N_CURRENT_VERSION;
 			break;
 		case SCCP_STYLE_GTT:
-			sc->i_prim = &gtt_w_prim;
+			// sc->i_prim = &gtt_w_prim;
 			sc->i_state = NS_UNBND;
 			sc->i_style = bminor;
 			sc->i_version = N_CURRENT_VERSION;
 			break;
 		case SCCP_STYLE_MGMT:
-			sc->i_prim = &mgm_w_prim;
+			// sc->i_prim = &mgm_w_prim;
 			sc->i_state = NS_UNBND;
 			sc->i_style = bminor;
 			sc->i_version = N_CURRENT_VERSION;
@@ -20210,6 +20319,38 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, minor_t b
 		sc->prev = scp;
 		*scp = sccp_get(sc);
 		/* set defaults */
+		sc->info.PRIM_type = N_INFO_ACK;
+		sc->info.NSDU_size = T_INFINITE; /* unlimited */
+		sc->info.ENSDU_size = T_INFINITE; /* unlimited */
+		sc->info.CDATA_size = T_INFINITE; /* unlimited  XXX */
+		sc->info.DDATA_size = T_INFINITE; /* unlimited  XXX */
+		sc->info.ADDR_size = sizeof(sc->src) + sizeof(sc->saddr);
+		sc->info.ADDR_length = sizeof(sc->src) + sizeof(sc->saddr);
+		sc->info.QOS_length = sizeof(sc->iqos);
+		sc->info.QOS_offset = sc->info.ADDR_offset + sc->info.ADDR_length;
+		sc->info.QOS_range_length = sizeof(sc->iqor);
+		sc->info.QOS_range_offset = sc->info.QOS_offset + sc->info.QOS_length;
+		sc->info.OPTIONS_flags = (REC_CONF_OPT | EX_DATA_OPT | DEFAULT_RC_SEL) & ~DEFAULT_RC_SEL;
+		sc->info.NIDU_size = T_INFINITE; /* unlimited */
+		sc->info.SERV_type = N_CONS | N_CLNS;
+		sc->info.PROVIDER_type = N_SUBNET;
+		sc->info.NODU_size = 254;
+		sc->info.CURRENT_state = NS_NOSTATES;
+		sc->info.PROTOID_length = sizeof(sc->pro);
+		sc->info.PROTOID_offset = sc->info.QOS_range_offset + sc->info.QOS_range_length;
+		sc->info.NPI_version = N_CURRENT_VERSION;
+
+		sc->iqos.n_qos_type = N_QOS_SEL_INFO_SCCP;
+		sc->iqos.protocol_class = 0;
+		sc->iqos.option_flags = 0;
+		sc->iqos.sequence_selection = 0;
+		sc->iqos.message_priority = 0;
+		sc->iqos.importance = 0;
+
+		sc->iqor.n_qos_type = N_QOS_RANGE_INFO_SCCP;
+		sc->iqor.protocol_classes = 0x0f;
+		sc->iqor.sequence_selection = 0x1f;
+
 		printd(("%s: %p: linked sc private structure\n", DRV_NAME, sc));
 	} else
 		ptrace(("%s: ERROR: Could not allocate sc private structure\n", DRV_NAME));
@@ -20262,7 +20403,7 @@ sccp_free_priv(struct sc *sc)
 	sccp_put(sc);		/* final put */
 }
 static struct sc *
-sccp_lookup(ulong id)
+sccp_lookup(uint id)
 {
 	struct sc *sc = NULL;
 
@@ -20270,10 +20411,10 @@ sccp_lookup(ulong id)
 		for (sc = master.sc.list; sc && sc->id != id; sc = sc->next) ;
 	return (sc);
 }
-static ulong
-sccp_get_id(ulong id)
+static inline uint
+sccp_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		for (id = ++sequence; sccp_lookup(id); id = ++sequence) ;
@@ -20300,7 +20441,7 @@ sccp_put(struct sc *sc)
  *  -------------------------------------------------------------------------
  */
 static struct na *
-sccp_alloc_na(ulong id, struct lmi_option *proto)
+sccp_alloc_na(uint id, struct lmi_option *proto)
 {
 	struct na *na;
 
@@ -20366,7 +20507,7 @@ sccp_free_na(struct na *na)
 	return;
 }
 static struct na *
-na_lookup(ulong id)
+na_lookup(uint id)
 {
 	struct na *na = NULL;
 
@@ -20374,10 +20515,10 @@ na_lookup(ulong id)
 		for (na = master.na.list; na && na->id != id; na = na->next) ;
 	return (na);
 }
-static ulong
-na_get_id(ulong id)
+static uint
+na_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
@@ -20404,7 +20545,7 @@ na_put(struct na *na)
  */
 #if 0
 static struct cp *
-sccp_alloc_cp(ulong id, struct sp *sp, ulong slr0, ulong slr1)
+sccp_alloc_cp(uint id, struct sp *sp, np_ulong slr0, np_ulong slr1)
 {
 	struct cp *cp;
 
@@ -20486,7 +20627,7 @@ cp_put(struct cp *cp)
 	}
 }
 static struct cp *
-cp_lookup(ulong id)
+cp_lookup(uint id)
 {
 	struct cp *cp = NULL;
 
@@ -20496,17 +20637,17 @@ cp_lookup(ulong id)
 }
 
 #if 0
-static ulong
-cp_get_id(ulong id)
+static uint
+cp_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct cp *
-sccp_lookup_cp(struct sp *sp, ulong slr, const int create)
+sccp_lookup_cp(struct sp *sp, uint slr, const int create)
 {
 	struct cp *cp;
 
@@ -20522,7 +20663,7 @@ sccp_lookup_cp(struct sp *sp, ulong slr, const int create)
  *  -------------------------------------------------------------------------
  */
 static struct ss *
-sccp_alloc_ss(ulong id, struct sp *sp, ulong ssn)
+sccp_alloc_ss(uint id, struct sp *sp, uint ssn)
 {
 	struct ss *ss;
 
@@ -20603,7 +20744,7 @@ ss_put(struct ss *ss)
 	}
 }
 static struct ss *
-ss_lookup(ulong id)
+ss_lookup(uint id)
 {
 	struct ss *ss = NULL;
 
@@ -20611,17 +20752,17 @@ ss_lookup(ulong id)
 		for (ss = master.ss.list; ss && ss->id != id; ss = ss->next) ;
 	return (ss);
 }
-static ulong
-ss_get_id(ulong id)
+static uint
+ss_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct ss *
-sccp_lookup_ss(struct sp *sp, ulong ssn, const int create)
+sccp_lookup_ss(struct sp *sp, uint ssn, const int create)
 {
 	struct ss *ss;
 
@@ -20636,7 +20777,7 @@ sccp_lookup_ss(struct sp *sp, ulong ssn, const int create)
  *  -------------------------------------------------------------------------
  */
 static struct rs *
-sccp_alloc_rs(ulong id, struct sr *sr, ulong ssn)
+sccp_alloc_rs(uint id, struct sr *sr, uint ssn)
 {
 	struct rs *rs;
 
@@ -20732,7 +20873,7 @@ rs_put(struct rs *rs)
 	}
 }
 static struct rs *
-rs_lookup(ulong id)
+rs_lookup(uint id)
 {
 	struct rs *rs = NULL;
 
@@ -20740,17 +20881,17 @@ rs_lookup(ulong id)
 		for (rs = master.rs.list; rs && rs->id != id; rs = rs->next) ;
 	return (rs);
 }
-static ulong
-rs_get_id(ulong id)
+static uint
+rs_get_id(uint id)
 {
-	static ulong sequence = 0;
+	static uint sequence = 0;
 
 	if (!id)
 		id = ++sequence;
 	return (id);
 }
 static struct rs *
-sccp_lookup_rs(struct sr *sr, ulong ssn, const int create)
+sccp_lookup_rs(struct sr *sr, uint ssn, const int create)
 {
 	struct rs *rs;
 
@@ -20765,7 +20906,7 @@ sccp_lookup_rs(struct sr *sr, ulong ssn, const int create)
  *  -------------------------------------------------------------------------
  */
 static struct sr *
-sccp_alloc_sr(ulong id, struct sp *sp, ulong pc)
+sccp_alloc_sr(uint id, struct sp *sp, uint pc)
 {
 	struct sr *sr, **srp;
 
@@ -20809,7 +20950,7 @@ sccp_free_sr(struct sr *sr)
 		struct sc *sc;
 
 		/* stop all timers */
-		__sr_timer_stop(sr, tall);
+		sr_timer_stop(sr, tall);
 		/* remove all remote subsystems */
 		while ((rs = sr->rs.list))
 			sccp_free_rs(rs);
@@ -20872,15 +21013,15 @@ sr_put(struct sr *sr)
 	}
 }
 static struct sr *
-sr_lookup(ulong id)
+sr_lookup(uint id)
 {
 	struct sr *sr;
 
 	for (sr = master.sr.list; sr && sr->id != id; sr = sr->next) ;
 	return (sr);
 }
-static ulong
-sr_get_id(ulong id)
+static uint
+sr_get_id(uint id)
 {
 	struct sr *sr;
 
@@ -20895,7 +21036,7 @@ sr_get_id(ulong id)
 	return (id);
 }
 static struct sr *
-sccp_lookup_sr(struct sp *sp, ulong pc, const int create)
+sccp_lookup_sr(struct sp *sp, uint pc, const int create)
 {
 	struct sr *sr;
 
@@ -20910,7 +21051,7 @@ sccp_lookup_sr(struct sp *sp, ulong pc, const int create)
  *  -------------------------------------------------------------------------
  */
 static struct sp *
-sccp_alloc_sp(ulong id, struct na *na, mtp_addr_t * add)
+sccp_alloc_sp(uint id, struct na *na, mtp_addr_t * add)
 {
 	struct sp *sp, **spp;
 
@@ -20948,7 +21089,7 @@ sccp_free_sp(struct sp *sp)
 	printd(("%s: %s: %p free sp->id = %ld\n", DRV_NAME, __FUNCTION__, sp, sp->id));
 	spin_lock_irqsave(&sp->lock, flags);
 	{
-		__sp_timer_stop(sp, tall);
+		sp_timer_stop(sp, tall);
 		/* freeing all signalling relations */
 		while (sp->sr.list)
 			sccp_free_sr(sp->sr.list);
@@ -21008,15 +21149,15 @@ sp_put(struct sp *sp)
 	}
 }
 static struct sp *
-sp_lookup(ulong id)
+sp_lookup(uint id)
 {
 	struct sp *sp;
 
 	for (sp = master.sp.list; sp && sp->id != id; sp = sp->next) ;
 	return (sp);
 }
-static ulong
-sp_get_id(ulong id)
+static uint
+sp_get_id(uint id)
 {
 	struct sp *sp;
 
@@ -21031,7 +21172,7 @@ sp_get_id(ulong id)
 	return (id);
 }
 static struct sp *
-sccp_lookup_sp(ulong ni, ulong pc, const int create)
+sccp_lookup_sp(uint ni, uint pc, const int create)
 {
 	struct na *na;
 	struct sp *sp = NULL;
@@ -21057,7 +21198,7 @@ sccp_lookup_sp(ulong ni, ulong pc, const int create)
  *  -------------------------------------------------------------------------
  */
 static struct mt *
-sccp_alloc_link(queue_t *q, struct mt **mpp, ulong index, cred_t *crp)
+sccp_alloc_link(queue_t *q, struct mt **mpp, uint index, cred_t *crp)
 {
 	struct mt *mt;
 
@@ -21070,8 +21211,8 @@ sccp_alloc_link(queue_t *q, struct mt **mpp, ulong index, cred_t *crp)
 		spin_lock_init(&mt->qlock);	/* "mt-queue-lock" */
 		(mt->iq = RD(q))->q_ptr = mtp_get(mt);
 		(mt->oq = WR(q))->q_ptr = mtp_get(mt);
-		mt->o_prim = mtp_w_prim;
-		mt->i_prim = mtp_r_prim;
+		// mt->o_prim = mtp_w_prim;
+		// mt->i_prim = mtp_r_prim;
 		mt->o_wakeup = NULL;
 		mt->i_wakeup = NULL;
 		mt->i_state = LMI_UNUSABLE;
@@ -21187,17 +21328,17 @@ mtp_put(struct mt *mt)
 	}
 }
 static struct mt *
-mtp_lookup(ulong id)
+mtp_lookup(uint id)
 {
 	struct mt *mt;
 
 	for (mt = master.mt.list; mt && mt->id != id; mt = mt->next) ;
 	return (mt);
 }
-static ulong
-mtp_get_id(ulong id)
+static uint
+mtp_get_id(uint id)
 {
-	static ulong identifier = 0;
+	static uint identifier = 0;
 
 	if (!id) {
 		id = ++identifier;
