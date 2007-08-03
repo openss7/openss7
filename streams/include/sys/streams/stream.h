@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.99 2007/05/17 22:01:13 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.100 2007/08/03 13:36:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +44,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:01:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:36:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.100  2007/08/03 13:36:07  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.99  2007/05/17 22:01:13  brian
  - corrections from strsctp performance testing
 
@@ -116,7 +119,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.99 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.100 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -337,6 +340,7 @@ typedef enum msg_type {
 	M_BREAK = 0x08,			/* v 3 4 S U O(0x10) A H M L(0x02) */
 	M_PASSFP = 0x09,		/* | 3 4 S U O(0x11) A H M L(0x06) */
 	M_EVENT = 0x0a,			/* ? S */
+#define M_EVENT M_EVENT
 	M_SIG = 0x0b,			/* ^ 3 4 S U O(0x13) A H M L(0x09) */
 	M_DELAY = 0x0c,			/* v 3 4 S U O(0x14) A H M L(0x04) */
 	M_CTL = 0x0d,			/* | 3 4 S U O(0x15) A H M L(0x03) */
@@ -344,7 +348,9 @@ typedef enum msg_type {
 	M_SETOPTS = 0x10,		/* ^ 3 4 S U O(0x20) A H M L(0x08) */
 	M_RSE = 0x11,			/* | 4 S U O(0x21) A H M L(0x07) */
 	M_TRAIL = 0x12,			/* ^ U H */
+#define M_TRAIL M_TRAIL
 	M_BACKWASH = 0x13,		/* v A */
+#define M_BACKWASH M_BACKWASH
 	QPCTL = 0x80,			/* - 3 4 S U O A H M L(0x0a) */
 	M_IOCACK = 0x81,		/* ^ 3 4 S U O A H M L(0x0f) */
 	M_IOCNAK = 0x82,		/* ^ 3 4 S U O A H M L(0x10) */
@@ -365,18 +371,31 @@ typedef enum msg_type {
 	/* the rest of these are all over the board, only M_UNHANGUP is common, they have been
 	   renumbered so that at least they don't overlap */
 	M_PCCTL = 0x91,			/* | U */
+#define M_PCCTL M_PCCTL
 	M_PCSETOPTS = 0x92,		/* ^ U */
+#define M_PCSETOPTS M_PCSETOPTS
 	M_PCEVENT = 0x93,		/* ? S(0x91) */
+#define M_PCEVENT M_PCEVENT
 	M_UNHANGUP = 0x94,		/* ^ S(0x92) O */
+#define M_UNHANGUP M_UNHANGUP
 	M_NOTIFY = 0x95,		/* ^ O(0x93) H(0x93) */
+#define M_NOTIFY M_NOTIFY
 	M_HPDATA = 0x96,		/* ^ O(0x8c) H(0x8c) M(0x93) */
+#define M_HPDATA M_HPDATA
 	M_LETSPLAY = 0x97,		/* ^ A */
+#define M_LETSPLAY M_LETSPLAY
 	M_DONTPLAY = 0x98,		/* v A */
+#define M_DONTPLAY M_DONTPLAY
 	M_BACKDONE = 0x99,		/* v A */
+#define M_BACKDONE M_BACKDONE
 	M_PCTTY = 0x9a,			/* v A */
+#define M_PCTTY M_PCTTY
 	M_CLOSE = 0x9b,			/* v H(0x94) */
+#define M_CLOSE M_CLOSE
 	M_CLOSE_REPL = 0x9c,		/* v H(0x95) */
+#define M_CLOSE_REPL M_CLOSE_REPL
 	M_MI = 0x9d,			/* ^ A */
+#define M_MI M_MI
 } msg_type_t;
 
 #define M_MI_READ_SEEK	    0

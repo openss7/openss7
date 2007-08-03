@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.20  2007/08/03 13:35:05  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.19  2007/07/14 01:34:12  brian
  - make license explicit, add documentation
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -106,7 +109,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:12 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -9536,7 +9539,7 @@ STATIC isup_opt_conf_sr_t ansi_sr_config_defaults = {
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-ct_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct ct *),
+ct_do_timeout(caddr_t data, const char *timer, cc_ulong *timeo, int (to_fnc) (struct ct *),
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct ct *ct = (struct ct *) data;
@@ -10439,7 +10442,7 @@ ct_timer_start(struct ct *ct, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-cg_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct cg *),
+cg_do_timeout(caddr_t data, const char *timer, cc_ulong *timeo, int (to_fnc) (struct cg *),
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct cg *cg = (struct cg *) data;
@@ -10805,7 +10808,7 @@ cg_timer_start(struct cg *cg, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-sr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struct sr *),
+sr_do_timeout(caddr_t data, const char *timer, cc_ulong *timeo, int (to_fnc) (struct sr *),
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct sr *sr = (struct sr *) data;
@@ -19187,7 +19190,7 @@ cc_unbind_req(queue_t *q, mblk_t *mp)
 		sp_put(xchg(&cc->bind.u.sp, NULL));
 		break;
 	case ISUP_BIND_DF:
-		xchg(&cc->bind.u.df, NULL);
+		(void)xchg(&cc->bind.u.df, NULL);
 		break;
 	}
 	cc->bind.type = ISUP_BIND_NONE;
@@ -23001,9 +23004,9 @@ STATIC int
 isup_sta_ct(isup_statem_t * arg, struct ct *ct, int size)
 {
 	struct cc *cc;
-	ulong *p;
+	cc_ulong *p;
 	isup_statem_ct_t *sta = (typeof(sta)) (arg + 1);
-	if (!ct || (size -= sizeof(*sta)) < sizeof(ulong))
+	if (!ct || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = ct->flags;
 	arg->state = ct->state;
@@ -23017,8 +23020,8 @@ isup_sta_ct(isup_statem_t * arg, struct ct *ct, int size)
 	sta->icc_bind = ct->bind.icc ? ct->bind.icc->id : 0;
 	/* 
 	   fit in a many as we can */
-	for (cc = ct->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
-	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
+	for (cc = ct->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(cc_ulong);
+	     cc = cc->bind.next, size -= sizeof(cc_ulong), *p++ = cc->id) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -23026,9 +23029,9 @@ STATIC int
 isup_sta_cg(isup_statem_t * arg, struct cg *cg, int size)
 {
 	struct cc *cc;
-	ulong *p;
+	cc_ulong *p;
 	isup_statem_cg_t *sta = (typeof(sta)) (arg + 1);
-	if (!cg || (size -= sizeof(*sta)) < sizeof(ulong))
+	if (!cg || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = cg->flags;
 	arg->state = cg->state;
@@ -23040,8 +23043,8 @@ isup_sta_cg(isup_statem_t * arg, struct cg *cg, int size)
 	sta->icc_bind = cg->bind.icc ? cg->bind.icc->id : 0;
 	/* 
 	   fit in a many as we can */
-	for (cc = cg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
-	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
+	for (cc = cg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(cc_ulong);
+	     cc = cc->bind.next, size -= sizeof(cc_ulong), *p++ = cc->id) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -23049,9 +23052,9 @@ STATIC int
 isup_sta_tg(isup_statem_t * arg, struct tg *tg, int size)
 {
 	struct cc *cc;
-	ulong *p;
+	cc_ulong *p;
 	isup_statem_tg_t *sta = (typeof(sta)) (arg + 1);
-	if (!tg || (size -= sizeof(*sta)) < sizeof(ulong))
+	if (!tg || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = tg->flags;
 	arg->state = tg->state;
@@ -23062,8 +23065,8 @@ isup_sta_tg(isup_statem_t * arg, struct tg *tg, int size)
 	sta->icc_bind = tg->bind.icc ? tg->bind.icc->id : 0;
 	/* 
 	   fit in a many as we can */
-	for (cc = tg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
-	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
+	for (cc = tg->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(cc_ulong);
+	     cc = cc->bind.next, size -= sizeof(cc_ulong), *p++ = cc->id) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -23071,9 +23074,9 @@ STATIC int
 isup_sta_sr(isup_statem_t * arg, struct sr *sr, int size)
 {
 	struct cc *cc;
-	ulong *p;
+	cc_ulong *p;
 	isup_statem_sr_t *sta = (typeof(sta)) (arg + 1);
-	if (!sr || (size -= sizeof(*sta)) < sizeof(ulong))
+	if (!sr || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = sr->flags;
 	arg->state = sr->state;
@@ -23085,8 +23088,8 @@ isup_sta_sr(isup_statem_t * arg, struct sr *sr, int size)
 	sta->icc_bind = sr->bind.icc ? sr->bind.icc->id : 0;
 	/* 
 	   fit in a many as we can */
-	for (cc = sr->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
-	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
+	for (cc = sr->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(cc_ulong);
+	     cc = cc->bind.next, size -= sizeof(cc_ulong), *p++ = cc->id) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -23094,9 +23097,9 @@ STATIC int
 isup_sta_sp(isup_statem_t * arg, struct sp *sp, int size)
 {
 	struct cc *cc;
-	ulong *p;
+	cc_ulong *p;
 	isup_statem_sp_t *sta = (typeof(sta)) (arg + 1);
-	if (!sp || (size -= sizeof(*sta)) < sizeof(ulong))
+	if (!sp || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = sp->flags;
 	arg->state = sp->state;
@@ -23107,8 +23110,8 @@ isup_sta_sp(isup_statem_t * arg, struct sp *sp, int size)
 	sta->icc_bind = sp->bind.icc ? sp->bind.icc->id : 0;
 	/* 
 	   fit in a many as we can */
-	for (cc = sp->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
-	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
+	for (cc = sp->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(cc_ulong);
+	     cc = cc->bind.next, size -= sizeof(cc_ulong), *p++ = cc->id) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -23127,9 +23130,9 @@ STATIC int
 isup_sta_df(isup_statem_t * arg, struct df *df, int size)
 {
 	struct cc *cc;
-	ulong *p;
+	cc_ulong *p;
 	isup_statem_df_t *sta = (typeof(sta)) (arg + 1);
-	if (!df || (size -= sizeof(*sta)) < sizeof(ulong))
+	if (!df || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = 0;
 	arg->state = 0;
@@ -23139,8 +23142,8 @@ isup_sta_df(isup_statem_t * arg, struct df *df, int size)
 	sta->icc_bind = df->bind.icc ? df->bind.icc->id : 0;
 	/* 
 	   fit in a many as we can */
-	for (cc = df->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(ulong);
-	     cc = cc->bind.next, size -= sizeof(ulong), *p++ = cc->id) ;
+	for (cc = df->bind.ogc, p = sta->ogc_bind; cc && size >= 2 * sizeof(cc_ulong);
+	     cc = cc->bind.next, size -= sizeof(cc_ulong), *p++ = cc->id) ;
 	*p++ = 0;
 	return (QR_DONE);
 }
@@ -25428,8 +25431,8 @@ isup_term_caches(void)
 #endif
 	}
 	if (isup_tg_cachep) {
-		if (kmem_cache_destroy(isup_tg_cachep)) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
+		if (kmem_cache_destroy(isup_tg_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy isup_tg_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
@@ -25593,7 +25596,7 @@ isup_free_cc(queue_t *q)
 				sp_put(xchg(&cc->bind.u.sp, NULL));
 				break;
 			case ISUP_BIND_DF:
-				xchg(&cc->bind.u.df, NULL);
+				(void) xchg(&cc->bind.u.df, NULL);
 				break;
 			default:
 				swerr();

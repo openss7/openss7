@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.8 2006/10/06 12:13:04 brian Exp $
+.\" @(#) $Id: mi_open_detached.9.man,v 0.9.2.9 2007/08/03 13:35:56 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:04 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/03 13:35:56 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mi_open_detached.9.man,v $
+.\" Revision 0.9.2.9  2007/08/03 13:35:56  brian
+.\" - manual updates, put ss7 modules in public release
+.\"
 .\" Revision 0.9.2.8  2006/10/06 12:13:04  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -89,7 +92,7 @@ sort-adjacent-labels
 .\"
 .\"
 .SH NAME
-.B mi_open_detached
+.B mi_open_detached, mi_open_detached_cache
 \- \fISTREAMS\fP create detached instance data
 .\"
 .\"
@@ -104,6 +107,8 @@ sort-adjacent-labels
 .B #include <sys/mpsddi.h>
 .HP
 .BI "caddr_t mi_open_detached(caddr_t *" mi_head ", size_t " size ", dev_t *" devp ");
+.HP
+.BI "caddr_t mi_open_detached_cache(caddr_t *" mi_head ", kmem_cachep_t " cachep ", dev_t *" devp ");
 .\"
 .\"
 .SH ARGUMENTS
@@ -115,6 +120,10 @@ an opaque pointer to the head of the private structure list.
 .TP
 .I size
 the size of the private structure to allocate.
+.TP
+.I cachep
+the pointer to a private structure cache with appropriately sized objects (see
+.BR mi_open_size (9)).
 .TP
 .I devp
 a pointer to the device number associated with the Stream.
@@ -136,6 +145,13 @@ In contrast to
 .BR mi_open_detached ()
 does not require an existing stream or module instance (queue) with which to associate the instance
 data.
+.PP
+.BR mi_open_detached_cache ()
+peforms the same functions as
+.BR mi_open_detached (),
+but allocates the private instance data from a predefined memory cache
+instead of using
+.BR kmem_alloc (9).
 .\"
 .\"
 .SH USAGE
@@ -159,8 +175,10 @@ housekeeping function is used in its stead.
 .PP
 When
 .BR mi_open_detached ()
-succeeds, it returns a pointer to the newly created driver or module instance data;
-when it fails, it returns
+and
+.BR mi_open_detached_cache ()
+succeed, they returns a pointer to the newly created driver or module instance data;
+when they fail, they return
 .BR NULL .
 .\"
 .\"
@@ -168,16 +186,22 @@ when it fails, it returns
 .PP
 When
 .BR mi_open_detached ()
-fails, it returns
+and
+.BR mi_open_detached_cache ()
+fail, they return
 .BR NULL .
 .BR mi_open_detached ()
-fails when it cannot allocate memory for driver or module instance data, or
+and
+.BR mi_open_detached_cache ()
+fail when they cannot allocate memory for driver or module instance data, or
 the device number is already allocated to another instance.
 .\"
 .\"
 .SH CONTEXT
 .PP
 .BR mi_open_detached ()
+and
+.BR mi_open_detached_cache ()
 can be called from any blocking context, however, it is intended to be called
 from a
 .I STREAMS
@@ -189,21 +213,25 @@ routine.
 .SH MP-STREAMS
 .PP
 .BR mi_open_detached ()
-is MP-safe.  The caller, however, is responsible for acquiring the necessary
+and
+.BR mi_open_detached_cache ()
+are MP-safe.  The caller, however, is responsible for acquiring the necessary
 locks before attempting to access the contents of the private instance data.
 .\"
 .\"
 .SH NOTICES
 .PP
 .BR mi_open_detached ()
-is an
+and
+.BR mi_open_detached_cache ()
+are
 .IR MPS \(rg-specific
-function:
+functions:
 .BR _MPS_SOURCE ,
 .B _AIX_SOURCE
 or
 .B _MAC_SOURCE
-must be defined before including DDI/DKI include files to expose this symbol.
+must be defined before including DDI/DKI include files to expose these symbols.
 .BR "@PACKAGE_TITLE@"
 must also have been compiled with
 .BR CONFIG_STREAMS_COMPAT_MPS ,
@@ -233,6 +261,22 @@ argument and a
 .B NULL
 .I crp
 argument.
+.PP
+.BR mi_open_detached_cache ()
+simply calls
+.BR mi_open_alloc_cache (9)
+to allocate a private structure from cache,
+.IR cachep ,
+and calls
+.BR mi_open_link (9)
+with the device pointer.
+.BR mi_open_link (9)
+is called with zero
+.I oflag
+argument and a
+.B NULL
+.I crp
+argument.
 .\"
 .\"
 .SH "SEE ALSO"
@@ -241,6 +285,7 @@ argument.
 .IR qi_qopen (9),
 .BR mi_attach (9),
 .BR mi_open_alloc_sleep (9),
+.BR mi_open_alloc_cache (9),
 .BR mi_open_link (9),
 .BR mpscompat (9),
 .BR aixcompat (9),
@@ -251,7 +296,9 @@ argument.
 .SH BUGS
 .PP
 .BR mi_open_detached ()
-has no known bugs.
+and
+.BR mi_open_detached_cache ()
+have no known bugs.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -310,6 +357,16 @@ See
 and
 .BR STREAMS (9)
 for additional compatibility considerations.
+.PP
+.BR mi_open_detached_cache ()
+is an
+.I OpenSS7 Project
+specific implementation of
+.BR mi_open_detached ()
+that is inherently non-portable.  While it is fairly straightforward to
+implement these in any Mentat implementation present on modern day UNIX
+systems, it requires exposing internals to the MPS implementation that might
+not be desirable.
 .\"
 .\"
 .SH CONFORMANCE
@@ -325,10 +382,11 @@ macotr
 macspg
 .]
 .IR AIX \(rg
-documentation.
+documentation,
 .[
 aixcpc
 .]
+.IR "The OpenSS7 Project" .
 .\"
 .\"
 .SH HISTORY
@@ -357,6 +415,13 @@ An undocumented version of
 .BR mi_open_detached ()
 appears in
 .IR Solaris \(rg.
+.PP
+.BR mi_open_detached_cache ()
+is an
+.I OpenSS7 Project
+function based loosely on the
+.BR mi_open_detached ()
+Mentat function.
 .\"
 .\"
 .[

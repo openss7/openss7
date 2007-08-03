@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tr.h,v 0.9.2.7 2007/02/13 14:05:29 brian Exp $
+ @(#) $Id: tr.h,v 0.9.2.8 2007/08/03 13:35:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 14:05:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr.h,v $
+ Revision 0.9.2.8  2007/08/03 13:35:01  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.7  2007/02/13 14:05:29  brian
  - corrected ulong and long for 32-bit compat
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_TR_H__
 #define __SS7_TR_H__
 
-#ident "@(#) $RCSfile: tr.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tr.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -72,6 +75,7 @@
 #define	TR_CONT_REQ		 9	/* Continue transaction request */
 #define TR_END_REQ		10	/* End transaction request */
 #define TR_ABORT_REQ		11	/* Abort transaction request */
+#define TR_ADDR_REQ		25	/* Address request */
 
 #define TR_INFO_ACK		12	/* Information acknowledgement */
 #define TR_BIND_ACK		13	/* Bound to network address */
@@ -85,6 +89,7 @@
 #define TR_END_IND		22	/* End transaction indication */
 #define TR_ABORT_IND		23	/* Abort transaction indication */
 #define TR_NOTICE_IND		24	/* Error indication */
+#define TR_ADDR_ACK		27	/* Address acknowledgement */
 
 #define TR_QOS_SEL1		0x0501
 
@@ -94,9 +99,6 @@ typedef struct {
 	t_uscalar_t seq_ctrl;		/* Sequence Control */
 	t_uscalar_t priority;		/* Message priority */
 } TR_qos_sel1_t;
-
-#define TR_PROVIDER		0x0001
-#define TR_USER			0x0002
 
 /*
  * TRPI interface states
@@ -141,6 +143,32 @@ typedef struct {
 				 */
 #define TRBADTOKEN	22	/* Token used is not associated with an open stream */
 #define TRNOPROTOID	23	/* Protocol id could not be allocated */
+
+/*
+ *  TR_ABORT_IND originator
+ */
+#define TR_PROVIDER		0x0001
+#define TR_USER			0x0002
+
+/*
+ *  TR_ABORT abort causes
+ */
+#define TR_ABTC_APPL_UNREC_MSG_TYPE		0x0100	/* unrecognized message type */
+#define TR_ABTC_APPL_UNREC_TRANS_ID		0x0101	/* unrecognized transaction id */
+#define TR_ABTC_APPL_BAD_XACT_PORTION		0x0102	/* badly formatted transaction portion */
+#define TR_ABTC_APPL_INCORRECT_XACT_PORTION	0x0103	/* incorrect transaction portion */
+#define TR_ABTC_APPL_RESOURCE_LIMITATION	0x0104	/* resource limitation */
+
+#define TR_ABTC_PRIV_UNREC_PKG_TYPE		0x0201	/* unrecognized package type */
+#define TR_ABTC_PRIV_INCORRECT_XACT_PORTION	0x0202	/* incorrect transaction portion */
+#define TR_ABTC_PRIV_BAD_XACT_PORTION		0x0203	/* badly structured transaction portion */
+#define TR_ABTC_PRIV_UNASSIGNED_RESP_TRANS_ID	0x0204	/* unassigned responding transaction id */
+#define TR_ABTC_PRIV_PERM_TO_RELEASE_PROB	0x0205	/* permission to release problem */
+#define TR_ABTC_PRIV_RESOURCE_UNAVAIL		0x0206	/* resource unavailable */
+#define TR_ABTC_PRIV_UNREC_DIALOG_PORTION_ID	0x0207	/* unrecognized dialogue portion id */
+#define TR_ABTC_PRIV_BAD_DIALOG_PORTION		0x0208	/* badly structured dialogue portion */
+#define TR_ABTC_PRIV_MISSING_DIALOG_PORTION	0x0209	/* missing dialogue portion */
+#define TR_ABTC_PRIV_INCONSIST_DIALOG_PORTION	0x020a	/* inconsistent dialogue portion */
 
 /*
  *  TR_INFO_REQ.  This primitive consists of one M_PCPROTO message block.

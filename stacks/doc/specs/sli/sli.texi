@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sli.texi,v 0.9.2.2 2007/07/09 09:04:51 brian Exp $
+% @(#) $Id: sli.texi,v 0.9.2.3 2007/08/03 13:34:54 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/07/09 09:04:51 $ by $Author: brian $
+% Last Modified $Date: 2007/08/03 13:34:54 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*- texinfo -*-
@@ -239,9 +239,9 @@ no obligation to provide any feature listed herein.
 @defcodeindex pv
 @c Define an index of protocol states
 @defcodeindex st
-@c Define an index of manual pages
-@defcodeindex pe
 @c Define an index of protocol errors
+@defcodeindex pe
+@c Define an index of manual pages
 @defindex mp
 
 @c @syncodeindex pr cp
@@ -387,6 +387,9 @@ is an @strong{UNCONTROLLED VERSION}.
 @smallexample
 
 $Log: sli.texi,v $
+Revision 0.9.2.3  2007/08/03 13:34:54  brian
+- manual updates, put ss7 modules in public release
+
 Revision 0.9.2.2  2007/07/09 09:04:51  brian
 - working up SLI specification
 

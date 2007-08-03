@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcap_ioctl.4.man,v 0.9.2.8 2006/12/27 16:35:54 brian Exp $
+.\" @(#) $Id: tcap_ioctl.4.man,v 0.9.2.9 2007/08/03 13:34:50 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/27 16:35:54 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/03 13:34:50 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcap_ioctl.4.man,v $
+.\" Revision 0.9.2.9  2007/08/03 13:34:50  brian
+.\" - manual updates, put ss7 modules in public release
+.\"
 .\" Revision 0.9.2.8  2006/12/27 16:35:54  brian
 .\" - added slpmod module and fixups for make check target
 .\"
@@ -87,7 +90,7 @@ sort-adjacent-labels
 .\"
 .SH NAME
 .B tcap_ioctl
-\- common IO controls for TCAP devices
+\- SS7 Transaction Capablities Application Part (TCAP) Device - Input-Output Controls
 .\"
 .\"
 .SH SYNOPSIS
@@ -107,7 +110,1060 @@ sort-adjacent-labels
 .\"
 .SH DESCRIPTION
 .PP
-.B THIS MANUAL PAGE IS INCOMPLETE AND MUST BE COMPLETED.
+.B TCAP-IOCTL
+is a definition of the managed object model for the
+.BR tcap (4)
+driver using the input-output contols defined in
+.BR lmi_ioctl (4).
+The
+.BR tcap (4)
+driver is an implementatino of the SS7 Transaction Capabilities Application Part (TCAP) protocol
+defined in ITU-T Recommendations Q.771-Q.775,
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+ETSI TCAP Version 1 and 2,
+.[
+tcapv1
+.]
+.[
+tcapv2
+.]
+ANSI T1.114,
+.[
+t1.114
+.]
+and other national standards documents.
+The
+.B TCAP-IOCTL
+provide the definition of the managed objects for the
+.BR tcap (4)
+driver in accordance with the manage object model in ITU-T Recommendation Q.751.1,
+.[
+q.751.1
+.]
+Q.751.2,
+.[
+q.751.2
+.]
+and Q.752;
+.[
+q.752
+.]
+and ANSI T1.116.1 and T1.116.2.
+.[
+t1.116.1
+.]
+.[
+t1.116.2
+.]
+.PP
+TCAP is an implementation of the Signalling System No. 7 Transaction Capabilities Application Part
+(TCAP).
+.[
+q771
+.]
+.[
+q772
+.]
+.[
+q773
+.]
+.[
+q774
+.]
+.[
+q775
+.]
+.[
+tcapv1
+.]
+.[
+tcapv2
+.]
+.[
+t1.114
+.]
+TCAP provides for the exchange of reliable sequenced or unreliable unsequenced deliver of packets
+over a connectionless network provider between two TCAP Entity Users.  TCAP relies on strong
+assurances that the data arrives in order on stream, if requested, and expects maintenance of
+sequencing of packets in the face of most network failures, from the network provider.  TCAP
+provides four Operations Classes:
+.TP
+.I Operations Class 1
+Success and failure are reported.
+.TP
+.I Operations Class 2
+Success is reported, but not failure.
+.TP
+.I Operations Class 3
+Failure is reported, but not success.
+.TP
+.I Operations Class 4
+Neither success nor failure are reported.
+.\"
+.\"
+.SS "Protocol Service Interface"
+.PP
+TCAP provides the following stream types:
+.HP
+.IR /dev/tcap ", " /dev/tcap-tci
+This device provides the TCAP protocol service interface using the TC-primitives of the Transaction
+Component Interface (TCI)
+.[
+tci revision 0.9.2
+.]
+described in
+.BR tci (7).
+.HP
+.IR /dev/tcap-tri
+This device provides the TCAP protocol service interface using the TR-primitives of the Transaction
+Interface (TRI)
+.[
+tri revision 0.9.2
+.]
+described in
+.BR tri (7).
+.HP
+.IR /dev/tcap-tpi-cl
+This device provides the TCAP protocol service interface using the T-primitives of the Transport
+Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+described in
+.BR tpi (7),
+for connectionless service.  It only supports Operations Class 4.
+.HP
+.IR /dev/tcap-tpi-co
+This device provides the TCAP protocol service interface using the T-primitives of the Transport
+Provider Interface (TPI)
+.[
+tpi revision 2.0.0
+.]
+described in
+.BR tpi (7),
+for connection-mode service.  It only supports Operations Classes 1, 2 and 3.
+.\"
+.\"
+.SS "Object Model"
+.PP
+TCAP provides for management of a number of managed objects.  These objects are of a number of types
+as follows:
+.TP
+.B TCAP_OBJ_TYPE_DF
+This manage object contains system-wide defaults.  Changing the values associated with this object
+changes the default used when new object are created.  There is only one instance of the default
+object that is created with the kernel module is loaded and destroyed when the kernel module is
+unloaded.  Information in this object is not persistent between module loads.  (However, Linux has
+had the capability for some time to store persistent kernel module data between kernel module loads
+and this object is a candidate for this type of peristence.)
+.TP
+.B TCAP_OBJ_TYPE_TC
+This managed object represents the user of the protocol service interface being provided by the TCAP
+provider.  For TCAP, this is a Transaction Component Interface (TCI),
+.[
+tci revision 0.9.2
+.]
+.BR tci (7),
+a Transaction Interface (TRI),
+.[
+tri revision 0.9.2
+.]
+.BR tri (7),
+or Transport Provider Interface (TPI),
+.[
+tpi revision 2.0.0
+.]
+.BR tpi (7),
+service interface.
+Management of this interface, therefore, is in accordance with the specific protocol.  TCAP user
+objects are bound to TCAP Entities using the protocol service interface.
+.sp
+For the TCAP multiplexing driver, this is the object associated with a Stream opened on the upper
+multiplexing driver; for the TCAP module, the Stream after the module is pushed.  In the STREAMS
+implementation, it is the private data associated with a queue-pair on the upper multiplex, or
+module.
+.TP
+.B TCAP_OBJ_TYPE_IV
+An Invoke object represents an operation in the Idle, Operation Sent, or Wait for Reject state.  IV
+objects are created and destroyed on demand by the TCAP provider protocol functions.  These objects
+are dynamic and cannod be managed, but their existence and state can be interrogated.  Invoke
+objects are associated with a Dialogue object.  They contain information about the operation
+including the invoke id, linked id, operation class, and operation.  Invoke objects are identified
+by a TCAP Entity id, a dialogue id and invoke id.
+.\".TP
+.\".B TCAP_OBJ_TYPE_OP
+.TP
+.B TCAP_OBJ_TYPE_DG
+A Dialogue object represents a dialogue in the Initiation Sent, Initiation Received or Active state.
+DG objects are created and destroyed on demand by the TCAP provider protocol functions.  These
+objects are dynamic and cannot be managed, but their existence and state can be interrogated.
+Dialogue object are associated with a Transaction object.  They contain information about the
+dialogue including the Application Context, user dialogue id and provider dialogue id.  Dialogue
+objects are identified by a TCAP Entity id and dialogue id.
+.\".TP
+.\".B TCAP_OBJ_TYPE_AC
+.TP
+.B TCAP_OBJ_TYPE_TR
+A Transaction object represents a transaction in the Initiation Sent, Initiation Received or Active
+state.  TR objects are created and destroyed on demand by the TCAP provider protocol functions.
+These object are dynamic and cannot be managed, but their existence and state can be interrogated.
+Transaction objects are associated with a TCAP User, TCAP Entity and SCCP-SAP objects.  They contain
+information about the transaction including the originating and destination transaction ids, and
+remote SCCP address.  Transaction objects are identified by a TCAP Entity id and provider
+transaction id.
+.TP
+.B TCAP_OBJ_TYPE_TE
+A TCAP Entity object represents a local TCAP provider instance.  TCAP Entity objects may be created
+on demand, using defaults from the Default object, but persist until explicitly destroyed using
+management controls.  Whenever it is requested that a TCAP user or SCCP-SAP be associated with a
+TCAP Entity for which a TCAP Entity does not yet exist, a TCAP Entity object is created on demand.
+TCAP Entities are identified by their local TCAP Entity Identifier.  TCAP Entities provide service
+to TCAP Users bound to Application Contexts.  A collection of SCCP-SAPs provide network service to
+the TCAP Entity.
+.TP
+.B TCAP_OBJ_TYPE_SP
+The SCCP-SAP object is a management object that represents an SCCP service access point.  SP objects
+are created on demand, using defaults from the Default object, but must be explicitly destroyed.
+Whenever it is requested that an SC object be associated with an SCCP-SAP for which an SCCP-SAP does
+not yet exist, an SCCP-SAP object is created on demand.  An SCCP-SAP instance is identified by its
+SCCP address.  Each SCCP-SAP object obtains network connectivity via a single SCCP provider object.
+.TP
+.B TCAP_OBJ_TYPE_SC
+The SC object is a management object that represents the SCCP provider.  SC objects are created on
+demand, using defaults from the Default object, and information obtained by interrogating the SCCP
+provider, and destroyed when unused.  Whenever and SCCP provider Stream is linked under a TCAP
+multiplexing driver or has a TCAP module pushed over it, an SCCP provider object is created on
+demand.  Whenever the SCCP provider Stream is unliked from the TCAP multiplexing driver or the TCAP
+module is popped, the object is destroyed.  A SCCP provider object is \(lqused\(rq when it has an
+SCCP provider Stream associated with it.
+.sp
+For TCAP multiplexing drivers, this is the object associated with an SCCP provider Stream linked
+under the multiplexing driver; for TCAP modules, the Stream upon which the module was pushed.  In
+the STREAMS implementation, it is the private data associated with a queue-pair on the lower
+multiplex, or the read-queue of the pushable module.
+SCCP provider objects are, therefore, identified by their STREAMS lower multiplex identifiers
+returned from the
+.IR I_LINK "(7) or " I_PLINK (7)
+operation, or are implicitly identified by the Stream over which a TCAP module was pushed using the
+.IR I_PUSH (7)
+operation.
+.PP
+.BR "Figure 1" ,
+below, illustrates the object model.
+.PP
+As can be seen from the illustration, User Streams, TC objects and AC objects have a one-to-one
+relationship.  The User Stream can be viewed as the implementation of the TC-AC managed objects.
+The TC managed object can be viewed as all of the TCAP attributes of the User Stream, whereas the AC
+object can be viewed as all of the Application aspects of the User Stream.
+.PP
+Also, SCCP provider Streams, SC objects and SP objects also have a one-to-one relationship.  The
+SCCP provider Stream can be viewed as the implementation of the SP-SC managed objects.  The SC
+managed object can be viewed as all of the SCCP aspects of the SCCP provider Stream.
+.PP
+TCAP Entity objects map TC User Streams to SCCP Provider Streams.
+.PP
+Each object has associated with it information in the following categories:
+.\"
+.\"
+.SH CONFIGURATION
+.PP
+All objects must be configured using
+.IR I_STR (7)
+.BR streamio (7)
+.BR ioctl (2)
+calls before they are usable.
+.sp
+.nf
+\fC\s-1\
+typedef union tcap_conf_obj {
+    struct tcap_conf_df df;
+    struct tcap_conf_tc tc;
+    struct tcap_conf_iv iv;
+    struct tcap_conf_dg dg;
+    struct tcap_conf_tr tr;
+    struct tcap_conf_te te;
+    struct tcap_conf_sp sp;
+    struct tcap_conf_sc sc;
+} tcap_conf_obj_t;
+
+typedef struct tcap_conf {
+    t_uscalar_t type; /* object type */
+    t_uscalar_t id;   /* object id */
+    t_uscalar_t cmd;  /* object command */
+    /* followed by specific configuration structure */
+    tcap_conf_obj_t config[0];
+} tcap_config_t;
+\s+1\fP
+.fi
+.TP
+.I type
+specifies the object type.  See object types under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier that identifies the object instance within the object type.  When
+the operation is
+.BR TCAP_ADD ,
+this field can be set to zero (0) and
+the TCAP provider
+will select a new unique object identifier or access the implicit object.  When the operation is
+.BR TCAP_GET ,
+this field can be set to zero (0) and
+the TCAP provider
+will return all object configurations of a type that will fit into the supplied buffer.
+.TP
+.I cmd
+specifies the command.  This field can be one of the following values:
+.RS
+.TP
+.B TCAP_GET
+Get configuration of an object.
+This command is only valid with input-output control
+.BR TCAP_IOCGCONFIG .
+.TP
+.B TCAP_ADD
+Add an object.
+This command is not valid with input-output control
+.BR TCAP_IOCGCONFIG .
+.TP
+Change an object.
+.B TCAP_CHA
+This command is not valid with input-output control
+.BR TCAP_IOCGCONFIG .
+.TP
+.B TCAP_DEL
+Delete an object.
+This command is not valid with input-output control
+.BR TCAP_IOCGCONFIG .
+.RE
+.PP
+The following input-output control commands use this structure:
+.TP
+.B TCAP_IOCGCONFIG
+Get an object configuration.
+.TP
+.B TCAP_IOCSCONFIG
+Set an object configuration.  This command may fail if an object is busy.
+.TP
+.B TCAP_IOCTCONFIG
+Test an object configuration.
+.TP
+.B TCAP_IOCCCONFIG
+Commit an object configuration.  This command will not fail if an object is busy.
+.PP
+The structures required to specify configuration are as follows (in order of dependency):
+.\"
+.SS "Default"
+.PP
+Although a configuration structure is defined for the default object, there is no need to create or
+configure the default object.  This object is created and configured at the time that the module
+loads.
+.sp
+.nf
+\fC\s-1\
+typedef struct tcap_conf_df {
+} tcap_conf_df_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP User"
+.PP
+The TCAP user is an object of type
+.BR TCAP_OBJ_TYPE_TC .
+TCAP user objects cannot be created, configured or destroyed using the management interface, but can
+be interrogated.
+.PP
+The object-specific configuration structure for TCAP User objects is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct tcap_conf_tc {
+} tcap_conf_tc_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP Entity"
+.PP
+These objects of type
+.B TCAP_OBJ_TYPE_TE
+represent a local TCAP Entity.  No information is required to create a TCAP Entity.
+.PP
+The object-specific configuration structure for TCAP Entities is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct tcap_conf_te {
+    lmi_option_t proto;               /* protocol variant and options */
+} tcap_conf_te_t;
+\s+1\fP
+.fi
+.TP
+.I proto
+specifies the protocol variant and protocol options associated with the TCAP Entity.  Note that the
+protocol variant and options associated with the TCAP Entity can be different from the protocol
+variant and options associated with the SCCP-SAP.  This is to support, for example, the common
+practise of running ITU-T TCAP over ANSI SCCP.
+.RS
+.TP
+.I pvar
+specifies the Protocol Variant.  For valid protocol variant values, see
+.BR lmi_ioctl (4).
+.TP
+.I popt
+specifies the Protocol Options.  For valid general protocol option values, see
+.BR lmi_ioctl "(4), " mtp_ioctl "(4) and " sccp_ioctl (4).
+TCAP does not add any new protocol option values.
+.RE
+.\"
+.SS "SCCP-SAP"
+.PP
+These object of type
+.B TCAP_OBJ_TYPE_SP
+represent a local SCCP SAP to the SCCP layer.  Because this is an SCCP-SAP, the information required
+to configure the SCCP-SAP consists of a MTP-SAP and an SCCP Subsystem Number.  An MTP-SAP consists
+of a Network Appearance, a Signalling Point Code (Network, Cluster, Member), and a Service Indicator
+value (SCCP=3).  Also, because an SCCP SAP serves a TCAP entity, a TCAP entity identifier is also
+required.
+.PP
+The object-specific configuration structure for SCCP-SAP objects is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct tcap_conf_sp {
+    t_uscalar_t teid;                 /* local TCAP Entity identifier */
+    struct sccp_addr add;             /* local SCCP-SAP */
+    lmi_option_t proto;               /* protocol variant and options */
+} tcap_conf_sp_t;
+\s+1\fP
+.fi
+.TP
+.I teid
+specifies the identifier of the local TCAP Entity to which this SCCP-SAP provides network service.
+.TP
+.I add
+specifes the local SCCP-SAP as a restricted form of the SCCP address:
+.RS
+.TP
+.I add.ni
+specifies the network indicator for the SCCP-SAP.
+.TP
+.I add.ri
+specifies the routing indicator for the SCCP address.  This field should be set to
+.BR SCCP_RI_DPC_SSN,
+and is ignored by the TCAP provider.
+.TP
+.I add.pc
+specifies the signalling point code for the SCCP address.  This field must be formatted appropriately
+for the associated protocol variant.
+.TP
+.I add.ssn
+specifies the subsystem number.  Subsystem number zero is prohibited.
+.TP
+.I add.gtt
+specifies the global title type.  This field should be set to
+.BR SCCP_GTTYPE_NONE ,
+and is ignored by the TCAP provider.
+.TP
+.I add.tt
+specifies the translaction type.  This field should be set to zero (0) and is ignored by the TCAP
+provider.
+.TP
+.I add.es
+specifies the encoding scheme.  This field should be set to zero (0) and is ignored by the TCAP
+provider.
+.TP
+.I add.nplan
+specifies the numbering plan.  This field should be set to zero (0) and is ignored by the TCAP
+provider.
+.TP
+.I add.alen
+specifies the length of the
+.I addr
+field.  This field should be set to zero (0).
+.TP
+.I add.addr[]
+specifies the address signals.  This field should not be present.
+.RE
+.TP
+.I proto
+specifies the protocol variant and protocol options associated with the SCCP-SAP.
+.RS
+.TP
+.I pvar
+specifies the Protocol Variant.  For valid protocol variant values, see
+.BR lmi_ioctl (4).
+.TP
+.I popt
+specifies the Protocol Options.  For valid general protocol option values, see
+.BR lmi_ioctl "(4), " mtp_ioctl "(4) and " sccp_ioctl (4).
+TCAP does not add any new protocol option values.
+.RE
+.\"
+.SS "SCCP Provider"
+.PP
+SCCP providers are objects of type
+.B TCAP_OBJ_TYPE_SC
+that provide service to TCAP Entities via an SCCP-SAP.  SCCP providers comprise separate Streams
+that provide SCCP services using the
+.BR npi (7)
+interface.  These Stremas are linked under the TCAP multiplexing driver,
+.BR tcap (4),
+using the
+.IR I_LINK "(7) or " I_PLINK (7)
+.BR streamio (7)
+operation.  When linked, SCCP providers are configured using the
+.B TCAP_IOCSCONFIG
+command.
+.PP
+An SCCP provider is determined by its lower multiplexing driver identifier that was returned as a
+result of the
+.IR I_LINK "(7) or " I_PLINK (7)
+operation and the SCCP-SAP to which it belongs.  The SCCP-SAP is identified by its SCCP address.
+.PP
+The object-specific configuration structure for SCCP provider objects is formatted as follows:
+.sp
+.nf
+\fC\s-1\
+typedef struct tcap_conf_sp {
+    t_uscalar_t spid;                 /* local SCCP-SAP identifier */
+    t_scalar_t muxid;                 /* lower multiplexing driver id */
+} tcap_conf_sp_t;
+\s+1\fP
+.fi
+.TP
+.I spid
+specifies the SCCP-SAP identifier that identifies the local subsystem to which the SCCP provider is
+associated.  This field wil be set to zero (0) when the SCCP-SAP object is implicit (i.e. for the
+TCAP pushable module where there is only one SCCP-SAP object).
+.TP
+.I muxid
+specifies the lower multiplex identifier returned by the STREAMS susbsystem when the SCCP provider
+Stream was linked under a TCAP multiplexer using the
+.IR I_LINK "(7) or " I_PLINK (7)
+.BR streamio (7)
+operation.  This field will be set to zero (0) when the lower SCCP provider Stream is implicit (i.e.
+when it has been pushed under a TCAP module using the
+.IR I_PUSH (7)
+.BR streamio (7)
+operation).
+.\"
+.\"
+.SH TIMERS
+.PP
+This section defines the object-specific timer structures.  The same object-specific timer
+structures are used to reference a running timer in the state structures (described under
+.RI \(lq STATE ,\(rq
+below), as well as to reference the timeout value in the options structures (described under
+.IR \(lq OPTIONS ,\(rq
+below).
+.PP
+Timers and timeout intervals for TCAP managed objects are determined by the relevant standards.
+See, for example, Q.774
+.[
+q774
+.]
+or ANSI T1.114.
+.[
+t1.114
+.]
+The nature of each timer is described briefly in this section.  The sub-sections that follow
+describe the timer structure for each managed object type.
+.\"
+.SS "Default"
+.PP
+TCAP has no global or general timers not directly associated with an operation.  No timers are
+defined by Q.774
+.[
+q774
+.]
+or ANSI T1.114
+.[
+t1.114
+.]
+for the system hosting the TCAP.
+.sp
+.nf
+\fC\s-1\
+typedef struct tcap_timers_df {
+} tcap_timers_df_t;
+\s+1\fP
+.fi
+.\"
+.SS "TC User"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_tc {
+    tcap_timer_t tinv;      /* invoke timer */
+    tcap_timer_t trej;      /* reject timer */
+} tcap_timers_tc_t;
+\s+1\fP
+.fi
+.TP
+.I tinv
+Specifies the default invoke operation timer for operations invoked from this TCAP User.
+.TP
+.I trej
+Specifies the default reject operation timer for operations invoked from this TCAP User.
+.\"
+.SS "Invoke"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_iv {
+    tcap_timer_t tinv;      /* invoke timer */
+    tcap_timer_t trej;      /* reject timer */
+} tcap_timers_iv_t;
+\s+1\fP
+.fi
+.TP
+.I tinv
+Specifies the invoke operation timer for this operation.
+.TP
+.I trej
+Specifies the reject operation timer for this operation.
+.\"
+.SS "Dialogue"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_dg {
+} tcap_timers_dg_t;
+\s+1\fP
+.fi
+.\"
+.SS "Transaction"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_tr {
+} tcap_timers_tr_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP Entity"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_te {
+    tcap_timer_t tinv;      /* invoke timer */
+    tcap_timer_t trej;      /* reject timer */
+} tcap_timers_te_t;
+\s+1\fP
+.fi
+.TP
+.I tinv
+Specifies the default invoke operation timer for operations invoked from this TCAP Entity.
+.TP
+.I trej
+Specifies the default reject operation timer for operations invoked from this TCAP Entity.
+.\"
+.SS "SCCP-SAP"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_sp {
+} tcap_timers_sp_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP Provider"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_timers_sc {
+} tcap_timers_sc_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH OPTIONS
+.PP
+.nf
+\fC\s-1\
+typedef union tcap_option_obj {
+    struct tcap_opt_conf_df df;
+    struct tcap_opt_conf_tc tc;
+    struct tcap_opt_conf_iv iv;
+    struct tcap_opt_conf_dg dg;
+    struct tcap_opt_conf_tr tr;
+    struct tcap_opt_conf_te te;
+    struct tcap_opt_conf_sp sp;
+    struct tcap_opt_conf_sc sc;
+} tcap_option_obj_t;
+
+typedef struct tcap_option {
+    t_uscalar_t type;                   /* object type */
+    t_uscalar_t id;                     /* object id */
+    /* followed by specific proto structure */
+    tcap_option_obj_t options[0];
+} tcap_option_t;
+\s+1\fP
+.fi
+.TP
+.I type
+specifies the object type.  See objects under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier that identifies the object instance within the object type.
+.PP
+The following input-output control use the
+.B tcap_option
+structure:
+.TP
+.B TCAP_IOCGOPTION
+Get object options.
+.TP
+.B TCAP_IOCSOPTION
+Set object options.
+.PP
+Following are the object specific options structures:
+.\"
+.SS "Default"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_df {
+} tcap_opt_conf_df_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP User"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_tc {
+} tcap_opt_conf_tc_t;
+\s+1\fP
+.fi
+.\"
+.SS "Invoke"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_iv {
+} tcap_opt_conf_iv_t;
+\s+1\fP
+.fi
+.\"
+.SS "Dialogue"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_dg {
+} tcap_opt_conf_dg_t;
+\s+1\fP
+.fi
+.\"
+.SS "Transaction"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_tr {
+} tcap_opt_conf_tr_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP Entity"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_te {
+} tcap_opt_conf_te_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP-SAP"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_sp {
+} tcap_opt_conf_sp_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP Provider"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_opt_conf_sc {
+} tcap_opt_conf_sc_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH STATE
+.PP
+.nf
+\fC\s-1\
+typedef union tcap_statem_obj {
+    struct tcap_statem_df df;
+    struct tcap_statem_tc tc;
+    struct tcap_statem_iv iv;
+    struct tcap_statem_dg dg;
+    struct tcap_statem_tr tr;
+    struct tcap_statem_te te;
+    struct tcap_statem_sp sp;
+    struct tcap_statem_sc sc;
+} tcap_statem_obj_t;
+
+typedef struct tcap_statem {
+    t_uscalar_t type;                   /* object type */
+    t_uscalar_t id;                     /* object id */
+    t_uscalar_t flags;                  /* object flags */
+    t_uscalar_t state;                  /* object state */
+    /* followed by object-specific state structure */
+    tcap_statem_obj_t statem[0];
+} tcap_statem_t;
+\s+1\fP
+.fi
+.TP
+.I type
+specifies the object type.  See object types under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier that identifies the object instance within the object type.
+.TP
+.I state
+specifies the primary state of the object.
+.TP
+.I flags
+specifies the primary state flags associated with the object.
+.PP
+The input-output controls that use the
+.B tcap_statem
+structure are as follows:
+.TP
+.B TCAP_IOCGSTATEM
+Get object state.
+.TP
+.B TCAP_IOCCMRESET
+Reset object state.
+.PP
+The object specific state structures are described in the subsections that follow:
+.\"
+.SS "Default"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_df {
+    tcap_timers_df_t timers;
+} tcap_statem_df_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP User"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_tc {
+    tcap_timers_tc_t timers;
+} tcap_statem_tc_t;
+\s+1\fP
+.fi
+.\"
+.SS "Invoke"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_iv {
+    tcap_timers_iv_t timers;
+} tcap_statem_iv_t;
+\s+1\fP
+.fi
+.\"
+.SS "Dialogue"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_dg {
+    tcap_timers_dg_t timers;
+} tcap_statem_dg_t;
+\s+1\fP
+.fi
+.\"
+.SS "Transaction"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_tr {
+    tcap_timers_tr_t timers;
+} tcap_statem_tr_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP Entity"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_te {
+    tcap_timers_te_t timers;
+} tcap_statem_te_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP-SAP"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_sp {
+    tcap_timers_sp_t timers;
+} tcap_statem_sp_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP Provider"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_statem_sc {
+    tcap_timers_sc_t timers;
+} tcap_statem_sc_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH STATS
+.PP
+.nf
+\fC\s-1\
+typedef union tcap_stats_obj {
+    struct tcap_stats_df df;
+    struct tcap_stats_tc tc;
+    struct tcap_stats_iv iv;
+    struct tcap_stats_dg dg;
+    struct tcap_stats_tr tr;
+    struct tcap_stats_te te;
+    struct tcap_stats_sp sp;
+    struct tcap_stats_sc sc;
+} tcap_stats_obj_t;
+
+typedef struct tcap_stats {
+    t_uscalar_t type;                   /* object type */
+    t_uscalar_t id;                     /* object id */
+    /* followed by specific proto structure */
+    tcap_stats_obj_t stats[0];
+} tcap_option_t;
+\s+1\fP
+.fi
+.TP
+.I type
+specifies the object type.  See objects under
+.RI \(lq "Object Model" ,\(rq
+above.
+.TP
+.I id
+specifies the object identifier that identifies the object instance within the object type.
+.PP
+The following input-output control use the
+.B tcap_stats
+structure:
+.TP
+.B TCAP_IOCGSTATSP
+Get statistics periods.
+.TP
+.B TCAP_IOCSSTATSP
+Set statistics periods.
+.TP
+.B TCAP_IOCGSTATS
+Get statistics.
+.TP
+.B TCAP_IOCCSTATS
+Collect statistics (performs an atomic get and reset).
+.PP
+Following are the object specific options structures:
+.\"
+.SS "Default"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_df {
+} tcap_stats_df_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP User"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_tc {
+} tcap_stats_tc_t;
+\s+1\fP
+.fi
+.\"
+.SS "Invoke"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_iv {
+} tcap_stats_iv_t;
+\s+1\fP
+.fi
+.\"
+.SS "Dialogue"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_dg {
+} tcap_stats_dg_t;
+\s+1\fP
+.fi
+.\"
+.SS "Transaction"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_tr {
+} tcap_stats_tr_t;
+\s+1\fP
+.fi
+.\"
+.SS "TCAP Entity"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_te {
+/* Q.752/A.1 a) protocol error in transaction portion with P-abort cause: unrecognized message type */
+} tcap_stats_te_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP SAP"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_sp {
+} tcap_stats_sp_t;
+\s+1\fP
+.fi
+.\"
+.SS "SCCP Provider"
+.PP
+.nf
+\fC\s-1\
+typedef struct tcap_stats_sc {
+} tcap_stats_sc_t;
+\s+1\fP
+.fi
 .\"
 .\"
 .SH IOCTLS
@@ -134,16 +1190,6 @@ None.
 .PP
 None.
 .\"
-.XX
-.[
-q752
-.]
-.[
-t1.116.1
-.]
-.[
-t1.116.2
-.]
 .\"
 .[
 $LIST$

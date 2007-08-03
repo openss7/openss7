@@ -1,3 +1,9 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strchan.refs: update references
+	* src/modules/ch_pmod.c: remove DB_TYPE definition
+	* src/modules/mx_pmod.c: remove DB_TYPE definition
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

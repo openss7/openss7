@@ -1,3 +1,8 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.refs: reference updates
+	* doc/manual/openss7.texi: doc update
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

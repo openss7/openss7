@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/03 13:36:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:36:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.32  2007/08/03 13:36:47  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.31  2007/07/14 01:37:10  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/03 13:36:47 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/03 13:36:47 $";
 
 #include <sys/os7/compat.h>
 
@@ -91,7 +94,7 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/07/14 01:37:10 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/03 13:36:47 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TIRDWR_LICENSE		"GPL v2"
@@ -762,7 +765,7 @@ tirdwr_pop(queue_t *q)
 	}
 #   if defined M_UNHANGUP
 	if ((priv->flags & TIRDWR_HANGUP)) {
-		if ((mp = allocb(0, BRPI_WAITOK))) {
+		if ((mp = allocb(0, BPRI_WAITOK))) {
 			mp->b_datap->db_type = M_UNHANGUP;
 			putnext(priv->rq, mp);
 		}

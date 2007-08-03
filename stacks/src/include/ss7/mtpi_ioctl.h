@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi_ioctl.h,v 0.9.2.8 2007/02/26 07:25:32 brian Exp $
+ @(#) $Id: mtpi_ioctl.h,v 0.9.2.9 2007/08/03 13:35:00 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/26 07:25:32 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpi_ioctl.h,v $
+ Revision 0.9.2.9  2007/08/03 13:35:00  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.8  2007/02/26 07:25:32  brian
  - synchronizing changes
 
@@ -70,7 +73,7 @@
 #ifndef __MTPI_IOCTL_H__
 #define __MTPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -384,7 +387,7 @@ typedef struct mtp_option {
  *  Signalling link configuration
  */
 typedef struct mtp_conf_sl {
-	mtp_ulong muxid;		/* lower multiplexor id */
+	int muxid;			/* lower multiplexor id */
 	mtp_ulong lkid;			/* link set id */
 	mtp_ulong slc;			/* signalling link code in lk */
 } mtp_conf_sl_t;
@@ -447,13 +450,14 @@ typedef struct mtp_conf_sp {
 /*
  *  Network appearance configuration
  */
+typedef struct mtp_conf_na_mask {
+	mtp_ulong member;		/* PC member mask */
+	mtp_ulong cluster;		/* PC cluster mask */
+	mtp_ulong network;		/* PC network mask */
+} mtp_conf_na_mask_t;
 typedef struct mtp_conf_na {
-	struct lmi_option options;		/* protocol options */
-	struct {
-		mtp_ulong member;	/* PC member mask */
-		mtp_ulong cluster;	/* PC cluster mask */
-		mtp_ulong network;	/* PC network mask */
-	} mask;
+	struct lmi_option options;	/* protocol options */
+	struct mtp_conf_na_mask mask;	/* point code mask */
 	mtp_ulong sls_bits;		/* bits in SLS */
 } mtp_conf_na_t;
 
@@ -520,6 +524,8 @@ typedef struct mtp_config {
 #define MTP_INHIBITED		0x06UL	/* Entity Inhibited (Management inhibited) */
 #define MTP_BLOCKED		0x07UL	/* Entity Blocked (Local Link Set failure) */
 #define MTP_INACTIVE		0x08UL	/* Entity Inactive (Link out of service) */
+#define MTP_LOC_INHIBIT		0x09UL	/* Entity locally inhibited */
+#define MTP_REM_INHIBIT		0x0aUL	/* Entity remotely inhibited */
 
 /*
    pseudo-states 
@@ -545,6 +551,8 @@ typedef struct mtp_config {
 #define MTPF_INHIBITED		(1<< MTP_INHIBITED)	/* Entity is inhibited */
 #define MTPF_BLOCKED		(1<< MTP_BLOCKED)	/* Entity is blocked */
 #define MTPF_INACTIVE		(1<< MTP_INACTIVE)	/* Entity is inactive */
+#define MTPF_LOC_INHIBIT	(1<< MTP_LOC_INHIBIT)	/* Entity is locally inhibited */
+#define MTPF_REM_INHIBIT	(1<< MTP_REM_INHIBIT)	/* Entity is remotely inhibited */
 
 /*
    additional state flags 
@@ -647,6 +655,8 @@ typedef struct mtp_statem_sl {
 #define SLF_INHIBITED	    (MTPF_INHIBITED)	/* Sig link Inhibited (Management inhibited) */
 #define SLF_BLOCKED	    (MTPF_BLOCKED)	/* Sig link Blocked (Processor Outage) */
 #define SLF_INACTIVE	    (MTPF_INACTIVE)	/* Sig link Inactive (Out of Service) */
+#define SLF_LOC_INHIBIT	    (MTPF_LOC_INHIBIT)	/* Sig link Locally Inhibited */
+#define SLF_REM_INHIBIT	    (MTPF_REM_INHIBIT)	/* Sig link Remotely Inhibited */
 
 #define SLF_LOSC_PROC_A	    (MTPF_LOSC_PROC_A)	/* Sig link uses link oscillation procedure A */
 #define SLF_LOSC_PROC_B	    (MTPF_LOSC_PROC_B)	/* Sig link uses link oscillation procedure B */
@@ -845,6 +855,7 @@ typedef struct mtp_statem_rs {
 #define RSF_CLUSTER	    (MTPF_CLUSTER)	/* Routeset is cluster route */
 #define RSF_XFER_FUNC	    (MTPF_XFER_FUNC)	/* Routeset has transfer function */
 #define RSF_ADJACENT	    (MTPF_ADJACENT)	/* Routeset is adjacent */
+#define RSF_SECURITY	    (MTPF_SECURITY)	/* Routeset has additional security procedures */
 
 /*
  *  Signalling point state
@@ -1020,7 +1031,7 @@ typedef struct mtp_stats {
 #define	MTP_IOCGSTATSP	_IOWR(	MTP_IOC_MAGIC,	 8,	mtp_stats_t	)
 #define	MTP_IOCSSTATSP	_IOWR(	MTP_IOC_MAGIC,	 9,	mtp_stats_t	)
 #define	MTP_IOCGSTATS	_IOWR(	MTP_IOC_MAGIC,	10,	mtp_stats_t	)
-#define	MTP_IOCSSTATS	_IOWR(	MTP_IOC_MAGIC,	11,	mtp_stats_t	)
+#define	MTP_IOCCSTATS	_IOWR(	MTP_IOC_MAGIC,	11,	mtp_stats_t	)
 
 /*
  *  Signalling link notifications

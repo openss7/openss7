@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:31 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:34:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.9  2007/08/03 13:34:34  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.8  2007/07/14 01:33:31  brian
  - make license explicit, add documentation
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:34 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:34 $";
 
 /*
  *  This is an SUA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -126,9 +129,6 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 #include <sys/strsun.h>
-
-#undef DB_TYPE
-#define DB_TYPE(mp) mp->b_datap->db_type
 
 #include <linux/socket.h>
 #include <net/ip.h>
@@ -184,7 +184,7 @@ static char const ident[] =
 /* ============================== */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP AS SCCP STREAMS MULTIPLEXING DRIVER."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:31 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/08/03 13:34:34 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

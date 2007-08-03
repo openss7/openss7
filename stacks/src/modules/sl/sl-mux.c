@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:02 $
+ @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 20:22:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl-mux.c,v $
+ Revision 0.9.2.2  2007/08/03 13:35:41  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.1  2007/07/21 20:22:02  brian
  - added channel modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:02 $"
+#ident "@(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $"
 
-static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:02 $";
+static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -81,9 +84,11 @@ static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1
  */
 
 #define _LFS_SOURCE 1
+#define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1
+#define _SUN_SOURCE 1
 
-#include <sys/os8/compat.h>
+#include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
 #include <ss7/lmi_ioctl.h>
@@ -97,7 +102,7 @@ static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:02 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -158,10 +163,10 @@ static struct module_info sl_minfo = {
 	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
-static struct module_stat sl_rstat __attribute__ ((__aligned(SMP_CACHE_BYTES)));
-static struct module_stat sl_wstat __attribute__ ((__aligned(SMP_CACHE_BYTES)));
-static struct module_stat sl_muxrstat __attribute__ ((__aligned(SMP_CACHE_BYTES)));
-static struct module_stat sl_muxwstat __attribute__ ((__aligned(SMP_CACHE_BYTES)));
+static struct module_stat sl_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sl_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sl_muxrstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sl_muxwstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static caddr_t sl_opens = NULL;
 static caddr_t sl_links = NULL;
@@ -206,6 +211,8 @@ struct sl {
 	struct slmux_ppa ppa;		/* lower multiplex index, ppa and clei */
 };
 
+#define SL_PRIV(q) ((struct sl *)q->q_ptr)
+
 static struct sl *sl_ctrl = NULL;	/* layer management control stream */
 
 /* LOGGING */
@@ -233,7 +240,7 @@ sl_find_index(struct sl *lm, int index)
 
 	for (sl = lm->lm.lm; sl && sl->ppa.slm_index != index; sl = sl->lm.next) ;
 	if (sl == NULL && lm->oq)
-		sl = (struct sl *) lm->oq->q_ptr;
+		sl = SL_PRIV(lm->oq);
 	return (sl);
 }
 static noinline fastcall struct sl *
@@ -263,7 +270,7 @@ sl_find_lower(struct sl *lm, struct slmux_ppa *ppa)
 	if (ppa->slm_clei[0] != '\0')
 		return sl_find_clei(lm, ppa->slm_clei);
 	if (lm->oq)
-		return (struct sl *)lm->oq->q_ptr;
+		return SL_PRIV(lm->oq);
 	return (NULL);
 }
 
@@ -274,6 +281,47 @@ sl_find_lower(struct sl *lm, struct slmux_ppa *ppa)
  *
  *  ===========================================================================
  */
+static inline const char *
+sl_iocname(int cmd)
+{
+	switch (_IOC_NR(cmd)) {
+	case SL_IOCGOPTIONS:
+		return ("SL_IOCGOPTIONS");
+	case SL_IOCSOPTIONS:
+		return ("SL_IOCSOPTIONS");
+	case SL_IOCGCONFIG:
+		return ("SL_IOCGCONFIG");
+	case SL_IOCSCONFIG:
+		return ("SL_IOCSCONFIG");
+	case SL_IOCTCONFIG:
+		return ("SL_IOCTCONFIG");
+	case SL_IOCCCONFIG:
+		return ("SL_IOCCCONFIG");
+	case SL_IOCGSTATEM:
+		return ("SL_IOCGSTATEM");
+	case SL_IOCCMRESET:
+		return ("SL_IOCCMRESET");
+	case SL_IOCGSTATSP:
+		return ("SL_IOCGSTATSP");
+	case SL_IOCSSTATSP:
+		return ("SL_IOCSSTATSP");
+	case SL_IOCGSTATS:
+		return ("SL_IOCGSTATS");
+	case SL_IOCCSTATS:
+		return ("SL_IOCCSTATS");
+	case SL_IOCGNOTIFY:
+		return ("SL_IOCGNOTIFY");
+	case SL_IOCSNOTIFY:
+		return ("SL_IOCSNOTIFY");
+	case SL_IOCCNOTIFY:
+		return ("SL_IOCCNOTIFY");
+	case SL_IOCCPASS:
+		return ("SL_IOCCPASS");
+	default:
+		return ("SL_IOC????");
+	}
+}
+
 static const char *
 sl_primname(sl_long prim)
 {
@@ -481,102 +529,440 @@ sl_release(struct sl *sl)
  *  beneath the lower multiplex.
  */
 
-static noinline fastcall int
-lmi_tx_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_info_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_info_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_INFO_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_INFO_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_attach_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_attach_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_ATTACH_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_ATTACH_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_detach_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_detach_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_DETACH_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_DETACH_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_enable_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_enable_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_ENABLE_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_ENABLE_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_disable_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_disable_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_DISABLE_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_DISABLE_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_optmgmt_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_OPTMGMT_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_OPTMGMT_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_pdu_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_pdu_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_PDU_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_PDU_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_emergency_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_emergency_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_EMERGENCY_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_EMERGENCY_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_emergency_ceases_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_EMERGENCY_CEASES_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_start_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_start_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_START_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_START_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_stop_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_stop_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_STOP_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_STOP_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_retrieve_bsnt_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RETRIEVE_BSNT_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_retrieval_req_and_fsnc_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_clear_buffers_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CLEAR_BUFFERS_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_clear_rtb_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_CLEAR_RTB_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CLEAR_RTB_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_continue_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_continue_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_continue_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_CONTINUE_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CONTINUE_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_local_proc_outage_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_LOCAL_PROCESSOR_OUTAGE_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_resume_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_resume_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RESUME_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RESUME_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_cong_discard_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CONGESTION_DISCARD_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_cong_accept_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CONGESTION_ACCEPT_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_no_cong_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_NO_CONGESTION_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_NO_CONGESTION_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_power_on_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_power_on_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_POWER_ON_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_POWER_ON_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_optmgmt_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_OPTMGMT_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_OPTMGMT_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
+#if 0
+static inline fastcall int
+sl_tx_notify_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_notify_req_t *p;
+	mblk_t *mp;
+
+	if ((mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_NOTIFY_REQ;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_NOTIFY_REQ ->");
+		putnext(sl->oq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
+#endif
 
 /*
  *  ===========================================================================
@@ -588,12 +974,29 @@ sl_tx_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
  *  the upper multiplex.
  */
 
-static noinline fastcall int
+static inline fastcall int
+m_error(struct sl *sl, queue_t *q, mblk_t *msg, int err)
+{
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, 2, BPRI_MED))) {
+		DB_TYPE(mp) = M_ERROR;
+		*mp->b_wptr++ = err < 0 ? -err : err;
+		*mp->b_wptr++ = err < 0 ? -err : err;
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- M_ERROR");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
+}
+
+static inline fastcall int
 lmi_tx_info_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 {
 	lmi_info_ack_t *p;
 	mblk_t *mp;
-	if ((mp = mi_allocb(q, sizeof(*p)))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_ACK;
@@ -611,13 +1014,13 @@ lmi_tx_info_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 	}
 	return (-ENOBUFS);
 }
-static noinline fastcall int
+static inline fastcall int
 lmi_tx_ok_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim)
 {
 	lmi_ok_ack_t *p;
 	mblk_t *mp;
 
-	if ((mp = mi_allocb(q, sizeof(*p)))) {
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_OK_ACK;
@@ -641,8 +1044,8 @@ lmi_tx_ok_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim)
 	}
 	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_error_ack(struct sl *sl, queue_t *q, mblk_t *mp, lmi_long prim, lmi_long error)
+static inline fastcall int
+lmi_tx_error_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long error)
 {
 	lmi_error_ack_t *p;
 	mblk_t *mp;
@@ -663,108 +1066,444 @@ lmi_tx_error_ack(struct sl *sl, queue_t *q, mblk_t *mp, lmi_long prim, lmi_long 
 	}
 	return (-ENOBUFS);
 }
-static noinline fastcall int
+static inline fastcall int
 lmi_error_reply(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long error)
 {
 	if (error <= 0)
 		return (error);
 	return lmi_tx_error_ack(sl, q, msg, prim, error);
 }
-static noinline fastcall int
-lmi_tx_enable_con(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_enable_con(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_enable_con_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_ENABLE_CON;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ENABLE_CON");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_disable_con(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_disable_con(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_disable_con_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_DISABLE_CON;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_DISABLE_CON");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_optmgmt_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_OPTMGMT_ACK;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_OPTMGMT_ACK");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_error_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_error_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_error_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_ERROR_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ERROR_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_stats_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_stats_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_stats_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_STATS_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_STATS_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-lmi_tx_event_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+lmi_tx_event_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_event_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_EVENT_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_EVENT_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_pdu_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_PDU_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_PDU_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_link_cong_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_LINK_CONGESTED_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LINK_CONGESTED_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_link_cong_ceased_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LINK_CONGESTION_CEASED_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_retrieved_msg_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RETRIEVED_MESSAGE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_retrieval_comp_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RETRIEVAL_COMPLETE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_rb_cleared_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RB_CLEARED_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RB_CLEARED_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_bsnt_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_BSNT_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_BSNT_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_in_service_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_IN_SERVICE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_IN_SERVICE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_out_of_service_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_OUT_OF_SERVICE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_rem_proc_out_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_REMOTE_PROCESSOR_OUTAGE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_rem_proc_recovered_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_REMOTE_PROCESSOR_RECOVERED_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_rtb_cleared_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RTB_CLEARED_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RTB_CLEARED_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_retrieval_not_poss_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RETRIEVAL_NOT_POSSIBLE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_bsnt_not_retr_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_BSNT_NOT_RETRIEVABLE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_optmgmt_ack_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = SL_OPTMGMT_ACK;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_OPTMGMT_ACK");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_notify_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_notify_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	lmi_event_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->lmi_primitive = LMI_EVENT_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_EVENT_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_loc_proc_out_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LOCAL_PROCESSOR_OUTAGE_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
-static noinline fastcall int
-sl_tx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
+static inline fastcall int
+sl_tx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
+	sl_loc_proc_recovered_ind_t *p;
+	mblk_t *mp;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		DB_TYPE(mp) = M_PCPROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->sl_primitive = SL_LOCAL_PROCESSOR_RECOVERED_IND;
+		mp->b_wptr += sizeof(*p);
+		freemsg(msg);
+		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LOCAL_PROCESSOR_RECOVERED_IND");
+		putnext(sl->rq, mp);
+		return (0);
+	}
+	return (-ENOBUFS);
 }
 
 /*
@@ -811,7 +1550,7 @@ lmi_rx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if (sl_get_m_state(sl) != LMI_UNATTACHED)
 		goto outstate;
 	ppa_size = mp->b_wptr - mp->b_rptr - sizeof(*p);
-	if (ppa_size <= 0 || ppa_size > SLM_CLEI_MAX)
+	if (ppa_size <= 0 || ppa_size > SLMUX_CLEI_MAX)
 		goto badppa;
 	switch (ppa_size) {
 	case 1:
@@ -832,14 +1571,14 @@ lmi_rx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	default:
 		ppa.slm_index = 0;
 		ppa.slm_ppa = 0;
-		if (ppa_size < SLM_CLEI_MAX)
+		if (ppa_size < SLMUX_CLEI_MAX)
 			ppa.slm_clei[ppa_size] = '\0';
 		strncpy(ppa.slm_clei, (char *) p->lmi_ppa, ppa_size);
 		break;
 	}
 	sl_set_m_state(sl, LMI_ATTACH_PENDING);
 	write_lock_irqsave(&sl_mux_lock, flags);
-	if (!(lower = sl_find_lower(&ppa))) {
+	if (!(lower = sl_find_lower(sl, &ppa))) {
 		write_unlock_irqrestore(&sl_mux_lock, flags);
 		goto badppa;
 	}
@@ -857,7 +1596,7 @@ lmi_rx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	if ((err = lmi_tx_ok_ack(sl, q, mp, LMI_ATTACH_REQ))) {
 		write_lock_irqsave(&sl_mux_lock, flags);
 		if (sl->oq) {
-			lower = (struct sl *) sl->oq->q_ptr;
+			lower = SL_PRIV(sl->oq);
 			sl->oq = NULL;
 		} else
 			lower = NULL;
@@ -900,7 +1639,7 @@ lmi_rx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, LMI_DETACH_PENDING);
 	write_lock_irqsave(&sl_mux_lock, flags);
 	if (sl->oq) {
-		lower = (struct sl *) sl->oq->q_ptr;
+		lower = SL_PRIV(sl->oq);
 		sl->oq = NULL;
 	} else
 		lower = NULL;
@@ -908,7 +1647,7 @@ lmi_rx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		lower->oq = NULL;
 	write_unlock_irqrestore(&sl_mux_lock, flags);
 	return lmi_tx_ok_ack(sl, q, mp, LMI_DETACH_REQ);
-      oustate:
+      outstate:
 	err = LMI_OUTSTATE;
 	goto error;
       badprim:
@@ -1072,11 +1811,12 @@ sl_rx_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
 static inline fastcall int
 sl_rx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	sl_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
+	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
 
 	(void) p;
 	return (1);
 }
+#if 0
 static inline fastcall int
 sl_rx_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1085,6 +1825,7 @@ sl_rx_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+#endif
 static inline fastcall int
 sl_rx_other_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1302,7 +2043,7 @@ sl_rx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 static inline fastcall int
 sl_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	sl_optmgmt_ack_t *p = (typeof(p)) mp->b_rptr;
+	lmi_optmgmt_ack_t *p = (typeof(p)) mp->b_rptr;
 
 	(void) p;
 	return (1);
@@ -1310,7 +2051,7 @@ sl_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 static inline fastcall int
 sl_rx_notify_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
-	sl_notify_ind_t *p = (typeof(p)) mp->b_rptr;
+	lmi_event_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	(void) p;
 	return (1);
@@ -1397,7 +2138,7 @@ sl_unlink_lm(struct sl *sl)
 	sl->lm.lm = NULL;
 }
 
-static void
+static inline void
 sl_link_mon(struct sl *mon, struct sl *sl)
 {
 	sl->mon.mon = mon;
@@ -1445,7 +2186,7 @@ sl_i_link(struct sl *lm, queue_t *q, mblk_t *mp)
 	mblk_t *rp;
 	int err;
 
-	if ((rp = mi_allocb(q, sizeof(*p))) == NULL) {
+	if ((rp = mi_allocb(q, sizeof(*p), BPRI_MED)) == NULL) {
 		mi_copy_done(q, mp, ENOBUFS);
 		return (0);
 	}
@@ -1495,7 +2236,7 @@ sl_i_plink(struct sl *lm, queue_t *q, mblk_t *mp)
 	mblk_t *rp;
 	int err;
 
-	if ((rp = mi_allocb(q, sizeof(*p))) == NULL) {
+	if ((rp = mi_allocb(q, sizeof(*p), BPRI_MED)) == NULL) {
 		mi_copy_done(q, mp, ENOBUFS);
 		return (0);
 	}
@@ -1549,7 +2290,6 @@ sl_i_unlink(struct sl *lm, queue_t *q, mblk_t *mp)
 	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
 	unsigned long flags;
 	struct sl *sl;
-	int err = 0;
 
 	write_lock_irqsave(&sl_mux_lock, flags);
 	if (unlikely((sl = sl_acquire(l->l_qtop)) == NULL)) {
@@ -1591,7 +2331,6 @@ sl_i_punlink(struct sl *lm, queue_t *q, mblk_t *mp)
 	struct linkblk *l = (typeof(l)) mp->b_cont->b_rptr;
 	unsigned long flags;
 	struct sl *sl = NULL;
-	int err;
 
 	write_lock_irqsave(&sl_mux_lock, flags);
 	if (unlikely((sl = sl_acquire(l->l_qtop)) == NULL)) {
@@ -1638,7 +2377,6 @@ sl_ioctl_ioccpass(struct sl *lm, queue_t *q, mblk_t *mp)
 	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
 	struct lmi_pass *arg = (typeof(arg)) mp->b_cont->b_rptr;
 	unsigned long flags;
-	int index, err = 0;
 	struct sl *sl;
 
 	if (ioc->ioc_count == TRANSPARENT) {
@@ -1665,7 +2403,7 @@ sl_ioctl_ioccpass(struct sl *lm, queue_t *q, mblk_t *mp)
 	read_lock(&sl_mux_lock);
 	arg->index = 0;		/* for next level */
 	/* recheck because we released locks ane retook them as read locks */
-	if (lm->ioc.id != ioc->ioc_id || lm->ioc.sl == NULL && ||sl->ioc.sl->wq == NULL) {
+	if (lm->ioc.id != ioc->ioc_id || lm->ioc.sl == NULL || sl->ioc.sl->wq == NULL) {
 		read_unlock(&sl_mux_lock);
 		mi_copy_done(q, mp, EINVAL);
 		return (0);
@@ -1687,7 +2425,7 @@ sl_iocdata_ioccpass(struct sl *lm, queue_t *q, mblk_t *mp)
 	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
 
 	read_lock(&sl_mux_lock);
-	if (lm->ioc.id != ioc->ioc_id || lm->ioc.sl == NULL && ||sl->ioc.sl->wq == NULL) {
+	if (lm->ioc.id != ioc->ioc_id || lm->ioc.sl == NULL || lm->ioc.sl->wq == NULL) {
 		read_unlock(&sl_mux_lock);
 		mi_copy_done(q, mp, EINVAL);
 		return (0);
@@ -1724,7 +2462,7 @@ slm_ioctl(struct sl *lm, queue_t *q, mblk_t *mp)
 	case _IOC_NR(SLM_IOCLPPA):
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCTL(SLM_IOCLPPA)");
 		/* situation where passed pointer is NULL or copyin length is zero */
-		if ((ioc->ioc_count == TRANSPARENT && *(long *) mp->b_cont->b_rptr == NULL) ||
+		if ((ioc->ioc_count == TRANSPARENT && *(long *) mp->b_cont->b_rptr == 0) ||
 		    ioc->ioc_count == 0) {
 			/* just return length */
 			mi_copy_set_rval(mp, sl_links_count);
@@ -1774,8 +2512,10 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 	void *arg = (typeof(arg)) mp->b_cont->b_rptr;
 	struct slmux_ppa *p = arg;
 	struct slmux_ppa_list *l = arg;
+	unsigned long flags;
 	int i, num, err = 0;
 	struct sl *sl, *s;
+	mblk_t *dp;
 
 	switch (_IOC_NR(cp->cp_cmd)) {
 	case _IOC_NR(SLM_IOCSPPA):
@@ -1784,7 +2524,7 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 		   when the PPA or CLEI is non-zero is it set.  Both the PPA and CLEI to set must
 		   be unique and can only identify the specified stream. */
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOCSPPA)");
-		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p)))) {
+		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p), 0))) {
 			write_lock_irqsave(&sl_mux_lock, flags);
 			if ((sl = sl_find_lower(lm, p)) &&
 			    ((!p->slm_ppa || !(s = sl_find_ppa(lm, p->slm_ppa)) || s == sl) ||
@@ -1806,7 +2546,7 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 		   multiplex stream can eb found by index, PPA or CLEI.  The entire triplet is
 		   returned. */
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOCGPPA)");
-		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p)))) {
+		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p), 0))) {
 			write_lock_irqsave(&sl_mux_lock, flags);
 			if ((sl = sl_find_lower(lm, p))) {
 				*(struct slmux_ppa *) dp->b_rptr = sl->ppa;
@@ -1824,10 +2564,10 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 		if (l->slm_list_num >= 0) {
 			num = l->slm_list_num;
 			i = sizeof(*l) + num * sizeof(struct slmux_ppa);
-			if ((dp = mi_copyout_alloc(q, mp, NULL, i))) {
+			if ((dp = mi_copyout_alloc(q, mp, NULL, i, 0))) {
 				l = (typeof(l)) dp->b_rptr;
 				p = l->slm_list_array;
-				read_lock(&sl_mux_lock, flags);
+				read_lock(&sl_mux_lock);
 				l->slm_list_num = num;
 				for (i = 0, sl = (typeof(sl)) mi_first_ptr(&sl_links);
 				     i < sl_links_count && i < num
@@ -1836,8 +2576,8 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 				}
 				if (i < l->slm_list_num)
 					l->slm_list_num = i;
-				mi_copy_set_rval(mp, sl_list_count);
-				read_unlock(&sl_mux_lock, flags);
+				mi_copy_set_rval(mp, sl_links_count);
+				read_unlock(&sl_mux_lock);
 			} else
 				err = ENOBUFS;
 		} else
@@ -1848,9 +2588,9 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 		   stream is identified by its index, PPA or CLEI.  A stream can only be monitored
 		   by one monitoring stream at a time. */
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOCSMON)");
-		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p)))) {
+		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p), 0))) {
 			write_lock_irqsave(&sl_mux_lock, flags);
-			if ((sl = sl_find_lower(lm, p)) && !sl->mon) {
+			if ((sl = sl_find_lower(lm, p)) && !sl->mon.mon) {
 				sl->mon.mon = lm;
 				if ((sl->mon.next = lm->mon.mon))
 					sl->mon.next->mon.prev = &sl->mon.next;
@@ -1867,10 +2607,10 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 		/* SLM_IOCCMON: Clear a stream from monitoring.  The stream to clear from
 		   monitoring is identified by its index, PPA or CLEI. */
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOCCMON)");
-		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p)))) {
+		if ((dp = mi_copyout_alloc(q, mp, NULL, sizeof(*p), 0))) {
 			write_lock_irqsave(&sl_mux_lock, flags);
-			if ((sl = sl_find_lower(lm, p)) && sl->mon == lm) {
-				sl->mon = NULL;
+			if ((sl = sl_find_lower(lm, p)) && sl->mon.mon == lm) {
+				sl->mon.mon = NULL;
 				*(struct slmux_ppa *) dp->b_rptr = sl->ppa;
 			} else
 				err = EINVAL;
@@ -1903,6 +2643,8 @@ slm_copyin(struct sl *lm, queue_t *q, mblk_t *mp)
 static noinline fastcall __unlikely int
 slm_copyout(struct sl *lm, queue_t *q, mblk_t *mp)
 {
+	struct copyresp *cp = (typeof(cp)) mp->b_rptr;
+
 	switch (_IOC_NR(cp->cp_cmd)) {
 	case _IOC_NR(SLM_IOCSPPA):
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOCSPPA)");
@@ -1920,7 +2662,7 @@ slm_copyout(struct sl *lm, queue_t *q, mblk_t *mp)
 		mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SLM_IOCCMON)");
 		goto copyout;
 	      copyout:
-		mi_copy_out(q, mp);
+		mi_copyout(q, mp);
 		break;
 	default:
 		mi_copy_done(q, mp, EINVAL);
@@ -1951,7 +2693,7 @@ sl_passalong_req(struct sl *sl, queue_t *q, mblk_t *mp)
 			read_unlock(&sl_mux_lock);
 			return (-EBUSY);
 		}
-		if ((lower = (struct sl *)sl->oq->q_ptr) && (mon = lower->mon.mon)) {
+		if ((lower = SL_PRIV(sl->oq)) && (mon = lower->mon.mon)) {
 			mblk_t *bp, *dp = NULL;
 			struct slmux_mon *p;
 
@@ -1959,7 +2701,7 @@ sl_passalong_req(struct sl *sl, queue_t *q, mblk_t *mp)
 				read_unlock(&sl_mux_lock);
 				return (-EBUSY);
 			}
-			if ((bp = mi_allocb(q, sizeof(*p) + mp->b_wptr - mp->b_rptr)) == NULL) {
+			if ((bp = mi_allocb(q, sizeof(*p) + mp->b_wptr - mp->b_rptr, BPRI_MED)) == NULL) {
 				read_unlock(&sl_mux_lock);
 				return (-ENOBUFS);
 			}
@@ -1994,7 +2736,7 @@ sl_passalong_req(struct sl *sl, queue_t *q, mblk_t *mp)
  * @q: upper write queue
  * @mp: the M_DATA message
  */
-static inline fastcall
+static inline fastcall int
 sl_w_data(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
@@ -2027,7 +2769,7 @@ sl_w_data(queue_t *q, mblk_t *mp)
  * @q: upper write queue
  * @mp: the M_(PC)PROTO message
  */
-static noinline fastcall
+static noinline fastcall int
 sl_w_proto(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
@@ -2042,7 +2784,7 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 			err = lmi_error_reply(sl, q, mp, 0, LMI_BADPRIM);
 			goto done;
 		}
-		if ((prim = *(typeof(prim)) mp->b_rptr) == SL_PDU_REQ)
+		if ((prim = *(typeof(prim) *) mp->b_rptr) == SL_PDU_REQ)
 			mi_strlog(q, STRLOGDA, SL_TRACE, "-> SL_PDU_REQ");
 		else
 			mi_strlog(q, STRLOGRX, SL_TRACE, "-> %s", sl_primname(prim));
@@ -2140,9 +2882,11 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 			case SL_OPTMGMT_REQ:
 				err = sl_rx_optmgmt_req(sl, q, mp);
 				break;
+#if 0
 			case SL_NOTIFY_REQ:
 				err = sl_rx_notify_req(sl, q, mp);
 				break;
+#endif
 			default:
 				err = sl_rx_other_req(sl, q, mp);
 				break;
@@ -2170,9 +2914,11 @@ sl_w_proto(queue_t *q, mblk_t *mp)
  * Note that the upper read queue does not need to be flushed becaue we never
  * place messages on the upper read queue.
  */
-static noinline fastcall
+static noinline fastcall int
 sl_w_flush(queue_t *q, mblk_t *mp)
 {
+	struct sl *sl;
+
 	if (mp->b_rptr[0] & FLUSHW) {
 		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHDATA);
@@ -2180,22 +2926,22 @@ sl_w_flush(queue_t *q, mblk_t *mp)
 			flushq(q, FLUSHDATA);
 	}
 	read_lock(&sl_mux_lock);
+	sl = SL_PRIV(q);
 	if (sl->oq) {
 		putnext(sl->oq, mp);
 	} else {
-		mp->b_rptr[0] & ~FLUSHW;
+		mp->b_rptr[0] &= ~FLUSHW;
 		qreply(q, mp);
 	}
 	read_unlock(&sl_mux_lock);
 	return (0);
 }
 
-static noinline fastcall
+static noinline fastcall int
 sl_w_ioctl(queue_t *q, mblk_t *mp)
 {
 	struct iocblk *ioc = (typeof(ioc)) mp->b_rptr;
 	struct sl *sl;
-	mblk_t *bp;
 	int err = 0;
 
 	if (!mp->b_cont) {
@@ -2273,12 +3019,11 @@ sl_w_ioctl(queue_t *q, mblk_t *mp)
 		err = -EAGAIN;
 	return (err);
 }
-static noinline fastcall
+static noinline fastcall int
 sl_w_iocdata(queue_t *q, mblk_t *mp)
 {
 	struct copyresp *cp = (typeof(cp)) mp->b_rptr;
-	unsigned long flags;
-	struct sl *sl;
+	struct sl *lm;
 	mblk_t *dp;
 	int err = 0;
 
@@ -2303,25 +3048,25 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
 			if (_IOC_NR(cp->cp_cmd) != _IOC_NR(LMI_IOCCPASS))
 				goto passalong;
 			mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(LMI_IOCCPASS)");
-			err = sl_iocdata_ioccpass(sl, q, mp);
+			err = sl_iocdata_ioccpass(lm, q, mp);
 			break;
 		case SL_IOC_MAGIC:
 			if (_IOC_NR(cp->cp_cmd) != _IOC_NR(SL_IOCCPASS))
 				goto passalong;
 			mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SL_IOCCPASS)");
-			err = sl_iocdata_ioccpass(sl, q, mp);
+			err = sl_iocdata_ioccpass(lm, q, mp);
 			break;
 		case SDT_IOC_MAGIC:
 			if (_IOC_NR(cp->cp_cmd) != _IOC_NR(SDT_IOCCPASS))
 				goto passalong;
 			mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SDT_IOCCPASS)");
-			err = sl_iocdata_ioccpass(sl, q, mp);
+			err = sl_iocdata_ioccpass(lm, q, mp);
 			break;
 		case SDL_IOC_MAGIC:
 			if (_IOC_NR(cp->cp_cmd) != _IOC_NR(SDL_IOCCPASS))
 				goto passalong;
 			mi_strlog(q, STRLOGRX, SL_TRACE, "-> M_IOCDATA(SDL_IOCCPASS)");
-			err = sl_iocdata_ioccpass(sl, q, mp);
+			err = sl_iocdata_ioccpass(lm, q, mp);
 			break;
 		default:
 		      passalong:
@@ -2347,7 +3092,7 @@ sl_w_iocdata(queue_t *q, mblk_t *mp)
  * Simply pass unrecognized STREAMS messages to the lower Stream if one
  * exists, otherwise, discard the message.
  */
-static noinline fastcall
+static noinline fastcall int
 sl_w_other(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
@@ -2368,12 +3113,12 @@ sl_w_other(queue_t *q, mblk_t *mp)
 		err = -EAGAIN;
 	return (err);
 }
-static noinline fastcall
+static noinline fastcall int
 sl_w_data_slow(queue_t *q, mblk_t *mp)
 {
 	return sl_w_data(q, mp);
 }
-static inline fastcall
+static inline fastcall int
 sl_w_msg_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -2422,7 +3167,7 @@ sl_passalong_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 			read_unlock(&sl_mux_lock);
 			return (-EBUSY);
 		}
-		if ((bp = mi_allocb(q, sizeof(*p) + mp->b_wptr - mp->b_rptr)) == NULL) {
+		if ((bp = mi_allocb(q, sizeof(*p) + mp->b_wptr - mp->b_rptr, BPRI_MED)) == NULL) {
 			read_unlock(&sl_mux_lock);
 			return (-ENOBUFS);
 		}
@@ -2458,7 +3203,7 @@ sl_passalong_ind(struct sl *sl, queue_t *q, mblk_t *mp)
  * @q: lower read queue
  * @mp: the M_DATA message
  */
-static inline fastcall
+static inline fastcall int
 sl_r_data(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
@@ -2486,7 +3231,7 @@ sl_r_data(queue_t *q, mblk_t *mp)
  * These messages are simply passed to the upper stream with flow control or
  * discarded.  No messages from the lower stream are currently intercepted.
  */
-static noinline fastcall
+static noinline fastcall int
 sl_r_proto(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
@@ -2501,7 +3246,7 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 			freemsg(mp);
 			goto done;
 		}
-		if ((prim = *(typeof(prim)) mp->b_rptr) == SL_PDU_IND)
+		if ((prim = *(typeof(prim) *) mp->b_rptr) == SL_PDU_IND)
 			mi_strlog(q, STRLOGDA, SL_TRACE, "<- SL_PDU_IND");
 		else
 			mi_strlog(q, STRLOGRX, SL_TRACE, "<- %s", sl_primname(prim));
@@ -2615,7 +3360,7 @@ sl_r_proto(queue_t *q, mblk_t *mp)
  * is passed to the layer management stream instead of the upper stream.  This can be checked by
  * checking the ioc_id of the message.
  */
-static noinline fastcall
+static noinline fastcall int
 sl_r_iocack(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl, *lm;
@@ -2666,9 +3411,11 @@ sl_r_iocack(queue_t *q, mblk_t *mp)
  * Note that the lower write queue does not need to be flushed because we
  * never place messages on the lower write queue.
  */
-static noinline fastcall
+static noinline fastcall int
 sl_r_flush(queue_t *q, mblk_t *mp)
 {
+	struct sl *sl;
+
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHDATA);
@@ -2676,10 +3423,11 @@ sl_r_flush(queue_t *q, mblk_t *mp)
 			flushq(q, FLUSHDATA);
 	}
 	read_lock(&sl_mux_lock);
+	sl = SL_PRIV(q);
 	if (sl->oq) {
 		putnext(sl->oq, mp);
 	} else {
-		mp->b_rptr[0] & ~FLUSHR;
+		mp->b_rptr[0] &= ~FLUSHR;
 		qreply(q, mp);
 	}
 	read_unlock(&sl_mux_lock);
@@ -2694,7 +3442,7 @@ sl_r_flush(queue_t *q, mblk_t *mp)
  * Simply pass unrecognized STREAMS messages to the upper Stream if one
  * exists, otherwise, discard the message.
  */
-static noinline fastcall
+static noinline fastcall int
 sl_r_other(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
@@ -2715,12 +3463,12 @@ sl_r_other(queue_t *q, mblk_t *mp)
 		err = -EAGAIN;
 	return (err);
 }
-static noinline fastcall
+static noinline fastcall int
 sl_r_data_slow(queue_t *q, mblk_t *mp)
 {
 	return sl_r_data(q, mp);
 }
-static inline fastcall
+static inline fastcall int
 sl_r_msg_slow(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
@@ -2952,8 +3700,8 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	if ((err = mi_open_comm(&sl_opens, sizeof(*sl), q, devp, oflags, sflag, crp)))
 		return (err);
 	sl_opens_count++;
-	sp = (typeof(sp)) q->q_tpr;
-	bzero(sp, sizeof(*sp));
+	sl = SL_PRIV(q);
+	bzero(sl, sizeof(*sl));
 	/* Initialize structure. */
 	return (0);
 }
@@ -2964,7 +3712,7 @@ sl_qclose(queue_t *q, int oflags, cred_t *crp)
 	unsigned long flags;
 	int state;
 
-	while ((sl = mi_sleeplock(q)) == NULL) ;
+	while ((sl = (struct sl *)mi_sleeplock(q)) == NULL) ;
 	write_lock_irqsave(&sl_mux_lock, flags);
 	/* We have a list of streams that we are managing: this must be the layer management
 	   control stream, because temporarily linked streams would have closed already, so these
@@ -2985,19 +3733,18 @@ sl_qclose(queue_t *q, int oflags, cred_t *crp)
 		lmi_disable_req_t *p;
 		mblk_t *mp;
 
-		while ((mp = allocb(sizeof(*p), BRI_WAITOK)) == NULL) ;
+		while ((mp = allocb(sizeof(*p), BPRI_WAITOK)) == NULL) ;
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		mp->b_wptr += sizeof(*p);
 		sl_set_m_state(sl, LMI_DISABLE_PENDING);
 		putnext(sl->oq, mp);
-		break;
 	}
 	read_unlock(&sl_mux_lock);
 	write_lock_irqsave(&sl_mux_lock, flags);
 	if (sl->oq) {
-		lower = (struct sl *) sl->oq->q_ptr;
+		lower = SL_PRIV(sl->oq);
 		sl->oq = NULL;
 		if (lower)
 			lower->oq = NULL;
@@ -3065,8 +3812,7 @@ MODULE_PARM(modid, "h");
 MODULE_PARM(major, "h");
 #else				/* module_param */
 module_param(modid, ushort, 0444);
-
-module_param(major, ushrot, 0444);
+module_param(major, ushort, 0444);
 #endif				/* module_param */
 MODULE_PARM_DESC(modid, "Module ID for SL-MUX driver.  (0 for allocation.)");
 MODULE_PARM_DESC(major, "Major Num for SL-MUX driver.  (0 for allocation.)");

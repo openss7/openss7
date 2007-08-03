@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:36:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.43  2007/08/03 13:36:01  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.42  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -181,10 +184,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/07/14 01:35:41 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -211,7 +214,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/07/14 01:35:41 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL v2"
@@ -727,6 +730,50 @@ EXPORT_SYMBOL(mi_close_detached);	/* mps/ddi.h */
 __MPS_EXTERN_INLINE int mi_close_comm(caddr_t *mi_head, queue_t *q);
 
 EXPORT_SYMBOL(mi_close_comm);	/* mps/ddi.h, aix/ddi.h */
+
+/**
+ * mi_open_detached_cache: - detached open
+ * @mi_head: private structure head
+ * @cachep: cache pointer for appropriately sized private structure cache
+ * @devp: device pointer from qi_qopen()
+ */
+__MPS_EXTERN_INLINE caddr_t mi_open_detached_cache(caddr_t *mi_head, kmem_cachep_t cachep,
+						   dev_t *devp);
+EXPORT_SYMBOL(mi_open_detached_cache);
+
+/**
+ * mi_open_comm_cache: - perform qi_qopen() housekeeping
+ * @mi_head: private structure list head
+ * @cachep: cache pointer for appropriately sized private structure cache
+ * @q: queue pointer from qi_qopen()
+ * @devp: device pointer from qi_qopen()
+ * @flag: open flags from qi_qopen()
+ * @sflag: STREAMS flag from qi_qopen()
+ * @credp: credentials pointer from qi_qopen()
+ */
+__MPS_EXTERN_INLINE int mi_open_comm_cache(caddr_t *mi_head, kmem_cachep_t cachep, queue_t *q,
+					   dev_t *devp, int flag, int sflag, cred_t *credp);
+EXPORT_SYMBOL(mi_open_comm_cache);
+
+/**
+ * mi_close_detached_cache: - close a detached cached private structure
+ * @mi_head: private structure list head
+ * @cachep: cache pointer for private structure cache
+ * @ptr: private structure to unlink and free
+ */
+__MPS_EXTERN_INLINE void mi_close_detached_cache(caddr_t *mi_head, kmem_cachep_t cachep,
+						 caddr_t ptr);
+EXPORT_SYMBOL(mi_close_detached_cache);
+
+/**
+ * mi_close_comm_cache: - perform common qi_qclose() housekeeping
+ * @mi_head: private structure list head
+ * @cachep: cache pointer for private structure cache
+ * @q: read queue of queue pair
+ */
+__MPS_EXTERN_INLINE int mi_close_comm_cache(caddr_t *mi_head, kmem_cachep_t cachep, queue_t *q);
+
+EXPORT_SYMBOL(mi_close_comm_cache);
 
 struct mi_iocblk {
 	caddr_t mi_caddr;		/* uaddr of TRANSPARENT ioctl, NULL for I_STR */

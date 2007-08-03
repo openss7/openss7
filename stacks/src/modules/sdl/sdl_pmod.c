@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $
+ @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/03 13:35:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 20:09:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_pmod.c,v $
+ Revision 0.9.2.3  2007/08/03 13:35:39  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.2  2007/07/21 20:09:51  brian
  - added pass structure
 
@@ -58,13 +61,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $"
+#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/03 13:35:39 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $";
+    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/03 13:35:39 $";
 
-#define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
+#define _MPS_SOURCE 1
+#define _SVR4_SOURCE 1
+#define _SUN_SOURCE 1
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -90,7 +95,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS PIPE MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/07/21 20:09:51 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/03 13:35:39 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2603,10 +2608,6 @@ sdl_m_iocdata(struct sdl *s, queue_t *q, mblk_t *mp)
 	mi_unlock(priv);
 	return (err);
 }
-
-#ifndef DB_TYPE
-#define DB_TYPE(mp) (mp->b_datap->db_type)
-#endif
 
 /**
  * sdl_m_other: - process other message

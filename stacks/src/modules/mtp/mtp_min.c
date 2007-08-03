@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:40 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:35:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 0.9.2.18  2007/08/03 13:35:25  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.17  2007/07/14 01:34:40  brian
  - make license explicit, add documentation
 
@@ -70,9 +73,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -99,9 +102,10 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/tpi_sctp.h>
 #include <sys/xti_ss7.h>
 #include <sys/xti_mtp.h>
+#include <sys/tihdr.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:40 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -145,6 +149,12 @@ MODULE_ALIAS("streams-mtp_min");
 #define DRV_BANNER	MTP_MIN_SPLASH
 #endif				/* MODULE */
 
+#define STRLOGTO	1
+#define STRLOGRX	2
+#define STRLOGTX	3
+#define STRLOGTE	5
+#define STRLOGDA	6
+
 /*
  *  =========================================================================
  *
@@ -175,6 +185,7 @@ typedef struct mtp_options {
 
 static mtp_options_t mtp_opt_defaults = { SS7_PVAR_ETSI_00, 0, 0, 0, 0, 0 };
 
+#if 0
 /*
    list linkage 
  */
@@ -223,6 +234,7 @@ typedef struct head {
 typedef struct str {
 	STR_DECLARATION (struct str);	/* stream declaration */
 } str_t;
+#endif
 
 #define PRIV(__q) ((str_t *)(__q)->q_ptr)
 
@@ -240,9 +252,12 @@ struct sl;				/* Signalling Link */
    mtp user 
  */
 struct mt {
+	struct mt *next;
 	queue_t *rq;
 	queue_t *wq;
 	cred_t cred;
+	uint state;
+	int ioc_id;
 	struct na *na;			/* network appearance */
 	struct mtp_addr src;		/* srce address */
 	struct mtp_addr dst;		/* dest address */
@@ -254,7 +269,7 @@ struct mt {
 	} sp;
 	struct sl *sl;			/* signalling link */
 	mtp_options_t options;
-	// mtp_opt_conf_mtp_t timers; /* MTP timers */
+	// mtp_opt_timr_mtp_t timers; /* MTP timers */
 	// mtp_opt_conf_mtp_t config; /* MTP configuration */
 };
 
@@ -276,15 +291,15 @@ typedef struct na {
 	struct T_info_ack *prot[16];	/* protoocl profiles for si values */
 } na_t;
 
-static ulong na_index = 0;
-static na_t *na_list = NULL;
+//static ulong na_index = 0;
+//static na_t *na_list = NULL;
 
 /*
    route set 
  */
 typedef struct rs {
 	HEAD_DECLARATION (struct rs);	/* head declaration */
-	int type;			/* type of routeset (cluster, member) */
+	//int type;			/* type of routeset (cluster, member) */
 	int cong_status;		/* congestion status */
 	int disc_status;		/* discard status */
 	uint32_t dest;			/* remote signalling point/cluster */
@@ -302,8 +317,8 @@ typedef struct rs {
 	mtp_opt_conf_rs_t config;	/* RS configuration */
 } rs_t;
 
-static ulong rs_index = 0;
-static rs_t *rs_list = NULL;
+//static ulong rs_index = 0;
+//static rs_t *rs_list = NULL;
 
 /*
    route list 
@@ -333,8 +348,8 @@ typedef struct rl {
 	} ls;
 } rl_t;
 
-static ulong rl_index = 0;
-static rl_t *rl_list = NULL;
+//static ulong rl_index = 0;
+//static rl_t *rl_list = NULL;
 
 /*
    route 
@@ -359,15 +374,15 @@ typedef struct rt {
 	mtp_opt_conf_rt_t config;	/* RT configuration */
 } rt_t;
 
-static ulong rt_index = 0;
-static rt_t *rt_list = NULL;
+//static ulong rt_index = 0;
+//static rt_t *rt_list = NULL;
 
 /*
    signalling point 
  */
 typedef struct sp {
 	HEAD_DECLARATION (struct sp);	/* head declaration */
-	uint type;			/* point code type */
+	//uint type;			/* point code type */
 	uint32_t ni;			/* network indicator */
 	uint32_t pc;			/* point code */
 	uint sls;			/* sls for loadsharing of management messages */
@@ -390,8 +405,8 @@ typedef struct sp {
 	mtp_opt_conf_sp_t config;	/* SP configuration */
 } sp_t;
 
-static ulong sp_index = 0;
-struct sp *sp_list = NULL;
+//static ulong sp_index = 0;
+//struct sp *sp_list = NULL;
 
 /*
    link set 
@@ -413,8 +428,8 @@ typedef struct ls {
 	struct sl **sls_map;		/* sls map for link set */
 } ls_t;
 
-static ulong ls_index = 0;
-static ls_t *ls_list = NULL;
+//static ulong ls_index = 0;
+//static ls_t *ls_list = NULL;
 
 /*
    link 
@@ -445,13 +460,26 @@ typedef struct lk {
 	mtp_opt_conf_lk_t config;	/* link configuration */
 } lk_t;
 
-static ulong lk_index = 0;
-static lk_t *lk_list = NULL;
+//static ulong lk_index = 0;
+//static lk_t *lk_list = NULL;
 
 /*
    signalling link 
  */
 struct sl {
+	struct sl *next;
+	queue_t *rq;
+	queue_t *wq;
+	union {
+	struct mt *other;
+	struct mt *mtp;
+	};
+	uint flags;
+	uint state;
+	union {
+		int index;
+		uint id;
+	};
 	struct {
 		struct sp *loc;		/* local signalling point for this signalling link */
 		struct sp *adj;		/* adjacent signalling point for this signalling link */
@@ -461,6 +489,7 @@ struct sl {
 		struct sl *next;	/* next signalling link in this link */
 		struct sl **prev;	/* prev signalling link in this link */
 	} lk;
+	struct mt *users[16];
 	ulong slc;			/* signalling link code */
 	int cong_status;		/* congestion status */
 	int disc_status;		/* discard status */
@@ -469,7 +498,7 @@ struct sl {
 	uint reason;			/* reason for failure */
 	unsigned char tdata[16];	/* test data */
 	size_t tlen;			/* test length */
-	mtp_opt_conf_sl_t timers;	/* SL timers */
+	mtp_timers_sl_t timers;		/* SL timers */
 	mtp_opt_conf_sl_t config;	/* SL configuration */
 };
 
@@ -522,56 +551,62 @@ mtp_build_opts(struct mt *mt, mtp_opts_t * ops, unsigned char *p)
 		const size_t hlen = sizeof(struct t_opthdr);
 
 		if (ops->pvar) {
-			oh = ((typeof(oh)) p)++;
+			oh = (typeof(oh)) p;
 			oh->len = hlen + sizeof(*(ops->pvar));
 			oh->level = T_SS7_SS7;
 			oh->name = T_SS7_PVAR;
 			oh->status = (ops->flags & (1 << T_SS7_PVAR)) ? T_SUCCESS : T_FAILURE;
+			p += sizeof(oh);
 			*((typeof(ops->pvar)) p) = *(ops->pvar);
 			p += _T_ALIGN_SIZEOF(*ops->pvar);
 		}
 		if (ops->mplev) {
-			oh = ((typeof(oh)) p)++;
+			oh = (typeof(oh)) p;
 			oh->len = hlen + sizeof(*(ops->mplev));
 			oh->level = T_SS7_SS7;
 			oh->name = T_SS7_MPLEV;
 			oh->status = (ops->flags & (1 << T_SS7_MPLEV)) ? T_SUCCESS : T_FAILURE;
+			p += sizeof(oh);
 			*((typeof(ops->mplev)) p) = *(ops->mplev);
 			p += _T_ALIGN_SIZEOF(*ops->mplev);
 		}
 		if (ops->debug) {
-			oh = ((typeof(oh)) p)++;
+			oh = (typeof(oh)) p;
 			oh->len = hlen + sizeof(*(ops->debug));
 			oh->level = T_SS7_SS7;
 			oh->name = T_SS7_DEBUG;
 			oh->status = (ops->flags & (1 << T_SS7_DEBUG)) ? T_SUCCESS : T_FAILURE;
+			p += sizeof(oh);
 			*((typeof(ops->debug)) p) = *(ops->debug);
 			p += _T_ALIGN_SIZEOF(*ops->debug);
 		}
 		if (ops->cluster) {
-			oh = ((typeof(oh)) p)++;
+			oh = (typeof(oh)) p;
 			oh->len = hlen + sizeof(*(ops->cluster));
 			oh->level = T_SS7_SS7;
 			oh->name = T_SS7_CLUSTER;
 			oh->status = (ops->flags & (1 << T_SS7_CLUSTER)) ? T_SUCCESS : T_FAILURE;
+			p += sizeof(oh);
 			*((typeof(ops->cluster)) p) = *(ops->cluster);
 			p += _T_ALIGN_SIZEOF(*ops->cluster);
 		}
 		if (ops->sls) {
-			oh = ((typeof(oh)) p)++;
+			oh = (typeof(oh)) p;
 			oh->len = hlen + sizeof(*(ops->sls));
 			oh->level = T_SS7_SS7;
 			oh->name = T_SS7_SEQ_CTRL;
 			oh->status = (ops->flags & (1 << T_SS7_SEQ_CTRL)) ? T_SUCCESS : T_FAILURE;
+			p += sizeof(oh);
 			*((typeof(ops->sls)) p) = *(ops->sls);
 			p += _T_ALIGN_SIZEOF(*ops->sls);
 		}
 		if (ops->mp) {
-			oh = ((typeof(oh)) p)++;
+			oh = (typeof(oh)) p;
 			oh->len = hlen + sizeof(*(ops->mp));
 			oh->level = T_SS7_SS7;
 			oh->name = T_SS7_PRIORITY;
 			oh->status = (ops->flags & (1 << T_SS7_PRIORITY)) ? T_SUCCESS : T_FAILURE;
+			p += sizeof(oh);
 			*((typeof(ops->mp)) p) = *(ops->mp);
 			p += _T_ALIGN_SIZEOF(*ops->mp);
 		}
@@ -713,6 +748,12 @@ mtp_opt_current(struct mt *mt, mtp_opts_t * ops)
 	}
 	return (0);
 }
+static int
+mtp_opt_negotiate(struct mt *mt, struct mtp_opts *ops)
+{
+	/* FIXME: write this function */
+	return (-EFAULT);
+}
 
 /*
  *  =========================================================================
@@ -721,6 +762,51 @@ mtp_opt_current(struct mt *mt, mtp_opts_t * ops)
  *
  *  =========================================================================
  */
+/*
+   TLI interface state flags 
+ */
+#define TSF_UNBND	( 1 << TS_UNBND		)
+#define TSF_WACK_BREQ	( 1 << TS_WACK_BREQ	)
+#define TSF_WACK_UREQ	( 1 << TS_WACK_UREQ	)
+#define TSF_IDLE	( 1 << TS_IDLE		)
+#ifdef TS_WACK_OPTREQ
+#define TSF_WACK_OPTREQ	( 1 << TS_WACK_OPTREQ	)
+#endif
+#define TSF_WACK_CREQ	( 1 << TS_WACK_CREQ	)
+#define TSF_WCON_CREQ	( 1 << TS_WCON_CREQ	)
+#define TSF_WRES_CIND	( 1 << TS_WRES_CIND	)
+#define TSF_WACK_CRES	( 1 << TS_WACK_CRES	)
+#define TSF_DATA_XFER	( 1 << TS_DATA_XFER	)
+#define TSF_WIND_ORDREL	( 1 << TS_WIND_ORDREL	)
+#define TSF_WREQ_ORDREL	( 1 << TS_WREQ_ORDREL	)
+#define TSF_WACK_DREQ6	( 1 << TS_WACK_DREQ6	)
+#define TSF_WACK_DREQ7	( 1 << TS_WACK_DREQ7	)
+#define TSF_WACK_DREQ9	( 1 << TS_WACK_DREQ9	)
+#define TSF_WACK_DREQ10	( 1 << TS_WACK_DREQ10	)
+#define TSF_WACK_DREQ11	( 1 << TS_WACK_DREQ11	)
+#define TSF_NOSTATES	( 1 << TS_NOSTATES	)
+#define TSM_WACK_DREQ	(TSF_WACK_DREQ6 \
+			|TSF_WACK_DREQ7 \
+			|TSF_WACK_DREQ9 \
+			|TSF_WACK_DREQ10 \
+			|TSF_WACK_DREQ11)
+#define TSM_LISTEN	(TSF_IDLE \
+			|TSF_WRES_CIND)
+#define TSM_CONNECTED	(TSF_WCON_CREQ\
+			|TSF_WRES_CIND\
+			|TSF_DATA_XFER\
+			|TSF_WIND_ORDREL\
+			|TSF_WREQ_ORDREL)
+#define TSM_DISCONN	(TSF_IDLE\
+			|TSF_UNBND)
+#define TSM_INDATA	(TSF_DATA_XFER\
+			|TSF_WIND_ORDREL)
+#define TSM_OUTDATA	(TSF_DATA_XFER\
+			|TSF_WREQ_ORDREL)
+#ifndef T_PROVIDER
+#define T_PROVIDER  0
+#define T_USER	    1
+#endif
 #ifdef _DEBUG
 static const char *
 state_name(long state)
@@ -799,7 +885,7 @@ mtp_check_src(struct mt *mt, mtp_addr_t * src)
 	struct sl *sl;
 
 	for (sl = sl_list; sl; sl = sl->next)
-		if (sl->lk.lk->ni == src->ni && sl->sp.loc == src->pc)
+		if (sl->lk.lk->ni == src->ni && sl->sp.loc->pc == src->pc)
 			goto check;
 	goto noaddr;
       check:
@@ -828,7 +914,7 @@ mtp_check_dst(struct mt *mt, mtp_addr_t * dst)
 
 	if (!(sl = mt->sl))
 		goto noaddr;
-	if (sl->adj != dst->pc)
+	if (sl->sp.adj->pc != dst->pc)
 		goto noaddr;
 	if (!sl->users[dst->si & 0xff])
 		goto noaddr;
@@ -854,7 +940,7 @@ mtp_bind(struct mt *mt, mtp_addr_t * src)
 	struct sl *sl;
 
 	for (sl = sl_list; sl; sl = sl->next)
-		if (sl->ni == src->ni && sl->loc == src->pc)
+		if (sl->lk.lk->ni == src->ni && sl->sp.loc->pc == src->pc)
 			break;
 	if (sl) {
 		sl->users[src->si & 0xff] = mt;
@@ -877,7 +963,7 @@ mtp_unbind(struct mt *mt)
 	struct sl *sl;
 
 	if ((sl = mt->sl)) {
-		sl->users[mt->src.mtp_si & 0xff] = NULL;
+		sl->users[mt->src.si & 0xff] = NULL;
 		mt->sl = NULL;
 		bzero(&mt->src, sizeof(mt->src));
 		return (0);
@@ -891,7 +977,7 @@ mtp_unbind(struct mt *mt)
  *  -------------------------------------------------------------------------
  *  Add the MTP user to the local signalling point service hashes.
  */
-static int
+static inline int
 mtp_connect(struct mt *mt, mtp_addr_t * dst)
 {
 	mt->dst = *dst;
@@ -940,7 +1026,7 @@ tp_send_msg(struct mt *mt, mtp_opts_t * opt, mtp_addr_t * dst, mblk_t *dp)
  *  -----------------------------------
  */
 static int
-m_error(queue_t *q, int error, mblk_t *sg)
+m_error(queue_t *q, mblk_t *msg, int error)
 {
 	struct mt *mt = MT_PRIV(q);
 	mblk_t *mp;
@@ -974,7 +1060,7 @@ t_info_ack(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_INFO_ACK;
 		p->TSDU_size = 272;
 		p->ETSDU_size = T_INVALID;
@@ -985,6 +1071,7 @@ t_info_ack(queue_t *q)
 		p->SERV_type = T_CLTS;
 		p->CURRENT_state = mt->state;
 		p->PROVIDER_flag = XPG4_1 & ~T_SNDZERO;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- T_INFO_ACK\n", DRV_NAME, mt));
 		putnext(mt->rq, mp);
 		return (QR_DONE);
@@ -1008,10 +1095,11 @@ t_bind_ack(queue_t *q, mtp_addr_t * add)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_INFO_ACK;
 		p->ADDR_length = add_len;
 		p->ADDR_offset = add_len ? sizeof(*p) : 0;
+		mp->b_wptr += sizeof(*p);
 		if (add_len) {
 			bcopy(add, mp->b_wptr, add_len);
 			mp->b_wptr += add_len;
@@ -1054,11 +1142,12 @@ t_error_ack(queue_t *q, ulong prim, long error)
 	}
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_ERROR_ACK;
 		p->ERROR_prim = prim;
 		p->TLI_error = error < 0 ? TSYSERR : error;
 		p->UNIX_error = error < 0 ? -error : 0;
+		mp->b_wptr += sizeof(*p);
 		if (error != TOUTSTATE) {
 			switch (mtp_get_state(mt)) {
 #ifdef TS_WACK_OPTREQ
@@ -1107,9 +1196,10 @@ t_ok_ack(queue_t *q, ulong prim)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_OK_ACK;
 		p->CORRECT_prim = prim;
+		mp->b_wptr += sizeof(*p);
 		switch (mtp_get_state(mt)) {
 #if 0
 		case TS_WACK_CREQ:
@@ -1154,7 +1244,7 @@ t_ok_ack(queue_t *q, ulong prim)
  *  T_UNITDATA_IND
  *  -----------------------------------
  */
-static int
+static inline int
 t_unitdata_ind(queue_t *q, mtp_addr_t * src, mtp_opts_t * opt, mblk_t *dp)
 {
 	struct mt *mt = MT_PRIV(q);
@@ -1165,12 +1255,13 @@ t_unitdata_ind(queue_t *q, mtp_addr_t * src, mtp_opts_t * opt, mblk_t *dp)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + src_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_UNITDATA_IND;
 		p->SRC_length = src_len;
 		p->SRC_offset = src_len ? sizeof(*p) : 0;
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) + src_len : 0;
+		mp->b_wptr += sizeof(*p);
 		if (src_len) {
 			bcopy(src, mp->b_wptr, src_len);
 			mp->b_wptr += src_len;
@@ -1206,13 +1297,14 @@ t_uderror_ind(queue_t *q, struct mt *mt, mtp_addr_t * dst, mtp_opts_t * opt, mbl
 		if ((mp = mi_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = 2;	/* XXX move ahead of data indications */
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
 			p->PRIM_type = T_UDERROR_IND;
 			p->DEST_length = dst_len;
 			p->DEST_offset = dst_len ? sizeof(*p) : 0;
 			p->OPT_length = opt_len;
 			p->OPT_offset = opt_len ? sizeof(*p) + dst_len : 0;
 			p->ERROR_type = etype;
+			mp->b_wptr += sizeof(*p);
 			if (dst_len) {
 				bcopy(dst, mp->b_wptr, dst_len);
 				mp->b_wptr += dst_len;
@@ -1234,6 +1326,34 @@ t_uderror_ind(queue_t *q, struct mt *mt, mtp_addr_t * dst, mtp_opts_t * opt, mbl
 }
 
 /*
+ *  T_ORDREL_IND
+ *  -----------------------------------
+ */
+static int
+t_ordrel_ind(queue_t *q)
+{
+	struct mt *mt = MT_PRIV(q);
+	mblk_t *mp;
+	struct T_ordrel_ind *p;
+
+	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
+		mp->b_datap->db_type = M_PROTO;
+		p = (typeof(p)) mp->b_wptr;
+		p->PRIM_type = T_ORDREL_IND;
+		mp->b_wptr += sizeof(*p);
+		if (mtp_get_state(mt) == TS_WIND_ORDREL)
+			mtp_set_state(mt, TS_IDLE);
+		if (mtp_get_state(mt) == TS_DATA_XFER)
+			mtp_set_state(mt, TS_WREQ_ORDREL);
+		printd(("%s: %p: <- T_ORDREL_IND\n", DRV_NAME, mt));
+		putnext(mt->rq, mp);
+		return (QR_DONE);
+	}
+	ptrace(("%s: %p: ERROR: No buffers\n", DRV_NAME, mt));
+	return (-ENOBUFS);
+}
+
+/*
  *  T_OPTMGMT_ACK
  *  -----------------------------------
  */
@@ -1247,11 +1367,12 @@ t_optmgmt_ack(queue_t *q, ulong flags, mtp_opts_t * opt)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_OPTMGMT_ACK;
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) : 0;
 		p->MGMT_flags = flags;
+		mp->b_wptr += sizeof(*p);
 		if (opt_len) {
 			mtp_build_opts(mt, opt, mp->b_wptr);
 			mp->b_wptr += opt_len;
@@ -1284,12 +1405,13 @@ t_addr_ack(queue_t *q, mtp_addr_t * loc, mtp_addr_t * rem)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_ADDR_ACK;
 		p->LOCADDR_length = loc_len;
 		p->LOCADDR_offset = loc_len ? sizeof(*p) : 0;
 		p->REMADDR_length = rem_len;
 		p->REMADDR_offset = rem_len ? sizeof(*p) : 0;
+		mp->b_wptr += sizeof(*p);
 		if (loc_len) {
 			bcopy(loc, mp->b_wptr, loc_len);
 			mp->b_wptr += loc_len;
@@ -1320,23 +1442,24 @@ t_capability_ack(queue_t *q, ulong caps)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = T_CAPABILITY_ACK;
 		p->CAP_bits1 = TC1_INFO;
 		p->ACCEPTOR_id = (caps & TC1_ACCEPTOR_ID) ? (ulong) mt->rq : 0;
 		if (caps & TC1_INFO) {
-			p->INFO_ack->PRIM_type = T_INFO_ACK;
-			p->INFO_ack->TSDU_size = 272;
-			p->INFO_ack->ETSDU_size = T_INVALID;
-			p->INFO_ack->CDATA_size = T_INVALID;
-			p->INFO_ack->DDATA_size = T_INVALID;
-			p->INFO_ack->ADDR_size = sizeof(mtp_addr_t);
-			p->INFO_ack->OPT_size = T_INFINITE;
-			p->INFO_ack->SERV_type = T_CLTS;
-			p->INFO_ack->CURRENT_state = mt->state;
-			p->INFO_ack->PROVIDER_flag = XPG4_1 & ~T_SNDZERO;
+			p->INFO_ack.PRIM_type = T_INFO_ACK;
+			p->INFO_ack.TSDU_size = 272;
+			p->INFO_ack.ETSDU_size = T_INVALID;
+			p->INFO_ack.CDATA_size = T_INVALID;
+			p->INFO_ack.DDATA_size = T_INVALID;
+			p->INFO_ack.ADDR_size = sizeof(mtp_addr_t);
+			p->INFO_ack.OPT_size = T_INFINITE;
+			p->INFO_ack.SERV_type = T_CLTS;
+			p->INFO_ack.CURRENT_state = mt->state;
+			p->INFO_ack.PROVIDER_flag = XPG4_1 & ~T_SNDZERO;
 		} else
 			bzero(&p->INFO_ack, sizeof(p->INFO_ack));
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- T_CAPABILITY_ACK\n", DRV_NAME, mt));
 		putnext(mt->rq, mp);
 		return (QR_DONE);
@@ -1356,7 +1479,7 @@ t_capability_ack(queue_t *q, ulong caps)
  *  SL_PDU_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_pdu_req(queue_t *q, mblk_t *dp)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1367,9 +1490,10 @@ sl_pdu_req(queue_t *q, mblk_t *dp)
 
 		if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-			p = ((typeof(p)) mp->b_wptr)++;
+			p = (typeof(p)) mp->b_wptr;
 			p->sl_primitive = SL_PDU_REQ;
 			p->sl_mp = 0;
+			mp->b_wptr += sizeof(*p);
 			mp->b_cont = dp;
 			printd(("%s: %p: SL_PDU_REQ [%d] ->\n", DRV_NAME, sl, msgdsize(dp)));
 			putnext(sl->wq, mp);
@@ -1386,7 +1510,7 @@ sl_pdu_req(queue_t *q, mblk_t *dp)
  *  SL_EMERGENCY_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_emergency_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1395,8 +1519,9 @@ sl_emergency_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_EMERGENCY_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_EMERGENCY_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1409,7 +1534,7 @@ sl_emergency_req(queue_t *q)
  *  SL_EMERGENCY_CEASES_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_emergency_ceases_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1418,8 +1543,9 @@ sl_emergency_ceases_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_EMERGENCY_CEASES_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1432,7 +1558,7 @@ sl_emergency_ceases_req(queue_t *q)
  *  SL_START_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_start_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1441,8 +1567,9 @@ sl_start_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_START_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_START_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1455,7 +1582,7 @@ sl_start_req(queue_t *q)
  *  SL_STOP_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_stop_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1464,8 +1591,9 @@ sl_stop_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_STOP_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_STOP_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1478,7 +1606,7 @@ sl_stop_req(queue_t *q)
  *  SL_RETRIEVE_BSNT_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
 {
 	mblk_t *mp;
@@ -1486,8 +1614,9 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_RETRIEVE_BSNT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1500,7 +1629,7 @@ sl_retrieve_bsnt_req(queue_t *q, struct sl *sl)
  *  SL_RETRIEVAL_REQUEST_AND_FSNC_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_retrieval_request_and_fsnc_req(queue_t *q, ulong fsnc)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1509,9 +1638,10 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, ulong fsnc)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
 		p->sl_fsnc = fsnc;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1524,7 +1654,7 @@ sl_retrieval_request_and_fsnc_req(queue_t *q, ulong fsnc)
  *  SL_RESUME_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_resume_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1533,8 +1663,9 @@ sl_resume_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_RESUME_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_RESUME_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1547,7 +1678,7 @@ sl_resume_req(queue_t *q)
  *  SL_CLEAR_BUFFERS_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_clear_buffers_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1556,8 +1687,9 @@ sl_clear_buffers_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_CLEAR_BUFFERS_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1570,7 +1702,7 @@ sl_clear_buffers_req(queue_t *q)
  *  SL_CLEAR_RTB_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_clear_rtb_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1579,8 +1711,9 @@ sl_clear_rtb_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_CLEAR_RTB_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_CLEAR_RTB_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1593,7 +1726,7 @@ sl_clear_rtb_req(queue_t *q)
  *  SL_LOCAL_PROCESSOR_OUTAGE_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_local_processor_outage_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1602,8 +1735,9 @@ sl_local_processor_outage_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_LOCAL_PROCESSOR_OUTAGE_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1616,7 +1750,7 @@ sl_local_processor_outage_req(queue_t *q)
  *  SL_CONGESTION_DISCARD_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_congestion_discard_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1625,8 +1759,9 @@ sl_congestion_discard_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_CONGESTION_DISCARD_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1639,7 +1774,7 @@ sl_congestion_discard_req(queue_t *q)
  *  SL_CONGESTION_ACCEPT_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_congestion_accept_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1648,8 +1783,9 @@ sl_congestion_accept_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_CONGESTION_ACCEPT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1662,7 +1798,7 @@ sl_congestion_accept_req(queue_t *q)
  *  SL_NO_CONGESTION_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_no_congestion_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1671,8 +1807,9 @@ sl_no_congestion_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_NO_CONGESTION_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1685,7 +1822,7 @@ sl_no_congestion_req(queue_t *q)
  *  SL_POWER_ON_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 sl_power_on_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1694,8 +1831,9 @@ sl_power_on_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_POWER_ON_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_POWER_ON_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1718,8 +1856,9 @@ sl_optmgmt_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_OPTMGMT_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_OPTMGMT_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1741,8 +1880,9 @@ sl_notify_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_NOTIFY_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: SL_NOTIFY_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1755,7 +1895,7 @@ sl_notify_req(queue_t *q)
  *  LMI_INFO_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_info_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1764,8 +1904,9 @@ lmi_info_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: LMI_INFO_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1778,7 +1919,7 @@ lmi_info_req(queue_t *q)
  *  LMI_ATTACH_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_attach_req(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1787,8 +1928,9 @@ lmi_attach_req(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ATTACH_REQ;
+		mp->b_wptr += sizeof(*p);
 		if (ppa_ptr && ppa_len) {
 			bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 			mp->b_wptr += ppa_len;
@@ -1805,7 +1947,7 @@ lmi_attach_req(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
  *  LMI_DETACH_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_detach_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1814,8 +1956,9 @@ lmi_detach_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_DETACH_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: LMI_DETACH_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1828,7 +1971,7 @@ lmi_detach_req(queue_t *q)
  *  LMI_ENABLE_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_enable_req(queue_t *q, caddr_t dst_ptr, size_t dst_len)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1837,8 +1980,9 @@ lmi_enable_req(queue_t *q, caddr_t dst_ptr, size_t dst_len)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ENABLE_REQ;
+		mp->b_wptr += sizeof(*p);
 		if (dst_ptr && dst_len) {
 			bcopy(dst_ptr, mp->b_wptr, dst_len);
 			mp->b_wptr += dst_len;
@@ -1855,7 +1999,7 @@ lmi_enable_req(queue_t *q, caddr_t dst_ptr, size_t dst_len)
  *  LMI_DISABLE_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_disable_req(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1864,8 +2008,9 @@ lmi_disable_req(queue_t *q)
 
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_DISABLE_REQ;
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: LMI_DISABLE_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1878,7 +2023,7 @@ lmi_disable_req(queue_t *q)
  *  LMI_OPTMGMT_REQ
  *  -----------------------------------
  */
-static int
+static inline int
 lmi_optmgmt_req(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -1887,11 +2032,12 @@ lmi_optmgmt_req(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 
 	if ((mp = mi_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
-		p = ((typeof(p)) mp->b_wptr)++;
+		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_OPTMGMT_REQ;
 		p->lmi_opt_length = opt_len;
 		p->lmi_opt_offset = opt_len ? sizeof(*p) : 0;
 		p->lmi_mgmt_flags = flags;
+		mp->b_wptr += sizeof(*p);
 		if (opt_ptr && opt_len) {
 			bcopy(opt_ptr, mp->b_wptr, opt_len);
 			mp->b_wptr += opt_len;
@@ -2311,7 +2457,7 @@ mtp_enc_sif(mblk_t *mp, struct mtp_msg *msg)
 		case 0x71:	/* tra */
 		case 0x72:	/* trw */
 		case 0x31:	/* rct */
-			return (0);
+			return;
 		case 0x32:	/* tfc */
 			return mtp_enc_tfc(mp, msg);
 		case 0x41:	/* tfp */
@@ -2359,7 +2505,7 @@ mtp_enc_sif(mblk_t *mp, struct mtp_msg *msg)
 		break;
 	}
 	swerr();
-	return (-EFAULT);
+	return;
 }
 
 #define max_msg_size (6 + 1 + 7 + 1 + 3 + 1)
@@ -2836,7 +2982,7 @@ mtp_send_route(queue_t *q, mblk_t *bp, struct mtp_msg *msg, mblk_t *mp)
 	struct sl *sl;
 
 	for (sl = sl_list; sl; sl = sl->next)
-		if (sl->adj == msg->dpc)
+		if (sl->sp.adj->pc == msg->dpc)
 			break;
 	if (sl) {
 		if (canputnext(sl->wq)) {
@@ -2847,7 +2993,7 @@ mtp_send_route(queue_t *q, mblk_t *bp, struct mtp_msg *msg, mblk_t *mp)
 		}
 		return (-EBUSY);
 	}
-	mi_strlog(q, 0, SL_ERROR, "Discarding message for DPC = %x",, msg->dpc);
+	mi_strlog(q, 0, SL_ERROR, "Discarding message for DPC = %x", msg->dpc);
 	goto error;
       error:
 	if (bp)
@@ -2855,7 +3001,7 @@ mtp_send_route(queue_t *q, mblk_t *bp, struct mtp_msg *msg, mblk_t *mp)
 	freemsg(mp);
 	return (0);
 }
-static int
+static inline int
 mtp_send_coo(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc, uint fsnl)
 {
@@ -2866,7 +3012,7 @@ mtp_send_coo(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_coa(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc, uint fsnl)
 {
@@ -2877,7 +3023,7 @@ mtp_send_coa(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_cbd(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc, uint cbc)
 {
@@ -2888,7 +3034,7 @@ mtp_send_cbd(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_cba(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc, uint cbc)
 {
@@ -2899,7 +3045,7 @@ mtp_send_cba(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_eco(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -2910,7 +3056,7 @@ mtp_send_eco(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_eca(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -2921,18 +3067,18 @@ mtp_send_eca(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_rct(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	     uint mp)
+	     uint dp)
 {
-	mblk_t *bp;
+	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
 
-	if ((bp = mtp_build_rct(q, &msg, pvar, ni, dpc, opc, sls, mp)))
+	if ((mp = mtp_build_rct(q, &msg, pvar, ni, dpc, opc, sls, dp)))
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tfc(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest, uint stat)
 {
@@ -2943,7 +3089,7 @@ mtp_send_tfc(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tfp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -2954,7 +3100,7 @@ mtp_send_tfp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tcp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -2965,7 +3111,7 @@ mtp_send_tcp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tfr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -2976,7 +3122,7 @@ mtp_send_tfr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tcr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -2987,7 +3133,7 @@ mtp_send_tcr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tfa(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -2998,7 +3144,7 @@ mtp_send_tfa(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tca(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -3009,7 +3155,7 @@ mtp_send_tca(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_rst(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -3020,7 +3166,7 @@ mtp_send_rst(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_rsr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -3031,7 +3177,7 @@ mtp_send_rsr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_rcp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -3042,7 +3188,7 @@ mtp_send_rcp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_rcr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest)
 {
@@ -3053,7 +3199,7 @@ mtp_send_rcr(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lin(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3064,7 +3210,7 @@ mtp_send_lin(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lun(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3075,7 +3221,7 @@ mtp_send_lun(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lia(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3086,7 +3232,7 @@ mtp_send_lia(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lua(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3097,7 +3243,7 @@ mtp_send_lua(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lid(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3108,7 +3254,7 @@ mtp_send_lid(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lfu(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3119,7 +3265,7 @@ mtp_send_lfu(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_llt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3130,7 +3276,7 @@ mtp_send_llt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_lrt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3141,7 +3287,7 @@ mtp_send_lrt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_tra(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls)
 {
 	mblk_t *mp;
@@ -3151,7 +3297,7 @@ mtp_send_tra(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_trw(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls)
 {
 	mblk_t *mp;
@@ -3161,7 +3307,7 @@ mtp_send_trw(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_dlc(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc, uint sdli)
 {
@@ -3172,7 +3318,7 @@ mtp_send_dlc(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_css(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3183,7 +3329,7 @@ mtp_send_css(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_cns(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3194,7 +3340,7 @@ mtp_send_cns(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_cnp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint slc)
 {
@@ -3205,7 +3351,7 @@ mtp_send_cnp(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_upu(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest, uint upi)
 {
@@ -3216,7 +3362,7 @@ mtp_send_upu(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_upa(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest, uint upi)
 {
@@ -3227,7 +3373,7 @@ mtp_send_upa(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_upt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	     uint32_t dest, uint upi)
 {
@@ -3238,7 +3384,7 @@ mtp_send_upt(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t 
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_sltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	      uint slc, unsigned char *data, size_t dlen)
 {
@@ -3249,7 +3395,7 @@ mtp_send_sltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_slta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	      uint slc, unsigned char *data, size_t dlen)
 {
@@ -3260,7 +3406,7 @@ mtp_send_slta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_ssltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	       uint slc, unsigned char *data, size_t dlen)
 {
@@ -3271,7 +3417,7 @@ mtp_send_ssltm(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_sslta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
 	       uint slc, unsigned char *data, size_t dlen)
 {
@@ -3282,14 +3428,14 @@ mtp_send_sslta(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
-static int
+static inline int
 mtp_send_user(queue_t *q, mblk_t *bp, uint pvar, uint ni, uint32_t dpc, uint32_t opc, uint sls,
-	      uint mp, uint si, unsigned char *data, size_t dlen)
+	      uint dp, uint si, unsigned char *data, size_t dlen)
 {
-	mblk_t *bp;
+	mblk_t *mp;
 	struct mtp_msg msg = { 0, };
 
-	if ((bp = mtp_build_user(q, &msg, pvar, ni, dpc, opc, sls, mp, si, data, dlen)))
+	if ((mp = mtp_build_user(q, &msg, pvar, ni, dpc, opc, sls, dp, si, data, dlen)))
 		return mtp_send_route(q, bp, &msg, mp);
 	return (-ENOBUFS);
 }
@@ -3325,11 +3471,11 @@ mtp_up_status_ind(queue_t *q, struct mt *mtp, uint32_t dest, uint user, uint sta
 	mtp_addr_t dst = mtp->src;
 	uint error;
 
-	dst.mtp_pc = dest;
-	dst.mtp_si = user;
+	dst.pc = dest;
+	dst.si = user;
 	return mtp_status_ind(q, mtp, &dst, error);
 }
-static int
+static inline int
 mtp_up_status_ind_all_local(queue_t *q, uint32_t dest, uint si, uint status)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -3347,10 +3493,10 @@ mtp_cong_status_ind(queue_t *q, struct mt *mtp, uint32_t dest, uint status)
 	mtp_addr_t dst = mtp->src;
 	uint error = T_MTP_CONGESTED(status) | T_MTP_M_MEMBER;
 
-	dst.mtp_pc = dest;
+	dst.pc = dest;
 	return mtp_status_ind(q, mtp, &dst, error);
 }
-static int
+static inline int
 mtp_cong_status_ind_all_local(queue_t *q, uint32_t dest, uint status)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -3374,10 +3520,10 @@ mtp_pause_ind(queue_t *q, struct mt *mtp, uint32_t dest)
 	mtp_addr_t dst = mtp->src;
 	uint error = T_MTP_PROHIBITED | T_MTP_M_MEMBER;
 
-	dst.mtp_pc = dest;
+	dst.pc = dest;
 	return mtp_status_ind(q, mtp, &dst, error);
 }
-static int
+static inline int
 mtp_pause_ind_all_local(queue_t *q, uint32_t dest)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -3401,10 +3547,10 @@ mtp_resume_ind(queue_t *q, struct mt *mtp, uint32_t dest)
 	mtp_addr_t dst = mtp->src;
 	uint error = T_MTP_AVAILABLE | T_MTP_M_MEMBER;
 
-	dst.mtp_pc = dest;
+	dst.pc = dest;
 	return mtp_status_ind(q, mtp, &dst, error);
 }
-static int
+static inline int
 mtp_resume_ind_all_local(queue_t *q, uint32_t dest)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -3429,7 +3575,7 @@ mtp_transfer_ind(queue_t *q, struct mt *mtp, struct mtp_msg *msg)
 	}
 	return (QR_DONE);
 }
-static int
+static inline int
 mtp_transfer_ind_local(queue_t *q, struct mtp_msg *msg)
 {
 	struct sl *sl = SL_PRIV(q);
@@ -3491,13 +3637,13 @@ sl_timer_stop(struct sl *sl, const uint t)
 	case t1t:
 		mi_timer_stop(sl->timers.t1t);
 		if (sl->timers.t1t) {
-			mi_strlog(sl->rq, STRLOGTE, "stopping t1t at %lu", jiffies);
+			mi_strlog(sl->rq, STRLOGTE, SL_TRACE, "stopping t1t at %lu", jiffies);
 			mi_timer_stop(sl->timers.t1t);
 		}
 		break;
 	case t2t:
 		if (sl->timers.t2t) {
-			mi_strlog(sl->rq, STRLOGTE, "stopping t2t at %lu", jiffies);
+			mi_strlog(sl->rq, STRLOGTE, SL_TRACE, "stopping t2t at %lu", jiffies);
 			mi_timer_stop(sl->timers.t2t);
 		}
 		break;
@@ -3512,13 +3658,13 @@ sl_timer_start(struct sl *sl, const uint t)
 	switch (t) {
 	case t1t:
 		if (sl->timers.t1t) {
-			mi_strlog(sl->rq, STRLOGTE, "starting t1t at %lu", jiffies);
+			mi_strlog(sl->rq, STRLOGTE, SL_TRACE, "starting t1t at %lu", jiffies);
 			mi_timer(sl->rq, sl->timers.t1t, sl->config.t1t);
 		}
 		break;
 	case t2t:
 		if (sl->timers.t2t) {
-			mi_strlog(sl->rq, STRLOGTE, "starting t2t at %lu", jiffies);
+			mi_strlog(sl->rq, STRLOGTE, SL_TRACE, "starting t2t at %lu", jiffies);
 			mi_timer(sl->rq, sl->timers.t2t, sl->config.t2t);
 		}
 		break;
@@ -3771,14 +3917,18 @@ sl_recv_upt(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *m
 static int
 sl_recv_sltm(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *msg)
 {
-	struct sl *sl = SL_PRIV(q);
-
-	if (msg->slc != sl->slc || msg->opc != sl->adj || msg->dpc != sl->loc)
+	if (msg->slc != sl->slc || msg->opc != sl->sp.adj->pc || msg->dpc != sl->sp.loc->pc)
 		goto eproto;
 	return mtp_send_slta(q, bp, SS7_PVAR_ETSI_00, 0, msg->opc, msg->dpc, msg->sls, sl->slc,
 			     msg->data, msg->dlen);
       eproto:
 	return (-EPROTO);
+}
+
+static void
+sl_sltm_failed(queue_t *q, struct sl *sl)
+{
+	/* FIXME */
 }
 
 /*
@@ -3792,7 +3942,7 @@ sl_t1t_timeout(queue_t *q)
 
 	if (sl->flags & (SL_F_WACK_SLTM | SL_F_WACK_SLTM2)) {
 		if (sl->flags & SL_F_WACK_SLTM) {
-			mtp_send_sltm(q, NULL, SS7_PVAR_ETSI_00, 0, sl->adj, sl->loc, 0, sl->slc,
+			mtp_send_sltm(q, NULL, SS7_PVAR_ETSI_00, 0, sl->sp.adj->pc, sl->sp.loc->pc, 0, sl->slc,
 				      sl->tdata, sl->tlen);
 			sl_timer_start(sl, t1t);
 			sl->flags &= ~SL_F_WACK_SLTM;
@@ -3827,7 +3977,7 @@ sl_t2t_timeout(queue_t *q)
 		sl->tlen = jiffies & 0xf;
 		for (i = 0; i < 4; i++)
 			bcopy(&random, sl->tdata + (i << 2), 4);
-		mtp_send_sltm(q, NULL, SS7_PVAR_ETSI_00, 0, sl->adj, sl->loc, 0, sl->slc, sl->tdata,
+		mtp_send_sltm(q, NULL, SS7_PVAR_ETSI_00, 0, sl->sp.adj->pc, sl->sp.loc->pc, 0, sl->slc, sl->tdata,
 			      sl->tlen);
 		sl_timer_start(sl, t1t);
 		return (0);
@@ -3843,7 +3993,6 @@ sl_t2t_timeout(queue_t *q)
 static int
 sl_recv_slta(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *msg)
 {
-	struct sl *sl = SL_PRIV(q);
 	int err, i;
 
 	if (sl->state != SLS_IN_SERVICE)
@@ -3851,7 +4000,7 @@ sl_recv_slta(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *
 	if (!(sl->flags & (SL_F_WACK_SLTM | SL_F_WACK_SLTM2)))
 		goto eproto;
 	sl_timer_stop(sl, t1t);
-	if (msg->slc != sl->slc || msg->opc != sl->adj || msg->dpc != sl->loc)
+	if (msg->slc != sl->slc || msg->opc != sl->sp.adj->pc || msg->dpc != sl->sp.loc->pc)
 		goto failed;
 	if (sl->tlen != msg->dlen)
 		goto failed;
@@ -3866,7 +4015,7 @@ sl_recv_slta(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *
       failed:
 	if (sl->flags & SL_F_WACK_SLTM) {
 		if ((err =
-		     mtp_send_sltm(q, bp, SS7_PVAR_ETSI_00, 0, sl->adj, sl->loc, 0, sl->slc,
+		     mtp_send_sltm(q, bp, SS7_PVAR_ETSI_00, 0, sl->sp.adj->pc, sl->sp.loc->pc, 0, sl->slc,
 				   sl->tdata, sl->tlen)))
 			return (err);
 		sl_timer_start(sl, t1t);
@@ -3909,6 +4058,12 @@ sl_recv_sslta(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg 
 	return (-EFAULT);
 }
 
+static int
+sl_reply_upu(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *msg)
+{
+	__ptrace(("SSLTA Unimplemeneted\n"));
+	return (-EFAULT);
+}
 /*
  *  RECV USER
  *  -----------------------------------
@@ -4549,7 +4704,7 @@ mtp_dec_msg(queue_t *q, mblk_t *mp, struct mtp_msg *msg)
 	msg->popt = 0;
 	if ((err = mtp_dec_sio(mp, msg)))
 		goto error;
-	if (msg->ni != sl->ni)
+	if (msg->ni != sl->lk.lk->ni)
 		goto discard;
 	if ((err = mtp_dec_rl(mp, msg)))
 		goto error;
@@ -4579,16 +4734,16 @@ sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp)
 	int err;
 	struct mtp_msg msg = { 0, };
 
-	if ((err = mtp_dec_msg(q, mp, &msg)))
+	if ((err = mtp_dec_msg(q, dp, &msg)))
 		goto decode;
-	if (sl->ni != msg.ni)
+	if (sl->lk.lk->ni != msg.ni)
 		goto eproto;
-	if (sl->loc != msg.dpc)
+	if (sl->sp.loc->pc != msg.dpc)
 		goto eproto;
-	if (sl->adj != msg.opc)
+	if (sl->sp.adj->pc != msg.opc)
 		goto eproto;
 	/* message is for us, process it */
-	return sl_proc_msg(sl, q, bp, mp, &msg);
+	return sl_proc_msg(sl, q, bp, dp, &msg);
       eproto:
 	mi_strlog(q, 0, SL_ERROR, "message not for us NI=%x, DPC=%x, OPC=%x, SI=%x\n",
 		  msg.ni, msg.dpc, msg.opc, msg.si);
@@ -4597,7 +4752,7 @@ sl_recv_msg(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp)
 	mi_strlog(q, 0, SL_ERROR, "decoding error %d", err);
 	goto error;
       error:
-	freemsg(mp);
+	freemsg(dp);
 	return (0);
 }
 
@@ -4638,7 +4793,6 @@ static int
 sl_pdu_ind(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
-	int err;
 	const sl_pdu_ind_t *p = (typeof(p)) mp->b_rptr;
 
 	if (sl->state != SLS_IN_SERVICE)
@@ -5382,7 +5536,6 @@ static int
 mtp_data_req(queue_t *q, mblk_t *mp)
 {
 	struct mt *mt = MT_PRIV(q);
-	int err;
 	int dlen = msgdsize(mp);
 
 	if (mtp_get_state(mt) == TS_IDLE)
@@ -5391,7 +5544,7 @@ mtp_data_req(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if (dlen == 0 || dlen > 272)
 		goto baddata;
-	return mtp_send_msg(mt, NULL, &mt->dst, mp);
+	return tp_send_msg(mt, NULL, &mt->dst, mp);
       baddata:
 	ptrace(("%s: %p: ERROR: bad data size %d\n", DRV_NAME, mt, dlen));
 	goto error;
@@ -5428,21 +5581,21 @@ t_conn_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if (mlen < p->DEST_offset + p->DEST_length)
 		goto einval;
-	if (mlen < p->OPT_offest + p->OPT_length)
+	if (mlen < p->OPT_offset + p->OPT_length)
 		goto einval;
 	{
 		mtp_addr_t *dst = (typeof(dst)) (mp->b_rptr + p->DEST_offset);
 
 		if (p->DEST_length < sizeof(*dst))
 			goto badaddr;
-		if (dst->mtp_family != AF_MTP)
+		if (dst->family != AF_MTP)
 			goto badaddr;
-		if (dst->si == 0 && mtp->src.mtp_si == 0)
+		if (dst->si == 0 && mtp->src.si == 0)
 			goto noaddr;
 		if (dst->si < 3 && mtp->cred.cr_uid != 0)
 			goto acces;
-		if (dst->si != mtp->src.mtp_si)
-			goto baddaddr;
+		if (dst->si != mtp->src.si)
+			goto badaddr;
 		if (!mtp_check_dst(mtp, dst))
 			goto badaddr;
 		{
@@ -5469,6 +5622,10 @@ t_conn_req(queue_t *q, mblk_t *mp)
       acces:
 	err = TACCES;
 	ptrace(("%s: %p: ERROR: no permission for address\n", DRV_NAME, mt));
+	goto error;
+      noaddr:
+	err = TNOADDR;
+	ptrace(("%s: %p: ERROR: address cannot be assigned\n", DRV_NAME, mt));
 	goto error;
       badaddr:
 	err = TBADADDR;
@@ -5529,7 +5686,7 @@ t_discon_req(queue_t *q, mblk_t *mp)
 static int
 t_data_req(queue_t *q, mblk_t *mp)
 {
-	struct mt *mt = PRIV(q);
+	struct mt *mt = MT_PRIV(q);
 	int err;
 	const struct T_data_req *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
@@ -5542,7 +5699,7 @@ t_data_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((1 << mtp_get_state(mt)) & ~TSM_OUTDATA)
 		goto outstate;
-	if ((err = mtp_send_msg(mt, NULL, &mt->dst, mp->b_cont)) == QR_ABSORBED)
+	if ((err = tp_send_msg(mt, NULL, &mt->dst, mp->b_cont)) == QR_ABSORBED)
 		return (QR_TRIMMED);
 	return (err);
       baddata:
@@ -5601,7 +5758,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if (p->CONIND_number)
 		goto notsupport;
-	if ((mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_lenth)
+	if ((mp->b_wptr < mp->b_rptr + p->ADDR_offset + p->ADDR_length)
 	    || (p->ADDR_length != sizeof(mtp_addr_t)))
 		goto badaddr;
 	{
@@ -5609,7 +5766,7 @@ t_bind_req(queue_t *q, mblk_t *mp)
 
 		/* 
 		   we don't allow wildcards yet. */
-		if (src->mtp_family != AF_MTP)
+		if (src->family != AF_MTP)
 			goto badaddr;
 		if (!src->si || !src->pc)
 			goto noaddr;
@@ -5705,7 +5862,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
 
 			if (mtp_parse_opts(mt, &opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 				goto badopt;
-			if ((err = mtp_send_msg(mt, &opts, dst, mp->b_cont)) == QR_ABSORBED)
+			if ((err = tp_send_msg(mt, &opts, dst, mp->b_cont)) == QR_ABSORBED)
 				return (QR_TRIMMED);
 			return (err);
 		}
@@ -5716,7 +5873,7 @@ t_unitdata_req(queue_t *q, mblk_t *mp)
       acces:
 	ptrace(("%s: %p: ERROR: no permission to address\n", DRV_NAME, mt));
 	goto error;
-      badadd:
+      badaddr:
 	ptrace(("%s: %p: ERROR: bad destination address\n", DRV_NAME, mt));
 	goto error;
       einval:
@@ -5741,7 +5898,6 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct mt *mt = MT_PRIV(q);
 	int err = 0;
-	const size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_optmgmt_req *p = (typeof(p)) mp->b_rptr;
 
 #ifdef TS_WACK_OPTREQ
@@ -5807,7 +5963,7 @@ t_optmgmt_req(queue_t *q, mblk_t *mp)
 static int
 t_ordrel_req(queue_t *q, mblk_t *mp)
 {
-	struct mt *mt = PRIV(q);
+	struct mt *mt = MT_PRIV(q);
 	const struct T_ordrel_req *p = (typeof(p)) mp->b_rptr;
 
 	if ((1 << mtp_get_state(mt)) & ~TSM_OUTDATA)
@@ -5836,7 +5992,6 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 {
 	struct mt *mt = MT_PRIV(q);
 	int err;
-	const size_t mlen = mp->b_wptr - mp->b_rptr;
 	const struct T_optdata_req *p = (typeof(p)) mp->b_rptr;
 
 	if (mtp_get_state(mt) == TS_IDLE)
@@ -5846,20 +6001,24 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 		goto einval;
 	if ((1 << mtp_get_state(mt)) & ~TSM_OUTDATA)
 		goto outstate;
-	if (p->DATA_flags & T_ODF_EX || p->DATA_flags & T_ODF_MORE)
+	if (p->DATA_flag & T_ODF_EX || p->DATA_flag & T_ODF_MORE)
 		goto notsupport;
 	else {
 		struct mtp_opts opts = { 0L, NULL, };
 
 		if (mtp_parse_opts(mt, &opts, mp->b_rptr + p->OPT_offset, p->OPT_length))
 			goto badopt;
-		if ((err = mtp_send_msg(mt, &opts, &mt->dst, mp->b_cont)) == QR_ABSORBED)
+		if ((err = tp_send_msg(mt, &opts, &mt->dst, mp->b_cont)) == QR_ABSORBED)
 			return (QR_TRIMMED);
 		return (err);
 	}
       badopt:
 	err = TBADOPT;
 	ptrace(("%s: %p: ERROR: bad options\n", DRV_NAME, mt));
+	goto error;
+      notsupport:
+	err = TNOTSUPPORT;
+	ptrace(("%s: %p: ERROR: primitive not supported\n", DRV_NAME, mt));
 	goto error;
       outstate:
 	err = TOUTSTATE;
@@ -5883,7 +6042,7 @@ t_optdata_req(queue_t *q, mblk_t *mp)
 static int
 t_addr_req(queue_t *q, mblk_t *mp)
 {
-	struct mt *mt = PRIV(q);
+	struct mt *mt = MT_PRIV(q);
 
 	(void) mp;
 	switch (mtp_get_state(mt)) {
@@ -5911,8 +6070,6 @@ t_addr_req(queue_t *q, mblk_t *mp)
 static int
 t_capability_req(queue_t *q, mblk_t *mp)
 {
-	struct mt *mt = MT_PRIV(q);
-	int err;
 	const struct T_capability_req *p = (typeof(p)) mp->b_rptr;
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -5931,6 +6088,11 @@ t_capability_req(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
+static struct lmi_option mtp_default_option = {
+	.pvar = SS7_PVAR_ITUT_00,
+	.popt = 0,
+};
+
 /*
  *  MTP_IOCGOPTION  - lmi_ioption_t
  *  -------------------------------------------------------------------
@@ -5944,9 +6106,7 @@ mtp_iocgoption(queue_t *q, mblk_t *mp)
 
 	if ((dp = mp->b_cont)) {
 		lmi_option_t *arg = (typeof(arg)) dp->b_rptr;
-		struct mt *mtp = MT_PRIV(q);
 		int ret = 0;
-		int flags = 0;
 
 		if (dp->b_wptr < dp->b_rptr + sizeof(*arg))
 			goto einval;
@@ -5971,9 +6131,7 @@ mtp_iocsoption(queue_t *q, mblk_t *mp)
 
 	if ((dp = mp->b_cont)) {
 		lmi_option_t *arg = (typeof(arg)) dp->b_rptr;
-		struct mt *mtp = MT_PRIV(q);
 		int ret = 0;
-		int flags = 0;
 
 		if (dp->b_wptr < dp->b_rptr + sizeof(*arg))
 			goto einval;
@@ -6172,14 +6330,24 @@ mtp_ioccpass(queue_t *q, mblk_t *mp)
  *
  *  -------------------------------------------------------------------------
  */
+static struct sl *
+sl_alloc_priv(queue_t *q, struct sl **slp, int index, cred_t *crp)
+{
+	fixme(("Unimplemented"));
+	return (NULL);
+}
+static void
+sl_free_priv(queue_t *sl)
+{
+	fixme(("Unimplemented"));
+}
 static int
 mt_w_ioctl(queue_t *q, mblk_t *mp)
 {
-	struct mt *mt = MT_PRIV(q);
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
-	int type = _IOC_TYPE(cmn), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
 
 	switch (type) {
@@ -6215,7 +6383,7 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 			}
 		case _IOC_NR(I_UNLINK):
 			for (sl = sl_list; sl; sl = sl->next)
-				if (sl->u.mux.index == lb->l_index)
+				if (sl->index == lb->l_index)
 					break;
 			if (!sl) {
 				ret = -EINVAL;
@@ -6240,55 +6408,55 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 		}
 		switch (nr) {
 		case _IOC_NR(MTP_IOCGOPTION):	/* lmi_option_t */
-			rtn = mtp_iocgoption(q, mp);
+			ret = mtp_iocgoption(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSOPTION):	/* lmi_option_t */
-			rtn = mtp_iocsoption(q, mp);
+			ret = mtp_iocsoption(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGCONFIG):	/* mtp_config_t */
-			rtn = mtp_iocgconfig(q, mp);
+			ret = mtp_iocgconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSCONFIG):	/* mtp_config_t */
-			rtn = mtp_iocsconfig(q, mp);
+			ret = mtp_iocsconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCTCONFIG):	/* mtp_config_t */
-			rtn = mtp_ioctconfig(q, mp);
+			ret = mtp_ioctconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCCONFIG):	/* mtp_config_t */
-			rtn = mtp_ioccconfig(q, mp);
+			ret = mtp_ioccconfig(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGSTATEM):	/* mtp_statem_t */
-			rtn = mtp_iocgstatem(q, mp);
+			ret = mtp_iocgstatem(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCMRESET):	/* mtp_statem_t */
-			rtn = mtp_ioccmreset(q, mp);
+			ret = mtp_ioccmreset(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGSTATSP):	/* mtp_stats_t */
-			rtn = mtp_iocgstatsp(q, mp);
+			ret = mtp_iocgstatsp(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSSTATSP):	/* mtp_stats_t */
-			rtn = mtp_iocsstatsp(q, mp);
+			ret = mtp_iocsstatsp(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGSTATS):	/* mtp_stats_t */
-			rtn = mtp_iocgstats(q, mp);
+			ret = mtp_iocgstats(q, mp);
 			break;
-		case _IOC_NR(MTP_IOCSSTATS):	/* mtp_stats_t */
-			rtn = mtp_iocsstats(q, mp);
+		case _IOC_NR(MTP_IOCCSTATS):	/* mtp_stats_t */
+			ret = mtp_iocsstats(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCGNOTIFY):	/* mtp_notify_t */
-			rtn = mtp_iocgnotify(q, mp);
+			ret = mtp_iocgnotify(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCSNOTIFY):	/* mtp_notify_t */
-			rtn = mtp_iocsnotify(q, mp);
+			ret = mtp_iocsnotify(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCNOTIFY):	/* mtp_notify_t */
-			rtn = mtp_ioccnotify(q, mp);
+			ret = mtp_ioccnotify(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCMGMT):	/* mtp_ctl_t */
-			rtn = mtp_ioccmgmt(q, mp);
+			ret = mtp_ioccmgmt(q, mp);
 			break;
 		case _IOC_NR(MTP_IOCCPASS):	/* mtp_ulong */
-			rtn = mtp_ioccpass(q, mp);
+			ret = mtp_ioccpass(q, mp);
 			break;
 		default:
 			ptrace(("%s: %d: ERROR: Unsupported MTP ioctl %d\n", nr));
@@ -6316,6 +6484,8 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 	return (QR_ABSORBED);
 }
 
+static queue_t *mtp_lmq = NULL;
+
 /*
  *  M_IOCACK, M_IOCNAK Handling
  *  -------------------------------------------------------------------------
@@ -6323,23 +6493,21 @@ mt_w_ioctl(queue_t *q, mblk_t *mp)
 static int
 sl_r_iocack(queue_t *q, mblk_t *mp)
 {
-	struct sl *sl = SL_PRIV(q);
 	mblk_t *dp;
-	queue_t *mq;
-	struct mt *mtp;
+	struct mt *mt, *lm;
 	struct iocblk *iocp = (typeof(iocp)) mp->b_rptr;
 	struct mtp_pass *pass = mp->b_cont ? ((typeof(pass)) mp->b_cont->b_rptr) - 1 : NULL;
 
-	if (!mtp_lmq || !(lm = LM_PRIV(mtp_lmq)) || lm->ioc_id != iocp->ioc_id)
+	if (!mtp_lmq || !(lm = MT_PRIV(mtp_lmq)) || lm->ioc_id != iocp->ioc_id)
 		goto discard;
-	lm->ioc_id == NULL;
+	lm->ioc_id = 0;
 	if (!(dp = mp->b_cont) || dp->b_rptr <= dp->b_datap->db_base + sizeof(*pass))
 		goto discard;
 	dp->b_rptr -= sizeof(*pass);
-	for (mq = mtp_list; mq && mq != *(typeof(mq) *) dp->b_rptr; mq = mq->next) ;
-	if (!mq || mq->ioc_id != iocp->ioc_id)
+	for (mt = mtp_list; mt && mt != *(typeof(mt) *) dp->b_rptr; mt = mt->next) ;
+	if (!mt || mt->ioc_id != iocp->ioc_id)
 		goto discard;
-	pass->pass_cmd = xchg(&iocp->ioc_cmd, MTP_IOCPASS);
+	iocp->ioc_cmd = MTP_IOCCPASS;
 	putnext(lm->rq, mp);
 	return (QR_ABSORBED);
       discard:
@@ -6556,10 +6724,18 @@ mt_w_proto(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
+static rwlock_t mt_mux_lock = RW_LOCK_UNLOCKED;
+
 /*
  *  M_SIG, M_PCSIG Handling
  *  -------------------------------------------------------------------------
  */
+static int
+mt_t1_timeout(queue_t *q)
+{
+	fixme(("Unimplemented"));
+	return (-EFAULT);
+}
 static int
 mt_w_sig(queue_t *q, mblk_t *mp)
 {
@@ -6593,7 +6769,7 @@ static int
 sl_r_sig(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
-	int err;
+	int err = 0;
 
 	read_lock(&mt_mux_lock);
 	if (!(sl = (struct sl *) mi_trylock(q))) {
@@ -6752,7 +6928,7 @@ mt_w_next(queue_t *q, mblk_t *mp)
 
 	read_lock(&mt_mux_lock);
 	if (mt->sl && (oq = mt->sl->wq)) {
-		if (pcmsg(mp) || bcanputnext(oq, mp->b_band)) {
+		if (pcmsg(DB_TYPE(mp)) || bcanputnext(oq, mp->b_band)) {
 			putnext(oq, mp);
 			read_unlock(&mt_mux_lock);
 			return (0);
@@ -6773,7 +6949,7 @@ sl_r_next(queue_t *q, mblk_t *mp)
 
 	read_lock(&mt_mux_lock);
 	if (sl->other && (oq = sl->other->wq)) {
-		if (pcmsg(mp) || bcanputnext(oq, mp->b_band)) {
+		if (pcmsg(DB_TYPE(mp)) || bcanputnext(oq, mp->b_band)) {
 			putnext(oq, mp);
 			read_unlock(&mt_mux_lock);
 			return (0);
@@ -6786,6 +6962,7 @@ sl_r_next(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+// static int mt_w_iocdata(queue_t *, mblk_t *);
 /*
  *  STREAMS message handling
  *  =========================================================================
@@ -6803,10 +6980,13 @@ mt_msg_slow(queue_t *q, mblk_t *mp)
 	case M_PCSIG:
 		return mt_w_sig(q, mp);
 	case M_FLUSH:
+		return mt_w_flush(q, mp);
 	case M_IOCTL:
 		return mt_w_ioctl(q, mp);
+#if 0
 	case M_IOCDATA:
 		return mt_w_iocdata(q, mp);
+#endif
 	}
 	return mt_w_next(q, mp);
 }
@@ -6817,8 +6997,8 @@ mt_msg(queue_t *q, mblk_t *mp)
 		return mt_w_data(q, mp);
 	if (DB_TYPE(mp) == M_PROTO)
 		if (mp->b_wptr >= mp->b_rptr + sizeof(uint32_t))
-			if (*(uint32_t *) mp->b_rptr == MTP_TRANSFER_REQ)
-				return mtp_transfer_req(MT_PRIV(q), q, mp);
+			if (*(uint32_t *) mp->b_rptr == T_DATA_REQ)
+				return t_data_req(q, mp);
 	return mt_msg_slow(q, mp);
 }
 static int
@@ -6853,7 +7033,7 @@ sl_msg(queue_t *q, mblk_t *mp)
 	if (DB_TYPE(mp) == M_PROTO)
 		if (mp->b_wptr >= mp->b_rptr + sizeof(uint32_t))
 			if (*(uint32_t *) mp->b_rptr == SL_PDU_IND)
-				return sl_pdu_ind(SL_PRIV(q), q, mp);
+				return sl_pdu_ind(q, mp);
 	return sl_msg_slow(q, mp);
 }
 
@@ -6908,8 +7088,8 @@ mt_rsrv(queue_t *q)
 {
 	struct mt *mt = MT_PRIV(q);
 
-	read_lock(&mt_mux_lock)
-	    if (mt->sl)
+	read_lock(&mt_mux_lock);
+	if (mt->sl)
 		qenable(mt->sl->rq);
 	read_unlock(&mt_mux_lock);
 	return (0);
@@ -6956,11 +7136,11 @@ sl_wsrv(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
 
-	read_lock(&mt_mux_lock)
-	    if (sl->other)
+	read_lock(&mt_mux_lock);
+	if (sl->other)
 		qenable(sl->other->wq);
-	read_unlock(&mt_mux_lock)
-	    return (0);
+	read_unlock(&mt_mux_lock);
+	return (0);
 }
 
 /**
@@ -7008,6 +7188,7 @@ sl_rput(queue_t *q, mblk_t *mp)
  *  OPEN
  *  -------------------------------------------------------------------------
  */
+static caddr_t mt_opens = NULL;
 static int
 mt_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
@@ -7026,10 +7207,10 @@ mt_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENOBUFS);
 	*(uint *) mp->b_rptr = t1;
 
-	if (!cminor)
+	if (!getminor(*devp))
 		sflag = CLONEOPEN;
-	if ((err = mi_open_comm(&mt_opens, q, devp, oflags, slfag, crp))) {
-		freeb(t1);
+	if ((err = mi_open_comm(&mt_opens, sizeof(*mt), q, devp, oflags, sflag, crp))) {
+		freeb(mp);
 		return (err);
 	}
 	mi_strlog(q, 0, SL_TRACE, "opened character device %d:%d", (int) getmajor(*devp),
@@ -7040,7 +7221,11 @@ mt_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 	mt->rq = RD(q);
 	mt->wq = WR(q);
 	mt->cred = *crp;
+#if 0
 	mt->timers.t1 = mp;
+#else
+	freemsg(mp);
+#endif
 	/* FIXME: initialize some more */
 	qprocson(q);
 	return (0);
@@ -7135,11 +7320,13 @@ static struct qinit sl_rinit = {
 	.qi_putp = sl_rput,		/* Write put (message from below) */
 	.qi_srvp = sl_rsrv,		/* Write queue service */
 	.qi_minfo = &sl_rinfo,		/* Information */
+	.qi_mstat = &sl_rstat,		/* Statistics */
 };
 static struct qinit sl_winit = {
 	.qi_putp = sl_wput,		/* Write put (message from above) */
 	.qi_srvp = sl_wsrv,		/* Write queue service */
 	.qi_minfo = &sl_winfo,		/* Information */
+	.qi_mstat = &sl_wstat,		/* Statistics */
 };
 
 static struct streamtab mtp_mininfo = {

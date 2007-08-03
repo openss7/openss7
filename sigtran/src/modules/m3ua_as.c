@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:45 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:44 $ by $Author: brian $
+ Last Modified $Date: 2007/08/03 13:34:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 0.9.2.8  2007/08/03 13:34:45  brian
+ - manual updates, put ss7 modules in public release
+
  Revision 0.9.2.7  2007/07/14 01:33:44  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $"
+#ident "@(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:45 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $";
+    "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:45 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -130,9 +133,6 @@ static char const ident[] =
 #undef mi_timer
 #define mi_timer mi_timer_MAC
 
-#undef DB_TYPE
-#define DB_TYPE(mp) mp->b_datap->db_type
-
 #include <linux/socket.h>
 #include <net/ip.h>
 
@@ -157,7 +157,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:44 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:45 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

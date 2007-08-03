@@ -1,3 +1,9 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/streams.refs: updated references
+	* doc/man/man9/iocblk.9.man: correction of syntax error
+	* include/sys/streams/stream.h: macro definitions of oddball message types
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

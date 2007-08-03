@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: cnam.texi,v 0.9.2.2 2007/07/04 08:32:16 brian Exp $
+% @(#) $Id: cnam.texi,v 0.9.2.3 2007/08/03 13:34:52 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/07/04 08:32:16 $ by $Author: brian $
+% Last Modified $Date: 2007/08/03 13:34:52 $ by $Author: brian $
 %
 % =========================================================================
 \input texinfo @c -*-texinfo-*-
@@ -63,7 +63,7 @@
 @setfilename cnam.info
 @include texi/args.texi
 @set MANUAL_TITLE OpenSS7 CNAM Query Platform
-@set MANUAL_TYPE Preliminary Design and Development Proposal
+@set MANUAL_TYPE High-Level Design
 @settitle @value{MANUAL_TITLE}
 @c %**end of header
 
@@ -74,7 +74,7 @@
 
 @include texi/args.texi
 @set MANUAL_TITLE OpenSS7 CNAM Query Platform
-@set MANUAL_TYPE Preliminary Design and Development Proposal
+@set MANUAL_TYPE High-Level Design
 
 @comment The following copyright information goes at the head of each .info file.
 @ifinfo
@@ -120,7 +120,7 @@ no obligation to provide any feature listed herein.
 
 @include texi/args.texi
 @set MANUAL_TITLE OpenSS7 CNAM Query Platform
-@set MANUAL_TYPE Preliminary Design and Development Proposal
+@set MANUAL_TYPE High-Level Design
 
 @ignore
 @shorttitlepage @value{MANUAL_TITLE} @value{MANUAL_TYPE}
@@ -371,6 +371,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: cnam.texi,v $
+Revision 0.9.2.3  2007/08/03 13:34:52  brian
+- manual updates, put ss7 modules in public release
+
 Revision 0.9.2.2  2007/07/04 08:32:16  brian
 - doc updates and m2pa correction
 
@@ -614,13 +617,108 @@ For more details on Gate scheduling for Phase 1 and Phase 2 of the project, @pxr
 @chapter Application Architecture
 @cindex Application architecture
 
-The @value{MANUAL_TITLE} is intended to provide a low scale, low cost CNAM query service.
-
 @menu
+* Application Background::
+* Application Objectives::
 * Application Requirements::
 * Solution Architecture::
 * Transaction Flows::
 @end menu
+
+The @value{MANUAL_TITLE} is intended to provide a low scale, low cost CNAM query service.
+
+@node Application Background
+@section Application Background
+@cindex application background
+
+Traditionally, Calling and Called Name Delivery service has been provided over the SS7 Signalling
+Network using GR-1188-CORE (formerly TR-NWT-001188).  GR-1188 provides for two approaches to
+providing the Calling and Called names:
+
+@table @emph
+
+@item ISUP Approach
+
+Under the ISUP approach, the Generic Name parameter is added to the IAM (providing the calling name)
+and to the ACM/CPG messages (providing the called name).  The calling name is provided by the
+originating local exchange (where the subscriber was provisioned).  The name is provisioned using
+the line service order.  The called name is provided by the terminating local exchange (again, where
+the subscriber was provisioned).  The name is provisioned using the line service order.
+
+@item TCAP Approach
+
+Under the TCAP approach, the Service Switching Point (SSP) queries a centrally located CNAM database
+using the called or calling number in the service key of the query and obtaining a Generic Name in
+response.  The name is then used as though it arrived in the appropriate ISUP message and may be
+propagated to outgoing ISUP messages.  The calling number is typically queried by the terminating
+exchange, whereas the called number is typically queried by the originating exchange.  Names are
+provisioned against numbers in a CNAM database.  Because there is quite an amount of other
+information associated wtih a local number in a LIDB (Line Information Data Base) the CNAM database
+and LIDB databases are normally implemented in the same database.  Even though they are coexistent,
+the CNAM and LIDB databases have different TCAP query and response formats.  While the LIDB uses a
+getData query, the CNAM database uses a AIN/BSDB-like service key query.
+
+@end table
+
+Both approaches can coexist: that is, if there is no GN in the appropriate ISUP message, a query of
+the CNAM database can be performed.
+
+The traditional architecture for providing CNAM database access is to provide SS7 network
+connectivity between SSPs (local and terminating exchanges) requiring CNAM query capability and a
+centrally located CNAM/LIDB database.  A number of clearing house style services have appeared which
+provide a single database access to an array of CNAM/LIDB databases operated by various incumbent
+and competitive service providers.
+
+Typicall low-speed narrowband SS7 signalling links have the capacity of providing about 100 queries
+per second at 1 Erlang.  Provisioned at 0.40 Erlang, 80 queries per second can be accomodated by a
+pair of low-speed narrowband SS7 signalling links.  A rather sizeable originating and terminating
+exchange with 50,000 subscriber lines, each generating an average 4CCS of traffic or approximately 2
+call per hour during the busy hour, generates approximately 28 transactions per second for each
+name.  If both originating and terminating names are queried, that is as many as 56 tansactions per
+second.  Calling and called name delivery services do not typically represent a 100% penetration in
+the switching center, but even given 80% penetration, that would represent about 40 queries per
+second, or the capacity of an entire low-speed SS7 signalling link per sizeable local switch.
+
+Graded SS7 links are expensive.  Thousands of dollars per month are required to provide the graded
+facility for a single SS7 signalling link.  Typical incumbent query costs for CNAM queries are 0.5
+cents per query.  Following the 80-20 rule, 80% of the calls within a local switching exchange are
+intra-switch calls, and 20% are inter-switch calls.  90-95% of the calls are typically local calls
+and 5-10% are long distance calls.  Of the 80% of the calls that are inter-switch, when both calling
+and called numbers are queried, an additional $0.01 per call is added for local calls for which the
+numbers and names belong to subscribers within the same switching center (not to mention subscribers
+of the same service provider).  80% of the costs associated with CNAM queries (the $0.01 per call
+and the capacity cost of the graded SS7 signalling links) can be avoided if a local, collocated CNAM
+database is provided at low cost.  $0.32 per second plus 80% of the cost of the graded signalling
+link can be avoided.  A switch with 100% penetration of both calling and called name delivery could
+avoid hundreds of thousands of dollars in cost per month.
+
+@node Application Objectives
+@section Application Objectives
+@cindex Application objectives
+
+The objective of the CNAM application is to avoid the graded SS7 link costs and incumbent query
+costs associated with CNAM database queries.
+
+@itemize
+
+@item Avoid expensive graded facilities for SS7 links.
+
+To avoid the high costs of the graded facilities required to support a pair of low-speed SS7
+signalling links, by colocating an Application Gateway platform with the local exchange, the SS7
+signalling links can be strung to the Application Gateway across the CO floor and the expensive
+graded facilities dropped.  Queries to locally attached or remote databases will be performed using
+the Internet Protocol suite.  This will avoid several thousand dollars per month in graded facility
+costs.
+
+@item Avoid expensive query costs on service provider's own subscriber names and numbers.
+
+To avoid query costs for intra-switch traffic and for inter-switch traffic where the originating and
+terminating switches belong to the same service provider, a locally attached, integrated or
+memory/disk cache database can be provided and provisioned with the service provider's own
+subscriber names and numbers.  This can avoid hundreds of thousands of dollars per month in
+incumbent or clearing house query charges.
+
+@end itemize
 
 @node Application Requirements
 @section Application Requirements
@@ -639,25 +737,103 @@ The platform has the following application requirements:
 @cindex Project phase 1, requirements
 
 @itemize
-@item Direct SS7 link connectivity to one or more switches across the CO floor (i.e. utilizing
-F-links).
-@item ANSI MTP2 conformance and interoperability (F-link operation).
-@item ANSI MTP3 conformance and interoperability (F-link operation).
+@item Direct SS7 link connectivity to one or more switches across the CO floor.
+
+As the objective is to avoid the graded facilities necessary to support SS7 signalling links, if the
+CO does not have a collocated STP pair, the Application Gateway would be attached directly to the
+collocated switches using low-speed narrowband SS7 F-links.  If the CO has a collocated STP pair, or
+if cost-effective access is possible via a service provider owned regional STP pair, the Application
+Gateway could be collocated with the STP pairs and attached via low-speed or high-speed narrowband
+SS7 A-links and still avoid the cost of graded facilities between the STP and a CNAM/LIDB provider.
+
+@item ANSI MTP2 conformance and interoperability (F-link and A/E-link operation).
+
+The Application Gateway must conform to ANSI MTP Level 2 (ANSI T1.111.3/2000) for F-link and A/E-link
+operation, for both low-speed (56/64 kbps, ANSI T1.111.3/2000) and high-speed (1.544Mbps, ANSI
+T1.111.3/2000 Annex A) signalling links.
+
+@item ANSI MTP3 conformance and interoperability (F-link and A/E-link operation).
+
+The Application Gateway must conform to ANSI MTP Level 3 (ANSI T1.111.4/2000) for F-link and A/E-link
+operation.  The Transfer Function is not required and in all instances the Application Gateway will
+operate a Signalling End Point (SEP).@footnote{It should be noted that for F-link operation, there
+is no need to provision more than on SS7 Signalling Point Code for all Application Gateways that are
+F-link attached in the entire network, regardless of the number of physical platforms.  This is
+possible as the only route that a switch sees to the platform is via F-links and not via A-links to
+any STP in the system.  The collection of all Application Gateways can be seen a one distributed
+CNAM database with one SS7 Signalling Point Code that is attached to mutliple switches using
+F-links.  With STP interconnection, it is still possible to have a single SS7 PC for each
+Application Gateway, provided that the connection to STPs is performed using E-links rather than
+A-links.}  This is a rather limited range of operation of the MTP Level 3 protocol layer.
+
 @item ANSI SCCP conformance and interoperability (Connectionless Protocol Class 0).
+
+The Application Gateway must provide an SCCP layer conforming to ANSI SCCP (ANSI T1.112/2000) but
+only need provide Protocol Class 0 operation and does not need to provide Global Title Translation.
+The Application Gateway will act as an Service Control Point (SCP) in the architecture.  This is a
+rather limited range of operation of the SCCP protocol layer.
+
 @item ANSI TCAP conformance and interoperability (Basic Query/Response).
+
+The Application Gateway must provide a TCAP layer conforming to ANSI TCAP (ANSI T1.114/2000) but
+only needs to provide Operation Class 1, and simple query/response capabilities.
+
 @item CNAM conformance and interoperability.
+
+The Application Gateway must provide CNAM query and response capability conforming to Telcordia
+(GR-1188-CORE), but only the TCAP method and only the CNAM Database requirements.
+
 @end itemize
+
+Phase 1 will provide an Application Gateway that can be interconnected with Service Switching Point
+(SSP) or Signalling Transfer Point (STP) using F-links or A/E-links, and that will provide the
+capabilities to receive CNAM queries and generate CNAM responses.  It will provide memory/disk
+cacheing and integrated database capbilities.
 
 @node Phase 2 Requirements
 @subsection Phase 2 Requirements
 @cindex Project phase 2, requirements
 
+@set SOAP SIGTRAN TUA, SR-3511 (TA1129+), SR-3389 (GDI), ONC RPC, SOAP, TCAP over SIP or other
+
 @itemize
-@item SIGTRAN TUA (draft-bidulock-sigtran-tua-04.txt) or SR 3332 (TA 1129+) signalling transport of
-TCAP, or other offboard query capability such as ONC RPC.
-@cindex TUA
+@item @value{SOAP} signalling transport of TCAP, or other oaffboard query capability.
+@cindex SIGTRAN TUA
+@cindex TA1129+
 @cindex ONC RPC
+
+The precise method selected must meet the delay expectations of the attached Service Switching Point
+(SSP).  In the traditional arrangement, where the SS7 signalling network is used to transport
+queries and responses to and from the CNAM databse, the ability of the SS7 network to provide highly
+reliable, yet low latency tranport capabilities is expected by the querying SSPs.  The query
+transport mechanism between the Application Gateway and a locally attached or remote back-end CNAM
+database must meet the same requirements.
+
+It has been shown that TCP is unsuitable as a transport for these types of signalling applications.
+Random noise and transient congestion can cause excessive delays and deadline misses for a large
+number of queries.  SCTP is a transport protocol developed by the IETF specifically for handling
+signalling applications such as these.
+
+The TCAP User Adaptation Layer (TUA) for SCTP provides the ability to transport SS7 TCAP queries
+using SCTP.  TUA provides not only idependent stream for queries avoiding head-of-line blocking
+issues associated with TCP, but provides network interface redundancy (multi-homing) and a
+redundancy model for clients and servers (active-standby, load sharing and broadcast).
+
+UDP is less suitable than SCTP (but more suitable than TCP) for such applications.  It is less
+suitable than SCTP, because SCTP provides for detection of lost packets and fast retransmission of
+lost packets and provides the ability to handle marginal levels of noise and transient congestion
+without losing queries or missing transaction response deadlines.  It is more suitable than TCP in
+that if a transaction query or response is lost, it does not impact the deadlines of all other
+queries on the association (the so-called "head of line blocking" problem associated with TCP).
+
+The only advantage that UDP and TCP have over SCTP is the fact that, being a recent protocol,
+offboard firewalls and session border controllers do not alway support SCTP.
+
 @end itemize
+
+Phase 2 will provide the Application Gateway of Phase 1 integrated with a @value{SOAP} query
+capability for accessing locally attached or remote databases using Internet Protocol over local
+area network, wide area network or the public Internet.
 
 @node Phase 3 Requirements
 @subsection Phase 3 Requirements
@@ -667,81 +843,221 @@ TCAP, or other offboard query capability such as ONC RPC.
 @item Full integration of CNAM/TCAP and off-board query capabilities.
 @end itemize
 
+Phase 3 will provide a fully integrated and tested Application Gateway.
+
 @node Solution Architecture
 @section Solution Architecture
 @cindex Solution architecture
 
 @menu
-* HLR Implementation for Testing::
+* CNAM Application Gateway::
 @end menu
 
-To meet client test objectives, two solution architectures are possible:
+All solutions consist of a narrow-band TDM based SS7 front-end.  To meet client solution objectives,
+however, a range of back-end architectures are possible:
 
 @enumerate
 
-@item HLR Implementation for Testing
+@item
+The OpenSS7 CNAM platform acts as a SIGTRAN STP and connects to a SIGTRAN Endpoint using M2PA.  In
+this arrangement, full SS7 protocol stacks are run on both the front-end and back-end system.
+This arrangment is illustrated in @figref{2.1} below.
 
-In this arrangement, an stand-alone HLR is implemented to fit into the laboratory test environment.
-Other nodes in a GPRS network are emulated by other pieces of test equipment.  This solution
-architecture is the focus of the current document and is described in @ref{HLR Implementation for
-Testing}.
+@item The OpenSS7 TUA multipelxing driver.
 
-@item Ferry Clip Testing
+This component provides TCAP User Adaptation Layer (TUA) Signalling Gateway capabilities to the
+Application Gateway.
 
-In this arrangement, the one test platform emulates all nodes in the GPRS network to perform full
-ferry-clip testing of the @dfn{Implementation Under Test}.  This solution architecture would be a
-better arrangement for systematic testing with a single test harness and is described in @ref{Ferry
-Clip Testing}.  Development of such an arrangement is outside the scope of the current proposal.
+@figuresized{cnam_m2pa,2.1,M2PA Signalling Gateway,5in}
+
+The disadvantages of this arrangement are that it requires duplication of SS7 MTP Level 3 and SCCP
+on both the front-end and back-end platforms, it requires the MTP Transfer Function at the
+Application Gateway, it requires an SCCP Relay capability at the Application Gateway, it only
+supports A- and E-link connection to SSPs and B/D-link connection to STPs.  In general, this is not
+a viable solution architecture for the CNAM Application Gateway.
+
+@item
+The OpenSS7 CNAM platform acts as a SIGTRAN SEP and connects to a SIGTRAN Endpoint using M2UA.  In
+this arrangent, only an SS7 MTP Level 2 stack is run on the front-end system and MTP Level 3, SCCP,
+TCAP and the CNAM application are run on the back-end system.
+This arrangment is illustrated in @figref{2.2} below.
+
+@figuresized{cnam_m2ua,2.2,M2UA Signalling Gateway,5in}
+
+This is a viable arrangement for the CNAM Application Gateway.  It provides functional placement of
+the majority of the SS7 stack at the back-end.  The front-end is only responsible for transporting
+SS7 signalling links to the back-end.  It is suitable for F-link and A/E-link operation because the
+signalling management traffic associated with these types of signalling links is low (as compared
+with B/D-links or C-links).
+
+Nevertheless, it might not be an efficient solution in that the processing power of distributed
+Application Gateways is not being fully utilitized.
+That is, the MTP Level 3, SCCP, TCAP and even part of the CNAM application can better be performed
+by the available processing capacity at the front-end rather that concentrated at the back-end.
+
+@item
+The OpenSS7 CNAM platform acts as a SIGTRAN SEP and connects to a SIGTRAN Endpoint using M3UA.  In
+this arrangement, only an SS7 MTP Level 3 stack is run on the front-end system and SCCP, TCAP and
+the CNAM application are run on the back-end system.
+This arrangment is illustrated in @figref{2.3} below.
+
+@figuresized{cnam_m3ua,2.3,M3UA Signalling Gateway,5in}
+
+This is a viable arrangement for the CNAM Application Gateway.  It provides functional placement of
+the upper layer of the SS7 signalling stack at the back-end, and the lower layers at the front-end.
+The MTP Level 2 and 3 stack is run on the front-end system and the SCCP, TCAP and CNAM application
+are run on the back-end system.  It is suitable for F-link and A/E-link operation because the
+signalling management traffic associated with these types of signalling links is low, and the MTP
+primitives reporting siganlling traffic management events is associated with the traffic itself.
+
+Again, this solution might not be as efficient as others in that the processing power of distributed
+Application Gateways mgith be underutilized.
+That is, the SCCP, TCAP and even part of the CNAM application can better be performed by the
+available processing capacity at the front-end rather that concentrated at the back-end.
+
+@item
+The OpenSS7 CNAM platform acts as a SIGTRAN SEP and connects to a SIGTRAN endpoint using SUA.  In
+this arrangement, an SS7 MTP and SCCP stack is run on the front-end system and TCAP and the CNAM
+application are run on the back-end system.
+This arrangment is illustrated in @figref{2.4} below.
+
+@figuresized{cnam_sua,2.4,SUA Signalling Gateway,5in}
+
+This is a viable arrangement for the CNAM Application Gateway.  It provides functional placement of
+the TCAP layer of the SS7 signalling stack at the back-end, and the layers beneath TCAP at the
+front-end.  It is suitable for SEP operation.
+
+Again, this solution might not be as efficient as others in that the processing power of distributed
+Application Gateways mgith be underutilized.
+That is, TCAP and part of the CNAM application can better be performed by the available processing
+capacity at the front-end rather that concentrated at the back-end.
+
+@item
+The OpenSS7 CNAM platform acts as a SIGTRAN SEP and connects to a SIGTRAN endpoint using TUA.  In
+this arrangement, an SS7 MTP, SCCP and TCAP stack is run on the front-end system and only the CNAM
+application is run on the back-end system.
+This arrangment is illustrated in @figref{2.5} below.
+
+@figuresized{cnam_tua,2.5,TUA Signalling Gateway,5in}
+
+This is a viable arrangement for the CNAM Application Gateway.  All SS7 signalling protocol stack
+layers are placed at the front-end and the application interface at the top of the TCAP stack is
+exported to the back-end using TUA.
+
+This solution is more efficient than the preceding arrangements in that the processing for the
+entire SS7 stack is distributed across Application Gateways, better utilizing the processing
+capacity of those nodes and relieving the CNAM databse of this processing.
+This is effectively the arrangement taken by SR-3511 (TA1129+) and SR-3389 (GDI), but utilizing the
+TUA protocol instead and taking advantage of the capabilities of SCTP.
+
+One disadvantage over the SUA approach is that SUA is a full RFC (RFC 3868) whereas TUA is only a
+draft (draft-bidulock-sigtran-tua-05.txt).
+
+@item
+The OpenSS7 CNAM platform acts as a SIGTRAN SEP and connects to a back-end application using
+@value{SOAP} IP-based query mechanism.  This arrangement, an SS7 MTP, SCCP, TCAP stack and CNAM
+application is run on the front-end system and the CNAM database itself is run on the back-end
+system.  In this last arrangement, CNAM query caching is possible.  This arrangment is illustrated
+in @figref{2.6} below.
+
+@figuresized{cnam_soap,2.6,CNAM Application Gateway,3.5in}
+
+A disadvantage of this approach over the TUA approach is that it is difficult to find a back-end
+transaction protocol that has a chance of meeting Service Switching Point (SSP) delay and
+reliablitiy requirements because there are few that support UDP, and fewer that support SCTP.
 
 @end enumerate
 
-@node HLR Implementation for Testing
-@subsection HLR Implementation for Testing
-@cindex HLR implementation for testing
+In all of the possible deployment arrangements, except the last two, the OpenSS7 CNAM Platform
+behaves as a SIGTRAN Signalling Gateway with various functional placement arragements between the
+front-end and back-end.  These configurations are dealt with in the OpenSS7 Signalling Gateway
+project documentation and will not be discussed further here.
 
-The first possible test arrangement is the HLR Implementation arrangement.  In this case, the
-OpenSS7 Test Platform behaves like the 3GPP GSM/UMTS HLR and the other components surrounding the
-SGSN must be provided by other equipment.  To take this approach only the @dfn{Gr} and @dfn{Gc}
-interfaces need be implemented initially.  The narrowband SS7 signalling bearer@footnote{The
-narrowband SS7 signalling bearer includes Q.703 Annex B.} is used for Phase 1.  The @dfn{C}
-and @dfn{D} interfaces are implemented in @dfn{Phase 2} along with the 3GPP TS 29.202 M3UA/SCTP
-signalling bearer.  This case is illustrated in @figref{1} below.
+In the last two arragements, the OpenSS7 CNAM Platform has an entire SS7 stack on the platform and
+only communicates with the back-end via a specialized database query mechanism.  These two
+arrangments will be the focus of this document.
 
-@figure{hlrtest,1,HLR Implementation for Testing}
+@node CNAM Application Gateway
+@subsection CNAM Application Gateway
+@cindex CNAM application gateway
 
-The High Performance GSM/UMTS GPRS HLR is built using the OpenSS7 SS7 and SIGTRAN stacks and
-associated utilities.  This project provides an additional 3GPP TS 24.060 GPRS HLR @dfn{STREAMS}
-SS7 Stack component and 3GPP TS 29.002 Mobile Application Part (MAP) @dfn{STREAMS} SS7 Stack
-component that provides the core capabilities of the HLR.
-
-This HLR capability consists of a number of components:
-@enumerate
-@item A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 TCAP protocol component,
-accept TCAP queries and provide conversations and responses.  This component contains the 3GPP TS
-29.002 message encoder and decoders and mapping to and from the TC interface
-@footnote{OpenSS7 implements the Q.771 TC interface with the Transaction Component Interface.
-@xref{Introduction,,,tci,Transaction Component Interface Specification}.  See also
-@uref{http://www.openss7.org/man/man2hml?7+tci, @b{tci}(7)}.}
-primitives of the TCAP component below.  This module implements a new GSM MAP primitive interface
-providing 3GPP TS 29.002 defined primitives.
-@footnote{OpenSS7 implements the 3GPP TS 29.002 MAP interface with the Mobile Application Part
-Interface.  @xref{Introduction,,,mapi,Mobile Application Part Interface Specification}.  See also
-@uref{http://www.openss7.org/man/man2html/7+mapi, @b{mapi}(8)}.}
-@item A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 MAP protocol component.
-This component exchanges 3GPP TS 29.002 MAP primitives with the module beneath and implements the
-3GPP TS 24.060 Release 4 state machines for a GPRS HLR.  This module also provides rule-based,
-template, and cached subscriber profile requests.
-@item A user-space daemon that services cache miss IMSI profile requests against an external database.
-@item User application programs used to configure and provision rules, templates and the external
+In the focal solution architecture, illustrated in @figref{2.6}, the CNAM Application Gateway
+platform supports a complete SS7 signalling stack from MTP Level 2 throught TCAP.  A CNAM
+application converts TCAP queries into @value{SOAP} queries to the back-end CNAM database.  Cacheing
+of queries is possible.  Phase 1 consists of verifying the TCAP signalling stack for operation.
+Phase 2 consists of providing the CNAM Application for the CNAM Application Gateway.  Phase 3
+consists of integrating the CNAM Application on the Application Gateway with the back-end CNAM
 database.
+
+@figure{cnam_iface,2.7,CNAM Application Gateway}
+
+The CNAM Application Gateway is build using the OpenSS7 SS7 signalling stack and associated
+utilities.  This project does not require any additional SS7 signalling components: the CNAM portion
+of the queries will be processed by the CNAM Application in user-space.
+
+This CNAM Application Gateway capability consists of a number of components:
+
+@enumerate
+@item
+The OpenSS7 SS7 stack including the following components:
+
+@itemize @bullet
+
+@item The OpenSS7 Linux Fast-STREAMS subsystem.
+
+This component supports all of the other OpenSS7 components which are based on STREAMS.
+
+@item The OpenSS7 V401P-SS7 MTP Level 2 driver for the Varion V401P card.
+
+This component provides narrowband signalling links, both low-speed (56/64kbps) and high-speed
+(1.544Mbps) signalling links.
+
+@item The OpenSS7 MTP Level 3 multiplexing driver.
+
+This component provides the Signalling End Point MTP Level 3 functions necessary to support F-links,
+A-links and E-links.
+
+@item The OpenSS7 SCCP multiplexing driver.
+
+This component provides the SCCP Protocol Class 0, non-GTT capabilities required by the Application
+Gateway.
+
+@item THe OpenSS7 TCAP multiplexing driver or pushable module.
+
+This component provides the TCAP Operations Class 1 capabilities required by the Application
+Gateway.
+
+@item The OpenSS7 TUA multiplexing driver.
+
+This component provides TCAP User Adaptation Layer (TUA) Signalling Gateway capabilities to the
+Application Gateway.
+
+@end itemize
+
+@item
+A kernel resident @dfn{STREAMS} module that sits above the OpenSS7 TCAP protocol component, accepts
+TCAP queries and provides conversations and responses.  This component contains the CNAM/LIDB
+message encoders and decoders and mapping to and from the TC interface @footnote{OpenSS7 implements
+the Q.771 TC interface with the Transaction Component Interface.
+@xref{Introduction,,,tci,Transaction Component Interface Specification}.  See also
+@uref{http://www.openss7.org/man/man2hml?7+tci, @b{tci}(7)}.} primitives of the TCAP component
+below.  This module also implements the CNAM/LIDB query state machine and provides for rule-based,
+cached CNAM/LIDB query requests.  This module conforms to Bellcore TR-NWT-001188 Issue 1 and
+Telcordia GR-1188-CORE Issue 2.
+
+@item
+A user-space daemon that services cache miss CNAM/LIDB requests against an external database by
+converting the CNAM/LIDB query into a @value{SOAP} query to the remote database.
+
+@item
+User application programs used to configure and provision SS7 stack and CNAM/LIDB cache rules.
 @end enumerate
 
-The solution architecture reuses where possible OpenSS7 SS7 and SIGTRAN stack components,
-drivers and hardware.  The solution starts as a hardened chassis non-redundant PC-based PCI
-platform.  A
+The solution architecture reuses where possible OpenSS7 SS7 stack components, drivers and hardware.
+The solution starts as a hardened chassis non-redundant PC-based PCI platform.  A
 @cindex carrier grade
-@dfn{carrier grade} redundant and network protection switched CompactPCI NEBS chassis
-is made available in @dfn{Phase 3}. (@xref{CPC 388}.)
+@dfn{carrier grade} redundant and network protection switched CompactPCI NEBS chassis is
+available, but would likely be excessive for this application. (@xref{CPC 388}.)
 @cindex CPC 388
 
 @page
@@ -750,128 +1066,326 @@ is made available in @dfn{Phase 3}. (@xref{CPC 388}.)
 @cindex Transaction flows
 
 @menu
-* Attach Transaction Flow::
-* Detach Transaction Flow::
-* Purge Transaction Flow::
-* Authentication Transaction Flow::
-* Insert Subscriber Data Transaction Flow::
-* Delete Subscriber Data Transaction Flow::
-* Mobile Terminated SM Transaction Flow::
+* Remote Database::
+* Locally Attached Database::
+* Integrated Database::
+* Memory/Disk Cache::
 @end menu
 
 This section provides some illustrative transaction flows.@footnote{This section is not intended as
 a @dfn{Detailed Design}, but provides illustration only for the @dfn{High-Level Design}.  Refer to
-3GPP TS 24.060 for detailed information.}
+GR-1188-CORE for detailed information.}
 
-@ignore
-@figure{xflow,2,Transaction Flow}
-@end ignore
+@node Remote Database
+@subsection Remote Database
+@cindex remote database
 
-@node Attach Transaction Flow
-@subsection Attach Transaction Flow
-@cindex Attach transaction flow
+Illustrated in @figref{2.8}, below, is the transaction flow that occurs when a query is directed to
+the Application Gateway that needs to be serviced by a remote database.  A remote database is one
+that is distant from the Application Gateway.  The intended application has the Application Gateway
+communicating with the remote database over the public Internet using the @value{SOAP} protocols.
 
-@figref{3} below illustrates and example transaction flow between the test environment and the
-High-Performance HLR.
+@figuresized{cnam_xflow1,2.8,CNAM Transaction Flow -- Remote Database,5in}
 
-@figure{xflow1,3,Transaction Flow --- Attach}
+The transaction flow, illustrated in @figref{2.8}, is as follows:
 
 @enumerate
-@item @samp{Update Location}/@samp{Cancel Location} -
-The SGSN receives an Attach from the MS and identifies the MS with the old SGSN (if any) and sends a
-MAP @samp{Update Location} request to the HLR.  The HLR, upon receipt of the @samp{Update Location},
-looks up the IMSI of the mobile.  If the IMSI exists and is currently located at an SGSN, the HLR
-sends a @samp{Cancel Location} message to the old SGSN.  If the MS is not located at an existing
-SGSN (first attach), step (2) is skipped and an @samp{Insert Subscriber Data} message is sent from
-the HLR to the updating SGSN.
 
-The existing SGSN is determined by maintaining the SS7 point code of the SGSN at which the MS was
-last located and whether the MS is currently attached.
-@item @samp{Cancel Location Ack}/@samp{Insert Subscriber Data} -
-Upon receiving a @samp{Cancel Location Ack} from the old SGSN, the HLR sends a @samp{Insert
-Subscriber Data} message to the updating SGSN.
-@item @samp{Insert Subscriber Data Ack}/@samp{Update Location Ack} -
-Upon receiving a @samp{Insert Subscriber Data Ack}, the HLR sends a @samp{Update Location Ack} to
-the updating SGSN.
-@item @samp{Update Location}/@samp{Cancel Location} -
-@item @samp{Cancel Location Ack}/@samp{Insert Subscriber Data} -
-@item @samp{Insert Subscriber Data Ack}/@samp{Update Location Ack} -
+@item
+The Service Switching Point (SSP) that is to perform a CNAM/LIDB dip formulates a GR-1188 CNAM TCAP Query and launches it to
+the CNAM subsystem for the point code associated with the CNAM/LIDB database which is locally
+attached via F-links.  There is no GTT and routing is performed on PC and SSN only.  When the
+Application Gateways are redundant, which of the redundant Application Gateways is selected is
+determined by the SLS selection made by the switch for the outgoing query.
+
+@item
+A query arrives at an Application Gateway the begins a transaction.  The CNAM application at the AG
+determines, through digit analysis, that the number placed in the query is not a locally maintained
+number and, therefore, that it must query the remote CNAM database.  It formulates a @value{SOAP}
+query and launches it toward a remote CNAM database.  Reduntant CNAM databases can be treated in an
+active-standby or load-sharing arrangement.  If redundant CNAM databases are provided which database
+is selected depends upon the active-standby or load-sharing algorithm.
+
+@item
+The CNAM database receives the @value{SOAP} query.
+
+@item
+The CNAM database looks up the number in the database and determines the result.
+
+@item
+The CNAM database formulates a @value{SOAP} result, providing the result back to the same
+Application Gateway that launched the query.
+
+@item
+The Application Gateway correlates the @value{SOAP} result with the @value{SOAP} query and the
+@value{SOAP} query with the TCAP Query, and formulates either a CNAM TCAP Response, or a CNAM TCAP
+Reject.  The Application Gateway may include the ACG (Automatic Code Gapping) parameter in the
+response to indicate an overload condition at the AG to the Service Switching Point (SSP).  The TCAP
+response or reject is routed to the originating PC and SSN of the query.
+
+@item
+The Service Switching Point (SSP) processes the response or reject and considers the optional ACG
+parameter to effect overload controls.
+
 @end enumerate
 
-@node Detach Transaction Flow
-@subsection Detach Transaction Flow
-@cindex Detach transaction flow
+The overall transaction flow must take into consideration the transactional requirements of the
+Service Switching Point (SSP).  Many SSPs are provisioned for a maximum number of open transactions.
+The provisioned maximum number of open transactions and the peak transaction rate determine the
+nominal response time.
 
-@figref{3b} illustrates the the @dfn{Detach} transaction flow.
+For example, given a local switch with 50,000 lines each generating 4 CCS of traffic, during the
+busy hour, peak, with an average 200 second call, will result in 2 call attempts per line during
+the busy hour, for 100,000 calls per hour, or 28 calls per second.  With 100% calling and called
+name display penetration, that ammounts to 28 transactions per second.  During a busy period, there
+could be 60 transactions per second.  With a nominal response time of 500 milliseconds, there must
+be a provisioned maximum number of open TCAP transactions of 30.
 
-@figure{xflow4,3b,Transaction Flow --- Detach}
+Nominal response times must also meet switching requirements for delay as the number must be
+generated between the first and second rings of the terminating line.  It is not obvious that
+peforming a TCP based transaction to a distant CNAM database over the public internet will provide
+the nominal response times necessary.
 
-For the purpose of GPRS testing, the HLR is required to initiate this procedure.
+@node Locally Attached Database
+@subsection Locally Attached Database
+@cindex locally attached database
 
-@node Purge Transaction Flow
-@subsection Purge Transaction Flow
-@cindex Purge transaction flow
+Illustrated in @figref{2.9}, below, is the transaction flow that occurs when a query is directed to
+the Application Gateway that needs to be serviced by a locally attached database.  A locally
+attached database is one that is maintained in proximity to the Application Gateway.  A locally
+attached database could contain names and numbers for subscribers of the service provider with which
+the Application Gateway is collocated.  The intended application has the Application Gateway
+communicating with the remote database over a LAN using the @value{SOAP} protocols.
 
-The Purge function allows an SGSN to inform the HLR that it has deleted the MM and PDP contexts of a
-detached MS.  The SGSN may, as an implementation option, delete the MM and PDP contexts of an MS
-immediately after the implicit or explicit detach of the MS.  Alternatively, the SGSN may keep for
-some time the MM and PDP contexts and the authentication triplets of the detached MS, so that the
-contexts can be reused at a later GPRS attach without accessing the HLR.
+@figuresized{cnam_xflow2,2.9,CNAM Transaction Flow -- Locally Attached Database,5in}
 
-When the SGSN deletes the MM and PDP contexts, it shall initiate the Purge procedures.
+In general, with the exception of query delays concerns, the transaction flow for the locally
+attached database and the transaction flows for the remotely attached database are identical from
+the perspective of the Application Gateway, just to different databases.
 
-@figure{xflow3,3c,Transaction Flow --- Purge}
+The transaction flow, illustrated in @figref{2.9}, is as follows:
 
-@node Authentication Transaction Flow
-@subsection Authentication Transaction Flow
-@cindex Authentication transaction flow
+@enumerate
 
-@figref{4} illustrates the @dfn{Authentication} transaction flow.
+@item
+The SPP that is to perofrm a CNAM/LIDB dip formulates a GR-1188 CNAM TCAP Query and launches it to
+the CNAM subsystem for the point code associated with the CNAM/LIDB database which is locally
+attached via F-links.  There is no GTT and routing is performed on PC and SSN only.  When the
+Application Gateways are redundant, which of the redundant Application Gateways is selected is
+determined by the SLS selection made by the switch for the outgoing query.
 
-@figure{xflow2,4,Transaction Flow --- Authentication}
+@item
+A query arrives at an Application Gateway that begins a transaction.  The CNAM application at the
+Application Gateway determines, through digit analysis, that the number placed in the query is a
+locally maintained number and, therefore, that it must query the locallly attached CNAM database.
+It formulates a @value{SOAP} query and launches it toward a locally attached CNAM database.
+Redundant CNAM databases can eb treated in an active-standby ro load-sharing arrangement.  If
+redundant CNAM databases are provided, which database is selected depends upon the active-standby or
+load-sharing algorithm.
 
-For the purpose of GPRS testing, the HLR will respond to this procedure without accessing an AuC.
-GSM triplets and UTMS quintets will be set to a fixed value.
+@item
+The CNAM database receives the @value{SOAP} query.
 
-@node Insert Subscriber Data Transaction Flow
-@subsection Insert Subscriber Data Transaction Flow
-@cindex Insert subscriber data transaction flow
+@item
+The CNAM database looks up the number in the database and determines the result.
 
-@figref{4b} illustrates the @dfn{Insert Subscribed Data} transaction flow.
+@item
+The CNAM database forumlates a @value{SOAP} result, providing the result back to the same
+Application Gateway that launched the query.
 
-@figure{xflow5,4b,Transaction Flow --- Insert Subscriber Data}
+@item
+The Application Gateway correlates the @value{SOAP} result and the query with the TCAP Query, and
+formulates either a CNAM TCAP Response, or CNAM TCAP Reject.  The Application Gateway may include
+the ACG (Automatic Code Gapping) parameter in the response to indicate an overload condition at the
+Application Gateway to the Service Switching Point (SSP).  The TCAP response or reject is routed to
+the originating PC and SSN of the query.
 
-For the purpose of GPRS testing, the HLR is required to initiate this procedure for subscriber data
-modifications.
+@item
+The Service Switching Point (SSP) processes the response or reject and considers the optional ACG
+parameter to effect SCP overload controls.
 
-@node Delete Subscriber Data Transaction Flow
-@subsection Delete Subscriber Data Transaction Flow
-@cindex Delete subscriber data transaction flow
+@end enumerate
 
-@figref{4c} illustrates the @dfn{Delete Subscribed Data} transaction flow.
+The overall transaction flow must still take into consideration the transactional requirements of
+the Service Switching Point (SSP).  Many SSPs place limits on nominal transaction delays as well as
+the number of open transactions.
 
-@figure{xflow6,4c,Transaction Flow --- Delete Subscriber Data}
+In particular, protocols that use TCP as a transport can have significant transaction delays
+introduced due to marginal amounts of noise or congestion, @emph{even for a locally attached
+database}.  It is recommdended that database protocols utilizing only UDP or SCTP transports be
+utilized.  UDP trades missing one trasaction for delaying all transactions on a given association.
+SCTP provides the ability to decouple trasnactions into indepdendent streams while retaining the
+ability to detect packet loss and perform retransmission to avoid missing deadlines.
 
-For the purpose of GPRS testing, the HLR is required to initiate this procedure for subscriber data
-deletions.
+If SCTP were to be used, the most straightforward approach would be that of using the TCAP User
+Adatpation Layer (TUA) from the SIGTRAN protocol suite over SCTP as illustrated in @figref{2.5}.
+In that configuration, TUA would provide the decoupling of transactions into independent SCTP
+streams for maximum reliabilty with a minimum of missed deadlines.  TUA in this arrangements also
+directly accomodates Application Server in the active-standby, load sharing and broadcast redundancy
+arrangements.
 
-@node Mobile Terminated SM Transaction Flow
-@subsection Mobile Terminated SM Transaction Flow
-@cindex Mobile terminated SM transaction flow
+SCTP makes more sense for a locally attached database than a remotely attached database.  Locally
+attached databases can be directly connected on LAN segments that do not connect with the public
+Internet and do not, therefore, need firewalling.  For remotely attached databases, particularly
+when they are attached over the public Internet, require sophisticated firewalls (e.g. Session
+Border Controllers), many of which do not fully support SCTP.
 
-For the purpose of GPRS testing, the HLR is required to respond to this procedure for mobile
-terminated short messages.
+Therefore, UDP makes more sense for a remotely attached database.  One such protocol that runs over
+UDP is the TA1129+ or SR-3511.  These consist of placing the TCAP portion of a CNAM TCAP transaction
+into a UDP packet directly and passing it to the database.  An application at the database
+translates the TCAP trasnaction to an SQL query and processes the SQL reponse into a TCAP Response
+which is then placed directly into a UDP packet and returned to the Application Gateway.
+
+Other methods for placing TCAP messages in UDP packets are the TCAP over SIP method, where TCAP is
+converted to an XML representation of the CNAM query.  The XML representation of the TCAP message is
+then used as the body of a SIP INVITE or INFO message.  The SIP INVITE or INFO message is then sent
+in a UDP packet to the database.
+
+The current likely evisions using SOAP for converting the TCAP CNAM Query into a SOAP query and then
+processing the SOAP response into a TCAP CNAM Response.  The problem with SOAP is that the typical
+application transports (i.e. HTTP) use TCP as an underlying transport.  TCP is unsuitable for this
+application due to the need to place limits on nominal response times and the number of open
+transactions to meet Service Switching Point (SSP) requirements.
+
+@node Integrated Database
+@subsection Integrated Database
+@cindex integrated database
+
+Illustrated in @figref{2.10}, below, is the transaction flow that occurs when a query is directed to
+the Application Gateway that needs to be serviced by a local database.  A local database is one that
+is maintained in proximity or conincident to the Application Gateway.  A local databse could contain
+names and numbers from subscribers of the service provider with which the Application Gateway is
+collocated.  The intended application has the Application Gateway communicating with an integrated
+databse using application programming interfaces.
+
+@figuresized{cnam_xflow3,2.10,CNAM Transaction Flow -- Integrated Database,5in}
+
+In general, with the exception that the database query is local rather than networked, the
+transaction flow for the integrated database and the transaction flows for the locally attached
+database are identical from the perspective of the Appplication Gateway, just to an integrated
+rather than networked database.
+
+The transaction flow, illustrated in @figref{2.10}, is as follows:
+
+@enumerate
+
+@item
+The SPP that is to perform a CNAM/LIDB dip formulates a GR-1188-CORE CNAM TCAP Query and launches it
+toward teh CNAM subsystem for the point code associated with the CNAM/LIDB database which is locally
+attached via F-links.  There is no GTT and routing is performed on PC and SSN only.  When the
+Application Gateways are reundant, which of the redundant Application Gateways is selected is
+determined by the SLS selection made by the switch for the outgoing query.
+
+@item
+A query arrives at an Application Gateway that begins a transaction.  The CNAM application at the
+Application Gateway determines, through digit analysis, that the number placed in the query is a
+locally maintained number and, therefore, that it must query the integrated CNAM database.  It
+formulates a query and generates it using the integrated database API.
+
+@item
+The integrated database processes the query and returns the response.
+
+@item
+The response from the integrated database is used to formulate a CNAM TCAP Response or CNAM TCAP
+Reject.  The Application gateway may include the ACG (Automatic Code Gapping) parameter in the
+response to indicate an overload condition at the Application Gateway to the Service Switching Point
+(SSP).  The TCAP response or reject is routed tot he originating PC and SSN of the query.
+
+@item
+The Service Switching Point (SSP) processes the response or reject and considers the optional ACG
+parameter to effect SCP overload controls.
+
+@end enumerate
+
+The overall transaction flow must still take into consideration the transactional requirements of
+the Service Switching Point (SSP).  Many SSPs place limits on nominal transaction delays as well as
+the number of open transactions.
+
+An intergrated database could also be used in the same fashion as a Disk Cache (@pxref{Memory/Disk
+Cache}).  In such a scenrio, the integrated database is populated by query misses and aging or
+purging of entries rather than a service order interface that would provision specific names against
+specific numbers.  When a query is performed against the intergrated database, and the result is
+unkonwn for the number provided, a locally attached or remote database can be queried as well and
+any result obtained from those databases placed in to the intergrated database.
+
+While some bilateral agreeemnts preclude cacheing of CNAM query results, it would be rare indeed to
+preclude a service provider from maintaining a databse of their own subscriber's names and numbers,
+and from querying that database.  Cacheing approaches to databases where the information changes
+very infrequently, yet the information is queried often, are quite viable.  A classic example is the
+cacheing of HLR information at the VLR.  While cacheing of LIDB entries can cause significant
+exposure, cacheing of CNAM results for names and numbers belonging to subscribers of the collocated
+service provider is effective because the service provider can purge entries from the cahce as they
+change.
+
+@node Memory/Disk Cache
+@subsection Memory/Disk Cache
+@cindex memory/disk cache
+
+Illustrated in @figref{2.11}, below, is the transaction flow that occurs when a query is directed to
+the Application Gateway that may be serviced from memory or disk cache.  A memory or disk cache is a
+cache that maintains a limited (or unlimited) database of the results from previous queries.  The
+cache entries can age and be deleted from the cache by age, or can be explicitly flushed.  The
+memory or disk cache can be disabled for some numbers (e.g. numbers not belonging to the querying
+service provider), or disable for all numbers (i.e. in cases where cacheing is not permitted by
+bilateral agreements).
+
+@figuresized{cnam_xflow4,2.11,CNAM Transaction Flow -- Memory/Disk Cache,5in}
+
+In general, with the exception that the query is directed toward a cache rather than an integrated
+database, the transaction flow for the cache  and the transaction flows for the integrated database
+are identical from the perspective of the Application Gateway, just to a memory or disk cache rahter
+than an integrated or networked database.
+
+The transaction flow, illustrated in @figref{2.11}, is as follows:
+
+@enumerate
+
+@item
+The SPP that is to perform a CNAM/LIDB dip formulates a GR-1188-CORE CNAM TCAP Query and launches it
+toward teh CNAM subsystem for the point code associated with the CNAM/LIDB database which is locally
+attached via F-links.  There is no GTT and routing is performed on PC and SSN only.  When the
+Application Gateways are reundant, which of the redundant Application Gateways is selected is
+determined by the SLS selection made by the switch for the outgoing query.
+
+@item
+A query arrives at an Application Gateway that begins a transaction.  The CNAM application at the
+Application Gateway determines, through digit analysis, that the number placed in the query is a
+cached number and, therefore, that it must query the memory or disk cache.  It formulates a query
+and generates it using the cache API.
+
+@item
+The cache processes the query and returns the response.  A cache miss will result in a further step
+of querying an integrated, locally attached or remote database as a backing store to pull the entry
+into the cache.  The resulting transaction flow would be as illustrated in @figref{2.10},
+@figref{2.9} or @figref{2.8}, depending upon whether the integrated, locally attached, or remote
+database are used as backing store.
+
+@item
+The response from the cache is used to formulate a CNAM TCAP Response or CNAM TCAP Reject.  The
+Application gateway may include the ACG (Automatic Code Gapping) parameter in the response to
+indicate an overload condition at the Application Gateway to the Service Switching Point (SSP).  The
+TCAP response or reject is routed to the originating PC and SSN of the query.
+
+@item
+The Service Switching Point (SSP) processes the response or reject and considers the optional ACG
+parameter to effect SCP overload controls.
+
+@end enumerate
+
+The overall transaction flow must still take into consideration the transactional requirements of
+the Service Switching Point (SSP).  Many SSPs place limits on nominal transaction delays as well as
+the number of open transactions.
 
 @node Network Architecture
 @chapter Network Architecture
 @cindex Network architecture
 
-@figref{5} illustrates the network configuration for the @value{MANUAL_TITLE} in a typical
+@figref{3.1} illustrates the network configuration for the @value{MANUAL_TITLE} in a typical
 deployment scenario.  The CNAM query platform (labelled SG in the diagram) is positioned and
 attached to switching equipment with intra-office SS7 F-links and communicates with the CNAM
 database proper using an IP network.
 
-@figure{cnam_netarch,5,Network Architecture}
+@figure{cnam_netarch,3.1,Network Architecture}
 
 The device is attached to SSPs (switches) via V401P-SS7
 @cindex V401P-SS7
@@ -889,28 +1403,48 @@ SCTP.
 @cindex M3UA
 
 On the IP network side of the device, the platform is connected on an internal LAN with multiple
-Ethernet segments and IP subnetworks.  CNAM requests originating on SSP within the SS7 network are
-accepted and responded to by the CNAM databases.  Queries are converted from traditional TDM SS7 to
-SIGTRAN over the IP network via the Signalling Gateway.
+Ethernet segments and IP subnetworks.  CNAM requests originating on Service Switching Point (SSP)
+within the SS7 network are accepted and responded to by the CNAM databases.  Queries are converted
+from traditional TDM SS7 to SIGTRAN over the IP network via the Signalling Gateway.
 
 From the viewpoint of the SS7 or SIGTRAN network, the platform acts as a Signalling Gateway
 for the purposes of passing CNAM queries and responses between the CNAM database and the locally
 attached SSPs.
 
-@figuresized{cnam_m2ua,44a,M2UA Network Architecture,4.5in}
+@figuresized{cnam_m2pa,3.2,M2PA Network Architecture,5.5in}
 
-@figref{44a} illustrates functional separation between the CNAM signalling gateway and database at
+@figref{3.2} illustrates functional separation between the CNAM signalling gateeway and database at
+the lowest functional level in the SS7 stack, MTP Level 1.
+This arrangement has the following characteristics:
+
+@itemize @bullet
+
+@item STP nodes may be colocated with Service Switching Point (SSP) nodes removing the need for
+graded SS7 transport facilities.
+
+@item MTP Level 3 need not be shared across Databases.  Therefore, all TCAP queries or aborts will
+appear at the correct DB.  Because DB nodes are not tightly coupled, they can be placed at a
+distance from each other.
+
+@item Functional placement does not efficiently utilize capacity: that is, both the STP nodes and
+the databases will be processing the entire SS7 stack, causing duplication.
+
+@end itemize
+
+@figuresized{cnam_m2ua,3.3,M2UA Network Architecture,5.5in}
+
+@figref{3.3} illustrates functional separation between the CNAM signalling gateway and database at
 the lowest functional level in the SS7 stack, MTP Level 2.
 This arrangement has the following characteristics:
 
 @itemize @bullet
 
-@item SG nodes may be colocated with SSP nodes removing the need for graded SS7 transport
-facilities.
+@item SG nodes may be colocated with Service Switching Point (SSP) nodes removing the need for
+graded SS7 transport facilities.
 
 @item The greatest number of SCTP associations are required between the DB and SG: one SCTP
 association is required for each signalling link, so each DB requires 3 SCTP associations to each SG
-for the configuration in @figref{44a}.
+for the configuration in @figref{3.3}.
 
 @item MTP Level 3 must be shared across databases.  Therefore, some TCAP queries or aborts may
 appear at the wrong DB and must be routed to the other with cross-links.  Because of tight coupling
@@ -923,24 +1457,24 @@ stack processing as well as CNAM application processing).
 @end itemize
 
 
-@figuresized{cnam_m3ua,44b,M3UA Network Architecture,4.5in}
+@figuresized{cnam_m3ua,3.4,M3UA Network Architecture,5.5in}
 
-@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+@figref{3.4} illustrates functional separation between the CNAM signalling gateway and database at
 MTP Level 3.
 This arrangement has the following characteristics:
 
 @itemize @bullet
 
 @item MTP Level 3 must be shared across the SGs, requiring cross-links between the SGs; however, as
-it is expected that both SGs are colocated wth the SSP, this does not present a difficulty.  DBs can
-be geographically dispersed.
+it is expected that both SGs are colocated wth the Service Switching Point (SSP), this does not
+present a difficulty.  DBs can be geographically dispersed.
 
 @end itemize
 
 
-@figuresized{cnam_sua,44c,SUA Network Architecture,4.5in}
+@figuresized{cnam_sua,3.5,SUA Network Architecture,5.5in}
 
-@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+@figref{3.5} illustrates functional separation between the CNAM signalling gateway and database at
 SCCP.
 This arrangement has the following characteristics:
 
@@ -951,9 +1485,9 @@ This arrangement has the following characteristics:
 @end itemize
 
 
-@figuresized{cnam_tua,44d,TUA Network Architecture,4.5in}
+@figuresized{cnam_tua,3.6,TUA Network Architecture,5.5in}
 
-@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+@figref{3.6} illustrates functional separation between the CNAM signalling gateway and database at
 TCAP.
 This arrangement has the following characteristics:
 
@@ -964,9 +1498,9 @@ This arrangement has the following characteristics:
 @end itemize
 
 
-@figuresized{cnam_soap,44e,SOAP Network Architecture,4.5in}
+@figuresized{cnam_soap,3.7,SOAP Network Architecture,3.5in}
 
-@figref{44b} illustrates functional separation between the CNAM signalling gateway and database at
+@figref{3.7} illustrates functional separation between the CNAM signalling gateway and database at
 SOAP.
 This arrangement has the following characteristics:
 
@@ -986,166 +1520,198 @@ This arrangement has the following characteristics:
 @section SG Reference Interfaces
 @cindex SG reference interfaces
 
-@figref{6} illustrates the HLR Reference Interfaces from 3GPP TS 24.060 Release 4.9.0
+@figref{3.8} illustrates the HLR Reference Interfaces from 3GPP TS 24.060 Release 4.9.0
 that are supported by the High Performance GSM/UMTS GPRS HLR.
 
-@figure{cnam_iface,6,SG Reference Interfaces}
+@figure{cnam_iface,3.8,SG Reference Interfaces}
 
-@multitable {@b{Gc Interface}}{This connects the HLR to the SMS-GMSC, SMS-IWMSC or SMS-SC.}
+@multitable @columnfractions .15 .85
+@item @b{A Interface} @tab
+This connects the Signalling Gateway (SG) to the Application Gateway (AG).
+@item @b{B Interface} @tab
+This connects the Signalling Gateway (SG) to the Service Switching Point (SSP).
 @item @b{C Interface} @tab
-This connects the HLR to the SMS-GMSC, SMS-IWMSC or SMS-SC.
+This connects the Application Gateway (AG) or Signalling Gateway (SG) to the CNAM Database (DB).  If
+the Signalling Gateway also acts as an Application Gateway, this is the interface used between the
+Signalling Gateway and CNAM Database.
 @item @b{D Interface} @tab
-This connects the HLR to the MSC/VLR.
-@item @b{Gr Interface} @tab
-This connects the HLR to the SGSN.
-@item @b{Gc Interface} @tab
-This connects the HLR to the GGSN.
+This connects the Signalling Gateway (SG) to the Operational Support System (OSS).
 @end multitable
 
 @menu
+* A Interface::
+* B Interface::
 * C Interface::
 * D Interface::
-* Gr Interface::
-* Gc Interface::
-* Signalling Bearers::
-* Other Interfaces::
 @end menu
+
+@node A Interface
+@subsection A Interface
+@cindex A interface
+
+The A Interface, illustrated in @figref{3.9}, below,  provides the interface between the Signalling
+Gateway (SG) and Application Gateway (AG) elements, when these elements are not integrated together
+on the same platform, and consists of draft-bidulock-sigtran-tua-04.txt TCAP User Adataptation Layer
+(TUA) over RFC 2960/3309 SCTP over RFC 791 IP over Ethernet.
+
+@figure{cnam_a,3.9,A Interface}
+
+The A Interface is responsible for trasnferring CNAM TCAP queries and responses between the
+front-end Signalling Gateway and the back-end Application Gateway.  The interface uses Stream
+Control Transmission Protocol (SCTP) for reliablity yet low latency transactions between the SG and
+AG.
+
+@table @dfn
+
+@item TUA
+Transaction Capabilities Application Part (TCAP) User Adaptation Layer (TUA) as specified in the
+ITEF Internet-Draft @file{draft-bidulock-sigtran-tua-04.txt}.  This protocol layer is responsible
+for exporting the Transaction Interface (TRI) and Trasaction Component Interface (TCI) from the
+Signalling Gateway (TUA-SG) to the Application Gateway (TUA-AS).  The protocol layer supports SCTP
+as a transport for reliability and low latency as well as supporting three redundancy models:
+active-standby, load sharing and broadcast.
+
+@item SCTP
+Stream Control Transmission Protocol (SCTP) as specified in IETF RFC 2960 and RFC 3309.  SCTP is a
+replacement for both TCP and UDP when used with signalling applications.  It is a product of the
+SIGTRAN (Siganalling Transport) working group of the IETF.  The protocol provides multi-homing for
+network interface and path redudancy, preservation of record boundaries, multiple streams of data
+flow to prevent head-of-line blocking, fast retransmission, selective acknowledgement, orderly
+release, rapid association restart, rapid failure detection, and a secure 4-way handshake for
+starting associations.
+
+@item IP
+Internet Protocol (IP) as specified in IETF RFC 791.  Internet Protocol is the best-effort bastion
+of the Internet Engineering Task Force.
+
+@item Ethernet
+Ethernet is based on the IEEE 802 and the ISO/IEC 8802 protocols.  Ethernet is a derivation of the
+Xerox local area network protocols currently used on top of IEEE 802 lower layers.
+
+
+@end table
+
+@node B Interface
+@subsection B Interface
+@cindex B interface
+
+The B Interface, illustrated in @figref{3.10}, below, provides the interface between the Signalling
+Gateway (SG) and the Service Switching Point (SSP) and consists of GR-1188-CORE Issue 2 CNAM
+application over ANSI T1.114/2000 TCAP over ANSI T1.112/2000 SCCP over ANSI T1.111 MTP using low-
+and high-speed links.
+
+@figure{cnam_b,3.10,B Interface}
+
+The B Interface is responsible for transferring CNAM TCAP queries and responses between the
+Signalling Gateway (SG) and the Service Switching Point (SSP) using directly connected SS7 links.
+
+@table @dfn
+
+@item CNAM
+Calling Name Delivery as specified in Telcordia GR-1188-CORE Issue 2.
+
+@item TCAP
+Transaction Capabilties Application Part (TCAP) as specified in ANSI T1.114/2000
+and Telcordia GR-246-CORE.  Based on X.219 ROSE (Remote Operation Service Execution), which is the
+OSI equivalent of Sun's Open Network Computing Remote Procedure Call (ONC RPC), Transaction
+Capabilities Application Part (TCAP) provides the basis for applications with to engage in
+trasactions across the SS7 network.  In this application, the mechanism is used to engage in queries
+and responses concerning numbers and names.
+
+@item SCCP
+Signalling Connection Control Part (SCCP) as specified in ANSI T1.112/2000
+and Telcordia GR-246-CORE.  The Signalling Connection Control Part (SCCP) is based on X.213
+CONS/CLNS and provides the equivalent of OSI network services for the SS7 network.  Which would
+normally run over a Context and Session protocol, runs directly over the SCCP.
+
+@item MTP
+Message Transfer Part (MTP) as specified in ANSI T1.111/2000 and Telcordia GR-246-CORE.  The Message
+Transfer Part (MTP) bears little resempblence to any OSI protocol.  It provides Layer 2 and partial
+Layer 3 services using a specialized protocol developed for Signalling System No. 7.
+
+@end table
 
 @node C Interface
 @subsection C Interface
-@cindex C Interface
+@cindex C interface
 
-The @dfn{C Interface} is not used for GSM GPRS
-@footnote{Although most of the transaction protocol components are already provided in @dfn{Phase
-1}, the @dfn{C Interface} is not fully implemented until @dfn{Phase 2}.}
-but may optionally be used for combined RA and LA registration services for
-SMS under UMTS.@footnote{@xref{Attach Transaction Flow}.}
-It is a direct MAP interface between  GMSC, IWMSC or SMSC and the HLR and consists
-of 3GPP TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried either over
-Q.704 MTP or over RFC 3332 M3UA.
-@cindex M3UA
+The C Interface, illustrated in @figref{3.11}, below, provides the interface between the Calling Name
+(CNAM) Database (DB) and the Application Gateway (AG) and consists of GR-1188-CORE Issue 2 CNAM
+application over W3C REC-SOAP12 Simple Object Access Protocol (SOAP) over HTTP 1.1/RFC 2616, over
+RFC 793 TCP, over RFC 791 IP over Ethernet.
 
-@figure{c,7,C Interface}
+@figure{cnam_c,3.11,C Interface}
+
+The C Interface is responsible for transferring the CNAM query and response particulars between the
+Application Gateway (AG) and back-end CNAM Database (DB).
+
+@table @dfn
+
+@item CNAM
+Calling Name Delivery as specified in Telcordia GR-1188-CORE Issue 2.
+
+@item SOAP
+Simple Object Access Protocol (SOAP) as specified in W3C REC-SOAP12.
+
+@item HTTP
+Hypertext Transfer Protocol (HTTP) as specified in IETF RFC 2616.
+
+@item TCP
+Transmission Control Protocol (TCP) as specified in IETF RFC 793 is the historical
+connecion-oriented protocol for the Internet Protocol (IP) suite.  It suffers from may limitations
+that make it unsuitable for signalling applications and for which Stream Control Transmission
+Protocol (SCTP) was designed.
+
+@item IP
+Internet Protocol (IP) as specified in IETF RFC 791.  Internet Protocol is the best-effort bastion
+of the Internet Engineering Task Force.
+
+@item Ethernet
+Ethernet is based on the IEEE 802 and the ISO/IEC 8802 protocols.  Ethernet is a derivation of the
+Xerox local area network protocols currently used on top of IEEE 802 lower layers.
+
+@end table
 
 @node D Interface
 @subsection D Interface
-@cindex D Interface
+@cindex D interface
 
-The @dfn{D Interface} is not used for GSM GPRS
-@footnote{Although most of the transaction protocol components are already provided in @dfn{Phase
-1}, the @dfn{D Interface} is not fully implemented until @dfn{Phase 2}.}
-but may optionally be used for combined RA and LA registration services for
-SMS under UMTS.@footnote{@xref{Attach Transaction Flow}.}
-It is a direct MAP interface between  MSC or VLR and the HLR and consists of 3GPP
-TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried either over Q.704 MTP
-or over RFC 3332 M3UA.
-@cindex M3UA
+The D Interface, illustrated in @figref{3.12}, below, provides the interface between the Application
+Gateway (AG) and Signalling Gateway (SG) and the Operational Support System (OSS) and consists of
+ISO/IEC 9595-2/9596-2 CMISE/CMIP over RFC 1189 CMOT, over RFC 793 TCP, over RFC 791 IP over
+Ethernet.
 
-@figure{d,8,D Interface}
+@figure{cnam_d,3.12,D Interface}
 
-@page
-@node Gr Interface
-@subsection Gr Interface
-@cindex Gr Interface
 
-The @dfn{Gr Interface} connects the 3G SGSN to the HLR.
-
-The @dfn{Gr Interface} is the primary GPRS interface.  It is an interface between the SGSN and the
-HLR and consists of 3GPP TS 29.002 MAP over Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are
-carried either over Q.704 MTP or over RFC 3332 M3UA.
-@cindex M3UA
-
-@figure{gr,9,Gr Interface}
+The D Interface is responsible for transferring management information between the AG/SG platforms
+and a back-end Operational Support System.
 
 @table @dfn
 
-@item Mobile Application Part (MAP):-
+@item CMISE/CMIP
+Common Management Information Service Element/Common Management Information Protocol (CMISE/CMIP) as
+specified in ISO/IEC 9595-2 and ISO/IEC 9596-2.
 
-This protocol supports signalling exchange with the HLR as defined in 3GPP TS 29.002, with the
-enhancements for GPRS as described in 3GPP TS 23.060.
+@item CMOT
+Common Management Information Protocol (CMIP) Over Transmission Control Protocol (TCP) (CMOT) as
+specified in IETF RFC 1189.
 
-@item TCAP and SCCP:-
+@item TCP
+Transmission Control Protocol (TCP) as specified in IETF RFC 793 is the historical
+connecion-oriented protocol for the Internet Protocol (IP) suite.  It suffers from may limitations
+that make it unsuitable for signalling applications and for which Stream Control Transmission
+Protocol (SCTP) was designed.
 
-These are the same protocols used to support MAP in CS PLMNs.
+@item IP
+Internet Protocol (IP) as specified in IETF RFC 791.  Internet Protocol is the best-effort bastion
+of the Internet Engineering Task Force.
 
-@item Signalling Bearer:-
-
-The Signalling Bearer is one of the signalling bearers specified in 3GPP TS 29.202, which provides
-the signalling bearers illustrated in @figref{10} below.
-
-@end table
-
-The @dfn{Gr Interface} is the focus of @dfn{Phase 1} of the HLR project.
-
-@node Gc Interface
-@subsection Gc Interface
-@cindex Gc Interface
-
-The @dfn{Gc Interface} connects the GGSN to the HLR.
-
-The @dfn{Gc Interface} is an optional GPRS interface.
-@footnote{Although most of the transaction protocol components are already provided in @dfn{Phase
-1}, the @dfn{Gc Interface} is not fully implemented until @dfn{Phase 2}.}
-It is a direct MAP interface between the GGSN and the HLR and consists of 3GPP TS 29.002 MAP over
-Q.771 TCAP over Q.711 SCCP.  SCCP peer messages are carried either over Q.704 MTP or over RFC 3332
-M3UA.
-@cindex M3UA
-It is also possible for a GGSN to tunnel MAP messages over GTP into SS7 MAP via another GSN
-that is PSPDN connected.
-
-@figure{gc,11,Gc Interface}
-
-@figure{gc2,12,Gn/Gc Interface}
-
-@table @dfn
-
-@item Mobile Application Part (MAP):-
-
-This protocol supports signalling exchange with the HLR, as described in "Network-Requested PDP
-Context Activation Procedure" of 3GPP TS 23.060.
-
-@item GPRS Tunnelling Protocol for the control plane (GTP-C):-
-
-This protocol tunnels signalling messages between the GGSN and the protocol-converting GSN in the
-backbone network.
-
-@item Interworking:-
-
-This function provides interworking between GTP and MAP for GGSN-HLR signalling.
+@item Ethernet
+Ethernet is based on the IEEE 802 and the ISO/IEC 8802 protocols.  Ethernet is a derivation of the
+Xerox local area network protocols currently used on top of IEEE 802 lower layers.
 
 @end table
-
-@node Signalling Bearers
-@subsection Signalling Bearers
-
-The signalling bearers that can be used to transport the @dfn{C}, @dfn{D}, or @dfn{Gr Interface} are
-described in 3GPP TS 29.202.  Signalling bearers include M3UA
-@cindex M3UA
-over
-@cindex SCTP
-SCTP,
-traditional narrowband MTP including Q.703 and
-@cindex Q.703 Annex B
-Q.703 Annex B, and broadband MTP (MTP3b) using SSCOP over AAL5 using an ATM or G.804 physical
-medium.  @figref{10} illustrates the possible signalling bearers below.
-
-Because broadband MTP has is not an initial requirement for the project, broadband MTP components
-is deferred to @dfn{Phase 3} of the project.  Narrowband MTP (including
-@cindex Q.703 Annex B
-Q.703 Annex B) and
-@cindex M3UA
-@cindex SCTP
-M3UA/SCTP
-is configured in @dfn{Phase 1}.
-
-@figure{sigbearer,10,TS 29.202 Signalling Bearers}
-
-@node Other Interfaces
-@subsection Other Interfaces
-@cindex Other interfaces
-
-Additional interfaces are implemented in other phases of the project.  For additional information,
-@pxref{Optional Network Support}.
 
 @node System Architecture
 @chapter System Architecture
@@ -1212,10 +1778,10 @@ The PC chassis is equipped with the following:@footnote{For detailed sizing cons
 @chapter Protocol Architecture
 @cindex Protocol architecture
 
-@figref{14} illustrates the protocol configuration for the High Performance GSM/UMTS GPRS HLR
-system.  The protocol stack uses the following OpenSS7 stack components:
+@figref{14} illustrates the protocol configuration for the @value{MANUAL_TITLE} system.  The
+protocol stack uses the following OpenSS7 stack components:
 
-@figuresized{protconf,14,Protocol Architecture,4in}
+@figuresized{cnam_protconf,14,Protocol Architecture,4in}
 
 @menu
 * Protocol Components::
@@ -1228,10 +1794,10 @@ system.  The protocol stack uses the following OpenSS7 stack components:
 The following Protocol Components are provided as part the OpenSS7 SS7 and SIGTRAN stacks:
 
 @menu
-* High Performance HLR 3GPP TS 23.060 GPRS Application::
-* High Performance HLR 3GPP TS 29.002 Mobile Application Part Application::
+* In-Memory GR-1188-CORE Issue 2 CNAM Application::
+* GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Application::
 * SS7 Stack Manager::
-* MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver::
+* GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Driver::
 * Transaction Capabilities Application Part (TCAP) Driver::
 * Signalling Connection Control Part (SCCP) Driver::
 * Message Transfer Part (MTP) Driver::
@@ -1241,9 +1807,9 @@ The following Protocol Components are provided as part the OpenSS7 SS7 and SIGTR
 * Stream Control Transmission Protocol (SCTP) Driver::
 @end menu
 
-@node High Performance HLR 3GPP TS 23.060 GPRS Application
-@subsection High Performance HLR 3GPP TS 23.060 GPRS Application
-@cindex High Performance HLR 3GPP TS 23.060 GPRS Application
+@node In-Memory GR-1188-CORE Issue 2 CNAM Application:
+@subsection In-Memory GR-1188-CORE Issue 2 CNAM Application:
+@cindex In-Memory GR-1188-CORE Issue 2 CNAM Application:
 
 The High Performance HLR 3GPP TS 23.060 Rel 4. GPRS Application is responsible for providing hybrid
 rule-based partitioning and HLR High Performance database information to the MAP 3GPP TS 29.002 HLR
@@ -1262,39 +1828,38 @@ indication to the attached High Performance GSM/UMTS GPRS HLR Application.
 
 This protocol component is developed as part of @dfn{Phase 1} of this project.
 
-@node High Performance HLR 3GPP TS 29.002 Mobile Application Part Application
-@subsection High Performance HLR 3GPP TS 29.002 Mobile Application Part Application
-@cindex High Performance HLR 3GPP TS 29.002 Mobile Application Part Application
+@node GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Application
+@subsection GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Application
+@cindex GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Application
 
-The High Performance HLR 3GPP TS 29.002 Mobile Application Part Application is responsible for accepting
-location update and authentication requests from the back end AC gateway and turning those requests
-into GSM MAP queries to an Authentication centre and propagating the response.  This is a
-straightforward application that converts between ONC RPC queries and responses and GSM MAP TCAP
-queues and responses using the published Transaction Component Interface (TCI).
+The GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Application is responsible for accepting
+CNAM queries from the front-end attached SSPs and turning those requests into database queries to
+the CNAM database and propagating the response.  This is a straightforward application that converts
+between @value{SOAP} queries and responses and CNAM TCAP queries and responses using the published
+Transaction Component Interface (TCI).
 
-The Mobile Application Part (MAP)  Home Location Register (HLR) module is responsible for responding
-to MAP-HLR transactions originating from the TCAP module beneath (e.g. MapLocationUpdate) and is
-responsible for generating outgoing MAP-HLR transactions to the TCAP module beneath (e.g.
-MapInsertSubscriber).  To perform its function, the MAP-HLR indexes all information based on the
-IMSI of the MS, including dynamic (state) and provisioned (subscriber) information.  For performance
-in both a testing and production environment, the module provides three levels of database
-partitioning and caching:
+The GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) module is responsible for responding to SSP
+transactions originating from the TCAP module beneath and is responsible for generating outgoing
+SSP responses to the TCAP module beneath.  To perform its function, the CNAM platformindexes all
+information based on the telephone number, including dynamic (state) and provisioned (subscriber)
+information.  For performance in both a testing and production environment, the module provides
+three levels of database partitioning and caching:
 
 @table @emph
 @item Rules
-Rules can be provided that is used to determine provisioned information based on components of
-the index (IMSI).  These rules can be used to generate a rather large simulated database without
-maintaining or accessing large database record areas.  The rule base provides a simulated
-partitioned database.  Each rule refers to a template or partial template of provisioned data.
+Rules can be provided that is used to determine provisioned information based on components of the
+Digits.  These rules can be used to generate a rather large simulated database without maintaining
+or accessing large database record areas.  The rule base provides a simulated partitioned database.
+Each rule refers to a template or partial template of provisioned data.
 @item Templates
-Templates can be provided that specify a profile of provisioned information for a class of
-indexes (IMSI).  Templates provide a compact local in-kernel cache of templates.  Indexes reference
+Templates can be provided that specify a profile of provisioned information for a class of indexes
+(Digits).  Templates provide a compact local in-kernel cache of templates.  Indexes reference
 templates rather than complete records.
 @item Records
-Records can be provided that specify the provisioned information for the specific index (IMSI).
+Records can be provided that specify the provisioned information for the specific index (Digits).
 Records provide a local in-kernel cache of specified records.  Records are unique for each index.
 @item Transactions
-The application can be queried by indicating the index IMSI and the module awaits a response
+The application can be queried by indicating the index Digits and the module awaits a response
 containing the provisioned information.  Transactions provide access to an external database.
 @end table
 
@@ -1309,19 +1874,19 @@ collection, operational measurements, management events and controls, log and al
 This is daemon process that is typically customized to meet a specific application.
 
 This is an existing component of the OpenSS7 stack that is extended to include the HLR
-components developed above and the MAP component developed below.
+components developed above and the CNAM component developed below.
 
-@node MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver
-@subsection MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver
-@cindex MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver
+@node GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Driver
+@subsection GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Driver
+@cindex GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Driver
 
-The MAP 3GPP TS 29.002 Mobile Application Part (MAP) Driver is responsible for accepting location update
-and authentication requests from the TCAP or TUA streams linked below as well as performing any
-necessary Global Title Translations (GTT) for the SCCP GTT control streams linked below.  The driver
-contains an in-kernel-memory HLR database.  The in-memory database is hybrid rule-based an IMSI
-indexed record-based.
+The GR-1188-CORE Issue 2 Calling Name Delivery (CNAM) Driver is responsible for accepting CNAM
+queries from the TCAP and TUA streams linked below as well as performing any necessary Global Title
+Translations (GTT) for the SCCP GTT control streams linked below.  The driver contains an
+in-kernel-memory CNAM database.  The in-memory database is hybrid rule-based an Digit indexed
+record-based.
 
-The MAP driver supports 3GPP TS 29.002 Release 4.
+The CNAM driver supports GR-1188-CORE Issue 2.
 This protocol component is developed as part of @dfn{Phase 1} of this project.
 
 @node Transaction Capabilities Application Part (TCAP) Driver
@@ -1331,7 +1896,7 @@ This protocol component is developed as part of @dfn{Phase 1} of this project.
 The transaction capabilities application part driver performs the essential transaction functions of
 the SS7 signalling stack.  SCCP or SUA streams are linked under the driver and the driver provides
 the functions of a TCAP SSP or SCP, MSC or HLR, SMSC and other TCAP nodes.  Transaction Capabilities
-Application Part streams bound to INAP, MAP or LNP TCAP-SAPs are accessed by the transaction
+Application Part streams bound to INAP, CNAM or LNP TCAP-SAPs are accessed by the transaction
 application using the Transaction Component Interface (TCI).
 
 The TCAP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
@@ -1386,7 +1951,7 @@ This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+tcap, @b{tcap}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for TCAP include integration testing with the MAP and HLR components.
+@dfn{Phase 1} activities for TCAP include integration testing with the CNAM components.
 
 @node Signalling Connection Control Part (SCCP) Driver
 @subsection Signalling Connection Control Part (SCCP) Driver
@@ -1433,7 +1998,7 @@ This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+sccp, @b{sccp}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for SCCP include integration testing with the MAP and HLR components.
+@dfn{Phase 1} activities for SCCP include integration testing with the CNAM components.
 
 @menu
 * Global Title Translations (GTT)::
@@ -1481,7 +2046,7 @@ This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+sccp, @b{sccp}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for SCCP include integration testing with the MAP and HLR components.
+@dfn{Phase 1} activities for SCCP include integration testing with the CNAM components.
 
 @node Message Transfer Part (MTP) Driver
 @subsection Message Transfer Part (MTP) Driver
@@ -1519,7 +2084,7 @@ These are an existing OpenSS7 SS7 stack components; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+mtp, @b{mtp}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for MTP3 and MTP2 include integration testing with the MAP and HLR
+@dfn{Phase 1} activities for MTP3 and MTP2 include integration testing with the CNAM
 components.
 
 @node MTP Level 3 User Adaptation Layer (M3UA) Driver
@@ -1546,7 +2111,7 @@ This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+m3ua, @b{m3ua}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for M3UA include integration testing with the MAP and HLR
+@dfn{Phase 1} activities for M3UA include integration testing with the CNAM
 components.
 
 @node Signalling Link (SL) Module
@@ -1579,7 +2144,7 @@ This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+sl, @b{sl}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for MTP2 include integration testing with the MAP and HLR
+@dfn{Phase 1} activities for MTP2 include integration testing with the CNAM
 components.
 
 @node Signalling Data Terminal (SDT) Module
@@ -1610,7 +2175,7 @@ This is an existing OpenSS7 SS7 stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+sdt, @b{sdt}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for MTP2 include integration testing with the MAP and HLR
+@dfn{Phase 1} activities for MTP2 include integration testing with the CNAM
 components.
 
 @node Stream Control Transmission Protocol (SCTP) Driver
@@ -1631,7 +2196,7 @@ This is an existing OpenSS7 SIGTRAN stack component; for documentation, see:
 @ifnotinfo
 @uref{http://www.openss7.org/man/man2html?4+sctp, @b{sctp}(4)}.
 @end ifnotinfo
-@dfn{Phase 1} activities for SCTP include integration testing with the MAP and HLR
+@dfn{Phase 1} activities for SCTP include integration testing with the CNAM
 components.
 
 @node Software Architecture
@@ -1745,16 +2310,14 @@ well as at its upper layer interface.
 @cindex Hardware architecture
 @cindex Hardware
 
-@figref{23} illustrates the hardware configuration for the High Performance GSM/UMTS GPRS HLR
-evaluation platform.
+@figref{23} illustrates the hardware configuration for the OpenSS7 CNAM Query Platform.
 
 @figuresized{platconf,23,Platform Architecture,5in}
 
-The High Performance GSM/UMTS GPRS HLR prototype platform consists of a medium end ix86 single
-processor PC in a hardened 19" rack mount chassis, loaded with WBEL3 Linux running a 2.4.21 kernel,
-@cindex LiS
-LiS 2.16.18-22, the OpenSS7 stack (strss7-0.9.2-1) software and the High Performance GSM/UMTS GPRS
-HLR application.
+The OpenSS7 CNAM Query Platform consists of a medium end ix86 single processor PC in a hardened 19"
+rack mount chassis, loaded with RHAS4 Linux running a 2.6.20 kernel,
+@cindex Linux Fast-STREAMS
+streams-0.9.2.3, the OpenSS7 stack (strss7-0.9a.8) software and the CNAM Query Platform application.
 
 SS7 or SIGTRAN signalling links are terminated either on E400P-SS7 cards (or other OpenSS7
 @cindex E400P-SS7
@@ -1801,8 +2364,7 @@ interface device hardware listed here has good price-performance, however, varyi
 performance (and therefore price) is available.  These cards are available either directly from the
 card manufacturer or are also resold by @uref{http://www.openss7.com/, OpenSS7 Corporation}.
 
-For the High Performance GSM/UMTS GPRS HLR application, Either the A104c or PCI 384 cards are
-recommended.
+For the @value{MANUAL_TITLE} application, the V401P cards are recommended.
 
 The following interface device hardware is available for the OpenSS7 Platform:
 

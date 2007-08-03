@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/04 08:32:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/03 13:34:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/04 08:32:16 $ by $Author: brian $
+# Last Modified $Date: 2007/08/03 13:34:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -100,12 +100,21 @@ if PKG_BUILD_INDEP
 FIG_FIGS		= \
 			cnam_iface.fig \
 			cnam_lab.fig \
+			cnam_m2pa.fig \
 			cnam_m2ua.fig \
 			cnam_m3ua.fig \
 			cnam_netarch.fig \
 			cnam_soap.fig \
 			cnam_sua.fig \
 			cnam_tua.fig \
+			cnam_xflow1.fig \
+			cnam_xflow2.fig \
+			cnam_xflow3.fig \
+			cnam_xflow4.fig \
+			cnam_a.fig \
+			cnam_b.fig \
+			cnam_c.fig \
+			cnam_d.fig \
 			c.fig \
 			d.fig \
 			gb.fig \
@@ -200,6 +209,7 @@ PNG_PNGS		= \
 			dl380g4.png
 
 PS_PSS			= \
+			cnam_protconf.ps \
 			mtp2.ps \
 			mtp3.ps \
 			platconf.ps \
@@ -221,6 +231,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.21  2007/08/03 13:34:52  brian
+# - manual updates, put ss7 modules in public release
+#
 # Revision 0.9.2.20  2007/07/04 08:32:16  brian
 # - doc updates and m2pa correction
 #
