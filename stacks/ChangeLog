@@ -1,3 +1,25 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/tcapconf.8.man:
+	* doc/projects/cnam_a.fig: added figures for cnam project
+	* doc/projects/cnam_b.fig: added figures for cnam project
+	* doc/projects/cnam_c.fig: added figures for cnam project
+	* doc/projects/cnam_d.fig: added figures for cnam project
+	* doc/projects/cnam_m2pa.fig: added figures for cnam project
+	* doc/projects/cnam_protconf.ag: added figures for cnam project
+	* doc/projects/cnam_protconf.ps: added figures for cnam project
+	* doc/projects/cnam_xflow1.fig: added figures for cnam project
+	* doc/projects/cnam_xflow2.fig: added figures for cnam project
+	* doc/projects/cnam_xflow3.fig: added figures for cnam project
+	* doc/projects/cnam_xflow4.fig: added figures for cnam project
+	* doc/specs/tci/tc.h: copy of header file here for include
+	* doc/specs/tri/tr.h: copy of header file here for include
+	* src/modules/mtp/mtp_mod.c: added minimal MTP module
+	* src/modules/sccp/sccp_mod.c: added minimal SCCP module
+	* src/modules/sl/sl_mux.new.c: added SL multiplexer
+	* src/modules/tcap/tc_mod.c: added minimal TR TCAP module
+	* src/modules/tcap/tr_mod.c: added minimal TC TCAP module
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update

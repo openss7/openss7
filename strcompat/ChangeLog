@@ -1,3 +1,10 @@
+2007-08-03  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man9/mi_close_comm_cache.9.man: add mans for cachce allocation
+	* doc/man/man9/mi_close_detached_cache.9.man: add mans for cachce allocation
+	* doc/man/man9/mi_open_comm_cache.9.man: add mans for cachce allocation
+	* doc/man/man9/mi_open_detached_cache.9.man: add mans for cachce allocation
+
 2007-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/news.texi: release notes update
