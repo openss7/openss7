@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: sccp.4.man,v 0.9.2.7 2007/08/03 13:34:50 brian Exp $
+.\" @(#) $Id: sccp.4.man,v 0.9.2.8 2007/08/06 04:43:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/08/03 13:34:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/06 04:43:51 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sccp.4.man,v $
+.\" Revision 0.9.2.8  2007/08/06 04:43:51  brian
+.\" - rework of pipe-based emulation modules
+.\"
 .\" Revision 0.9.2.7  2007/08/03 13:34:50  brian
 .\" - manual updates, put ss7 modules in public release
 .\"
@@ -366,8 +369,10 @@ These management controls are documented in
 .PP
 .BR ss7 (8),
 .BR sccpi (7),
-.BR sccp_npi (7),
-.BR sccp_tpi (7),
+.BR npi (7),
+.BR npi_sccp (7),
+.BR tpi (7),
+.BR tpi_sccp (7),
 .BR xti_sccp (3),
 .BR sccp_socket (7),
 .BR sockets (3),

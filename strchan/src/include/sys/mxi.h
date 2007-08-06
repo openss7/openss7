@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi.h,v 0.9.2.5 2007/07/14 01:35:35 brian Exp $
+ @(#) $Id: mxi.h,v 0.9.2.6 2007/08/06 04:44:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:35 $ by $Author: brian $
+ Last Modified $Date: 2007/08/06 04:44:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi.h,v $
+ Revision 0.9.2.6  2007/08/06 04:44:04  brian
+ - rework of pipe-based emulation modules
+
  Revision 0.9.2.5  2007/07/14 01:35:35  brian
  - make license explicit, add documentation
 
@@ -70,7 +73,7 @@
 #ifndef __SYS_MXI_H__
 #define __SYS_MXI_H__
 
-#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -79,48 +82,48 @@ typedef uint32_t mx_ulong;
 typedef uint16_t mx_ushort;
 typedef uint8_t mx_uchar;
 
-#define MX_INFO_REQ		 1UL
-#define MX_OPTMGMT_REQ		 2UL
-#define MX_ATTACH_REQ		 3UL
-#define MX_ENABLE_REQ		 4UL
-#define MX_CONNECT_REQ		 5UL
-#define MX_DATA_REQ		 6UL
-#define MX_DISCONNECT_REQ	 7UL
-#define MX_DISABLE_REQ		 8UL
-#define MX_DETACH_REQ		 9UL
+#define MX_INFO_REQ		 1U
+#define MX_OPTMGMT_REQ		 2U
+#define MX_ATTACH_REQ		 3U
+#define MX_ENABLE_REQ		 4U
+#define MX_CONNECT_REQ		 5U
+#define MX_DATA_REQ		 6U
+#define MX_DISCONNECT_REQ	 7U
+#define MX_DISABLE_REQ		 8U
+#define MX_DETACH_REQ		 9U
 
-#define MX_INFO_ACK		10UL
-#define MX_OPTMGMT_ACK		11UL
-#define MX_OK_ACK		12UL
-#define MX_ERROR_ACK		13UL
-#define MX_ENABLE_CON		14UL
-#define MX_CONNECT_CON		15UL
-#define MX_DATA_IND		16UL
-#define MX_DISCONNECT_IND	17UL
-#define MX_DISCONNECT_CON	18UL
-#define MX_DISABLE_IND		19UL
-#define MX_DISABLE_CON		20UL
-#define MX_EVENT_IND		21UL
+#define MX_INFO_ACK		10U
+#define MX_OPTMGMT_ACK		11U
+#define MX_OK_ACK		12U
+#define MX_ERROR_ACK		13U
+#define MX_ENABLE_CON		14U
+#define MX_CONNECT_CON		15U
+#define MX_DATA_IND		16U
+#define MX_DISCONNECT_IND	17U
+#define MX_DISCONNECT_CON	18U
+#define MX_DISABLE_IND		19U
+#define MX_DISABLE_CON		20U
+#define MX_EVENT_IND		21U
 
 /*
  *  MX STATES
  */
-#define MXS_UNINIT		-2UL
-#define MXS_UNUSABLE		-1UL
-#define MXS_DETACHED		 0UL
-#define MXS_WACK_AREQ		 1UL
-#define MXS_WACK_UREQ		 2UL
-#define MXS_ATTACHED		 3UL
-#define MXS_WACK_EREQ		 4UL
-#define MXS_WCON_EREQ		 5UL
-#define MXS_WACK_RREQ		 6UL
-#define MXS_WCON_RREQ		 7UL
-#define MXS_ENABLED		 8UL
-#define MXS_WACK_CREQ		 9UL
-#define MXS_WCON_CREQ		10UL
-#define MXS_WACK_DREQ		11UL
-#define MXS_WCON_DREQ		12UL
-#define MXS_CONNECTED		13UL
+#define MXS_UNINIT		-2U
+#define MXS_UNUSABLE		-1U
+#define MXS_DETACHED		 0U
+#define MXS_WACK_AREQ		 1U
+#define MXS_WACK_UREQ		 2U
+#define MXS_ATTACHED		 3U
+#define MXS_WACK_EREQ		 4U
+#define MXS_WCON_EREQ		 5U
+#define MXS_WACK_RREQ		 6U
+#define MXS_WCON_RREQ		 7U
+#define MXS_ENABLED		 8U
+#define MXS_WACK_CREQ		 9U
+#define MXS_WCON_CREQ		10U
+#define MXS_WACK_DREQ		11U
+#define MXS_WCON_DREQ		12U
+#define MXS_CONNECTED		13U
 
 /*
  *  MX STATE FLAGS

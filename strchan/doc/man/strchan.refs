@@ -93,7 +93,7 @@
 %Q OpenSS7 Corporation
 %R strss7-0.9.2
 %N Draft 2
-%T Local Management Interface Specification
+%T Local Management Interface (LMI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
@@ -104,7 +104,7 @@
 %Q OpenSS7 Corporation
 %R strss7-0.9.2
 %N Draft 2
-%T Signalling Link Interface Specification
+%T Signalling Link Interface (SLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
@@ -115,7 +115,7 @@
 %Q OpenSS7 Corporation
 %R strss7-0.9.2
 %N Draft 2
-%T Signalling Data Terminal Interface Specification
+%T Signalling Data Terminal Interface (SDTI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
@@ -126,11 +126,33 @@
 %Q OpenSS7 Corporation
 %R strss7-0.9.2
 %N Draft 2
-%T Signalling Data Link Interface Specification
+%T Signalling Data Link Interface (SDLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdli.pdf
+
+%L CHI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R CHI Revision 0.9.2
+%N Draft 2
+%T Channel Interface (CHI) Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/chi.pdf
+
+%L MXI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R MXI Revision 0.9.2
+%N Draft 2
+%T Multiplex Interface (MXI) Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/mxi.pdf
 
 %K xxx
 %A X Programmer's Group

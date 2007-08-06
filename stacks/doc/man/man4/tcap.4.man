@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: tcap.4.man,v 0.9.2.7 2007/08/03 13:34:50 brian Exp $
+.\" @(#) $Id: tcap.4.man,v 0.9.2.8 2007/08/06 04:43:51 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/08/03 13:34:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/06 04:43:51 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: tcap.4.man,v $
+.\" Revision 0.9.2.8  2007/08/06 04:43:51  brian
+.\" - rework of pipe-based emulation modules
+.\"
 .\" Revision 0.9.2.7  2007/08/03 13:34:50  brian
 .\" - manual updates, put ss7 modules in public release
 .\"
@@ -372,7 +375,7 @@ Stream.
 Each
 .B TCAP
 Stream provides a service primitive interface that implements the TCAP protocol 
-The ssytem call,
+The system call,
 .BR putpmsg (2s),
 can be called to issue service primitives on the interface;
 .BR getpmsg (2s),
@@ -381,7 +384,7 @@ to receive primitives.
 as described in
 .BR streamio (7)
 and
-.BR mtp_ioctl (7)
+.BR tcap_ioctl (4)
 can be used to manage the Stream and the TCAP provider.
 .\"
 .\"
@@ -646,7 +649,7 @@ transporting ETSI TCAP over ANSI SCCP.
 .SH IOCTLS
 .PP
 All interfaces support a set of management IO controls using
-.BR ioctl(2)
+.BR ioctl (2s)
 system calls on the
 .IR tcap_stream ", " tcap_xtistr " or " tcap_socket
 file descriptor or socket.  These management controls are documented in
@@ -655,13 +658,32 @@ file descriptor or socket.  These management controls are documented in
 .\"
 .SH "SEE ALSO"
 .PP
-.BR tcap (8),
-.BR ss7confd (8),
-.BR tcapi (7),
-.BR tpi_tcap (7),
-.BR tcap_socket (7),
+.BR getpmsg (2s),
+.BR ioctl (2s),
+.BR I_PLINK (7),
+.BR mtp (4),
+.BR open (2s),
+.BR protosw (5),
+.BR putpmsg (2s),
+.BR sccp (4),
+.BR socket (3),
 .BR sockets (3),
-.BR xnet (3).
+.BR socksys (4),
+.BR specfs (5),
+.BR streamio (7),
+.BR STREAMS (4),
+.BR sua (4),
+.BR tcap_ioctl (4),
+.BR tcap_ioctl (7),
+.BR TC_BIND_REQ (7),
+.BR tci (7),
+.BR t_open (3),
+.BR tpi (7),
+.BR tpi_tcap (7),
+.BR tri (7),
+.BR xnet (3),
+.BR xti (3),
+.BR xti_tcap (3).
 .\"
 .\"
 .SH FILES
