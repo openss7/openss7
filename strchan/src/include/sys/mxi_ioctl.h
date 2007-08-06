@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mxi_ioctl.h,v 0.9.2.4 2007/07/14 01:35:35 brian Exp $
+ @(#) $Id: mxi_ioctl.h,v 0.9.2.5 2007/08/06 04:44:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:35 $ by $Author: brian $
+ Last Modified $Date: 2007/08/06 04:44:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mxi_ioctl.h,v $
+ Revision 0.9.2.5  2007/08/06 04:44:04  brian
+ - rework of pipe-based emulation modules
+
  Revision 0.9.2.4  2007/07/14 01:35:35  brian
  - make license explicit, add documentation
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_MXI_IOCTL_H__
 #define __SYS_MXI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: mxi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -237,6 +240,15 @@ typedef struct mx_statem {
 
 typedef struct mx_stats {
 	mx_ulong header;
+	mx_ulong rx_octets;
+	mx_ulong tx_octets;
+	mx_ulong rx_overruns;
+	mx_ulong tx_underruns;
+	mx_ulong rx_buffer_overflows;
+	mx_ulong tx_buffer_overflows;
+	mx_ulong lead_cts_lost;
+	mx_ulong lead_dcd_lost;
+	mx_ulong carrier_lost;
 } mx_stats_t;
 
 #define	MX_IOCGSTATSP	_IOR(	MX_IOC_MAGIC,	 8, mx_stats_t	    )

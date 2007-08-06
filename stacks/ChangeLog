@@ -1,3 +1,12 @@
+2007-08-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man4/sccp.4.man: rework of SDL-, SDT-, SL-PMOD
+	* doc/man/man4/tcap.4.man: rework of SDL-, SDT-, SL-PMOD
+	* src/modules/sdl/sdl_pmod.c: rework of SDL-, SDT-, SL-PMOD
+	* src/modules/sdt/sdt_pmod.c: rework of SDL-, SDT-, SL-PMOD
+	* src/modules/sl/sl-mux.c: rework of SDL-, SDT-, SL-PMOD
+	* src/modules/sl/slpmod.c: rework of SDL-, SDT-, SL-PMOD
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am:

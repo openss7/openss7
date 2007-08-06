@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi_ioctl.h,v 0.9.2.3 2006/12/20 23:07:39 brian Exp $
+ @(#) $Id: chi_ioctl.h,v 0.9.2.4 2007/08/06 04:44:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/20 23:07:39 $ by $Author: brian $
+ Last Modified $Date: 2007/08/06 04:44:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi_ioctl.h,v $
+ Revision 0.9.2.4  2007/08/06 04:44:04  brian
+ - rework of pipe-based emulation modules
+
  Revision 0.9.2.3  2006/12/20 23:07:39  brian
  - updates for release and current development
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_CHI_IOCTL_H__
 #define __SYS_CHI_IOCTL_H__
 
-#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
+#ident "@(#) $RCSfile: chi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation"
 
 /* This file can be processed by doxygen(1). */
 
@@ -112,6 +115,15 @@ typedef struct ch_statem {
  */
 typedef struct ch_stats {
 	ch_ulong header;
+	ch_ulong rx_octets;
+	ch_ulong tx_octets;
+	ch_ulong rx_overruns;
+	ch_ulong tx_underruns;
+	ch_ulong rx_buffer_overflows;
+	ch_ulong tx_buffer_overflows;
+	ch_ulong lead_cts_lost;
+	ch_ulong lead_dcd_lost;
+	ch_ulong carrier_lost;
 } ch_stats_t;
 
 #define	CH_IOCGSTATSP	_IOR(	CH_IOC_MAGIC,	 8, ch_stats_t	    )

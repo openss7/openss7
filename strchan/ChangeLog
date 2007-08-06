@@ -1,3 +1,13 @@
+2007-08-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/strchan.refs: rework of CH-PMOD and MX-PMOD
+	* doc/man/man4/mx.4.man: rework of CH-PMOD and MX-PMOD
+	* src/include/sys/chi_ioctl.h: rework of CH-PMOD and MX-PMOD
+	* src/include/sys/mxi.h: rework of CH-PMOD and MX-PMOD
+	* src/include/sys/mxi_ioctl.h: rework of CH-PMOD and MX-PMOD
+	* src/modules/ch_pmod.c: rework of CH-PMOD and MX-PMOD
+	* src/modules/mx_pmod.c: rework of CH-PMOD and MX-PMOD
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/strchan.refs: update references

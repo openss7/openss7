@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $
+ @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/06 04:43:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl-mux.c,v $
+ Revision 0.9.2.3  2007/08/06 04:43:57  brian
+ - rework of pipe-based emulation modules
+
  Revision 0.9.2.2  2007/08/03 13:35:41  brian
  - manual updates, put ss7 modules in public release
 
@@ -58,9 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $"
+#ident "@(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:57 $"
 
-static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $";
+static char const ident[] =
+    "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:57 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -102,7 +106,7 @@ static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/03 13:35:41 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:57 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -194,6 +198,9 @@ struct sl {
 	int state;			/* management state of stream */
 	uint oldstate;			/* checkpoint state of stream */
 	struct {
+		struct sl *sl;		/* attached upper or lower structure */
+	} sl;
+	struct {
 		struct sl *lm;		/* layer management stream for linked streams */
 		struct sl *next;	/* next stream for same lm */
 		struct sl **prev;	/* prev stream for same lm */
@@ -239,8 +246,8 @@ sl_find_index(struct sl *lm, int index)
 	struct sl *sl;
 
 	for (sl = lm->lm.lm; sl && sl->ppa.slm_index != index; sl = sl->lm.next) ;
-	if (sl == NULL && lm->oq)
-		sl = SL_PRIV(lm->oq);
+	if (sl == NULL)
+		sl = lm->sl.sl;
 	return (sl);
 }
 static noinline fastcall struct sl *
@@ -269,9 +276,7 @@ sl_find_lower(struct sl *lm, struct slmux_ppa *ppa)
 		return sl_find_ppa(lm, ppa->slm_ppa);
 	if (ppa->slm_clei[0] != '\0')
 		return sl_find_clei(lm, ppa->slm_clei);
-	if (lm->oq)
-		return SL_PRIV(lm->oq);
-	return (NULL);
+	return (lm->sl.sl);
 }
 
 /*
@@ -529,6 +534,12 @@ sl_release(struct sl *sl)
  *  beneath the lower multiplex.
  */
 
+/**
+ * lmi_tx_info_req: - issue an LMI_INFO_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_info_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -541,12 +552,19 @@ lmi_tx_info_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_INFO_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_INFO_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "LMI_INFO_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_attach_req: - issue an LMI_ATTACH_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_attach_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -559,12 +577,19 @@ lmi_tx_attach_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_ATTACH_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_ATTACH_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "LMI_ATTACH_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_detach_req: - issue an LMI_DETACH_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_detach_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -577,12 +602,19 @@ lmi_tx_detach_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_DETACH_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_DETACH_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "LMI_DETACH_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_enable_req: - issue an LMI_ENABLE_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_enable_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -595,12 +627,19 @@ lmi_tx_enable_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_ENABLE_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_ENABLE_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "LMI_ENABLE_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_disable_req: - issue an LMI_DISABLE_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_disable_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -613,12 +652,19 @@ lmi_tx_disable_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_DISABLE_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_DISABLE_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "LMI_DISABLE_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_optmgmt_req: - issue an LMI_OPTMGMT_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -631,14 +677,23 @@ lmi_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_OPTMGMT_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_OPTMGMT_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "LMI_OPTMGMT_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_pdu_req: - issue an SL_PDU_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @mpri: message priority
+ * @dp: user data
+ */
 static inline fastcall int
-sl_tx_pdu_req(struct sl *sl, queue_t *q, mblk_t *msg)
+sl_tx_pdu_req(struct sl *sl, queue_t *q, mblk_t *msg, sl_ulong mpri, mblk_t *dp)
 {
 	sl_pdu_req_t *p;
 	mblk_t *mp;
@@ -647,14 +702,25 @@ sl_tx_pdu_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->sl_primitive = SL_PDU_REQ;
+		p->sl_mp = mpri;
 		mp->b_wptr += sizeof(*p);
+		mp->b_cont = dp;
+		if (msg && msg->b_cont == dp)
+			msg->b_cont = NULL;
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_PDU_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_PDU_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_emergency_req: - issue an SL_EMERGENCY_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_emergency_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -667,12 +733,19 @@ sl_tx_emergency_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_EMERGENCY_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_EMERGENCY_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_EMERGENCY_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_emergency_ceases_req: - issue an SL_CEASES_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -685,12 +758,19 @@ sl_tx_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_EMERGENCY_CEASES_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_EMERGENCY_CEASES_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_EMERGENCY_CEASES_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_start_req: - issue an SL_START_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_start_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -703,12 +783,19 @@ sl_tx_start_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_START_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_START_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_START_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_stop_req: - issue an SL_STOP_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_stop_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -721,12 +808,19 @@ sl_tx_stop_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_STOP_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_STOP_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_STOP_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_retrieve_bsnt_req: - issue an SL_BSNT_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -739,12 +833,19 @@ sl_tx_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RETRIEVE_BSNT_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RETRIEVE_BSNT_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_RETRIEVE_BSNT_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_retrieval_request_and_fsnc_req: - issue an SL_RETRIEVAL_REQUEST_AND_FSNC_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -757,12 +858,19 @@ sl_tx_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RETRIEVAL_REQUEST_AND_FSNC_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_RETRIEVAL_REQUEST_AND_FSNC_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_clear_buffers_req: - issue an SL_CLEAR_BUFFERS_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -775,12 +883,19 @@ sl_tx_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CLEAR_BUFFERS_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_CLEAR_BUFFERS_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_clear_rtb_req: - issue an SL_CLEAR_RTB_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -793,12 +908,19 @@ sl_tx_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_CLEAR_RTB_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CLEAR_RTB_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_CLEAR_RTB_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_continue_req: - issue an SL_CONTINUE_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_continue_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -811,12 +933,19 @@ sl_tx_continue_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_CONTINUE_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CONTINUE_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_CONTINUE_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_local_processor_outage_req: - issue an SL_LOCAL_PROCESSOR_OUTAGE_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -829,12 +958,19 @@ sl_tx_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_LOCAL_PROCESSOR_OUTAGE_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_LOCAL_PROCESSOR_OUTAGE_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_resume_req: - issue an SL_RESUME_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_resume_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -847,12 +983,19 @@ sl_tx_resume_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RESUME_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_RESUME_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_RESUME_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_congestion_discard_req: - issue an SL_CONGESTION_DISCARD_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -865,12 +1008,19 @@ sl_tx_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_CONGESTION_DISCARD_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CONGESTION_DISCARD_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_CONGESTION_DISCARD_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_congestion_accept_req: - issue an SL_CONGESTION_ACCEPT_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -883,12 +1033,19 @@ sl_tx_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_CONGESTION_ACCEPT_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CONGESTION_ACCEPT_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_CONGESTION_ACCEPT_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_no_congestion_req: - issue an SL_CONGESTION_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -901,12 +1058,19 @@ sl_tx_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_NO_CONGESTION_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_NO_CONGESTION_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_NO_CONGESTION_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_power_on_req: - issue an SL_POWER_ON_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_power_on_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -919,12 +1083,19 @@ sl_tx_power_on_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_POWER_ON_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_POWER_ON_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_POWER_ON_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_optmgmt_req: - issue an SL_OPTMGMT_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -937,13 +1108,20 @@ sl_tx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_OPTMGMT_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_OPTMGMT_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_OPTMGMT_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
 #if 0
+/**
+ * sl_tx_notify_req: - issue an SL_NOTIFY_REQ
+ * @sl: lower private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_notify_req(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -956,8 +1134,8 @@ sl_tx_notify_req(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_NOTIFY_REQ;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_NOTIFY_REQ ->");
-		putnext(sl->oq, mp);
+		mi_strlog(sl->wq, STRLOGTX, SL_TRACE, "SL_NOTIFY_REQ ->");
+		putnext(sl->wq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
@@ -974,6 +1152,13 @@ sl_tx_notify_req(struct sl *sl, queue_t *q, mblk_t *msg)
  *  the upper multiplex.
  */
 
+/**
+ * m_error: - issue an M_ERROR message
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ * @err: error to indicate
+ */
 static inline fastcall int
 m_error(struct sl *sl, queue_t *q, mblk_t *msg, int err)
 {
@@ -984,18 +1169,25 @@ m_error(struct sl *sl, queue_t *q, mblk_t *msg, int err)
 		*mp->b_wptr++ = err < 0 ? -err : err;
 		*mp->b_wptr++ = err < 0 ? -err : err;
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- M_ERROR");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- M_ERROR");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
 
+/**
+ * lmi_tx_info_ack: - issue an LMI_INFO_ACK primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_info_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 {
 	lmi_info_ack_t *p;
 	mblk_t *mp;
+
 	if ((mp = mi_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1008,12 +1200,19 @@ lmi_tx_info_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_ppa_style = LMI_STYLE2;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_INFO_ACK");
-		qreply(q, mp);
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_INFO_ACK");
+		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_ok_ack: - issue an LMI_OK_ACK primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_ok_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim)
 {
@@ -1038,12 +1237,19 @@ lmi_tx_ok_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim)
 		}
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_OK_ACK");
-		qreply(q, mp);
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_OK_ACK");
+		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_error_ack: - issue an LMI_ERROR_ACK primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_error_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long error)
 {
@@ -1060,12 +1266,19 @@ lmi_tx_error_ack(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long
 		p->lmi_state = sl_restore_m_state(sl);
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ERROR_ACK");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_ERROR_ACK");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_error_reply: - issue an LMI_ERROR_ACK primitive if required
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_error_reply(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long error)
 {
@@ -1073,6 +1286,13 @@ lmi_error_reply(struct sl *sl, queue_t *q, mblk_t *msg, lmi_long prim, lmi_long 
 		return (error);
 	return lmi_tx_error_ack(sl, q, msg, prim, error);
 }
+
+/**
+ * lmi_tx_enable_con: - issue an LMI_ENABLE_CON primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_enable_con(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1085,12 +1305,19 @@ lmi_tx_enable_con(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_ENABLE_CON;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ENABLE_CON");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_ENABLE_CON");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_disable_con: - issue an LMI_DISABLE_CON primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_disable_con(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1103,12 +1330,19 @@ lmi_tx_disable_con(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_DISABLE_CON;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_DISABLE_CON");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_DISABLE_CON");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_optmgmt_ack: - issue an LMI_OPTMGMT_ACK primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1121,12 +1355,19 @@ lmi_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_OPTMGMT_ACK;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_OPTMGMT_ACK");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_OPTMGMT_ACK");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_error_ind: - issue an LMI_ERROR_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_error_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1139,12 +1380,19 @@ lmi_tx_error_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_ERROR_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_ERROR_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_ERROR_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_stats_ind: - issue an LMI_STATS_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_stats_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1157,12 +1405,19 @@ lmi_tx_stats_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_STATS_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_STATS_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_STATS_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * lmi_tx_event_ind: - issue an LMI_EVENT_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 lmi_tx_event_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1175,12 +1430,19 @@ lmi_tx_event_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_EVENT_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_EVENT_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_EVENT_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_pdu_ind: - issue an SL_PDU_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1193,12 +1455,19 @@ sl_tx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_PDU_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_PDU_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_PDU_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_link_congested_ind: - issue an SL_LINK_CONGESTED_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1211,12 +1480,19 @@ sl_tx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_LINK_CONGESTED_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LINK_CONGESTED_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_LINK_CONGESTED_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_link_congestion_ceased_ind: - issue an SL_LINK_CONGESTION_CEASED_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1229,12 +1505,19 @@ sl_tx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_LINK_CONGESTION_CEASED_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LINK_CONGESTION_CEASED_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_LINK_CONGESTION_CEASED_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_retrieved_message_ind: - issue an SL_RETRIEVED_MESSAGE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1247,12 +1530,19 @@ sl_tx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RETRIEVED_MESSAGE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RETRIEVED_MESSAGE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_RETRIEVED_MESSAGE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_retrieval_complete_ind: - issue an SL_RETRIEVAL_COMPLETE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1265,12 +1555,19 @@ sl_tx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RETRIEVAL_COMPLETE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RETRIEVAL_COMPLETE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_RETRIEVAL_COMPLETE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_rb_cleared_ind: - issue an SL_RB_CLEARED_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1283,12 +1580,19 @@ sl_tx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RB_CLEARED_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RB_CLEARED_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_RB_CLEARED_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_bsnt_ind: - issue an SL_BSNT_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1301,12 +1605,19 @@ sl_tx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_BSNT_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_BSNT_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_BSNT_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_in_service_ind: - issue an SL_IN_SERVICE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1319,12 +1630,19 @@ sl_tx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_IN_SERVICE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_IN_SERVICE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_IN_SERVICE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_out_of_service_ind: - issue an SL_OUT_OF_SERVICE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1337,12 +1655,19 @@ sl_tx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_OUT_OF_SERVICE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_OUT_OF_SERVICE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_OUT_OF_SERVICE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_remote_processor_outage_ind: - issue an SL_REMOTE_PROCESSOR_OUTAGE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1355,12 +1680,19 @@ sl_tx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_REMOTE_PROCESSOR_OUTAGE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_REMOTE_PROCESSOR_OUTAGE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_REMOTE_PROCESSOR_OUTAGE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_remote_processor_recovered_ind: - issue an SL_REMOTE_PROCESSOR_RECOVERED_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1373,12 +1705,19 @@ sl_tx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_REMOTE_PROCESSOR_RECOVERED_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_REMOTE_PROCESSOR_RECOVERED_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_REMOTE_PROCESSOR_RECOVERED_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_rtb_cleared_ind: - issue an SL_RTB_CLEARED_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1391,12 +1730,19 @@ sl_tx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RTB_CLEARED_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RTB_CLEARED_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_RTB_CLEARED_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_retrieval_not_possible_ind: - issue an SL_RETRIEVAL_NOT_POSSIBLE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1409,12 +1755,19 @@ sl_tx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_RETRIEVAL_NOT_POSSIBLE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_RETRIEVAL_NOT_POSSIBLE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_RETRIEVAL_NOT_POSSIBLE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_bsnt_not_retrievable_ind: - issue an SL_BSNT_NOT_RETRIEVABLE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1427,12 +1780,19 @@ sl_tx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_BSNT_NOT_RETRIEVABLE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_BSNT_NOT_RETRIEVABLE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_BSNT_NOT_RETRIEVABLE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_optmgmt_ack: - issue an SL_OPTMGMT_ACK primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1445,12 +1805,19 @@ sl_tx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = SL_OPTMGMT_ACK;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_OPTMGMT_ACK");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_OPTMGMT_ACK");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_notify_ind: - issue an SL_NOTIFY_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_notify_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1463,12 +1830,19 @@ sl_tx_notify_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_primitive = LMI_EVENT_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- LMI_EVENT_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- LMI_EVENT_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_local_processor_outage_ind: - issue an SL_LOCAL_PROCESSOR_OUTAGE_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1481,12 +1855,19 @@ sl_tx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_LOCAL_PROCESSOR_OUTAGE_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LOCAL_PROCESSOR_OUTAGE_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_LOCAL_PROCESSOR_OUTAGE_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
 	return (-ENOBUFS);
 }
+
+/**
+ * sl_tx_local_processor_recovered_ind: - issue an SL_LOCAL_PROCESSOR_RECOVERED_IND primitive
+ * @sl: upper private structure
+ * @q: active queue
+ * @msg: message to free upon success
+ */
 static inline fastcall int
 sl_tx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 {
@@ -1499,7 +1880,7 @@ sl_tx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->sl_primitive = SL_LOCAL_PROCESSOR_RECOVERED_IND;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
-		mi_strlog(q, STRLOGTX, SL_TRACE, "<- SL_LOCAL_PROCESSOR_RECOVERED_IND");
+		mi_strlog(sl->rq, STRLOGTX, SL_TRACE, "<- SL_LOCAL_PROCESSOR_RECOVERED_IND");
 		putnext(sl->rq, mp);
 		return (0);
 	}
@@ -1516,6 +1897,12 @@ sl_tx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *msg)
  *  above the upper multiplex.
  */
 
+/**
+ * lmi_rx_info_req: - process an LMI_INFO_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the LMI_INFO_REQ primitive
+ */
 static noinline fastcall int
 lmi_rx_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1536,6 +1923,13 @@ lmi_rx_info_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	}
 	return (1);
 }
+
+/**
+ * lmi_rx_attach_req: - process an LMI_ATTACH_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the LMI_ATTACH_REQ primitive
+ */
 static noinline fastcall int
 lmi_rx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1545,7 +1939,7 @@ lmi_rx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	struct sl *lower;
 	unsigned long flags;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto badprim;
 	if (sl_get_m_state(sl) != LMI_UNATTACHED)
 		goto outstate;
@@ -1624,6 +2018,13 @@ lmi_rx_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
       error:
 	return lmi_error_reply(sl, q, mp, LMI_ATTACH_REQ, err);
 }
+
+/**
+ * lmi_rx_detach_req: - process an LMI_DETACH_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the LMI_DETACH_REQ primitive
+ */
 static noinline fastcall int
 lmi_rx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1632,7 +2033,7 @@ lmi_rx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	unsigned long flags;
 	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto badprim;
 	if (sl_get_m_state(sl) != LMI_DISABLED)
 		goto outstate;
@@ -1656,6 +2057,13 @@ lmi_rx_detach_req(struct sl *sl, queue_t *q, mblk_t *mp)
       error:
 	return lmi_error_reply(sl, q, mp, LMI_DETACH_REQ, err);
 }
+
+/**
+ * lmi_rx_enable_req: - process an LMI_ENABLE_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the LMI_ENABLE_REQ primitive
+ */
 static inline fastcall int
 lmi_rx_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1664,6 +2072,13 @@ lmi_rx_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * lmi_rx_disable_req: - process an LMI_DISABLE_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the LMI_DISABLE_REQ primitive
+ */
 static inline fastcall int
 lmi_rx_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1672,6 +2087,13 @@ lmi_rx_disable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * lmi_rx_optmgmt_req: - process an LMI_OPTMGMT_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the LMI_OPTMGMT_REQ primitive
+ */
 static inline fastcall int
 lmi_rx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1680,6 +2102,13 @@ lmi_rx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_pdu_req: - process an SL_PDU_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_PDU_REQ primitive
+ */
 static inline fastcall int
 sl_rx_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1688,6 +2117,13 @@ sl_rx_pdu_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_emergency_req: - process an SL_EMERGENCY_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_EMERGENCY_REQ primitive
+ */
 static inline fastcall int
 sl_rx_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1696,6 +2132,13 @@ sl_rx_emergency_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_emergency_ceases_req: - process an SL_EMERGENCY_CEASES_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_EMERGENCY_CEASES_REQ primitive
+ */
 static inline fastcall int
 sl_rx_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1704,6 +2147,13 @@ sl_rx_emergency_ceases_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_start_req: - process an SL_START_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_START_REQ primitive
+ */
 static inline fastcall int
 sl_rx_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1712,6 +2162,13 @@ sl_rx_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_stop_req: - process an SL_STOP_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_STOP_REQ primitive
+ */
 static inline fastcall int
 sl_rx_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1720,6 +2177,13 @@ sl_rx_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_retrieve_bsnt_req: - process an SL_BSNT_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_BSNT_REQ primitive
+ */
 static inline fastcall int
 sl_rx_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1728,6 +2192,13 @@ sl_rx_retrieve_bsnt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_retrieval_request_and_fsnc_req: - process an SL_RETRIEVAL_REQUEST_AND_FSNC_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_RETRIEVAL_REQUEST_AND_FSNC_REQ primitive
+ */
 static inline fastcall int
 sl_rx_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1736,6 +2207,13 @@ sl_rx_retrieval_request_and_fsnc_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_clear_buffers_req: - process an SL_CLEAR_BUFFERS_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_CLEAR_BUFFERS_REQ primitive
+ */
 static inline fastcall int
 sl_rx_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1744,6 +2222,13 @@ sl_rx_clear_buffers_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_clear_rtb_req: - process an SL_CLEAR_RTB_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_CLEAR_RTB_REQ primitive
+ */
 static inline fastcall int
 sl_rx_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1752,6 +2237,13 @@ sl_rx_clear_rtb_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_continue_req: - process an SL_CONTINUE_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_CONTINUE_REQ primitive
+ */
 static inline fastcall int
 sl_rx_continue_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1760,6 +2252,13 @@ sl_rx_continue_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_local_processor_outage_req: - process an SL_PROCESSOR_OUTAGE_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_PROCESSOR_OUTAGE_REQ primitive
+ */
 static inline fastcall int
 sl_rx_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1768,6 +2267,13 @@ sl_rx_local_processor_outage_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_resume_req: - process an SL_RESUME_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_RESUME_REQ primitive
+ */
 static inline fastcall int
 sl_rx_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1776,6 +2282,13 @@ sl_rx_resume_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_congestion_discard_req: - process an SL_CONGESTION_DISCARD_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_CONGESTION_DISCARD_REQ primitive
+ */
 static inline fastcall int
 sl_rx_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1784,6 +2297,13 @@ sl_rx_congestion_discard_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_congestion_accept_req: - process an SL_CONGESTION_ACCEPT_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_CONGESTION_ACCEPT_REQ primitive
+ */
 static inline fastcall int
 sl_rx_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1792,6 +2312,13 @@ sl_rx_congestion_accept_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_no_congestion_req: - process an SL_NO_CONGESTION_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_NO_CONGESTION_REQ primitive
+ */
 static inline fastcall int
 sl_rx_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1800,6 +2327,13 @@ sl_rx_no_congestion_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_power_on_req: - process an SL_POWER_ON_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_POWER_ON_REQ primitive
+ */
 static inline fastcall int
 sl_rx_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1808,6 +2342,13 @@ sl_rx_power_on_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_optmgmt_req: - process an SL_OPTMGMT_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_OPTMGMT_REQ primitive
+ */
 static inline fastcall int
 sl_rx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1816,7 +2357,14 @@ sl_rx_optmgmt_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
 #if 0
+/**
+ * sl_rx_notify_req: - process an SL_NOTIFY_REQ primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the SL_NOTIFY_REQ primitive
+ */
 static inline fastcall int
 sl_rx_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1826,6 +2374,12 @@ sl_rx_notify_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	return (1);
 }
 #endif
+/**
+ * sl_rx_other_req: - process an unknown primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the unknown primitive
+ */
 static inline fastcall int
 sl_rx_other_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1834,6 +2388,13 @@ sl_rx_other_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_data_req: - process an M_DATA primitive
+ * @sl: upper private structure
+ * @q: upper write queue
+ * @mp: the M_DATA primitive
+ */
 static inline fastcall int
 sl_rx_data_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1850,6 +2411,12 @@ sl_rx_data_req(struct sl *sl, queue_t *q, mblk_t *mp)
  *  lower multiplex.
  */
 
+/**
+ * lmi_rx_info_ack: - process an LMI_INFO_ACK primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_INFO_ACK primitive
+ */
 static inline fastcall int
 lmi_rx_info_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1859,6 +2426,13 @@ lmi_rx_info_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, p->lmi_state);
 	return (1);
 }
+
+/**
+ * lmi_rx_ok_ack: - process an LMI_OK_ACK primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_OK_ACK primitive
+ */
 static inline fastcall int
 lmi_rx_ok_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1868,6 +2442,13 @@ lmi_rx_ok_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, p->lmi_state);
 	return (1);
 }
+
+/**
+ * lmi_rx_error_ack: - process an LMI_ERROR_ACK primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_ERROR_ACK primitive
+ */
 static inline fastcall int
 lmi_rx_error_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1877,6 +2458,13 @@ lmi_rx_error_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, p->lmi_state);
 	return (1);
 }
+
+/**
+ * lmi_rx_enable_con: - process an LMI_ENABLE_CON primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_ENABLE_CON primitive
+ */
 static inline fastcall int
 lmi_rx_enable_con(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1886,6 +2474,13 @@ lmi_rx_enable_con(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, p->lmi_state);
 	return (1);
 }
+
+/**
+ * lmi_rx_disable_con: - process an LMI_DISABLE_CON primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_DISABLE_CON primitive
+ */
 static inline fastcall int
 lmi_rx_disable_con(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1895,6 +2490,13 @@ lmi_rx_disable_con(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, p->lmi_state);
 	return (1);
 }
+
+/**
+ * lmi_rx_optmgmt_ack: - process an LMI_OPTMGMT_ACK primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_OPTMGMT_ACK primitive
+ */
 static inline fastcall int
 lmi_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1903,6 +2505,13 @@ lmi_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * lmi_rx_error_ind: - process an LMI_ERROR_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_ERROR_IND primitive
+ */
 static inline fastcall int
 lmi_rx_error_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1912,6 +2521,13 @@ lmi_rx_error_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	sl_set_m_state(sl, p->lmi_state);
 	return (1);
 }
+
+/**
+ * lmi_rx_stats_ind: - process an LMI_STATS_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_STATS_IND primitive
+ */
 static inline fastcall int
 lmi_rx_stats_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1920,6 +2536,13 @@ lmi_rx_stats_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * lmi_rx_event_ind: - process an LMI_EVENT_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_EVENT_IND primitive
+ */
 static inline fastcall int
 lmi_rx_event_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1928,6 +2551,13 @@ lmi_rx_event_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_pdu_ind: - process an LMI_PDU_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the LMI_PDU_IND primitive
+ */
 static inline fastcall int
 sl_rx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1936,6 +2566,13 @@ sl_rx_pdu_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_link_congested_ind: - process an SL_LINK_CONGESTED_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_LINK_CONGESTED_IND primitive
+ */
 static inline fastcall int
 sl_rx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1944,6 +2581,13 @@ sl_rx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_link_congestion_ceased_ind: - process an SL_LINK_CONGESTION_CEASED_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_LINK_CONGESTION_CEASED_IND primitive
+ */
 static inline fastcall int
 sl_rx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1952,6 +2596,13 @@ sl_rx_link_congestion_ceased_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_retrieved_message_ind: - process an SL_RETRIEVED_MESSAGE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_RETRIEVED_MESSAGE_IND primitive
+ */
 static inline fastcall int
 sl_rx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1960,6 +2611,13 @@ sl_rx_retrieved_message_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_retrieval_complete_ind: - process an SL_RETRIEVAL_COMPLETE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_RETRIEVAL_COMPLETE_IND primitive
+ */
 static inline fastcall int
 sl_rx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1968,6 +2626,13 @@ sl_rx_retrieval_complete_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_rb_cleared_ind: - process an SL_RB_CLEARED_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_RB_CLEARED_IND primitive
+ */
 static inline fastcall int
 sl_rx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1976,6 +2641,13 @@ sl_rx_rb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_bsnt_ind: - process an SL_BSNT_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_BSNT_IND primitive
+ */
 static inline fastcall int
 sl_rx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1984,6 +2656,13 @@ sl_rx_bsnt_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_in_service_ind: - process an SL_IN_SERVICE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_IN_SERVICE_IND primitive
+ */
 static inline fastcall int
 sl_rx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -1992,6 +2671,13 @@ sl_rx_in_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_out_of_service_ind: - process an SL_OUT_OF_SERVICE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_OUT_OF_SERVICE_IND primitive
+ */
 static inline fastcall int
 sl_rx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2000,6 +2686,13 @@ sl_rx_out_of_service_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_remote_processor_outage_ind: - process an SL_REMOTE_PROCESSOR_OUTAGE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_REMOTE_PROCESSOR_OUTAGE_IND primitive
+ */
 static inline fastcall int
 sl_rx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2008,6 +2701,13 @@ sl_rx_remote_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_remote_processor_recovered_ind: - process an SL_REMOTE_PROCESSOR_RECOVERED_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_REMOTE_PROCESSOR_RECOVERED_IND primitive
+ */
 static inline fastcall int
 sl_rx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2016,6 +2716,13 @@ sl_rx_remote_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_rtb_cleared_ind: - process an SL_RTB_CLEARED_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_RTB_CLEARED_IND primitive
+ */
 static inline fastcall int
 sl_rx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2024,6 +2731,13 @@ sl_rx_rtb_cleared_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_retrieval_not_possible_ind: - process an SL_RETRIEVAL_NOT_POSSIBLE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_RETRIEVAL_NOT_POSSIBLE_IND primitive
+ */
 static inline fastcall int
 sl_rx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2032,6 +2746,13 @@ sl_rx_retrieval_not_possible_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_bsnt_not_retrievable_ind: - process an SL_BSNT_NOT_RETRIEVABLE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_BSNT_NOT_RETRIEVABLE_IND primitive
+ */
 static inline fastcall int
 sl_rx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2040,6 +2761,13 @@ sl_rx_bsnt_not_retrievable_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_optmgmt_ack: - process an SL_OPTMGMT_ACK primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_OPTMGMT_ACK primitive
+ */
 static inline fastcall int
 sl_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2048,6 +2776,13 @@ sl_rx_optmgmt_ack(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_notify_ind: - process an SL_NOTIFY_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_NOTIFY_IND primitive
+ */
 static inline fastcall int
 sl_rx_notify_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2056,6 +2791,13 @@ sl_rx_notify_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_processor_outage_ind: - process an SL_PROCESSOR_OUTAGE_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_PROCESSOR_OUTAGE_IND primitive
+ */
 static inline fastcall int
 sl_rx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2064,6 +2806,13 @@ sl_rx_local_processor_outage_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_local_processor_recovered_ind: - process an SL_LOCAL_PROCESSOR_RECOVERED_IND primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the SL_LOCAL_PROCESSOR_RECOVERED_IND primitive
+ */
 static inline fastcall int
 sl_rx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2072,6 +2821,13 @@ sl_rx_local_processor_recovered_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_other_ind: - process an unknown primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the unknown primitive
+ */
 static inline fastcall int
 sl_rx_other_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2080,6 +2836,13 @@ sl_rx_other_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	(void) p;
 	return (1);
 }
+
+/**
+ * sl_rx_data_ind: - process an M_DATA primitive
+ * @sl: lower private structure
+ * @q: lower read queue
+ * @mp: the M_DATA primitive
+ */
 static inline fastcall int
 sl_rx_data_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 {
@@ -2701,7 +3464,9 @@ sl_passalong_req(struct sl *sl, queue_t *q, mblk_t *mp)
 				read_unlock(&sl_mux_lock);
 				return (-EBUSY);
 			}
-			if ((bp = mi_allocb(q, sizeof(*p) + mp->b_wptr - mp->b_rptr, BPRI_MED)) == NULL) {
+			if ((bp =
+			     mi_allocb(q, sizeof(*p) + mp->b_wptr - mp->b_rptr,
+				       BPRI_MED)) == NULL) {
 				read_unlock(&sl_mux_lock);
 				return (-ENOBUFS);
 			}
@@ -2779,8 +3544,8 @@ sl_w_proto(queue_t *q, mblk_t *mp)
 		sl_long prim;
 
 		sl_save_m_state(sl);
-		
-		if (mp->b_wptr < mp->b_rptr + sizeof(prim)) {
+
+		if (!MBLKIN(mp, 0, sizeof(prim))) {
 			err = lmi_error_reply(sl, q, mp, 0, LMI_BADPRIM);
 			goto done;
 		}
@@ -3242,7 +4007,7 @@ sl_r_proto(queue_t *q, mblk_t *mp)
 
 		sl_save_m_state(sl);
 
-		if (mp->b_wptr < mp->b_rptr + sizeof(prim)) {
+		if (!MBLKIN(mp, 0, sizeof(prim))) {
 			freemsg(mp);
 			goto done;
 		}
@@ -3712,7 +4477,7 @@ sl_qclose(queue_t *q, int oflags, cred_t *crp)
 	unsigned long flags;
 	int state;
 
-	while ((sl = (struct sl *)mi_sleeplock(q)) == NULL) ;
+	while ((sl = (struct sl *) mi_sleeplock(q)) == NULL) ;
 	write_lock_irqsave(&sl_mux_lock, flags);
 	/* We have a list of streams that we are managing: this must be the layer management
 	   control stream, because temporarily linked streams would have closed already, so these

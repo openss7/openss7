@@ -1,7 +1,7 @@
 '\" rtp
-.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\" -*- nroff -*- vim: ft=nroff nocin nosi tw=100
 .\"
-.\" @(#) $Id: mx.4.man,v 0.9.2.3 2007/07/21 20:43:44 brian Exp $
+.\" @(#) $Id: mx.4.man,v 0.9.2.4 2007/08/06 04:44:02 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/07/21 20:43:44 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/06 04:44:02 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mx.4.man,v $
+.\" Revision 0.9.2.4  2007/08/06 04:44:02  brian
+.\" - rework of pipe-based emulation modules
+.\"
 .\" Revision 0.9.2.3  2007/07/21 20:43:44  brian
 .\" - added manual pages, corrections
 .\"
@@ -113,13 +116,14 @@ the
 .BR mxi (7)
 interface.
 .B MX
-provides for the control of the matrix and underlying interfaces and
-communication facilities.
+provides for the control of the matrix and underlying interfaces and communication facilities.  It
+provides digital cross-connect switching services to its users and is effectively a virtual DCCS and
+channel bank.
 .PP
 .B MX
 is implemented as a
 .IR STREAMS (4)
-driver.
+multiplexing pseudo-device driver.
 .B MX
 Streams can be linked under the
 .BR MG (4)
@@ -134,32 +138,75 @@ multiplexing driver.
 Streams can be configured using
 .BR mxi_ioctl (4).
 .\"
-.SS Drivers
+.SS "Lower Multiplex Service Interface"
+.PP
+The MX drivers supports driver Streams linked under the multiplexing driver that provide channelized
+access to device or pseudo-device drivers supporting either the MX Interface (MXI),
+.[
+mxi revision 0.9.2
+.]
+.BR mxi (7),
+raw multiplex interface,
+or CH Interface (CHI),
+.[
+chi revision 0.9.2
+.]
+.BR chi (7),
+raw channel interface.  Each of these Streams linked beneath the MX multiplexing driver represents
+communications channels to and from a device or pseudo-device driver.
+.\"
+.SS "Upper Multiplex Service Interface"
 .PP
 .B MX
-provides the following Stream types that are directly compatible with the
-Stream types provided by other
+provides the following Stream types that are directly compatible with the Stream types provided by
+other
 .BR MX
+and
+.BR CH
 drivers.  To select one of these Stream types, the
 .I device
 argument to the
 .BR open (2)
 call can be one of the following:
+.\"
 .TP
 .I /dev/mx
-This device provides the
-.B MX
-protocol service interface using the MX-primitives of the Multiplex Interface
+This device provides a protocol service interface using the MX-primitives of the Multiplex Interface
+(MXI),
+.[
+mxi revision 0.9.2
+.]
 described in
 .BR mxi (7),
-as interpreted for use with local swithcing drivers described in
+as interpreted for use with local switching drivers described in
 .BR mxi_mx (7).
-This interface is suitable both for use with other SS7 modules and drivers, as
-well as with the
+This interface is suitable both for use with other SS7 modules and drivers, as well as with the
 .BR mg (4)
 driver using the
 .B OpenSwitch
 call framework.
+.\"
+.TP
+.I /dev/ch
+This device provides the
+protocol service interface using the CH-primitives of the Channel Interface
+(CHI),
+.[
+chi revision 0.9.2
+.]
+described in
+.BR chi (7),
+as interpreted for use with local switching drivers described in
+.BR chi_ch (7).
+This interface is suitable both for use with other SS7 modules and drivers, as well as with the
+communications module for ISO networking,
+.BR cd (4),
+and the communications module for SS7 networking,
+.BR sdl (4),
+and the communications module for ISDN networking,
+.RB q920 (4).
+.\"
+.SS Drivers
 .TP
 .BR x400p (4)
 .TP
@@ -172,125 +219,112 @@ The
 .B MX
 driver is the switching workhorse of the
 .B @PACKAGE_TITLE@
-package.  Both MXI and CHI Streams can be opened on the upper multiplex.
-Bothe MXI and CHI Streams can be linked on the lower multiplex.  Any channel
-of any Stream, whether upper or lower, can be connected through the multiplex
-to any other channel.
+package.  Both MXI and CHI Streams can be opened on the upper multiplex.  Both MXI and CHI Streams
+can be linked on the lower multiplex.  Any channel of any Stream, whether upper or lower, can be
+digitally cross-connected through the multiplex to any other channel, in either direction,
+independently.  (This, of course, supports LEA monitoring functions.)
 .PP
 The
 .B MX
-driver can perform simply isochronous conversion functions (e.g. mu-law to
-a-law), digital padding, echo cancellation, compression/decompression, minor
-rate adaption (e.g, 8-bit A-law into 5-bit GSM), that do not cause flow
-control considerations as it performs simply matrix operations.
-Preestablished or canned tones an announcements can be supported by the
-driver. Dynamic announcemets need to be provided by an external module or in
-hardware.  Complex operations such as HDLC conversion need to be provided
-upstream or in hardware.
+driver can perform simply isochronous conversion functions (e.g. mu-law to a-law), digital padding,
+echo cancellation, compression/decompression, minor rate adaption (e.g, 8-bit A-law into 5-bit GSM),
+that do not cause flow control and jitter buffering considerations as it performs simply matrix
+operations.  Pre-established tones or canned announcements can be supported by the driver. Dynamic
+announcements need to be provided by an external module or in hardware.  Complex operations such as
+HDLC conversion need to be provided upstream or in hardware.
 .PP
 The
 .B MX
-driver is intended to support single-rate and multi-rate channels; however,
-single-rate and multi-rate connection must match and no multi-rate conversion
-will be performed.
-The purpose of the
+driver is intended to support single-rate and multi-rate channels; however, single-rate and
+multi-rate connection must match and no multi-rate conversion will be performed.  The purpose of the
 .B MX
-driver is to perform simple circuit switching and do it very fast.
+driver is to perform simple digital cross-connect and do it very fast.
 .PP
 The
 .B MX
-driver can be modelled as a hardware Time-Space-Time switch, only switching is
-performed primarily in software.  (When the driver connects two channels from
-the lower multiplex, the data path may be through hardware instead of
-software.)
+driver can be modelled as a hardware
+.I Time-Space-Time
+switch, where the
+.I Space
+stage is performed primarily in software.  (When the driver connects two channels from the same
+lower multiplex, the data path may be through hardware instead of software.)
 .PP
 The
 .B MX
-driver is, however, may be able to perform channel insertion and deletion from
-a span.  For example, an entire E1 or T1 span can be connected, channel for
-channel, to another E1 or T1 span.  The drivers has the ability to remove or
-insert one or more channels on either side of the span connection.  The
-purpose of channel insertion and deletion is to pull signalling channels out
-of a span, particularly for ISDN primary rate connections and SS7 signalling.
+driver, however, is able to perform channel insertion and deletion from a span.  For example, an
+entire E1 or T1 span can be connected, channel for channel, to another E1 or T1 span.  The drivers
+has the ability to remove or insert one or more channels on either side of the span connection.  The
+purpose of channel insertion and deletion is to pull signalling channels out of a span, particularly
+for ISO networking, ISDN primary rate connections and SS7 signalling.
 .\"
 .SS Configuration
 .PP
-At boot time, or when a new span or circuit is brought into service, a
-management program opens a device or pseudo-device driver to obtain a Stream
-reprsenting the new channel or span an links the Stream beneath the MX
-multiplexing driver. Input-output controls are then used to assign the channel
-or span (and timeslots within the span) to circuit identification numbers
-within the matrix.  These channel identification numbers and the mapping to
-specific hardware should be maintained in configuration files.
+At boot time, or when a new span or circuit is brought into service, a management program opens a
+device or pseudo-device driver to obtain a Stream representing the new channel or span an links the
+Stream beneath the MX multiplexing driver. Input-output controls are then used to assign the channel
+or span (and time-slots within the span) to circuit identification numbers within the matrix.  These
+channel identification numbers and the mapping to specific hardware should be maintained in
+configuration files.
 .PP
-For example, when a T1 span is put into service on a V401P card, the
-management program opens a Stream on the V401P MX device that represents the
-T1 span, attaches the Stream to the T1 span, and then links the Stream beneath
-the
+For example, when a T1 span is put into service on a V401P card, the management program opens a
+Stream on the V401P MX device that represents the T1 span, attaches the Stream to the T1 span, and
+then links the Stream beneath the
 .B MX
-driver.  A configuration table is used to determine the circuit number
-assignments for the card and T1 span selected.  An input-output control is
-issued to the
+driver.  A configuration table is used to determine the circuit number assignments for the card and
+T1 span selected.  An input-output control is issued to the
 .B MX
-driver with the multiplex index of the linked span, and the circuit number
-assignments for the span.  This input-output control also identifies other
-particulars about the span (number of channels, DS0 or DS0A, etc).
+driver with the multiplex index of the linked span, and the circuit number assignments for the span.
+This input-output control also identifies other particulars about the span (number of channels, DS0
+or DS0A, etc).
 The
 .B MX
-driver provides the ability for management programs to determine the lower
-multiplex identifier that is associated with any circuit or circuit range.
-This allow the management program to perform a
-.BR I_PLINK (7)
-operation and close the Stream.  It can later discover the multiplex ID from
-the circuit assigment (contained in the configuration table) with an
-input-output control to the MX driver, so that it know the multiplex ID to
-user to remove the circuit or span from service with an
-.BR I_PUNLINK (7)
+driver provides the ability for management programs to determine the lower multiplex identifier that
+is associated with any circuit or circuit range.  This allow the management program to perform a
+.IR I_PLINK (7)
+operation and close the Stream.  It can later discover the multiplex ID from the circuit assignment
+(contained in the configuration table) with an input-output control to the MX driver, so that it
+knows the multiplex ID to use to remove the circuit or span from service with an
+.IR I_PUNLINK (7)
 operation.
 .PP
-As another example, an Ephemeral connection manager process that is listening
-for Ephemeral connection requests on the connection management Stream of the
+As another example, an Ephemeral connection manager process that is listening for Ephemeral
+connection requests on the connection management Stream of the
 .BR mg (4)
-driver, receives a request to establish an RTP Stream to a remote host.  The
-Ephemeral connection manager opens a
+driver, receives a request to establish an RTP Stream to a remote host.  The Ephemeral connection
+manager opens a
 .BR rawip (4)
 device, and pushes the
 .BR rtp (4)
 module over the device.
 The
 .BR rtp (4)
-module is set to convert the media Stream to that appropriate for the channel
-to which the Ephemeral connection will ultimately occur, and the Stream, which
-provides a CHI interface, is linked under the MX driver.  It assigns a
-circuit identification number with an input-output control.  The Ephemeral
-connection manager then requests that the
+module is set to convert the media Stream to that appropriate for the channel to which the Ephemeral
+connection will ultimately occur, and the Stream, which provides a CHI interface, is linked under
+the MX driver.  It assigns a circuit identification number with an input-output control.  The
+Ephemeral connection manager then requests that the
 .B MX
 driver connect the Ephemeral connection to a Gateway circuit through the
 matrix.
 .PP
-While CHI and MXI Streams on the lower multplex are attached to their circuits
-or connections for the full time that they are linked, CHI and MXI Streams on
-the upper multiplex are not so.  When a user-level program opens a Stream on
-the upper multiplex, it remains unattached to any particular channel.  CHI or
-MXI primitives are used to connect the upper multiplex Stream to either a
-lower or another upper multiplex Stream.
+While CHI and MXI Streams on the lower multiplex are attached to their circuits or connections for
+the full time that they are linked, CHI and MXI Streams on the upper multiplex are not so.  When a
+user-level program opens a Stream on the upper multiplex, it remains unattached to any particular
+channel.  CHI or MXI primitives are used to connect the upper multiplex Stream to either a lower or
+another upper multiplex Stream.
 .PP
-Upper multiplex Stream provide the ability to terminate circuit connections
-within another STREAMS module or driver above the MX driver.  For example,
-a number of MXI Streams can be opened on the upper multiplex and are
-identified by their device numbers and any asigned termination identifiers.
-These Streams, which represent unconnected circuits, can then be linked under
-a tones and announcements driver.  When a switching process such as the
+Upper multiplex Streams provide the ability to terminate circuit connections within another STREAMS
+module or driver above the MX driver.  For example, a number of MXI Streams can be opened on the
+upper multiplex and are identified by their device numbers and any assigned termination identifiers.
+These Streams, which represent unconnected circuits, can then be linked under a
+tones-and-announcements driver.  When a switching process such as the
 .BR mg (4)
-driver wishes to provide a tone or announcment to a circuit or an ephemeral
-connection, it request that the MX driver connect the circuit or ephemeral
-connection to one on the upper multiplex that terminates at the tones and
-announcements driver.  By sending control messages to the tones and
-announcements driver, the
+driver wishes to provide a tone or announcement to a circuit or an ephemeral connection, it request
+that the MX driver connect the circuit or ephemeral connection to one on the upper multiplex that
+terminates at the tones-and-announcements driver.  By sending control messages to the
+tones-and-announcements driver, the
 .BR mg (4)
-driver can then play progress tones or announcments to the user at the other
-end of the locally terminated connection.
-.\"
+driver can then play progress tones or announcements to the user at the other end of the locally
+terminated connection.  .\"
 .\"
 .SH INTERFACE
 .PP
@@ -308,27 +342,23 @@ driver provides three interfaces at the upper multiplex: the
 .BR chi (7)
 interface for single- and multi-rate channels, the
 .BR mxi (7)
-interface for time-division multiplexed channel groups (i.e, spans); and a
-management control interface for controling connections made across the
-matrix.
+interface for time-division multiplexed channel groups (i.e, spans); and a management control
+interface for controlling connections made across the matrix.
 .\"
 .\"
 .SH ADDRESSES
 .PP
-Circuit addresses are 32-bit identifiers that are assigned to circuits or
-cirguit groups.  Each circuit (upper or lower) has a unique identifier within
-the
+Circuit addresses are 32-bit identifiers that are assigned to circuits or circuit groups.  Each
+circuit (upper or lower) has a unique identifier within the
 .B MX
-driver.  One of the identifiers for a circuit within a circuit group can be
-used to identify the circuit group as a whole.
-Flags are used in management primitives to indicate whether a particular
+driver.  One of the identifiers for a circuit within a circuit group can be used to identify the
+circuit group as a whole.  Flags are used in management primitives to indicate whether a particular
 identifier refers to a circuit or a circuit group.
 .PP
-Assignment of circuit identifiers, assign from requirements for uniqueness,
-are arbitrary.  For operation with ISUP, a good choice would be to assign some
-bit range of the identifier to be identical to the ISUP circuit identification
-code for the circuit and the remainder to uniquely identifier one like ISUP
-CIC assignment from another.
+Assignment of circuit identifiers, assign from requirements for uniqueness, are arbitrary.  For
+operation with ISUP, a good choice would be to assign some bit range of the identifier to be
+identical to the ISUP circuit identification code for the circuit and the remainder to uniquely
+identifier one like ISUP CIC assignment from another.
 .\"
 .\"
 .SH IOCTLS
@@ -347,21 +377,19 @@ file descriptor.  These management controls are documented in
 .\"
 .SH NOTICES
 .PP
-Unlike other OpenSS7 protocol modules and drivers providing transport
-communications services,
-.B MX
-does not provide a
-.BR sockets (3)
-interface.  This is because the special needs of switch multiplex control are
-divorced from the sockets paradigm.
+For performance reasons, it might not be advantageous to pass SS7, ISDN and ISO signalling channels
+through the software switch matrix.  To permit signalling channels to be subject to a different set
+of flow control rules and priorities, SS7, ISDN and ISO signalling channels can sometimes be dropped
+and inserted into a channel group directly from the hardware driver (e.g, V401P driver).
 .PP
-On the other hand, the
+Drivers providing MX or CH streams to this MX driver should also support digital-cross connect
+directly within the driver.  Only when digital cross-connect is needed between drivers should this
+matrix be used.
 .PP
-For performance reasons, SS7 and ISDN primary rate signalling channels are not
-passed through the software switch matrix.  This permits signalling channels
-to be subject to a different set of flow control rules and priorities.  SS7
-and ISDN primary rate signalling channels can be dropped and inserted into a
-channel group directly from the hardware driver (e.g, V401P driver).
+Although the examples under USAGE describe linking and unlinking of Streams to support dynamic
+switching, it is discouraged for the obvious diminishing returns to scale impacts.  Streams should
+be linked in advance and the ability of the CHI and MXI interfaces to request enabling and disabling
+of Streams and connection and disconnection of channels used instead.
 .\"
 .\"
 .SH FILES
