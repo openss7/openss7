@@ -1,11 +1,44 @@
-OpenSS7 STREAMS VOIP -- history of user visible changes.  2007-06-24
-$Id: NEWS,v 0.9.2.17 2007/06/24 09:21:36 brian Exp $
+OpenSS7 STREAMS VOIP -- history of user visible changes.  2007-08-12
+$Id: NEWS,v 0.9.2.18 2007/08/12 15:36:00 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 STREAMS VOIP package.
+
+ Major changes for release strvoip-0.9.2.4
+------------------------------------------
+
+This is the fourth open source release of the `OpenSS7 STREAMS VOIP'
+package.  This release contains modules and drivers formerly only
+available with Commercial releases of the `strss7' package and which
+are only recently available as open source with the release of this
+package.
+
+With OpenSS7 Master Package release `openss7-0.9.2.D', the VOIP
+components were separated from the `strss7' package and placed in this
+package.  Not all of the VOIP components previously part of the
+`strss7' package have been strapped into this release.  Components will
+be re-validated against `Linux Fast-STREAMS' on a module-by-module and
+driver-by-driver basis.  See `TODO' in the release, or `Schedule', in
+the manual, for information about the release schedule.
+
+This is a beta grade release of H.323.  It deprecates previous VOIP
+component releases from the `strss7' package.  Please upgrade to the
+most current release of these components before reporting bugs.
+
+This release is a maintenance release providing support for recent
+distributions and tool chains.
+
+Major features since the last public release are as follows:
+
+   - Added Carrier Softswitch (`carrier') project document.
+
+   - Minor documentation corrections.
+
+   - Made kernel modules license explicit GPL v2.
+
 
  Major changes for release strvoip-0.9.2.3
 ------------------------------------------

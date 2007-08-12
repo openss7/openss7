@@ -1,11 +1,31 @@
-Linux Fast-STREAMS -- history of user visible changes.  2007-06-24
-$Id: NEWS,v 0.9.2.55 2007/06/24 09:21:26 brian Exp $
+Linux Fast-STREAMS -- history of user visible changes.  2007-08-12
+$Id: NEWS,v 0.9.2.56 2007/08/12 15:35:49 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 `Linux Fast-STREAMS' package.
+
+ Major changes for release streams-0.9.2.4
+------------------------------------------
+
+This is the thirteenth  `OpenSS7 Project' release of `Linux
+Fast-STREAMS'.  `LiS' was fully deprecated as of the previous release
+and `Linux Fast-STREAMS' is the only STREAMS package contained in the
+OpenSS7 Master Package (since `openss7-0.9.2.D').
+
+This release is a stable, production grade release.  The release
+includes maintenance support for recent distributions and tool chain,
+but also includes some performance and feature upgrades and inspection
+bug fixes.
+
+Major features since the last public release are as follows:
+
+   - Minor documentation corrections.
+
+   - Made kernel modules license explicit GPL v2.
+
 
  Major changes for release streams-0.9.2.3
 ------------------------------------------
@@ -87,7 +107,7 @@ Major features since the last public release are as follows:
    - Fix for clone open failure locking problems, demand loading of
      clone minors, an error in clone minor device deregistration, and
      an error in queue syncrhornization.  See
-     `http://www.openss7.org/codefiles/streams-0.9.2.3/BUGS' in the
+     `http://www.openss7.org/codefiles/streams-0.9.2.4/BUGS' in the
      release for more information.
 
    - Added feature to perform automatic reference counting of modules
@@ -129,7 +149,7 @@ enhancements and fixes:
 
    - The package now builds a replacement libLiS and libpLiS library so
      that user applications written to work with LiS-2.18.1 through
-     LiS-2.18.6 do no need to be recompiled.  Added versions to all
+     LiS-2.18.7 do no need to be recompiled.  Added versions to all
      library symbols in all three libraries.
 
    - Minor bug fixes to STREAMS library.  isastream(3) and fattach(3)

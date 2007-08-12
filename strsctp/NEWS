@@ -1,11 +1,28 @@
-OpenSS7 STREAMS SCTP -- history of user visible changes.  2007-06-24
-$Id: NEWS,v 0.9.2.43 2007/06/24 09:21:32 brian Exp $
+OpenSS7 STREAMS SCTP -- history of user visible changes.  2007-08-12
+$Id: NEWS,v 0.9.2.44 2007/08/12 15:35:56 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 STREAMS SCTP package.
+
+ Major changes for release strsctp-0.9.2.9.rc1
+----------------------------------------------
+
+This release is a stable production release.  This release is primarily
+a maintenance release to support recent distributions and tool chains.
+
+Major features since the last public release are as follows:
+
+   - Minor documentation corrections.
+
+   - Made kernel modules license explicit GPL v2.
+
+   - Work-around for incorrect driver use of NETIF_HW_CSUM.
+
+   - Proper setting of XTI_SNDBUF and XTI_RCVBUF.
+
 
  Major changes for release strsctp-0.9.2.8
 ------------------------------------------
@@ -44,12 +61,12 @@ Major features since the last public release are as follows:
 
    - Fixed a buffer double-free bug when out-of-the-blue messages were
      being processed on non-listening Streams.  See
-     `http://www.openss7.org/codefiles/strsctp-0.9.2.8/BUGS' in the
+     `http://www.openss7.org/codefiles/strsctp-0.9.2.9.rc1/BUGS' in the
      release for more information.
 
    - Fixed a rather noxious locking bug in sctp_cleanup_read() that was
      suppressing interrupts across a putnext() call.  See
-     `http://www.openss7.org/codefiles/strsctp-0.9.2.8/BUGS' in the
+     `http://www.openss7.org/codefiles/strsctp-0.9.2.9.rc1/BUGS' in the
      release for more information.
 
    - Improvements to the common build environment with better support

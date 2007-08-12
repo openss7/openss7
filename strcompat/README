@@ -1,5 +1,5 @@
-OpenSS7 STREAMS Compatibility -- read me first file.  2007-06-24
-$Id: README,v 0.9.2.28 2007/06/24 09:21:25 brian Exp $
+OpenSS7 STREAMS Compatibility -- read me first file.  2007-08-12
+$Id: README,v 0.9.2.29 2007/08/12 15:35:48 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 STREAMS Compatibility
 ==============================
 
-Package strcompat-0.9.2.6 was released under GPLv2 2007-06-24.
+Package strcompat-0.9.2.7.rc1 was released under GPLv2 2007-08-12.
 
 The `OpenSS7 STREAMS Compatibility' package provides the ability for
 `Linux Fast-STREAMS' to exhibit source level compatibility with a wide
@@ -73,12 +73,12 @@ well.
  Release
 --------
 
-This is the `strcompat-0.9.2.6' package, released 2007-06-24.  This
-`0.9.2.6' release, and the latest version, can be obtained from the
+This is the `strcompat-0.9.2.7.rc1' package, released 2007-08-12.  This
+`0.9.2.7.rc1' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.7.rc1.tar.bz2
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
 `dsc', or as a set of binary `rpm's or `deb's.  See the download page
@@ -113,7 +113,7 @@ See `README-alpha' (if it exists) for alpha release information.
 
 The quickest and easiest way to ensure that all prerequisites are met
 is to download and install this package from within the `OpenSS7 Master
-Package', `openss7-0.9.2.F', instead of separately.
+Package', `openss7-0.9.2.G', instead of separately.
 
 Prerequisites for the OpenSS7 STREAMS Compatibility package are as
 follows:
@@ -136,8 +136,8 @@ follows:
 Package', then the dependencies listed below will already have been met
 by unpacking the master package.)
 
-  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.3
-     (http://www.openss7.org/tarballs/streams-0.9.2.3.tar.bz2).  (4)
+  2. `OpenSS7 Linux Fast-STREAMS', streams-0.9.2.4
+     (http://www.openss7.org/tarballs/streams-0.9.2.4.tar.bz2).  (4)
 
 
 When configuring and building multiple `OpenSS7 Project' release
@@ -157,7 +157,7 @@ You also need the same version of `gcc(1)' compiler with which the
 kernel was built.  If it is not the default, add `CC=kgcc' on the line
 after `./configure', for example:
 
-     $> ../strcompat-0.9.2.6/configure CC='gcc-3.4'
+     $> ../strcompat-0.9.2.7.rc1/configure CC='gcc-3.4'
 
  Installation
 -------------
@@ -165,11 +165,11 @@ after `./configure', for example:
 The following commands will download, configure, build, check, install,
 validate, uninstall and remove the package:
 
-     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.6.tar.bz2
-     $> tar -xjvf strcompat-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.7.rc1.tar.bz2
+     $> tar -xjvf strcompat-0.9.2.7.rc1.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../strcompat-0.9.2.6/configure --enable-autotest
+     $> ../strcompat-0.9.2.7.rc1/configure --enable-autotest
      $> make
      $> make check
      $> sudo make install
@@ -177,8 +177,8 @@ validate, uninstall and remove the package:
      $> sudo make uninstall
      $> popd
      $> sudo rm -rf build
-     $> rm -rf strcompat-0.9.2.6
-     $> rm -f strcompat-0.9.2.6.tar.bz2
+     $> rm -rf strcompat-0.9.2.7.rc1
+     $> rm -f strcompat-0.9.2.7.rc1.tar.bz2
 
 If you have problems, try building with the logging targets instead.
 If the make of a logging target fails, an automatic problem report will
@@ -186,11 +186,11 @@ be generated that can be mailed to The OpenSS7 Project
 <bugs@openss7.org>.(5) Installation steps using the logging targets
 proceed as follows:
 
-     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.6.tar.bz2
-     $> tar -xjvf strcompat-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.7.rc1.tar.bz2
+     $> tar -xjvf strcompat-0.9.2.7.rc1.tar.bz2
      $> mkdir build
      $> pushd build
-     $> ../strcompat-0.9.2.6/configure --enable-autotest
+     $> ../strcompat-0.9.2.7.rc1/configure --enable-autotest
      $> make compile.log
      $> make check.log
      $> sudo make install.log
@@ -198,8 +198,8 @@ proceed as follows:
      $> sudo make uninstall.log
      $> popd
      $> sudo rm -rf build
-     $> rm -rf strcompat-0.9.2.6
-     $> rm -f strcompat-0.9.2.6.tar.bz2
+     $> rm -rf strcompat-0.9.2.7.rc1
+     $> rm -f strcompat-0.9.2.7.rc1.tar.bz2
 
 See `README-make' for additional specialized make targets.
 
@@ -215,14 +215,14 @@ The OpenSS7 STREAMS Compatibility package is available from the
 downloads area of The OpenSS7 Project website
 (http://www.openss7.org/download.html) using a command such as:
 
-     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.6.tar.bz2
+     $> wget http://www.openss7.org/tarballs/strcompat-0.9.2.7.rc1.tar.bz2
 
 Unpack the tarball using a command such as:
 
-     $> tar -xjvf strcompat-0.9.2.6.tar.bz2
+     $> tar -xjvf strcompat-0.9.2.7.rc1.tar.bz2
 
 The tarball will unpack into the relative subdirectory named after the
-package name: strcompat-0.9.2.6.
+package name: strcompat-0.9.2.7.rc1.
 
 The package builds using the GNU `autoconf' utilities and the
 `configure' script.  To build the package, we recommend using a
@@ -230,19 +230,19 @@ separate `build' directory as follows:
 
      $> mkdir build
      $> cd build
-     $> ../strcompat-0.9.2.6/configure
+     $> ../strcompat-0.9.2.7.rc1/configure
 
 In general, the package configures and builds without adding any
 special options to the `configure' script.  For general options to the
 `configure' script, see the GNU `INSTALL' file in the distribution:
 
-     $> less ../strcompat-0.9.2.6/INSTALL
+     $> less ../strcompat-0.9.2.7.rc1/INSTALL
 
 For specific options to the `configure' script, see the
 `INSTALL-strcompat' file in the distribution, or simply execute the
 configure script with the `--help' option like so:
 
-     $> ../strcompat-0.9.2.6/configure --help
+     $> ../strcompat-0.9.2.7.rc1/configure --help
 
 After configuring the package, the package can be compiled simply by
 issuing the `make' command:
@@ -282,8 +282,8 @@ Then the build directory and tarball can be simply removed:
 
      $> cd ..
      $> rm -rf build
-     $> rm -rf strcompat-0.9.2.6
-     $> rm -f strcompat-0.9.2.6.tar.bz2
+     $> rm -rf strcompat-0.9.2.7.rc1
+     $> rm -f strcompat-0.9.2.7.rc1.tar.bz2
 
  Detailed Installation Instructions
 -----------------------------------
@@ -292,7 +292,7 @@ More detailed installation instructions can be found in the
 `Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
-     $> cd ../strcompat-0.9.2.6
+     $> cd ../strcompat-0.9.2.7.rc1
      $> less doc/manual/strcompat.txt
      $> lynx doc/manual/strcompat.html
      $> info doc/manual/strcompat.info
