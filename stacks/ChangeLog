@@ -53,6 +53,16 @@
 	* src/util/slmon.c: PPA handling
 	* src/util/ss7capd.c: PPA handling
 
+	* src/util/sdlconf.c: header updates
+	* src/util/slconfd.c: header updates
+	* src/util/slmon.c: header updates
+	* src/util/ss7capd.c: header updates
+	* src/util/init/strss7: header updates
+	* src/util/init/strss7.sh: header updates
+	* src/util/modutils/strss7.in: header updates
+	* src/util/sysconfig/strss7: header updates
+	* src/util/sysconfig/strss7.conf: header updates
+
 2007-08-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/sccp.4.man: rework of SDL-, SDT-, SL-PMOD
