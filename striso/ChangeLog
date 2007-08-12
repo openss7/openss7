@@ -1,6 +1,8 @@
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/striso.texi: GPLv3
+	* src/drivers/clns-ip.c: two new driver implementations
+	* src/drivers/clns-udp.c: two new driver implementations
 
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
