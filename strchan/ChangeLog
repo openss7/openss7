@@ -1,6 +1,8 @@
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strchan.texi: GPLv3
+	* src/test/test-ch-pmod.c: new test program
+	* src/test/test-mx-pmod.c: new test program
 
 2007-08-06  Brian Bidulock  <bidulock@openss7.org>
 
