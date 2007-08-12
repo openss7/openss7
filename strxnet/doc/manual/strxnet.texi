@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strxnet.texi,v 0.9.2.31 2007/02/28 06:31:42 brian Exp $
+% @(#) $Id: strxnet.texi,v 0.9.2.32 2007/08/12 06:45:21 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/02/28 06:31:42 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:45:21 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -420,6 +420,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strxnet.texi,v $
+Revision 0.9.2.32  2007/08/12 06:45:21  brian
+- updated licenses in manuals
+
 Revision 0.9.2.31  2007/02/28 06:31:42  brian
 - updates and corrections, #ifdef instead of #if
 
@@ -861,7 +864,7 @@ The @cite{@value{PACKAGE_TITLE}} package provides the following @dfn{STREAMS} mo
 
 @subsubheading Licensing
 
-The @manref{timod(4)} module is licensed under the @cite{GPL Version 2} (@pxrefman{GNU Generic
+The @manref{timod(4)} module is licensed under the @cite{GPL Version 3} (@pxrefman{GNU Generic
 Public License}).
 Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
@@ -870,7 +873,7 @@ Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corp
 
 @subsubheading Licensing
 
-The @manref{tirdwr(4)} module is licensed under the @cite{GPL Version 2} (@pxrefman{GNU Generic
+The @manref{tirdwr(4)} module is licensed under the @cite{GPL Version 3} (@pxrefman{GNU Generic
 Public License}).
 Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
@@ -991,7 +994,7 @@ specifying undefined symbols.  See @refman{Development}, for more information.
 
 @subsubheading Licensing
 
-The @manref{libxnet(3)} library is licensed under the @cite{LGPL Version 2.1} (@pxrefman{GNU Lesser
+The @manref{libxnet(3)} library is licensed under the @cite{LGPL Version 3} (@pxrefman{GNU Lesser
 Public License}).
 Other licensing terms are available from @email{sales@@openss7.com, OpenSS7 Corporation}.
 
@@ -1665,9 +1668,9 @@ Nevertheless, the older TLI declarations are also provided in the @file{tiuser.h
 @page
 @include texi/uitpi.texi
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

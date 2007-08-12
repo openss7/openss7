@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo
 % =========================================================================
 %
-% @(#) $Id: libsocklib.texi,v 0.9.2.3 2007/06/23 01:38:27 brian Exp $
+% @(#) $Id: libsocklib.texi,v 0.9.2.4 2007/08/12 06:45:02 brian Exp $
 %
 % =========================================================================
 %
@@ -53,11 +53,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/23 01:38:27 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:45:02 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: libsocklib.texi,v $
+% Revision 0.9.2.4  2007/08/12 06:45:02  brian
+% - updated licenses in manuals
+%
 % Revision 0.9.2.3  2007/06/23 01:38:27  brian
 % - updates for release
 %
@@ -332,6 +335,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 
 @smallexample
 $Log: libsocklib.texi,v $
+Revision 0.9.2.4  2007/08/12 06:45:02  brian
+- updated licenses in manuals
+
 Revision 0.9.2.3  2007/06/23 01:38:27  brian
 - updates for release
 
@@ -551,9 +557,9 @@ Settlement Agreement} and are therefore possibly subject to the @cite{USL/BSD Co
 @page
 @include texi/uslbsd.texi
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strutil.texi,v 0.9.2.13 2007/06/23 01:38:29 brian Exp $
+% @(#) $Id: strutil.texi,v 0.9.2.14 2007/08/12 06:45:12 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/23 01:38:29 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:45:12 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: strutil.texi,v $
+Revision 0.9.2.14  2007/08/12 06:45:12  brian
+- updated licenses in manuals
+
 Revision 0.9.2.13  2007/06/23 01:38:29  brian
 - updates for release
 
@@ -767,9 +770,9 @@ is deprecated and full of bugs! Pond Scum: do not use it, migrate to Linux Fast-
 @end menu
 
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

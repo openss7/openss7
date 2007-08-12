@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: STREAMS.texi,v 0.9.2.37 2007/03/17 08:31:56 brian Exp $
+% @(#) $Id: STREAMS.texi,v 0.9.2.38 2007/08/12 06:44:32 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/03/17 08:31:56 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:44:32 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -426,6 +426,9 @@ package.
 @smallexample
 
 $Log: STREAMS.texi,v $
+Revision 0.9.2.38  2007/08/12 06:44:32  brian
+- updated licenses in manuals
+
 Revision 0.9.2.37  2007/03/17 08:31:56  brian
 - corrected formatting problems
 
@@ -3390,9 +3393,9 @@ For additional details,
 @end menu
 
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: LiS.texi,v 1.1.6.23 2007/02/28 06:30:12 brian Exp $
+% @(#) $Id: LiS.texi,v 1.1.6.24 2007/08/12 06:43:35 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/02/28 06:30:12 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:43:35 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -403,6 +403,9 @@ package.
 @smallexample
 
 $Log: LiS.texi,v $
+Revision 1.1.6.24  2007/08/12 06:43:35  brian
+- updated licenses in manuals
+
 Revision 1.1.6.23  2007/02/28 06:30:12  brian
 - updates and corrections, #ifdef instead of #if
 
@@ -5404,9 +5407,9 @@ For additional details,
 @end menu
 
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

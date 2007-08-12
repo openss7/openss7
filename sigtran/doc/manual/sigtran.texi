@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: sigtran.texi,v 0.9.2.4 2007/06/22 00:18:29 brian Exp $
+% @(#) $Id: sigtran.texi,v 0.9.2.5 2007/08/12 06:44:01 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/22 00:18:29 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:44:01 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -401,6 +401,9 @@ package.
 @smallexample
 
 $Log: sigtran.texi,v $
+Revision 0.9.2.5  2007/08/12 06:44:01  brian
+- updated licenses in manuals
+
 Revision 0.9.2.4  2007/06/22 00:18:29  brian
 - mostly documentation updates for release, some netconfig workaround
 
@@ -1103,9 +1106,9 @@ of manual pages installed totals several hundred manual pages and they will not 
 @end menu
 
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 

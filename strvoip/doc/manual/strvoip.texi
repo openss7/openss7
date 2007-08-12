@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: strvoip.texi,v 0.9.2.4 2007/06/23 01:38:31 brian Exp $
+% @(#) $Id: strvoip.texi,v 0.9.2.5 2007/08/12 06:45:16 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/23 01:38:31 $ by $Author: brian $
+% Last Modified $Date: 2007/08/12 06:45:16 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -401,6 +401,9 @@ package.
 @smallexample
 
 $Log: strvoip.texi,v $
+Revision 0.9.2.5  2007/08/12 06:45:16  brian
+- updated licenses in manuals
+
 Revision 0.9.2.4  2007/06/23 01:38:31  brian
 - updates for release
 
@@ -724,9 +727,9 @@ This manual uses @cite{texinfo} typographic conventions.
 @end menu
 
 @page
-@include texi/gpl.texi
+@include texi/gpl3.texi
 @page
-@include texi/lesser.texi
+@include texi/lgpl3.texi
 @page
 @include texi/fdl.texi
 
