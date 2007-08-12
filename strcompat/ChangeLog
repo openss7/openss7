@@ -1,6 +1,9 @@
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strcompat.texi: GPLv3
+	* doc/man/man9/mi_acquire.9.man: doc for new functions
+	* doc/man/man9/mi_acquire_sleep.9.man: doc for new functions
+	* doc/man/man9/mi_release.9.man: doc for new functions
 
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
