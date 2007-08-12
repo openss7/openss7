@@ -1,0 +1,369 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: mi_acquire_sleep.9.man,v 0.9.2.1 2007/08/12 15:20:23 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/08/12 15:20:23 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mi_acquire_sleep.9.man,v $
+.\" Revision 0.9.2.1  2007/08/12 15:20:23  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strcompat.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strcompat.macros
+.\"
+.\"
+.TH MI_SLEEPLOCK 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B mi_acquire_sleep
+\- acquire a lock on a queue private structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #define _MPS_SOURCE
+.br
+.B #include <sys/stream.h>
+.br
+.B #include <sys/ddi.h>
+.br
+.B #include <sys/mpsddi.h>
+.HP
+.BI "caddr_t \fRmi_acquire_sleep(\fPcaddr_t " ptr ", caddr_t *" ptrp ", rwlock_t *" lockp ", unsigned long *" flagsp \fR)\fP;
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I ptr
+a pointer to the private structure of the queue pair requesting the lock.
+.TP
+.I ptrp
+a pointer to the location where the pointer to the private structure to lock is located.
+.TP
+.I lockp
+is a pointer to a write-locked read-write lock used to protect the passed in locking location (or
+.B NULL
+for no lock).
+.TP
+.I flagsp
+is a pointer to a flags word that was used to store the processor flag word when the write-lock was
+locked (or
+.B NULL
+for no flag word).
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR MPS \(rg-specific
+DDI.
+.PP
+.I "Linux Fast-STREAMS"
+specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.BR mi_acquire (),
+.BR mi_acquire_sleep (9),
+and
+.BR mi_release (9)
+are a set of per queue pair Stream locking functions that can be used with the
+functions from the
+.BR mi_open_comm (9)
+family.
+.PP
+.BR mi_acquire_sleep ()
+attempts to lock the private structure associated with the pointer,
+.IR *ptrp .
+When successful, the function returns a pointer to the private structure.
+When the lock cannot be immediately required, the calling process is put to sleep awaiting the
+release of the lock and awoken either on a signal, upon acquiring the lock, or upon pointer,
+.IR *ptrp ,
+becoming
+.BR NULL .
+When unsuccessful (the process is interrupted by a signal, or pointer
+.IR *ptrp ,
+has become
+.BR NULL ),
+the function returns
+.BR NULL .
+.PP
+Before sleeping, if the lock pointer,
+.IR lockp ,
+is
+.RB non- NULL ,
+the lock will be unlocked for write before the sleep and locked again for write after the sleep.  If
+the flags word pointer,
+.IR flagsp ,
+is also
+.RB non- NULL ,
+flags will be restored and saved in the flags word when unlocking and locking.
+After reacquiring the lock, the private structure pointer,
+.IR *ptrp ,
+will be rechecked for
+.BR NULL .
+When the function exits, the lock, if provided, will be write locked and any flags stored in the
+flags word pointer.
+.\"
+.\"
+.SH USAGE
+.PP
+.BR mi_acquire_sleep ()
+simplifies the implementation of private structure locks for fully MP-SAFE
+.IR STREAMS (9)
+modules and drivers.  The function attempts to lock the private structure associated with pointer,
+.IR *ptrp ,
+and serializes access to the associated private structure.  While the lock is held, access to the
+private structure is exclusive to the lock holder.
+.PP
+.BR mi_acquire_sleep ()
+is called during a open or close routine when the routine wishes exclusive access to the private
+structure (perhaps to alter state variables).
+.PP
+When
+.BR mi_acquire_sleep ()
+fails to acquire the lock, the caller will sleep.  When the lock is released by the current lock
+holder, the sleeping process will be woken.
+.\"
+.\"
+.SH RETURN
+.PP
+When
+.BR mi_acquire_sleep ()
+succeeds, it returns a pointer to the locked private structure associated with pointer,
+.IR *ptrp ;
+when unsucessful, it returns
+.BR NULL .
+When
+.BR mi_acquire_sleep ()
+fails, it fails either because a signal was caught, or the pointer,
+.IR *ptrp ,
+has become
+.BR NULL .
+The caller can determine which by testing
+.IR *ptrp
+for
+.BR NULL.
+.\"
+.\"
+.SH ERRORS
+.PP
+.BR mi_acquire_sleep ()
+fails and returns
+.B NULL
+when the process' sleep is interrupted by a signal.
+When
+.BR mi_acquire_sleep ()
+fails and returns
+.BR NULL ,
+the caller has the option of simply reinvoking
+.BR mi_acquire_sleep ().
+.\"
+.\"
+.SH CONTEXT
+.PP
+.BR mi_acquire_sleep ()
+can be called from any blockable context, including user context, and module open and close
+procedures.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+.BR mi_acquire_sleep ()
+is MP-safe, however, the caller is responsible for ensuring the validity of the passed in pointers
+across the call.
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR mi_acquire_sleep ()
+must only be called for a private structure that was allocated with
+.BR mi_alloc (9)
+or
+.BR mi_alloc_sleep (9),
+or one of the other private structure allocation functions from the
+.BR mi_open_comm (9)
+family of functions.
+.PP
+Any queue that uses
+.BR mi_acquire_sleep (9)
+should have a queue service procedure.
+.PP
+Each successful call to
+.BR mi_acquire_sleep ()
+must be matched with a corresponding call to
+.BR mi_release (9)
+or processor or process deadlock may occur.
+.PP
+The lock acquired by
+.BR mi_acquire_sleep ()
+on the private structure associated with pointer,
+.IR *ptrp ,
+is not a recursive lock.  That is, if
+.BR mi_acquire_sleep ()
+is called twice for the same pointer,
+.IR *ptrp ,
+and with no intervening
+.BR mi_release (9),
+and the first call to
+.BR mi_acquire_sleep ()
+succeeds, the second call will sleep indefinitely  This is the best behaviour for
+.IR STREAMS (9)
+open and close procedures which are seldomly written with reentrancy in mind.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.BR mi_acquire_sleep ()
+is implemented using synchronization variable lock functions.  See
+.BR SV_WAIT_SIG (9)
+for more information.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR mi_acquire (9),
+.BR mi_release (9),
+.BR SV_WAIT_SIG (9),
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH BUGS
+.PP
+.BR mi_acquire_sleep ()
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR mi_acquire_sleep ()
+is
+compatible with
+.IR MPS \(rg,
+.IR AIX \(rg,
+.IR MacOT \(rg,
+and
+.IR Solaris \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.BR mi_acquire_sleep ()
+is an OpenSS7 Project specific implementation of an
+.IR MPS \(rg-compatible
+function and should not be used by portable
+.I STREAMS
+drivers and modules.
+.IP \(em
+.BR mi_acquire_sleep ()
+is provided for use with SS7 drivers and modules that need some automatic locking of queue pair
+private structure for speed and efficiency.
+.IP \(em
+.BR mi_acquire_sleep ()
+does not exist in any other
+.IR MPS \(rg
+implementation other than
+.IR "Linux Fast-STREAMS" .
+.PP
+See
+.BR mpscompat (9),
+.BR aixcompat (9),
+.BR maccompat (9),
+.BR suncompat (9),
+and
+.BR STREAMS (9)
+for additional compatibility considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+Conforms to
+.B OpenSS7
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR mi_acquire_sleep ()
+is new for
+.BR "@PACKAGE_TITLE@" .
+It is largely equivalent to the
+.BR ss7_trylock (9)
+SS7 common function that appeared in early releases of the
+.B strss7
+package and is also contained in
+.BR "@PACKAGE_TITLE@" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

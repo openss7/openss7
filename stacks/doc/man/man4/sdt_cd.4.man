@@ -1,0 +1,259 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: sdt_cd.4.man,v 0.9.2.1 2007/08/12 15:20:11 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/08/12 15:20:11 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: sdt_cd.4.man,v $
+.\" Revision 0.9.2.1  2007/08/12 15:20:11  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH SDT_CD 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
+.\"
+.\"
+.SH NAME
+.B sdt-cd, sdt_cd
+\- SS7 Q.702 Signalling Terminal Module
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stropts.h>
+.br
+.B #include <ss7/sdti.h>
+.br
+.B #include <ss7/sdti_ioctl.h>
+.HP
+.BI "int " cd_stream " = open(" cd_device ", " flags );
+.PD 0
+.HP
+.BI "int " retval " = ioctl(" cd_stream ", " \fRI_PUSH\fI ", " \fR\*(lqsdt-cd\*(rq\fI );
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B SDT-CD
+is an implementation fo the Signalling System No. 7 (SS7)
+.[
+q700
+.]
+Signalling Terminal (SDT) as specified in ITU-T Recommendation Q.702.
+.[
+q702
+.]
+.PP
+.B SDT-CD
+is implemented as a pushable
+.IR STREAMS (4)
+module.  The
+.B SDT-CD
+module can be pushed over Streams conforming to the Communication Device
+Interface (CDI)
+.[
+cdi revision 0.9.2
+.]
+as described in
+.BR cdi (7).
+The
+.B SDT-CD
+module provides data terminal access to the HDLC frames from the
+communications device provided by the
+.BR cd_hdlc (4)
+or
+.BR cd_daed (4)
+Stream below it.  The
+.B SDT-CD
+provides AERM, SUERM and EIM functions indirectly.  The upper interface
+provided by the
+.B SDT-CD
+module is the Signalling Data Terminal Interface (SDTI)
+.[
+sdti
+.]
+as described in
+.BR sdti (7).
+.PP
+.B SDT-CD
+Streams, as any other SDTI Stream, can have
+.BR sl (4)
+modules pushed to provide a complete SS7 Signalling Link
+.[
+q703
+.]
+that can then be linked under the
+.BR sl-mux (4)
+link multiplexing driver for subsequent use by an
+.BR mtp (4),
+or
+.BR m2ua (4)
+driver using the
+.IR I_LINK "(7) or " I_PLINK (7)
+commands of
+.BR streamio (7),
+to provide signalling link services to the Level 3 protocol.  This is normally
+performed, as required, by the SS7 Confirmation Daemon,
+.BR ss7confd (8).
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.B SDT-CD
+has been implemented as a pushable module to ease the development of SS7
+Signalling Link drivers for various cards that already have raw HDLC support
+in the Linux kernel.  The
+.BR cd (4)
+driver can be used to open a raw HDLC device that has an implementation within
+the Linux kernel, and the
+.BR SDT-CD
+module is pushed to transform the
+.B CD_HDLC
+stream into an SS7 Signalling Terminal, and then push the
+.BR sl (4)
+module to provide a complete and compliant SS7 Signalling Link.
+.PP
+.B SDT-CD
+implements the AERM/SUERM/EIM functions missing from the raw HDLC Stream.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B SDT-CD
+modules are not normally pushed or acessed directly by user-level programs.
+The
+.B SDT-CD
+module is used directly by some test and monitoring programs.  The
+.B SDT-CD
+module is not normally pushed by the configuration daemon either, but forms
+part of an
+.BR autopush (8)
+specification for clone minor devices on the
+.BR cd (4)
+driver.
+.\"
+.\"
+.SH IOCTLS
+.PP
+The
+.B SDT-CD
+module responds to Local Management Interface (LMI),
+.BR lmi_ioctl (4),
+input-output controls as interpreted for
+.BR sdti (7)
+operation as described in
+.BR sdti_ioctl (4).
+.\"
+.\"
+.SH FILES
+.PP
+.BR <ss7/sdti.h> ,
+.BR <ss7/sdti_ioctl.h> .
+.\"
+.\"
+.SH MODULES
+.PP
+.RI streams- sdt-cd .o
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR SS7 (4),
+.BR cdi (7),
+.BR cd (4),
+.BR sl (4),
+.BR sdti (7),
+.BR sdti_ioctl (4),
+.BR ss7confd (8),
+.BR autopush (8).
+.\"
+.\"
+.SH VERSIONS
+.PP
+The
+.B SDT-CD
+module conforms to the SDTI Specification, Revision 0.9.2.
+.[
+sdti revision 0.9.2
+.]
+.PP
+The
+.B SDT-CD
+module first appeared in
+.BR strss7 (4)
+release 0.9.2.
+.\"
+.\"
+.[
+$LIST$
+.]
+.\"
+.TI
