@@ -1,6 +1,7 @@
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strxns.texi: GPLv3
+	* src/drivers/llc.c: new driver for LLC2
 
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
