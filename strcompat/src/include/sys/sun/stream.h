@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.15 2007/05/22 02:10:17 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.16 2007/08/12 15:51:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/22 02:10:17 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.16  2007/08/12 15:51:13  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.15  2007/05/22 02:10:17  brian
  - SCTP performance testing updates
 
@@ -102,7 +105,7 @@
 #ifndef __SYS_SUN_STREAM_H__
 #define __SYS_SUN_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/sun/stream.h directly, include sys/stream.h instead."
@@ -118,6 +121,10 @@
 
 #ifndef __SUN_EXTERN_INLINE
 #define __SUN_EXTERN_INLINE __EXTERN_INLINE streamscall
+#endif
+
+#ifndef __SUN_EXTERN
+#define __SUN_EXTERN extern streamscall
 #endif
 
 #ifndef _SUN_SOURCE
@@ -152,18 +159,18 @@ unfreezestr_SUN(queue_t *q)
 #define unfreezestr unfreezestr_SUN
 
 #ifdef LFS
-extern void qwait(queue_t *rq);
-extern int qwait_sig(queue_t *rq);
+__SUN_EXTERN void qwait(queue_t *rq);
+__SUN_EXTERN int qwait_sig(queue_t *rq);
 #endif
 
 #ifdef LFS
-extern bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *),
+__SUN_EXTERN bufcall_id_t qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *),
 			     void *arg);
-extern timeout_id_t qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks);
+__SUN_EXTERN timeout_id_t qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks);
 #endif
 
-extern void qunbufcall(queue_t *q, bufcall_id_t bcid);
-extern clock_t quntimeout(queue_t *q, timeout_id_t toid);
+__SUN_EXTERN void qunbufcall(queue_t *q, bufcall_id_t bcid);
+__SUN_EXTERN clock_t quntimeout(queue_t *q, timeout_id_t toid);
 
 #ifdef LFS
 /* LiS already defines this */
@@ -175,7 +182,7 @@ queclass(mblk_t *mp)
 #endif
 
 #ifdef LFS
-extern void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
+__SUN_EXTERN void qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter);
 #endif
 
 #define straln (caddr_t)((intptr_t)(a) & ~(sizeof(int)-1))
@@ -216,17 +223,17 @@ mkiocb(unsigned int command)
 }
 
 /* These are MPS definitions exposed by OpenSolaris, but implemented in mpscompat.c */
-extern mblk_t *mi_timer_alloc_SUN(size_t size);
-extern void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
-extern void mi_timer_ticks(mblk_t *mp, clock_t ticks);
-extern void mi_timer_stop(mblk_t *mp);
-extern void mi_timer_move(queue_t *q, mblk_t *mp);
-extern int mi_timer_valid(mblk_t *mp);
-extern int mi_timer_requeue(mblk_t *mp);
-extern void mi_timer_free(mblk_t *mp);
-extern unsigned long mi_timer_remain(mblk_t *mp);
-extern int mi_timer_running(mblk_t *mp);
-extern int mi_timer_cond(mblk_t *mp, clock_t msec);
+__SUN_EXTERN mblk_t *mi_timer_alloc_SUN(size_t size);
+__SUN_EXTERN void mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec);
+__SUN_EXTERN void mi_timer_ticks(mblk_t *mp, clock_t ticks);
+__SUN_EXTERN void mi_timer_stop(mblk_t *mp);
+__SUN_EXTERN void mi_timer_move(queue_t *q, mblk_t *mp);
+__SUN_EXTERN int mi_timer_valid(mblk_t *mp);
+__SUN_EXTERN int mi_timer_requeue(mblk_t *mp);
+__SUN_EXTERN void mi_timer_free(mblk_t *mp);
+__SUN_EXTERN unsigned long mi_timer_remain(mblk_t *mp);
+__SUN_EXTERN int mi_timer_running(mblk_t *mp);
+__SUN_EXTERN int mi_timer_cond(mblk_t *mp, clock_t msec);
 
 #define mi_timer_alloc(_size)		mi_timer_alloc_SUN(_size)
 #define mi_timer(_q,_mp,_msec)		mi_timer_SUN(_q,_mp,_msec)

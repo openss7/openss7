@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.15 2006/12/08 05:08:14 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.16 2007/08/12 15:51:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.16  2007/08/12 15:51:08  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.15  2006/12/08 05:08:14  brian
  - some rework resulting from testing and inspection
 
@@ -103,7 +106,7 @@
 #ifndef __SYS_MPS_DDI_H__
 #define __SYS_MPS_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -116,6 +119,10 @@
 #ifndef __MPS_EXTERN_INLINE
 #define __MPS_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __AIX_EXTERN_INLINE */
+
+#ifndef __MPS_EXTERN
+#define __MPS_EXTERN extern streamscall
+#endif
 
 #ifndef _MPS_SOURCE
 #warning "_MPS_SOURCE not defined but MPS ddi.h included"
@@ -190,22 +197,22 @@ mi_free(void *ptr)
 /*
  *  System wrapper functions.
  */
-extern int mi_sprintf(char *buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
+__MPS_EXTERN int mi_sprintf(char *buf, char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 
 #if 0
 /* not implemented yet */
-extern int mi_sprintf_putc(char *cookie, int ch);
+__MPS_EXTERN int mi_sprintf_putc(char *cookie, int ch);
 #endif
 
-extern int mi_strcmp(const caddr_t cp1, const caddr_t cp2);
-extern int mi_strlen(const caddr_t str);
-extern long mi_strtol(const caddr_t str, caddr_t *ptr, int base);
+__MPS_EXTERN int mi_strcmp(const caddr_t cp1, const caddr_t cp2);
+__MPS_EXTERN int mi_strlen(const caddr_t str);
+__MPS_EXTERN long mi_strtol(const caddr_t str, caddr_t *ptr, int base);
 
 /*
  *  Some internals showing.
  */
-extern void mps_intr_disable(pl_t * plp);
-extern void mps_intr_enable(pl_t pl);
+__MPS_EXTERN void mps_intr_disable(pl_t * plp);
+__MPS_EXTERN void mps_intr_enable(pl_t pl);
 
 #else
 #ifdef _MPS_SOURCE

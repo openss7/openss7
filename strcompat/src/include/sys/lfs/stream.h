@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.13 2006/12/08 05:08:10 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.14 2007/08/12 15:51:04 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.14  2007/08/12 15:51:04  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.13  2006/12/08 05:08:10  brian
  - some rework resulting from testing and inspection
 
@@ -94,7 +97,7 @@
 #ifndef __SYS_LFS_STREAM_H__
 #define __SYS_LFS_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/lfs/stream.h directly, include sys/stream.h instead."
@@ -111,6 +114,10 @@
 #ifndef __LFS_EXTERN_INLINE
 #define __LFS_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif
+
+#ifndef __LFS_EXTERN
+#define __LFS_EXTERN extern streamscall
+#endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _LFS_SOURCE
 #warning "_LFS_SOURCE not defined but LFS stream.h included."
@@ -133,8 +140,8 @@ appq(queue_t *q, mblk_t *emp, mblk_t *nmp)
 
 #define ANYBAND (-1)
 
-extern int bcanget(queue_t *q, int band);
-extern int canget(queue_t *q);
+__LFS_EXTERN int bcanget(queue_t *q, int band);
+__LFS_EXTERN int canget(queue_t *q);
 
 __LFS_EXTERN_INLINE int
 enableq(queue_t *q)

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.7 2006/12/08 05:08:15 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.8 2007/08/12 15:51:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.8  2007/08/12 15:51:10  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.7  2006/12/08 05:08:15  brian
  - some rework resulting from testing and inspection
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_OS7_DDI_H__
 #define __SYS_OS7_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,6 +77,10 @@
 #ifndef __OS7_EXTERN_INLINE
 #define __OS7_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __OS7_EXTERN_INLINE */
+
+#ifndef __OS7_EXTERN
+#define __OS7_EXTERN extern streamscall
+#endif
 
 #ifndef _OS7_SOURCE
 #warning "_OS7_SOURCE not defined but OS7 ddi.h included"

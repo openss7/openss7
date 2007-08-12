@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: osfcompat.c,v $
+ Revision 0.9.2.27  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.26  2007/07/14 01:35:42  brian
  - make license explicit, add documentation
 
@@ -67,9 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
 
-static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $";
+static char const ident[] =
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -83,6 +87,7 @@ static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __OSF_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __OSF_EXTERN streamscall
 
 #define _OSF_SOURCE
 
@@ -90,7 +95,7 @@ static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL v2"
@@ -141,7 +146,7 @@ static struct str_comm *str_list = NULL;
  *  -------------------------------------------------------------------------
  *  for V4 open
  */
-int
+__OSF_EXTERN int
 streams_open_comm(unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 {
 	struct str_comm *sp, **spp = &str_list;
@@ -223,7 +228,7 @@ EXPORT_SYMBOL(streams_open_comm);
  *  -------------------------------------------------------------------------
  *  for V3 open
  */
-int
+__OSF_EXTERN int
 streams_open_ocomm(dev_t dev, unsigned int size, queue_t *q, dev_t *devp, int oflag, int sflag,
 		   cred_t *crp)
 {
@@ -243,7 +248,7 @@ EXPORT_SYMBOL(streams_open_ocomm);
  *  -------------------------------------------------------------------------
  *  for both V3 and V4 close
  */
-int
+__OSF_EXTERN int
 streams_close_comm(queue_t *q, int oflag, cred_t *crp)
 {
 	spin_lock(&str_list_lock);
@@ -274,7 +279,7 @@ EXPORT_SYMBOL(streams_close_comm);
  *  STRMOD_ADD
  *  -------------------------------------------------------------------------
  */
-dev_t
+__OSF_EXTERN dev_t
 strmod_add(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
 #ifdef LIS
@@ -422,7 +427,7 @@ EXPORT_SYMBOL(strmod_add);
  *  STRMOD_DEL
  *  -------------------------------------------------------------------------
  */
-int
+__OSF_EXTERN int
 strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 {
 #ifdef LIS
@@ -467,8 +472,8 @@ strmod_del(dev_t dev, struct streamtab *st, struct streamadm *sa)
 
 EXPORT_SYMBOL(strmod_del);
 
-int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-int
+__OSF_EXTERN int uprintf(const char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+__OSF_EXTERN int
 uprintf(const char *fmt, ...)
 {
 	va_list args;

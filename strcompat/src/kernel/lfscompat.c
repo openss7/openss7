@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.31  2007/08/12 15:51:18  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.30  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -142,9 +145,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $"
 
-static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $";
+static char const ident[] =
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -158,6 +162,7 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __LFS_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __LFS_EXTERN streamscall
 
 #define _LFS_SOURCE
 
@@ -167,7 +172,7 @@ static char const ident[] = "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.9.2.1 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LFSCOMP_LICENSE		"GPL v2"
@@ -214,7 +219,7 @@ __LFS_EXTERN_INLINE int bcmp(const void *s1, const void *s2, size_t len);
 
 EXPORT_SYMBOL(bcmp);
 
-int
+__LFS_EXTERN int
 bcanget(queue_t *q, int band)
 {
 	int result;
@@ -243,7 +248,7 @@ bcanget(queue_t *q, int band)
 
 EXPORT_SYMBOL_GPL(bcanget);
 
-int
+__LFS_EXTERN int
 canget(queue_t *q)
 {
 	int result;
@@ -275,7 +280,7 @@ __LFS_EXTERN_INLINE int copyout(const void *from, void *to, size_t len);
 
 EXPORT_SYMBOL(copyout);
 
-int
+__LFS_EXTERN int
 drv_getparm(const unsigned int parm, void *value_p)
 {
 	switch (parm) {
@@ -315,7 +320,7 @@ drv_getparm(const unsigned int parm, void *value_p)
 		return (0);
 	}
 	case UCRED:
-		*(cred_t **) value_p = ((cred_t *)&current->uid);
+		*(cred_t **) value_p = ((cred_t *) &current->uid);
 		return (0);
 	case STRMSGSIZE:
 #ifdef LFS
@@ -397,7 +402,7 @@ __LFS_EXTERN_INLINE int ctlmsg(unsigned char type);
 
 EXPORT_SYMBOL(ctlmsg);
 
-__LFS_EXTERN_INLINE int isdatablk(dblk_t * db);
+__LFS_EXTERN_INLINE int isdatablk(dblk_t *db);
 
 EXPORT_SYMBOL(isdatablk);
 
@@ -519,7 +524,7 @@ static vstrlog_t vstrlog_hook = &vstrlog_default;
  *  LOCKING: This function holds a write lock on strlog_reg_lock to keep others from calling a
  *  strlog() implementation function that is about to be unloaded for safe log driver unloading.
  */
-vstrlog_t
+__LFS_EXTERN vstrlog_t
 register_strlog(vstrlog_t newlog)
 {
 	unsigned long flags;
@@ -542,10 +547,11 @@ EXPORT_SYMBOL_GPL(register_strlog);
  *  @fmt:	printf(3) format
  *  @args:	format specific arguments
  */
-int
+__LFS_EXTERN int
 vstrlog(short mid, short sid, char level, unsigned short flag, char *fmt, va_list args)
 {
 	int result = 0;
+
 	read_lock(&strlog_reg_lock);
 	if (vstrlog_hook != NULL) {
 		result = (*vstrlog_hook) (mid, sid, level, flag, fmt, args);
@@ -571,7 +577,7 @@ EXPORT_SYMBOL_GPL(vstrlog);
  *  LOCKING: This function holds a read lock on strlog_reg_lock to keep de-registrations from
  *  occurring while the function is being called for safe log driver unloading.
  */
-int
+__LFS_EXTERN int
 strlog(short mid, short sid, char level, unsigned short flag, char *fmt, ...)
 {
 	int result = 0;

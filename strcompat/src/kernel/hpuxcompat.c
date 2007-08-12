@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hpuxcompat.c,v $
+ Revision 0.9.2.30  2007/08/12 15:51:18  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.29  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -70,9 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $"
 
-static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:41 $";
+static char const ident[] =
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -86,6 +90,7 @@ static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9
  */
 
 #define __HPUX_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __HPUX_EXTERN streamscall
 
 #define _HPUX_SOURCE
 
@@ -93,7 +98,7 @@ static char const ident[] = "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/07/14 01:35:41 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HPUXCOMP_LICENSE	"GPL v2"
@@ -127,7 +132,7 @@ static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
  *
  *  Return Value:streams_get_sleep_lock() returns a pointer to the global sleep lock.
  */
-lock_t *
+__HPUX_EXTERN lock_t *
 streams_get_sleep_lock(caddr_t event)
 {
 	(void) event;
@@ -136,7 +141,8 @@ streams_get_sleep_lock(caddr_t event)
 
 EXPORT_SYMBOL(streams_get_sleep_lock);	/* hpux/ddi.h */
 
-lock_t *get_sleep_lock(caddr_t event) __attribute__ ((alias(__stringify(streams_get_sleep_lock))));
+__HPUX_EXTERN lock_t *get_sleep_lock(caddr_t event)
+    __attribute__ ((alias(__stringify(streams_get_sleep_lock))));
 
 EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
 
@@ -161,17 +167,18 @@ EXPORT_SYMBOL(get_sleep_lock);	/* hpux/ddi.h */
  *  Examples: streams_put((void *)&put, q, mp, q) will effect the put() STREAMS utility, but always
  *  guaranteed to be executed within the STREAMS scheduler.
  */
-void
+__HPUX_EXTERN void
 streams_put(streams_put_t func, queue_t *q, mblk_t *mp, void *priv)
 {
-	extern void __strfunc(void (*func)(void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg);
+	extern void __strfunc(void (*func) (void *, mblk_t *), queue_t *q, mblk_t *mp, void *arg);
+
 	__strfunc(func, q, mp, priv);
 }
 
 EXPORT_SYMBOL(streams_put);	/* hpux/ddi.h */
 #endif
 
-int
+__HPUX_EXTERN int
 str_install_HPUX(struct stream_inst *inst)
 {
 #ifdef LIS
@@ -327,7 +334,7 @@ str_install_HPUX(struct stream_inst *inst)
 
 EXPORT_SYMBOL(str_install_HPUX);
 
-int
+__HPUX_EXTERN int
 str_uninstall(struct stream_inst *inst)
 {
 #ifdef LIS

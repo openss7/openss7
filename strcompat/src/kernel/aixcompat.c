@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $
+ @(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:40 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aixcompat.c,v $
+ Revision 0.9.2.31  2007/08/12 15:51:18  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.30  2007/07/14 01:35:40  brian
  - make license explicit, add documentation
 
@@ -70,9 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $"
+#ident "@(#) $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $"
 
-static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $";
+static char const ident[] =
+    "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -86,6 +90,7 @@ static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __AIX_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __AIX_EXTERN streamscall
 
 #define _AIX_SOURCE
 
@@ -93,7 +98,7 @@ static char const ident[] = "$RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define AIXCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define AIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:40 $"
+#define AIXCOMP_REVISION	"LfS $RCSfile: aixcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $"
 #define AIXCOMP_DEVICE		"AIX 5L Version 5.1 Compatibility"
 #define AIXCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define AIXCOMP_LICENSE		"GPL v2"
@@ -126,7 +131,7 @@ MODULE_ALIAS("streams-aixcompat");
  *  WANTIO
  *  -------------------------------------------------------------------------
  */
-int
+__AIX_EXTERN int
 wantio(queue_t *q, struct wantio *w)
 {
 	queue_t *wq = WR(q);
@@ -142,7 +147,7 @@ wantio(queue_t *q, struct wantio *w)
 	return (0);
 }
 
-EXPORT_SYMBOL(wantio);	/* aix/ddi.h */
+EXPORT_SYMBOL(wantio);		/* aix/ddi.h */
 
 /* 
  *  WANTMSG
@@ -150,14 +155,14 @@ EXPORT_SYMBOL(wantio);	/* aix/ddi.h */
  */
 __AIX_EXTERN_INLINE int wantmsg(queue_t *q, int streamscall (*func) (mblk_t *));
 
-EXPORT_SYMBOL(wantmsg);	/* aix/ddi.h */
+EXPORT_SYMBOL(wantmsg);		/* aix/ddi.h */
 #endif
 
 /* 
  *  STR_INSTALL
  *  -------------------------------------------------------------------------
  */
-int
+__AIX_EXTERN int
 str_install_AIX(int cmd, strconf_t * sc)
 {
 	if (!sc)

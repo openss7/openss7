@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $
+ @(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:36:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: suncompat.c,v $
+ Revision 0.9.2.36  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.35  2007/08/03 13:36:01  brian
  - manual updates, put ss7 modules in public release
 
@@ -70,9 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $"
+#ident "@(#) $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/12 15:51:19 $"
 
-static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $";
+static char const ident[] =
+    "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -86,6 +90,7 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __SUN_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __SUN_EXTERN streamscall
 
 #define _SUN_SOURCE
 
@@ -93,7 +98,7 @@ static char const ident[] = "$RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define SUNCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SUNCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/03 13:36:01 $"
+#define SUNCOMP_REVISION	"LfS $RCSfile: suncompat.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/12 15:51:19 $"
 #define SUNCOMP_DEVICE		"Solaris(R) 8 Compatibility"
 #define SUNCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SUNCOMP_LICENSE		"GPL v2"
@@ -127,7 +132,7 @@ EXPORT_SYMBOL(unfreezestr_SUN);
  *  qwait:  - wait for a procedure to be called on a queue pair
  *  @rq:    a pointer to the read queue of the queue pair
  */
-void
+__SUN_EXTERN void
 qwait(queue_t *rq)
 {
 	struct queinfo *qu = (typeof(qu)) rq;
@@ -152,7 +157,7 @@ EXPORT_SYMBOL(qwait);		/* sun/ddi.h */
  *  qwait_sig: - wait for a procedure on a queue pair or signal
  *  @rq:    a pointer to the read queue of the queue pair
  */
-int
+__SUN_EXTERN int
 qwait_sig(queue_t *rq)
 {
 	struct queinfo *qu = (typeof(qu)) rq;
@@ -184,7 +189,7 @@ EXPORT_SYMBOL(qwait_sig);	/* sun/ddi.h */
  *  @function:	the callback function when bytes and headers are available
  *  @arg:	a client argument to pass to the callback function
  */
-bufcall_id_t
+__SUN_EXTERN bufcall_id_t
 qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (void *), void *arg)
 {
 	// queue_t *rq = RD(q);
@@ -193,7 +198,7 @@ qbufcall(queue_t *q, size_t size, int priority, void streamscall (*function) (vo
 }
 
 EXPORT_SYMBOL(qbufcall);	/* sun/ddi.h */
-timeout_id_t
+__SUN_EXTERN timeout_id_t
 qtimeout(queue_t *q, void streamscall (*timo_fcn) (void *), void *arg, long ticks)
 {
 	// queue_t *rq = RD(q);
@@ -209,14 +214,14 @@ EXPORT_SYMBOL(qtimeout);	/* sun/ddi.h */
  *  @bcid:	buffer call id returned by qbufcall()
  *  Notices:	Don't ever call this function with an expired bufcall id.
  */
-void
+__SUN_EXTERN void
 qunbufcall(queue_t *q, bufcall_id_t bcid)
 {
 	unbufcall(bcid);
 }
 
 EXPORT_SYMBOL(qunbufcall);	/* sun/ddi.h */
-clock_t
+__SUN_EXTERN clock_t
 quntimeout(queue_t *q, timeout_id_t toid)
 {
 	return untimeout(toid);
@@ -247,7 +252,8 @@ EXPORT_SYMBOL(queclass);	/* sun/ddi.h */
 __SUN_EXTERN_INLINE void
 qwriter(queue_t *qp, mblk_t *mp, void streamscall (*func) (queue_t *qp, mblk_t *mp), int perimeter)
 {
-	extern void __strwrit(queue_t *q, mblk_t *mp, void streamscall (*func)(queue_t *, mblk_t *), int perim);
+	extern void __strwrit(queue_t *q, mblk_t *mp,
+			      void streamscall (*func) (queue_t *, mblk_t *), int perim);
 	__strwrit(qp, mp, func, perimeter);
 }
 
@@ -641,7 +647,7 @@ struct mod_ops mod_strmops = { MODREV_1, 0, };
 
 EXPORT_SYMBOL(mod_strmops);	/* strconf.h */
 
-int
+__SUN_EXTERN int
 mod_install(struct modlinkage *ml)
 {
 	/* FIXME: this is our register function, write it! */
@@ -732,7 +738,7 @@ mod_install(struct modlinkage *ml)
 
 EXPORT_SYMBOL(mod_install);	/* strconf.h */
 
-int
+__SUN_EXTERN int
 mod_remove(struct modlinkage *ml)
 {
 	/* FIXME: this is our unregister function, write it! */
@@ -796,7 +802,7 @@ mod_remove(struct modlinkage *ml)
 
 EXPORT_SYMBOL(mod_remove);	/* strconf.h */
 
-int
+__SUN_EXTERN int
 mod_info(struct modlinkage *ml, struct modinfo *mi)
 {
 	return (0);		/* never called */

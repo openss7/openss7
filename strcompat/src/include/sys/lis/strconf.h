@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strconf.h,v 0.9.2.18 2007/03/25 00:52:33 brian Exp $
+ @(#) $Id: strconf.h,v 0.9.2.19 2007/08/12 15:51:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 00:52:33 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strconf.h,v $
+ Revision 0.9.2.19  2007/08/12 15:51:06  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.18  2007/03/25 00:52:33  brian
  - synchronization updates
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_LIS_STRCONF_H__
 #define __SYS_LIS_STRCONF_H__
 
-#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.18 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strconf.h,v $ $Name:  $($Revision: 0.9.2.19 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRCONF_H__
 #warning "Do not include sys/aix/strconf.h directly, include sys/strconf.h instead."
@@ -92,6 +95,10 @@
 #ifndef __LIS_EXTERN_INLINE
 #define __LIS_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __LIS_EXTERN_INLINE */
+
+#ifndef __LIS_EXTERN
+#define __LIS_EXTERN extern streamscall
+#endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _LIS_SOURCE
 #warning "_LIS_SOURCE not defined but LIS strconf.h included"
@@ -141,8 +148,8 @@ extern int streamscall lis_unregister_strmod(struct streamtab *strtab);
 #define LIS_QLOCK_QUEUE_PAIR	2
 #define LIS_QLOCK_GLOBAL	3
 
-extern int streamscall lis_register_module_qlock_option(modID_t id, int qlock_option);
-extern int streamscall lis_register_driver_qlock_option(major_t major, int qlock_option);
+extern int _RP lis_register_module_qlock_option(modID_t id, int qlock_option);
+extern int _RP lis_register_driver_qlock_option(major_t major, int qlock_option);
 
 extern int _RP lis_apush_get(struct lis_strapush *ap);
 extern int _RP lis_apush_set(struct lis_strapush *ap);

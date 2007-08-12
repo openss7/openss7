@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 0.9.2.38  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.37  2007/07/14 01:35:42  brian
  - make license explicit, add documentation
 
@@ -67,9 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $"
+#ident "@(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/12 15:51:19 $"
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $";
+static char const ident[] =
+    "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -83,6 +87,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9
  */
 
 #define __SVR4_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __SVR4_EXTERN streamscall
 
 #define _SVR4_SOURCE
 
@@ -90,7 +95,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/07/14 01:35:42 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/12 15:51:19 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL v2"
@@ -152,9 +157,8 @@ MODULE_ALIAS("streams-svr4compat");
 
 #endif
 
-
 #undef MPSTR_QLOCK
-long
+__SVR4_EXTERN pl_t
 MPSTR_QLOCK(queue_t *q)
 {
 #ifdef LIS
@@ -168,20 +172,20 @@ MPSTR_QLOCK(queue_t *q)
 	if (q->q_klock.kl_owner == current)
 		q->q_klock.kl_nest++;
 	else {
-		unsigned long flags;
+		pl_t pl;
 
-		local_save_str(flags);
+		pl = splstr();
 		write_lock(&q->q_klock.kl_lock);
-		q->q_klock.kl_isrflags = flags;
+		q->q_klock.kl_isrflags = pl;
 		q->q_klock.kl_owner = current;
 		q->q_klock.kl_nest = 0;
 	}
 	return (q->q_klock.kl_isrflags);
 #else
-	unsigned long flags = 0;
+	pl_t pl = splstr();
 
-	write_lock_str(&q->q_lock, flags);
-	return (flags);
+	write_lock(&q->q_lock);
+	return (pl);
 #endif
 #endif
 }
@@ -189,11 +193,11 @@ MPSTR_QLOCK(queue_t *q)
 EXPORT_SYMBOL(MPSTR_QLOCK);	/* svr4/ddi.h */
 
 #undef MPSTR_QRELE
-void
-MPSTR_QRELE(queue_t *q, long s)
+__SVR4_EXTERN void
+MPSTR_QRELE(queue_t *q, pl_t pl)
 {
 #ifdef LIS
-	lis_flags_t flags = s;
+	lis_flags_t flags = pl;
 
 	lis_rw_write_unlock_irqrestore(&q->q_isr_lock, &flags);
 	return;
@@ -214,9 +218,8 @@ MPSTR_QRELE(queue_t *q, long s)
 	}
 	return;
 #else
-	unsigned long flags = s;
-
-	write_unlock_str(&q->q_lock, flags);
+	write_unlock(&q->q_lock);
+	splx(pl);
 #endif
 #endif
 }
@@ -224,8 +227,8 @@ MPSTR_QRELE(queue_t *q, long s)
 EXPORT_SYMBOL(MPSTR_QRELE);	/* svr4/ddi.h */
 
 #undef MPSTR_STPLOCK
-long
-MPSTR_STPLOCK(struct stdata *sd)
+__SVR4_EXTERN pl_t
+MPSTR_STPLOCK(struct stdata * sd)
 {
 #ifdef LIS
 	lis_flags_t flags;
@@ -248,9 +251,10 @@ MPSTR_STPLOCK(struct stdata *sd)
 	}
 	return (sd->sd_klock.kl_isrflags);
 #else
-	unsigned long flags = 0;
-	write_lock_str(&sd->sd_lock, flags);
-	return (flags);
+	pl_t pl = splstr();
+
+	write_lock(&sd->sd_lock);
+	return (pl);
 #endif
 #endif
 }
@@ -258,11 +262,11 @@ MPSTR_STPLOCK(struct stdata *sd)
 EXPORT_SYMBOL(MPSTR_STPLOCK);	/* svr4/ddi.h */
 
 #undef MPSTR_STPRELE
-void
-MPSTR_STPRELE(struct stdata *sd, long s)
+__SVR4_EXTERN void
+MPSTR_STPRELE(struct stdata *sd, pl_t pl)
 {
 #ifdef LIS
-	lis_flags_t flags = s;
+	lis_flags_t flags = pl;
 
 	lis_spin_unlock_irqrestore(&sd->sd_lock, &flags);
 	return;
@@ -282,25 +286,13 @@ MPSTR_STPRELE(struct stdata *sd, long s)
 		local_restore_str(flags);
 	}
 #else
-	unsigned long flags = s;
-	write_unlock_str(&sd->sd_lock, flags);
+	write_unlock(&sd->sd_lock);
+	splx(pl);
 #endif
 #endif
 }
 
 EXPORT_SYMBOL(MPSTR_STPRELE);	/* svr4/ddi.h */
-
-static pl_t current_spl[NR_CPUS] __cacheline_aligned;
-
-pl_t
-spl0(void)
-{
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 0);
-
-	local_irq_enable();
-	local_bh_enable();
-	return (old_level);
-}
 
 #ifdef LFS
 __SVR4_EXTERN_INLINE toid_t dtimeout(timo_fcn_t *timo_fcn, caddr_t arg, long ticks, pl_t pl,
@@ -311,122 +303,149 @@ __SVR4_EXTERN_INLINE toid_t itimeout(timo_fcn_t *timo_fcn, caddr_t arg, long tic
 EXPORT_SYMBOL(itimeout);	/* svr4/ddi.h */
 #endif
 
+#if defined CONFIG_STREAMS_NOIRQ || defined _TEST
+
+#define pl_base	    0
+#define pl_atomic   2
+#define pl_bh	    3
+#define pl_irq	    6
+
+#else				/* defined CONFIG_STREAMS_NOIRQ || defined _TEST */
+
+#define pl_base	    0
+#define pl_atomic   2
+#define pl_bh	    3
+#define pl_irq	    4
+
+#endif				/* defined CONFIG_STREAMS_NOIRQ || defined _TEST */
+
+/**
+ * slp: - raise priority level
+ * @level: level to raise
+ *
+ * spl() can only be used to raise the priority level.
+ * splx() only be used to reduce (restore) the priority level.
+ */
+__SVR4_EXTERN pl_t
+spl(const pl_t level)
+{
+	if (level > 7 || level < 0) {
+		swerr();
+		return invpl;
+	}
+	if (in_irq())
+		return (pl_irq);
+	if (in_interrupt()) {
+		if (level >= pl_irq)
+			local_irq_disable();
+		return (pl_bh);
+	}
+#if defined HAVE_KFUNC_IN_ATOMIC
+	if (in_atomic()) {
+		if (level >= pl_irq)
+			local_irq_disable();
+		else if (level >= pl_bh)
+			local_bh_disable();
+		return (pl_atomic);
+	}
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC */
+	if (level >= pl_irq)
+		local_irq_disable();
+	else if (level >= pl_bh)
+		local_bh_disable();
+	else if (level >= pl_atomic)
+		preempt_disable();
+	return (pl_base);
+}
+
+EXPORT_SYMBOL(spl);		/* svr4/ddi.h */
+
+__SVR4_EXTERN pl_t
+spl0(void)
+{
+	return spl(0);
+}
+
 EXPORT_SYMBOL(spl0);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl1(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 1);
-
-	local_irq_enable();
-	local_bh_enable();
-	return (old_level);
+	return spl(1);
 }
 
 EXPORT_SYMBOL(spl1);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl2(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 2);
-
-	local_irq_enable();
-	local_bh_enable();
-	return (old_level);
+	return spl(2);
 }
 
 EXPORT_SYMBOL(spl2);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl3(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 3);
-
-	local_bh_disable();
-	local_irq_enable();
-	return (old_level);
+	return spl(3);
 }
 
 EXPORT_SYMBOL(spl3);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl4(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 4);
-
-	local_bh_disable();
-	local_irq_enable();
-	return (old_level);
+	return spl(4);
 }
 
 EXPORT_SYMBOL(spl4);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl5(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 5);
-
-	local_irq_disable();
-	local_bh_disable();
-	return (old_level);
+	return spl(5);
 }
 
 EXPORT_SYMBOL(spl5);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl6(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 6);
-
-	local_irq_disable();
-	local_bh_disable();
-	return (old_level);
+	return spl(6);
 }
 
 EXPORT_SYMBOL(spl6);		/* svr4/ddi.h */
 
-pl_t
+__SVR4_EXTERN pl_t
 spl7(void)
 {
-	pl_t old_level = xchg(&current_spl[smp_processor_id()], 7);
-
-	local_irq_disable();
-	local_bh_disable();
-	return (old_level);
+	return spl(7);
 }
 
 EXPORT_SYMBOL(spl7);		/* svr4/ddi.h */
 
-pl_t
-spl(const pl_t level)
-{
-	switch (level) {
-	case 0:
-		return spl0();
-	case 1:
-		return spl1();
-	case 2:
-		return spl2();
-	case 3:
-		return spl3();
-	case 4:
-		return spl4();
-	case 5:
-		return spl5();
-	case 6:
-		return spl6();
-	case 7:
-		return spl7();
-	}
-	swerr();
-	return (invpl);
-}
-
-EXPORT_SYMBOL(spl);		/* svr4/ddi.h */
-void
+/**
+ * slpx: - restore priority level
+ * @level: level to restore
+ *
+ * splx() only be used to reduce (restore) the priority level.
+ * spl() can only be used to raise the priority level.
+ */
+__SVR4_EXTERN void
 splx(const pl_t level)
 {
-	return (void) spl(level);
+	if (likely(level >= 0)) {
+		if (likely(level < pl_irq) && likely(in_irq()))
+			local_irq_enable();
+		else if (likely(level < pl_bh) && likely(in_interrupt()))
+			local_bh_enable();
+#if defined HAVE_KFUNC_IN_ATOMIC
+		else if (likely(level < pl_atomic) && likely(in_atomic()))
+			preempt_enable();
+#endif				/* defined HAVE_KFUNC_IN_ATOMIC */
+	} else
+		swerr();
+	return;
 }
 
 EXPORT_SYMBOL(splx);		/* svr4/ddi.h */
@@ -441,7 +460,7 @@ EXPORT_SYMBOL(geteminor);	/* uw7/ddi.h */
 #ifndef NODEV
 #define NODEV 0
 #endif
-int
+__SVR4_EXTERN int
 etoimajor(major_t emajor)
 {
 	major_t major = NODEV;
@@ -542,7 +561,7 @@ RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl)
 }
 
 EXPORT_SYMBOL(RW_TRYRDLOCK);	/* svr4/ddi.h */
-pl_t
+__SVR4_EXTERN pl_t
 RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
@@ -566,7 +585,7 @@ RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl)
 }
 
 EXPORT_SYMBOL(RW_TRYWRLOCK);	/* svr4/ddi.h */
-void
+__SVR4_EXTERN void
 RW_UNLOCK(rwlock_t *lockp, pl_t pl)
 {
 #if defined CONFIG_SMP && (defined HAVE_KFUNC_READ_TRYLOCK || defined HAVE_KMACRO_READ_TRYLOCK)
@@ -626,7 +645,7 @@ EXPORT_SYMBOL(SV_DEALLOC);	/* svr4/ddi.h */
 #undef	__wake_up_sync
 #define __wake_up_sync __wake_up
 #endif
-void
+__SVR4_EXTERN void
 SV_SIGNAL(sv_t * svp)
 {
 #ifdef HAVE___WAKE_UP_SYNC_ADDR
@@ -646,9 +665,11 @@ EXPORT_SYMBOL(SV_SIGNAL);	/* svr4/ddi.h */
 #define schedule() streams_schedule()
 #endif
 
-void
+__SVR4_EXTERN void
 SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
 {
+	pl_t pl = plbase;
+
 	DECLARE_WAITQUEUE(wait, current);
 	set_current_state(TASK_UNINTERRUPTIBLE);
 	add_wait_queue(&svp->sv_waitq, &wait);
@@ -656,25 +677,25 @@ SV_WAIT(sv_t * svp, int priority, lock_t * lkp)
 		if (!svp->sv_condv--)
 			break;
 		svp->sv_condv++;
-		if (lkp)
-			spin_unlock(lkp);
+		UNLOCK(lkp, pl);
 		schedule();
+		pl = LOCK(lkp, plstr);
 		if (lkp)
 			spin_lock(lkp);
 		set_current_state(TASK_UNINTERRUPTIBLE);
 	}
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&svp->sv_waitq, &wait);
-	if (lkp)
-		spin_unlock(lkp);
+	UNLOCK(lkp, priority);
 }
 
 EXPORT_SYMBOL(SV_WAIT);		/* svr4/ddi.h */
 
-int
+__SVR4_EXTERN int
 SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
 {
 	int signal = 0;
+	pl_t pl = plbase;
 
 	DECLARE_WAITQUEUE(wait, current);
 	set_current_state(TASK_INTERRUPTIBLE);
@@ -684,18 +705,16 @@ SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp)
 		if (signal_pending(current) || --svp->sv_condv == 0)
 			break;
 		svp->sv_condv++;
-		if (lkp)
-			spin_unlock(lkp);
+		UNLOCK(lkp, pl);
 		schedule();
-		if (lkp)
-			spin_lock(lkp);
+		pl = LOCK(lkp, plstr);
 		set_current_state(TASK_INTERRUPTIBLE);
 		signal = 0;
 	}
 	set_current_state(TASK_RUNNING);
 	remove_wait_queue(&svp->sv_waitq, &wait);
-	if (lkp)
-		spin_unlock(lkp);
+	UNLOCK(lkp, priority);
+	splx(priority);
 	return signal;
 }
 
@@ -725,7 +744,7 @@ int ts_maxkmdpri = 39;
 #define PCATCH	    0x8000
 #define PNOSTOP	    0x4000
 
-int
+__SVR4_EXTERN int
 sleep(caddr_t event, pl_t pl)
 {
 	return 1;
@@ -733,7 +752,7 @@ sleep(caddr_t event, pl_t pl)
 
 EXPORT_SYMBOL(sleep);		/* svr4/ddi.h */
 
-void
+__SVR4_EXTERN void
 wakeup(caddr_t event)
 {
 	return;

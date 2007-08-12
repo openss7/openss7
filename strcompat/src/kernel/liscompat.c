@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.49  2007/08/12 15:51:18  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.48  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -76,9 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $"
 
-static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/07/14 01:35:41 $";
+static char const ident[] =
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -92,6 +96,7 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __LIS_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __LIS_EXTERN streamscall
 #define __LIS_NO_MACROS
 #define __depr
 
@@ -103,7 +108,7 @@ static char const ident[] = "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/07/14 01:35:41 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define LISCOMP_LICENSE		"GPL v2"
@@ -185,11 +190,11 @@ __LIS_EXTERN_INLINE int _RP lis_adjmsg(mblk_t *mp, int length);
 
 EXPORT_SYMBOL(lis_adjmsg);
 __LIS_EXTERN_INLINE struct msgb *_RP lis_allocb(int size, unsigned int priority, char *file_name,
-					    int line_nr);
+						int line_nr);
 EXPORT_SYMBOL(lis_allocb);
 __LIS_EXTERN_INLINE struct msgb *_RP lis_allocb_physreq(int size, unsigned int priority,
-						    void *physreq_ptr, char *file_name,
-						    int line_nr);
+							void *physreq_ptr, char *file_name,
+							int line_nr);
 EXPORT_SYMBOL(lis_allocb_physreq);
 #ifdef LIS_DEPRECARTED_FUNCTIONS
 __LIS_EXTERN_INLINE queue_t *_RP lis_allocq(const char *name);
@@ -214,7 +219,8 @@ EXPORT_SYMBOL(lis_bcanputnext);
 __LIS_EXTERN_INLINE int _RP lis_bcanputnext_anyband(queue_t *q);
 
 EXPORT_SYMBOL(lis_bcanputnext_anyband);
-__LIS_EXTERN_INLINE int _RP lis_bufcall(unsigned size, int priority, void streamscall (*function) (long), long arg);
+__LIS_EXTERN_INLINE int _RP lis_bufcall(unsigned size, int priority,
+					void streamscall (*function) (long), long arg);
 
 EXPORT_SYMBOL(lis_bufcall);
 __LIS_EXTERN_INLINE mblk_t *_RP lis_copyb(mblk_t *mp);
@@ -238,9 +244,10 @@ __LIS_EXTERN_INLINE mblk_t *_RP lis_dupmsg(mblk_t *mp);
 
 EXPORT_SYMBOL(lis_dupmsg);
 __LIS_EXTERN_INLINE mblk_t *_RP lis_esballoc(unsigned char *base, int size, int priority,
-					 frtn_t *freeinfo, char *file_name, int line_nr);
+					     frtn_t *freeinfo, char *file_name, int line_nr);
 EXPORT_SYMBOL(lis_esballoc);
-__LIS_EXTERN_INLINE int _RP lis_esbbcall(int priority, void streamscall (*function) (long), long arg);
+__LIS_EXTERN_INLINE int _RP lis_esbbcall(int priority, void streamscall (*function) (long),
+					 long arg);
 
 EXPORT_SYMBOL(lis_esbbcall);
 __LIS_EXTERN_INLINE void _RP lis_flushband(queue_t *q, unsigned char band, int flag);
@@ -296,14 +303,15 @@ EXPORT_SYMBOL(lis_putbq);
 __LIS_EXTERN_INLINE int _RP lis_putctl(queue_t *q, int type, char *file_name, int line_nr);
 
 EXPORT_SYMBOL(lis_putctl);
-__LIS_EXTERN_INLINE int _RP lis_putctl1(queue_t *q, int type, int param, char *file_name, int line_nr);
+__LIS_EXTERN_INLINE int _RP lis_putctl1(queue_t *q, int type, int param, char *file_name,
+					int line_nr);
 
 EXPORT_SYMBOL(lis_putctl1);
 __LIS_EXTERN_INLINE int _RP lis_putnextctl(queue_t *q, int type, char *file_name, int line_nr);
 
 EXPORT_SYMBOL(lis_putnextctl);
 __LIS_EXTERN_INLINE int _RP lis_putnextctl1(queue_t *q, int type, int param, char *file_name,
-					int line_nr);
+					    int line_nr);
 EXPORT_SYMBOL(lis_putnextctl1);
 __LIS_EXTERN_INLINE int _RP lis_putq(queue_t *q, mblk_t *mp);
 
@@ -377,7 +385,7 @@ __LIS_EXTERN_INLINE int _RP lis_testb(int size, unsigned int priority);
 
 EXPORT_SYMBOL(lis_testb);
 __LIS_EXTERN_INLINE toid_t _RP lis_timeout_fcn(timo_fcn_t *timo_fcn, caddr_t arg, long ticks,
-					   char *file_name, int line_nr);
+					       char *file_name, int line_nr);
 EXPORT_SYMBOL(lis_timeout_fcn);
 __LIS_EXTERN_INLINE void _RP lis_unbufcall(int bcid);
 
@@ -413,14 +421,14 @@ char lis_version[] = "2.18.4";
 
 EXPORT_SYMBOL(lis_version);
 #ifdef LIS_DEPRECARTED_FUNCTIONS
-char *
+_RP char *
 lis_poll_events(short events)
 {
 	return dont_use_this_function();
 }
 
 EXPORT_SYMBOL(lis_poll_events);
-const char *
+_RP const char *
 lis_maj_min_name(stdata_t *head)
 {
 	return dont_use_this_function();
@@ -889,7 +897,8 @@ lis_dobufcall(int cpu_id)
 
 EXPORT_SYMBOL(lis_dobufcall);
 void
-_RP lis_enable_intr(struct streamtab *strtab, int major, const char *name)
+ _RP
+lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 {
 	/* don't do this */
 	swerr();
@@ -898,7 +907,8 @@ _RP lis_enable_intr(struct streamtab *strtab, int major, const char *name)
 
 EXPORT_SYMBOL(lis_enable_intr);
 void
-_RP lis_fifo_close_sync(struct inode *i, struct file *f)
+ _RP
+lis_fifo_close_sync(struct inode *i, struct file *f)
 {
 	/* don't do this */
 	swerr();
@@ -907,7 +917,8 @@ _RP lis_fifo_close_sync(struct inode *i, struct file *f)
 
 EXPORT_SYMBOL(lis_fifo_close_sync);
 void
-_RP lis_flush_print_buffer(void)
+ _RP
+lis_flush_print_buffer(void)
 {
 	/* print buffers will be processed by kernel. */
 	return;
@@ -1428,7 +1439,7 @@ lis_request_irq(unsigned int irq, irqreturn_t(*handler) (int, void *, struct pt_
 	return WARN(request_irq(irq, handler, flags, device, dev_id));
 }
 #else
-int
+_RP int
 lis_request_irq(unsigned int irq, void (*handler) (int, void *, struct pt_regs *),
 		unsigned long flags, const char *device, void *dev_id)
 {
@@ -2560,7 +2571,7 @@ lis_mknod(char *name, int mode, dev_t dev)
 {
 #ifdef HAVE_SYS_MKNOD_ADDR
 	asmlinkage long (*sys_mknod) (const char *filename, int mode, dev_t dev)
-	    = (typeof(sys_mknod)) HAVE_SYS_MKNOD_ADDR;
+	= (typeof(sys_mknod)) HAVE_SYS_MKNOD_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 
@@ -2581,7 +2592,7 @@ lis_unlink(char *name)
 {
 #ifdef HAVE_SYS_UNLINK_ADDR
 	asmlinkage long (*sys_unlink) (const char *pathname)
-	    = (typeof(sys_unlink)) HAVE_SYS_UNLINK_ADDR;
+	= (typeof(sys_unlink)) HAVE_SYS_UNLINK_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 
@@ -2603,7 +2614,7 @@ lis_mount(char *dev_name, char *dir_name, char *fstype, unsigned long rwflag, vo
 #ifdef HAVE_SYS_MOUNT_ADDR
 	asmlinkage long (*sys_mount) (char *dev_name, char *dir_name, char *type,
 				      unsigned long flags, void *data)
-	    = (typeof(sys_mount)) HAVE_SYS_MOUNT_ADDR;
+	= (typeof(sys_mount)) HAVE_SYS_MOUNT_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 
@@ -2625,7 +2636,7 @@ lis_umount2(char *path, int flags)
 {
 #ifdef HAVE_SYS_UMOUNT_ADDR
 	asmlinkage long (*sys_umount) (char *name, int flags)
-	    = (typeof(sys_umount)) HAVE_SYS_UMOUNT_ADDR;
+	= (typeof(sys_umount)) HAVE_SYS_UMOUNT_ADDR;
 	mm_segment_t old_fs;
 	int ret;
 
@@ -2843,26 +2854,34 @@ lis_register_driver_qlock_option(major_t major, int qlock_option)
 		switch (qlock_option) {
 		case LIS_QLOCK_NONE:
 			cdev->d_sqlvl = SQLVL_NOP;
-			cdev->d_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			cdev->d_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			cdev->d_flag |= D_MP;
 			break;
 		default:
 		case LIS_QLOCK_QUEUE:
 			cdev->d_sqlvl = SQLVL_QUEUE;
-			cdev->d_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			cdev->d_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			cdev->d_flag |= D_MTPERQ;
 			break;
 		case LIS_QLOCK_QUEUE_PAIR:
 			cdev->d_sqlvl = SQLVL_QUEUEPAIR;
-			cdev->d_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			cdev->d_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			cdev->d_flag |= D_MTQPAIR;
 			break;
 		case LIS_QLOCK_GLOBAL:
 			cdev->d_sqlvl = SQLVL_ELSEWHERE;
 			cdev->d_sqinfo = "global";
-			cdev->d_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			cdev->d_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			cdev->d_flag |= 0;
-			err = register_strsync((struct fmodsw *)cdev);
+			err = register_strsync((struct fmodsw *) cdev);
 			break;
 		}
 	}
@@ -2899,24 +2918,32 @@ lis_register_module_qlock_option(modID_t modid, int qlock_option)
 		switch (qlock_option) {
 		case LIS_QLOCK_NONE:
 			fmod->f_sqlvl = SQLVL_NOP;
-			fmod->f_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			fmod->f_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			fmod->f_flag |= D_MP;
 			break;
 		default:
 		case LIS_QLOCK_QUEUE:
 			fmod->f_sqlvl = SQLVL_QUEUE;
-			fmod->f_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			fmod->f_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			fmod->f_flag |= D_MTPERQ;
 			break;
 		case LIS_QLOCK_QUEUE_PAIR:
 			fmod->f_sqlvl = SQLVL_QUEUEPAIR;
-			fmod->f_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			fmod->f_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			fmod->f_flag |= D_MTQPAIR;
 			break;
 		case LIS_QLOCK_GLOBAL:
 			fmod->f_sqlvl = SQLVL_ELSEWHERE;
 			fmod->f_sqinfo = "global";
-			fmod->f_flag &= ~(D_MP|D_UP|D_MTPERQ|D_MTQPAIR|D_MTPERMOD|D_MTOUTPERIM|D_MTOCEXCL|D_MTPUTSHARED);
+			fmod->f_flag &=
+			    ~(D_MP | D_UP | D_MTPERQ | D_MTQPAIR | D_MTPERMOD | D_MTOUTPERIM |
+			      D_MTOCEXCL | D_MTPUTSHARED);
 			fmod->f_flag |= 0;
 			err = register_strsync(fmod);
 			break;
