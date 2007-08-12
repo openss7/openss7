@@ -7,6 +7,28 @@
 	* am/openss7.am: added new tag macro expansions
 	* scripts/Doxyfile.in: new extern replacements, GPLv3
 
+	* scripts/Doxyfile.in: updated script headers
+	* scripts/cflagcheck: updated script headers
+	* scripts/check_commands: updated script headers
+	* scripts/check_decls: updated script headers
+	* scripts/check_headers: updated script headers
+	* scripts/check_libs: updated script headers
+	* scripts/check_mans: updated script headers
+	* scripts/check_modules: updated script headers
+	* scripts/check_streams: updated script headers
+	* scripts/check_version: updated script headers
+	* scripts/chkconfig: updated script headers
+	* scripts/inet_mkdev: updated script headers
+	* scripts/inet_rmdev: updated script headers
+	* scripts/install_initd: updated script headers
+	* scripts/modpost.sh: updated script headers
+	* scripts/modsyms.sh: updated script headers
+	* scripts/remove_initd: updated script headers
+	* scripts/send-pr: updated script headers
+	* scripts/send-pr.config.in: updated script headers
+	* scripts/strconf-sh: updated script headers
+	* scripts/texinfo.cnf: updated script headers
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: reference updates
