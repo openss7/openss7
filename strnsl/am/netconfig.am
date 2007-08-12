@@ -1,18 +1,18 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/06/22 09:32:07 $
+# @(#) $RCSfile: netconfig.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 17:31:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
-## Foundation; version 2 of the License.
+## Foundation; version 3 of the License.
 ##
 ## This program is distributed in the hope that it will be useful, but WITHOUT
 ## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -20,8 +20,8 @@
 ## details.
 ##
 ## You should have received a copy of the GNU General Public License along with
-## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-## Ave, Cambridge, MA 02139, USA.
+## this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+## Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,34 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/22 09:32:07 $ by $Author: brian $
-##
-## -----------------------------------------------------------------------------
-##
-## $Log: netconfig.am,v $
-## Revision 0.9.2.8  2007/06/22 09:32:07  brian
-## - fix status inversion syntax error
-##
-## Revision 0.9.2.7  2007/06/22 06:46:10  brian
-## - another stab
-##
-## Revision 0.9.2.6  2007/06/22 05:00:48  brian
-## - one more try
-##
-## Revision 0.9.2.5  2007/06/22 04:52:14  brian
-## - try another workaround for libtirpc
-##
-## Revision 0.9.2.4  2007/06/22 04:14:28  brian
-## - be smarter about netconfig install
-##
-## Revision 0.9.2.3  2007/06/21 22:31:44  brian
-## - fix up problems with libtirpc
-##
-## Revision 0.9.2.2  2006/12/28 10:26:04  brian
-## - distribute netconfig file
-##
-## Revision 0.9.2.1  2006/10/16 05:13:50  brian
-## - rules for configuration files
+## Last Modified $Date: 2007/08/12 17:31:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -174,4 +147,35 @@ endif
 
 EXTRA_DIST		+= src/util/sysconfig/netconfig
 
+## =============================================================================
+##
+## $Log: netconfig.am,v $
+## Revision 0.9.2.9  2007/08/12 17:31:06  brian
+## - updated headers
+##
+## Revision 0.9.2.8  2007/06/22 09:32:07  brian
+## - fix status inversion syntax error
+##
+## Revision 0.9.2.7  2007/06/22 06:46:10  brian
+## - another stab
+##
+## Revision 0.9.2.6  2007/06/22 05:00:48  brian
+## - one more try
+##
+## Revision 0.9.2.5  2007/06/22 04:52:14  brian
+## - try another workaround for libtirpc
+##
+## Revision 0.9.2.4  2007/06/22 04:14:28  brian
+## - be smarter about netconfig install
+##
+## Revision 0.9.2.3  2007/06/21 22:31:44  brian
+## - fix up problems with libtirpc
+##
+## Revision 0.9.2.2  2006/12/28 10:26:04  brian
+## - distribute netconfig file
+##
+## Revision 0.9.2.1  2006/10/16 05:13:50  brian
+## - rules for configuration files
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
