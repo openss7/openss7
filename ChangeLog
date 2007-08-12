@@ -1,3 +1,9 @@
+2007-08-12  Brian Bidulock  <bidulock@openss7.org>
+
+	* texi/gpl.texi: minor formatting change
+	* texi/gpl3.texi: added version 3 license
+	* texi/lgpl3.texi: added version 3 license
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: reference updates
