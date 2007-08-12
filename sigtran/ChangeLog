@@ -1,6 +1,20 @@
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/sigtran.texi: GPLv3
+	* src/drivers/isua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/drivers/m2ua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/drivers/m3ua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/drivers/sua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/drivers/tua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/drivers/ua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/modules/m2pa_sl.c: changes to LMI PPA addresses, GPLv3
+	* src/modules/m2ua_as.c: changes to LMI PPA addresses, GPLv3
+	* src/modules/sdl_sctp.c: changes to LMI PPA addresses, GPLv3
+	* src/modules/sdt_sctp.c: changes to LMI PPA addresses, GPLv3
+	* src/modules/sdt_tpi.c: changes to LMI PPA addresses, GPLv3
+	* src/modules/sl_tpi.c: changes to LMI PPA addresses, GPLv3
+	* src/test/test-m2pa.c: changes to LMI PPA addresses, GPLv3
+	* src/test/test-m2ua_as.c: changes to LMI PPA addresses, GPLv3
 
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 

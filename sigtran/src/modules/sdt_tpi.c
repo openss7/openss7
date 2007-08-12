@@ -1,6 +1,67 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:45 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/12 16:15:37 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdt_tpi.c,v $
+ Revision 0.9.2.8  2007/08/12 16:15:37  brian
+ -
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $"
+
+static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $";
+
+/*****************************************************************************
+
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +106,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:45 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:45 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -71,6 +132,9 @@ static char const ident[] =
  *  can be used for SCTP transport, a standard way to use SCTP for SS7
  *  signallign link transport would be M2PA instead of this module.
  */
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
+
 #include <sys/os7/compat.h>
 
 #include <linux/socket.h>
@@ -88,7 +152,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:45 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/12 16:15:37 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL v2"
@@ -336,20 +400,25 @@ m_hangup(queue_t *q, struct sdt *sdt, int err)
 STATIC INLINE int
 lmi_info_ack(queue_t *q, struct sdt *sdt, caddr_t ppa_ptr, size_t ppa_len)
 {
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sdt->i_state;
 		p->lmi_max_sdu =
 		    sdt->sdt.config.m + 1 + ((sdt->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_min_sdu = ((sdt->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE2;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = 0; /* FIXME */
+		p->lmi_prov_state = 0; /* FIXME */
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
 		printd(("%s: %p: <- LMI_INFO_ACK\n", MOD_NAME, sdt));
@@ -1853,7 +1922,8 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto emsgsize;
 	if (sdt->i_state == LMI_UNUSABLE)
 		goto eagain;
@@ -1862,11 +1932,12 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	if (sdt->i_state != LMI_UNATTACHED)
 		goto outstate;
 	sdt->i_state = LMI_ATTACH_PENDING;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p) + sdt->t.add_size)
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
 		goto badppa;
-	bcopy(p->lmi_ppa, &sdt->t.loc, sdt->t.add_size);
-	/* 
-	   start bind in motion */
+	if (p->lmi_ppa_length < sdt->t.add_size)
+		goto badppa;
+	bcopy(mp->b_rptr + p->lmi_ppa_offset, &sdt->t.loc, sdt->t.add_size);
+	/* start bind in motion */
 	return t_bind_req(q, sdt);
       badppa:
 	ptrace(("%s: PROTO: bad ppa (too short)\n", MOD_NAME));
@@ -1878,8 +1949,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	ptrace(("%s: PROTO: primitive not support for style\n", MOD_NAME));
 	return lmi_error_ack(q, sdt, LMI_ATTACH_REQ, LMI_NOTSUPP, EOPNOTSUPP);
       eagain:
-	/* 
-	   wait for stream to become usable */
+	/* wait for stream to become usable */
 	rare();
 	return (-EAGAIN);
       emsgsize:
@@ -1945,7 +2015,8 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto emsgsize;
 	if (sdt->i_state == LMI_UNUSABLE)
 		goto eagain;
@@ -1955,9 +2026,11 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	switch (sdt->t.serv_type) {
 	case T_CLTS:
 		assure(sdt->t.state == TS_IDLE);
-		if (mp->b_wptr < mp->b_rptr + sizeof(*p) + sdt->t.add_size)
-			goto badppa;
-		bcopy(p->lmi_rem, &sdt->t.rem, sdt->t.add_size);
+		if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+			goto badaddr;
+		if (p->lmi_rem_length < sdt->t.add_size)
+			goto badaddr;
+		bcopy(mp->b_rptr + p->lmi_rem_offset, &sdt->t.rem, sdt->t.add_size);
 		return lmi_enable_con(q, sdt);
 	case T_COTS:
 	case T_COTS_ORD:
@@ -1967,25 +2040,25 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			return lmi_enable_con(q, sdt);
 		case LMI_STYLE2:
 			assure(sdt->t.state == TS_IDLE);
-			if (mp->b_wptr == mp->b_rptr + sizeof(*p))	/* wait for T_CONN_IND */
+			if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+				goto badaddr;
+			if (p->lmi_rem_length == 0)	/* wait for T_CONN_IND */
 				return (QR_DONE);
-			if (mp->b_wptr < mp->b_rptr + sizeof(*p) + sdt->t.add_size)
-				goto badppa;
-			bcopy(p->lmi_rem, &sdt->t.rem, sdt->t.add_size);
-			/* 
-			   start connection in motion */
+			if (p->lmi_rem_length < sdt->t.add_size)
+				goto badaddr;
+			bcopy(mp->b_rptr + p->lmi_rem_offset, &sdt->t.rem, sdt->t.add_size);
+			/* start connection in motion */
 			return t_conn_req(q, sdt);
 		}
 	}
-      badppa:
-	ptrace(("%s: PROTO: bad ppa (too short)\n", MOD_NAME));
-	return lmi_error_ack(q, sdt, LMI_ATTACH_REQ, LMI_BADPPA, EMSGSIZE);
+      badaddr:
+	ptrace(("%s: PROTO: bad address (too short)\n", MOD_NAME));
+	return lmi_error_ack(q, sdt, LMI_ATTACH_REQ, LMI_BADADDRESS, EINVAL);
       outstate:
 	ptrace(("%s: PROTO: out of state\n", MOD_NAME));
 	return lmi_error_ack(q, sdt, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
       eagain:
-	/* 
-	   wait for stream to become usable */
+	/* wait for stream to become usable */
 	rare();
 	return (-EAGAIN);
       emsgsize:

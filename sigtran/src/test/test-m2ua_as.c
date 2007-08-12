@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:08:56 $
+ @(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:15:43 $
 
  -----------------------------------------------------------------------------
 
@@ -9,32 +9,18 @@
 
  All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written authorization
- of the copyright holder, and licensors, if any.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
- The recipient of this document, by its retention and use, warrants that the
- recipient will protect this information and keep it confidential, and will
- not disclose the information contained in this document without the written
- permission of its owner.
-
- The author reserves the right to revise this software and documentation for
- any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of the
- technical arts, or the reflection of changes in the design of any techniques,
- or procedures embodied, described, or referred to herein.  The author is
- under no obligation to provide any feature listed herein.
-
- -----------------------------------------------------------------------------
-
- As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:08:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2ua_as.c,v $
+ Revision 0.9.2.5  2007/08/12 16:15:43  brian
+ -
+
  Revision 0.9.2.4  2007/03/15 10:08:56  brian
  - updates for release
 
@@ -78,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:08:56 $"
+#ident "@(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:15:43 $"
 
-static char const ident[] = "$RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:08:56 $";
+static char const ident[] = "$RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:15:43 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   0
@@ -6808,6 +6797,8 @@ do_signal(int child, int action)
 	case __TEST_ATTACH_REQ:
 		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi.attach_req.lmi_ppa_length = ADDR_length;
+		p->lmi.attach_req.lmi_ppa_offset = sizeof(p->lmi.attach_req);
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.attach_req), ADDR_length);
 		data = NULL;
@@ -6840,6 +6831,8 @@ do_signal(int child, int action)
 	case __TEST_ENABLE_REQ:
 		ctrl->len = sizeof(p->lmi.enable_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.enable_req.lmi_primitive = LMI_ENABLE_REQ;
+		p->lmi.enable_req.lmi_rem_length = ADDR_length;
+		p->lmi.enable_req.lmi_rem_offset = sizeof(p->lmi.enable_req);
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.enable_req), ADDR_length);
 		data = NULL;

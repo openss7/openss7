@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/03 13:34:45 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/12 16:15:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:34:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.11  2007/08/12 16:15:36  brian
+ -
+
  Revision 0.9.2.10  2007/08/03 13:34:45  brian
  - manual updates, put ss7 modules in public release
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/03 13:34:45 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/12 16:15:36 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/03 13:34:45 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/12 16:15:36 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -157,7 +160,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/03 13:34:45 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/12 16:15:36 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -231,6 +234,8 @@ struct sl {
 	int coninds;			/* npi connection indications */
 	lmi_option_t option;		/* protocol and variant options */
 	struct {
+		uint flags;		/* overall provider flags */
+		uint state;		/* overall provider state */
 		sl_timers_t timers;	/* SL protocol timers */
 		sl_config_t config;	/* SL configuration options */
 		sl_statem_t statem;	/* SL state machine variables */
@@ -861,6 +866,10 @@ lmi_info_ack(struct sl *sl, queue_t *q, mblk_t *msg)
 		p->lmi_min_sdu = sl->info.lm.lmi_min_sdu;
 		p->lmi_header_len = sl->info.lm.lmi_header_len;
 		p->lmi_ppa_style = sl->info.lm.lmi_ppa_style;
+		p->lmi_ppa_length = sl->loc_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = sl->sl.flags; /* FIXME */
+		p->lmi_prov_state = sl->sl.state; /* FIXME */
 		mp->b_wptr += sizeof(*p);
 		bcopy(&sl->loc, mp->b_wptr, sl->loc_len);
 		mp->b_wptr += sl->loc_len;
@@ -3462,10 +3471,12 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (sl_get_i_state(sl) != LMI_UNATTACHED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
 
 	/* FIXME: the first 4 bytes of the PPA should be an ASPID (set to zero when ASPID not
 	   required) and the remainder should be a sockaddr_storage structure, or just an ASPID, or 
@@ -3475,8 +3486,8 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	switch (sl_get_n_state(sl)) {
 	case NS_UNBND:
 		sl_set_i_state(sl, LMI_ATTACH_PENDING);
-		return n_bind_req(sl, q, mp, (caddr_t) &p->lmi_ppa[0],
-				  mp->b_wptr - mp->b_rptr - sizeof(*p));
+		return n_bind_req(sl, q, mp, (caddr_t) (mp->b_rptr + p->lmi_ppa_offset),
+				  p->lmi_ppa_length);
 	case NS_IDLE:
 		sl_set_i_state(sl, LMI_ATTACH_PENDING);
 		return lmi_ok_ack(sl, q, mp, LMI_ATTACH_REQ);
@@ -3488,6 +3499,8 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		return lmi_ok_ack(sl, q, mp, LMI_ATTACH_REQ);
 	}
 	goto outstate;
+      badppa:
+	return lmi_error_ack(sl, q, mp, LMI_ATTACH_REQ, LMI_BADPPA);
       tooshort:
 	return lmi_error_ack(sl, q, mp, LMI_ATTACH_REQ, LMI_TOOSHORT);
       outstate:
@@ -3551,10 +3564,12 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 {
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (sl_get_i_state(sl) != LMI_DISABLED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	sl_set_i_state(sl, LMI_ENABLE_PENDING);
 
 	/* FIXME: the first 4 bytes of the remote should be an IID and the remainder should be a
@@ -3570,10 +3585,10 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		caddr_t aptr;
 		size_t alen;
 
-		if (mp->b_wptr >= mp->b_rptr + sizeof(*p) + sizeof(uint32_t)) {
-			sl->iid = *(uint32_t *) &p->lmi_rem[0];
-			aptr = (caddr_t) &p->lmi_rem[0] + sizeof(uint32_t);
-			alen = mp->b_wptr - mp->b_rptr - sizeof(*p) - sizeof(uint32_t);
+		if (MBLKIN(mp, p->lmi_rem_offset, sizeof(uint32_t))) {
+			sl->iid = *(uint32_t *) (mp->b_rptr + p->lmi_rem_offset);
+			aptr = (caddr_t) (mp->b_rptr + p->lmi_rem_offset + sizeof(uint32_t));
+			alen = p->lmi_rem_length - sizeof(uint32_t);
 		} else {
 			sl->iid = 0;
 			aptr = NULL;
@@ -3592,8 +3607,10 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		if (sl_get_u_state(sl) == ASP_INACTIVE) {
 			uint32_t *iid;
 
-			if (mp->b_wptr >= mp->b_rptr + sizeof(*p) + sizeof(uint32_t)) {
-				iid = (sl->iid = *(uint32_t *) &p->lmi_rem[0]) ? &sl->iid : NULL;
+			if (MBLKIN(mp, p->lmi_rem_offset, sizeof(uint32_t))) {
+				iid = (sl->iid =
+				       *(uint32_t *) (mp->b_rptr +
+						      p->lmi_rem_offset)) ? &sl->iid : NULL;
 			} else {
 				iid = NULL;
 			}
@@ -3603,6 +3620,8 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		return lmi_enable_con(sl, q, mp);
 	}
 	goto outstate;
+      badaddr:
+	return lmi_error_ack(sl, q, mp, LMI_ENABLE_REQ, LMI_BADADDRESS);
       tooshort:
 	return lmi_error_ack(sl, q, mp, LMI_ENABLE_REQ, LMI_TOOSHORT);
       outstate:

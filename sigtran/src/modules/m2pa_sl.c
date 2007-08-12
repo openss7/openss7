@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:43 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/12 16:15:35 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.18  2007/08/12 16:15:35  brian
+ -
+
  Revision 0.9.2.17  2007/07/14 01:33:43  brian
  - make license explicit, add documentation
 
@@ -97,18 +100,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:43 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/12 16:15:35 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:43 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/12 16:15:35 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
 #endif
 
-#define _LFS_SOURCE 1
-#define _SVR4_SOURCE 1
-#define _MPS_SOURCE 1
+#define _LFS_SOURCE	1
+#define _SVR4_SOURCE	1
+#define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
 
 //#define _DEBUG 1
 #undef _DEBUG
@@ -134,7 +138,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:43 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/12 16:15:35 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -267,6 +271,8 @@ typedef struct sl {
 	bufq_t tb;			/* transmission buffer */
 	bufq_t rtb;			/* retransmission buffer */
 	struct {
+		uint flags;		/* overall provider flags */
+		uint state;		/* overall provider state */
 		sl_timers_t timers;	/* SL protocol timers */
 		sl_config_t config;	/* SL configuration options */
 		sl_statem_t statem;	/* state machine variables */
@@ -611,6 +617,10 @@ lmi_info_ack(struct sl *sl, queue_t *q)
 		p->lmi_min_sdu = sl->info.lm.lmi_min_sdu;
 		p->lmi_header_len = sl->info.lm.lmi_header_len;
 		p->lmi_ppa_style = sl->info.lm.lmi_ppa_style;
+		p->lmi_ppa_length = sl->loc_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = sl->sl.flags;
+		p->lmi_prov_state = sl->sl.state;
 		mp->b_wptr += sizeof(*p);
 		bcopy(&sl->loc, mp->b_wptr, sl->loc_len);
 		mp->b_wptr += sl->loc_len;
@@ -1503,36 +1513,36 @@ n_exdata_req(struct sl *sl, queue_t *q, void *qos_ptr, size_t qos_len, mblk_t *d
  *
  *  =========================================================================
  */
-#define MF_LPO			0x00000001
-#define MF_RPO			0x00000002
-#define MF_LOC_INS		0x00000004
-#define MF_REM_INS		0x00000008
-#define MF_LOC_BUSY		0x00000010
-#define MF_REM_BUSY		0x00000020
-#define MF_LOC_EMERG		0x00000040
-#define MF_REM_EMERG		0x00000080
-#define MF_RECV_MSU		0x00000100
-#define MF_SEND_MSU		0x00000200
-#define MF_CONG_ACCEPT		0x00000400
-#define MF_CONG_DISCARD		0x00000800
-#define MF_RTB_FULL		0x00001000
-#define MF_L3_CONG_DETECT	0x00002000
-#define MF_L2_CONG_DETECT	0x00004000
-#define MF_CONTINUE		0x00008000
-#define MF_CLEAR_RTB		0x00010000
-#define MF_NEED_FLUSH		0x00020000
-#define MF_WAIT_SYNC		0x00040000
-#define MF_REM_ALN		0x00080000
+#define MF_LPO			SLF_LOC_PROC_OUT
+#define MF_RPO			SLF_REM_PROC_OUT
+#define MF_LOC_INS		SLF_LOC_IN_SERV
+#define MF_REM_INS		SLF_REM_IN_SERV
+#define MF_LOC_BUSY		SLF_LOC_BUSY
+#define MF_REM_BUSY		SLF_REM_BUSY
+#define MF_LOC_EMERG		SLF_LOC_EMERG
+#define MF_REM_EMERG		SLF_REM_EMERG
+#define MF_RECV_MSU		SLF_RECV_MSU
+#define MF_SEND_MSU		SLF_SEND_MSU
+#define MF_CONG_ACCEPT		SLF_CONG_ACCEPT
+#define MF_CONG_DISCARD		SLF_CONG_DISCARD
+#define MF_RTB_FULL		SLF_RTB_FULL
+#define MF_L3_CONG_DETECT	SLF_L3_CONG_DETECT
+#define MF_L2_CONG_DETECT	SLF_L2_CONG_DETECT
+#define MF_CONTINUE		SLF_CONTINUE
+#define MF_CLEAR_RTB		SLF_CLEAR_RTB
+#define MF_NEED_FLUSH		SLF_NEED_FLUSH
+#define MF_WAIT_SYNC		SLF_WAIT_SYNC
+#define MF_REM_ALN		SLF_REM_ALIGN
 
-#define MS_POWER_OFF		0
-#define MS_OUT_OF_SERVICE	1
-#define MS_NOT_ALIGNED		2
-#define MS_ALIGNED		3
-#define MS_PROVING		4
-#define MS_ALIGNED_NOT_READY	5
-#define MS_ALIGNED_READY	6
-#define MS_IN_SERVICE		7
-#define MS_PROCESSOR_OUTAGE	8
+#define MS_POWER_OFF		SLS_POWER_OFF
+#define MS_OUT_OF_SERVICE	SLS_OUT_OF_SERVICE
+#define MS_NOT_ALIGNED		SLS_NOT_ALIGNED
+#define MS_ALIGNED		SLS_INITIAL_ALIGNMENT
+#define MS_PROVING		SLS_PROVING
+#define MS_ALIGNED_NOT_READY	SLS_ALIGNED_NOT_READY
+#define MS_ALIGNED_READY	SLS_ALIGNED_READY
+#define MS_IN_SERVICE		SLS_IN_SERVICE
+#define MS_PROCESSOR_OUTAGE	SLS_PROCESSOR_OUTAGE
 
 #ifdef _DEBUG
 const char *
@@ -5204,11 +5214,17 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto protoshort;
 	if (sl_get_i_state(sl) != LMI_UNATTACHED)
 		goto outstate;
-	return n_bind_req(sl, q, (caddr_t) (p + 1), mp->b_wptr - mp->b_rptr - sizeof(*p));
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
+	return n_bind_req(sl, q, mp->b_rptr + p->lmi_ppa_offset, p->lmi_ppa_length);
+badppa:
+	m2palogrx(sl, "bad PPA");
+	err = LMI_BADPPA;
+	goto error;
       outstate:
 	m2palogrx(sl, "would place interface out of state");
 	err = LMI_OUTSTATE;
@@ -5270,14 +5286,20 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto protoshort;
 	if (sl_get_i_state(sl) != LMI_DISABLED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	return n_conn_req(sl, q, (caddr_t) (p + 1), mp->b_wptr - mp->b_rptr - sizeof(*p));
       outstate:
 	m2palogrx(sl, "would place interface out of state");
 	err = LMI_OUTSTATE;
+	goto error;
+      badaddr:
+	m2palogrx(sl, "bad address");
+	err = LMI_BADADDRESS;
 	goto error;
       protoshort:
 	m2palogrx(sl, "M_PROTO block too short");
@@ -8210,12 +8232,16 @@ sl_alloc_priv(queue_t *q, struct sl **slp, dev_t *devp, cred_t *crp, int mid, in
 
 		/* LM information defaults */
 		sl->info.lm.lmi_primitive = LMI_INFO_ACK;
-		sl->info.lm.lmi_version = 1;
+		sl->info.lm.lmi_version = LMI_CURRENT_VERSION;
 		sl->info.lm.lmi_state = LMI_UNUSABLE;
 		sl->info.lm.lmi_max_sdu = 538;
 		sl->info.lm.lmi_min_sdu = 1;
 		sl->info.lm.lmi_header_len = 10;
 		sl->info.lm.lmi_ppa_style = LMI_STYLE2;
+		sl->info.lm.lmi_ppa_length = 0;
+		sl->info.lm.lmi_ppa_offset = sizeof(sl->info.lm);
+		sl->info.lm.lmi_prov_flags = 0;
+		sl->info.lm.lmi_prov_state = MS_POWER_OFF;
 
 		m2palogno(sl, "setting module private structure defaults");
 	} else

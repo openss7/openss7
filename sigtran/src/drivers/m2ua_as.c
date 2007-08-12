@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/03 13:34:22 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/12 16:15:12 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:34:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.17  2007/08/12 16:15:12  brian
+ -
+
  Revision 0.9.2.16  2007/08/03 13:34:22  brian
  - manual updates, put ss7 modules in public release
 
@@ -100,10 +103,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/03 13:34:22 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/12 16:15:12 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/03 13:34:22 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/12 16:15:12 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -230,7 +233,7 @@ static char const ident[] =
 /* ============================== */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/03 13:34:22 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/12 16:15:12 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2442,7 +2445,7 @@ ua_init_object_up(struct up *up, uint id)
 	up->up.options = ua_defaults.options.up;
 #if 0
 	up->up.info.lmi_primitive = LMI_INFO_ACK;
-	up->up.info.lmi_version = 1;	/* LMI in fact does not have a version. */
+	up->up.info.lmi_version = LMI_CURRENT_VERSION;
 	up->up.info.lmi_state = LMI_UNUSABLE;
 	up->up.info.lmi_max_sdu = 272;
 	/* TS 102 141 says that this is retricted to the narrowband maximum.  That is way too
@@ -3924,17 +3927,23 @@ lmi_info_ack(struct up *up, queue_t *q, mblk_t *msg)
 		case LMI_ATTACH_PENDING:
 		case LMI_UNUSABLE:
 		default:
+			p->lmi_ppa_length = 0;
+			p->lmi_ppa_offset = sizeof(*p);
 			break;
 		case LMI_DISABLED:
 		case LMI_ENABLE_PENDING:
 		case LMI_ENABLED:
 		case LMI_DISABLE_PENDING:
 		case LMI_DETACH_PENDING:
+			p->lmi_ppa_length = sizeof(up->as.as->as.addr.m2ua);
+			p->lmi_ppa_offset = sizeof(*p);
 			bcopy(&up->as.as->as.addr.m2ua, mp->b_wptr,
 			      sizeof(up->as.as->as.addr.m2ua));
 			mp->b_wptr += sizeof(up->as.as->as.addr.m2ua);
 			break;
 		}
+		p->lmi_prov_flags = 0; /* FIXME */
+		p->lmi_prov_state = 0; /* FIXME */
 		freemsg(msg);
 		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- LMI_INFO_ACK");
 		putnext(up->rq, mp);
@@ -11379,12 +11388,14 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 	unsigned long flags;
 	int err = 0;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (up_get_state(up) != LMI_UNATTACHED)
 		goto outstate;
-	ppa_ptr = (caddr_t) p->lmi_ppa;
-	ppa_len = mp->b_wptr - mp->b_rptr - sizeof(*p);
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
+	ppa_ptr = (caddr_t) (mp->b_rptr + p->lmi_ppa_offset);
+	ppa_len = p->lmi_ppa_length;
 	if (ppa_len == 0) {
 		/* the user can specific a zero-length PPA when reattaching */
 		if (up->as.as->as.addr.m2ua.sdti == 0 && up->as.as->as.addr.m2ua.sdli == 0
@@ -11404,14 +11415,14 @@ lmi_attach_req(struct up *up, queue_t *q, mblk_t *mp)
 
 		if (ppa_len < spid_len + 1)
 			goto badppa;
-		spid = spid ? : *(uint32_t *) p->lmi_ppa;
+		spid = spid ? : *(uint32_t *) ppa_ptr;
 		if (ppa_len == spid_len + sizeof(uint32_t)) {
-			asid = *(uint32_t *) ((caddr_t) p->lmi_ppa + spid_len);
+			asid = *(uint32_t *) (ppa_ptr + spid_len);
 			iid_ptr = NULL;
 			iid_len = 0;
 		} else {
 			asid = 0;
-			iid_ptr = (caddr_t) p->lmi_ppa + spid_len;
+			iid_ptr = ppa_ptr + spid_len;
 			iid_len = ppa_len - spid_len;
 			iid_len = strnlen(iid_ptr, iid_len);
 			if (iid_len == 0)
@@ -11614,7 +11625,7 @@ lmi_enable_req(struct up *up, queue_t *q, mblk_t *mp)
 	struct rp *rp;
 	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (up_get_state(up) != LMI_DISABLED)
 		goto outstate;
@@ -11623,12 +11634,16 @@ lmi_enable_req(struct up *up, queue_t *q, mblk_t *mp)
 		goto initfailed;
 	if (as_get_state(as) != AS_INACTIVE)
 		goto unspec;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	for (rp = up->as.as->rp.list; rp; rp = rp->as.next)
 		if (rp_get_state(rp) == AS_INACTIVE)
 			if ((err = rp_send_aspt_aspac_req(rp, q, NULL, NULL, 0)))
 				return (err);
 	freemsg(mp);
 	return (0);
+      badaddr:
+	return lmi_error_ack(up, q, mp, LMI_ENABLE_REQ, LMI_BADADDRESS);
       unspec:
 	return lmi_error_ack(up, q, mp, LMI_ENABLE_REQ, LMI_UNSPEC);
       initfailed:
