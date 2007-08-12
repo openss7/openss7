@@ -3,6 +3,10 @@
 	* doc/manual/striso.texi: GPLv3
 	* src/drivers/clns-ip.c: two new driver implementations
 	* src/drivers/clns-udp.c: two new driver implementations
+	* NOTES: updates, still working up CONS
+	* doc/man/striso.refs: updates, still working up CONS
+	* src/drivers/clns.c: updates, still working up CONS
+	* src/drivers/cons.c: updates, still working up CONS
 
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
