@@ -1,18 +1,18 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/06/28 10:11:43 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/12 17:31:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
-## Foundation; version 2 of the License.
+## Foundation; version 3 of the License.
 ##
 ## This program is distributed in the hope that it will be useful, but WITHOUT
 ## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -20,8 +20,8 @@
 ## details.
 ##
 ## You should have received a copy of the GNU General Public License along with
-## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-## Ave, Cambridge, MA 02139, USA.
+## this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+## Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,46 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2007/06/28 10:11:43 $ by $Author: brian $
-##
-## -----------------------------------------------------------------------------
-##
-## $Log: info.am,v $
-## Revision 0.9.2.49  2007/06/28 10:11:43  brian
-## - force portrait mode
-##
-## Revision 0.9.2.48  2007/03/26 07:56:13  brian
-## - install html images properly, needs autoconf 2.61 and automake 2.10
-##
-## Revision 0.9.2.47  2006/07/03 01:57:57  brian
-## - bump text files down to 72 columns
-##
-## Revision 0.9.2.46  2006/03/20 13:48:37  brian
-## - get automake to run clean
-##
-## Revision 0.9.2.45  2006/03/20 11:52:11  brian
-## - add DEVELOPMENT check
-##
-## Revision 0.9.2.44  2006/03/15 11:33:37  brian
-## - can't distribute pdf and txt images
-##
-## Revision 0.9.2.43  2006/03/15 07:17:22  brian
-## - build and distribute text texinfo documentation
-##
-## Revision 0.9.2.42  2006/03/11 14:32:41  brian
-## - trying to pass distcheck on texinfo files
-##
-## Revision 0.9.2.41  2006/03/11 13:00:19  brian
-## - try to avoid rebuilding docs when unnecessary
-##
-## Revision 0.9.2.40  2006/03/07 11:00:06  brian
-## - only rebuild info in maintainer mode
-##
-## Revision 0.9.2.39  2006/03/07 10:28:49  brian
-## - keep docs from being rebuilt unless in maintainer mode
-##
-## Revision 0.9.2.38  2006/03/06 11:35:14  brian
-## - updated headers
+## Last Modified $Date: 2007/08/12 17:31:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -429,4 +390,47 @@ endif
 ## DEVELOPMENT
 endif
 
+## =============================================================================
+##
+## $Log: info.am,v $
+## Revision 0.9.2.50  2007/08/12 17:31:06  brian
+## - updated headers
+##
+## Revision 0.9.2.49  2007/06/28 10:11:43  brian
+## - force portrait mode
+##
+## Revision 0.9.2.48  2007/03/26 07:56:13  brian
+## - install html images properly, needs autoconf 2.61 and automake 2.10
+##
+## Revision 0.9.2.47  2006/07/03 01:57:57  brian
+## - bump text files down to 72 columns
+##
+## Revision 0.9.2.46  2006/03/20 13:48:37  brian
+## - get automake to run clean
+##
+## Revision 0.9.2.45  2006/03/20 11:52:11  brian
+## - add DEVELOPMENT check
+##
+## Revision 0.9.2.44  2006/03/15 11:33:37  brian
+## - can't distribute pdf and txt images
+##
+## Revision 0.9.2.43  2006/03/15 07:17:22  brian
+## - build and distribute text texinfo documentation
+##
+## Revision 0.9.2.42  2006/03/11 14:32:41  brian
+## - trying to pass distcheck on texinfo files
+##
+## Revision 0.9.2.41  2006/03/11 13:00:19  brian
+## - try to avoid rebuilding docs when unnecessary
+##
+## Revision 0.9.2.40  2006/03/07 11:00:06  brian
+## - only rebuild info in maintainer mode
+##
+## Revision 0.9.2.39  2006/03/07 10:28:49  brian
+## - keep docs from being rebuilt unless in maintainer mode
+##
+## Revision 0.9.2.38  2006/03/06 11:35:14  brian
+## - updated headers
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -1,18 +1,18 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: doxy.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/09/19 10:50:57 $
+# @(#) $RCSfile: doxy.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 17:31:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
-## Foundation; version 2 of the License.
+## Foundation; version 3 of the License.
 ##
 ## This program is distributed in the hope that it will be useful, but WITHOUT
 ## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -20,8 +20,8 @@
 ## details.
 ##
 ## You should have received a copy of the GNU General Public License along with
-## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-## Ave, Cambridge, MA 02139, USA.
+## this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+## Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -46,28 +46,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/09/19 10:50:57 $ by $Author: brian $
-##
-## -----------------------------------------------------------------------------
-##
-## $Log: doxy.am,v $
-## Revision 0.9.2.6  2006/09/19 10:50:57  brian
-## - updated doxygen approach
-##
-## Revision 0.9.2.5  2006/09/18 11:46:34  brian
-## - moved doxyfile to common area
-##
-## Revision 0.9.2.4  2006/09/18 11:21:11  brian
-## - another improvement
-##
-## Revision 0.9.2.3  2006/09/18 10:30:37  brian
-## - better doxydir determination
-##
-## Revision 0.9.2.2  2006/09/18 10:17:59  brian
-## - better documentation location
-##
-## Revision 0.9.2.1  2006/09/18 08:40:55  brian
-## - add new doxygen makefile fragment
+## Last Modified $Date: 2007/08/12 17:31:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -108,4 +87,29 @@ doxy: doxy-html
 
 MY_PHONY    += doxy doxy-html
 
+## =============================================================================
+##
+## $Log: doxy.am,v $
+## Revision 0.9.2.7  2007/08/12 17:31:06  brian
+## - updated headers
+##
+## Revision 0.9.2.6  2006/09/19 10:50:57  brian
+## - updated doxygen approach
+##
+## Revision 0.9.2.5  2006/09/18 11:46:34  brian
+## - moved doxyfile to common area
+##
+## Revision 0.9.2.4  2006/09/18 11:21:11  brian
+## - another improvement
+##
+## Revision 0.9.2.3  2006/09/18 10:30:37  brian
+## - better doxydir determination
+##
+## Revision 0.9.2.2  2006/09/18 10:17:59  brian
+## - better documentation location
+##
+## Revision 0.9.2.1  2006/09/18 08:40:55  brian
+## - add new doxygen makefile fragment
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
