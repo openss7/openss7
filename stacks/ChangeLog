@@ -1,6 +1,17 @@
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strss7.texi: GPLv3
+	* src/modules/sl/sl-mux.c: removed
+	* src/modules/sl/sl_mux.c: moved
+	* src/modules/sl/sl_min.c: moved
+
+	* doc/man/man4/sdt_cd.4.man: added new files
+	* src/modules/sdl/sdl_cd.c: added new files
+	* src/modules/sdt/sdt_cd.c: added new files
+	* src/modules/tcap/TCAPPackage.asn: added new files
+	* src/test/sdl/test-sdl-pmod.c: added new files
+	* src/test/sdt/test-sdt-pmod.c: added new files
+	* src/test/sl/test-sl-pmod.c: added new files
 
 2007-08-06  Brian Bidulock  <bidulock@openss7.org>
 
