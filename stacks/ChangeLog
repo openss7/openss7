@@ -63,6 +63,25 @@
 	* src/util/sysconfig/strss7: header updates
 	* src/util/sysconfig/strss7.conf: header updates
 
+	* tests/kernel.at: header updates
+	* tests/local.at: header updates
+	* tests/testsuite-inet_raw.at: header updates
+	* tests/testsuite-inet_raw2.at: header updates
+	* tests/testsuite-inet_sctp.at: header updates
+	* tests/testsuite-inet_tcp.at: header updates
+	* tests/testsuite-inet_udp.at: header updates
+	* tests/testsuite-inet_udp2.at: header updates
+	* tests/testsuite-m2pa.at: header updates
+	* tests/testsuite-sctp.at: header updates
+	* tests/testsuite-sctp_n.at: header updates
+	* tests/testsuite-sctp_n2.at: header updates
+	* tests/testsuite-sctp_t.at: header updates
+	* tests/testsuite-timod.at: header updates
+	* tests/testsuite-tirdwr.at: header updates
+	* tests/testsuite-x400p-sl.at: header updates
+	* tests/testsuite-xnet.at: header updates
+	* tests/testsuite-xnet_thr.at: header updates
+
 2007-08-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/sccp.4.man: rework of SDL-, SDT-, SL-PMOD
