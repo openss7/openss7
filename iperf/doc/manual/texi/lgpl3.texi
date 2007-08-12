@@ -1,9 +1,9 @@
 @c @setfilename lgpl3.info
 
-@node GNU Lesser General Public License Version 3
-@section GNU Lesser General Public License Version 3
-@cindex license, Lesser General Public License Version 3
-@cindex license, LGPL3
+@node GNU Lesser General Public License
+@section GNU Lesser General Public License
+@cindex license, Lesser General Public License
+@cindex license, LGPL
 
 @sp 2
 @center GNU LESSER GENERAL PUBLIC LICENSE
