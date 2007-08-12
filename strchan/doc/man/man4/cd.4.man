@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: cd.4.man,v 0.9.2.3 2006/12/20 23:07:34 brian Exp $
+.\" @(#) $Id: cd.4.man,v 0.9.2.4 2007/08/12 16:01:53 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/20 23:07:34 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/12 16:01:53 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: cd.4.man,v $
+.\" Revision 0.9.2.4  2007/08/12 16:01:53  brian
+.\" - minor documentation update
+.\"
 .\" Revision 0.9.2.3  2006/12/20 23:07:34  brian
 .\" - updates for release and current development
 .\"
@@ -106,6 +109,24 @@ sort-adjacent-labels
 .B CD
 is an implementation of a communications device driver as specified in the
 Communications Device Interface.
+.PP
+This is a multiplexing driver used to support linking CD HDLC Streams.  When CD Streams are linked
+under the driver and configured using input-output controls, the HDLC Streams appears as an HLDC
+device to Linux.  CD Streams can also be opened on the upper multiplex and attached to Linux raw
+HDLC devices.  This permits CD drivers to be expired to Linux and CD user to also use Linux devices
+not directly supported with a STREAMS driver.
+.PP
+To manage mapping of upper multiplex CD Streams to Linux devices, a specialized input-output control
+and CD primitive is used.  These take as an argument the ASCII name of the device and return a PPA
+(minor device number) that can be used either to open the device directly or can be used to attach
+at Style 2 CD Stream to the device.
+.PP
+To manage mapping of lower multiplex CD Streams to Linux devices, a specialized input-output control
+is used.  This input-output control takes as an argument the multiplex id and the ASCII device name.
+When successful, the lower multiplex Stream is mapped to the Linux device of the same name.  Devices
+mapped in this way begin life as a raw-HDLC device but can be configured using the sethdlc(8)
+utility for Linux.
+
 .\"
 .\"
 .PP

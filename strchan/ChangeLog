@@ -3,6 +3,7 @@
 	* doc/manual/strchan.texi: GPLv3
 	* src/test/test-ch-pmod.c: new test program
 	* src/test/test-mx-pmod.c: new test program
+	* doc/man/man4/cd.4.man: minor update
 
 2007-08-06  Brian Bidulock  <bidulock@openss7.org>
 
