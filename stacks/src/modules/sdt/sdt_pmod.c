@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:55 $
+ @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/06 04:43:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_pmod.c,v $
+ Revision 0.9.2.4  2007/08/12 16:20:27  brian
+ - new PPA handling
+
  Revision 0.9.2.3  2007/08/06 04:43:55  brian
  - rework of pipe-based emulation modules
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:55 $"
+#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:55 $";
+    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -102,7 +105,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:43:55 $A"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $A"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -777,12 +780,36 @@ lmi_info_ack(struct sdt *s, queue_t *q, mblk_t *msg)
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sdt_get_l_state(s);
 		p->lmi_max_sdu = s->max_sdu;
 		p->lmi_min_sdu = s->min_sdu;
 		p->lmi_header_len = s->header_len;
 		p->lmi_ppa_style = LMI_STYLE1;
+		p->lmi_ppa_length = 0;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = 0;
+		p->lmi_prov_state = 0;
+		if (s->sdt.statem.aerm_state != SDT_STATE_IDLE) {
+			if (s->sdt.statem.Ti == s->sdt.config.Tin)
+				p->lmi_prov_state = SDTS_NORMAL_PROVING;
+			if (s->sdt.statem.Ti == s->sdt.config.Tie)
+				p->lmi_prov_state = SDTS_EMERGENCY_PROVING;
+		} else if (s->sdt.statem.suerm_state != SDT_STATE_IDLE
+			   || s->sdt.statem.eim_state != SDT_STATE_IDLE) {
+			if (s->sdt.statem.octet_counting_mode || s->sdt.statem.interval_error)
+				p->lmi_prov_state = SDTS_MONITORING_ERRORS;
+			else
+				p->lmi_prov_state = SDTS_MONITORING;
+		} else if (s->sdt.statem.aborted_proving) {
+			p->lmi_prov_state = SDTS_ABORTED_PROVING;
+		} else {
+			if (s->sdt.statem.daedr_state != SDT_STATE_IDLE ||
+			    s->sdt.statem.daedt_state != SDT_STATE_IDLE)
+				p->lmi_prov_state = SDTS_IDLE;
+			else
+				p->lmi_prov_state = SDTS_POWER_OFF;
+		}
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(s->oq, STRLOGTX, SL_TRACE, "<- LMI_INFO_ACK");
@@ -1942,8 +1969,10 @@ lmi_attach_req(struct sdt *s, queue_t *q, mblk_t *mp)
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
 	if (sdt_get_l_state(s) != LMI_UNATTACHED
-	    && (sdt_get_l_state(s) != LMI_DISABLED || MBLKL(mp) == sizeof(*p)))
+	    && (sdt_get_l_state(s) != LMI_DISABLED || p->lmi_ppa_length == 0))
 		goto outstate;
 	/* Note that we do not need to support LMI_ATTACH_REQ because this is a style 1 drier only,
 	   but if the address is null, simply move to the appropriate state. */
@@ -1952,6 +1981,9 @@ lmi_attach_req(struct sdt *s, queue_t *q, mblk_t *mp)
 	return (0);
       outstate:
 	err = LMI_OUTSTATE;
+	goto error;
+      badppa:
+	err = LMI_BADPPA;
 	goto error;
       tooshort:
 	err = LMI_TOOSHORT;
@@ -2004,16 +2036,21 @@ lmi_detach_req(struct sdt *s, queue_t *q, mblk_t *mp)
 static int
 lmi_enable_req(struct sdt *s, queue_t *q, mblk_t *mp)
 {
-	lmi_enable_req_t *p;
+	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (sdt_get_l_state(s) != LMI_DISABLED && sdt_get_l_state(s) != LMI_ENABLED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	if ((err = sdt_enable(s, q, mp)) != 0)
 		goto error;
 	return (0);
+      badaddr:
+	err = LMI_BADADDRESS;
+	goto error;
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;

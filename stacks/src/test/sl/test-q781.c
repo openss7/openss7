@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:31 $
+ @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:20:41 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/06 11:45:31 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q781.c,v $
+ Revision 0.9.2.9  2007/08/12 16:20:41  brian
+ - new PPA handling
+
  Revision 0.9.2.8  2006/12/06 11:45:31  brian
  - updated X400P driver and test suites
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:31 $"
+#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:20:41 $"
 
-static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/12/06 11:45:31 $";
+static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:20:41 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -8356,6 +8359,8 @@ pt_attach(void)
 	ctrl.len = sizeof(p->attach_req) + sizeof(loc);
 	ctrl.buf = cbuf;
 	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	p->attach_req.lmi_ppa_length = sizeof(loc);
+	p->attach_req.lmi_ppa_offset = sizeof(p->attach_req);
 	bcopy(&loc, p->attach_req.lmi_ppa, sizeof(loc));
 	if ((ret = putmsg(pt_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("****ERROR: putmsg failed\n");
@@ -8449,7 +8454,9 @@ pt_enable(void)
 	ctrl.len = sizeof(p->enable_req) + sizeof(rem);
 	ctrl.buf = cbuf;
 	p->enable_req.lmi_primitive = LMI_ENABLE_REQ;
-	bcopy(&rem, p->enable_req.lmi_rem, sizeof(rem));
+	p->enable_req.lmi_rem_length = sizeof(rem);
+	p->enable_req.lmi_rem_offset = sizeof(p->enable_req);
+	bcopy(&rem, cbuf + sizeof(p->enable_req), sizeof(rem));
 	if ((ret = putmsg(pt_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("****ERROR: putmsg failed\n");
 		printf("           %s: %s\n", __FUNCTION__, strerror(errno));
@@ -8758,6 +8765,8 @@ iut_attach(void)
 	ctrl.len = sizeof(p->attach_req) + sizeof(loc);
 	ctrl.buf = cbuf;
 	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	p->attach_req.lmi_ppa_length = sizeof(loc);
+	p->attach_req.lmi_ppa_offset = sizeof(p->attach_req);
 	bcopy(&loc, p->attach_req.lmi_ppa, sizeof(loc));
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
@@ -8841,7 +8850,9 @@ iut_enable(void)
 	ctrl.len = sizeof(p->enable_req) + sizeof(rem);
 	ctrl.buf = cbuf;
 	p->enable_req.lmi_primitive = LMI_ENABLE_REQ;
-	bcopy(&rem, p->enable_req.lmi_rem, sizeof(rem));
+	p->enable_req.lmi_rem_length = sizeof(rem);
+	p->enable_req.lmi_rem_offset = sizeof(p->enable_req);
+	bcopy(&rem, cbuf + sizeof(p->enable_req), sizeof(rem));
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
 		FFLUSH(stdout);
@@ -9869,7 +9880,6 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 		switch (p->lmi_primitive) {
 		case LMI_INFO_ACK:
 		{
-			int ppalen = ctrl->len - sizeof(p->info_ack);
 			printf("LMI_INFO_ACK:\n");
 			printf("Version = 0x%08lx\n", (long)p->info_ack.lmi_version);
 			printf("State = %lu\n", (ulong)p->info_ack.lmi_state);
@@ -9877,9 +9887,9 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			printf("Min sdu = %lu\n", (ulong)p->info_ack.lmi_min_sdu);
 			printf("Header len = %lu\n", (ulong)p->info_ack.lmi_header_len);
 			printf("PPA style = %lu\n", (ulong)p->info_ack.lmi_ppa_style);
-			printf("PPA length = %u\n", ppalen);
+			printf("PPA length = %lu\n", (ulong)p->info_ack.lmi_ppa_length);
 			FFLUSH(stdout);
-			print_ppa((ppa_t *) p->info_ack.lmi_ppa_addr, ppalen);
+			print_ppa((ppa_t *)(ctrl->buf + p->info_ack.lmi_ppa_offset), p->info_ack.lmi_ppa_length);
 		}
 			return (p->lmi_primitive);
 		case LMI_OK_ACK:
@@ -10114,7 +10124,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+General Public License  (GPL)  Version 3  or later,  so long as  the software is\n\
 distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
 and libraries.\n\
 \n\
@@ -10144,7 +10154,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 20:09:52 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slm.c,v $
+ Revision 0.9.2.16  2007/08/12 16:20:29  brian
+ - new PPA handling
+
  Revision 0.9.2.15  2007/07/21 20:09:52  brian
  - added pass structure
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $"
 
-static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $";
+static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It
@@ -97,7 +100,7 @@ static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/21 20:09:52 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

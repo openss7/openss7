@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/06 04:43:57 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/06 04:43:57 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.7  2007/08/12 16:20:30  brian
+ - new PPA handling
+
  Revision 0.9.2.6  2007/08/06 04:43:57  brian
  - rework of pipe-based emulation modules
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/06 04:43:57 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $"
 
 static char const ident[] =
-    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/06 04:43:57 $";
+    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -104,7 +107,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/06 04:43:57 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -552,13 +555,6 @@ sl_l_state_name(int state)
 	}
 }
 
-#define SLS_POWER_OFF		0
-#define SLS_OUT_OF_SERVICE	1
-#define SLS_ALIGNMENT		2
-#define SLS_ALIGNED_READY	3
-#define SLS_ALIGNED_NOT_READY	4
-#define SLS_IN_SERVICE		5
-
 static const char *
 sl_i_state_name(int state)
 {
@@ -567,24 +563,24 @@ sl_i_state_name(int state)
 		return ("SLS_POWER_OFF");
 	case SLS_OUT_OF_SERVICE:
 		return ("SLS_OUT_OF_SERVICE");
-	case SLS_ALIGNMENT:
-		return ("SLS_ALIGNMENT");
+	case SLS_NOT_ALIGNED:
+		return ("SLS_NOT_ALIGNED");
+	case SLS_INITIAL_ALIGNMENT:
+		return ("SLS_INITIAL_ALIGNMENT");
+	case SLS_PROVING:
+		return ("SLS_PROVING");
 	case SLS_ALIGNED_READY:
 		return ("SLS_ALIGNED_READY");
 	case SLS_ALIGNED_NOT_READY:
 		return ("SLS_ALIGNED_NOT_READY");
 	case SLS_IN_SERVICE:
 		return ("SLS_IN_SERVICE");
+	case SLS_PROCESSOR_OUTAGE:
+		return ("SLS_PROCESSOR_OUTAGE");
 	default:
 		return ("SL_????");
 	}
 }
-
-#define SLF_LOC_PROC_OUT	(1<<0)
-#define SLF_REM_PROC_OUT	(1<<1)
-#define SLF_EMERGENCY		(1<<2)
-#define SLF_CONG_DISCARD	(1<<3)
-#define SLF_CONG_ACCEPT		(1<<4)
 
 static const char *
 sl_flags_set(int mask)
@@ -878,12 +874,16 @@ lmi_info_ack(struct sl *s, queue_t *q, mblk_t *msg)
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sl_get_l_state(s);
 		p->lmi_max_sdu = s->max_sdu;
 		p->lmi_min_sdu = s->min_sdu;
 		p->lmi_header_len = s->header_len;
 		p->lmi_ppa_style = LMI_STYLE1;
+		p->lmi_ppa_length = 0;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = s->state.i_flags;	/* FIXME maintain provider flags */
+		p->lmi_prov_state = s->state.i_state;	/* FIXME maintain provider state */
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(s->oq, STRLOGTX, SL_TRACE, "<- LMI_INFO_ACK");
@@ -1837,12 +1837,12 @@ sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 	case SLS_POWER_OFF:
 		goto outstate;
 	case SLS_OUT_OF_SERVICE:
-		sl_set_i_state(sl, SLS_ALIGNMENT);
+		sl_set_i_state(sl, SLS_INITIAL_ALIGNMENT);
 		sl_timer_start(sl, 1, 20000);
 		switch (sl_get_i_state(so)) {
 		case SLS_POWER_OFF:
 			break;
-		case SLS_ALIGNMENT:
+		case SLS_INITIAL_ALIGNMENT:
 			sl_timer_stop(sl, 1);
 			if (sl_get_flags(sl) & (SLF_LOC_PROC_OUT | SLF_REM_PROC_OUT)) {
 				sl_set_i_state(sl, SLS_ALIGNED_NOT_READY);
@@ -1870,7 +1870,7 @@ sl_start_req(struct sl *sl, queue_t *q, mblk_t *mp)
 			goto outstate;
 		}
 		break;
-	case SLS_ALIGNMENT:
+	case SLS_INITIAL_ALIGNMENT:
 	case SLS_ALIGNED_READY:
 	case SLS_ALIGNED_NOT_READY:
 	case SLS_IN_SERVICE:
@@ -1903,7 +1903,7 @@ sl_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		goto discard;
 	case SLS_OUT_OF_SERVICE:
 		goto discard;
-	case SLS_ALIGNMENT:
+	case SLS_INITIAL_ALIGNMENT:
 	case SLS_ALIGNED_READY:
 	case SLS_ALIGNED_NOT_READY:
 	case SLS_IN_SERVICE:
@@ -1914,7 +1914,7 @@ sl_stop_req(struct sl *sl, queue_t *q, mblk_t *mp)
 		case SLS_POWER_OFF:
 		case SLS_OUT_OF_SERVICE:
 			break;
-		case SLS_ALIGNMENT:
+		case SLS_INITIAL_ALIGNMENT:
 		case SLS_ALIGNED_READY:
 		case SLS_ALIGNED_NOT_READY:
 		case SLS_IN_SERVICE:
@@ -2238,7 +2238,7 @@ sl_t1_timeout(struct sl *sl, queue_t *q)
 {
 	if (sl_get_l_state(sl) != LMI_ENABLED)
 		goto outstate;
-	if (sl_get_i_state(sl) != SLS_ALIGNMENT)
+	if (sl_get_i_state(sl) != SLS_INITIAL_ALIGNMENT)
 		goto outstate;
 	sl_set_i_state(sl, SLS_OUT_OF_SERVICE);
 	return sl_out_of_service_ind(sl, q, NULL, 0);
@@ -3461,7 +3461,7 @@ __sl_m_proto(struct sl *s, queue_t *q, mblk_t *mp)
 	t_uscalar_t prim;
 	int rtn;
 
-	if (unlikely(MBLKIN(mp, 0, sizeof(prim)))) {
+	if (likely(MBLKIN(mp, 0, sizeof(prim)))) {
 		sl_ulong prim = *(typeof(prim) *) mp->b_rptr;
 
 		if (likely(prim == SL_PDU_REQ)) {
@@ -3549,8 +3549,7 @@ sl_m_sig(queue_t *q, mblk_t *mp)
 	if (likely((priv = mi_trylock(q)) != NULL)) {
 		err = __sl_m_sig(SL_PRIV(q), q, mp);
 		mi_unlock(priv);
-	} else 
-		err = mi_timer_requeue(mp) ? -EAGAIN : 0;
+	}
 	return (err);
 }
 
@@ -3875,7 +3874,7 @@ static caddr_t sl_opens = NULL;
 static streamscall int
 sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 {
-	struct sl_pair *sp;
+	struct sl_pair *p;
 	mblk_t *loc_tp, *rem_tp;
 	int err;
 
@@ -3889,240 +3888,240 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 		return (ENOBUFS);
 	}
 	*(int *) rem_tp->b_rptr = 1;
-	if ((err = mi_open_comm(&sl_opens, sizeof(*sp), q, devp, oflags, sflag, crp))) {
+	if ((err = mi_open_comm(&sl_opens, sizeof(*p), q, devp, oflags, sflag, crp))) {
 		mi_timer_free(loc_tp);
 		mi_timer_free(rem_tp);
 		return (err);
 	}
 
-	sp = PRIV(q);
-	bzero(sp, sizeof(*sp));
+	p = PRIV(q);
+	bzero(p, sizeof(*p));
 
 	/* initialize the structure */
-	sp->r_priv.pair = sp;
-	sp->r_priv.other = &sp->w_priv;
-	sp->r_priv.oq = WR(q);
-	sp->r_priv.max_sdu = 272;
-	sp->r_priv.min_sdu = 3;
-	sp->r_priv.header_len = 0;
-	sp->r_priv.ppa_style = LMI_STYLE1;
-	sp->r_priv.state.l_state = LMI_DISABLED;
-	sp->r_priv.oldstate.l_state = LMI_DISABLED;
-	sp->r_priv.state.i_state = SLS_POWER_OFF;
-	sp->r_priv.oldstate.i_state = SLS_POWER_OFF;
-	sp->r_priv.state.i_flags = 0;
-	sp->r_priv.oldstate.i_flags = 0;
+	p->r_priv.pair = p;
+	p->r_priv.other = &p->w_priv;
+	p->r_priv.oq = WR(q);
+	p->r_priv.max_sdu = 272;
+	p->r_priv.min_sdu = 3;
+	p->r_priv.header_len = 0;
+	p->r_priv.ppa_style = LMI_STYLE1;
+	p->r_priv.state.l_state = LMI_DISABLED;
+	p->r_priv.oldstate.l_state = LMI_DISABLED;
+	p->r_priv.state.i_state = SLS_POWER_OFF;
+	p->r_priv.oldstate.i_state = SLS_POWER_OFF;
+	p->r_priv.state.i_flags = 0;
+	p->r_priv.oldstate.i_flags = 0;
 
-	sp->r_priv.t1 = loc_tp;
-	bufq_init(&sp->r_priv.tb);
-	bufq_init(&sp->r_priv.rb);
+	p->r_priv.t1 = loc_tp;
+	bufq_init(&p->r_priv.tb);
+	bufq_init(&p->r_priv.rb);
 
-	sp->r_priv.option.pvar = SS7_PVAR_ITUT_00;
-	sp->r_priv.option.popt = 0;
+	p->r_priv.option.pvar = SS7_PVAR_ITUT_00;
+	p->r_priv.option.popt = 0;
 
-	sp->r_priv.sdt.notify.events = 0;
+	p->r_priv.sdt.notify.events = 0;
 
-	sp->r_priv.sdt.config.t8 = 100;
-	sp->r_priv.sdt.config.Tin = 4;
-	sp->r_priv.sdt.config.Tie = 1;
-	sp->r_priv.sdt.config.T = 64;
-	sp->r_priv.sdt.config.D = 256;
-	sp->r_priv.sdt.config.Te = 793544;	/* E1 */
-	sp->r_priv.sdt.config.De = 11328000;	/* E1 */
-	sp->r_priv.sdt.config.Ue = 198384000;	/* E1 */
-	sp->r_priv.sdt.config.N = 16;
-	sp->r_priv.sdt.config.m = 272;
-	sp->r_priv.sdt.config.b = 8;
-	sp->r_priv.sdt.config.f = SDT_FLAGS_ONE;
+	p->r_priv.sdt.config.t8 = 100;
+	p->r_priv.sdt.config.Tin = 4;
+	p->r_priv.sdt.config.Tie = 1;
+	p->r_priv.sdt.config.T = 64;
+	p->r_priv.sdt.config.D = 256;
+	p->r_priv.sdt.config.Te = 793544;	/* E1 */
+	p->r_priv.sdt.config.De = 11328000;	/* E1 */
+	p->r_priv.sdt.config.Ue = 198384000;	/* E1 */
+	p->r_priv.sdt.config.N = 16;
+	p->r_priv.sdt.config.m = 272;
+	p->r_priv.sdt.config.b = 8;
+	p->r_priv.sdt.config.f = SDT_FLAGS_ONE;
 
-	sp->r_priv.sdt.statem.aerm_state = SDT_STATE_IDLE;
-	sp->r_priv.sdt.statem.aborted_proving = false;
-	sp->r_priv.sdt.statem.Ca = 0;
-	sp->r_priv.sdt.statem.Ti = 0;
-	sp->r_priv.sdt.statem.suerm_state = SDT_STATE_IDLE;
-	sp->r_priv.sdt.statem.Cs = 0;
-	sp->r_priv.sdt.statem.Ns = 0;
-	sp->r_priv.sdt.statem.eim_state = SDT_STATE_IDLE;
-	sp->r_priv.sdt.statem.Ce = 0;
-	sp->r_priv.sdt.statem.su_received = false;
-	sp->r_priv.sdt.statem.interval_error = false;
-	sp->r_priv.sdt.statem.daedt_state = SDT_STATE_IDLE;
-	sp->r_priv.sdt.statem.daedr_state = SDT_STATE_IDLE;
-	sp->r_priv.sdt.statem.octet_counting_mode = false;
+	p->r_priv.sdt.statem.aerm_state = SDT_STATE_IDLE;
+	p->r_priv.sdt.statem.aborted_proving = false;
+	p->r_priv.sdt.statem.Ca = 0;
+	p->r_priv.sdt.statem.Ti = 0;
+	p->r_priv.sdt.statem.suerm_state = SDT_STATE_IDLE;
+	p->r_priv.sdt.statem.Cs = 0;
+	p->r_priv.sdt.statem.Ns = 0;
+	p->r_priv.sdt.statem.eim_state = SDT_STATE_IDLE;
+	p->r_priv.sdt.statem.Ce = 0;
+	p->r_priv.sdt.statem.su_received = false;
+	p->r_priv.sdt.statem.interval_error = false;
+	p->r_priv.sdt.statem.daedt_state = SDT_STATE_IDLE;
+	p->r_priv.sdt.statem.daedr_state = SDT_STATE_IDLE;
+	p->r_priv.sdt.statem.octet_counting_mode = false;
 
-	sp->r_priv.sdt.stats.tx_bytes = 0;
-	sp->r_priv.sdt.stats.tx_sus = 0;
-	sp->r_priv.sdt.stats.tx_sus_repeated = 0;
-	sp->r_priv.sdt.stats.tx_underruns = 0;
-	sp->r_priv.sdt.stats.tx_aborts = 0;
-	sp->r_priv.sdt.stats.tx_buffer_overflows = 0;
-	sp->r_priv.sdt.stats.tx_sus_in_error = 0;
-	sp->r_priv.sdt.stats.rx_bytes = 0;
-	sp->r_priv.sdt.stats.rx_sus = 0;
-	sp->r_priv.sdt.stats.rx_sus_compressed = 0;
-	sp->r_priv.sdt.stats.rx_overruns = 0;
-	sp->r_priv.sdt.stats.rx_aborts = 0;
-	sp->r_priv.sdt.stats.rx_buffer_overflows = 0;
-	sp->r_priv.sdt.stats.rx_sus_in_error = 0;
-	sp->r_priv.sdt.stats.rx_sync_transitions = 0;
-	sp->r_priv.sdt.stats.rx_crc_errors = 0;
-	sp->r_priv.sdt.stats.rx_frame_errors = 0;
-	sp->r_priv.sdt.stats.rx_frame_overflows = 0;
-	sp->r_priv.sdt.stats.rx_frame_too_long = 0;
-	sp->r_priv.sdt.stats.rx_frame_too_short = 0;
-	sp->r_priv.sdt.stats.rx_residue_errors = 0;
-	sp->r_priv.sdt.stats.rx_length_error = 0;
-	sp->r_priv.sdt.stats.carrier_cts_lost = 0;
-	sp->r_priv.sdt.stats.carrier_dcd_lost = 0;
-	sp->r_priv.sdt.stats.carrier_lost = 0;
+	p->r_priv.sdt.stats.tx_bytes = 0;
+	p->r_priv.sdt.stats.tx_sus = 0;
+	p->r_priv.sdt.stats.tx_sus_repeated = 0;
+	p->r_priv.sdt.stats.tx_underruns = 0;
+	p->r_priv.sdt.stats.tx_aborts = 0;
+	p->r_priv.sdt.stats.tx_buffer_overflows = 0;
+	p->r_priv.sdt.stats.tx_sus_in_error = 0;
+	p->r_priv.sdt.stats.rx_bytes = 0;
+	p->r_priv.sdt.stats.rx_sus = 0;
+	p->r_priv.sdt.stats.rx_sus_compressed = 0;
+	p->r_priv.sdt.stats.rx_overruns = 0;
+	p->r_priv.sdt.stats.rx_aborts = 0;
+	p->r_priv.sdt.stats.rx_buffer_overflows = 0;
+	p->r_priv.sdt.stats.rx_sus_in_error = 0;
+	p->r_priv.sdt.stats.rx_sync_transitions = 0;
+	p->r_priv.sdt.stats.rx_crc_errors = 0;
+	p->r_priv.sdt.stats.rx_frame_errors = 0;
+	p->r_priv.sdt.stats.rx_frame_overflows = 0;
+	p->r_priv.sdt.stats.rx_frame_too_long = 0;
+	p->r_priv.sdt.stats.rx_frame_too_short = 0;
+	p->r_priv.sdt.stats.rx_residue_errors = 0;
+	p->r_priv.sdt.stats.rx_length_error = 0;
+	p->r_priv.sdt.stats.carrier_cts_lost = 0;
+	p->r_priv.sdt.stats.carrier_dcd_lost = 0;
+	p->r_priv.sdt.stats.carrier_lost = 0;
 
-	sp->r_priv.sdl.notify.events = 0;
+	p->r_priv.sdl.notify.events = 0;
 
-	sp->r_priv.sdl.config.ifname = NULL;
-	sp->r_priv.sdl.config.iftype = SDL_TYPE_PACKET;
-	sp->r_priv.sdl.config.ifrate = SDL_RATE_NONE;
-	sp->r_priv.sdl.config.ifgtype = SDL_GTYPE_NONE;
-	sp->r_priv.sdl.config.ifgrate = SDL_GRATE_NONE;
-	sp->r_priv.sdl.config.ifmode = SDL_MODE_PEER;
-	sp->r_priv.sdl.config.ifgmode = SDL_GMODE_NONE;
-	sp->r_priv.sdl.config.ifgcrc = SDL_GCRC_NONE;
-	sp->r_priv.sdl.config.ifclock = SDL_CLOCK_NONE;
-	sp->r_priv.sdl.config.ifcoding = SDL_CODING_NONE;
-	sp->r_priv.sdl.config.ifframing = SDL_FRAMING_NONE;
-	sp->r_priv.sdl.config.ifblksize = 8;
-	sp->r_priv.sdl.config.ifleads = 0;
-	sp->r_priv.sdl.config.ifbpv = 0;
-	sp->r_priv.sdl.config.ifalarms = 0;
-	sp->r_priv.sdl.config.ifrxlevel = 0;
-	sp->r_priv.sdl.config.iftxlevel = 1;
-	sp->r_priv.sdl.config.ifsync = 0;
-	// sp->r_priv.sdl.config.ifsyncsrc = { 0, 0, 0, 0};
+	p->r_priv.sdl.config.ifname = NULL;
+	p->r_priv.sdl.config.iftype = SDL_TYPE_PACKET;
+	p->r_priv.sdl.config.ifrate = SDL_RATE_NONE;
+	p->r_priv.sdl.config.ifgtype = SDL_GTYPE_NONE;
+	p->r_priv.sdl.config.ifgrate = SDL_GRATE_NONE;
+	p->r_priv.sdl.config.ifmode = SDL_MODE_PEER;
+	p->r_priv.sdl.config.ifgmode = SDL_GMODE_NONE;
+	p->r_priv.sdl.config.ifgcrc = SDL_GCRC_NONE;
+	p->r_priv.sdl.config.ifclock = SDL_CLOCK_NONE;
+	p->r_priv.sdl.config.ifcoding = SDL_CODING_NONE;
+	p->r_priv.sdl.config.ifframing = SDL_FRAMING_NONE;
+	p->r_priv.sdl.config.ifblksize = 8;
+	p->r_priv.sdl.config.ifleads = 0;
+	p->r_priv.sdl.config.ifbpv = 0;
+	p->r_priv.sdl.config.ifalarms = 0;
+	p->r_priv.sdl.config.ifrxlevel = 0;
+	p->r_priv.sdl.config.iftxlevel = 1;
+	p->r_priv.sdl.config.ifsync = 0;
+	// p->r_priv.sdl.config.ifsyncsrc = { 0, 0, 0, 0};
 
-	sp->r_priv.sdl.statem.tx_state = SDL_STATE_IDLE;
-	sp->r_priv.sdl.statem.rx_state = SDL_STATE_IDLE;
+	p->r_priv.sdl.statem.tx_state = SDL_STATE_IDLE;
+	p->r_priv.sdl.statem.rx_state = SDL_STATE_IDLE;
 
-	sp->r_priv.sdl.stats.rx_octets = 0;
-	sp->r_priv.sdl.stats.tx_octets = 0;
-	sp->r_priv.sdl.stats.rx_overruns = 0;
-	sp->r_priv.sdl.stats.tx_underruns = 0;
-	sp->r_priv.sdl.stats.rx_buffer_overflows = 0;
-	sp->r_priv.sdl.stats.tx_buffer_overflows = 0;
-	sp->r_priv.sdl.stats.lead_cts_lost = 0;
-	sp->r_priv.sdl.stats.lead_dcd_lost = 0;
-	sp->r_priv.sdl.stats.carrier_lost = 0;
+	p->r_priv.sdl.stats.rx_octets = 0;
+	p->r_priv.sdl.stats.tx_octets = 0;
+	p->r_priv.sdl.stats.rx_overruns = 0;
+	p->r_priv.sdl.stats.tx_underruns = 0;
+	p->r_priv.sdl.stats.rx_buffer_overflows = 0;
+	p->r_priv.sdl.stats.tx_buffer_overflows = 0;
+	p->r_priv.sdl.stats.lead_cts_lost = 0;
+	p->r_priv.sdl.stats.lead_dcd_lost = 0;
+	p->r_priv.sdl.stats.carrier_lost = 0;
 
-	sp->w_priv.pair = sp;
-	sp->w_priv.other = &sp->r_priv;
-	sp->w_priv.oq = q;
-	sp->w_priv.max_sdu = 272;
-	sp->w_priv.min_sdu = 3;
-	sp->w_priv.header_len = 0;
-	sp->w_priv.ppa_style = LMI_STYLE1;
-	sp->w_priv.state.l_state = LMI_DISABLED;
-	sp->w_priv.oldstate.l_state = LMI_DISABLED;
-	sp->w_priv.state.i_state = SLS_POWER_OFF;
-	sp->w_priv.oldstate.i_state = SLS_POWER_OFF;
-	sp->w_priv.state.i_flags = 0;
-	sp->w_priv.oldstate.i_flags = 0;
+	p->w_priv.pair = p;
+	p->w_priv.other = &p->r_priv;
+	p->w_priv.oq = q;
+	p->w_priv.max_sdu = 272;
+	p->w_priv.min_sdu = 3;
+	p->w_priv.header_len = 0;
+	p->w_priv.ppa_style = LMI_STYLE1;
+	p->w_priv.state.l_state = LMI_DISABLED;
+	p->w_priv.oldstate.l_state = LMI_DISABLED;
+	p->w_priv.state.i_state = SLS_POWER_OFF;
+	p->w_priv.oldstate.i_state = SLS_POWER_OFF;
+	p->w_priv.state.i_flags = 0;
+	p->w_priv.oldstate.i_flags = 0;
 
-	sp->w_priv.t1 = rem_tp;
-	bufq_init(&sp->w_priv.tb);
-	bufq_init(&sp->w_priv.rb);
+	p->w_priv.t1 = rem_tp;
+	bufq_init(&p->w_priv.tb);
+	bufq_init(&p->w_priv.rb);
 
-	sp->w_priv.option.pvar = SS7_PVAR_ITUT_00;
-	sp->w_priv.option.popt = 0;
+	p->w_priv.option.pvar = SS7_PVAR_ITUT_00;
+	p->w_priv.option.popt = 0;
 
-	sp->w_priv.sdt.notify.events = 0;
+	p->w_priv.sdt.notify.events = 0;
 
-	sp->w_priv.sdt.config.t8 = 100;
-	sp->w_priv.sdt.config.Tin = 4;
-	sp->w_priv.sdt.config.Tie = 1;
-	sp->w_priv.sdt.config.T = 64;
-	sp->w_priv.sdt.config.D = 256;
-	sp->w_priv.sdt.config.Te = 793544;	/* E1 */
-	sp->w_priv.sdt.config.De = 11328000;	/* E1 */
-	sp->w_priv.sdt.config.Ue = 198384000;	/* E1 */
-	sp->w_priv.sdt.config.N = 16;
-	sp->w_priv.sdt.config.m = 272;
-	sp->w_priv.sdt.config.b = 8;
-	sp->w_priv.sdt.config.f = SDT_FLAGS_ONE;
+	p->w_priv.sdt.config.t8 = 100;
+	p->w_priv.sdt.config.Tin = 4;
+	p->w_priv.sdt.config.Tie = 1;
+	p->w_priv.sdt.config.T = 64;
+	p->w_priv.sdt.config.D = 256;
+	p->w_priv.sdt.config.Te = 793544;	/* E1 */
+	p->w_priv.sdt.config.De = 11328000;	/* E1 */
+	p->w_priv.sdt.config.Ue = 198384000;	/* E1 */
+	p->w_priv.sdt.config.N = 16;
+	p->w_priv.sdt.config.m = 272;
+	p->w_priv.sdt.config.b = 8;
+	p->w_priv.sdt.config.f = SDT_FLAGS_ONE;
 
-	sp->w_priv.sdt.statem.aerm_state = SDT_STATE_IDLE;
-	sp->w_priv.sdt.statem.aborted_proving = false;
-	sp->w_priv.sdt.statem.Ca = 0;
-	sp->w_priv.sdt.statem.Ti = 0;
-	sp->w_priv.sdt.statem.suerm_state = SDT_STATE_IDLE;
-	sp->w_priv.sdt.statem.Cs = 0;
-	sp->w_priv.sdt.statem.Ns = 0;
-	sp->w_priv.sdt.statem.eim_state = SDT_STATE_IDLE;
-	sp->w_priv.sdt.statem.Ce = 0;
-	sp->w_priv.sdt.statem.su_received = false;
-	sp->w_priv.sdt.statem.interval_error = false;
-	sp->w_priv.sdt.statem.daedt_state = SDT_STATE_IDLE;
-	sp->w_priv.sdt.statem.daedr_state = SDT_STATE_IDLE;
-	sp->w_priv.sdt.statem.octet_counting_mode = false;
+	p->w_priv.sdt.statem.aerm_state = SDT_STATE_IDLE;
+	p->w_priv.sdt.statem.aborted_proving = false;
+	p->w_priv.sdt.statem.Ca = 0;
+	p->w_priv.sdt.statem.Ti = 0;
+	p->w_priv.sdt.statem.suerm_state = SDT_STATE_IDLE;
+	p->w_priv.sdt.statem.Cs = 0;
+	p->w_priv.sdt.statem.Ns = 0;
+	p->w_priv.sdt.statem.eim_state = SDT_STATE_IDLE;
+	p->w_priv.sdt.statem.Ce = 0;
+	p->w_priv.sdt.statem.su_received = false;
+	p->w_priv.sdt.statem.interval_error = false;
+	p->w_priv.sdt.statem.daedt_state = SDT_STATE_IDLE;
+	p->w_priv.sdt.statem.daedr_state = SDT_STATE_IDLE;
+	p->w_priv.sdt.statem.octet_counting_mode = false;
 
-	sp->w_priv.sdt.stats.tx_bytes = 0;
-	sp->w_priv.sdt.stats.tx_sus = 0;
-	sp->w_priv.sdt.stats.tx_sus_repeated = 0;
-	sp->w_priv.sdt.stats.tx_underruns = 0;
-	sp->w_priv.sdt.stats.tx_aborts = 0;
-	sp->w_priv.sdt.stats.tx_buffer_overflows = 0;
-	sp->w_priv.sdt.stats.tx_sus_in_error = 0;
+	p->w_priv.sdt.stats.tx_bytes = 0;
+	p->w_priv.sdt.stats.tx_sus = 0;
+	p->w_priv.sdt.stats.tx_sus_repeated = 0;
+	p->w_priv.sdt.stats.tx_underruns = 0;
+	p->w_priv.sdt.stats.tx_aborts = 0;
+	p->w_priv.sdt.stats.tx_buffer_overflows = 0;
+	p->w_priv.sdt.stats.tx_sus_in_error = 0;
 
-	sp->w_priv.sdt.stats.rx_bytes = 0;
-	sp->w_priv.sdt.stats.rx_sus = 0;
-	sp->w_priv.sdt.stats.rx_sus_compressed = 0;
-	sp->w_priv.sdt.stats.rx_overruns = 0;
-	sp->w_priv.sdt.stats.rx_aborts = 0;
-	sp->w_priv.sdt.stats.rx_buffer_overflows = 0;
-	sp->w_priv.sdt.stats.rx_sus_in_error = 0;
-	sp->w_priv.sdt.stats.rx_sync_transitions = 0;
-	sp->w_priv.sdt.stats.rx_crc_errors = 0;
-	sp->w_priv.sdt.stats.rx_frame_errors = 0;
-	sp->w_priv.sdt.stats.rx_frame_overflows = 0;
-	sp->w_priv.sdt.stats.rx_frame_too_long = 0;
-	sp->w_priv.sdt.stats.rx_frame_too_short = 0;
-	sp->w_priv.sdt.stats.rx_residue_errors = 0;
-	sp->w_priv.sdt.stats.rx_length_error = 0;
-	sp->w_priv.sdt.stats.carrier_cts_lost = 0;
-	sp->w_priv.sdt.stats.carrier_dcd_lost = 0;
-	sp->w_priv.sdt.stats.carrier_lost = 0;
+	p->w_priv.sdt.stats.rx_bytes = 0;
+	p->w_priv.sdt.stats.rx_sus = 0;
+	p->w_priv.sdt.stats.rx_sus_compressed = 0;
+	p->w_priv.sdt.stats.rx_overruns = 0;
+	p->w_priv.sdt.stats.rx_aborts = 0;
+	p->w_priv.sdt.stats.rx_buffer_overflows = 0;
+	p->w_priv.sdt.stats.rx_sus_in_error = 0;
+	p->w_priv.sdt.stats.rx_sync_transitions = 0;
+	p->w_priv.sdt.stats.rx_crc_errors = 0;
+	p->w_priv.sdt.stats.rx_frame_errors = 0;
+	p->w_priv.sdt.stats.rx_frame_overflows = 0;
+	p->w_priv.sdt.stats.rx_frame_too_long = 0;
+	p->w_priv.sdt.stats.rx_frame_too_short = 0;
+	p->w_priv.sdt.stats.rx_residue_errors = 0;
+	p->w_priv.sdt.stats.rx_length_error = 0;
+	p->w_priv.sdt.stats.carrier_cts_lost = 0;
+	p->w_priv.sdt.stats.carrier_dcd_lost = 0;
+	p->w_priv.sdt.stats.carrier_lost = 0;
 
-	sp->w_priv.sdl.notify.events = 0;
+	p->w_priv.sdl.notify.events = 0;
 
-	sp->w_priv.sdl.config.ifname = NULL;
-	sp->w_priv.sdl.config.iftype = SDL_TYPE_PACKET;
-	sp->w_priv.sdl.config.ifrate = SDL_RATE_NONE;
-	sp->w_priv.sdl.config.ifgtype = SDL_GTYPE_NONE;
-	sp->w_priv.sdl.config.ifgrate = SDL_GRATE_NONE;
-	sp->w_priv.sdl.config.ifmode = SDL_MODE_PEER;
-	sp->w_priv.sdl.config.ifgmode = SDL_GMODE_NONE;
-	sp->w_priv.sdl.config.ifgcrc = SDL_GCRC_NONE;
-	sp->w_priv.sdl.config.ifclock = SDL_CLOCK_NONE;
-	sp->w_priv.sdl.config.ifcoding = SDL_CODING_NONE;
-	sp->w_priv.sdl.config.ifframing = SDL_FRAMING_NONE;
-	sp->w_priv.sdl.config.ifblksize = 8;
-	sp->w_priv.sdl.config.ifleads = 0;
-	sp->w_priv.sdl.config.ifbpv = 0;
-	sp->w_priv.sdl.config.ifalarms = 0;
-	sp->w_priv.sdl.config.ifrxlevel = 0;
-	sp->w_priv.sdl.config.iftxlevel = 1;
-	sp->w_priv.sdl.config.ifsync = 0;
-	// sp->w_priv.sdl.config.ifsyncsrc = { 0, 0, 0, 0};
+	p->w_priv.sdl.config.ifname = NULL;
+	p->w_priv.sdl.config.iftype = SDL_TYPE_PACKET;
+	p->w_priv.sdl.config.ifrate = SDL_RATE_NONE;
+	p->w_priv.sdl.config.ifgtype = SDL_GTYPE_NONE;
+	p->w_priv.sdl.config.ifgrate = SDL_GRATE_NONE;
+	p->w_priv.sdl.config.ifmode = SDL_MODE_PEER;
+	p->w_priv.sdl.config.ifgmode = SDL_GMODE_NONE;
+	p->w_priv.sdl.config.ifgcrc = SDL_GCRC_NONE;
+	p->w_priv.sdl.config.ifclock = SDL_CLOCK_NONE;
+	p->w_priv.sdl.config.ifcoding = SDL_CODING_NONE;
+	p->w_priv.sdl.config.ifframing = SDL_FRAMING_NONE;
+	p->w_priv.sdl.config.ifblksize = 8;
+	p->w_priv.sdl.config.ifleads = 0;
+	p->w_priv.sdl.config.ifbpv = 0;
+	p->w_priv.sdl.config.ifalarms = 0;
+	p->w_priv.sdl.config.ifrxlevel = 0;
+	p->w_priv.sdl.config.iftxlevel = 1;
+	p->w_priv.sdl.config.ifsync = 0;
+	// p->w_priv.sdl.config.ifsyncsrc = { 0, 0, 0, 0};
 
-	sp->w_priv.sdl.statem.tx_state = SDL_STATE_IDLE;
-	sp->w_priv.sdl.statem.rx_state = SDL_STATE_IDLE;
+	p->w_priv.sdl.statem.tx_state = SDL_STATE_IDLE;
+	p->w_priv.sdl.statem.rx_state = SDL_STATE_IDLE;
 
-	sp->w_priv.sdl.stats.rx_octets = 0;
-	sp->w_priv.sdl.stats.tx_octets = 0;
-	sp->w_priv.sdl.stats.rx_overruns = 0;
-	sp->w_priv.sdl.stats.tx_underruns = 0;
-	sp->w_priv.sdl.stats.rx_buffer_overflows = 0;
-	sp->w_priv.sdl.stats.tx_buffer_overflows = 0;
-	sp->w_priv.sdl.stats.lead_cts_lost = 0;
-	sp->w_priv.sdl.stats.lead_dcd_lost = 0;
-	sp->w_priv.sdl.stats.carrier_lost = 0;
+	p->w_priv.sdl.stats.rx_octets = 0;
+	p->w_priv.sdl.stats.tx_octets = 0;
+	p->w_priv.sdl.stats.rx_overruns = 0;
+	p->w_priv.sdl.stats.tx_underruns = 0;
+	p->w_priv.sdl.stats.rx_buffer_overflows = 0;
+	p->w_priv.sdl.stats.tx_buffer_overflows = 0;
+	p->w_priv.sdl.stats.lead_cts_lost = 0;
+	p->w_priv.sdl.stats.lead_dcd_lost = 0;
+	p->w_priv.sdl.stats.carrier_lost = 0;
 
 	qprocson(q);
 	return (0);
@@ -4137,18 +4136,26 @@ sl_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 static streamscall int
 sl_qclose(queue_t *q, int oflags, cred_t *crp)
 {
-	struct sl_pair *sp = PRIV(q);
+	struct sl_pair *p = PRIV(q);
 
 	qprocsoff(q);
-	mi_timer_free(XCHG(&sp->r_priv.t1, NULL));
-	mi_timer_free(XCHG(&sp->w_priv.t1, NULL));
-	bufq_purge(&sp->r_priv.tb);
-	bufq_purge(&sp->r_priv.rb);
-	bufq_purge(&sp->w_priv.tb);
-	bufq_purge(&sp->w_priv.rb);
+	mi_timer_free(XCHG(&p->r_priv.t1, NULL));
+	mi_timer_free(XCHG(&p->w_priv.t1, NULL));
+	bufq_purge(&p->r_priv.tb);
+	bufq_purge(&p->r_priv.rb);
+	bufq_purge(&p->w_priv.tb);
+	bufq_purge(&p->w_priv.rb);
 	mi_close_comm(&sl_opens, q);
 	return (0);
 }
+
+/*
+ *  =========================================================================
+ *
+ *  PRIVATE STRUCTURE ALLOCATION, DEALLOCATION AND CACHE
+ *
+ *  =========================================================================
+ */
 
 /*
  *  =========================================================================
@@ -4158,7 +4165,7 @@ sl_qclose(queue_t *q, int oflags, cred_t *crp)
  *  =========================================================================
  */
 
-static struct qinit sl_rinit = {
+STATIC struct qinit sl_rinit = {
 	.qi_putp = sl_putp,		/* Read put (message from below) */
 	.qi_srvp = sl_srvp,		/* Read queue service */
 	.qi_qopen = sl_qopen,		/* Each open */
@@ -4167,14 +4174,14 @@ static struct qinit sl_rinit = {
 	.qi_mstat = &sl_rstat,		/* Statistics */
 };
 
-static struct qinit sl_winit = {
+STATIC struct qinit sl_winit = {
 	.qi_putp = sl_putp,		/* Write put (message from above) */
 	.qi_srvp = sl_srvp,		/* Write queue service */
 	.qi_minfo = &sl_minfo,		/* Information */
 	.qi_mstat = &sl_wstat,		/* Statistics */
 };
 
-static struct streamtab slpmodinfo = {
+STATIC struct streamtab slpmodinfo = {
 	.st_rdinit = &sl_rinit,		/* Upper read queue */
 	.st_wrinit = &sl_winit,		/* Upper write queue */
 };
@@ -4201,7 +4208,7 @@ MODULE_PARM_DESC(modid, "Module ID for SLPMOD module.  (0 for allocation.)");
 #define fmodsw _fmodsw
 #endif				/* LIS */
 
-static struct fmodsw sl_fmod = {
+STATIC struct fmodsw sl_fmod = {
 	.f_name = MOD_NAME,
 	.f_str = &slpmodinfo,
 	.f_flag = D_MP,
@@ -4211,14 +4218,14 @@ static struct fmodsw sl_fmod = {
 /**
  * slpmodinit: - initialize SL-PMOD
  */
-static __init int
+MODULE_STATIC int __init
 slpmodinit(void)
 {
 	int err;
 
 	cmn_err(CE_NOTE, MOD_BANNER);
 	if ((err = register_strmod(&sl_fmod)) < 0) {
-		cmn_err(CE_WARN, "%s: could not regsiter module %d\n", MOD_NAME, (int) modid);
+		cmn_err(CE_WARN, "%s: could not register module %d, err = %d\n", MOD_NAME, (int) modid, err);
 		return (err);
 	}
 	if (modid == 0)
@@ -4227,10 +4234,10 @@ slpmodinit(void)
 }
 
 /**
- * slpmodexit: - terminate SL-PMOD
+ * slpmodterminate: - terminate SL-PMOD
  */
-static __exit void
-slpmodexit(void)
+MODULE_STATIC void __exit
+slpmodterminate(void)
 {
 	int err;
 
@@ -4242,6 +4249,6 @@ slpmodexit(void)
 }
 
 module_init(slpmodinit);
-module_exit(slpmodexit);
+module_exit(slpmodterminate);
 
 #endif				/* LINUX */

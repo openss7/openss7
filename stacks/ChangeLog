@@ -13,6 +13,46 @@
 	* src/test/sdt/test-sdt-pmod.c: added new files
 	* src/test/sl/test-sl-pmod.c: added new files
 
+	* doc/man/strss7.refs: updates CDI reference
+	* doc/man/man4/sdt.4.man: cosmetic
+	* doc/man/man7/LMI_INFO_ACK.7.man: PPA updates
+
+	* src/include/ss7/lmi.h: PPA handling
+	* src/include/ss7/mtpi_ioctl.h: PPA handling
+	* src/include/ss7/sdli.h: PPA handling
+	* src/include/ss7/sdti.h: PPA handling
+	* src/include/ss7/sli.h: PPA handling
+	* src/modules/mtp/mtp.c: PPA handling
+	* src/modules/mtp/mtp_min.c: PPA handling
+	* src/modules/mtp/mtp_mod.c: PPA handling
+	* src/modules/sccp/sccp.c:
+	* src/modules/sdl/sdl.c: PPA handling
+	* src/modules/sdl/sdl_ch.c: PPA handling
+	* src/modules/sdl/sdl_pmod.c: PPA handling
+	* src/modules/sdl/sdlm.c: PPA handling
+	* src/modules/sdl/spm.c: PPA handling
+	* src/modules/sdt/sdt.c: PPA handling
+	* src/modules/sdt/sdt_pmod.c: PPA handling
+	* src/modules/sl/lis.conf: sl_mux sl_min adjustment
+	* src/modules/sl/sl.c: PPA handling
+	* src/modules/sl/sl_dl.c: PPA handling
+	* src/modules/sl/sl_mux.c: PPA handling
+	* src/modules/sl/slm.c: PPA handling
+	* src/modules/sl/slmux.c: PPA handling
+	* src/modules/sl/slpmod.c: PPA handling
+	* src/modules/sl/sm_mod.c: PPA handling
+	* src/modules/tcap/tcap.c: PPA handling
+	* src/modules/x400p-ss7/sl_x100p.c: PPA handling
+	* src/modules/x400p-ss7/sl_x400p.c: PPA handling
+	* src/modules/x400p-ss7/x100p-ss7.c: PPA handling
+	* src/modules/x400p-ss7/x400p-ss7.c: PPA handling
+	* src/test/sl/test-q781.c: PPA handling
+	* src/test/x400p-ss7/test-x100p.c: PPA handling
+	* src/test/x400p-ss7/test-x400p.c: PPA handling
+	* src/util/sdlconf.c: PPA handling
+	* src/util/slmon.c: PPA handling
+	* src/util/ss7capd.c: PPA handling
+
 2007-08-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man4/sccp.4.man: rework of SDL-, SDT-, SL-PMOD

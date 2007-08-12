@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:00 $
+ @(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $
 
  -----------------------------------------------------------------------------
 
@@ -9,10 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; either version 2 of the License, or (at your option) any later
- version.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -20,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -46,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 20:22:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_ch.c,v $
+ Revision 0.9.2.2  2007/08/12 16:20:25  brian
+ - new PPA handling
+
  Revision 0.9.2.1  2007/07/21 20:22:00  brian
  - added channel modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:00 $"
+#ident "@(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $"
 
-static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:00 $";
+static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $";
 
 #define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
@@ -74,6 +76,9 @@ static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.1
  * Another more direct approach is to have a SDT module that pushes directly over a CH Stream
  * instead of over an SDL Stream.  Nevertheless, this module can be useful for testing.
  */
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
+
 #include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
@@ -84,7 +89,7 @@ static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <sys/chi_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/07/21 20:22:00 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL-CH module."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -624,12 +629,16 @@ lmi_info_ack(struct sdl *sdl, queue_t *q, mblk_t *msg)
 		mp->b_band = 0;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sdl_get_m_state(sdl);
 		p->lmi_max_sdu = sdl->max_sdu;
 		p->lmi_min_sdu = sdl->min_sdu;
 		p->lmi_header_len = sdl->header_len;
 		p->lmi_ppa_style = sdl->ppa_style;
+		p->lmi_ppa_length = sdl->ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = sdl->flags & (SDL_RX_DIRECTION | SDL_TX_DIRECTION);
+		p->lmi_prov_state = p->lmi_prov_flags ? SDL_CONNECTED : SDL_DISCONNECTED;
 		mp->b_wptr += sizeof(*p);
 		bcopy(sdl->ppa, mp->b_wptr, sdl->ppa_len);
 		mp->b_wptr += sdl->ppa_len;
@@ -1324,16 +1333,18 @@ lmi_attach_req(struct sdl *sdl, queue_t *q, mblk_t *mp)
 	size_t ppa_len;
 	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
 	if (sdl_get_m_state(sdl) == LMI_UNUSABLE)
 		goto fatalerr;
 	if (sdl_get_m_state(sdl) != LMI_UNATTACHED)
 		goto outstate;
 	if (sdl->ppa_style != LMI_STYLE2)
 		goto badprim;
-	ppa_ptr = (caddr_t)(p + 1);
-	ppa_len = mp->b_wptr - mp->b_rptr - sizeof(*p);
+	ppa_ptr = (caddr_t) (mp->b_rptr + p->lmi_ppa_offset);
+	ppa_len = p->lmi_ppa_length;
 	sdl_checkpoint_m_state(sdl, LMI_ATTACH_PENDING);
 	return ch_attach_req(sdl->ch, q, mp, ppa_ptr, ppa_len, 0);
       badprim:
@@ -1344,6 +1355,9 @@ lmi_attach_req(struct sdl *sdl, queue_t *q, mblk_t *mp)
 	goto error;
       fatalerr:
 	err = LMI_FATALERR;
+	goto error;
+      badppa:
+	err = LMI_BADPPA;
 	goto error;
       tooshort:
 	err = LMI_TOOSHORT;
@@ -1402,14 +1416,19 @@ lmi_enable_req(struct sdl *sdl, queue_t *q, mblk_t *mp)
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (sdl_get_m_state(sdl) == LMI_UNUSABLE)
 		goto fatalerr;
 	if (sdl_get_m_state(sdl) != LMI_DISABLED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	sdl_checkpoint_m_state(sdl, LMI_ENABLE_PENDING);
 	return ch_enable_req(sdl->ch, q, mp);
+      badaddr:
+	err = LMI_BADADDRESS;
+	goto error;
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;
@@ -2307,12 +2326,12 @@ sdl_ioctl(queue_t *q, mblk_t *mp)
 
 	switch (_IOC_NR(ioc->ioc_cmd)) {
 	case _IOC_NR(SDL_IOCGOPTIONS):
-		size = sizeof(sdl->option);
-		break;
-	case _IOC_NR(SDL_IOCSOPTIONS):
 		if (!(bp = mi_copyout_alloc(q, mp, NULL, sizeof(sdl->option), false)))
 			goto enobufs;
 		bcopy(&sdl->option, bp->b_rptr, sizeof(sdl->option));
+		break;
+	case _IOC_NR(SDL_IOCSOPTIONS):
+		size = sizeof(sdl->option);
 		break;
 	case _IOC_NR(SDL_IOCGCONFIG):
 		if (!(bp = mi_copyout_alloc(q, mp, NULL, sizeof(sdl->sdl.config), false)))

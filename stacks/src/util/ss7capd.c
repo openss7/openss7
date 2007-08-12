@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:20:49 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:22:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 0.9.2.3  2007/08/12 16:20:49  brian
+ - new PPA handling
+
  Revision 0.9.2.2  2007/01/21 20:22:41  brian
  - working up drivers
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $"
+#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:20:49 $"
 
 static char const ident[] =
-    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $";
+    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:20:49 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -413,7 +416,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.2 2007/01/21 20:22:41 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.3 2007/08/12 16:20:49 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -712,8 +715,10 @@ cap_attach(void)
 	ctrl.maxlen = sizeof(cbuf);
 	ctrl.len = sizeof(p->attach_req) + sizeof(ppa);
 	ctrl.buf = cbuf;
-	p->lmi_primitive = LMI_ATTACH_REQ;
-	bcopy(&ppa, p->attach_req.lmi_ppa, sizeof(ppa));
+	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	p->attach_req.lmi_ppa_length = sizeof(ppa);
+	p->attach_req.lmi_ppa_offset = sizeof(p->attach_req);
+	bcopy(&ppa, cbuf + sizeof(p->attach_req), sizeof(ppa));
 	if ((ret = putmsg(cap_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		syslog(LOG_ERR, "%s: putmsg: %m", __FUNCTION__);
 		cap_exit(1);
@@ -765,6 +770,8 @@ cap_enable(void)
 	ctrl.len = sizeof(p->enable_req);
 	ctrl.buf = cbuf;
 	p->enable_req.lmi_primitive = LMI_ENABLE_REQ;
+	p->enable_req.lmi_rem_length = 0;
+	p->enable_req.lmi_rem_offset = sizeof(p->enable_req);
 	if ((ret = putmsg(cap_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		syslog(LOG_ERR, "%s: putmsg: %m", __FUNCTION__);
 		cap_exit(1);

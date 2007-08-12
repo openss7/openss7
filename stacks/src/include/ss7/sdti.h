@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdti.h,v 0.9.2.4 2007/06/17 01:56:02 brian Exp $
+ @(#) $Id: sdti.h,v 0.9.2.5 2007/08/12 16:19:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:19:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdti.h,v $
+ Revision 0.9.2.5  2007/08/12 16:19:53  brian
+ - new PPA handling
+
  Revision 0.9.2.4  2007/06/17 01:56:02  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_SDTI_H__
 #define __SS7_SDTI_H__
 
-#ident "@(#) $RCSfile: sdti.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sdti.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -105,6 +108,25 @@ typedef lmi_uchar sdt_uchar;
 #define SDT_LSC_LINK_FAILURE_IND		(-7L - SDT_PROTO_BASE)
 #define SDT_TXC_TRANSMISSION_REQUEST_IND	(-8L - SDT_PROTO_BASE)
 #define SDT_USTR_FIRST				(-8L - SDT_PROTO_BASE)
+
+/*
+ *  STATE
+ */
+#define SDTS_POWER_OFF			0
+#define SDTS_IDLE			1
+#define SDTS_ABORTED_PROVING		2
+#define SDTS_NORMAL_PROVING		3
+#define SDTS_EMERGENCY_PROVING		4
+#define SDTS_MONITORING_ERRORS		5
+#define SDTS_MONITORING			6
+
+/*
+ *  FLAGS
+ */
+#define SDTF_DAEDT_ACTIVE		(1<<0)
+#define SDTF_DAEDR_ACTIVE		(1<<1)
+#define SDTF_AERM_ACTIVE		(1<<2)
+#define SDTF_SUERM_ACTIVE		(1<<3)
 
 /*
  *  SDT_RC_SIGNAL_UNIT_IND, M_DATA or M_PROTO

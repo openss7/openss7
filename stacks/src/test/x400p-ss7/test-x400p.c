@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:15:11 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:44 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:15:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.20  2007/08/12 16:20:44  brian
+ - new PPA handling
+
  Revision 0.9.2.19  2007/03/15 10:15:11  brian
  - test case reporting and release date
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:15:11 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:44 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/03/15 10:15:11 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:44 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -251,11 +254,15 @@ static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9
 
 static const char *lpkgname = "SS7 MTP Level 2";
 
-/* static const char *spkgname = "SIGTRAN"; */
+/* static const char *spkgname = "strss7"; */
 static const char *lstdname = "Q.703/ANSI T1.111.3/JQ.703";
 static const char *sstdname = "Q.781";
 static const char *shortname = "MTP2";
+#ifdef LFS
+static char devname[256] = "/dev/streams/clone/x400p-sl";
+#else
 static char devname[256] = "/dev/x400p-sl";
+#endif
 
 static int repeat_verbose = 0;
 static int repeat_on_success = 0;
@@ -747,6 +754,7 @@ static const char *failure_string = NULL;
 #define __stringify(x) __stringify_1(x)
 #define FAILURE_STRING(string) "[" __stringify(__LINE__) "] " string
 
+/* lockf does not work well on SMP for some reason */
 #if 1
 #undef lockf
 #define lockf(x,y,z) 0
@@ -1143,6 +1151,14 @@ N_qos_sel_info_sctp_t qos_info = {
 	.options = 0,
 };
 #endif				/* TEST_M2PA */
+
+/*
+ *  -------------------------------------------------------------------------
+ *
+ *  Printing things
+ *
+ *  -------------------------------------------------------------------------
+ */
 
 char *
 errno_string(long err)
@@ -2026,6 +2042,10 @@ ioctl_string(int cmd, intptr_t arg)
 		return ("I_HEAP_REPORT");
 	case I_FIFO:
 		return ("I_FIFO");
+	case I_GETMSG:
+		return ("I_GETMSG");
+	case I_PUTMSG:
+		return ("I_PUTMSG");
 	case I_PUTPMSG:
 		return ("I_PUTPMSG");
 	case I_GETPMSG:
@@ -5307,7 +5327,7 @@ test_pop(int child)
 /*
  *  -------------------------------------------------------------------------
  *
- *  STREAM Initialization
+ *  Stream Initialization
  *
  *  -------------------------------------------------------------------------
  */
@@ -6610,6 +6630,8 @@ do_signal(int child, int action)
 	case __TEST_ATTACH_REQ:
 		ctrl->len = sizeof(p->lmi.attach_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.attach_req.lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi.attach_req.lmi_ppa_length = ADDR_length;
+		p->lmi.attach_req.lmi_ppa_offset = sizeof(p->lmi.attach_req);
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.attach_req), ADDR_length);
 		data = NULL;
@@ -6640,6 +6662,8 @@ do_signal(int child, int action)
 	case __TEST_ENABLE_REQ:
 		ctrl->len = sizeof(p->lmi.enable_req) + (ADDR_buffer ? ADDR_length : 0);
 		p->lmi.enable_req.lmi_primitive = LMI_ENABLE_REQ;
+		p->lmi.enable_req.lmi_rem_length = ADDR_length;
+		p->lmi.enable_req.lmi_rem_offset = sizeof(p->lmi.enable_req);
 		if (ADDR_buffer)
 			bcopy(ADDR_buffer, ctrl->buf + sizeof(p->lmi.enable_req), ADDR_length);
 		data = NULL;
@@ -20961,7 +20985,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -20992,7 +21016,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

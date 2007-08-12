@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.24  2007/08/12 16:20:14  brian
+ - new PPA handling
+
  Revision 0.9.2.23  2007/08/03 13:35:28  brian
  - manual updates, put ss7 modules in public release
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -119,7 +122,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:28 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1688,7 +1691,7 @@ sc_trylock(struct sc *sc, queue_t *q)
 static void
 sc_unlock(struct sc *sc)
 {
-	mi_unlock((caddr_t) sc);
+	mi_release((caddr_t) sc);
 }
 static bool
 sp_trylock(struct sp *sp, queue_t *q)
@@ -1723,7 +1726,7 @@ mt_trylock(struct mt *mt, queue_t *q)
 static void
 mt_unlock(struct mt *mt)
 {
-	mi_unlock((caddr_t) mt);
+	mi_release((caddr_t) mt);
 }
 static struct sc *
 sc_acquire(queue_t *q)

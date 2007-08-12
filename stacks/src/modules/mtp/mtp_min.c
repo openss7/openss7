@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $
+ @(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 16:20:11 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_min.c,v $
+ Revision 0.9.2.19  2007/08/12 16:20:11  brian
+ - new PPA handling
+
  Revision 0.9.2.18  2007/08/03 13:35:25  brian
  - manual updates, put ss7 modules in public release
 
@@ -73,9 +76,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $"
+#ident "@(#) $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 16:20:11 $"
 
-static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $";
+static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 16:20:11 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL (Signalling Link)
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.
 #include <sys/tihdr.h>
 
 #define MTP_MIN_DESCRIP		"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/03 13:35:25 $"
+#define MTP_MIN_REVISION	"OpenSS7 $RCSfile: mtp_min.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 16:20:11 $"
 #define MTP_MIN_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux STREAMS."
 #define MTP_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -1923,18 +1926,18 @@ static inline int
 lmi_attach_req(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 {
 	struct sl *sl = SL_PRIV(q);
-	mblk_t *mp;
 	lmi_attach_req_t *p;
+	mblk_t *mp;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
 		mp->b_wptr += sizeof(*p);
-		if (ppa_ptr && ppa_len) {
-			bcopy(ppa_ptr, mp->b_wptr, ppa_len);
-			mp->b_wptr += ppa_len;
-		}
+		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
+		mp->b_wptr += ppa_len;
 		printd(("%s: %p: LMI_ATTACH_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -1982,11 +1985,11 @@ lmi_enable_req(queue_t *q, caddr_t dst_ptr, size_t dst_len)
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ENABLE_REQ;
+		p->lmi_rem_length = dst_len;
+		p->lmi_rem_offset = sizeof(*p);
 		mp->b_wptr += sizeof(*p);
-		if (dst_ptr && dst_len) {
-			bcopy(dst_ptr, mp->b_wptr, dst_len);
-			mp->b_wptr += dst_len;
-		}
+		bcopy(dst_ptr, mp->b_wptr, dst_len);
+		mp->b_wptr += dst_len;
 		printd(("%s: %p: LMI_ENABLE_REQ ->\n", DRV_NAME, sl));
 		putnext(sl->wq, mp);
 		return (QR_ABSORBED);
@@ -3902,8 +3905,8 @@ sl_recv_upt(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *m
 	return (-EFAULT);
 }
 
-#define SLS_OUT_OF_SERVICE	    0
-// #define SLS_IN_SERVICE 1
+#define SLS_OOSERV		    0
+#define SLS_INSERV		    1
 #define SLS_PENDING_ACTIVATION	    2
 #define SLS_PENDING_DEACTIVATION    3
 
@@ -3966,7 +3969,7 @@ sl_t2t_timeout(queue_t *q)
 {
 	struct sl *sl = SL_PRIV(q);
 
-	if (sl->state == SLS_IN_SERVICE) {
+	if (sl->state == SLS_INSERV) {
 		int i;
 		unsigned long random = jiffies;
 
@@ -3995,7 +3998,7 @@ sl_recv_slta(struct sl *sl, queue_t *q, mblk_t *bp, mblk_t *dp, struct mtp_msg *
 {
 	int err, i;
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto eproto;
 	if (!(sl->flags & (SL_F_WACK_SLTM | SL_F_WACK_SLTM2)))
 		goto eproto;
@@ -4772,7 +4775,7 @@ sl_data_ind(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto outstate;
 	return sl_recv_msg(sl, q, NULL, mp);
       outstate:
@@ -4795,7 +4798,7 @@ sl_pdu_ind(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	const sl_pdu_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p) || !mp->b_cont)
 		goto badprim;
@@ -4823,7 +4826,7 @@ sl_link_congested_ind(queue_t *q, mblk_t *mp)
 	int err;
 	const sl_link_cong_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -4862,7 +4865,7 @@ sl_link_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 	int err;
 	const sl_link_cong_ceased_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -5052,7 +5055,7 @@ sl_out_of_service_ind(queue_t *q, mblk_t *mp)
 	int err;
 	const sl_out_of_service_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -5081,7 +5084,7 @@ sl_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 	int err;
 	const sl_rem_proc_out_ind_t *p = (typeof(p)) mp->b_rptr;
 
-	if (sl->state != SLS_IN_SERVICE)
+	if (sl->state != SLS_INSERV)
 		goto outstate;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
@@ -7238,14 +7241,20 @@ mt_qopen(queue_t *q, dev_t *devp, int oflags, int sflag, cred_t *crp)
 static int
 mt_qclose(queue_t *q, int flag, cred_t *crp)
 {
-	struct mt *mt;
+	struct mt *mt = MT_PRIV(q);
 	unsigned long flags;
+	struct sl *sl;
 
 	qprocsoff(q);
 	mi_strlog(q, 0, SL_TRACE, "closing character device");
-	while (!(mt = (struct mt *) mi_sleeplock(q))) ;
 	write_lock_irqsave(&mt_mux_lock, flags);
-	if (mt->sl) {
+	/* run till we get the lock */
+	if ((sl = (void *) mi_acquire_sleep((void *) mt, (void *) &mt->sl, &mt_mux_lock, &flags))) {
+		sl->mtp = NULL;
+		mt->sl = NULL;
+		mi_unlock((caddr_t) sl);
+	} else if (mt->sl) {
+		/* interrupted, brave it without locks */
 		mt->sl->mtp = NULL;
 		mt->sl = NULL;
 	}
