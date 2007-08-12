@@ -3,18 +3,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/03/07 10:12:59 $
+# @(#) $RCSfile: strcomp.m4,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/12 19:05:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,76 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: strcomp.m4,v $
-# Revision 0.9.2.34  2007/03/07 10:12:59  brian
-# - more corrections
-#
-# Revision 0.9.2.33  2007/03/07 09:24:08  brian
-# - further corrections
-#
-# Revision 0.9.2.32  2007/03/07 07:29:22  brian
-# - search harder for versions
-#
-# Revision 0.9.2.31  2007/03/06 23:39:54  brian
-# - more corrections
-#
-# Revision 0.9.2.30  2007/03/06 23:13:57  brian
-# - master build correction
-#
-# Revision 0.9.2.29  2007/03/04 23:26:40  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.28  2007/03/04 23:14:43  brian
-# - better search for modversions
-#
-# Revision 0.9.2.27  2007/03/04 22:16:20  brian
-# - preparing for eventual library
-#
-# Revision 0.9.2.26  2007/03/01 07:17:25  brian
-# - updating common build process
-#
-# Revision 0.9.2.25  2007/03/01 06:38:15  brian
-# - updates to common build process
-#
-# Revision 0.9.2.24  2007/03/01 00:10:18  brian
-# - update to build process for 2.4 kernels
-#
-# Revision 0.9.2.23  2007/02/28 11:51:32  brian
-# - make sure build directory exists
-#
-# Revision 0.9.2.22  2007/02/27 08:38:37  brian
-# - release corrections for 2.4 kernel builds
-#
-# Revision 0.9.2.21  2006-12-28 08:32:32  brian
-# - use cache names for master src and build directories
-#
-# Revision 0.9.2.20  2006/10/27 22:17:02  brian
-# - changes for 2.6.18 kernel
-#
-# Revision 0.9.2.19  2006/09/29 10:57:46  brian
-# - autoconf does not like multiline cache variables
-#
-# Revision 0.9.2.18  2006/09/29 03:46:16  brian
-# - substitute LDFLAGS32
-#
-# Revision 0.9.2.17  2006/09/29 03:22:38  brian
-# - handle flags better
-#
-# Revision 0.9.2.16  2006/09/27 05:08:41  brian
-# - distinguish LDADD from LDFLAGS
-#
-# Revision 0.9.2.15  2006/09/18 00:33:51  brian
-# - added checks for 32bit compatibility libraries
-#
-# Revision 0.9.2.14  2006/03/14 09:20:47  brian
-# - typo
-#
-# Revision 0.9.2.13  2006/03/14 09:04:11  brian
-# - syntax consistency, advanced search
+# Last Modified $Date: 2007/08/12 19:05:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -696,8 +627,80 @@ AC_DEFUN([_STRCOMP_], [dnl
 # =============================================================================
 
 # =============================================================================
+#
+# $Log: strcomp.m4,v $
+# Revision 0.9.2.35  2007/08/12 19:05:32  brian
+# - rearrange and update headers
+#
+# Revision 0.9.2.34  2007/03/07 10:12:59  brian
+# - more corrections
+#
+# Revision 0.9.2.33  2007/03/07 09:24:08  brian
+# - further corrections
+#
+# Revision 0.9.2.32  2007/03/07 07:29:22  brian
+# - search harder for versions
+#
+# Revision 0.9.2.31  2007/03/06 23:39:54  brian
+# - more corrections
+#
+# Revision 0.9.2.30  2007/03/06 23:13:57  brian
+# - master build correction
+#
+# Revision 0.9.2.29  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.28  2007/03/04 23:14:43  brian
+# - better search for modversions
+#
+# Revision 0.9.2.27  2007/03/04 22:16:20  brian
+# - preparing for eventual library
+#
+# Revision 0.9.2.26  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.25  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
+# Revision 0.9.2.24  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
+# Revision 0.9.2.23  2007/02/28 11:51:32  brian
+# - make sure build directory exists
+#
+# Revision 0.9.2.22  2007/02/27 08:38:37  brian
+# - release corrections for 2.4 kernel builds
+#
+# Revision 0.9.2.21  2006-12-28 08:32:32  brian
+# - use cache names for master src and build directories
+#
+# Revision 0.9.2.20  2006/10/27 22:17:02  brian
+# - changes for 2.6.18 kernel
+#
+# Revision 0.9.2.19  2006/09/29 10:57:46  brian
+# - autoconf does not like multiline cache variables
+#
+# Revision 0.9.2.18  2006/09/29 03:46:16  brian
+# - substitute LDFLAGS32
+#
+# Revision 0.9.2.17  2006/09/29 03:22:38  brian
+# - handle flags better
+#
+# Revision 0.9.2.16  2006/09/27 05:08:41  brian
+# - distinguish LDADD from LDFLAGS
+#
+# Revision 0.9.2.15  2006/09/18 00:33:51  brian
+# - added checks for 32bit compatibility libraries
+#
+# Revision 0.9.2.14  2006/03/14 09:20:47  brian
+# - typo
+#
+# Revision 0.9.2.13  2006/03/14 09:04:11  brian
+# - syntax consistency, advanced search
+#
+# =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

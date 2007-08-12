@@ -29,6 +29,39 @@
 	* scripts/strconf-sh: updated script headers
 	* scripts/texinfo.cnf: updated script headers
 
+	* m4/autotest.m4: rearrange and update headers
+	* m4/bcm.m4: rearrange and update headers
+	* m4/chan.m4: rearrange and update headers
+	* m4/dast.m4: rearrange and update headers
+	* m4/deb.m4: rearrange and update headers
+	* m4/devfs.m4: rearrange and update headers
+	* m4/dist.m4: rearrange and update headers
+	* m4/doxy.m4: rearrange and update headers
+	* m4/genksyms.m4: rearrange and update headers
+	* m4/inet.m4: rearrange and update headers
+	* m4/init.m4: rearrange and update headers
+	* m4/isdn.m4: rearrange and update headers
+	* m4/iso.m4: rearrange and update headers
+	* m4/kernel.m4: rearrange and update headers
+	* m4/libraries.m4: rearrange and update headers
+	* m4/man.m4: rearrange and update headers
+	* m4/nsl.m4: rearrange and update headers
+	* m4/openss7.m4: rearrange and update headers
+	* m4/pr.m4: rearrange and update headers
+	* m4/public.m4: rearrange and update headers
+	* m4/rpm.m4: rearrange and update headers
+	* m4/sctp.m4: rearrange and update headers
+	* m4/sigtran.m4: rearrange and update headers
+	* m4/sock.m4: rearrange and update headers
+	* m4/ss7.m4: rearrange and update headers
+	* m4/strcomp.m4: rearrange and update headers
+	* m4/strconf.m4: rearrange and update headers
+	* m4/streams.m4: rearrange and update headers
+	* m4/voip.m4: rearrange and update headers
+	* m4/xns.m4: rearrange and update headers
+	* m4/xopen.m4: rearrange and update headers
+	* m4/xti.m4: rearrange and update headers
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: reference updates
