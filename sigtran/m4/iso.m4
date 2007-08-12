@@ -3,18 +3,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/07 10:12:59 $
+# @(#) $RCSfile: iso.m4,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/12 19:05:31 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,63 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/07 10:12:59 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: iso.m4,v $
-# Revision 0.9.2.17  2007/03/07 10:12:59  brian
-# - more corrections
-#
-# Revision 0.9.2.16  2007/03/07 09:24:08  brian
-# - further corrections
-#
-# Revision 0.9.2.15  2007/03/07 07:29:21  brian
-# - search harder for versions
-#
-# Revision 0.9.2.14  2007/03/06 23:39:54  brian
-# - more corrections
-#
-# Revision 0.9.2.13  2007/03/06 23:13:57  brian
-# - master build correction
-#
-# Revision 0.9.2.12  2007/03/04 23:26:40  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.11  2007/03/04 23:14:42  brian
-# - better search for modversions
-#
-# Revision 0.9.2.10  2007/03/01 07:17:25  brian
-# - updating common build process
-#
-# Revision 0.9.2.9  2007/03/01 06:38:15  brian
-# - updates to common build process
-#
-# Revision 0.9.2.8  2007/03/01 01:45:15  brian
-# - updating build process
-#
-# Revision 0.9.2.7  2007/03/01 00:10:18  brian
-# - update to build process for 2.4 kernels
-#
-# Revision 0.9.2.6  2007/02/28 11:51:31  brian
-# - make sure build directory exists
-#
-# Revision 0.9.2.5  2007/02/22 08:36:38  brian
-# - balance parentheses
-#
-# Revision 0.9.2.4  2006-12-28 08:32:31  brian
-# - use cache names for master src and build directories
-#
-# Revision 0.9.2.3  2006/09/30 08:12:45  brian
-# - corrected search start for includes
-#
-# Revision 0.9.2.2  2006/09/30 07:30:57  brian
-# - turn on lib in iso.m4
-#
-# Revision 0.9.2.1  2006/09/30 07:29:06  brian
-# - corrected warning message
-# - corrected variable name in xti.m4
-# - added iso.m4 to locate striso package
+# Last Modified $Date: 2007/08/12 19:05:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -622,8 +566,67 @@ AC_DEFUN([_ISO_], [dnl
 # =============================================================================
 
 # =============================================================================
+#
+# $Log: iso.m4,v $
+# Revision 0.9.2.18  2007/08/12 19:05:31  brian
+# - rearrange and update headers
+#
+# Revision 0.9.2.17  2007/03/07 10:12:59  brian
+# - more corrections
+#
+# Revision 0.9.2.16  2007/03/07 09:24:08  brian
+# - further corrections
+#
+# Revision 0.9.2.15  2007/03/07 07:29:21  brian
+# - search harder for versions
+#
+# Revision 0.9.2.14  2007/03/06 23:39:54  brian
+# - more corrections
+#
+# Revision 0.9.2.13  2007/03/06 23:13:57  brian
+# - master build correction
+#
+# Revision 0.9.2.12  2007/03/04 23:26:40  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.11  2007/03/04 23:14:42  brian
+# - better search for modversions
+#
+# Revision 0.9.2.10  2007/03/01 07:17:25  brian
+# - updating common build process
+#
+# Revision 0.9.2.9  2007/03/01 06:38:15  brian
+# - updates to common build process
+#
+# Revision 0.9.2.8  2007/03/01 01:45:15  brian
+# - updating build process
+#
+# Revision 0.9.2.7  2007/03/01 00:10:18  brian
+# - update to build process for 2.4 kernels
+#
+# Revision 0.9.2.6  2007/02/28 11:51:31  brian
+# - make sure build directory exists
+#
+# Revision 0.9.2.5  2007/02/22 08:36:38  brian
+# - balance parentheses
+#
+# Revision 0.9.2.4  2006-12-28 08:32:31  brian
+# - use cache names for master src and build directories
+#
+# Revision 0.9.2.3  2006/09/30 08:12:45  brian
+# - corrected search start for includes
+#
+# Revision 0.9.2.2  2006/09/30 07:30:57  brian
+# - turn on lib in iso.m4
+#
+# Revision 0.9.2.1  2006/09/30 07:29:06  brian
+# - corrected warning message
+# - corrected variable name in xti.m4
+# - added iso.m4 to locate striso package
+#
+# =============================================================================
 # 
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
