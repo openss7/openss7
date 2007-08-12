@@ -62,6 +62,11 @@
 	* m4/xopen.m4: rearrange and update headers
 	* m4/xti.m4: rearrange and update headers
 
+	* configure.fast: updated headers
+	* configure.nexusware: updated headers
+	* configure.norm: updated headers
+	* configure.test: updated headers
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* openss7.refs: reference updates
