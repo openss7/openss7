@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:20:49 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:49:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:49 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:49:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 0.9.2.4  2007/08/12 16:49:58  brian
+ - header updates
+
  Revision 0.9.2.3  2007/08/12 16:20:49  brian
  - new PPA handling
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:20:49 $"
+#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:49:58 $"
 
 static char const ident[] =
-    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:20:49 $";
+    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:49:58 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -145,7 +148,7 @@ version(int argc, char **argv)
 	fprintf(stdout, "\
 %2$s\n\
 Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 2, included here by reference.\n\
+Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -416,7 +419,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.3 2007/08/12 16:20:49 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.4 2007/08/12 16:49:58 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

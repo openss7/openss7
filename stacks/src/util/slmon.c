@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:49 $
+ @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:49:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:49 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:49:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slmon.c,v $
+ Revision 0.9.2.5  2007/08/12 16:49:58  brian
+ - header updates
+
  Revision 0.9.2.4  2007/08/12 16:20:49  brian
  - new PPA handling
 
@@ -64,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:49 $"
+#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:49:58 $"
 
-static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:49 $";
+static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:49:58 $";
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is
@@ -299,7 +302,7 @@ output_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.4 2007/08/12 16:20:49 brian Exp $ Output File Header\n");
+	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.5 2007/08/12 16:49:58 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -2216,7 +2219,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -2247,7 +2250,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

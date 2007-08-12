@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $
+ @(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:49:58 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/21 20:22:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:49:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconfd.c,v $
+ Revision 0.9.2.3  2007/08/12 16:49:58  brian
+ - header updates
+
  Revision 0.9.2.2  2007/01/21 20:22:41  brian
  - working up drivers
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $"
+#ident "@(#) $RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:49:58 $"
 
-static char const ident[] = "$RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/01/21 20:22:41 $";
+static char const ident[] = "$RCSfile: slconfd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/12 16:49:58 $";
 
 /*
  *  This is a configuration daemon for the SL-MUX multiplexing driver.  Its purpose is to open
@@ -159,7 +162,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -190,7 +193,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
