@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:45 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.7  2007/08/12 16:15:37  brian
+ -
+
  Revision 0.9.2.6  2007/07/14 01:33:45  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:45 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:45 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $";
+
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
 
 #include <sys/os7/compat.h>
 
@@ -93,7 +99,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:45 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -235,20 +241,25 @@ typedef struct sdt {
 STATIC int
 lmi_info_ack(sdt_t * sp)
 {
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sp->state;
 		p->lmi_max_sdu = -1;
 		p->lmi_min_sdu = 0;
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE1;
+		p->lmi_ppa_length = 0;
+		p->lmi_ppa_length = sizeof(*p);
+		p->lmi_prov_flags = 0; /* FIXME */
+		p->lmi_prov_state = 0; /* FIXME */
 		putnext(sp->iq, mp);
 		return (0);
 	}
@@ -742,13 +753,13 @@ lmi_info_req(sdt_t * sp, mblk_t *mp)
 STATIC int
 lmi_attach_req(sdt_t * sp, mblk_t *mp)
 {
-	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_attach_req_t *p = (lmi_attach_req_t *) mp->b_rptr;
+	int err;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
-		if (mlen >= sizeof(*p)) {
+		if (MBLKIN(mp, 0, sizeof(*p))) {
 			if (sp->state == LMI_UNATTACHED) {
 				sp->state = LMI_ATTACH_PENDING;
 
@@ -806,13 +817,13 @@ lmi_detach_req(sdt_t * sp, mblk_t *mp)
 STATIC int
 lmi_enable_req(sdt_t * sp, mblk_t *mp)
 {
-	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_enable_req_t *p = (lmi_enable_req_t *) mp->b_rptr;
+	int err;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
-		if (mlen >= sizeof(*p)) {
+		if (MBLKIN(mp, 0, sizeof(*p))) {
 			if (sp->state == LMI_DISABLED) {
 				sp->state = LMI_ENABLE_PENDING;
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:21 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:34:21 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.9  2007/08/12 16:15:11  brian
+ -
+
  Revision 0.9.2.8  2007/08/03 13:34:21  brian
  - manual updates, put ss7 modules in public release
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:21 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:21 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -150,7 +153,7 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/08/03 13:34:21 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3832,17 +3835,23 @@ lmi_info_ack(struct up *up, queue_t *q, mblk_t *msg)
 		case LMI_ATTACH_PENDING:
 		case LMI_UNUSABLE:
 		default:
+			p->lmi_ppa_length = 0;
+			p->lmi_ppa_offset = sizeof(*p);
 			break;
 		case LMI_DISABLED:
 		case LMI_ENABLE_PENDING:
 		case LMI_ENABLED:
 		case LMI_DISABLE_PENDING:
 		case LMI_DETACH_PENDING:
+			p->lmi_ppa_length = sizeof(up->as.as->as.addr.m2ua);
+			p->lmi_ppa_offset = sizeof(*p);
 			bcopy(&up->as.as->as.addr.m2ua, mp->b_wptr,
 			      sizeof(up->as.as->as.addr.m2ua));
 			mp->b_wptr += sizeof(up->as.as->as.addr.m2ua);
 			break;
 		}
+		p->lmi_prov_flags = 0; /* FIXME */
+		p->lmi_prov_state = 0; /* FIXME */
 		freemsg(msg);
 		strlog(up->mid, up->sid, UALOGTX, SL_TRACE, "<- LMI_INFO_ACK");
 		putnext(up->rq, mp);

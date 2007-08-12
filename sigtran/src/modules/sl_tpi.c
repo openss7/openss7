@@ -1,6 +1,67 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:45 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:37 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/12 16:15:37 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sl_tpi.c,v $
+ Revision 0.9.2.9  2007/08/12 16:15:37  brian
+ -
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:37 $"
+
+static char const ident[] = "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:37 $";
+
+/*****************************************************************************
+
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +106,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:15:37 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:45 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:37 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:45 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:37 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
  *  cam be pushed over a TLI transport to effect an OpenSS7 Signalling Link or
  *  Signalling Data Terminal.
  */
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
+
 #include <sys/os7/compat.h>
 
 #include <linux/socket.h>
@@ -592,19 +656,24 @@ STATIC INLINE int
 lmi_info_ack(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 {
 	sl_t *sl = PRIV(q);
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
+
 	if ((mp = sl_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sl->state;
 		p->lmi_max_sdu = sl->sdt.config.m + 1 + ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_min_sdu = ((sl->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE2;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = 0; /* FIXME */
+		p->lmi_prov_state = 0; /* FIXME */
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
 		printd(("%s: %p: <- LMI_INFO_ACK\n", SL_TPI_MOD_NAME, sl));
@@ -5035,17 +5104,19 @@ STATIC int
 lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
-	int mlen = mp->b_wptr - mp->b_rptr;
-	if (mlen >= sizeof(*p)) {
+
+	if (MBLKIN(mp, 0, sizeof(*p))) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state != LMI_UNUSABLE) {
 			if (sl->style == LMI_STYLE2) {
 				if (sl->state == LMI_UNATTACHED) {
 					sl->state = LMI_ATTACH_PENDING;
-					if (mlen - sizeof(*p) >= sl->t.add_size) {
-						bcopy(p->lmi_ppa, &sl->t.loc, sl->t.add_size);
-						/* 
-						   start bind in motion */
+					if (MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length) &&
+					    p->lmi_ppa_length >= sl->t.add_size) {
+						bcopy(mp->b_rptr + p->lmi_ppa_offset, &sl->t.loc,
+						      sl->t.add_size);
+						/* start bind in motion */
 						return t_bind_req(q);
 					} else {
 						ptrace(("%s: PROTO: bad ppa (too short)\n",
@@ -5129,16 +5200,19 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 STATIC int
 lmi_enable_req(queue_t *q, mblk_t *mp)
 {
-	int mlen;
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
-	if ((mlen = mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
+
+	if (MBLKIN(mp, 0, sizeof(*p))) {
 		sl_t *sl = PRIV(q);
+
 		if (sl->state != LMI_UNUSABLE) {
 			if (sl->state == LMI_DISABLED) {
 				sl->state = LMI_ENABLE_PENDING;
 				if (sl->t.serv_type == T_CLTS) {
 					assure(sl->t.state == TS_IDLE);
-					if (mlen - sizeof(*p) < sl->t.add_size)
+					if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+						goto emsgsize;
+					if (p->lmi_rem_length < sl->t.add_size)
 						goto emsgsize;
 					bcopy(p->lmi_rem, &sl->t.rem, sl->t.add_size);
 					return lmi_enable_con(q);
@@ -5148,15 +5222,16 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 						return lmi_enable_con(q);
 					} else {
 						assure(sl->t.state == TS_IDLE);
-						if (mlen == sizeof(*p))
-							/* 
-							   wait for T_CONN_IND */
+						if (p->lmi_rem_length == 0)
+							/* wait for T_CONN_IND */
 							return (QR_DONE);
-						if (mlen - sizeof(*p) < sl->t.add_size)
+						if (!MBLKIN(mp, p->lmi_rem_offset,
+							    p->lmi_rem_length))
+							goto emsgsize;
+						if (p->lmi_rem_length < sl->t.add_size)
 							goto emsgsize;
 						bcopy(p->lmi_rem, &sl->t.rem, sl->t.add_size);
-						/* 
-						   start connection in motion */
+						/* start connection in motion */
 						return t_conn_req(q);
 					}
 				}
@@ -5165,8 +5240,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 				return lmi_error_ack(q, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
 			}
 		} else {
-			/* 
-			   wait for stream to become usable */
+			/* wait for stream to become usable */
 			return (-EAGAIN);
 		}
 	}
