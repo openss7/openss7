@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: maccompat.c,v $
+ Revision 0.9.2.20  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.19  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $"
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:41 $";
+static char const ident[] =
+    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -77,6 +81,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __MAC_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __MAX_EXTERN streamscall
 
 #define _MAC_SOURCE
 
@@ -84,7 +89,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:41 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL v2"
@@ -320,7 +325,7 @@ mpnotify_func(caddr_t arg)
 	return;
 }
 
-int
+__MAC_EXTERN int
 mpnotify(mblk_t *mp, mpnotify_func_t func, caddr_t arg)
 {
 	frtn_t *frtnp;

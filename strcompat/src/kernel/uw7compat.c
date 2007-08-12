@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: uw7compat.c,v $
+ Revision 0.9.2.27  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.26  2007/07/14 01:35:42  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
 
-static char const ident[] = "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $";
+static char const ident[] =
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -77,6 +81,7 @@ static char const ident[] = "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.
  */
 
 #define __UW7_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __UW7_EXTERN streamscall
 
 #define _UW7_SOURCE
 
@@ -84,7 +89,7 @@ static char const ident[] = "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:35:42 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define UW7COMP_LICENSE		"GPL v2"
@@ -114,7 +119,7 @@ MODULE_ALIAS("streams-uw7compat");
  *  @priority:		priority of the allocation
  *  @physreq_ptr:	physical requirements of the message block
  */
-mblk_t *
+__UW7_EXTERN mblk_t *
 allocb_physreq(size_t size, uint priority, physreq_t * prp)
 {
 #ifdef LIS
@@ -134,7 +139,7 @@ allocb_physreq(size_t size, uint priority, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(allocb_physreq);	/* uw7/ddi.h */
-mblk_t *
+__UW7_EXTERN mblk_t *
 msgphysreq(mblk_t *mp, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
@@ -149,7 +154,7 @@ msgphysreq(mblk_t *mp, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(msgphysreq);	/* uw7/ddi.h */
-mblk_t *
+__UW7_EXTERN mblk_t *
 msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 {
 	if (prp->phys_align > 8)
@@ -164,7 +169,7 @@ msgpullup_physreq(mblk_t *mp, size_t len, physreq_t * prp)
 }
 
 EXPORT_SYMBOL(msgpullup_physreq);	/* uw7/ddi.h */
-mblk_t *
+__UW7_EXTERN mblk_t *
 msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
 {
 	return (NULL);
@@ -172,8 +177,8 @@ msgscgth(mblk_t *mp, physreq_t * prp, scgth_t * sgp)
 
 EXPORT_SYMBOL(msgscgth);	/* uw7/ddi.h */
 
-int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
-int
+__UW7_EXTERN int printf_UW7(char *fmt, ...) __attribute__ ((format(printf, 1, 2)));
+__UW7_EXTERN int
 printf_UW7(char *fmt, ...)
 {
 	va_list args;

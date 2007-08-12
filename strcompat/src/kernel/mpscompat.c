@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:36:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 0.9.2.44  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.43  2007/08/03 13:36:01  brian
  - manual updates, put ss7 modules in public release
 
@@ -184,10 +187,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $"
+#ident "@(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/12 15:51:19 $"
 
 static char const ident[] =
-    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $";
+    "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -200,6 +203,7 @@ static char const ident[] =
  */
 
 #define __MPS_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __MPS_EXTERN streamscall
 
 #ifdef LIS
 #define _LFS_SOURCE
@@ -214,7 +218,7 @@ static char const ident[] =
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/03 13:36:01 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/12 15:51:19 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL v2"
@@ -306,6 +310,7 @@ struct mi_comm {
 	bcid_t mi_wbid;			/* wr queue bufcall */
 	long mi_users;			/* users and waiters */
 	queue_t *mi_q;			/* attached read queue */
+	struct mi_comm *mi_waiter;	/* waiter on lock */
 	wait_queue_head_t mi_waitq;	/* processes waiting on lock */
 	union {
 		dev_t dev;		/* device number (or NODEV for modules) */
@@ -328,7 +333,7 @@ struct mi_comm {
  * mi_open procedures with the structure.  The allocated structure must be initialized using
  * mi_open_obj.
  */
-size_t
+__MPS_EXTERN size_t
 mi_open_size(size_t size)
 {
 	return (size + sizeof(struct mi_comm));
@@ -348,7 +353,7 @@ EXPORT_SYMBOL(mi_open_size);
  *
  * Note that this function will return NULL if passed NULL.
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_open_obj(void *obj, size_t size)
 {
 	struct mi_comm *mi;
@@ -373,7 +378,7 @@ EXPORT_SYMBOL(mi_open_obj);
  * their own allocation schemes (such as memory caches).
  * 
  */
-void *
+__MPS_EXTERN void *
 mi_close_obj(caddr_t ptr)
 {
 	return ((caddr_t) ptr_to_mi(ptr));
@@ -387,7 +392,7 @@ EXPORT_SYMBOL(mi_close_obj);
  *
  * Calculates and returns the size of the structure necessary for the user to deallocate.
  */
-size_t
+__MPS_EXTERN size_t
 mi_close_size(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -397,7 +402,7 @@ mi_close_size(caddr_t ptr)
 
 EXPORT_SYMBOL(mi_close_size);
 
-caddr_t
+__MPS_EXTERN caddr_t
 mi_open_alloc_cache(kmem_cachep_t cachep, int flag)
 {
 	struct mi_comm *mi;
@@ -409,7 +414,7 @@ mi_open_alloc_cache(kmem_cachep_t cachep, int flag)
 
 EXPORT_SYMBOL(mi_open_alloc_cache);
 
-void
+__MPS_EXTERN void
 mi_close_free_cache(kmem_cachep_t cachep, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -434,7 +439,7 @@ mi_open_alloc_flag(size_t size, int flag)
  *  MI_OPEN_ALLOC
  *  -------------------------------------------------------------------------
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_open_alloc(size_t size)
 {
 	return mi_open_alloc_flag(size, KM_NOSLEEP);
@@ -446,7 +451,7 @@ EXPORT_SYMBOL(mi_open_alloc);	/* mps/ddi.h */
  *  MI_OPEN_ALLOC_SLEEP
  *  -------------------------------------------------------------------------
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_open_alloc_sleep(size_t size)
 {
 	return mi_open_alloc_flag(size, KM_SLEEP);
@@ -461,7 +466,7 @@ EXPORT_SYMBOL(mi_open_alloc_sleep);	/* mps/ddi.h */
  * OpenSolaris uses a head structure, we don't, primarily because the documentation for mi_open_comm
  * for both AIX and MacOT says that we use a "static pointer" initialized to NULL.
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_first_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
@@ -479,7 +484,7 @@ EXPORT_SYMBOL(mi_first_ptr);	/* mps/ddi.h */
  * MacOT don't document it that way.  If you have a STREAMS driver that can also be pushed as a
  * module, use two separate lists.
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_first_dev_ptr(caddr_t *mi_head)
 {
 	struct mi_comm *mi = *(struct mi_comm **) mi_head;
@@ -494,7 +499,7 @@ EXPORT_SYMBOL(mi_first_dev_ptr);	/* mps/ddi.h */
  * mi_next_ptr: - get the next pointer in head list
  * @ptr: previous pointer
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_next_ptr(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -515,7 +520,7 @@ EXPORT_SYMBOL(mi_next_ptr);	/* mps/ddi.h, aix/ddi.h */
  * MacOT don't document it that way.  If you have a STREAMS driver that can also be pushed as a
  * module, use two separate lists.
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_next_dev_ptr(caddr_t *mi_head, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -532,7 +537,7 @@ EXPORT_SYMBOL(mi_next_dev_ptr);	/* mps/ddi.h */
  *
  * Linux Fast-STREAMS embellishment.
  */
-caddr_t
+__MPS_EXTERN caddr_t
 mi_prev_ptr(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -555,7 +560,7 @@ static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
  * @sflag: STREAMS flag from qi_qopen()
  * @credp: credentials pointer from qi_qopen()
  */
-int
+__MPS_EXTERN int
 mi_open_link(caddr_t *mi_head, caddr_t ptr, dev_t *devp, int flag, int sflag, cred_t *credp)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -626,7 +631,7 @@ EXPORT_SYMBOL(mi_open_detached);	/* mps/ddi.h */
  * @q: queue to which to attach
  * @ptr: private structure
  */
-void
+__MPS_EXTERN void
 mi_attach(queue_t *q, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -657,7 +662,7 @@ EXPORT_SYMBOL(mi_open_comm);	/* mps/ddi.h, aix/ddi.h */
  * @mi_head: private structure list head
  * @ptr: private structure to unlink
  */
-void
+__MPS_EXTERN void
 mi_close_unlink(caddr_t *mi_head, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -679,7 +684,7 @@ EXPORT_SYMBOL(mi_close_unlink);	/* mps/ddi.h */
  * mi_close_free: - free a private structure
  * @ptr: private structure to free
  */
-void
+__MPS_EXTERN void
 mi_close_free(caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -695,7 +700,7 @@ EXPORT_SYMBOL(mi_close_free);	/* mps/ddi.h */
  * @q: read queue of queue pair
  * @ptr: private structure to detach
  */
-void
+__MPS_EXTERN void
 mi_detach(queue_t *q, caddr_t ptr)
 {
 	struct mi_comm *mi = ptr_to_mi(ptr);
@@ -801,67 +806,136 @@ struct mi_iocblk {
 #define MI_WAIT_WQ		(1<<MI_WAIT_WQ_BIT)
 #define MI_WAIT_SLEEP		(1<<MI_WAIT_SLEEP_BIT)
 
+static noinline fastcall void
+mi_wakepriv(struct mi_comm *mi)
+{
+	if (!test_and_clear_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users))
+		if (waitqueue_active(&mi->mi_waitq))
+			wake_up_all(&mi->mi_waitq);
+	if (!test_and_clear_bit(MI_WAIT_RQ_BIT, &mi->mi_users))
+		qenable(RD(mi->mi_q));
+	if (!test_and_clear_bit(MI_WAIT_WQ_BIT, &mi->mi_users))
+		qenable(WR(mi->mi_q));
+}
+
 /**
- * mi_trylock: - try to lock a private structure
- * @q: queue pair associated with private structure
+ * mi_acquire: - try to lock a private structure
+ * @ptr: pointer to private structure to lock
+ * @q: active queue pair associated with locker
  *
  * Returns a pointer to the locked private structure or NULL if the private structure could not be
  * locked or does not exist.
  */
-caddr_t
-mi_trylock(queue_t *q)
+__MPS_EXTERN caddr_t
+mi_acquire(caddr_t ptr, queue_t *q)
 {
-	caddr_t ptr = q->q_ptr;
 	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
-		if (q->q_flag & QREADR)
-			set_bit(MI_WAIT_RQ_BIT, &mi->mi_users);
-		else
-			set_bit(MI_WAIT_WQ_BIT, &mi->mi_users);
-		if (test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
-			ptr = NULL;
+		if (q && (mi = ptr_to_mi((caddr_t) q->q_ptr))) {
+			if (q->q_flag & QREADR)
+				set_bit(MI_WAIT_RQ_BIT, &mi->mi_users);
+			else
+				set_bit(MI_WAIT_WQ_BIT, &mi->mi_users);
+			if ((mi = xchg(&mi->mi_waiter, mi)))
+				mi_wakepriv(mi);
+			mi = ptr_to_mi(ptr);
+			if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
+				return (ptr);
+		}
+		return (NULL);
 	}
 	return (ptr);
 }
 
-EXPORT_SYMBOL(mi_trylock);
+EXPORT_SYMBOL(mi_acquire);
 
 /**
- * mi_sleeplock: - lock a private structure or sleep
- * @q: queue pair associated wtih private structure
+ * mi_acquire_sleep: - lock a private structure or wait
+ * @ptrw: pointer to private structure of locker
+ * @ptrp: pointer to pointer to private structure to lock
+ * @lockp: pointer to an irq locked lock protecting *ptrp
+ * @flagsp: pointer to saved flags word
  *
  * Returns a pointer to the locked private structure or NULL if the private structure could not be
- * locked because a signal was caught or does not exist.
+ * locked because a signal was caught or does not exist.  The caller can test the condition for
+ * reutrning NULL by checking *ptrp.  When a lock pointer is passed, the lock must be write locked
+ * before the call and the function returns with the lock write locked.  If a flags pointer is
+ * provided, irq write locks will be performed.  The lock must protect the *ptrp dereference.
+ *
+ * This function will sleep until *ptrp is successfully locked, *ptrp becomes NULL, or the waiting
+ * process is interrupted by a signal.
+ *
+ * This function is typically used to acquire a lock on a lower multiplex private structure from the
+ * open or close routine of a upper multiplex private structure.
  */
-caddr_t
-mi_sleeplock(queue_t *q)
+__MPS_EXTERN caddr_t
+mi_acquire_sleep(caddr_t ptrw, caddr_t *ptrp, rwlock_t *lockp, unsigned long *flagsp)
 {
-	caddr_t ptr = q->q_ptr;
+	caddr_t ptr = *ptrp;
 	struct mi_comm *mi = ptr_to_mi(ptr);
 
 	if (mi && unlikely(test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))) {
 		DECLARE_WAITQUEUE(wait, current);
-		add_wait_queue(&mi->mi_waitq, &wait);
+		struct mi_comm *ml = ptr_to_mi(ptrw);
+
+		add_wait_queue(&ml->mi_waitq, &wait);
 		for (;;) {
 			if (signal_pending(current)) {
 				ptr = NULL;
 				break;
 			}
 			set_current_state(TASK_INTERRUPTIBLE);
-			set_bit(MI_WAIT_SLEEP_BIT, &mi->mi_users);
+			set_bit(MI_WAIT_SLEEP_BIT, &ml->mi_users);
 			if (!test_and_set_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users))
 				break;
+			{
+				struct mi_comm *mw = xchg(&mi->mi_waiter, ml);
+
+				if (lockp) {
+					if (flagsp)
+						write_unlock_irqrestore(lockp, *flagsp);
+					else
+						write_unlock(lockp);
+				}
+				if (mw != NULL)
+					mi_wakepriv(mw);
+			}
 			schedule();
+			{
+				if (lockp) {
+					if (flagsp)
+						write_lock_irqsave(lockp, *flagsp);
+					else
+						write_lock(lockp);
+				}
+			}
+			if ((ptr = *ptrp) == NULL)
+				break;
+			mi = ptr_to_mi(ptr);
 		}
 		set_current_state(TASK_RUNNING);
-		remove_wait_queue(&mi->mi_waitq, &wait);
+		remove_wait_queue(&ml->mi_waitq, &wait);
+		clear_bit(MI_WAIT_SLEEP_BIT, &ml->mi_users);
 	}
 	return (ptr);
 
 }
 
-EXPORT_SYMBOL(mi_sleeplock);
+EXPORT_SYMBOL(mi_acquire_sleep);
+
+__MPS_EXTERN void
+mi_release(caddr_t ptr)
+{
+	struct mi_comm *mi = ptr_to_mi(ptr);
+
+	clear_bit(MI_WAIT_LOCKED_BIT, &mi->mi_users);
+
+	if ((mi = xchg(&mi->mi_waiter, NULL)))
+		mi_wakepriv(mi);
+	return;
+}
+EXPORT_SYMBOL(mi_release);
 
 /**
  * mi_unlock: - unlock a private structure
@@ -869,24 +943,31 @@ EXPORT_SYMBOL(mi_sleeplock);
  *
  * Unlock a private structure and wake waiters and schedule blocked queues.
  */
-void
+__MPS_EXTERN void
 mi_unlock(caddr_t ptr)
 {
-	struct mi_comm *mi = ptr_to_mi(ptr);
-	long users;
-
-	users = xchg(&mi->mi_users, 0);
-
-	if (users & MI_WAIT_SLEEP)
-		if (waitqueue_active(&mi->mi_waitq))
-			wake_up_all(&mi->mi_waitq);
-	if (users & MI_WAIT_RQ)
-		enableq(RD(mi->mi_q));
-	if (users & MI_WAIT_WQ)
-		enableq(WR(mi->mi_q));
+	return mi_release(ptr);
 }
 
 EXPORT_SYMBOL(mi_unlock);
+
+__MPS_EXTERN caddr_t
+mi_trylock(queue_t *q)
+{
+	return mi_acquire((caddr_t) q->q_ptr, q);
+}
+EXPORT_SYMBOL(mi_trylock);
+
+__MPS_EXTERN caddr_t
+mi_sleeplock(queue_t *q)
+{
+	caddr_t ptr = (caddr_t) q->q_ptr;
+
+	if (ptr)
+		ptr = mi_acquire_sleep(ptr, &ptr, NULL, NULL);
+	return (ptr);
+}
+EXPORT_SYMBOL(mi_sleeplock);
 
 /*
  *  =========================================================================
@@ -895,7 +976,7 @@ EXPORT_SYMBOL(mi_unlock);
  *
  *  =========================================================================
  */
-static streamscall void
+static fastcall void
 mi_qenable(long data)
 {
 	queue_t *q = (queue_t *) data;
@@ -906,7 +987,7 @@ mi_qenable(long data)
 	qenable(q);
 }
 
-void
+__MPS_EXTERN void
 mi_bufcall(queue_t *q, int size, int priority)
 {
 	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
@@ -930,7 +1011,7 @@ EXPORT_SYMBOL(mi_bufcall);
  *  =========================================================================
  */
 
-mblk_t *
+__MPS_EXTERN mblk_t *
 mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 {
 	if (unlikely(mp == NULL || (size > FASTBUF && mp->b_datap->db_lim - mp->b_rptr < size)
@@ -947,7 +1028,7 @@ mi_reuse_proto(mblk_t *mp, size_t size, int keep_on_error)
 
 EXPORT_SYMBOL(mi_reuse_proto);
 
-mblk_t *
+__MPS_EXTERN mblk_t *
 mi_reallocb(mblk_t *mp, size_t size)
 {
 	if (unlikely(mp == NULL ||
@@ -1019,7 +1100,7 @@ EXPORT_SYMBOL(mi_allocb);	/* mps/stream.h */
  * fixed, this code will still work, it will just send an extraneous M_IOCNAK to the Stream head
  * that will be discarded because no M_IOCTL will be in progress anymore.
  */
-void
+__MPS_EXTERN void
 mi_copy_done(queue_t *q, mblk_t *mp, int err)
 {
 	union ioctypes *ioc;
@@ -1072,7 +1153,7 @@ EXPORT_SYMBOL(mi_copy_done);	/* mps/ddi.h */
  * @uaddr: NULL for first copyin operation, or user address for subsequent operation
  * @len: length of data to copy in
  */
-void
+__MPS_EXTERN void
 mi_copyin(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -1181,7 +1262,7 @@ EXPORT_SYMBOL(mi_copyin);	/* mps/ddi.h */
  * even for an I_STR input-output control, in which case, a subsequent mi_copyin_n() operation will
  * always issue an M_COPYIN resulting in an M_IOCDATA.
  */
-void
+__MPS_EXTERN void
 mi_copyin_n(queue_t *q, mblk_t *mp, size_t offset, size_t len)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -1235,7 +1316,7 @@ EXPORT_SYMBOL(mi_copyin_n);	/* mps/ddi.h */
  * @len: length of data to copy out
  * @free_on_error: when non-zero close input-output operation automatically on error
  */
-mblk_t *
+__MPS_EXTERN mblk_t *
 mi_copyout_alloc(queue_t *q, mblk_t *mp, caddr_t uaddr, size_t len, int free_on_error)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -1300,7 +1381,7 @@ EXPORT_SYMBOL(mi_copyout_alloc);	/* mps/ddi.h */
  * @q: write queue on which message was received
  * @mp: the M_IOCTL or M_IOCDATA message
  */
-void
+__MPS_EXTERN void
 mi_copyout(queue_t *q, mblk_t *mp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -1360,7 +1441,7 @@ EXPORT_SYMBOL(mi_copyout);	/* mps/ddi.h */
  * case the passed in message block is used to pass an M_IOCNAK upstream).  If no error occured, it
  * returns the state of the input-output control operation.
  */
-int
+__MPS_EXTERN int
 mi_copy_state(queue_t *q, mblk_t *mp, mblk_t **mpp)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -1403,7 +1484,7 @@ EXPORT_SYMBOL(mi_copy_state);	/* mps/ddi.h */
  * function in the input-output control operation is called.  The last functions called would be
  * either mi_copyout() or mi_copy_done().
  */
-void
+__MPS_EXTERN void
 mi_copy_set_rval(mblk_t *mp, int rval)
 {
 	union ioctypes *ioc = (typeof(ioc)) mp->b_rptr;
@@ -1477,10 +1558,10 @@ EXPORT_SYMBOL(mi_copy_set_rval);
 
 typedef struct mi_timeb {
 	spinlock_t tb_lock;
-	long tb_state;		/* the state of the timer */
-	toid_t tb_tid;		/* the timeout id when a timeout is running */
-	clock_t tb_time;	/* the time of expiry */
-	queue_t *tb_q;		/* where to queue the timer message on timeout */
+	long tb_state;			/* the state of the timer */
+	toid_t tb_tid;			/* the timeout id when a timeout is running */
+	clock_t tb_time;		/* the time of expiry */
+	queue_t *tb_q;			/* where to queue the timer message on timeout */
 } tblk_t;
 
 #undef mi_timer_alloc
@@ -1552,7 +1633,7 @@ mi_timer_putq(queue_t *q, mblk_t *mp)
  * already in the TB_IDLE state.
  * 
  */
-static streamscall void
+static fastcall void
 mi_timer_expiry(caddr_t data)
 {
 	mblk_t *mp = (typeof(mp)) data;
@@ -1582,7 +1663,7 @@ mi_timer_expiry(caddr_t data)
  * Allocates and returns a timer message block for use in other helper functions.  Note that we
  * allocate a duplicate message block as protection against being freed.
  */
-mblk_t *
+__MPS_EXTERN mblk_t *
 mi_timer_alloc_MAC(queue_t *q, size_t size)
 {
 	mblk_t *mp;
@@ -1611,7 +1692,7 @@ EXPORT_SYMBOL(mi_timer_alloc_MAC);
  *
  * Start or restart a timer.
  */
-void
+__MPS_EXTERN void
 mi_timer_MAC(mblk_t *mp, clock_t msec)
 {
 	mi_timer_ticks(mp, drv_msectohz(msec));
@@ -1619,7 +1700,7 @@ mi_timer_MAC(mblk_t *mp, clock_t msec)
 
 EXPORT_SYMBOL(mi_timer_MAC);
 
-int
+__MPS_EXTERN int
 mi_timer_requeue(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -1650,7 +1731,7 @@ mi_timer_requeue(mblk_t *mp)
 	case TB_IDLE:
 		tb->tb_state = TB_EXPIRED;
 		mp->b_datap->db_type = M_SIG;
-		rval = (1); /* caller must putq or putbq back */
+		rval = (1);	/* caller must putq or putbq back */
 		break;
 	case TB_CANCELLED:
 		/* Timer was cancelled while in user's hands. */
@@ -1680,7 +1761,7 @@ EXPORT_SYMBOL(mi_timer_requeue);
  * This return value is for use by mi_timer_q_switch() only.  mi_timer_cancel() can be called in any
  * context at any point in time.
  */
-int
+__MPS_EXTERN int
 mi_timer_cancel(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -1737,7 +1818,7 @@ EXPORT_SYMBOL(mi_timer_cancel);
  *
  * Returns the timer message that was used.
  */
-mblk_t *
+__MPS_EXTERN mblk_t *
 mi_timer_q_switch(mblk_t *mp, queue_t *q, mblk_t *new_mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -1767,7 +1848,7 @@ EXPORT_SYMBOL(mi_timer_q_switch);
  *
  * Solaris style mi_timer_alloc() does not assign a queue at the time of allocation.
  */
-mblk_t *
+__MPS_EXTERN mblk_t *
 mi_timer_alloc_SUN(size_t size)
 {
 	return mi_timer_alloc_MAC(NULL, size);
@@ -1780,7 +1861,7 @@ EXPORT_SYMBOL(mi_timer_alloc_SUN);
  *  @mp: the timer message
  *  @ticks: the time in HZ
  */
-void
+__MPS_EXTERN void
 mi_timer_ticks(mblk_t *mp, clock_t ticks)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -1845,7 +1926,7 @@ EXPORT_SYMBOL(mi_timer_ticks);
  *  When msec is (clock_t)(-2) move the timer to the new @q specified.  When msec is (clock_t)(0),
  *  requeue the message.
  */
-void
+__MPS_EXTERN void
 mi_timer_SUN(queue_t *q, mblk_t *mp, clock_t msec)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -1877,7 +1958,7 @@ EXPORT_SYMBOL(mi_timer_SUN);
  * We want mi_timer_stop() to be way faster than mi_timer_cancel() which is plodding and always
  * attempts to remove the message from the queue if it finds it there.
  */
-void
+__MPS_EXTERN void
 mi_timer_stop(mblk_t *mp)
 {
 	mi_timer_cancel(mp);
@@ -1895,7 +1976,7 @@ EXPORT_SYMBOL(mi_timer_stop);
  * is removed from that queue and its disposition made permanent, which may involve being requeued
  * to the new target queue.
  */
-void
+__MPS_EXTERN void
 mi_timer_move(queue_t *q, mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -1927,7 +2008,7 @@ mi_timer_move(queue_t *q, mblk_t *mp)
 						tb->tb_state = TB_ACTIVE;
 						tb->tb_tid =
 						    timeout(mi_timer_expiry, (caddr_t) mp,
-								    tb->tb_time - jiffies);
+							    tb->tb_time - jiffies);
 						if (tb->tb_tid)
 							break;
 						tb->tb_state = TB_RESCHEDULED;
@@ -1996,7 +2077,7 @@ EXPORT_SYMBOL(mi_timer_move);
  * message immediately when the timeout is zero.  On other implementation it should have a similar
  * effect (even if timeout is called with a zero argument).
  */
-int
+__MPS_EXTERN int
 mi_timer_valid(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -2055,7 +2136,7 @@ EXPORT_SYMBOL(mi_timer_valid);
  * mi_timer_running: - is the timer running
  * @mp: timer message
  */
-int
+__MPS_EXTERN int
 mi_timer_running(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -2073,7 +2154,7 @@ EXPORT_SYMBOL(mi_timer_running);
  *
  * Return is true (1) if the timer was restarted, or false (0) if it was just left running.
  */
-int
+__MPS_EXTERN int
 mi_timer_cond(mblk_t *mp, clock_t ticks)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -2131,7 +2212,7 @@ EXPORT_SYMBOL(mi_timer_cond);
  * Returns the remaining time (in milliseconds) on a timer if running or rescheduled, zero
  * otherwise.
  */
-unsigned long
+__MPS_EXTERN unsigned long
 mi_timer_remain(mblk_t *mp)
 {
 	tblk_t *tb = (typeof(tb)) mp->b_datap->db_base;
@@ -2163,7 +2244,7 @@ EXPORT_SYMBOL(mi_timer_remain);
  *
  * Cancels and frees (or marks to be freed) a timer message.
  */
-void
+__MPS_EXTERN void
 mi_timer_free(mblk_t *mp)
 {
 	tblk_t *tb;
@@ -2200,7 +2281,7 @@ mi_timer_free(mblk_t *mp)
 
 EXPORT_SYMBOL(mi_timer_free);
 
-queue_t *
+__MPS_EXTERN queue_t *
 mi_allocq(struct streamtab *st)
 {
 #ifdef LIS
@@ -2217,7 +2298,7 @@ mi_allocq(struct streamtab *st)
 
 EXPORT_SYMBOL(mi_allocq);
 
-void
+__MPS_EXTERN void
 mi_freeq(queue_t *q)
 {
 #ifdef LIS
@@ -2230,7 +2311,7 @@ mi_freeq(queue_t *q)
 
 EXPORT_SYMBOL(mi_freeq);
 
-int
+__MPS_EXTERN int
 mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
 	int result = 0;
@@ -2647,7 +2728,7 @@ mi_vmpprintf(mblk_t *mp, char *fmt, va_list args)
  *  to a linear buffer of fixed size.  A newline character will always be written to terminate the
  *  string.
  */
-int
+__MPS_EXTERN int
 mi_mpprintf(mblk_t *mp, char *fmt, ...)
 {
 	va_list args;
@@ -2672,7 +2753,7 @@ EXPORT_SYMBOL(mi_mpprintf);
  * newline character from the previous string written to the message block with either mi_mpprintf()
  * or a previous call to mi_mpprintf_nr().
  */
-int
+__MPS_EXTERN int
 mi_mpprintf_nr(mblk_t *mp, char *fmt, ...)
 {
 	va_list args;
@@ -2700,7 +2781,7 @@ EXPORT_SYMBOL(mi_mpprintf_nr);
  *  MI_SET_STH_HIWAT
  *  -------------------------------------------------------------------------
  */
-int
+__MPS_EXTERN int
 mi_set_sth_hiwat(queue_t *q, size_t size)
 {
 	struct stroptions *so;
@@ -2726,7 +2807,7 @@ EXPORT_SYMBOL(mi_set_sth_hiwat);
  *  MI_SET_STH_LOWAT
  *  -------------------------------------------------------------------------
  */
-int
+__MPS_EXTERN int
 mi_set_sth_lowat(queue_t *q, size_t size)
 {
 	struct stroptions *so;
@@ -2752,7 +2833,7 @@ EXPORT_SYMBOL(mi_set_sth_lowat);
  *  MI_SET_STH_MAXBLK
  *  -------------------------------------------------------------------------
  */
-int
+__MPS_EXTERN int
 mi_set_sth_maxblk(queue_t *q, ssize_t size)
 {
 #ifdef SO_MAXBLK
@@ -2779,7 +2860,7 @@ EXPORT_SYMBOL(mi_set_sth_maxblk);
  *  MI_SET_STH_COPYOPT
  *  -------------------------------------------------------------------------
  */
-int
+__MPS_EXTERN int
 mi_set_sth_copyopt(queue_t *q, int copyopt)
 {
 #ifdef SO_COPYOPT
@@ -2806,7 +2887,7 @@ EXPORT_SYMBOL(mi_set_sth_copyopt);
  *  MI_SET_STH_WROFF
  *  -------------------------------------------------------------------------
  */
-int
+__MPS_EXTERN int
 mi_set_sth_wroff(queue_t *q, size_t size)
 {
 	struct stroptions *so;
@@ -2834,7 +2915,7 @@ EXPORT_SYMBOL(mi_set_sth_wroff);
  *
  *  =========================================================================
  */
-int
+__MPS_EXTERN int
 mi_sprintf(char *buf, char *fmt, ...)
 {
 	int result;
@@ -2848,7 +2929,7 @@ mi_sprintf(char *buf, char *fmt, ...)
 
 EXPORT_SYMBOL(mi_sprintf);
 
-int
+__MPS_EXTERN int
 mi_strcmp(const caddr_t cp1, const caddr_t cp2)
 {
 	return strcmp(cp1, cp2);
@@ -2856,7 +2937,7 @@ mi_strcmp(const caddr_t cp1, const caddr_t cp2)
 
 EXPORT_SYMBOL(mi_strcmp);
 
-int
+__MPS_EXTERN int
 mi_strlen(const caddr_t str)
 {
 	return strlen(str);
@@ -2864,7 +2945,7 @@ mi_strlen(const caddr_t str)
 
 EXPORT_SYMBOL(mi_strlen);
 
-long
+__MPS_EXTERN long
 mi_strtol(const caddr_t str, caddr_t *ptr, int base)
 {
 	return simple_strtol(str, ptr, base);
@@ -2883,7 +2964,7 @@ EXPORT_SYMBOL(mi_strtol);
  *  MI_OFFSET_PARAM
  *  -------------------------------------------------------------------------
  */
-uint8_t *
+__MPS_EXTERN uint8_t *
 mi_offset_param(mblk_t *mp, size_t offset, size_t len)
 {
 	if (mp || len == 0) {
@@ -2901,7 +2982,7 @@ EXPORT_SYMBOL(mi_offset_param);
  *  MI_OFFSET_PARAMC
  *  -------------------------------------------------------------------------
  */
-uint8_t *
+__MPS_EXTERN uint8_t *
 mi_offset_paramc(mblk_t *mp, size_t offset, size_t len)
 {
 	uint8_t *result = NULL;
@@ -2936,7 +3017,7 @@ EXPORT_SYMBOL(mi_offset_paramc);
  *  MPS_BECOME_WRITER
  *  -------------------------------------------------------------------------
  */
-void
+__MPS_EXTERN void
 mps_become_writer(queue_t *q, mblk_t *mp, proc_ptr_t proc)
 {
 #ifdef LIS
@@ -2959,7 +3040,7 @@ EXPORT_SYMBOL(mps_become_writer);
  *  MPS_INTR_DISABLE
  *  -------------------------------------------------------------------------
  */
-void
+__MPS_EXTERN void
 mps_intr_disable(pl_t * plp)
 {
 	unsigned long flags = *plp;
@@ -2974,7 +3055,7 @@ EXPORT_SYMBOL(mps_intr_disable);
  *  MPS_INTR_ENABLE
  *  -------------------------------------------------------------------------
  */
-void
+__MPS_EXTERN void
 mps_intr_enable(pl_t pl)
 {
 	unsigned long flags = pl;

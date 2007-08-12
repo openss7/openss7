@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.15 2006/12/08 05:08:08 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.16 2007/08/12 15:51:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:08 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.16  2007/08/12 15:51:03  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.15  2006/12/08 05:08:08  brian
  - some rework resulting from testing and inspection
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_IRIX_DDI_H__
 #define __SYS_IRIX_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.15 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.16 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -74,6 +77,10 @@
 #ifndef __IRIX_EXTERN_INLINE
 #define __IRIX_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __IRIX_EXTERN_INLINE */
+
+#ifndef __IRIX_EXTERN
+#define __IRIX_EXTERN extern streamscall
+#endif				/* __AIX_EXTERN_INLINE */
 
 #ifndef _IRIX_SOURCE
 #warning "_IRIX_SOURCE not defined but IRIX ddi.h included"
@@ -93,7 +100,7 @@ icmn_err(int err_lvl, const char *fmt, va_list args)
 }
 
 /* gcc 3.4.3 can't handle inlining with variable argument list */
-extern void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
+__IRIX_EXTERN void cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
     __attribute__ ((format(printf, 3, 4)));
 
 #else

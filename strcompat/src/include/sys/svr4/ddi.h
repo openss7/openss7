@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 0.9.2.28 2007/03/30 11:59:22 brian Exp $
+ @(#) $Id: ddi.h,v 0.9.2.29 2007/08/12 15:51:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/30 11:59:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 0.9.2.29  2007/08/12 15:51:15  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.28  2007/03/30 11:59:22  brian
  - heavy rework of MP syncrhonization
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_SVR4_DDI_H__
 #define __SYS_SVR4_DDI_H__
 
-#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.28 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 0.9.2.29 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __KERNEL__
 #error "Do not use kernel headers for user space programs"
@@ -80,6 +83,10 @@
 #ifndef __SVR4_EXTERN_INLINE
 #define __SVR4_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __SVR4_EXTERN_INLINE */
+
+#ifndef __SVR4_EXTERN
+#define __SVR4_EXTERN extern streamscall
+#endif
 
 #ifndef _SVR4_SOURCE
 #warning "_SVR4_SOURCE not defined but SVR4 ddi.h included"
@@ -109,32 +116,32 @@ typedef struct sv {
 	int sv_condv;
 } sv_t;
 
-#define invpl	    -1
-#define plbase	    0
-#define pltimeout   3
-#define pltty	    4
-#define plstr	    5
-#define pldisk	    6
-#define plhi	    7
+#define invpl		-1
+#define plbase		 0
+#define pltimeout	 3
+#define pltty		 4
+#define plstr		 5
+#define pldisk		 6
+#define plhi		 7
 
-extern void splx(const pl_t level);
-extern pl_t spl(const pl_t level);
+__SVR4_EXTERN void splx(const pl_t level);
+__SVR4_EXTERN pl_t spl(const pl_t level);
 
-extern pl_t spl0(void);
-extern pl_t spl1(void);
-extern pl_t spl2(void);
-extern pl_t spl3(void);
-extern pl_t spl4(void);
-extern pl_t spl5(void);
-extern pl_t spl6(void);
-extern pl_t spl7(void);
+__SVR4_EXTERN pl_t spl0(void);
+__SVR4_EXTERN pl_t spl1(void);
+__SVR4_EXTERN pl_t spl2(void);
+__SVR4_EXTERN pl_t spl3(void);
+__SVR4_EXTERN pl_t spl4(void);
+__SVR4_EXTERN pl_t spl5(void);
+__SVR4_EXTERN pl_t spl6(void);
+__SVR4_EXTERN pl_t spl7(void);
 
-#define splbase	    spl0
-#define spltimeout  spl3
-#define spltty	    spl4
-#define splstr	    spl5
-#define spldisk	    spl6
-#define splhi	    spl7
+#define splbase()	spl0()
+#define spltimeout()	spl3()
+#define spltty()	spl4()
+#define splstr()	spl5()
+#define spldisk()	spl6()
+#define splhi()		spl7()
 
 typedef int processorid_t;
 
@@ -161,8 +168,8 @@ geteminor(dev_t dev)
 {
 	return (MINOR(getminor(dev)));
 }
-extern int etoimajor(major_t emajor);
-extern int itoemajor(major_t imajor, int prevemaj);
+__SVR4_EXTERN int etoimajor(major_t emajor);
+__SVR4_EXTERN int itoemajor(major_t imajor, int prevemaj);
 
 #ifdef LOCK_ALLOC
 #undef LOCK_ALLOC
@@ -254,9 +261,9 @@ RW_RDLOCK(rwlock_t *lockp, pl_t pl)
 	read_lock(lockp);
 	return (old_pl);
 }
-extern pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
-extern pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
-extern void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
+__SVR4_EXTERN pl_t RW_TRYRDLOCK(rwlock_t *lockp, pl_t pl);
+__SVR4_EXTERN pl_t RW_TRYWRLOCK(rwlock_t *lockp, pl_t pl);
+__SVR4_EXTERN void RW_UNLOCK(rwlock_t *lockp, pl_t pl);
 
 __SVR4_EXTERN_INLINE pl_t
 RW_WRLOCK(rwlock_t *lockp, pl_t pl)
@@ -340,12 +347,12 @@ SV_DEALLOC(sv_t * svp)
 {
 	kmem_free(svp, sizeof(*svp));
 }
-extern void SV_SIGNAL(sv_t * svp);
-extern void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
-extern int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
+__SVR4_EXTERN void SV_SIGNAL(sv_t * svp);
+__SVR4_EXTERN void SV_WAIT(sv_t * svp, int priority, lock_t * lkp);
+__SVR4_EXTERN int SV_WAIT_SIG(sv_t * svp, int priority, lock_t * lkp);
 
-extern int sleep(caddr_t event, pl_t pl);
-extern void wakeup(caddr_t event);
+__SVR4_EXTERN int sleep(caddr_t event, pl_t pl);
+__SVR4_EXTERN void wakeup(caddr_t event);
 
 #undef ASSERT
 #define ASSERT(__assertion) assert((__assertion))

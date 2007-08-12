@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: os7compat.c,v $
+ Revision 0.9.2.31  2007/08/12 15:51:19  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.30  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -146,10 +149,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:19 $"
 
 static char const ident[] =
-    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $";
+    "$RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:19 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -163,6 +166,7 @@ static char const ident[] =
  */
 
 #define __OS7_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __OS7_EXTERN streamscall
 
 #define _OS7_SOURCE
 
@@ -170,7 +174,7 @@ static char const ident[] =
 
 #define OS7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OS7COMP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/07/14 01:35:41 $"
+#define OS7COMP_REVISION	"LfS $RCSfile: os7compat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:19 $"
 #define OS7COMP_DEVICE		"OpenSS7 Compatibility"
 #define OS7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OS7COMP_LICENSE		"GPL v2"
@@ -192,58 +196,56 @@ MODULE_ALIAS("streams-os7compat");
 #endif
 #endif
 
-__OS7_EXTERN_INLINE void streamscall ss7_bufsrv(long data);
+__OS7_EXTERN_INLINE void ss7_bufsrv(long data);
 
 EXPORT_SYMBOL_GPL(ss7_bufsrv);
-__OS7_EXTERN_INLINE streamscall void ss7_unbufcall(str_t * s);
+__OS7_EXTERN_INLINE void ss7_unbufcall(str_t * s);
 
 EXPORT_SYMBOL_GPL(ss7_unbufcall);
-__OS7_EXTERN_INLINE streamscall void ss7_bufcall(queue_t *q, size_t size, int prior);
+__OS7_EXTERN_INLINE void ss7_bufcall(queue_t *q, size_t size, int prior);
 
 EXPORT_SYMBOL_GPL(ss7_bufcall);
-__OS7_EXTERN_INLINE streamscall void ss7_esbbcall(queue_t *q, int prior);
+__OS7_EXTERN_INLINE void ss7_esbbcall(queue_t *q, int prior);
 
 EXPORT_SYMBOL_GPL(ss7_esbbcall);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_allocb(queue_t *q, size_t size, int prior);
+__OS7_EXTERN_INLINE mblk_t *ss7_allocb(queue_t *q, size_t size, int prior);
 
 EXPORT_SYMBOL_GPL(ss7_allocb);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_esballoc(queue_t *q, unsigned char *base, size_t size,
-						     int prior, frtn_t *frtn);
+__OS7_EXTERN_INLINE mblk_t *ss7_esballoc(queue_t *q, unsigned char *base, size_t size,
+					 int prior, frtn_t *frtn);
 EXPORT_SYMBOL_GPL(ss7_esballoc);
-__OS7_EXTERN_INLINE streamscall int ss7_pullupmsg(queue_t *q, mblk_t *mp, int size);
+__OS7_EXTERN_INLINE int ss7_pullupmsg(queue_t *q, mblk_t *mp, int size);
 
 EXPORT_SYMBOL_GPL(ss7_pullupmsg);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_dupb(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE mblk_t *ss7_dupb(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_GPL(ss7_dupb);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_dupmsg(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE mblk_t *ss7_dupmsg(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_GPL(ss7_dupmsg);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_copyb(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE mblk_t *ss7_copyb(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_GPL(ss7_copyb);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_copymsg(queue_t *q, mblk_t *bp);
+__OS7_EXTERN_INLINE mblk_t *ss7_copymsg(queue_t *q, mblk_t *bp);
 
 EXPORT_SYMBOL_GPL(ss7_copymsg);
 
-__OS7_EXTERN_INLINE streamscall mblk_t *__ss7_fast_allocb(struct ss7_bufpool *pool, size_t size,
-							  int prior);
+__OS7_EXTERN_INLINE mblk_t *__ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior);
 
 EXPORT_SYMBOL_GPL(__ss7_fast_allocb);
-__OS7_EXTERN_INLINE streamscall mblk_t *ss7_fast_allocb(struct ss7_bufpool *pool, size_t size,
-							int prior);
+__OS7_EXTERN_INLINE mblk_t *ss7_fast_allocb(struct ss7_bufpool *pool, size_t size, int prior);
 
 EXPORT_SYMBOL_GPL(ss7_fast_allocb);
-__OS7_EXTERN_INLINE streamscall void __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE void __ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(__ss7_fast_freeb);
-__OS7_EXTERN_INLINE streamscall void ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE void ss7_fast_freeb(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(ss7_fast_freeb);
-__OS7_EXTERN_INLINE streamscall void __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE void __ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(__ss7_fast_freemsg);
-__OS7_EXTERN_INLINE streamscall void ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
+__OS7_EXTERN_INLINE void ss7_fast_freemsg(struct ss7_bufpool *pool, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(ss7_fast_freemsg);
 __OS7_EXTERN_INLINE void ss7_bufpool_init(struct ss7_bufpool *pool);
@@ -262,22 +264,22 @@ EXPORT_SYMBOL_GPL(ss7_bufpool_term);
 __OS7_EXTERN_INLINE void bufq_init(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_init);
-__OS7_EXTERN_INLINE streamscall psw_t bufq_lock(bufq_t * q);
+__OS7_EXTERN_INLINE psw_t bufq_lock(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_lock);
-__OS7_EXTERN_INLINE streamscall void bufq_unlock(bufq_t * q, psw_t pl);
+__OS7_EXTERN_INLINE void bufq_unlock(bufq_t * q, psw_t pl);
 
 EXPORT_SYMBOL_GPL(bufq_unlock);
-__OS7_EXTERN_INLINE streamscall size_t bufq_length(bufq_t * q);
+__OS7_EXTERN_INLINE size_t bufq_length(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_length);
-__OS7_EXTERN_INLINE streamscall size_t bufq_size(bufq_t * q);
+__OS7_EXTERN_INLINE size_t bufq_size(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_size);
-__OS7_EXTERN_INLINE streamscall mblk_t *bufq_head(bufq_t * q);
+__OS7_EXTERN_INLINE mblk_t *bufq_head(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_head);
-__OS7_EXTERN_INLINE streamscall mblk_t *bufq_tail(bufq_t * q);
+__OS7_EXTERN_INLINE mblk_t *bufq_tail(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_tail);
 __OS7_EXTERN_INLINE void __bufq_add(bufq_t * q, mblk_t *mp);
@@ -289,16 +291,16 @@ EXPORT_SYMBOL_GPL(__bufq_sub);
 __OS7_EXTERN_INLINE void __bufq_queue(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(__bufq_queue);
-__OS7_EXTERN_INLINE streamscall void bufq_queue(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE void bufq_queue(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(bufq_queue);
-__OS7_EXTERN_INLINE streamscall void bufq_queue_head(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE void bufq_queue_head(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(bufq_queue_head);
-__OS7_EXTERN_INLINE streamscall void bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np);
+__OS7_EXTERN_INLINE void bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np);
 
 EXPORT_SYMBOL_GPL(bufq_insert);
-__OS7_EXTERN_INLINE streamscall void bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np);
+__OS7_EXTERN_INLINE void bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np);
 
 EXPORT_SYMBOL_GPL(bufq_append);
 __OS7_EXTERN_INLINE mblk_t *__bufq_dequeue(bufq_t * q);
@@ -310,35 +312,34 @@ EXPORT_SYMBOL_GPL(bufq_dequeue);
 __OS7_EXTERN_INLINE mblk_t *__bufq_dequeue_tail(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(__bufq_dequeue_tail);
-__OS7_EXTERN_INLINE streamscall mblk_t *bufq_dequeue_tail(bufq_t * q);
+__OS7_EXTERN_INLINE mblk_t *bufq_dequeue_tail(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_dequeue_tail);
 __OS7_EXTERN_INLINE mblk_t *__bufq_unlink(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(__bufq_unlink);
-__OS7_EXTERN_INLINE streamscall mblk_t *bufq_unlink(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE mblk_t *bufq_unlink(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(bufq_unlink);
-__OS7_EXTERN_INLINE streamscall void bufq_splice_head(bufq_t * q1, bufq_t * q2);
+__OS7_EXTERN_INLINE void bufq_splice_head(bufq_t * q1, bufq_t * q2);
 
 EXPORT_SYMBOL_GPL(bufq_splice_head);
-__OS7_EXTERN_INLINE streamscall void bufq_splice_tail(bufq_t * q1, bufq_t * q2);
+__OS7_EXTERN_INLINE void bufq_splice_tail(bufq_t * q1, bufq_t * q2);
 
 EXPORT_SYMBOL_GPL(bufq_splice_tail);
-__OS7_EXTERN_INLINE streamscall void bufq_freehead(bufq_t * q);
+__OS7_EXTERN_INLINE void bufq_freehead(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_freehead);
-__OS7_EXTERN_INLINE streamscall void bufq_purge(bufq_t * q);
+__OS7_EXTERN_INLINE void bufq_purge(bufq_t * q);
 
 EXPORT_SYMBOL_GPL(bufq_purge);
 __OS7_EXTERN_INLINE void __bufq_supply(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(__bufq_supply);
-__OS7_EXTERN_INLINE streamscall void bufq_supply(bufq_t * q, mblk_t *mp);
+__OS7_EXTERN_INLINE void bufq_supply(bufq_t * q, mblk_t *mp);
 
 EXPORT_SYMBOL_GPL(bufq_supply);
-__OS7_EXTERN_INLINE streamscall mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize,
-						      int maxcount);
+__OS7_EXTERN_INLINE mblk_t *bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount);
 
 EXPORT_SYMBOL_GPL(bufq_resupply);
 
@@ -358,7 +359,6 @@ EXPORT_SYMBOL_GPL(bufq_resupply);
 
 #endif
 
-
 /**
  * ss7_trylockq: - try to lock a queue pair for exclusive operation
  * @q: queue in queue pair
@@ -370,7 +370,7 @@ EXPORT_SYMBOL_GPL(bufq_resupply);
  * against an implicit recursive put procedure (one that calls a put procedure that calls another
  * that calls the original put procedure).  Locking is strict and safe against interrupts.
  */
-INLINE streamscall __hot int
+__OS7_EXTERN_INLINE int
 ss7_trylockq(queue_t *q)
 {
 	int res;
@@ -405,7 +405,7 @@ extern int enableq(queue_t *q);
  * does not have a service procedure, one will still be called directly to drain deferred messages
  * from the queue.
  */
-INLINE streamscall __hot void
+__OS7_EXTERN_INLINE void
 ss7_unlockq(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -485,7 +485,7 @@ ss7_flushq(queue_t *q, mblk_t *mp, const unsigned char flag)
  * Performs canonical flushing from a write queue.  The mesage is passed along or looped if
  * required and QR_ABSORBED returned, or QR_DONE returned if the message is to be discarded.
  */
-noinline streamscall int
+__OS7_EXTERN noinline int
 ss7_w_flush(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -505,7 +505,7 @@ EXPORT_SYMBOL_GPL(ss7_w_flush);
  * Performs canonical flushing from a read queue.  The mesage is passed along or looped if
  * required and QR_ABSORBED returned, or QR_DONE returned if the message is to be discarded.
  */
-noinline streamscall int
+__OS7_EXTERN noinline int
 ss7_r_flush(queue_t *q, mblk_t *mp)
 {
 	int rtn;
@@ -537,7 +537,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 		if (mp->b_cont)
 			if (unlikely(putq(q, mp->b_cont) == 0)) {
 				mp->b_cont->b_band = 0;
-				putq(q, mp->b_cont); /* must succeed */
+				putq(q, mp->b_cont);	/* must succeed */
 			}
 	case QR_TRIMMED:
 		freeb(mp);
@@ -561,7 +561,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case QR_DISABLE:
 		if (unlikely(putq(q, mp) == 0)) {
 			mp->b_band = 0;
-			putq(q, mp); /* must succeed */
+			putq(q, mp);	/* must succeed */
 		}
 		break;
 	case QR_PASSFLOW:
@@ -576,7 +576,7 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
 	case QR_RETRY:
 		if (unlikely(putq(q, mp) == 0)) {
 			mp->b_band = 0;
-			putq(q, mp); /* must succeed */
+			putq(q, mp);	/* must succeed */
 		}
 		break;
 	}
@@ -604,9 +604,9 @@ ss7_putq_slow(queue_t *q, mblk_t *mp, int rtn)
  * The message processing procedure proc() is invoked with the queue pair locked and the procedure
  * has exclusive access to the queue pair private structure.
  */
-streamscall __hot int
+__OS7_EXTERN __hot int
 ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *),
-		void streamscall (*procwake)(queue_t *))
+	 void streamscall (*procwake) (queue_t *))
 {
 	int locked = 0;
 
@@ -616,7 +616,7 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *),
 	if (likely(mp->b_datap->db_type < QPCTL) && unlikely(q->q_first || (q->q_flag & QSVCBUSY))) {
 		if (unlikely(putq(q, mp) == 0)) {
 			mp->b_band = 0;
-			putq(q, mp); /* must succeed */
+			putq(q, mp);	/* must succeed */
 		}
 		return (0);
 	}
@@ -646,7 +646,7 @@ ss7_putq(queue_t *q, mblk_t *mp, int streamscall (*proc) (queue_t *, mblk_t *),
 		seldom();
 		if (unlikely(putq(q, mp) == 0)) {
 			mp->b_band = 0;
-			putq(q, mp); /* must succeed */
+			putq(q, mp);	/* must succeed */
 		}
 	}
 	return (0);
@@ -666,7 +666,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		if (mp->b_cont)
 			if (!putbq(q, mp->b_cont)) {
 				mp->b_cont->b_band = 0;
-				putbq(q, mp->b_cont); /* must succeed */
+				putbq(q, mp->b_cont);	/* must succeed */
 			}
 	case QR_TRIMMED:
 		freeb(mp);
@@ -693,7 +693,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		noenable(q);
 		if (!putbq(q, mp)) {
 			mp->b_band = 0;
-			putbq(q, mp); /* must succeed */
+			putbq(q, mp);	/* must succeed */
 		}
 		rtn = 0;
 		return (0);
@@ -711,7 +711,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 				q->q_ptr, rtn));
 			if (!putbq(q, mp)) {
 				mp->b_band = 0;
-				putbq(q, mp); /* must succeed */
+				putbq(q, mp);	/* must succeed */
 			}
 			return (0);
 		}
@@ -749,13 +749,13 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
 		mp->b_band = 255;
 		if (unlikely(putq(q, mp) == 0)) {
 			mp->b_band = 0;
-			putq(q, mp); /* must succeed */
+			putq(q, mp);	/* must succeed */
 		}
 		return (0);
 	case QR_RETRY:
 		if (!putbq(q, mp)) {
 			mp->b_band = 0;
-			putbq(q, mp); /* must succeed */
+			putbq(q, mp);	/* must succeed */
 		}
 		return (1);
 	}
@@ -771,7 +771,7 @@ ss7_srvq_slow(queue_t *q, mblk_t *mp, int rtn)
  * lacking qprocson()/qprocsoff() and other poor behaviour.  Only the synchronization is necessary
  * for running D_MP under Linux Fast-STREAMS.
  */
-streamscall __hot int
+__OS7_EXTERN __hot int
 ss7_srvq(queue_t *q, int streamscall (*proc) (queue_t *, mblk_t *),
 	 void streamscall (*procwake) (queue_t *))
 {
@@ -839,7 +839,7 @@ ss7_oput_slow(str_t * s, mblk_t *mp)
  * The checks for the existence of a queue and the existence of a processing routine are to handle
  * the older LiS lack of a proper qprocson()/qprocsoff() mechanism.
  */
-streamscall __hot_out int
+__OS7_EXTERN __hot_out int
 ss7_oput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -884,7 +884,7 @@ ss7_osrv_slow(str_t * s, queue_t *q)
  * done by the deferral mechanism for bufcalls.  The message is deferred to the queue and this
  * procedure invoked on callback when there is no service procedure to enable.
  */
-streamscall __hot_out int
+__OS7_EXTERN __hot_out int
 ss7_osrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -922,7 +922,7 @@ ss7_iput_slow(str_t * s, mblk_t *mp)
  * The checks for the existence of a queue and the existence of a processing routine are to handle
  * the older LiS lack of a proper qprocson()/qprocsoff() mechanism.
  */
-streamscall __hot_in int
+__OS7_EXTERN __hot_in int
 ss7_iput(queue_t *q, mblk_t *mp)
 {
 	str_t *s = STR_PRIV(q);
@@ -967,7 +967,7 @@ ss7_isrv_slow(str_t * s, queue_t *q)
  * done by the deferral mechanism for bufcalls.  The message is deferred to the queue and this
  * procedure invoked on callback when there is no service procedure to enable.
  */
-streamscall __hot_in int
+__OS7_EXTERN __hot_in int
 ss7_isrv(queue_t *q)
 {
 	str_t *s = STR_PRIV(q);
@@ -983,18 +983,17 @@ ss7_isrv(queue_t *q)
 
 EXPORT_SYMBOL_GPL(ss7_isrv);
 
-__OS7_EXTERN_INLINE streamscall void ss7_do_timeout(caddr_t data, const char *timer,
-						    const char *mod, toid_t *timeo,
-						    int (*to_fnc) (struct head *),
-						    void streamscall (*exp_func) (caddr_t));
+__OS7_EXTERN_INLINE void ss7_do_timeout(caddr_t data, const char *timer,
+					const char *mod, toid_t *timeo,
+					int (*to_fnc) (struct head *),
+					void streamscall (*exp_func) (caddr_t));
 EXPORT_SYMBOL_GPL(ss7_do_timeout);
-__OS7_EXTERN_INLINE streamscall void ss7_stop_timer(struct head *h, const char *timer,
-						    const char *mod, toid_t *timeo);
+__OS7_EXTERN_INLINE void ss7_stop_timer(struct head *h, const char *timer,
+					const char *mod, toid_t *timeo);
 EXPORT_SYMBOL_GPL(ss7_stop_timer);
-__OS7_EXTERN_INLINE streamscall void ss7_start_timer(struct head *h, const char *timer,
-						     const char *mod, toid_t *timeo,
-						     void streamscall (*exp_func) (caddr_t),
-						     ulong val);
+__OS7_EXTERN_INLINE void ss7_start_timer(struct head *h, const char *timer,
+					 const char *mod, toid_t *timeo,
+					 void streamscall (*exp_func) (caddr_t), ulong val);
 EXPORT_SYMBOL_GPL(ss7_start_timer);
 
 #ifdef CONFIG_STREAMS_COMPAT_OS7_MODULE

@@ -5,6 +5,82 @@
 	* doc/man/man9/mi_acquire_sleep.9.man: doc for new functions
 	* doc/man/man9/mi_release.9.man: doc for new functions
 
+	* doc/man/Makefile.am: added new manpages GPLv3 header
+	* doc/man/man9/spl.9.man: correction
+
+	* src/include/sys/ddi.h: GPLv3 headers
+	* src/include/sys/strconf.h: GPLv3 headers
+	* src/include/sys/stream.h: GPLv3 headers
+	* src/include/sys/strlog.h: GPLv3 headers
+	* src/include/sys/strsun.h: GPLv3 headers
+	* src/include/sys/sunddi.h: GPLv3 headers
+
+	* src/include/sys/aix/ddi.h: extern updates
+	* src/include/sys/aix/strconf.h: extern updates
+	* src/include/sys/aix/stream.h: extern updates
+	* src/include/sys/hpux/ddi.h: extern updates
+	* src/include/sys/hpux/strconf.h: extern updates
+	* src/include/sys/hpux/stream.h: extern updates
+	* src/include/sys/irix/ddi.h: extern updates
+	* src/include/sys/irix/strconf.h: extern updates
+	* src/include/sys/irix/stream.h: extern updates
+	* src/include/sys/lfs/ddi.h: extern updates
+	* src/include/sys/lfs/strconf.h: extern updates
+	* src/include/sys/lfs/stream.h: extern updates
+	* src/include/sys/lis/ddi.h: extern updates
+	* src/include/sys/lis/strconf.h: extern updates
+	* src/include/sys/lis/stream.h: extern updates
+	* src/include/sys/mac/ddi.h: extern updates
+	* src/include/sys/mac/strconf.h: extern updates
+	* src/include/sys/mac/stream.h: extern updates
+	* src/include/sys/mps/ddi.h: extern updates
+	* src/include/sys/mps/strconf.h: extern updates
+	* src/include/sys/mps/stream.h: extern updates
+	* src/include/sys/os7/allocb.h: extern updates
+	* src/include/sys/os7/bufpool.h: extern updates
+	* src/include/sys/os7/bufq.h: extern updates
+	* src/include/sys/os7/compat.h: extern updates
+	* src/include/sys/os7/ddi.h: extern updates
+	* src/include/sys/os7/debug.h: extern updates
+	* src/include/sys/os7/lock.h: extern updates
+	* src/include/sys/os7/priv.h: extern updates
+	* src/include/sys/os7/queue.h: extern updates
+	* src/include/sys/os7/strconf.h: extern updates
+	* src/include/sys/os7/stream.h: extern updates
+	* src/include/sys/os7/timer.h: extern updates
+	* src/include/sys/osf/ddi.h: extern updates
+	* src/include/sys/osf/strconf.h: extern updates
+	* src/include/sys/osf/stream.h: extern updates
+	* src/include/sys/sun/ddi.h: extern updates
+	* src/include/sys/sun/strconf.h: extern updates
+	* src/include/sys/sun/stream.h: extern updates
+	* src/include/sys/sun/strsun.h: extern updates
+	* src/include/sys/svr3/ddi.h: extern updates
+	* src/include/sys/svr3/strconf.h: extern updates
+	* src/include/sys/svr3/stream.h: extern updates
+	* src/include/sys/svr4/ddi.h: extern updates
+	* src/include/sys/svr4/strconf.h: extern updates
+	* src/include/sys/svr4/stream.h: extern updates
+	* src/include/sys/uw7/ddi.h: extern updates
+	* src/include/sys/uw7/strconf.h: extern updates
+	* src/include/sys/uw7/stream.h: extern updates
+	  - get binary compatibility a bit better
+
+	* src/kernel/aixcompat.c: extern updates
+	* src/kernel/hpuxcompat.c: extern updates
+	* src/kernel/irixcompat.c: extern updates
+	* src/kernel/lfscompat.c: extern updates
+	* src/kernel/liscompat.c: extern updates
+	* src/kernel/maccompat.c: extern updates
+	* src/kernel/mpscompat.c: extern updates
+	* src/kernel/os7compat.c: extern updates
+	* src/kernel/osfcompat.c: extern updates
+	* src/kernel/suncompat.c: extern updates
+	* src/kernel/svr3compat.c: extern updates
+	* src/kernel/svr4compat.c: extern updates
+	* src/kernel/uw7compat.c: extern updates
+	  - get binary compatibility a bit better
+
 2007-08-03  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/Makefile.am: add manual pages

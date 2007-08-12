@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.12 2007/08/03 13:35:59 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.13 2007/08/12 15:51:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:59 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsun.h,v $
+ Revision 0.9.2.13  2007/08/12 15:51:13  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.12  2007/08/03 13:35:59  brian
  - manual updates, put ss7 modules in public release
 
@@ -64,7 +67,7 @@
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -81,6 +84,10 @@
 #ifndef __SUN_EXTERN_INLINE
 #define __SUN_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif				/* __SUN_EXTERN_INLINE */
+
+#ifndef __SUN_EXTERN
+#define __SUN_EXTERN extern streamscall
+#endif
 
 #include <linux/types.h>
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 15:51:18 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: irixcompat.c,v $
+ Revision 0.9.2.19  2007/08/12 15:51:18  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.18  2007/07/14 01:35:41  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $"
+#ident "@(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 15:51:18 $"
 
-static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $";
+static char const ident[] =
+    "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 15:51:18 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -77,6 +81,7 @@ static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9
  */
 
 #define __IRIX_EXTERN_INLINE __inline__ streamscall __unlikely
+#define __IRIX_EXTERN streamscall
 
 #define _IRIX_SOURCE
 
@@ -84,7 +89,7 @@ static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:41 $"
+#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/12 15:51:18 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL v2"
@@ -133,7 +138,7 @@ __IRIX_EXTERN_INLINE void icmn_err(int err_lvl, const char *fmt, va_list args);
 
 EXPORT_SYMBOL(icmn_err);	/* irix/ddi.h */
 /* gcc 3.4.3 can't handle inlining with variable argument list */
-extern void
+__IRIX_EXTERN void
 cmn_err_tag(int sequence, int err_lvl, const char *fmt, ... /* args */ )
 {
 	va_list args;

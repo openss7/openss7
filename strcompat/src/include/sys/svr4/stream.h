@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.7 2006/12/08 05:08:22 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.8 2007/08/12 15:51:15 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 05:08:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 15:51:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.8  2007/08/12 15:51:15  brian
+ - header and extern updates, GPLv3, 3 new lock functions
+
  Revision 0.9.2.7  2006/12/08 05:08:22  brian
  - some rework resulting from testing and inspection
 
@@ -76,7 +79,7 @@
 #ifndef __SYS_SVR4_STREAM_H__
 #define __SYS_SVR4_STREAM_H__
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do not include sys/svr4/stream.h directly, include sys/stream.h instead."
@@ -94,6 +97,10 @@
 #define __SVR4_EXTERN_INLINE __EXTERN_INLINE streamscall
 #endif
 
+#ifndef __SVR4_EXTERN
+#define __SVR4_EXTERN extern streamscall
+#endif
+
 #ifndef _SVR4_SOURCE
 #warning "_SVR4_SOURCE not defined but SVR4 stream.h included."
 #endif
@@ -103,22 +110,22 @@
 #if defined CONFIG_STREAMS_COMPAT_SVR4 || defined CONFIG_STREAMS_COMPAT_SVR4_MODULE
 
 /* don't use these functions, they are way too dangerous */
-extern long MPSTR_QLOCK(queue_t *q);
+__SVR4_EXTERN long MPSTR_QLOCK(queue_t *q);
 
 #ifndef MPSTR_QLOCK
 #define MPSTR_QLOCK(__q) MPSTR_QLOCK(__q)
 #endif
-extern void MPSTR_QRELE(queue_t *q, long s);
+__SVR4_EXTERN void MPSTR_QRELE(queue_t *q, long s);
 
 #ifndef MPSTR_QRELE
 #define MPSTR_QRELE(__q,__f) MPSTR_QRELE(__q,__f)
 #endif
-extern long MPSTR_STPLOCK(struct stdata *stp);
+__SVR4_EXTERN long MPSTR_STPLOCK(struct stdata *stp);
 
 #ifndef MPSTR_STPLOCK
 #define MPSTR_STPLOCK(__s) MPSTR_STPLOCK(__s)
 #endif
-extern void MPSTR_STPRELE(struct stdata *stp, long s);
+__SVR4_EXTERN void MPSTR_STPRELE(struct stdata *stp, long s);
 
 #ifndef MPSTR_STPRELE
 #define MPSTR_STPRELE(__s,__f) MPSTR_STPRELE(__s,__f)

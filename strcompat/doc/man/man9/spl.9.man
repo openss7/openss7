@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: spl.9.man,v 0.9.2.12 2006/10/06 12:13:06 brian Exp $
+.\" @(#) $Id: spl.9.man,v 0.9.2.13 2007/08/12 15:50:57 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/10/06 12:13:06 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/12 15:50:57 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: spl.9.man,v $
+.\" Revision 0.9.2.13  2007/08/12 15:50:57  brian
+.\" - header and extern updates, GPLv3, 3 new lock functions
+.\"
 .\" Revision 0.9.2.12  2006/10/06 12:13:06  brian
 .\" - updated manual pages to pass make check and for release
 .\" - updated release files for release
@@ -176,6 +179,31 @@ high priority level, suitable for all other high priority tasks.
 .\"
 .SH DESCRIPTION
 .PP
+These functions can be used to alter the system priority level.  The system
+priority level is an abstraction of the interrupt context of the processor
+on which the function is executed.  When the current priority level is
+.IR pl-x ,
+then no thread of execution running at priority level
+.IR pl-y ,
+can be running, where
+.IR pl-y " <= " pl-x .
+.PP
+Any of the
+.BR spl ()
+functions, with the exception of
+.BR splx (),
+will only result in raising or maintaining the system priority level;
+.BR splx ()
+can will only result in lowering or maintaining the system priority level.
+When
+.BR spl ()
+is passed minus one
+.RB ( -1 )
+as the level,
+.IR level ,
+then no change is made to the priority level, but the current priority level is
+still returned.  In this way, the current priority level can be determined.
+.PP
 All of the
 .BR spl ()
 functions, except
@@ -214,8 +242,11 @@ are also equivalent to
 .BR spl6 (),
 .BR spl7 (),
 .BR spl5 (),
+.BR spl4 (),
 and
-.BR spl4 ().
+.BR spl3 ().
+.PP
+The following relationship is guaranteed:
 .\"
 .\"
 .SH USAGE
@@ -225,13 +256,25 @@ The following code snippet illustrates the use of the
 functions:
 .sp
 .nf
-{
-        pl_t save_pl = splstr();
+\fC\s-1{
+    pl_t save_pl = splstr();
 
-        /* do some stuff */
+    /* do some stuff */
 
-        splx(save_pl);
-}
+    splx(save_pl);
+}\s+1\fP
+.fi
+.PP
+The following code snippet illustrates how to obtain the current priority
+level using
+.BR spl ():
+.sp
+.nf
+\fC\s-1{
+    pl_t current_pl = spl(-1);
+
+    /* do some stuff */
+}\s+1\fP
 .fi
 .\"
 .\"
