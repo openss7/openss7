@@ -9,18 +9,125 @@ Here are some notes on all things ISO:
 
 See the OSI-FAQ at http://www.cl.cam.ac.uk/~mgk25/osi-faq.txt
 
+ISO/IEC 10589 (IS-IS) (RFC 1142) Routeing Parameters:
+------------------------------------------
+01-80-C2-00-00-14   [AllL1ISs] The multi-destination address All Level 2
+		    Intermediate Systems (ISO 10589/RFC 1142)
+01-80-C2-00-00-15   [AllL2ISs] The multi-destination address All Level 2
+		    Intermediate Systems (ISO 10589/RFC 1142)
+09-00-2B-00-00-04   [AllEndSystems] The multi-destination address All
+		    End Systems used by ISO 9542/RFC 995.
+09-00-2B-00-00-05   [AllIntermediateSystems] The multi-destination
+		    address All Intermediate Systems used by ISO
+		    9542/RFC 995.
+10000011 (0x83)	    [IDR-PD] The Network Layer Protocol Discriminator
+		    assigned by ISO/TR 9577 (X.263)
+00000000 (0x00)	    [IDR-Selector] The NSAP selector for the
+		    Intermediate System Network Entity
+FE		    [ISO-SAP] The SAP for ISO Network Layer on ISO
+		    8802-3 LANs
+
+
+Multicast MAC Addresses:
+------------------------
+
+Standard group MAC addresses:
+
+01-80-C2-00-00-14   (ISO 10589/RFC 1142) All Level 1 Intermediate Systems Addresses
+01-80-C2-00-00-15   (ISO 10589/RFC 1142) All Level 2 Intermediate Systems Addresses
+
+01-80-C2-00-00-16   (ISO 10030/RFC 1223) All CONS End System Address
+01-80-C2-00-00-17   (ISO 10030/RFC 1223) All CONS SNARES Address
+
+01-80-C2-00-00-1B   (ISO 9542/RFC 1768)  All Multicast Capable End Systems Address
+01-80-C2-00-00-1C   (ISO 9542/RFC 1768)  All Multicast Announcements Address
+01-80-C2-00-00-1D   (ISO 9542/RFC 1768)  All Multicast Capable Intermediate Systems Address
+
+Group MAC addresses used in ISO 9542 ES-IS protocol:
+
+09-00-2B-00-00-04   (ISO 9542/RFC 995) All End System Network Entities Address
+09-00-2B-00-00-05   (ISO 9542/RFC 995) All Intermeidate System Network Entities Address
+
+Locally administered group MAC address used by IEEE Std. 802.5
+
+(IEEE Std. 802.5 Funcional Addresses)  [Note: Potential users of the
+addresses listed below are warened that, since these addresses are
+derived from the locally adminstered address space, there are no
+guarantees that the addresses will be used only for the listed
+purposes.]
+
+03-00-00-00-01-00   All Intermediate System Network Entities Address (ISO 9542/RFC 995)
+03-00-00-00-02-00   All End System Network Entities Address (also 802.5) (ISO 9542/RFC 995)
+
+03-00-00-00-08-00   All CONS SNARES Address (ISO 10030, RFC 1223)
+03-00-00-00-10-00   All CONS End System Address (ISO 10030, RFC 1223)
+
 Ethernet Types:
 ---------------
 
 - 0x00FE shown in RFC 1701 (GRE) for OSI Network Layer, but it
   conflicts with the 802.3 length field.  RFC 1700 shows this
-  as the LSAP for ISO CLNS IS 8473.
+  as the LSAP for ISO CLNS IS 8473, but it is really for the whole
+  network layer using ISO/IEC TR 9577 encapsulation
 
 - 0x0800 is IPv4.
 
 - 0x0801 is X.75 Internet
 - 0x0805 is X.25 Level 3 (PLP?). (Likely ISO 8881: X.25 for use on LANs)
 - 0x0806 is ARP
+
+LLC LSAPS
+---------
+
+- 0x7E ISO/IEC 8208 (X.25 PLP over LLC2)
+- 0xFE ISO/TR 9577 NLP ID PDUs
+
+ISO/TR 9577 (X.263) NLPIDs
+--------------------------
+
+- 00000000 - 0x00 ISO/IEC 8473-1 | X.233 (inactive subset)
+
+- 00001000 - 0x08 Q.931, Q.932, Q.933, X.36, ISO/IEC 11572, ISO/IEC 11582
+- 00001001 - 0x09 Q.2931
+- 00001010 - 0x0A Q.2119
+- xx01xxxx - ---- X.25 LLC2 (ISO/IEC 8208 - Modulo 8)
+- xx10xxxx - ---- X.25 LLC2 (ISO/IEC 8208 - Modulo 128)
+- 00110010 - 0x32 X.45
+- 0011xxxx - ---- X.25 LLC2 (ISO/IEC 8208 - GFI Extension, except 0x32)
+- 01000100 - 0x44 G.764 (PVP)
+
+- 10000000 - 0x80 IEEE SNAP
+- 10000001 - 0x81 CLNL  (ISO/IEC 8473-1 | X.233) (active subset)
+- 10000010 - 0x82 ES-IS (ISO 9542)
+- 10000011 - 0x83 IS-IS (ISO/IEC 10589)
+- 10000101 - 0x85 IDRP  (ISO/IEC 10747) (Not used, 0x81 instead)
+- 10001010 - 0x8A SNARE (ISO/IEC 10030)
+- 10001011 - 0x8B X.273 (ISO/IEC 11577) (NLS)
+- 10001110 - 0x8E IPv6  (RFC 2460)
+- 11001100 - 0xCC IPv4  (RFC 0791)
+- 11001111 - 0xCF PPP   (RFC 1548)
+
+Note that CLNL packets are self identifying: that is, they identify
+whether they are CLNP, ES-IS or IS-IS packets.
+
+It looks like 8208 packets are placing the X.25 address field directly
+into the NLP-ID or some such.
+
+
+IP Multicast Addresses:
+-----------------------
+
+- 224.0.0.1  All Systems on this subnet.		(RFC1112)
+- 224.0.0.2  All Routers on this subnet.		(RFC1112)
+- 224.0.0.3  Unassigned
+
+- 224.0.0.5  OSPFIGP  OSPFIGP All Routers		(RFC2328)
+- 224.0.0.6  OSPFIGP  OSPFIGP Designated routers	(RFC2328)
+
+- 224.0.0.19 IPAllL1ISs (ISO/IEC 10589 IS-IS)		(RFC1142)
+- 224.0.0.20 IPALLL2ISs (ISO/IEC 10589 IS-IS)		(RFC1142)
+- 224.0.0.21 IPAllIntermediateSystems (IS-IS)		(RFC1142)
+
 
 IP Protocol Numbers:
 --------------------
@@ -37,6 +144,8 @@ IP Protocol Numbers:
   notes.)  There is no RFC reference.  I suppose this is CLNS over IP.
   (Actually, there is a direct reference by Marshall in RFC 1070 for
   this protocol number.)
+
+  This protocol can use 224.0.0.1 with the SNAcP defined in RFC 1070.
 
 - Protocol Number 124 'ISIS over IPv4' is assigned by IANA. (Linux
   /etc/protocols lists this with no notes.)  There is no RFC reference.
@@ -60,6 +169,8 @@ Well Known Port Numbers:
 - TCP/UDP/SCTP port number 147 'iso-ip' is assigned by IANA for ISO-IP
   (Marshall T. Rose) (not listed in /etc/services) (Mentioned directly
   by Marshall in RFC 1070 for UDP.)
+
+  This protocol can use 224.0.0.1 with the SNAcP defined in RFC 1070.
 
 - TCP/UDP/SCTP port number 163 'cmip-man' is assigned by IANA for
   CMIP/TCP Manager (Mashall T. Rose).  (Linux /etc/services notes that
@@ -97,6 +208,27 @@ Registered Port Numbers:
 - TCP/UDP/SCTP port number 17007 'isode-dua' is assigned by IANA. (not
   listed in /etc/services)  (Probably ISODE DUA-DSA for directory
   services.)
+
+Routing:
+--------
+
+RFC 1195 - Use of OSI IS-IS for Routing in TCP/IP and Dual Environments
+RFC 1142 - OSI IS-IS Intra-domain Routing Protocol (ISO/IEC 10589)
+RFC 1070 - Use of the Internet as a Subnetwork for Experimentation with the OSI Network Layer
+ISO/IEC  9542 (ES-IS) CLNS [RFC 0995, RFC 1768]
+ISO/IEC 10589 (IS-IS) CLNS [RFC 1142]
+ISO/IEC 10747 (IDRP)
+ISO/IEC 10030 (ES-ES) CONS [RFC 1223]
+
+Addressing
+----------
+
+- X.121
+- E.164
+- RFC 1069 - IP NSAPs
+- RFC 4548 - IP NSAPs
+- RFC 1768 - Multicast NSAPs for CLNS and (ES-IS/IS-IS) extensions
+
 
 Design Notes:
 =============

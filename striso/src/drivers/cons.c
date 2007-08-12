@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cons.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/10 10:12:40 $
+ @(#) $RCSfile: cons.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:00:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,22 +45,47 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/10 10:12:40 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:00:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cons.c,v $
+ Revision 0.9.2.2  2007/08/12 16:00:24  brian
+ - updates, still working up CONS
+
  Revision 0.9.2.1  2006/10/10 10:12:40  brian
  - added losts of striso files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cons.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/10 10:12:40 $"
+#ident "@(#) $RCSfile: cons.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:00:24 $"
 
-static char const ident[] = "$RCSfile: cons.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/10 10:12:40 $";
+static char const ident[] = "$RCSfile: cons.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:00:24 $";
 
 /*
- *  ISO CONS driver.
+ *  This is an X.223 CONS driver.
  *
- *  This is an X.213 pseudo-device driver.
+ *  The driver implements X.223 (support of CONS using X.25) as a multiplexing pseudo-device driver.
+ *  Per X.223, it implements the X.25 PLP in support of the CONS service interface.  The driver
+ *  presents a NPI CONS service interface at the upper multiplex.
+ *
+ *  Data links Streams providing the data link service using the DLPI interface are linked beneath
+ *  the multiplexing driver.  Data link Streams should be attached, bound and connected.  Data link
+ *  Streams can be Streams of any type.  In support of X.223 they can be LLC2 connections per
+ *  ISO/IEC 8881, ISDN connections per X.612 ISO/IEC 9574, X.21/X.21 bis PADS or X.30 ISDN TAs per
+ *  X.613 ISO/IEC 10588, or PSTN per X.614 ISO/IEC 10732.
+ *
+ *  Routing:
+ *
+ *  X.121 address-based routing is performed by associating a network title (IS) or address (ES)
+ *  with each data link to form a routing table.  Network titles or addresses are associated with a
+ *  data link once it has been linked beneath the multiplexing driver using input-output controls.
+ *  Packets received that are associated with external addresses are routed out another data link or
+ *  rejected.  Packets received that are associated with a locally assigned address are processed
+ *  against the CONS interface.
+ *
+ */
+
+/*
+ * vim: tw=100
  */

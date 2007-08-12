@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:23 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:00:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.14  2007/08/12 16:00:23  brian
+ - updates, still working up CONS
+
  Revision 0.9.2.13  2007/07/14 01:36:23  brian
  - make license explicit, add documentation
 
@@ -84,7 +87,7 @@
  - corrections for cooked manual pages in spec files
  - added release documentation to spec and rules files
  - copyright header updates
- - moved controlling tty checks in stream head
+ - moved controlling tty checks in Stream head
  - missing some defines for LiS build in various source files
  - added OSI headers to striso package
  - added includes and manual page paths to acincludes for various packages
@@ -116,18 +119,56 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $";
 
 /*
+ *  This is an X.233 CLNS driver.
+ *
+ *  The driver implements X.233 (CLNP) as a multiplexing pseudo-device driver.  The driver presents
+ *  an NPI CLNS service interface at the upper multiplex.
+ *
+ *  Data link streasm providing the CODLS or CLDLS data link services using the DLPI interface are
+ *  linked beneath the multiplexing driver.  Data link Streams should be attached and bound (CLDLS)
+ *  or attached, bound and connected (CODLS), before being linked.  Data link Streams can be Streams
+ *  of any type.  In support of various methods for transporting CLNP, the can be one of the
+ *  following types:
+ *
+ *  DL_ETHER:	    Ethertype 0x00FE, MTU 1500.
+ *  DL_CSMACD:	    LLC1 hooked into LSAP 0x00FE, MTU 1497 or MTU 1492 (w/SNAP).
+ *  DL_ETH_CSMA:    Capable of both DL_ETHER and DL_CSMACD.
+ *  DL_X25:	    NPLID 0x81
+ *  DL_MPFRAME:	    MP over FR,   NPLID 0x81 or SNAP 0x80.
+ *
+ *  Note that RFC 1070 ISO-IP is implemented using separate device drivers.
+ *
+ *  For handling CONS over (ISO-IP RFC 1070), NPI provider Streams are linked under the multiplexing
+ *  driver.  These are CLNS Streams from the np-ip driver or np-udp driver from the strxns package.
+ *
+ *  NP-IP:	    IP packets with protocol number 80. (RFC 1070)
+ *  NP-UDP:	    UDP packets for port number 147. (RFC 1070)
+ *
+ *  CLNP packets are self identifying as CLNS, ES-IS, or IS-IS (IDRP) packets.  When configured for
+ *  ES operation, the driver initiates and responds to ES-IS packets on data links that have been
+ *  associated with the end system.  When configured for IS operation, the driver initiates and
+ *  responds to IS-IS packets on data links that have been associated with the intermediate system.
+ *  ES, IS and their associated addresses, network titles and data links are configured using
+ *  input-output controls.
+ *
+ *  Routing is performed in accordance with ES or IS procedures.  Additional addressing schemes,
+ *  routing procedures exist for IP and UDP encapsulation of CLNP packets.  For these forms the
+ *  SNPA address (IP address) is provided by the NPI service interface.  Routing is performed
+ *  directly to the underlying NP-IP or NP-UDP provider Streams.  In fact, this will be implemented
+ *  as a separate driver.
+ *
  *  This is an X.233 CLNS driver.  This is an NPI driver that can be pushed over or link a DLPI
- *  stream.  DLPI streams can be DL_ETH, DL_CMSACD or DL_CMSA or DL_IP and this driver will use
+ *  Stream.  DLPI Streams can be DL_ETH, DL_CMSACD or DL_CMSA or DL_IP and this driver will use
  *  various methods for transporting CLNS.
  *
- *  Actually, this is a CLNL driver.  It does not have to link DL streams underneath unless there is
- *  only a DL stream for the link driver.  This hooks into the Linux device independent packet layer
+ *  Actually, this is a CLNL driver.  It does not have to link DL Streams underneath unless there is
+ *  only a DL Stream for the link driver.  This hooks into the Linux device independent packet layer
  *  on a number of levels:
  *
  *  Ethernet: - hook into Ethertype 0x00FE, max packet size 1500.
@@ -172,7 +213,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:36:23 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL v2"
