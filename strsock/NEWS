@@ -1,11 +1,32 @@
-OpenSS7 STREAMS Sockets -- history of user visible changes.  2007-06-24
-$Id: NEWS,v 0.9.2.25 2007/06/24 09:21:33 brian Exp $
+OpenSS7 STREAMS Sockets -- history of user visible changes.  2007-08-12
+$Id: NEWS,v 0.9.2.26 2007/08/12 15:35:57 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 STREAMS Sockets package.
+
+ Major changes for release strsock-0.9.2.4
+------------------------------------------
+
+This `OpenSS7 Project' release is the fourth separate release of the
+`OpenSS7 STREAMS Sockets' package whose components were formerly part
+of the `strss7', `strxnet' and `streams' packages.  These networking
+modules provide the Sockets library.  The package contains all the
+necessary manual pages and other documentation.  The package is
+packaged as an OpenSS7 style autoconf tarball.
+
+This is the fourth alpha release and is part of the OpenSS7 Master
+Package (`openss7-0.9.2.G').  This release is primarily a maintenance
+release supporting recent distributions and tool chains.
+
+Major features since the last public release are as follows:
+
+   - Minor documentation corrections.
+
+   - Made kernel modules license explicit GPL v2.
+
 
  Major changes for release strsock-0.9.2.3
 ------------------------------------------
@@ -17,7 +38,7 @@ modules provide the Sockets library.  The package contains all the
 necessary manual pages and other documentation.  The package is
 packaged as an OpenSS7 style autoconf tarball.
 
-This is the second alpha release and is part of the OpenSS7 Master
+This is the third alpha release and is part of the OpenSS7 Master
 Package (`openss7-0.9.2.F').  This release is primarily a maintenance
 release supporting recent distributions and tool chains.
 
@@ -52,7 +73,7 @@ necessary manual pages and other documentation.  The package is
 packaged as an OpenSS7 style autoconf tarball.
 
 This is the second alpha release for `Linux Fast-STREAMS' and is part of
-the OpenSS7 Master Package (`openss7-0.9.2.F').  This release is
+the OpenSS7 Master Package (`openss7-0.9.2.E').  This release is
 primarily a maintenance release supporting recent distributions and
 tool chains.
 
@@ -80,7 +101,7 @@ necessary manual pages and other documentation.  The package is
 packaged as an OpenSS7 style autoconf tarball.
 
 This is the initial alpha release for `Linux Fast-STREAMS' and is part
-of the OpenSS7 Master Package (`openss7-0.9.2.F').
+of the OpenSS7 Master Package (`openss7-0.9.2.D').
 
 This release is the initial public release.
 

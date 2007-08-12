@@ -1,11 +1,58 @@
-OpenSS7 SS7 Stack -- history of user visible changes.  2007-06-24
-$Id: NEWS,v 0.9.2.39 2007/06/24 09:21:21 brian Exp $
+OpenSS7 SS7 Stack -- history of user visible changes.  2007-08-12
+$Id: NEWS,v 0.9.2.40 2007/08/12 15:35:44 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 SS7 Stack package.
+
+ Major changes for release strss7-0.9a.8.rc1
+--------------------------------------------
+
+The OpenSS7 SS7 Stack package contains a wide array of SS7 drivers and
+components for Linux Fast-STREAMS.  This is the public release package
+which has most of the components removed.  Subscribers and sponsors of
+the OpenSS7 Project have access to the full array of components.
+
+This is the eighth release of the OpenSS7 SS7 Stack strss7 package that
+contains SS7 (Signalling System No. 7) signalling stack components for
+Linux Fast-STREAMS.  The package contains the necessary header files,
+manual pages and other documentation for SS7 components in a separate
+autoconf tarball.
+
+This release is primarily to support recent compilers, kernels and
+distributions.
+
+Major features since the last public release are as follows:
+
+   - Added MTPI specification texinfo (info, html, pdf) document.
+
+   - Added CNAM project document.  The CNAM projects provides a locally
+     attached TCAP CNAM database front-end that performs SS7 stack
+     functions local to the switching office and queries a back-end
+     CNAM database using IP over the Internet.
+
+   - Aded SDLI, SDTI and SLI specifications texinfo (info, html, pdf)
+     document.
+
+   - Made kernel module license explicit GPL v2.
+
+   - Added manual pages for LMI and all LMI primitives.
+
+   - Added manual pages for SDLI and all SDLI primitives.
+
+   - Added manual pages for SDTI and all SDTI primitives.
+
+   - Added manual pages for SLI and all SLI primitives.
+
+   - Corrections for recent RHAS4 kernels defining irq_handler_t with 3
+     argument function template.
+
+   - Added sdl-pmod and sdt-pmod STREAMS modules and manual pages.
+     These two STREAMS modules simluate an SDT and SDL interface
+     connection using a STREAMS-based pipe for testing purposes.
+
 
  Major changes for release strss7-0.9a.7
 ----------------------------------------
@@ -65,15 +112,15 @@ Major features since the last public release are as follows:
 
    - Corrected support for the DS2152/21352/21552/2154/21352/21555
      chips present in older V400P cards.  (See
-     `http://www.openss7.org/codefiles/strss7-0.9a.7/BUGS' in the
+     `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/BUGS' in the
      release for more information.)
 
    - Support for the DS2156 chip present in recent V401PE cards.  (See
-     `http://www.openss7.org/codefiles/strss7-0.9a.7/BUGS' in the
+     `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/BUGS' in the
      release for more information.)
 
    - Corrections for timer bugs in the X400P-SS7 driver.  (See
-     `http://www.openss7.org/codefiles/strss7-0.9a.7/BUGS' in the
+     `http://www.openss7.org/codefiles/strss7-0.9a.8.rc1/BUGS' in the
      release for more information.)
 
    - Improvements to the common build environment with better support

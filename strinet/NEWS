@@ -1,11 +1,34 @@
-OpenSS7 INET Networking -- history of user visible changes.  2007-06-24
-$Id: NEWS,v 0.9.2.45 2007/06/24 09:21:27 brian Exp $
+OpenSS7 INET Networking -- history of user visible changes.  2007-08-12
+$Id: NEWS,v 0.9.2.46 2007/08/12 15:35:50 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 The sections that follow provide information on OpenSS7 releases of the
 OpenSS7 INET Networking package.
+
+ Major changes for release strinet-0.9.2.7
+------------------------------------------
+
+This `OpenSS7 Project' release is another separate add-on package
+release of the `OpenSS7 INET Networking' package that was formerly
+present in the (long deprecated) `LiS' package.  The networking drivers
+are provided, as well as the TPI and XTI header files for INET and loop
+back operation.  The package contains all the necessary manual packages
+and other documentation for INET components in a separate autoconf
+tarball.  This release is a stable, production grade release for `Linux
+Fast-STREAMS' and is part of the OpenSS7 Master Package
+(`openss7-0.9.2.G').
+
+This release is primarily a maintenance release to support recent
+distributions and tool chains.
+
+Major features since the last public release are as follows:
+
+   - Minor documentation corrections.
+
+   - Made kernel modules license explicit GPL v2.
+
 
  Major changes for release strinet-0.9.2.6
 ------------------------------------------
@@ -54,7 +77,7 @@ back operation.  The package contains all the necessary manual packages
 and other documentation for INET components in a separate autoconf
 tarball.  This release is a stable, production grade release for `Linux
 Fast-STREAMS' and is part of the OpenSS7 Master Package
-(`openss7-0.9.2.F').
+(`openss7-0.9.2.E').
 
 This release is primarily a maintenance release to support recent
 distributions and tool chains.
@@ -83,7 +106,7 @@ back operation.  The package contains all the necessary manual packages
 and other documentation for INET components in a separate autoconf
 tarball.  This release is a stable, production grade release for `Linux
 Fast-STREAMS' and is part of the OpenSS7 Master Package
-(`openss7-0.9.2.F').
+(`openss7-0.9.2.D').
 
 This release is both a maintenance release and a feature release.  The
 major new feature added is a fully "STREAMS" based implementation of the `rawip(4)'
