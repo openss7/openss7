@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: mtpi_ioctl.h,v 0.9.2.9 2007/08/03 13:35:00 brian Exp $
+ @(#) $Id: mtpi_ioctl.h,v 0.9.2.10 2007/08/12 16:19:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:19:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtpi_ioctl.h,v $
+ Revision 0.9.2.10  2007/08/12 16:19:53  brian
+ - new PPA handling
+
  Revision 0.9.2.9  2007/08/03 13:35:00  brian
  - manual updates, put ss7 modules in public release
 
@@ -73,7 +76,7 @@
 #ifndef __MTPI_IOCTL_H__
 #define __MTPI_IOCTL_H__
 
-#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: mtpi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -610,9 +613,9 @@ typedef struct mtp_statem_sl {
 	struct mtp_timers_sl timers;
 } mtp_statem_sl_t;
 
-#define SLS_OUT_OF_SERVICE	0	/* out of service */
+#define SLS_OOS			0	/* out of service */
 #define SLS_PROC_OUTG		1	/* processor outage */
-#define SLS_IN_SERVICE		2	/* in service */
+#define SLS_IS			2	/* in service */
 #define SLS_WACK_COO		3	/* waiting COA/ECA in response to COO */
 #define SLS_WACK_ECO		4	/* waiting COA/ECA in response to ECO */
 #define SLS_WCON_RET		5	/* waiting for retrieval confrimation */

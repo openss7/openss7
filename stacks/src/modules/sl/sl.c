@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:06 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.22  2007/08/12 16:20:29  brian
+ - new PPA handling
+
  Revision 0.9.2.21  2007/07/14 01:35:06  brian
  - make license explicit, add documentation
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -87,6 +90,9 @@ static char const ident[] =
  *  Having the SL state machines separate permits live upgrade and allows this
  *  state machine to be rigorously conformance tested only once.
  */
+#define _LFS_SOURCE	1
+#define _SUN_SOURCE	1
+
 #include <sys/os7/compat.h>
 
 #include <ss7/lmi.h>
@@ -97,7 +103,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/07/14 01:35:06 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3718,15 +3724,18 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto emsgsize;
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
 	if (sl->i_state == LMI_UNUSABLE)
 		goto eagain;
 	if (sl->i_style != LMI_STYLE2)
 		goto eopnotsupp;
 	if (sl->i_state != LMI_UNATTACHED)
 		goto outstate;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p) + 2)
+	if (p->lmi_ppa_length < 2)
 		goto badppa;
 	sl->i_state = LMI_ATTACH_PENDING;
 	return (QR_PASSFLOW);
@@ -3795,14 +3804,19 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto emsgsize;
 	if (sl->i_state == LMI_UNUSABLE)
 		goto eagain;
 	if (sl->i_state != LMI_DISABLED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	sl->i_state = LMI_ENABLE_PENDING;
 	return (QR_PASSALONG);
+      badaddr:
+	return lmi_error_ack(q, sl, LMI_ENABLE_REQ, LMI_BADADDRESS, EINVAL);
       outstate:
 	ptrace(("%s: PROTO: out of state\n", MOD_NAME));
 	return lmi_error_ack(q, sl, LMI_ENABLE_REQ, LMI_OUTSTATE, EPROTO);
@@ -4289,6 +4303,8 @@ sdt_info_ack(queue_t *q, mblk_t *mp)
 			p->lmi_max_sdu = p->lmi_max_sdu > hlen ? p->lmi_max_sdu - hlen : 0;
 			p->lmi_min_sdu = p->lmi_min_sdu > hlen ? p->lmi_min_sdu - hlen : 0;
 			p->lmi_header_len += hlen;
+			p->lmi_prov_flags = sl->flags;
+			p->lmi_prov_state = sl->state;	/* FIXME: maintain this variable! */
 			break;
 		default:
 			goto outstate;

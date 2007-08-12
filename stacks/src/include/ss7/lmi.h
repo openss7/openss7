@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi.h,v 0.9.2.8 2007/03/25 18:59:12 brian Exp $
+ @(#) $Id: lmi.h,v 0.9.2.9 2007/08/12 16:19:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 18:59:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:19:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lmi.h,v $
+ Revision 0.9.2.9  2007/08/12 16:19:53  brian
+ - new PPA handling
+
  Revision 0.9.2.8  2007/03/25 18:59:12  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,7 +64,7 @@
 #ifndef __LMI_H__
 #define __LMI_H__
 
-#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lmi.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -168,8 +171,16 @@ typedef struct {
 	lmi_ulong lmi_min_sdu;
 	lmi_ulong lmi_header_len;
 	lmi_ulong lmi_ppa_style;
+	lmi_ulong lmi_ppa_length;
+	lmi_ulong lmi_ppa_offset;
+	lmi_ulong lmi_prov_flags;	/* provider specific flags */
+	lmi_ulong lmi_prov_state;	/* provider specific state */
 	lmi_uchar lmi_ppa_addr[0];
 } lmi_info_ack_t;
+
+#define LMI_VERSION_1	    1
+#define LMI_VERSION_2	    2
+#define LMI_CURRENT_VERSION LMI_VERSION_2
 
 /*
  *  LMI provider style.
@@ -187,6 +198,8 @@ typedef struct {
 
 typedef struct {
 	lmi_long lmi_primitive;		/* LMI_ATTACH_REQ */
+	lmi_ulong lmi_ppa_length;
+	lmi_ulong lmi_ppa_offset;
 	lmi_uchar lmi_ppa[0];
 } lmi_attach_req_t;
 
@@ -204,6 +217,8 @@ typedef struct {
 
 typedef struct {
 	lmi_long lmi_primitive;		/* LMI_ENABLE_REQ */
+	lmi_ulong lmi_rem_length;
+	lmi_ulong lmi_rem_offset;
 	lmi_uchar lmi_rem[0];
 } lmi_enable_req_t;
 

@@ -1,6 +1,67 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:01 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdl.c,v $
+ Revision 0.9.2.20  2007/08/12 16:20:25  brian
+ - new PPA handling
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $"
+
+static char const ident[] = "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $";
+
+/*****************************************************************************
+
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +106,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:01 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:01 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $";
+
+#define _LFS_SOURCE	1
+//#define _SVR4_SOURCE	1
+//#define _MPS_SOURCE	1
+#define _SUN_SOURCE	1
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides the
@@ -66,7 +132,7 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:01 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:25 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -279,14 +345,26 @@ lmi_info_ack(queue_t *q, struct sdl *s)
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = s->i_state;
 		p->lmi_max_sdu = 64;
 		p->lmi_min_sdu = 8;
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE1;	/* only STYLE1 for modules */
+		p->lmi_ppa_length = 0;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = 0;
+		p->lmi_prov_state = SDL_DISCONNECTED;
+		if (s->statem.tx_state == SDL_STATE_IN_SERVICE) {
+			p->lmi_prov_state = SDL_CONNECTED;
+			p->lmi_prov_flags |= SDL_TX_DIRECTION;
+		}
+		if (s->statem.rx_state == SDL_STATE_IN_SERVICE) {
+			p->lmi_prov_state = SDL_CONNECTED;
+			p->lmi_prov_flags |= SDL_RX_DIRECTION;
+		}
+		mp->b_wptr += sizeof(*p);
 		printd(("%s: %p: <- LMI_INFO_ACK\n", MOD_NAME, s));
 		putnext(s->oq, mp);
 		return (QR_DONE);
@@ -751,7 +829,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	struct sdl *s = SDL_PRIV(q);
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto emsgsize;
 	if (s->i_state == LMI_UNUSABLE)
 		goto eagain;
@@ -759,7 +837,9 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		goto eopnotsupp;
 	if (s->i_state != LMI_UNATTACHED)
 		goto outstate;
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p) + 2)
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
+	if (p->lmi_ppa_length != 2)
 		goto badppa;
 	s->i_state = LMI_ATTACH_PENDING;
 	return lmi_ok_ack(q, s, LMI_ATTACH_REQ);
@@ -824,7 +904,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	struct sdl *s = SDL_PRIV(q);
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto emsgsize;
 	if (s->i_state == LMI_UNUSABLE)
 		goto eagain;

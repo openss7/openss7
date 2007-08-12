@@ -1,6 +1,67 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:37 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/12 16:20:49 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/12 16:20:49 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdlconf.c,v $
+ Revision 0.9.2.6  2007/08/12 16:20:49  brian
+ - new PPA handling
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/12 16:20:49 $"
+
+static char const ident[] = "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/12 16:20:49 $";
+
+/*****************************************************************************
+
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/12 16:20:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +106,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:49 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:37 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/12 16:20:49 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/06/17 01:56:37 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/12 16:20:49 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -603,6 +664,8 @@ slconf_get(void)
 	ctrl.len = sizeof(p->attach_req) + sizeof(ppa);
 	ctrl.buf = cbuf;
 	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	p->attach_req.lmi_ppa_length = sizeof(ppa);
+	p->attach_req.lmi_ppa_offset = sizeof(p->attach_req);
 	bcopy(&ppa, p->attach_req.lmi_ppa, sizeof(ppa));
 	if ((ret = putmsg(fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		perror(__FUNCTION__);
@@ -685,6 +748,8 @@ slconf_set(void)
 	ctrl.len = sizeof(p->attach_req) + sizeof(ppa);
 	ctrl.buf = cbuf;
 	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	p->attach_req.lmi_ppa_length = sizeof(ppa);
+	p->attach_req.lmi_ppa_offset = sizeof(p->attach_req);
 	bcopy(&ppa, p->attach_req.lmi_ppa, sizeof(ppa));
 	if ((ret = putmsg(fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		perror(__FUNCTION__);

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/03 13:35:43 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.20  2007/08/12 16:20:31  brian
+ - new PPA handling
+
  Revision 0.9.2.19  2007/08/03 13:35:43  brian
  - manual updates, put ss7 modules in public release
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/03 13:35:43 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/03 13:35:43 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -123,7 +126,7 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/08/03 13:35:43 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1112,7 +1115,7 @@ static struct tc *
 tc_acquire(queue_t *q)
 {
 	/* FIXME: lock te if available too */
-	return ((struct tc *)mi_trylock(q));
+	return ((struct tc *) mi_trylock(q));
 }
 
 static void
@@ -1126,7 +1129,7 @@ static struct sc *
 sc_acquire(queue_t *q)
 {
 	/* FIXME: lock te if available too */
-	return ((struct sc *)mi_trylock(q));
+	return ((struct sc *) mi_trylock(q));
 }
 
 static void

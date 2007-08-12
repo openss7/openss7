@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/12 16:20:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/22 01:10:16 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.45  2007/08/12 16:20:36  brian
+ - new PPA handling
+
  Revision 0.9.2.44  2007/07/22 01:10:16  brian
  - corrections for RHAS4 irq_handler_t and XEN paddr_t
 
@@ -142,10 +145,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/12 16:20:36 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/12 16:20:36 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -163,6 +166,7 @@ static char const ident[] =
 #define _LFS_SOURCE	1
 #define _MPS_SOURCE	1
 #define _SVR4_SOURCE	1
+#define _SUN_SOURCE	1
 
 #define X400P_DOWNLOAD_FIRMWARE 1
 
@@ -200,7 +204,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/07/22 01:10:16 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/12 16:20:36 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -344,6 +348,8 @@ typedef struct xp {
 	xp_path_t rx;			/* receive path variables */
 	lmi_option_t option;		/* LMI protocol and variant options */
 	struct {
+		uint flags;		/* overall provider flags */
+		uint state;		/* overall provider state */
 		bufq_t rb;		/* received buffer */
 		bufq_t tb;		/* transmission buffer */
 		bufq_t rtb;		/* retransmission buffer */
@@ -1086,20 +1092,25 @@ sl_notify_ind(struct xp *xp, queue_t *q)
 STATIC noinline fastcall __unlikely int
 lmi_info_ack(struct xp *xp, queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 {
-	mblk_t *mp;
 	lmi_info_ack_t *p;
+	mblk_t *mp;
 
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = xp->i_state;
 		p->lmi_max_sdu = xp->sdt.config.m + 1 + ((xp->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_min_sdu = ((xp->option.popt & SS7_POPT_XSN) ? 6 : 3);
 		p->lmi_header_len = 0;
 		p->lmi_ppa_style = LMI_STYLE2;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = xp->sl.flags;
+		p->lmi_prov_state = xp->sl.state;
+		fixme(("%s: maintain provider flags", __FUNCTION__));
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
 		printd(("%s: %p: <- LMI_INFO_ACK\n", DRV_NAME, xp));
@@ -7380,7 +7391,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
 
-	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
+	if (!MBLKIN(mp, 0, sizeof(*p))) {
 		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME,
 			(long) (mp->b_wptr - mp->b_rptr)));
 		goto lmi_badprim;
@@ -7389,8 +7400,12 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		ptrace(("%s: ERROR: interface out of state\n", DRV_NAME));
 		goto lmi_outstate;
 	}
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto lmi_badppa;
+	if (p->lmi_ppa_length != sizeof(ppa))
+		goto lmi_badppa;
 	xp->i_state = LMI_ATTACH_PENDING;
-	ppa = *(typeof(ppa) *) (p + 1);
+	ppa = *(typeof(ppa) *) (mp->b_rptr + p->lmi_ppa_offset);
 	/* check card */
 	card = (ppa >> 12) & 0x0f;
 	for (cd = x400p_cards; cd && cd->card != card; cd = cd->next) ;

@@ -1,7 +1,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: LMI_INFO_ACK.7.man,v 0.9.2.1 2007/07/21 20:15:12 brian Exp $
+.\" @(#) $Id: LMI_INFO_ACK.7.man,v 0.9.2.2 2007/08/12 16:19:52 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -53,11 +53,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2007/07/21 20:15:12 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/12 16:19:52 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: LMI_INFO_ACK.7.man,v $
+.\" Revision 0.9.2.2  2007/08/12 16:19:52  brian
+.\" - new PPA handling
+.\"
 .\" Revision 0.9.2.1  2007/07/21 20:15:12  brian
 .\" - added documentation
 .\"
@@ -103,7 +106,10 @@ typedef struct {
     lmi_ulong lmi_min_sdu;
     lmi_ulong lmi_header_len;
     lmi_ulong lmi_ppa_style;
-    lmi_uchar lmi_ppa_addr[0];
+    lmi_ulong lmi_ppa_length;
+    lmi_ulong lmi_ppa_offset;
+    lmi_ulong lmi_info_length;
+    lmi_ulong lmi_info_offset;
 } lmi_info_ack_t;
 \fR\s+1
 .fi
@@ -128,7 +134,24 @@ Indicates the service primitive type.  Always
 .TP
 .I lmi_version
 Indicates the version of this specification that is being used by the LMS
-provider.
+provider.  Four constants are currently provided to test for version:
+.RS
+.TP \w'\fBLMI_CURRENT_VERSION\fR\(em'u
+.B LMI_VERSION_1
+Indicates version 1 of the LMI interface.
+.PD 0
+.TP
+.B LMI_VERSION_2
+Indicates version 2 of the LMI interface.
+.TP
+.B LMI_VERSION_3
+Indicates version 3 of the LMI interface.
+.TP
+.B LMI_CURRENT_VERSION
+The current version of the LMI interface: currently
+.BR LMI_VERSION_3 .
+.PD
+.RE
 .TP
 .I lmi_state
 Indicates the state of the LMS provider at the time that the information
@@ -194,12 +217,33 @@ PPA must be explicitly attached using
 .BR LMI_ATTACH_REQ (7).
 .PD
 .RE
+.\".TP
+.\".I lmi_ppa_addr
+.\"This is a variable length field.  The length of the field is determined by
+.\"the length of the
+.\".BR M_PROTO "(9) or " M_PCPROTO (9)
+.\"message block.
+.\".sp
+.\"For a
+.\".I Style 2
+.\"driver, when
+.\".I lmi_ppa_style
+.\"is
+.\".BR LMI_STYLE2 ,
+.\"and when in an attached state, this field providers the current PPA associated
+.\"with the stream; the length is typically 4 bytes.
+.\".sp
+.\"For a
+.\".I Style 1
+.\"driver, when
+.\".I lmi_ppa_style
+.\"is
+.\".BR LMI_STYLE1 ,
+.\"the length it 0 bytes.
 .TP
-.I lmi_ppa_addr
-This is a variable length field.  The length of the field is determined by
-the length of the
-.BR M_PROTO "(9) or " M_PCPROTO (9)
-message block.
+.I lmi_ppa_length
+Indicates the length of the Physical Point of Attachment to which the Stream
+is attached.
 .sp
 For a
 .I Style 2
@@ -207,8 +251,13 @@ driver, when
 .I lmi_ppa_style
 is
 .BR LMI_STYLE2 ,
-and when in an attached state, this field providers the current PPA associated
-with the stream; the length is typically 4 bytes.
+and when
+.I lmi_state
+indicates an attached state, this field provides the length of the current PPA
+associated with the Stream; the length is typically 4 bytes.
+When
+.I lmi_state
+indicates an unattached state, this field is zero (0).
 .sp
 For a
 .I Style 1
@@ -216,7 +265,26 @@ driver, when
 .I lmi_ppa_style
 is
 .BR LMI_STYLE1 ,
-the length it 0 bytes.
+this length is zero (0).
+In the case, however, where a driver is emulating a
+.I Style 1
+driver with an underlying
+.I Style 2
+provider, this field may still indicate the currently attached PPA.
+.TP
+.I lmi_ppa_offset
+Indicates the offset, from the beginning of the message block, of the Physical
+Point of Attachment (PPA).
+.TP
+.I lmi_info_length
+Indicates the length of the provider specific information.  Provider
+specific information is defined for the specific provider and consists of a
+structure containing additional provider specific information such as provider
+state and options.
+.TP
+.I lmi_info_offset
+Indicates the offset, from the beginning of the message block, of the provider
+specific information.
 .\"
 .\"
 .SS State

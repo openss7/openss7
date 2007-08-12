@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/03 13:35:10 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:19:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.22  2007/08/12 16:19:54  brian
+ - new PPA handling
+
  Revision 0.9.2.21  2007/08/03 13:35:10  brian
  - manual updates, put ss7 modules in public release
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/03 13:35:10 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/03 13:35:10 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -125,7 +128,7 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/03 13:35:10 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -675,9 +678,9 @@ static uint sl_get_id(uint);
 /*
  *  SL interface state flags
  */
-#define SLSF_OUT_OF_SERVICE	(1<< SLS_OUT_OF_SERVICE)	/* out of service */
+#define SLSF_OUT_OF_SERVICE	(1<< SLS_OOS)		/* out of service */
 #define SLSF_PROC_OUTG		(1<< SLS_PROC_OUTG)	/* processor outage */
-#define SLSF_IN_SERVICE		(1<< SLS_IN_SERVICE)	/* in service */
+#define SLSF_IN_SERVICE		(1<< SLS_IS)		/* in service */
 #define SLSF_WACK_COO		(1<< SLS_WACK_COO)	/* waiting COA/ECA in response to COO */
 #define SLSF_WACK_ECO		(1<< SLS_WACK_ECO)	/* waiting COA/ECA in response to ECO */
 #define SLSF_WCON_RET		(1<< SLS_WCON_RET)	/* waiting for retrieval confirmation */
@@ -1154,12 +1157,12 @@ static const char *
 sl_state_name(struct sl *sl, uint state)
 {
 	switch (state) {
-	case SLS_OUT_OF_SERVICE:
-		return ("SLS_OUT_OF_SERVICE");
+	case SLS_OOS:
+		return ("SLS_OOS");
 	case SLS_PROC_OUTG:
 		return ("SLS_PROC_OUTG");
-	case SLS_IN_SERVICE:
-		return ("SLS_IN_SERVICE");
+	case SLS_IS:
+		return ("SLS_IS");
 	case SLS_WACK_COO:
 		return ("SLS_WACK_COO");
 	case SLS_WACK_ECO:
@@ -3311,7 +3314,7 @@ sl_stop_req(queue_t *q, struct sl *sl)
 		p->sl_primitive = SL_STOP_REQ;
 		mp->b_wptr += sizeof(*p);
 		mi_strlog(q, STRLOGTX, SL_TRACE, "SL_STOP_REQ ->");
-		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
+		sl_set_l_state(sl, SLS_OOS);
 		putnext(sl->wq, mp);
 		return (0);
 	}
@@ -3417,7 +3420,7 @@ sl_clear_buffers_req(queue_t *q, struct sl *sl)
 			p->sl_primitive = SL_CLEAR_BUFFERS_REQ;
 			mp->b_wptr += sizeof(*p);
 			mi_strlog(q, STRLOGTX, SL_TRACE, "SL_CLEAR_BUFFERS_REQ ->");
-			sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
+			sl_set_l_state(sl, SLS_OOS);
 			putnext(sl->wq, mp);
 			return (0);
 		}
@@ -3567,7 +3570,7 @@ sl_power_on_req(queue_t *q, struct sl *sl)
 			mp->b_wptr += sizeof(*p);
 			/* should maybe set routing state to active */
 			mi_strlog(q, STRLOGTX, SL_TRACE, "SL_POWER_ON_REQ ->");
-			sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
+			sl_set_l_state(sl, SLS_OOS);
 			putnext(sl->wq, mp);
 			return (0);
 		}
@@ -3658,18 +3661,18 @@ lmi_info_req(queue_t *q, struct sl *sl)
 static inline int
 lmi_attach_req(queue_t *q, struct sl *sl, caddr_t ppa_ptr, size_t ppa_len)
 {
-	mblk_t *mp;
 	lmi_attach_req_t *p;
+	mblk_t *mp;
 
 	if ((mp = mi_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
 		mp->b_wptr += sizeof(*p);
-		if (ppa_ptr && ppa_len) {
-			bcopy(ppa_ptr, mp->b_wptr, ppa_len);
-			mp->b_wptr += ppa_len;
-		}
+		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
+		mp->b_wptr += ppa_len;
 		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_ATTACH_REQ ->");
 		putnext(sl->wq, mp);
 		return (0);
@@ -3717,11 +3720,11 @@ lmi_enable_req(queue_t *q, struct sl *sl, caddr_t dst_ptr, size_t dst_len)
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ENABLE_REQ;
+		p->lmi_rem_length = dst_len;
+		p->lmi_rem_offset = sizeof(*p);
 		mp->b_wptr += sizeof(*p);
-		if (dst_ptr && dst_len) {
-			bcopy(dst_ptr, mp->b_wptr, dst_len);
-			mp->b_wptr += dst_len;
-		}
+		bcopy(dst_ptr, mp->b_wptr, dst_len);
+		mp->b_wptr += dst_len;
 		mi_strlog(q, STRLOGTX, SL_TRACE, "LMI_ENABLE_REQ ->");
 		putnext(sl->wq, mp);
 		return (0);
@@ -9699,7 +9702,7 @@ sl_stop_restore(queue_t *q, struct sl *sl)
 		/* fall through */
 	}
 	case SLS_PROC_OUTG:
-	case SLS_IN_SERVICE:
+	case SLS_IS:
 		/* T31(ANSI) is a false congesiton detection timer */
 		sl_timer_stop(sl, t31a);
 		if (sl->state < SL_UNUSABLE && (sl->flags & SLF_TRAFFIC)) {
@@ -11215,7 +11218,7 @@ lk_t30a_timeout(queue_t *q, struct lk *lk)
 static int
 sl_t31a_timeout(queue_t *q, struct sl *sl)
 {
-	if (sl_get_l_state(sl) == SLS_IN_SERVICE) {
+	if (sl_get_l_state(sl) == SLS_IS) {
 		todo(("Notify management of false congestion\n"));
 		return sl_stop_restore(q, sl);
 	}
@@ -11254,12 +11257,12 @@ static int
 sl_t32a_timeout(queue_t *q, struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
-	case SLS_OUT_OF_SERVICE:
+	case SLS_OOS:
 		/* we can now restore the link */
 		/* T19(ANSI) is a maintenance guard timer */
 		sl_timer_start(q, sl, t19a);
 		return sl_start_req(q, sl);
-	case SLS_IN_SERVICE:
+	case SLS_IS:
 		/* nothing to do */
 		return (0);
 	}
@@ -11293,7 +11296,7 @@ sl_t32a_timeout(queue_t *q, struct sl *sl)
 static int
 sl_t33a_timeout(queue_t *q, struct sl *sl)
 {
-	if (sl_get_l_state(sl) == SLS_IN_SERVICE)
+	if (sl_get_l_state(sl) == SLS_IS)
 		/* link has passed probation */
 		return (0);
 	rare();
@@ -11309,7 +11312,7 @@ static int
 sl_t34a_timeout(queue_t *q, struct sl *sl)
 {
 	switch (sl_get_l_state(sl)) {
-	case SLS_OUT_OF_SERVICE:
+	case SLS_OOS:
 		/* link has exited suspension */
 		/* T19(ANSI) is a maintenance guard timer */
 		sl_timer_start(q, sl, t19a);
@@ -11386,7 +11389,7 @@ sl_t1t_timeout(queue_t *q, struct sl *sl)
 static int
 sl_t2t_timeout(queue_t *q, struct sl *sl)
 {
-	if (sl_get_l_state(sl) == SLS_IN_SERVICE) {
+	if (sl_get_l_state(sl) == SLS_IS) {
 		struct lk *lk = sl->lk.lk;
 		struct sp *loc = lk->sp.loc;
 		struct rs *adj = lk->sp.adj;
@@ -11507,7 +11510,7 @@ mtp_recv_coo(queue_t *q, struct mtp_msg *m)
 		goto eproto;
 	switch (sl_get_l_state(sl)) {
 	case SLS_WIND_INSI:
-	case SLS_IN_SERVICE:
+	case SLS_IS:
 	case SLS_PROC_OUTG:
 	case SLS_WACK_SLTM:
 		return sl_stop_restore(q, sl);
@@ -11664,7 +11667,7 @@ mtp_recv_eco(queue_t *q, struct mtp_msg *m)
 	if ((sl = mtp_lookup_sl(q, sl, m))) {
 		switch (sl_get_l_state(sl)) {
 		case SLS_WIND_INSI:
-		case SLS_IN_SERVICE:
+		case SLS_IS:
 		case SLS_PROC_OUTG:
 		case SLS_WACK_SLTM:
 			return sl_stop_restore(q, sl);
@@ -12912,7 +12915,7 @@ mtp_recv_slta(queue_t *q, struct mtp_msg *m)
 	struct rs *adj = lk->sp.adj;
 	int err;
 
-	if (sl_get_l_state(sl) != SLS_IN_SERVICE && sl_get_l_state(sl) != SLS_WACK_SLTM)
+	if (sl_get_l_state(sl) != SLS_IS && sl_get_l_state(sl) != SLS_WACK_SLTM)
 		goto unexpected;
 	if (!(sl->flags & (SLF_WACK_SLTM | SLF_WACK_SLTM2)))
 		goto unexpected;
@@ -12933,7 +12936,7 @@ mtp_recv_slta(queue_t *q, struct mtp_msg *m)
 			if ((err = sl_set_state(q, sl, SL_RESTORED)))
 				return (err);
 			/* in service at level 3 */
-			sl_set_l_state(sl, SLS_IN_SERVICE);
+			sl_set_l_state(sl, SLS_IS);
 			goto discard;
 		}
 		/* no further action taken on success */
@@ -14134,7 +14137,7 @@ sl_rb_cleared_ind(queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
 	if (sl_get_l_state(sl) == SLS_WIND_CLRB) {
-		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
+		sl_set_l_state(sl, SLS_OOS);
 		return (0);
 	}
 	if ((1 << sl_get_l_state(sl)) &
@@ -14442,7 +14445,7 @@ sl_out_of_service_ind(queue_t *q, mblk_t *mp)
 		goto einval;
 	switch (sl_get_l_state(sl)) {
 	case SLS_WIND_INSI:
-	case SLS_IN_SERVICE:
+	case SLS_IS:
 	case SLS_PROC_OUTG:
 	case SLS_WACK_SLTM:
 		return sl_stop_restore(q, sl);
@@ -14487,7 +14490,7 @@ sl_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto einval;
-	if (sl_get_l_state(sl) != SLS_IN_SERVICE)
+	if (sl_get_l_state(sl) != SLS_IS)
 		goto outstate;
 	if ((err = sl_set_state(q, sl, SL_BLOCKED)))
 		return (err);
@@ -14528,7 +14531,7 @@ sl_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 		goto outstate;
 	if ((err = sl_set_state(q, sl, SL_UNBLOCKED)))
 		return (err);
-	sl_set_l_state(sl, SLS_IN_SERVICE);
+	sl_set_l_state(sl, SLS_IS);
 	return (0);
       outstate:
 	mi_strlog(q, 0, SL_ERROR,
@@ -14563,7 +14566,7 @@ sl_rtb_cleared_ind(queue_t *q, mblk_t *mp)
 		goto einval;
 	switch (sl_get_l_state(sl)) {
 	case SLS_WIND_CLRB:
-		sl_set_l_state(sl, SLS_OUT_OF_SERVICE);
+		sl_set_l_state(sl, SLS_OOS);
 		return (0);
 	case SLS_WCON_RET:
 		/* we oft times blindly clear RTB before retrieval */
@@ -21600,7 +21603,7 @@ mtp_alloc_link(queue_t *q, int index, cred_t *crp, minor_t unit)
 		sl->state = LMI_UNATTACHED;
 		sl->style = LMI_STYLE2;
 		sl->version = 1;
-		sl->l_state = SLS_OUT_OF_SERVICE;
+		sl->l_state = SLS_OOS;
 		/* allocate timers */
 		if (!(sl->timers.t1 = mi_timer_alloc(sizeof(*t))))
 			goto enobufs;

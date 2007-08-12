@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sli.h,v 0.9.2.6 2007/08/03 13:35:01 brian Exp $
+ @(#) $Id: sli.h,v 0.9.2.7 2007/08/12 16:19:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:19:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sli.h,v $
+ Revision 0.9.2.7  2007/08/12 16:19:53  brian
+ - new PPA handling
+
  Revision 0.9.2.6  2007/08/03 13:35:01  brian
  - manual updates, put ss7 modules in public release
 
@@ -61,7 +64,7 @@
 #ifndef __SS7_SLI_H__
 #define __SS7_SLI_H__
 
-#ident "@(#) $RCSfile: sli.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sli.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -113,6 +116,46 @@ typedef lmi_uchar sl_uchar;
 #define SL_LOCAL_PROCESSOR_OUTAGE_IND		(-17 - SL_PROTO_BASE)
 #define SL_LOCAL_PROCESSOR_RECOVERED_IND	(-18 - SL_PROTO_BASE)
 #define SL_USTR_FIRST				(-18 - SL_PROTO_BASE)
+
+/*
+ *  SLI PROVIDER STATE
+ */
+#define SLS_POWER_OFF			 0
+#define SLS_OUT_OF_SERVICE		 1
+#define SLS_NOT_ALIGNED			 2
+#define SLS_INITIAL_ALIGNMENT		 3
+#define SLS_PROVING			 4
+#define SLS_ALIGNED_READY		 5
+#define SLS_ALIGNED_NOT_READY		 6
+#define SLS_IN_SERVICE			 7
+#define SLS_PROCESSOR_OUTAGE		 8
+
+/*
+ *  SLI PROVIDER FLAGS
+ */
+#define SLF_LOC_PROC_OUT	(1<< 0)
+#define SLF_REM_PROC_OUT	(1<< 1)
+#define SLF_LOC_IN_SERV		(1<< 2)
+#define SLF_REM_IN_SERV		(1<< 3)
+#define SLF_LOC_BUSY		(1<< 4)
+#define SLF_REM_BUSY		(1<< 5)
+#define SLF_LOC_EMERG		(1<< 6)
+#define SLF_EMERGENCY		SLF_LOC_EMERG
+#define SLF_REM_EMERG		(1<< 7)
+#define SLF_RECV_MSU		(1<< 8)
+#define SLF_SEND_MSU		(1<< 9)
+#define SLF_CONG_ACCEPT		(1<<10)
+#define SLF_CONG_DISCARD	(1<<11)
+#define SLF_RTB_FULL		(1<<12)
+#define SLF_L3_CONG_DETECT	(1<<13)
+#define SLF_L2_CONG_DETECT	(1<<14)
+#define SLF_LINK_CONGESTED	SLF_L2_CONG_DETECT
+#define SLF_CONTINUE		(1<<15)
+#define SLF_LEVEL_3_IND		SLF_CONTINUE
+#define SLF_CLEAR_RTB		(1<<16)
+#define SLF_NEED_FLUSH		(1<<17)
+#define SLF_WAIT_SYNC		(1<<18)
+#define SLF_REM_ALIGN		(1<<19)
 
 /*
  *  SLI PROTOCOL PRIMITIVES

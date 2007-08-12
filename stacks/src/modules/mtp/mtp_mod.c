@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:50 $
+ @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:02:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_mod.c,v $
+ Revision 0.9.2.2  2007/08/12 16:20:12  brian
+ - new PPA handling
+
  Revision 0.9.2.1  2007/08/03 13:02:50  brian
  - added documentation and minimal modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:50 $"
+#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $"
 
-static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:50 $";
+static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $";
 
 /*
  * MTP-MOD is a minimal MTP in the spirit of Q.710 but which also supports ANSI and other variants.
@@ -95,7 +98,7 @@ static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/mtpi_ioctl.h>
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
-#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:50 $"
+#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $"
 #define MT_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1183,6 +1186,8 @@ lmi_attach_req(struct sl *sl, queue_t *q, mblk_t *msg, size_t ppa_len, caddr_t p
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_ATTACH_REQ;
+		p->lmi_ppa_length = ppa_len;
+		p->lmi_ppa_offset = sizeof(*p);
 		mp->b_wptr += sizeof(*p);
 		bcopy(ppa_ptr, mp->b_wptr, ppa_len);
 		mp->b_wptr += ppa_len;
@@ -1240,6 +1245,8 @@ lmi_enable_req(struct sl *sl, queue_t *q, mblk_t *msg, size_t rem_len, caddr_t r
 			DB_TYPE(mp) = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
 			p->lmi_primitive = LMI_ENABLE_REQ;
+			p->lmi_rem_length = rem_len;
+			p->lmi_rem_offset = sizeof(*p);
 			mp->b_wptr += sizeof(*p);
 			bcopy(rem_ptr, mp->b_wptr, rem_len);
 			mp->b_wptr += rem_len;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/25 12:19:08 $
+ @(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:49 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:19:08 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slmon.c,v $
+ Revision 0.9.2.4  2007/08/12 16:20:49  brian
+ - new PPA handling
+
  Revision 0.9.2.3  2007/05/25 12:19:08  brian
  - check for pm_message_t
 
@@ -61,9 +64,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/25 12:19:08 $"
+#ident "@(#) $RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:49 $"
 
-static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/05/25 12:19:08 $";
+static char const ident[] = "$RCSfile: slmon.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:49 $";
 
 /*
  * This is a signalling link monitoring utiltiy for the SL-MUX multiplexing driver.  It purpose is
@@ -296,7 +299,7 @@ output_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.3 2007/05/25 12:19:08 brian Exp $ Output File Header\n");
+	fprintf(stdout, " # SS7MON $Id: slmon.c,v 0.9.2.4 2007/08/12 16:20:49 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -436,8 +439,8 @@ decode_ctrl(void)
 	case LMI_ATTACH_REQ:
 		fprintf(stdout, "ctrl=LMI_ATTACH_REQ");
 		fprintf(stdout, "{lmi_ppa=");
-		print_data((caddr_t) p->lmi.attach_req.lmi_ppa,
-			   ctrl.len - sizeof(p->lmi.attach_req));
+		print_data((caddr_t) (cbuf + p->lmi.attach_req.lmi_ppa_offset),
+				p->lmi.attach_req.lmi_ppa_length);
 		fputc('}', stdout);
 		break;
 	case LMI_DETACH_REQ:
@@ -446,8 +449,8 @@ decode_ctrl(void)
 	case LMI_ENABLE_REQ:
 		fprintf(stdout, "ctrl=LMI_ENABLE_REQ");
 		fprintf(stdout, "{lmi_rem");
-		print_data((caddr_t) p->lmi.enable_req.lmi_rem,
-			   ctrl.len - sizeof(p->lmi.enable_req));
+		print_data((caddr_t) (cbuf + p->lmi.enable_req.lmi_rem_offset),
+			   p->lmi.enable_req.lmi_rem_length);
 		fputc('}', stdout);
 		break;
 	case LMI_DISABLE_REQ:
@@ -505,8 +508,41 @@ decode_ctrl(void)
 			break;
 		}
 		fprintf(stdout, ",lmi_ppa_addr=");
-		print_data((caddr_t) p->lmi.info_ack.lmi_ppa_addr,
-			   ctrl.len - sizeof(p->lmi.info_ack));
+		print_data((caddr_t) (ctrl.buf + p->lmi.info_ack.lmi_ppa_offset), p->lmi.info_ack.lmi_ppa_length);
+		fprintf(stdout, ",lmi_prov_flags=%x", p->lmi.info_ack.lmi_prov_flags);
+		fprintf(stdout, ",lmi_prov_state=");
+		switch (p->lmi.info_ack.lmi_prov_state) {
+		case SLS_POWER_OFF:
+			fprintf(stdout, "SLS_POWER_OFF");
+			break;
+		case SLS_OUT_OF_SERVICE:
+			fprintf(stdout, "SLS_OUT_OF_SERVICE");
+			break;
+		case SLS_NOT_ALIGNED:
+			fprintf(stdout, "SLS_NOT_ALIGNED");
+			break;
+		case SLS_INITIAL_ALIGNMENT:
+			fprintf(stdout, "SLS_INITIAL_ALIGNMENT");
+			break;
+		case SLS_PROVING:
+			fprintf(stdout, "SLS_PROVING");
+			break;
+		case SLS_ALIGNED_READY:
+			fprintf(stdout, "SLS_ALIGNED_READY");
+			break;
+		case SLS_ALIGNED_NOT_READY:
+			fprintf(stdout, "SLS_ALIGNED_NOT_READY");
+			break;
+		case SLS_IN_SERVICE:
+			fprintf(stdout, "SLS_IN_SERVICE");
+			break;
+		case SLS_PROCESSOR_OUTAGE:
+			fprintf(stdout, "SLS_PROCESSOR_OUTAGE");
+			break;
+		default:
+			fprintf(stdout, "[%u]", p->lmi.info_ack.lmi_prov_state);
+			break;
+		}
 		fputc('}', stdout);
 		break;
 	case LMI_OK_ACK:
@@ -1355,8 +1391,10 @@ mon_attach(void)
 	ctrl.maxlen = sizeof(cbuf);
 	ctrl.len = sizeof(p->attach_req) + ppa_len;
 	ctrl.buf = cbuf;
-	p->lmi_primitive = LMI_ATTACH_REQ;
-	bcopy(&ppa, p->attach_req.lmi_ppa, ppa_len);
+	p->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	p->attach_req.lmi_ppa_length = ppa_len;
+	p->attach_req.lmi_ppa_offset = sizeof(p->attach_req);
+	bcopy(&ppa, cbuf + sizeof(p->attach_req), ppa_len);
 	if ((ret = putmsg(mon_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		syslog(LOG_ERR, "%s: putmsg: %m", __FUNCTION__);
 		mon_exit(1);

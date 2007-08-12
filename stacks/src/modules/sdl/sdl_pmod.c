@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/06 04:43:53 $
+ @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:20:25 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/06 04:43:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_pmod.c,v $
+ Revision 0.9.2.5  2007/08/12 16:20:25  brian
+ - new PPA handling
+
  Revision 0.9.2.4  2007/08/06 04:43:53  brian
  - rework of pipe-based emulation modules
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/06 04:43:53 $"
+#ident "@(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:20:25 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/06 04:43:53 $";
+    "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:20:25 $";
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -103,7 +106,7 @@ static char const ident[] =
 #undef unfreezestr
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS PIPE MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/06 04:43:53 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:20:25 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -770,12 +773,16 @@ lmi_info_ack(struct sdl *s, queue_t *q, mblk_t *msg)
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		p->lmi_primitive = LMI_INFO_ACK;
-		p->lmi_version = 1;
+		p->lmi_version = LMI_CURRENT_VERSION;
 		p->lmi_state = sdl_get_l_state(s);
 		p->lmi_max_sdu = s->max_sdu;
 		p->lmi_min_sdu = s->min_sdu;
 		p->lmi_header_len = s->header_len;
 		p->lmi_ppa_style = LMI_STYLE1;
+		p->lmi_ppa_length = 0;
+		p->lmi_ppa_offset = sizeof(*p);
+		p->lmi_prov_flags = s->state.i_flags & (SDL_TX_DIRECTION | SDL_RX_DIRECTION);
+		p->lmi_prov_state = p->lmi_prov_flags ? SDL_CONNECTED : SDL_DISCONNECTED;
 		mp->b_wptr += sizeof(*p);
 		freemsg(msg);
 		mi_strlog(s->oq, STRLOGTX, SL_TRACE, "<- LMI_INFO_ACK");
@@ -1550,8 +1557,10 @@ lmi_attach_req(struct sdl *s, queue_t *q, mblk_t *mp)
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
+	if (!MBLKIN(mp, p->lmi_ppa_offset, p->lmi_ppa_length))
+		goto badppa;
 	if (sdl_get_l_state(s) != LMI_UNATTACHED
-	    && (sdl_get_l_state(s) != LMI_DISABLED || MBLKL(mp) == sizeof(*p)))
+	    && (sdl_get_l_state(s) != LMI_DISABLED || p->lmi_ppa_length == 0))
 		goto outstate;
 	/* Note that we do not need to support LMI_ATTACH_REQ because this is a style 1 drier only,
 	   but if the address is null, simply move to the appropriate state. */
@@ -1560,6 +1569,9 @@ lmi_attach_req(struct sdl *s, queue_t *q, mblk_t *mp)
 	return (0);
       outstate:
 	err = LMI_OUTSTATE;
+	goto error;
+      badppa:
+	err = LMI_BADPPA;
 	goto error;
       tooshort:
 	err = LMI_TOOSHORT;
@@ -1612,16 +1624,21 @@ lmi_detach_req(struct sdl *s, queue_t *q, mblk_t *mp)
 static int
 lmi_enable_req(struct sdl *s, queue_t *q, mblk_t *mp)
 {
-	lmi_enable_req_t *p;
+	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
 	int err;
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto tooshort;
 	if (sdl_get_l_state(s) != LMI_DISABLED && sdl_get_l_state(s) != LMI_ENABLED)
 		goto outstate;
+	if (!MBLKIN(mp, p->lmi_rem_offset, p->lmi_rem_length))
+		goto badaddr;
 	if ((err = sdl_enable(s, q, mp)) != 0)
 		goto error;
 	return (0);
+      badaddr:
+	err = LMI_BADADDRESS;
+	goto error;
       outstate:
 	err = LMI_OUTSTATE;
 	goto error;

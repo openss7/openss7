@@ -1,6 +1,67 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $
+
+ -----------------------------------------------------------------------------
+
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdlm.c,v $
+ Revision 0.9.2.21  2007/08/12 16:20:25  brian
+ - new PPA handling
+
+ *****************************************************************************/
+
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $"
+
+static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $";
+
+/*****************************************************************************
+
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +106,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $"
 
 static char const ident[] =
-    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $";
+    "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -63,6 +124,10 @@ static char const ident[] =
  *  bottom side of the multiplexor.  A binding operation is performed to bind
  *  an upper stream to a lower stream.
  */
+
+#define _LFS_SOURCE
+#define _SUN_SOURCE
+
 #include <sys/os7/compat.h>
 
 #include <sys/dlpi.h>
@@ -77,7 +142,7 @@ static char const ident[] =
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:01 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:20:25 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -577,18 +642,22 @@ m_error_reply(queue_t *q, mblk_t *mp, int err)
 STATIC INLINE int
 lmi_attach_req(queue_t *q, mblk_t *mp)
 {
-	int err;
-	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_attach_req_t *m = ((typeof(m)) mp->b_rptr);
-	if (mlen < sizeof(*m) || mlen < 2 * sizeof(ulong))
+	int err;
+
+	if (!MBLKIN(mp, 0, sizeof(*m)))
 		goto lprotoshort;
+	if (!MBLKIN(mp, m->lmi_ppa_offset, m->lmi_ppa_length))
+		goto lbadppa;
 	if (q->q_next)
 		goto loutstate;
 	{
 		struct dl *dl = DL_PRIV(q);
 		struct sd *sd;
-		ulong ppa = *((ulong *) &m->lmi_ppa);
+		ulong ppa = *(ulong *) (mp->b_rptr + m->lmi_ppa_offset);
 
+		if (m->lmi_ppa_length != sizeof(ppa))
+			goto lbadppa;
 		for (sd = master.sd.list; sd && sd->ppa != ppa; sd = sd->next) ;
 		if (!sd || sd->iq->q_next)
 			goto lbadppa;
