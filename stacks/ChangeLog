@@ -1,3 +1,33 @@
+2007-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/README.Debian: header updates for GPLv3
+	* debian/TODO.Debian: header updates for GPLv3
+	* debian/copyright: header updates for GPLv3
+	* debian/mscript_header.in: header updates for GPLv3
+	* debian/mscript_postinst.in: header updates for GPLv3
+	* debian/mscript_postrm.in: header updates for GPLv3
+	* debian/mscript_preinst.in: header updates for GPLv3
+	* debian/mscript_prerm.in: header updates for GPLv3
+	* debian/rules.in: header updates for GPLv3
+	* debian/strss7-core.postinst.in: header updates for GPLv3
+	* debian/strss7-core.postrm.in: header updates for GPLv3
+	* debian/strss7-core.preinst.in: header updates for GPLv3
+	* debian/strss7-core.prerm.in: header updates for GPLv3
+	* debian/strss7-dev.postinst.in: header updates for GPLv3
+	* debian/strss7-dev.preinst.in: header updates for GPLv3
+	* debian/strss7-dev.prerm.in: header updates for GPLv3
+	* debian/strss7-devel.preinst.in: header updates for GPLv3
+	* debian/strss7-doc.postinst.in: header updates for GPLv3
+	* debian/strss7-doc.preinst.in: header updates for GPLv3
+	* debian/strss7-doc.prerm.in: header updates for GPLv3
+	* debian/strss7-init.postinst.in: header updates for GPLv3
+	* debian/strss7-init.postrm.in: header updates for GPLv3
+	* debian/strss7-init.preinst.in: header updates for GPLv3
+	* debian/strss7-init.prerm.in: header updates for GPLv3
+	* debian/strss7-lib.preinst.in: header updates for GPLv3
+	* debian/strss7-source.preinst.in: header updates for GPLv3
+	* debian/strss7-util.preinst.in: header updates for GPLv3
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strss7.texi: GPLv3
