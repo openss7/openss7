@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2007/03/28 13:44:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.147 $) $Date: 2007/08/13 22:45:51 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,76 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/28 13:44:08 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.146  2007/03/28 13:44:08  brian
-# - updates to syncrhonization, release notes and documentation
-#
-# Revision 0.9.2.145  2007/03/13 06:17:14  brian
-# - suppress errors when building 32-bit libs
-#
-# Revision 0.9.2.144  2007/03/08 06:08:48  brian
-# - modutil_DATA should not be distributed (and it reorders uninstall)
-#
-# Revision 0.9.2.143  2007/03/04 00:23:48  brian
-# - add version file creation
-#
-# Revision 0.9.2.142  2006/11/26 15:27:32  brian
-# - testing and corrections to strlog capabilities
-#
-# Revision 0.9.2.141  2006/10/03 13:52:02  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 0.9.2.140  2006/10/01 21:30:18  brian
-# - distribute release and library version files
-#
-# Revision 0.9.2.139  2006/09/29 11:50:20  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 0.9.2.138  2006/09/27 05:15:16  brian
-# - distinguish LDADD from LDFLAGS
-#
-# Revision 0.9.2.137  2006/09/24 21:36:49  brian
-# - added lib files
-#
-# Revision 0.9.2.136  2006/09/18 17:43:11  brian
-# - added doxy rules to makefile and release notes
-#
-# Revision 0.9.2.135  2006/09/18 01:15:23  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.134  2006/08/26 09:18:29  brian
-# - better release file generation
-#
-# Revision 0.9.2.133  2006/07/24 09:01:09  brian
-# - results of udp2 optimizations
-#
-# Revision 0.9.2.132  2006/07/01 11:41:52  brian
-# - changed to new KBUILD_ flags
-#
-# Revision 0.9.2.131  2006/03/21 13:24:40  brian
-# - included pr.am
-#
-# Revision 0.9.2.130  2006/03/20 11:54:02  brian
-# - added checks for DEVELOPMENT
-#
-# Revision 0.9.2.129  2006/03/06 11:38:40  brian
-# - updated headers
+# Last Modified $Date: 2007/08/13 22:45:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1123,4 +1054,77 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.147  2007/08/13 22:45:51  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.146  2007/03/28 13:44:08  brian
+# - updates to syncrhonization, release notes and documentation
+#
+# Revision 0.9.2.145  2007/03/13 06:17:14  brian
+# - suppress errors when building 32-bit libs
+#
+# Revision 0.9.2.144  2007/03/08 06:08:48  brian
+# - modutil_DATA should not be distributed (and it reorders uninstall)
+#
+# Revision 0.9.2.143  2007/03/04 00:23:48  brian
+# - add version file creation
+#
+# Revision 0.9.2.142  2006/11/26 15:27:32  brian
+# - testing and corrections to strlog capabilities
+#
+# Revision 0.9.2.141  2006/10/03 13:52:02  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
+# Revision 0.9.2.140  2006/10/01 21:30:18  brian
+# - distribute release and library version files
+#
+# Revision 0.9.2.139  2006/09/29 11:50:20  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
+# Revision 0.9.2.138  2006/09/27 05:15:16  brian
+# - distinguish LDADD from LDFLAGS
+#
+# Revision 0.9.2.137  2006/09/24 21:36:49  brian
+# - added lib files
+#
+# Revision 0.9.2.136  2006/09/18 17:43:11  brian
+# - added doxy rules to makefile and release notes
+#
+# Revision 0.9.2.135  2006/09/18 01:15:23  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 0.9.2.134  2006/08/26 09:18:29  brian
+# - better release file generation
+#
+# Revision 0.9.2.133  2006/07/24 09:01:09  brian
+# - results of udp2 optimizations
+#
+# Revision 0.9.2.132  2006/07/01 11:41:52  brian
+# - changed to new KBUILD_ flags
+#
+# Revision 0.9.2.131  2006/03/21 13:24:40  brian
+# - included pr.am
+#
+# Revision 0.9.2.130  2006/03/20 11:54:02  brian
+# - added checks for DEVELOPMENT
+#
+# Revision 0.9.2.129  2006/03/06 11:38:40  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

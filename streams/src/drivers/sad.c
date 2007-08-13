@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/13 22:46:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:46 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.53  2007/08/13 22:46:15  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.52  2007/07/14 01:35:46  brian
  - make license explicit, add documentation
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/13 22:46:15 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/13 22:46:15 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -116,7 +119,7 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/07/14 01:35:46 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/13 22:46:15 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SAD_LICENSE	"GPL v2"
@@ -195,7 +198,7 @@ static struct module_info sad_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat sad_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat sad_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 #ifdef __LP64__
 #  undef WITH_32BIT_CONVERSION

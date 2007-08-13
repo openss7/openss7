@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.8 2007/06/22 00:18:46 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.9 2007/08/13 22:45:59 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:46 $ by $Author: brian $
+@c Last Modified $Date: 2007/08/13 22:45:59 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -75,7 +75,7 @@ kernels without patching, recompiling or tainting the kernel.  Its small run-tim
 the release suitable for embedded targets.
 
 @ignore
-This package is released under the @cite{GNU Public License Version 2}; however, commercial
+This package is released under the @cite{GNU Public License Version 3}; however, commercial
 licensing and support is available from @uref{http://www.openss7.com/, OpenSS7 Corporation}.
 
 The release is available as an @manpage{autoconf(1)} tarball, SRPM or DSC, or as a set of binary

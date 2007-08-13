@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 0.9.2.82 2007/05/17 22:01:13 brian Exp $
+ @(#) $Id: strsubr.h,v 0.9.2.83 2007/08/13 22:46:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/17 22:01:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 0.9.2.83  2007/08/13 22:46:09  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.82  2007/05/17 22:01:13  brian
  - corrections from strsctp performance testing
 
@@ -106,7 +109,7 @@
 #ifndef __SYS_STREAMS_STRSUBR_H__
 #define __SYS_STREAMS_STRSUBR_H__
 
-#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.82 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsubr.h,v $ $Name:  $($Revision: 0.9.2.83 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STRSUBR_H__
 #warning "Do no include sys/streams/strsubr.h directly, include sys/strsubr.h instead."
@@ -259,7 +262,7 @@ struct stdata {
 //      struct streamtab *sd_strtab;    /* driver streamtab */
 	struct inode *sd_inode;		/* back pointer to inode */
 //      struct dentry *sd_dentry;       /* back pointer to dentry */
-//	struct file *sd_file;		/* back pointer to (current) file */
+//      struct file *sd_file;           /* back pointer to (current) file */
 	rwlock_t sd_lock;		/* structure lock for this stream */
 	rwlock_t sd_plumb;		/* plumbing and procedure lock for this stream */
 	rwlock_t sd_freeze;		/* lock for freezing streams */
@@ -273,7 +276,7 @@ struct stdata {
 	pid_t sd_pgrp;			/* foreground process group */
 	ushort sd_wroff;		/* write offset */
 	ushort sd_wrpad;		/* write padding */
-//	unsigned char sd_band;		/* highest blocked band */
+//      unsigned char sd_band;          /* highest blocked band */
 	ssize_t sd_minpsz;		/* cached sd_wq->q_next->q_minpsz */
 	ssize_t sd_maxpsz;		/* cached sd_wq->q_next->q_maxpsz */
 	ssize_t sd_strmsgsz;		/* cached sysctl_str_strmsgsz */
@@ -302,8 +305,8 @@ struct stdata {
 //      mblk_t *sd_mark;                /* pointer to marked message */
 	ulong sd_closetime;		/* queue drain wait time on close */
 	ulong sd_ioctime;		/* time to wait for ioctl() acknowledgement */
-//	ulong sd_rtime;			/* time to forward held message */
-//	struct stdata *sd_scanq;	/* next on scan list */
+//      ulong sd_rtime;                 /* time to forward held message */
+//      struct stdata *sd_scanq;        /* next on scan list */
 //      klock_t sd_klock;               /* lock for queues under this stream */
 	struct cdevsw *sd_cdevsw;	/* device entry */
 	struct list_head sd_list;	/* list against device */

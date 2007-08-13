@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 0.9.2.20 2006/10/27 23:19:32 brian Exp $
+ @(#) $Id: kmem.h,v 0.9.2.21 2007/08/13 22:46:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/27 23:19:32 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: kmem.h,v $
+ Revision 0.9.2.21  2007/08/13 22:46:08  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.20  2006/10/27 23:19:32  brian
  - changes for 2.6.18 kernel
 
@@ -63,7 +67,7 @@
 #ifndef __SYS_STREAMS_KMEM_H__
 #define __SYS_STREAMS_KMEM_H__ 1
 
-#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.20 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: kmem.h,v $ $Name:  $($Revision: 0.9.2.21 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_KMEM_H__
 #warning "Do no include sys/streams/kmem.h directly, include sys/kmem.h instead."

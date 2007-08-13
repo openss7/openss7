@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2007/05/25 12:21:22 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:21:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 0.9.2.166  2007/08/13 22:46:18  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.165  2007/05/25 12:21:22  brian
  - check for looping
 
@@ -179,10 +182,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2007/05/25 12:21:22 $"
+#ident "@(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $"
 
 static char const ident[] =
-    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.165 $) $Date: 2007/05/25 12:21:22 $";
+    "$RCSfile: strsched.c,v $ $Name:  $($Revision: 0.9.2.166 $) $Date: 2007/08/13 22:46:18 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -1061,36 +1064,31 @@ mdbblock_alloc_slow(uint priority, void *func)
 			__ensure(md->msgblk.m_mblock.b_cont == NULL,
 				 md->msgblk.m_mblock.b_cont = NULL);
 			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
-				 md->msgblk.m_mblock.b_rptr = md->databuf);
+				md->msgblk.m_mblock.b_rptr = md->databuf);
 			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
-				 md->msgblk.m_mblock.b_wptr = md->databuf);
+				md->msgblk.m_mblock.b_wptr = md->databuf);
 			__ensure(md->msgblk.m_mblock.b_datap == NULL,
 				 md->msgblk.m_mblock.b_datap = NULL);
-			 md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
-			__ensure(md->msgblk.m_mblock.b_band == 0,
-				 md->msgblk.m_mblock.b_band = 0);
-			__ensure(md->msgblk.m_mblock.b_pad1 == 0,
-				 md->msgblk.m_mblock.b_pad1 = 0);
-			__ensure(md->msgblk.m_mblock.b_flag == 0,
-				 md->msgblk.m_mblock.b_flag = 0);
-			__ensure(md->msgblk.m_mblock.b_csum == 0,
-				 md->msgblk.m_mblock.b_csum = 0);
+			md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+			__ensure(md->msgblk.m_mblock.b_band == 0, md->msgblk.m_mblock.b_band = 0);
+			__ensure(md->msgblk.m_mblock.b_pad1 == 0, md->msgblk.m_mblock.b_pad1 = 0);
+			__ensure(md->msgblk.m_mblock.b_flag == 0, md->msgblk.m_mblock.b_flag = 0);
+			__ensure(md->msgblk.m_mblock.b_csum == 0, md->msgblk.m_mblock.b_csum = 0);
 
 			__ensure(md->datablk.d_dblock.db_frtnp == NULL,
 				 md->datablk.d_dblock.db_frtnp = NULL);
 			_ensure(md->datablk.d_dblock.db_base == md->databuf,
-				 md->datablk.d_dblock.db_base = md->databuf);
+				md->datablk.d_dblock.db_base = md->databuf);
 			_ensure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF,
-				 md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
-			__ensure(md->datablk.d_dblock.db_ref == 0,
-				 md->datablk.d_dblock.db_ref = 0);
+				md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
+			__ensure(md->datablk.d_dblock.db_ref == 0, md->datablk.d_dblock.db_ref = 0);
 			md->datablk.d_dblock.db_ref = 1;
 			__ensure(md->datablk.d_dblock.db_type == M_DATA,
 				 md->datablk.d_dblock.db_type = M_DATA);
 			__ensure(md->datablk.d_dblock.db_flag == 0,
 				 md->datablk.d_dblock.db_flag = 0);
 			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
-				 md->datablk.d_dblock.db_size = FASTBUF);
+				md->datablk.d_dblock.db_size = FASTBUF);
 #endif
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
@@ -1161,36 +1159,31 @@ mdbblock_alloc(uint priority, void *func)
 			__ensure(md->msgblk.m_mblock.b_cont == NULL,
 				 md->msgblk.m_mblock.b_cont = NULL);
 			_ensure(md->msgblk.m_mblock.b_rptr == md->databuf,
-				 md->msgblk.m_mblock.b_rptr = md->databuf);
+				md->msgblk.m_mblock.b_rptr = md->databuf);
 			_ensure(md->msgblk.m_mblock.b_wptr == md->databuf,
-				 md->msgblk.m_mblock.b_wptr = md->databuf);
+				md->msgblk.m_mblock.b_wptr = md->databuf);
 			__ensure(md->msgblk.m_mblock.b_datap == NULL,
 				 md->msgblk.m_mblock.b_datap = NULL);
-			 md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
-			__ensure(md->msgblk.m_mblock.b_band == 0,
-				 md->msgblk.m_mblock.b_band = 0);
-			__ensure(md->msgblk.m_mblock.b_pad1 == 0,
-				 md->msgblk.m_mblock.b_pad1 = 0);
-			__ensure(md->msgblk.m_mblock.b_flag == 0,
-				 md->msgblk.m_mblock.b_flag = 0);
-			__ensure(md->msgblk.m_mblock.b_csum == 0,
-				 md->msgblk.m_mblock.b_csum = 0);
+			md->msgblk.m_mblock.b_datap = &md->datablk.d_dblock;
+			__ensure(md->msgblk.m_mblock.b_band == 0, md->msgblk.m_mblock.b_band = 0);
+			__ensure(md->msgblk.m_mblock.b_pad1 == 0, md->msgblk.m_mblock.b_pad1 = 0);
+			__ensure(md->msgblk.m_mblock.b_flag == 0, md->msgblk.m_mblock.b_flag = 0);
+			__ensure(md->msgblk.m_mblock.b_csum == 0, md->msgblk.m_mblock.b_csum = 0);
 
 			__ensure(md->datablk.d_dblock.db_frtnp == NULL,
 				 md->datablk.d_dblock.db_frtnp = NULL);
 			_ensure(md->datablk.d_dblock.db_base == md->databuf,
-				 md->datablk.d_dblock.db_base = md->databuf);
+				md->datablk.d_dblock.db_base = md->databuf);
 			_ensure(md->datablk.d_dblock.db_lim == md->databuf + FASTBUF,
-				 md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
-			__ensure(md->datablk.d_dblock.db_ref == 0,
-				 md->datablk.d_dblock.db_ref = 0);
+				md->datablk.d_dblock.db_lim = md->databuf + FASTBUF);
+			__ensure(md->datablk.d_dblock.db_ref == 0, md->datablk.d_dblock.db_ref = 0);
 			md->datablk.d_dblock.db_ref = 1;
 			__ensure(md->datablk.d_dblock.db_type == M_DATA,
 				 md->datablk.d_dblock.db_type = M_DATA);
 			__ensure(md->datablk.d_dblock.db_flag == 0,
 				 md->datablk.d_dblock.db_flag = 0);
 			_ensure(md->datablk.d_dblock.db_size == FASTBUF,
-				 md->datablk.d_dblock.db_size = FASTBUF);
+				md->datablk.d_dblock.db_size = FASTBUF);
 #endif
 
 			_ptrace(("%s: allocated mblk %p\n", __FUNCTION__, mp));
@@ -3625,7 +3618,7 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 			q->q_qinfo->qi_mstat->ms_ocnt++;
 #endif
 		this_thread->syncq_cookie = sc;
-		err = (*q_open)(q, devp, oflag, sflag, crp);
+		err = (*q_open) (q, devp, oflag, sflag, crp);
 		this_thread->syncq_cookie = NULL;
 		leave_syncq(sc->sc_sq);
 	} else
@@ -3635,7 +3628,7 @@ qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ocnt++;
 #endif
-		err = (*q_open)(q, devp, oflag, sflag, crp);
+		err = (*q_open) (q, devp, oflag, sflag, crp);
 	}
 	/* SVR 3.2 compatibility of return codes and handle broken LiS modules */
 	err = (err == OPENFAIL) ? -ENXIO : (err > 0 ? -err : err);
@@ -3678,7 +3671,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 			q->q_qinfo->qi_mstat->ms_ccnt++;
 #endif
 		this_thread->syncq_cookie = sc;
-		err = (*q_close)(q, oflag, crp);
+		err = (*q_close) (q, oflag, crp);
 		this_thread->syncq_cookie = NULL;
 		leave_syncq(sc->sc_sq);
 	} else
@@ -3688,7 +3681,7 @@ qclose(queue_t *q, int oflag, cred_t *crp)
 		if (unlikely(q->q_qinfo->qi_mstat != NULL))
 			q->q_qinfo->qi_mstat->ms_ccnt++;
 #endif
-		err = (*q_close)(q, oflag, crp);
+		err = (*q_close) (q, oflag, crp);
 	}
 	/* handle broken LiS modujles */
 	err = err > 0 ? -err : err;
@@ -4928,8 +4921,8 @@ __runqueues(struct softirq_action *unused)
 	} while (unlikely(((volatile unsigned long) t->flags & (QRUNFLAGS)) != 0 && runs < 10));
 
 	if (runs >= 10)
-		printk(KERN_WARNING "CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n", smp_processor_id(),
-			(volatile unsigned long) t->flags);
+		printk(KERN_WARNING "CPU#%d: STREAMS scheduler looping: flags = 0x%08lx\n",
+		       smp_processor_id(), (volatile unsigned long) t->flags);
 
 	atomic_dec(&t->lock);
 

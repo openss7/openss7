@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/26 15:27:44 $
+ @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/13 22:46:35 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/11/26 15:27:44 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testlog.c,v $
+ Revision 0.9.2.2  2007/08/13 22:46:35  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.1  2006/11/26 15:27:44  brian
  - testing and corrections to strlog capabilities
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/26 15:27:44 $"
+#ident "@(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/13 22:46:35 $"
 
-static char const ident[] = "$RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/11/26 15:27:44 $";
+static char const ident[] =
+    "$RCSfile: testlog.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/13 22:46:35 $";
 
 /*
  *  This is a little user space program to test the correctness of the formatting of the data blocks
@@ -123,8 +127,8 @@ unsigned char dbuf[BUFSIZE];
 struct log_ctl cbuf = { 0, };
 size_t clen = sizeof(cbuf);
 
-struct strbuf ctrl = { .buf = (char *)&cbuf, .len = sizeof(cbuf), .maxlen = sizeof(cbuf) };
-struct strbuf data = { .buf = (char *)dbuf, .len = sizeof(dbuf), .maxlen = sizeof(dbuf) };
+struct strbuf ctrl = {.buf = (char *) &cbuf,.len = sizeof(cbuf),.maxlen = sizeof(cbuf) };
+struct strbuf data = {.buf = (char *) dbuf,.len = sizeof(dbuf),.maxlen = sizeof(dbuf) };
 
 #define PROMOTE_TYPE	    int
 #define PROMOTE_SIZE	    (sizeof(PROMOTE_TYPE))
@@ -138,7 +142,7 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 	size_t len = strnlen(fmt, LOGMSGSZ);
 	size_t plen = PROMOTE_ALIGN(len + 1);
 
-	bp = (unsigned char *)buf->buf; {
+	bp = (unsigned char *) buf->buf; {
 		va_list args2;
 		size_t nargs = 0, alen = 0;
 		char type;
@@ -321,11 +325,11 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 		*bp++ = '\0';	/* terminate format string */
 		va_end(args2);
 		/* pass through once more with arguments */
-		dp = (unsigned char *)buf->buf + plen; { 
+		dp = (unsigned char *) buf->buf + plen; {
 			buf->len = plen + alen;
 			buf->maxlen = plen + alen;
 
-			fmt = (const char *)buf->buf;
+			fmt = (const char *) buf->buf;
 
 			for (; *fmt; ++fmt) {
 				if (*fmt != '%')
@@ -469,7 +473,7 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 					size_t slen = strnlen(s, LOGMSGSZ);
 					size_t splen = PROMOTE_ALIGN(slen + 1);
 
-					strncpy((char *)dp, s, slen);
+					strncpy((char *) dp, s, slen);
 					dp[slen] = '\0';
 					dp += splen;
 					if (!--nargs)
@@ -527,7 +531,7 @@ my_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, va
 	lp->ttime = time(NULL);
 	gettimeofday(&tv, NULL);
 	lp->ltime = tv.tv_sec;
-	lp->seq_no  = 0;
+	lp->seq_no = 0;
 	lp->pri = pri | LOG_USER;
 
 	log_alloc_data(&data, fmt, args);

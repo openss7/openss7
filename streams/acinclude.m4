@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.145 $) $Date: 2007/06/22 00:18:38 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.146 $) $Date: 2007/08/13 22:45:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,106 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/22 00:18:38 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 0.9.2.145  2007/06/22 00:18:38  brian
-# - mostly documentation updates for release, some netconfig workaround
-#
-# Revision 0.9.2.144  2007/06/20 05:16:49  brian
-# - updates for Fedora 7 and 2.6.21 kernel
-#
-# Revision 0.9.2.143  2007/05/03 22:40:37  brian
-# - significant performance improvements, some bug corrections
-#
-# Revision 0.9.2.142  2007/04/12 20:06:01  brian
-# - changes from performance testing and misc bug fixes
-#
-# Revision 0.9.2.141  2007/03/25 19:01:07  brian
-# - changes to support 2.6.20-1.2307.fc5 kernel
-#
-# Revision 0.9.2.140  2007/03/25 03:27:28  brian
-# - enable syncrhonization and stats by default
-#
-# Revision 0.9.2.139  2007/03/05 23:01:56  brian
-# - checking in release changes
-#
-# Revision 0.9.2.138  2007/03/04 23:41:36  brian
-# - additional include path
-#
-# Revision 0.9.2.137  2007/03/04 23:30:04  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.136  2007/03/04 23:14:25  brian
-# - better search for modversions
-#
-# Revision 0.9.2.135  2007/03/03 08:39:55  brian
-# - corrections for STREAMS_VERSION
-#
-# Revision 0.9.2.134  2007/03/02 09:23:19  brian
-# - build updates and esballoc() feature
-#
-# Revision 0.9.2.133  2007/02/28 06:30:47  brian
-# - updates and corrections, #ifdef instead of #if
-#
-# Revision 0.9.2.132  2007/01/09 10:56:43  brian
-# - typo
-#
-# Revision 0.9.2.131  2007/01/02 16:32:02  brian
-# - updates for release, disable streams-bcm by default
-#
-# Revision 0.9.2.130  2006/12/18 07:32:35  brian
-# - lfs device names, autoload clone minors, device numbering, missing manpages
-#
-# Revision 0.9.2.129  2006/11/26 15:27:32  brian
-# - testing and corrections to strlog capabilities
-#
-# Revision 0.9.2.128  2006/10/30 06:40:08  brian
-# - changes to handle missing linux/compile.h on SuSE
-#
-# Revision 0.9.2.127  2006/10/29 13:11:40  brian
-# - final changes for FC5 2.6.18 w/ inode diet
-#
-# Revision 0.9.2.126  2006/10/28 01:08:31  brian
-# - better support for 2.6.18 inode diet
-#
-# Revision 0.9.2.125  2006/10/27 23:19:31  brian
-# - changes for 2.6.18 kernel
-#
-# Revision 0.9.2.124  2006/10/12 10:22:43  brian
-# - removed redundant debug flags
-#
-# Revision 0.9.2.123  2006/09/18 13:20:10  brian
-# - better directory detection
-#
-# Revision 0.9.2.122  2006/09/18 01:15:23  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.121  2006/08/16 07:42:23  brian
-# - added checks for non-exported kthread functions under SLES 9
-#
-# Revision 0.9.2.120  2006/07/25 06:39:04  brian
-# - expanded minor device numbers and optimization and locking corrections
-#
-# Revision 0.9.2.119  2006/07/24 09:01:09  brian
-# - results of udp2 optimizations
-#
-# Revision 0.9.2.118  2006/07/03 02:59:21  brian
-# - updated documentation for release
-#
-# Revision 0.9.2.117  2006/05/08 03:12:28  brian
-# - added module id base to strconf
-#
-# Revision 0.9.2.116  2006/03/21 13:24:15  brian
-# - added problem report checks
-#
-# Revision 0.9.2.115  2006/03/05 03:51:19  brian
-# - aligned to LiS
-#
-# Revision 0.9.2.114  2006/03/03 10:57:09  brian
-# - 32-bit compatibility support, updates for release
+# Last Modified $Date: 2007/08/13 22:45:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1779,8 +1680,110 @@ AC_DEFUN([_LFS_], [dnl
 # =============================================================================
 
 # =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.146  2007/08/13 22:45:51  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.145  2007/06/22 00:18:38  brian
+# - mostly documentation updates for release, some netconfig workaround
+#
+# Revision 0.9.2.144  2007/06/20 05:16:49  brian
+# - updates for Fedora 7 and 2.6.21 kernel
+#
+# Revision 0.9.2.143  2007/05/03 22:40:37  brian
+# - significant performance improvements, some bug corrections
+#
+# Revision 0.9.2.142  2007/04/12 20:06:01  brian
+# - changes from performance testing and misc bug fixes
+#
+# Revision 0.9.2.141  2007/03/25 19:01:07  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
+# Revision 0.9.2.140  2007/03/25 03:27:28  brian
+# - enable syncrhonization and stats by default
+#
+# Revision 0.9.2.139  2007/03/05 23:01:56  brian
+# - checking in release changes
+#
+# Revision 0.9.2.138  2007/03/04 23:41:36  brian
+# - additional include path
+#
+# Revision 0.9.2.137  2007/03/04 23:30:04  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.136  2007/03/04 23:14:25  brian
+# - better search for modversions
+#
+# Revision 0.9.2.135  2007/03/03 08:39:55  brian
+# - corrections for STREAMS_VERSION
+#
+# Revision 0.9.2.134  2007/03/02 09:23:19  brian
+# - build updates and esballoc() feature
+#
+# Revision 0.9.2.133  2007/02/28 06:30:47  brian
+# - updates and corrections, #ifdef instead of #if
+#
+# Revision 0.9.2.132  2007/01/09 10:56:43  brian
+# - typo
+#
+# Revision 0.9.2.131  2007/01/02 16:32:02  brian
+# - updates for release, disable streams-bcm by default
+#
+# Revision 0.9.2.130  2006/12/18 07:32:35  brian
+# - lfs device names, autoload clone minors, device numbering, missing manpages
+#
+# Revision 0.9.2.129  2006/11/26 15:27:32  brian
+# - testing and corrections to strlog capabilities
+#
+# Revision 0.9.2.128  2006/10/30 06:40:08  brian
+# - changes to handle missing linux/compile.h on SuSE
+#
+# Revision 0.9.2.127  2006/10/29 13:11:40  brian
+# - final changes for FC5 2.6.18 w/ inode diet
+#
+# Revision 0.9.2.126  2006/10/28 01:08:31  brian
+# - better support for 2.6.18 inode diet
+#
+# Revision 0.9.2.125  2006/10/27 23:19:31  brian
+# - changes for 2.6.18 kernel
+#
+# Revision 0.9.2.124  2006/10/12 10:22:43  brian
+# - removed redundant debug flags
+#
+# Revision 0.9.2.123  2006/09/18 13:20:10  brian
+# - better directory detection
+#
+# Revision 0.9.2.122  2006/09/18 01:15:23  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 0.9.2.121  2006/08/16 07:42:23  brian
+# - added checks for non-exported kthread functions under SLES 9
+#
+# Revision 0.9.2.120  2006/07/25 06:39:04  brian
+# - expanded minor device numbers and optimization and locking corrections
+#
+# Revision 0.9.2.119  2006/07/24 09:01:09  brian
+# - results of udp2 optimizations
+#
+# Revision 0.9.2.118  2006/07/03 02:59:21  brian
+# - updated documentation for release
+#
+# Revision 0.9.2.117  2006/05/08 03:12:28  brian
+# - added module id base to strconf
+#
+# Revision 0.9.2.116  2006/03/21 13:24:15  brian
+# - added problem report checks
+#
+# Revision 0.9.2.115  2006/03/05 03:51:19  brian
+# - aligned to LiS
+#
+# Revision 0.9.2.114  2006/03/03 10:57:09  brian
+# - 32-bit compatibility support, updates for release
+#
+# =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

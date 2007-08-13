@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/07/14 01:35:54 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:54 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strmain.c,v $
+ Revision 0.9.2.34  2007/08/13 22:46:17  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.33  2007/07/14 01:35:54  brian
  - make license explicit, add documentation
 
@@ -58,9 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/07/14 01:35:54 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $"
 
-static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/07/14 01:35:54 $";
+static char const ident[] =
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -74,7 +78,7 @@ static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/07/14 01:35:54 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL v2"

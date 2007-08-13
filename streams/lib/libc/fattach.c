@@ -1,26 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/24 21:57:02 $
+ @(#) $Id: fattach.c,v 0.9.2.13 2007/08/13 22:46:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; version 2.1 of the License.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:10 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: fattach.c,v $
+ Revision 0.9.2.13  2007/08/13 22:46:10  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/24 21:57:02 $"
+#ident "@(#) $RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/13 22:46:10 $"
 
 static char const ident[] =
-    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2006/09/24 21:57:02 $";
+    "$RCSfile: fattach.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/13 22:46:10 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -106,7 +112,7 @@ __streams_fattach_r(int fd, const char *path)
   * This symbol is a strong alias of __streams_fattach().
   */
 int __lis_fattach(int fd, const char *path)
-	__attribute__((weak, alias("__streams_fattach")));
+    __attribute__ ((weak, alias("__streams_fattach")));
 
 /** @brief Attach a stream to a path in a filesystem.
   * @param fd the file descriptor of the stream to attach.
@@ -115,7 +121,7 @@ int __lis_fattach(int fd, const char *path)
   * This symbol is a strong alias of __streams_fattach_r().
   */
 int __lis_fattach_r(int fd, const char *path)
-	__attribute__((weak, alias("__streams_fattach_r")));
+    __attribute__ ((weak, alias("__streams_fattach_r")));
 
 /** @fn int fattach(int fd, const char *path)
   * @param fd the file descriptor of the stream to attach.

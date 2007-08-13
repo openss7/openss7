@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: stream.h,v 0.9.2.100 2007/08/03 13:36:07 brian Exp $
+ @(#) $Id: stream.h,v 0.9.2.101 2007/08/13 22:46:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:36:07 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stream.h,v $
+ Revision 0.9.2.101  2007/08/13 22:46:09  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.100  2007/08/03 13:36:07  brian
  - manual updates, put ss7 modules in public release
 
@@ -119,7 +123,7 @@
 #ifndef __SYS_STREAMS_STREAM_H__
 #define __SYS_STREAMS_STREAM_H__ 1
 
-#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.100 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 0.9.2.101 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __SYS_STREAM_H__
 #warning "Do no include sys/streams/stream.h directly, include sys/stream.h instead."
@@ -173,7 +177,7 @@ typedef unsigned long __streams_dev_t;
 #if 0
 #include <linux/skbuff.h>	/* for struct sk_buff */
 #else
-struct sk_buff;			/* good enough to declare it */
+struct sk_buff;				/* good enough to declare it */
 #endif
 
 #include "sys/streams/config.h"	/* build specific configuration file */
@@ -244,7 +248,6 @@ struct sk_buff;			/* good enough to declare it */
 #ifndef FNATIVE
 #define FNATIVE IOC_NATIVE
 #endif
-
 
 /* 
  *  strdata - qinit structure stream head read
@@ -427,8 +430,8 @@ typedef struct msgb {
 #define MSGNOTMARKNEXT	(1<< 5)	/* Solaris */
 #define MSGCOMPRESS	(1<< 8)	/* OSF: compress like messages as space allows */
 #define MSGNOTIFY	(1<< 9)	/* OSF: notify when message consumed */
-#define MSGCSUM		(1<<10) /* LfS: UDP/TCP partial checksum was performed on copyin */
-#define MSGCRC32C	(1<<11) /* LfS: CRC32C partial checksum was performed on copyin */
+#define MSGCSUM		(1<<10)	/* LfS: UDP/TCP partial checksum was performed on copyin */
+#define MSGCRC32C	(1<<11)	/* LfS: CRC32C partial checksum was performed on copyin */
 
 #define NOERROR		(-1)	/* UnixWare, OSF, HP-UX */
 #define TRANSPARENT	(-1)
@@ -486,9 +489,9 @@ struct stroptions {
 #define SO_COWENABLE	(1<<21)	/* OSF/HPUX (1<<14) */
 #define SO_COWDISABLE	(1<<22)	/* OSF/HPUX (1<<15) */
 #define SO_WRPAD	(1<<23)	/* LfS: write tail padding */
-#define SO_NOCSUM	(1<<24) /* LfS: no checksum on copy */
-#define SO_CSUM		(1<<25) /* LfS: UDP/TCP checksum on copy */
-#define SO_CRC32C	(1<<26) /* LfS: SCTP CRC32C checksum on copy */
+#define SO_NOCSUM	(1<<24)	/* LfS: no checksum on copy */
+#define SO_CSUM		(1<<25)	/* LfS: UDP/TCP checksum on copy */
+#define SO_CRC32C	(1<<26)	/* LfS: SCTP CRC32C checksum on copy */
 #define SO_SKBUFF	(1<<27)	/* LfS: allocate sk_buffs for data */
 #define SO_NOSKBUFF	(1<<28)	/* LfS: do not allocate sk_buffs for data */
 
@@ -777,7 +780,7 @@ struct fmodsw {
 	struct module *f_kmod;		/* kernel module */
 };
 
-struct cdev; /* just in case */
+struct cdev;				/* just in case */
 
 struct cdevsw {
 	struct list_head d_list;	/* list of all structures */
@@ -1111,7 +1114,7 @@ __STRUTIL_EXTERN_INLINE mblk_t *dupmsg(mblk_t *mp);
 __STREAMS_EXTERN mblk_t *skballoc(struct sk_buff *skb, uint priority);
 __STREAMS_EXTERN mblk_t *esballoc(unsigned char *base, size_t size, uint priority,
 				  frtn_t *freeinfo);
-__STRUTIL_EXTERN_INLINE int isdatablk(dblk_t * db);
+__STRUTIL_EXTERN_INLINE int isdatablk(dblk_t *db);
 __STRUTIL_EXTERN_INLINE int isdatamsg(mblk_t *mp);
 __STRUTIL_EXTERN_INLINE void linkb(register mblk_t *mp1, register mblk_t *mp2);
 __STRUTIL_EXTERN_INLINE mblk_t *linkmsg(mblk_t *mp1, mblk_t *mp2);
@@ -1241,7 +1244,7 @@ dupmsg(mblk_t *mp)
 }
 
 __STRUTIL_EXTERN_INLINE int
-isdatablk(dblk_t * db)
+isdatablk(dblk_t *db)
 {
 	return datamsg(db->db_type);
 }
@@ -1298,7 +1301,7 @@ msgsize(mblk_t *mp)
 				prefetch(b->b_cont);
 				if (likely(b->b_wptr > b->b_rptr))
 					size += b->b_wptr - b->b_rptr;
-			} while (unlikely((b = b->b_cont) != NULL)) ;
+			} while (unlikely((b = b->b_cont) != NULL));
 		}
 		return (size);
 	}
@@ -1393,7 +1396,7 @@ __STRUTIL_EXTERN_INLINE int
 canenable(queue_t *q)
 {
 	dassert(q);
-	return (!((volatile unsigned long)q->q_flag & QNOENB));
+	return (!((volatile unsigned long) q->q_flag & QNOENB));
 }
 
 __STREAMS_EXTERN int enableq(queue_t *q);

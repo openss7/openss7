@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strdebug.h,v 0.9.2.43 2007/05/07 18:51:36 brian Exp $
+ @(#) $Id: strdebug.h,v 0.9.2.44 2007/08/13 22:46:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -44,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:51:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strdebug.h,v $
+ Revision 0.9.2.44  2007/08/13 22:46:09  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
 #ifndef __SYS_STREAMS_STRDEBUG_H__
 #define __SYS_STREAMS_STRDEBUG_H__
 
-#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/05/07 18:51:36 $"
+#ident "@(#) $RCSfile: strdebug.h,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/13 22:46:09 $"
 
 #ifndef __SYS_STRDEBUG_H__
 #warning "Do no include sys/streams/strdebug.h directly, include sys/strdebug.h instead."
@@ -224,7 +231,7 @@
 #define __EXTERN_INLINE static inline
 #endif
 
-#else /* defined(_OPTIMIZE_NORMAL) */
+#else				/* defined(_OPTIMIZE_NORMAL) */
 
 #undef prefetchw
 #define prefetchw(__a) __builtin_prefetch((__a),1,3)

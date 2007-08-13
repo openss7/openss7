@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/07/14 01:35:45 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.61  2007/08/13 22:46:14  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.60  2007/07/14 01:35:45  brian
  - make license explicit, add documentation
 
@@ -73,9 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/07/14 01:35:45 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $"
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/07/14 01:35:45 $";
+static char const ident[] =
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -92,7 +96,7 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.60
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/07/14 01:35:45 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL v2"
@@ -175,8 +179,8 @@ static struct module_info clone_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat clone_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat clone_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat clone_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat clone_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static struct qinit clone_rinit = {
 	.qi_putp = strrput,
@@ -332,7 +336,7 @@ cdev_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
-	.owner = NULL, /* yes NULL */
+	.owner = NULL,			/* yes NULL */
 	.open = cdev_open,
 };
 
@@ -540,7 +544,7 @@ clone_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations clone_f_ops ____cacheline_aligned = {
-	.owner = NULL, /* yes NULL */
+	.owner = NULL,			/* yes NULL */
 	.open = clone_open,
 };
 
