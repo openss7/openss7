@@ -1,3 +1,60 @@
+2007-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: updated to GPLv3 headers
+	* README: updated to GPLv3 headers
+	* acinclude.m4: updated to GPLv3 headers
+	* configure.ac: updated to GPLv3 headers
+	* configure.nexusware: updated to GPLv3 headers
+	* strcompat.spec.in: updated to GPLv3 headers
+	* debian/copyright: updated to GPLv3 headers
+	* debian/mscript_header.in: updated to GPLv3 headers
+	* debian/mscript_postinst.in: updated to GPLv3 headers
+	* debian/mscript_postrm.in: updated to GPLv3 headers
+	* debian/mscript_preinst.in: updated to GPLv3 headers
+	* debian/mscript_prerm.in: updated to GPLv3 headers
+	* debian/rules.in: updated to GPLv3 headers
+	* debian/strcompat-core.postinst.in: updated to GPLv3 headers
+	* debian/strcompat-core.postrm.in: updated to GPLv3 headers
+	* debian/strcompat-core.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-core.prerm.in: updated to GPLv3 headers
+	* debian/strcompat-dev.postinst.in: updated to GPLv3 headers
+	* debian/strcompat-dev.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-dev.prerm.in: updated to GPLv3 headers
+	* debian/strcompat-devel.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-doc.postinst.in: updated to GPLv3 headers
+	* debian/strcompat-doc.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-doc.prerm.in: updated to GPLv3 headers
+	* debian/strcompat-init.postinst.in: updated to GPLv3 headers
+	* debian/strcompat-init.postrm.in: updated to GPLv3 headers
+	* debian/strcompat-init.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-init.prerm.in: updated to GPLv3 headers
+	* debian/strcompat-lib.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-source.preinst.in: updated to GPLv3 headers
+	* debian/strcompat-util.preinst.in: updated to GPLv3 headers
+	* doc/Makefile.am: updated to GPLv3 headers
+	* doc/man/strcompat.macros: updated to GPLv3 headers
+	* doc/man/strcompat.refs: updated to GPLv3 headers
+	* doc/manual/Makefile.am: updated to GPLv3 headers
+	* lib32/Makefile.am: updated to GPLv3 headers
+	* src/Makefile.am: updated to GPLv3 headers
+	* src/include/Makefile.am: updated to GPLv3 headers
+	* src/include/sys/strcompat/config.h.in: updated to GPLv3 headers
+	* src/include/sys/strcompat/version.h.in: updated to GPLv3 headers
+	* src/util/init/strcompat: updated to GPLv3 headers
+	* src/util/init/strcompat.sh: updated to GPLv3 headers
+	* src/util/modutils/strcompat.in: updated to GPLv3 headers
+	* src/util/sysconfig/strcompat: updated to GPLv3 headers
+	* src/util/sysconfig/strcompat.conf: updated to GPLv3 headers
+	* tests/Makefile.am: updated to GPLv3 headers
+	* tests/atlocal.in: updated to GPLv3 headers
+	* tests/dummy1.m4: updated to GPLv3 headers
+	* tests/dummy2.m4: updated to GPLv3 headers
+	* tests/dummy3.m4: updated to GPLv3 headers
+	* tests/dummy4.m4: updated to GPLv3 headers
+	* tests/kernel.at: updated to GPLv3 headers
+	* tests/local.at: updated to GPLv3 headers
+	* tests/testsuite.at: updated to GPLv3 headers
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strcompat.texi: GPLv3
