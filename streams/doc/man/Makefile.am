@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.86 $) $Date: 2007/05/07 18:38:44 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/08/13 22:45:57 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,43 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/07 18:38:44 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.86  2007/05/07 18:38:44  brian
-# - updated manual pages
-#
-# Revision 0.9.2.85  2007/04/12 20:06:03  brian
-# - changes from performance testing and misc bug fixes
-#
-# Revision 0.9.2.84  2007/03/30 14:51:39  brian
-# - updated manual pages and missing symbol
-#
-# Revision 0.9.2.83  2007/03/28 13:44:11  brian
-# - updates to syncrhonization, release notes and documentation
-#
-# Revision 0.9.2.82  2006/12/31 13:26:31  brian
-# - documentation updates for release
-#
-# Revision 0.9.2.81  2006/12/18 07:32:36  brian
-# - lfs device names, autoload clone minors, device numbering, missing manpages
-#
-# Revision 0.9.2.80  2006/10/05 12:16:49  brian
-# - updates for release
-#
-# Revision 0.9.2.79  2006/09/23 00:35:57  brian
-# - added manpages
-#
-# Revision 0.9.2.78  2006/09/18 01:18:37  brian
-# - updated documentation and include file makefiles
-#
-# Revision 0.9.2.77  2006/08/22 12:36:43  brian
-# - udpates to documentation, tweaks to Stream head
-#
-# Revision 0.9.2.76  2006/03/06 11:38:35  brian
-# - updated headers
+# Last Modified $Date: 2007/08/13 22:45:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2544,4 +2508,44 @@ endif
 
 include ../../am/man.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.87  2007/08/13 22:45:57  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.86  2007/05/07 18:38:44  brian
+# - updated manual pages
+#
+# Revision 0.9.2.85  2007/04/12 20:06:03  brian
+# - changes from performance testing and misc bug fixes
+#
+# Revision 0.9.2.84  2007/03/30 14:51:39  brian
+# - updated manual pages and missing symbol
+#
+# Revision 0.9.2.83  2007/03/28 13:44:11  brian
+# - updates to syncrhonization, release notes and documentation
+#
+# Revision 0.9.2.82  2006/12/31 13:26:31  brian
+# - documentation updates for release
+#
+# Revision 0.9.2.81  2006/12/18 07:32:36  brian
+# - lfs device names, autoload clone minors, device numbering, missing manpages
+#
+# Revision 0.9.2.80  2006/10/05 12:16:49  brian
+# - updates for release
+#
+# Revision 0.9.2.79  2006/09/23 00:35:57  brian
+# - added manpages
+#
+# Revision 0.9.2.78  2006/09/18 01:18:37  brian
+# - updated documentation and include file makefiles
+#
+# Revision 0.9.2.77  2006/08/22 12:36:43  brian
+# - udpates to documentation, tweaks to Stream head
+#
+# Revision 0.9.2.76  2006/03/06 11:38:35  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

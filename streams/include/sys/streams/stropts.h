@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: stropts.h,v 0.9.2.31 2007/05/03 22:40:42 brian Exp $
+ @(#) $Id: stropts.h,v 0.9.2.32 2007/08/13 22:46:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:40:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 0.9.2.32  2007/08/13 22:46:09  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.31  2007/05/03 22:40:42  brian
  - significant performance improvements, some bug corrections
 
@@ -81,7 +85,7 @@
 #ifndef __SYS_STREAMS_STROPTS_H__
 #define __SYS_STREAMS_STROPTS_H__
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.31 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 0.9.2.32 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -115,7 +119,7 @@ typedef unsigned long int t_uscalar_t;
 #endif
 
 #define __SID		('S' << 8)
-//#define STR		('S'<<8)	/* for UnixWare/Solaris compatibility */
+//#define STR           ('S'<<8)        /* for UnixWare/Solaris compatibility */
 
 #undef __NOT_IMPLEMENTED__
 

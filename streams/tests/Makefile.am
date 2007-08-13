@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2006/03/10 14:05:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/13 22:46:42 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,63 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2006/03/10 14:05:22 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.31  2006/03/10 14:05:22  brian
-# - corrected kishore's problem with missing testsuite-admin.at
-#
-# Revision 0.9.2.30  2006/03/06 11:38:39  brian
-# - updated headers
-#
-# Revision 0.9.2.29  2005/12/20 04:49:39  brian
-# - added autotest.am Makefile fragment
-#
-# Revision 0.9.2.28  2005/12/14 11:32:06  brian
-# - added way to pass options to testsuite from make installcheck
-#
-# Revision 0.9.2.27  2005/10/11 10:45:53  brian
-# - STREAMS-based pipes are working on RH 7.2 and FC4
-# - starting test suites for STREAMS-based pipes
-# - completed testing of STREAMS-based FIFOs
-# - updated documentation for FIFOs
-#
-# Revision 0.9.2.26  2005/09/09 20:27:26  brian
-# - added mux driver
-#
-# Revision 0.9.2.25  2005/09/08 05:52:45  brian
-# - added nullmod module and loop driver
-# - corrections during testing
-# - many ioctl(2p) test cases work very well now
-#
-# Revision 0.9.2.24  2005/07/21 20:47:25  brian
-# - sync with notebook
-#
-# Revision 0.9.2.20  2005/07/21 20:47:25  brian
-# - sync with notebook
-#
-# Revision 0.9.2.19  2005/06/15 00:46:05  brian
-# - corrected a couple targets
-#
-# Revision 0.9.2.18  2005/05/30 14:25:55  brian
-# - packaged standalong test suites
-#
-# Revision 0.9.2.17  2005/05/21 07:39:52  brian
-# - new testsuite organization
-#
-# Revision 0.9.2.16  2005/05/20 04:44:58  brian
-# - updated autotest makefiles
-#
-# Revision 0.9.2.15  2005/05/16 11:25:08  brian
-# - minor rearrangement
-#
-# Revision 0.9.2.14  2005/05/15 23:57:20  brian
-# - update tests
-#
-# Revision 0.9.2.13  2005/05/14 23:59:23  brian
-# - getting autotest up and running
+# Last Modified $Date: 2007/08/13 22:46:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -203,4 +147,64 @@ if CONFIG_STREAMS_SC_MODULE
 TESTSUITE_DEPS		+= $(TESTSUITE)-sc.at
 endif
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.32  2007/08/13 22:46:42  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.31  2006/03/10 14:05:22  brian
+# - corrected kishore's problem with missing testsuite-admin.at
+#
+# Revision 0.9.2.30  2006/03/06 11:38:39  brian
+# - updated headers
+#
+# Revision 0.9.2.29  2005/12/20 04:49:39  brian
+# - added autotest.am Makefile fragment
+#
+# Revision 0.9.2.28  2005/12/14 11:32:06  brian
+# - added way to pass options to testsuite from make installcheck
+#
+# Revision 0.9.2.27  2005/10/11 10:45:53  brian
+# - STREAMS-based pipes are working on RH 7.2 and FC4
+# - starting test suites for STREAMS-based pipes
+# - completed testing of STREAMS-based FIFOs
+# - updated documentation for FIFOs
+#
+# Revision 0.9.2.26  2005/09/09 20:27:26  brian
+# - added mux driver
+#
+# Revision 0.9.2.25  2005/09/08 05:52:45  brian
+# - added nullmod module and loop driver
+# - corrections during testing
+# - many ioctl(2p) test cases work very well now
+#
+# Revision 0.9.2.24  2005/07/21 20:47:25  brian
+# - sync with notebook
+#
+# Revision 0.9.2.20  2005/07/21 20:47:25  brian
+# - sync with notebook
+#
+# Revision 0.9.2.19  2005/06/15 00:46:05  brian
+# - corrected a couple targets
+#
+# Revision 0.9.2.18  2005/05/30 14:25:55  brian
+# - packaged standalong test suites
+#
+# Revision 0.9.2.17  2005/05/21 07:39:52  brian
+# - new testsuite organization
+#
+# Revision 0.9.2.16  2005/05/20 04:44:58  brian
+# - updated autotest makefiles
+#
+# Revision 0.9.2.15  2005/05/16 11:25:08  brian
+# - minor rearrangement
+#
+# Revision 0.9.2.14  2005/05/15 23:57:20  brian
+# - update tests
+#
+# Revision 0.9.2.13  2005/05/14 23:59:23  brian
+# - getting autotest up and running
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strutil.h,v 0.9.2.56 2007/05/07 18:51:38 brian Exp $
+ @(#) $Id: strutil.h,v 0.9.2.57 2007/08/13 22:46:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/07 18:51:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.h,v $
+ Revision 0.9.2.57  2007/08/13 22:46:21  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.56  2007/05/07 18:51:38  brian
  - changes from release testing
 
@@ -73,7 +76,7 @@
 #ifndef __LOCAL_STRUTIL_H__
 #define __LOCAL_STRUTIL_H__
 
-#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.56 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strutil.h,v $ $Name:  $($Revision: 0.9.2.57 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -95,7 +98,7 @@ extern struct syncq *global_outer_syncq;
 extern bool __rmvq(queue_t *q, mblk_t *mp);
 #endif
 extern streams_fastcall __unlikely bool
-__flushq(queue_t *q, int flag, mblk_t ***mppp, unsigned long bands[]);
+ __flushq(queue_t *q, int flag, mblk_t ***mppp, unsigned long bands[]);
 
 /*
  *  An interesting locking issue: if STREAMS is invoke from ISRs it needs irq protection on locks;

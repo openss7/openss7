@@ -1,26 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/24 21:57:02 $
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/13 22:46:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; version 2.1 of the License.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/24 21:57:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:11 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: putpmsg.c,v $
+ Revision 0.9.2.20  2007/08/13 22:46:11  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/24 21:57:02 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/13 22:46:11 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2006/09/24 21:57:02 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/13 22:46:11 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -295,7 +301,8 @@ __old_streams_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf
   * @par Alias:
   * This symbol is a weak alias of __streams_putpmsg().
   */
-int __lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+int __lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		  int flags)
     __attribute__ ((weak, alias("__streams_putpmsg")));
 
 /** @brief Put a message to a stream band.
@@ -308,7 +315,8 @@ int __lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datp
   * @par Alias:
   * This symbol is a weak alias of __streams_putpmsg_r().
   */
-int __lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+int __lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		    int flags)
     __attribute__ ((weak, alias("__streams_putpmsg_r")));
 
 /** @brief Put a message to a stream band.
@@ -321,7 +329,8 @@ int __lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *da
   * @par Alias:
   * This symbol is a weak alias of __old_streams_putpmsg().
   */
-int __old_lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+int __old_lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+		      int flags)
     __attribute__ ((weak, alias("__old_streams_putpmsg")));
 
 /** @brief Put a message to a stream band.
@@ -334,7 +343,8 @@ int __old_lis_putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *
   * @par Alias:
   * This symbol is a weak alias of __old_streams_putpmsg_r().
   */
-int __old_lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)
+int __old_lis_putpmsg_r(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band,
+			int flags)
     __attribute__ ((weak, alias("__old_streams_putpmsg_r")));
 
 /** @fn int putpmsg(int fd, const struct strbuf *ctlptr, const struct strbuf *datptr, int band, int flags)

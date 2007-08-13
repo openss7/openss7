@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/08 22:48:47 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/13 22:46:39 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -220,7 +220,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/03/08 22:48:47 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/13 22:46:39 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -231,7 +231,7 @@ esac
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -239,8 +239,8 @@ esac
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -265,7 +265,13 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/08 22:48:47 $ by $Author: brian $
+# Last Modified $Date: 2007/08/13 22:46:39 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: streams.sh,v $
+# Revision 0.9.2.19  2007/08/13 22:46:39  brian
+# - GPLv3 header updates
 #
 # =============================================================================
 

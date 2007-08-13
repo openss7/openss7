@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/15 10:22:15 $
+ @(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/13 22:46:29 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:22:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-log.c,v $
+ Revision 0.9.2.26  2007/08/13 22:46:29  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.25  2007/03/15 10:22:15  brian
  - test case reporting and pushed release date one day
 
@@ -150,9 +153,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/15 10:22:15 $"
+#ident "@(#) $RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/13 22:46:29 $"
 
-static char const ident[] = "$RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/15 10:22:15 $";
+static char const ident[] = "$RCSfile: test-log.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/13 22:46:29 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -207,6 +210,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "LOG";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/log";
 #else
@@ -2827,7 +2831,7 @@ test_case_3_1(int child)
 
 	ctl.len = ctl.maxlen = sizeof(lc);
 	ctl.buf = (char *) &lc;
-	dat.len = dat.maxlen = strlen(message)+1;
+	dat.len = dat.maxlen = strlen(message) + 1;
 	dat.buf = message;
 	lc.mid = 2;
 	lc.sid = 0;
@@ -2872,7 +2876,7 @@ test_case_3_2(int child)
 
 	ctl.len = ctl.maxlen = sizeof(lc);
 	ctl.buf = (char *) &lc;
-	dat.len = dat.maxlen = strlen(message)+1;
+	dat.len = dat.maxlen = strlen(message) + 1;
 	dat.buf = message;
 	lc.mid = 2;
 	lc.sid = 0;
@@ -2917,7 +2921,7 @@ test_case_3_3(int child)
 
 	ctl.len = ctl.maxlen = sizeof(lc);
 	ctl.buf = (char *) &lc;
-	dat.len = dat.maxlen = strlen(message)+1;
+	dat.len = dat.maxlen = strlen(message) + 1;
 	dat.buf = message;
 	lc.mid = 2;
 	lc.sid = 0;
@@ -3022,9 +3026,9 @@ test_case_3_7(int child)
 	int flags = 0;
 
 	ctrl.len = ctrl.maxlen = 3 * sizeof(lc);
-	ctrl.buf = (char *)&lc;
+	ctrl.buf = (char *) &lc;
 	data.len = data.maxlen = 256;
-	data.buf = (char *)buf;
+	data.buf = (char *) buf;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -3074,9 +3078,9 @@ test_case_3_8(int child)
 	int flags = 0;
 
 	ctrl.len = ctrl.maxlen = 3 * sizeof(lc);
-	ctrl.buf = (char *)&lc;
+	ctrl.buf = (char *) &lc;
 	data.len = data.maxlen = 256;
-	data.buf = (char *)buf;
+	data.buf = (char *) buf;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -3126,9 +3130,9 @@ test_case_3_9(int child)
 	int flags = 0;
 
 	ctrl.len = ctrl.maxlen = 3 * sizeof(lc);
-	ctrl.buf = (char *)&lc;
+	ctrl.buf = (char *) &lc;
 	data.len = data.maxlen = 256;
-	data.buf = (char *)buf;
+	data.buf = (char *) buf;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -3196,9 +3200,9 @@ test_case_4_x_1(int child)
 	int flags = 0;
 
 	ctrl.len = ctrl.maxlen = sizeof(lc);
-	ctrl.buf = (char *)&lc;
+	ctrl.buf = (char *) &lc;
 	data.len = data.maxlen = 256;
-	data.buf = (char *)buf;
+	data.buf = (char *) buf;
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		goto failure;
@@ -3956,7 +3960,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -3987,7 +3991,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

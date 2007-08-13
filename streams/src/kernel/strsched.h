@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: strsched.h,v 0.9.2.34 2007/04/12 20:06:11 brian Exp $
+ @(#) $Id: strsched.h,v 0.9.2.35 2007/08/13 22:46:19 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/12 20:06:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.h,v $
+ Revision 0.9.2.35  2007/08/13 22:46:19  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.34  2007/04/12 20:06:11  brian
  - changes from performance testing and misc bug fixes
 
@@ -70,7 +73,7 @@
 #ifndef __LOCAL_STRSCHED_H__
 #define __LOCAL_STRSCHED_H__
 
-#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.34 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsched.h,v $ $Name:  $($Revision: 0.9.2.35 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef __EXTERN
 #define __EXTERN extern
@@ -144,8 +147,8 @@ BIG_STATIC struct apinfo *streams_fastcall ap_get(struct apinfo *api);
 BIG_STATIC void streams_fastcall ap_put(struct apinfo *api);
 
 /* XXX: not even in strsched.c */
-BIG_STATIC_STH int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp, int oflag,
-			    int sflag, cred_t *crp);
+BIG_STATIC_STH int streams_fastcall autopush(struct stdata *sd, struct cdevsw *cdev, dev_t *devp,
+					     int oflag, int sflag, cred_t *crp);
 
 #if 0
 /* ctors and dtors for devinfo */
@@ -179,7 +182,7 @@ BIG_STATIC void streams_fastcall freechain(mblk_t *mp, mblk_t **mpp);
 // __STREAMS_EXTERN void qschedule(queue_t *q);
 
 #if defined CONFIG_STREAMS_SYNCQS
-							     /* synq functions *//* XXX: not even in strsched.c */
+/* synq functions *//* XXX: not even in strsched.c */
 __STREAMS_EXTERN void __defer_put(syncq_t *sq, queue_t *q, mblk_t *mp);
 #endif
 

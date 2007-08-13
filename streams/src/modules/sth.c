@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.192 $) $Date: 2007/08/13 22:46:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:57 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 0.9.2.192  2007/08/13 22:46:22  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.191  2007/07/14 01:35:57  brian
  - make license explicit, add documentation
 
@@ -232,10 +235,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $"
+#ident "@(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.192 $) $Date: 2007/08/13 22:46:22 $"
 
 static char const ident[] =
-    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $";
+    "$RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.192 $) $Date: 2007/08/13 22:46:22 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -337,7 +340,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.191 $) $Date: 2007/07/14 01:35:57 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 0.9.2.192 $) $Date: 2007/08/13 22:46:22 $"
 #define STH_DEVICE	"SVR 4.2 STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL v2"
@@ -3594,6 +3597,7 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 #endif
 	struct task_struct *p;
 	int retval = -ESRCH;
+
 #ifdef HAVE_KMACRO_DO_EACH_PID_TASK
 	struct pid *pid;
 
@@ -3606,7 +3610,8 @@ __kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 			err = send_group_sig_info(sig, info, p);
 			if (retval)
 				retval = err;
-		} while_each_pid_task(pid, PIDTYPE_SID, p);
+		}
+		while_each_pid_task(pid, PIDTYPE_SID, p);
 	}
 #else
 	do_each_task_pid(sess, PIDTYPE_SID, p) {
@@ -10739,9 +10744,8 @@ strwput(queue_t *q, mblk_t *mp)
 			   && (mp->b_wptr > mp->b_rptr)
 			   && (mp->b_wptr - mp->b_rptr <= mp->b_datap->db_lim - mp->b_wptr)
 		    ) {
-			/* M_DATA, will hold another write of the same size, not delimited,
-			   feature activated, single message block, band zero, non-zero-length
-			   message. */
+			/* M_DATA, will hold another write of the same size, not delimited, feature 
+			   activated, single message block, band zero, non-zero-length message. */
 			/* held - add stream head to scan list */
 			if (test_bit(STRHOLD_BIT, &sd->sd_flag))
 				/* Actually, this qscan() is a little redundant now. Because we

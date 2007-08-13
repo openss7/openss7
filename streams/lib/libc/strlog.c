@@ -1,26 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 07:32:39 $
+ @(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 22:46:11 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; version 2.1 of the License.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 07:32:39 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:11 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: strlog.c,v $
+ Revision 0.9.2.4  2007/08/13 22:46:11  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 07:32:39 $"
+#ident "@(#) $RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 22:46:11 $"
 
-static char const ident[] = "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 07:32:39 $";
+static char const ident[] =
+    "$RCSfile: strlog.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/13 22:46:11 $";
 
 #include "streams.h"
 
@@ -90,7 +97,7 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 		char type;
 		unsigned char *dp;
 
-		buf->buf = (char *)bp;
+		buf->buf = (char *) bp;
 		buf->len = plen;
 		buf->maxlen = plen;
 
@@ -269,11 +276,11 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 		va_end(args2);
 		/* pass through once more with arguments */
 		if ((bp = realloc(buf->buf, plen + alen))) {
-			buf->buf = (char *)bp;
+			buf->buf = (char *) bp;
 			buf->len = plen + alen;
 			buf->maxlen = plen + alen;
 
-			fmt = (const char *)bp;
+			fmt = (const char *) bp;
 			dp = bp + plen;
 
 			for (; *fmt; ++fmt) {
@@ -418,7 +425,7 @@ log_alloc_data(struct strbuf *buf, const char *fmt, va_list args)
 					size_t slen = strnlen(s, LOGMSGSZ);
 					size_t splen = PROMOTE_ALIGN(slen + 1);
 
-					strncpy((char *)dp, s, slen);
+					strncpy((char *) dp, s, slen);
 					dp[slen] = '\0';
 					dp += splen;
 					if (!--nargs)
@@ -455,7 +462,8 @@ __streams_vstrlog(short mid, short sid, char level, unsigned short flags, const 
 		  va_list args)
 {
 	static int log_fd = 0;
-	struct strbuf ctrl = { 0, }, data = { 0, };
+	struct strbuf ctrl = { 0, }, data = {
+	0,};
 	struct log_ctl lc;
 	struct timeval tv;
 	int err, pri, band, flag;
@@ -492,7 +500,7 @@ __streams_vstrlog(short mid, short sid, char level, unsigned short flags, const 
 		flag = MSG_BAND;
 	}
 
-	ctrl.buf = (char *)&lc;
+	ctrl.buf = (char *) &lc;
 	ctrl.len = sizeof(lc);
 	ctrl.maxlen = sizeof(lc);
 
@@ -503,7 +511,7 @@ __streams_vstrlog(short mid, short sid, char level, unsigned short flags, const 
 	lc.ttime = time(NULL);
 	gettimeofday(&tv, NULL);
 	lc.ltime = tv.tv_sec;
-	lc.seq_no  = 0;
+	lc.seq_no = 0;
 	lc.pri = pri | LOG_USER;
 
 	if (log_alloc_data(&data, fmt, args) != 0)

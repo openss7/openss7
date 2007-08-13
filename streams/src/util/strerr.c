@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/22 02:10:19 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:37 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/22 02:10:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 0.9.2.25  2007/08/13 22:46:37  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.24  2007/05/22 02:10:19  brian
  - SCTP performance testing updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/22 02:10:19 $"
+#ident "@(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:37 $"
 
 static char const ident[] =
-    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/05/22 02:10:19 $";
+    "$RCSfile: strerr.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:37 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -676,7 +679,7 @@ version(int argc, char **argv)
 	fprintf(stdout, "\
 %2$s\n\
 Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 2, included here by reference.\n\
+Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -754,15 +757,15 @@ All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version 2 of the License.\n\
+Foundation; Version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
 You should  have received a copy of the GNU  General  Public License  along with\n\
-this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
-Cambridge, MA 02139, USA.\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -1309,6 +1312,7 @@ main(int argc, char *argv[])
 				struct strbuf ctl = { 1024, 1024, cbuf };
 				struct strbuf dat = { 2048, 2048, dbuf };
 				struct log_ctl *lc;
+
 #if 0
 				char sbuf[1024];
 				char fchar[] = "          ";
@@ -1329,12 +1333,14 @@ main(int argc, char *argv[])
 				lc = (struct log_ctl *) cbuf;
 				if (ctl.len < sizeof(*lc)) {
 					if (output > 2)
-						fprintf(stderr, "ctl.len = %d, skipping\n", ctl.len);
+						fprintf(stderr, "ctl.len = %d, skipping\n",
+							ctl.len);
 					continue;
 				}
 				if (dat.len <= 0) {
 					if (output > 2)
-						fprintf(stderr, "dat.len = %d, skipping\n", dat.len);
+						fprintf(stderr, "dat.len = %d, skipping\n",
+							dat.len);
 					continue;
 				}
 				if (!nomead || outfile[0] == '\0') {
@@ -1347,7 +1353,7 @@ main(int argc, char *argv[])
 					snprintf_text(sbuf, sizeof(sbuf), dbuf, dat.len);
 					fprintf(stdout, "%d", lc->seq_no);
 					snprintf(tbuf, sizeof(tbuf), ctime(&ltime));
-					tbuf[strnlen(tbuf, sizeof(tbuf))-1] = '\0';
+					tbuf[strnlen(tbuf, sizeof(tbuf)) - 1] = '\0';
 					fprintf(stdout, " %s", tbuf);
 					fprintf(stdout, " %lu", (unsigned long) lc->ttime);
 					fprintf(stdout, " %3d", lc->level);

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/04/04 01:15:18 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/13 22:46:17 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/04 01:15:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/13 22:46:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 0.9.2.32  2007/08/13 22:46:17  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.31  2007/04/04 01:15:18  brian
  - performance improvements (speeds up put and srv procedures)
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/04/04 01:15:18 $"
+#ident "@(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/13 22:46:17 $"
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/04/04 01:15:18 $";
+static char const ident[] =
+    "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/13 22:46:17 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -155,7 +159,7 @@ pipe_file_open(void)
 	}
 	if (IS_ERR((file = (void *) dentry))) {
 		_ptrace(("%s: parent lookup in error, errno %d\n", __FUNCTION__,
-			-(int) PTR_ERR(file)));
+			 -(int) PTR_ERR(file)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
@@ -168,7 +172,7 @@ pipe_file_open(void)
 
 		name.hash = full_name_hash(name.name, name.len);
 		_printd(("%s: looking up minor device %hu by name '%s', len %d\n", __FUNCTION__, 0,
-			name.name, name.len));
+			 name.name, name.len));
 		down(&parent->d_inode->i_sem);
 		dentry = lookup_hash(&name, parent);
 		up(&parent->d_inode->i_sem);
@@ -176,7 +180,7 @@ pipe_file_open(void)
 	}
 	if (IS_ERR((file = (void *) dentry))) {
 		_ptrace(("%s: dentry lookup in error, errno %d\n", __FUNCTION__,
-			-(int) PTR_ERR(file)));
+			 -(int) PTR_ERR(file)));
 		goto done;
 	}
 	if (!dentry->d_inode) {
@@ -184,11 +188,11 @@ pipe_file_open(void)
 		goto enoent;
 	}
 	_printd(("%s: opening dentry %p, inode %p (%ld)\n", __FUNCTION__, dentry, dentry->d_inode,
-		dentry->d_inode->i_ino));
+		 dentry->d_inode->i_ino));
 	file = dentry_open(dentry, mntget(mnt), O_CLONE | 0x3);
 	if (IS_ERR(file)) {
 		_ptrace(("%s: dentry_open returned error, errno %d\n", __FUNCTION__,
-			-(int) PTR_ERR(file)));
+			 -(int) PTR_ERR(file)));
 		goto done;
 	}
       done:
@@ -255,25 +259,34 @@ STATIC spinlock_t pipe_ino_lock = SPIN_LOCK_UNLOCKED;
 STATIC int pipe_ino = 0;
 
 #ifdef HAVE_FILE_MOVE_ADDR
-static typeof(&file_move) _file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+static
+typeof(&file_move)
+_file_move = (typeof(_file_move)) HAVE_FILE_MOVE_ADDR;
+
 #define file_move(__f, __l) _file_move(__f, __l)
 #endif
 #ifdef HAVE_FILE_KILL_ADDR
-static typeof(&file_kill) _file_kill = (typeof(_file_kill)) HAVE_FILE_KILL_ADDR;
+	static typeof(&file_kill) _file_kill = (typeof(_file_kill)) HAVE_FILE_KILL_ADDR;
+
 #define file_kill(__f) _file_kill(__f)
 #else
-void file_kill(struct file *file) {
+	void file_kill(struct file *file)
+{
 	static LIST_HEAD(kill_list);
-	file_move(file, &kill_list); /* out of the way.. */
+
+	file_move(file, &kill_list);	/* out of the way.. */
 }
 #endif
 #ifdef HAVE_PUT_FILP_ADDR
-static typeof(&put_filp) _put_filp = (typeof(_put_filp)) HAVE_PUT_FILP_ADDR;
+static
+typeof(&put_filp)
+_put_filp = (typeof(_put_filp)) HAVE_PUT_FILP_ADDR;
+
 #define put_filp(__f) _put_filp(__f)
 #endif
 
-streams_fastcall long
-do_spipe(int *fds)
+	streams_fastcall long
+	 do_spipe(int *fds)
 {
 	dev_t dev;
 	minor_t minor;
