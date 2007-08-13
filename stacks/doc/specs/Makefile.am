@@ -1,17 +1,18 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:49 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/13 15:22:00 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +20,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,19 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/14 01:33:49 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.8  2007/07/14 01:33:49  brian
-# - make license explicit, add documentation
-#
-# Revision 0.9.2.7  2007/06/27 08:42:03  brian
-# - added MTPI spec document
-#
-# Revision 0.9.2.6  2006/03/06 11:38:22  brian
-# - updated headers
+# Last Modified $Date: 2007/08/13 15:22:00 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,4 +54,20 @@ include ../../am/openss7.am
 
 SUBDIRS = cci tri tci mapi mtpi sli sdli sdti
 
+## =============================================================================
+##
+## $Log: Makefile.am,v $
+## Revision 0.9.2.9  2007/08/13 15:22:00  brian
+## - header updates, added references
+##
+## Revision 0.9.2.8  2007/07/14 01:33:49  brian
+## - make license explicit, add documentation
+##
+## Revision 0.9.2.7  2007/06/27 08:42:03  brian
+## - added MTPI spec document
+##
+## Revision 0.9.2.6  2006/03/06 11:38:22  brian
+## - updated headers
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

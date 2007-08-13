@@ -1,6 +1,7 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/03/14 04:28:08 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/13 15:22:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -11,7 +12,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +20,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/14 04:28:08 $ by $Author: brian $
+# Last Modified $Date: 2007/08/13 15:22:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -111,38 +112,41 @@ endif
 
 include ../../../am/info.am
 
-# =============================================================================
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.17  2007/03/14 04:28:08  brian
-# - typo
-#
-# Revision 0.9.2.16  2007/03/14 04:23:17  brian
-# - do not depend on args.texi or discheck target fails
-#
-# Revision 0.9.2.15  2007/03/06 21:26:18  brian
-# - final updates and corrections to build process for release
-#
-# Revision 0.9.2.14  2006/08/26 09:17:23  brian
-# - better release file generation
-#
-# Revision 0.9.2.13  2006/08/22 12:44:21  brian
-# - documentation updates
-#
-# Revision 0.9.2.12  2006/03/20 13:50:37  brian
-# - get automake to run clean
-#
-# Revision 0.9.2.11  2006/03/20 13:36:36  brian
-# - added checks for Development
-#
-# Revision 0.9.2.10  2006/03/07 00:44:55  brian
-# - removed double log lists
-#
-# Revision 0.9.2.9  2006/03/07 00:42:40  brian
-# - added log to headers
-#
-# Revision 0.9.2.8  2006/03/06 11:38:20  brian
-# - updated headers
-#
-# =============================================================================
+## =============================================================================
+##
+## $Log: Makefile.am,v $
+## Revision 0.9.2.18  2007/08/13 15:22:10  brian
+## - header updates, added references
+##
+## Revision 0.9.2.17  2007/03/14 04:28:08  brian
+## - typo
+##
+## Revision 0.9.2.16  2007/03/14 04:23:17  brian
+## - do not depend on args.texi or discheck target fails
+##
+## Revision 0.9.2.15  2007/03/06 21:26:18  brian
+## - final updates and corrections to build process for release
+##
+## Revision 0.9.2.14  2006/08/26 09:17:23  brian
+## - better release file generation
+##
+## Revision 0.9.2.13  2006/08/22 12:44:21  brian
+## - documentation updates
+##
+## Revision 0.9.2.12  2006/03/20 13:50:37  brian
+## - get automake to run clean
+##
+## Revision 0.9.2.11  2006/03/20 13:36:36  brian
+## - added checks for Development
+##
+## Revision 0.9.2.10  2006/03/07 00:44:55  brian
+## - removed double log lists
+##
+## Revision 0.9.2.9  2006/03/07 00:42:40  brian
+## - added log to headers
+##
+## Revision 0.9.2.8  2006/03/06 11:38:20  brian
+## - updated headers
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
