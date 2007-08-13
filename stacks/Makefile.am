@@ -1,6 +1,7 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.95 $) $Date: 2007/08/12 15:35:43 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2007/08/13 15:21:55 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,121 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 15:35:43 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.95  2007/08/12 15:35:43  brian
-# - new release files with GPLv3
-#
-# Revision 0.9.2.94  2007/08/03 13:34:47  brian
-# - manual updates, put ss7 modules in public release
-#
-# Revision 0.9.2.93  2007/07/21 20:09:42  brian
-# - added pass structure
-#
-# Revision 0.9.2.92  2007/07/14 01:33:47  brian
-# - make license explicit, add documentation
-#
-# Revision 0.9.2.91  2007/06/20 07:53:22  brian
-# - updates for Fedora 7 and 2.6.21
-#
-# Revision 0.9.2.90  2007/03/16 10:30:27  brian
-# - final changes from release
-#
-# Revision 0.9.2.89  2007/03/13 06:17:00  brian
-# - suppress errors when building 32-bit libs
-#
-# Revision 0.9.2.88  2007/03/08 06:08:29  brian
-# - modutil_DATA should not be distributed (and it reorders uninstall)
-#
-# Revision 0.9.2.87  2007/03/04 00:23:35  brian
-# - add version file creation
-#
-# Revision 0.9.2.86  2007/02/21 01:09:04  brian
-# - updating mtp.c driver, better mi_open allocators
-#
-# Revision 0.9.2.85  2007/02/17 02:49:04  brian
-# - first clean recompile of MTP modules on LFS
-#
-# Revision 0.9.2.84  2007/02/13 07:55:40  brian
-# - working up MTP and UAs
-#
-# Revision 0.9.2.83  2007/01/21 20:22:35  brian
-# - working up drivers
-#
-# Revision 0.9.2.82  2006/12/29 05:51:03  brian
-# - changes for successful master build
-#
-# Revision 0.9.2.81  2006/12/27 16:35:57  brian
-# - added slpmod module and fixups for make check target
-#
-# Revision 0.9.2.80  2006/12/18 10:50:55  brian
-# - subpackaging changes for release
-#
-# Revision 0.9.2.79  2006/12/07 10:04:34  brian
-# - added init scripts to master makefile
-#
-# Revision 0.9.2.78  2006/12/06 11:45:13  brian
-# - updated X400P driver and test suites
-#
-# Revision 0.9.2.77  2006/10/03 13:51:33  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 0.9.2.76  2006/10/01 21:30:15  brian
-# - distribute release and library version files
-#
-# Revision 0.9.2.75  2006/09/29 11:50:09  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 0.9.2.74  2006/09/27 05:15:13  brian
-# - distinguish LDADD from LDFLAGS
-#
-# Revision 0.9.2.73  2006/09/25 20:15:43  brian
-# - rationalized to strinet and strxnet
-#
-# Revision 0.9.2.72  2006/09/18 17:43:10  brian
-# - added doxy rules to makefile and release notes
-#
-# Revision 0.9.2.71  2006/09/18 01:15:22  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.70  2006/08/26 09:17:30  brian
-# - better release file generation
-#
-# Revision 0.9.2.69  2006/07/01 12:32:36  brian
-# - add clobbered section back in
-#
-# Revision 0.9.2.68  2006/07/01 11:59:39  brian
-# - added new KERNEL_BLDFLAGS to makefiles
-#
-# Revision 0.9.2.67  2006/03/21 13:24:37  brian
-# - included pr.am
-#
-# Revision 0.9.2.66  2006/03/20 11:53:58  brian
-# - added checks for DEVELOPMENT
-#
-# Revision 0.9.2.65  2006/03/07 13:16:56  brian
-# - tools must be compiled static for distcheck
-#
-# Revision 0.9.2.64  2006/03/07 01:04:06  brian
-# - removed conflicting perftest
-#
-# Revision 0.9.2.63  2006/03/06 11:38:27  brian
-# - updated headers
+# Last Modified $Date: 2007/08/13 15:21:55 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1484,4 +1371,122 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+## =============================================================================
+##
+## $Log: Makefile.am,v $
+## Revision 0.9.2.96  2007/08/13 15:21:55  brian
+## - header updates, added references
+##
+## Revision 0.9.2.95  2007/08/12 15:35:43  brian
+## - new release files with GPLv3
+##
+## Revision 0.9.2.94  2007/08/03 13:34:47  brian
+## - manual updates, put ss7 modules in public release
+##
+## Revision 0.9.2.93  2007/07/21 20:09:42  brian
+## - added pass structure
+##
+## Revision 0.9.2.92  2007/07/14 01:33:47  brian
+## - make license explicit, add documentation
+##
+## Revision 0.9.2.91  2007/06/20 07:53:22  brian
+## - updates for Fedora 7 and 2.6.21
+##
+## Revision 0.9.2.90  2007/03/16 10:30:27  brian
+## - final changes from release
+##
+## Revision 0.9.2.89  2007/03/13 06:17:00  brian
+## - suppress errors when building 32-bit libs
+##
+## Revision 0.9.2.88  2007/03/08 06:08:29  brian
+## - modutil_DATA should not be distributed (and it reorders uninstall)
+##
+## Revision 0.9.2.87  2007/03/04 00:23:35  brian
+## - add version file creation
+##
+## Revision 0.9.2.86  2007/02/21 01:09:04  brian
+## - updating mtp.c driver, better mi_open allocators
+##
+## Revision 0.9.2.85  2007/02/17 02:49:04  brian
+## - first clean recompile of MTP modules on LFS
+##
+## Revision 0.9.2.84  2007/02/13 07:55:40  brian
+## - working up MTP and UAs
+##
+## Revision 0.9.2.83  2007/01/21 20:22:35  brian
+## - working up drivers
+##
+## Revision 0.9.2.82  2006/12/29 05:51:03  brian
+## - changes for successful master build
+##
+## Revision 0.9.2.81  2006/12/27 16:35:57  brian
+## - added slpmod module and fixups for make check target
+##
+## Revision 0.9.2.80  2006/12/18 10:50:55  brian
+## - subpackaging changes for release
+##
+## Revision 0.9.2.79  2006/12/07 10:04:34  brian
+## - added init scripts to master makefile
+##
+## Revision 0.9.2.78  2006/12/06 11:45:13  brian
+## - updated X400P driver and test suites
+##
+## Revision 0.9.2.77  2006/10/03 13:51:33  brian
+## - changes to pass make check target
+## - added some package config.h files
+## - removed AUTOCONFIG_H from Makefile.am's
+## - source code changes for compile
+## - added missing manual pages
+## - renamed conflicting manual pages
+## - parameterized include Makefile.am
+## - updated release notes
+##
+## Revision 0.9.2.76  2006/10/01 21:30:15  brian
+## - distribute release and library version files
+##
+## Revision 0.9.2.75  2006/09/29 11:50:09  brian
+## - libtool library tweaks in Makefile.am
+## - better rpm spec handling in *.spec.in
+## - added AC_LIBTOOL_DLOPEN to configure.ac
+## - updated some copyright headers
+## - rationalized item in two packages
+## - added manual pages, drivers and modules to new strtty package
+##
+## Revision 0.9.2.74  2006/09/27 05:15:13  brian
+## - distinguish LDADD from LDFLAGS
+##
+## Revision 0.9.2.73  2006/09/25 20:15:43  brian
+## - rationalized to strinet and strxnet
+##
+## Revision 0.9.2.72  2006/09/18 17:43:10  brian
+## - added doxy rules to makefile and release notes
+##
+## Revision 0.9.2.71  2006/09/18 01:15:22  brian
+## - add 32bit libs, release file changes, additional packages
+##
+## Revision 0.9.2.70  2006/08/26 09:17:30  brian
+## - better release file generation
+##
+## Revision 0.9.2.69  2006/07/01 12:32:36  brian
+## - add clobbered section back in
+##
+## Revision 0.9.2.68  2006/07/01 11:59:39  brian
+## - added new KERNEL_BLDFLAGS to makefiles
+##
+## Revision 0.9.2.67  2006/03/21 13:24:37  brian
+## - included pr.am
+##
+## Revision 0.9.2.66  2006/03/20 11:53:58  brian
+## - added checks for DEVELOPMENT
+##
+## Revision 0.9.2.65  2006/03/07 13:16:56  brian
+## - tools must be compiled static for distcheck
+##
+## Revision 0.9.2.64  2006/03/07 01:04:06  brian
+## - removed conflicting perftest
+##
+## Revision 0.9.2.63  2006/03/06 11:38:27  brian
+## - updated headers
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

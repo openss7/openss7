@@ -1,17 +1,18 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/21 20:24:05 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/13 15:21:57 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +20,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,55 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/21 20:24:05 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.41  2007/07/21 20:24:05  brian
-# - updated manpages
-#
-# Revision 0.9.2.40  2007/03/06 21:26:10  brian
-# - final updates and corrections to build process for release
-#
-# Revision 0.9.2.39  2007/02/17 02:49:06  brian
-# - first clean recompile of MTP modules on LFS
-#
-# Revision 0.9.2.38  2007/01/21 20:22:37  brian
-# - working up drivers
-#
-# Revision 0.9.2.37  2007/01/08 16:23:08  brian
-# - final updates for release
-#
-# Revision 0.9.2.36  2006/12/29 05:51:06  brian
-# - changes for successful master build
-#
-# Revision 0.9.2.35  2006/12/28 05:32:58  brian
-# - changes for make check target
-#
-# Revision 0.9.2.34  2006/12/27 16:35:58  brian
-# - added slpmod module and fixups for make check target
-#
-# Revision 0.9.2.33  2006/12/23 13:06:59  brian
-# - manual page and other package updates for release
-#
-# Revision 0.9.2.32  2006/12/21 11:14:40  brian
-# - documentation updates for release, and moved tali
-#
-# Revision 0.9.2.31  2006/12/18 10:50:57  brian
-# - subpackaging changes for release
-#
-# Revision 0.9.2.30  2006/05/07 22:12:43  brian
-# - updated for NPI-IP driver
-#
-# Revision 0.9.2.29  2006/03/15 07:21:30  brian
-# - add unused man pages for public release
-#
-# Revision 0.9.2.28  2006/03/07 00:55:52  brian
-# - package passes full documentation check
-#
-# Revision 0.9.2.27  2006/03/06 11:38:12  brian
-# - updated headers
+# Last Modified $Date: 2007/08/13 15:21:57 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3520,4 +3473,56 @@ endif
 
 include ../../am/man.am
 
+## =============================================================================
+##
+## $Log: Makefile.am,v $
+## Revision 0.9.2.42  2007/08/13 15:21:57  brian
+## - header updates, added references
+##
+## Revision 0.9.2.41  2007/07/21 20:24:05  brian
+## - updated manpages
+##
+## Revision 0.9.2.40  2007/03/06 21:26:10  brian
+## - final updates and corrections to build process for release
+##
+## Revision 0.9.2.39  2007/02/17 02:49:06  brian
+## - first clean recompile of MTP modules on LFS
+##
+## Revision 0.9.2.38  2007/01/21 20:22:37  brian
+## - working up drivers
+##
+## Revision 0.9.2.37  2007/01/08 16:23:08  brian
+## - final updates for release
+##
+## Revision 0.9.2.36  2006/12/29 05:51:06  brian
+## - changes for successful master build
+##
+## Revision 0.9.2.35  2006/12/28 05:32:58  brian
+## - changes for make check target
+##
+## Revision 0.9.2.34  2006/12/27 16:35:58  brian
+## - added slpmod module and fixups for make check target
+##
+## Revision 0.9.2.33  2006/12/23 13:06:59  brian
+## - manual page and other package updates for release
+##
+## Revision 0.9.2.32  2006/12/21 11:14:40  brian
+## - documentation updates for release, and moved tali
+##
+## Revision 0.9.2.31  2006/12/18 10:50:57  brian
+## - subpackaging changes for release
+##
+## Revision 0.9.2.30  2006/05/07 22:12:43  brian
+## - updated for NPI-IP driver
+##
+## Revision 0.9.2.29  2006/03/15 07:21:30  brian
+## - add unused man pages for public release
+##
+## Revision 0.9.2.28  2006/03/07 00:55:52  brian
+## - package passes full documentation check
+##
+## Revision 0.9.2.27  2006/03/06 11:38:12  brian
+## - updated headers
+##
+## =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
