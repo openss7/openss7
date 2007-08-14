@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2006/10/30 06:50:04 $
+dnl @(#) $RCSfile: testsuite-strtst.at,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 10:47:20 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,7 +33,7 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl GNU General Public License (GPL) Version 3, so long as the software is
 dnl distributed with, and only used for the testing of, OpenSS7 modules,
 dnl drivers, and libraries.
 dnl
@@ -61,41 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2006/10/30 06:50:04 $ by $Author: brian $
-dnl
-dnl --------------------------------------------------------------------------
-dnl
-dnl $Log: testsuite-strtst.at,v $
-dnl Revision 0.9.2.10  2006/10/30 06:50:04  brian
-dnl - added ability to sync between test cases
-dnl
-dnl Revision 0.9.2.9  2006/09/18 00:48:44  brian
-dnl - updated testsuite headers
-dnl
-dnl Revision 0.9.2.8  2006/03/05 04:03:09  brian
-dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
-dnl - updates for new release
-dnl
-dnl Revision 0.9.2.7  2005/10/23 05:01:27  brian
-dnl - test programs and modules for POSIX testing
-dnl
-dnl Revision 0.9.2.6  2005/06/24 17:19:49  brian
-dnl - skip band test on failure
-dnl
-dnl Revision 0.9.2.5  2005/06/24 16:58:46  brian
-dnl - testsuite as always verbose internally
-dnl
-dnl Revision 0.9.2.4  2005/05/30 14:25:54  brian
-dnl - packaged standalong test suites
-dnl
-dnl Revision 0.9.2.3  2005/05/21 07:39:51  brian
-dnl - new testsuite organization
-dnl
-dnl Revision 0.9.2.2  2005/05/21 07:14:25  brian
-dnl - added full set of LiS tests
-dnl
-dnl Revision 0.9.2.1  2005/05/20 04:46:05  brian
-dnl - added test suite for strtst
+dnl Last Modified $Date: 2007/08/14 10:47:20 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -201,4 +167,42 @@ AT_KEYWORDS([strtst mt_open])
 AT_CHECK([test_strtst mt_open], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl ==========================================================================
+dnl
+dnl $Log: testsuite-strtst.at,v $
+dnl Revision 0.9.2.11  2007/08/14 10:47:20  brian
+dnl - GPLv3 header update
+dnl
+dnl Revision 0.9.2.10  2006/10/30 06:50:04  brian
+dnl - added ability to sync between test cases
+dnl
+dnl Revision 0.9.2.9  2006/09/18 00:48:44  brian
+dnl - updated testsuite headers
+dnl
+dnl Revision 0.9.2.8  2006/03/05 04:03:09  brian
+dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+dnl - updates for new release
+dnl
+dnl Revision 0.9.2.7  2005/10/23 05:01:27  brian
+dnl - test programs and modules for POSIX testing
+dnl
+dnl Revision 0.9.2.6  2005/06/24 17:19:49  brian
+dnl - skip band test on failure
+dnl
+dnl Revision 0.9.2.5  2005/06/24 16:58:46  brian
+dnl - testsuite as always verbose internally
+dnl
+dnl Revision 0.9.2.4  2005/05/30 14:25:54  brian
+dnl - packaged standalong test suites
+dnl
+dnl Revision 0.9.2.3  2005/05/21 07:39:51  brian
+dnl - new testsuite organization
+dnl
+dnl Revision 0.9.2.2  2005/05/21 07:14:25  brian
+dnl - added full set of LiS tests
+dnl
+dnl Revision 0.9.2.1  2005/05/20 04:46:05  brian
+dnl - added test suite for strtst
+dnl
+dnl ==========================================================================
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

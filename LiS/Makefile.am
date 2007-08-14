@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.48 $) $Date: 2007/03/13 06:16:53 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.6.49 $) $Date: 2007/08/14 10:46:52 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,73 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:16:53 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 1.1.6.48  2007/03/13 06:16:53  brian
-# - suppress errors when building 32-bit libs
-#
-# Revision 1.1.6.47  2007/03/08 06:08:25  brian
-# - modutil_DATA should not be distributed (and it reorders uninstall)
-#
-# Revision 1.1.6.46  2007/03/04 00:23:18  brian
-# - add version file creation
-#
-# Revision 1.1.6.45  2006/10/03 13:51:21  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 1.1.6.44  2006/10/01 21:30:13  brian
-# - distribute release and library version files
-#
-# Revision 1.1.6.43  2006/09/29 11:49:58  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 1.1.6.42  2006/09/27 05:15:12  brian
-# - distinguish LDADD from LDFLAGS
-#
-# Revision 1.1.6.41  2006/09/25 12:17:24  brian
-# - updates for distcheck
-#
-# Revision 1.1.6.40  2006/09/24 21:36:47  brian
-# - added lib files
-#
-# Revision 1.1.6.39  2006/09/18 17:43:07  brian
-# - added doxy rules to makefile and release notes
-#
-# Revision 1.1.6.38  2006/09/18 01:15:20  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 1.1.6.37  2006/08/26 09:15:51  brian
-# - better release file generation
-#
-# Revision 1.1.6.36  2006/07/01 11:59:37  brian
-# - added new KERNEL_BLDFLAGS to makefiles
-#
-# Revision 1.1.6.35  2006/03/21 13:24:34  brian
-# - included pr.am
-#
-# Revision 1.1.6.34  2006/03/20 12:51:45  brian
-# - added missing README-alpha file
-#
-# Revision 1.1.6.33  2006/03/20 11:53:55  brian
-# - added checks for DEVELOPMENT
-#
-# Revision 1.1.6.32  2006/03/06 11:37:48  brian
-# - updated headers
+# Last Modified $Date: 2007/08/14 10:46:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -694,4 +628,74 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 1.1.6.49  2007/08/14 10:46:52  brian
+# - GPLv3 header update
+#
+# Revision 1.1.6.48  2007/03/13 06:16:53  brian
+# - suppress errors when building 32-bit libs
+#
+# Revision 1.1.6.47  2007/03/08 06:08:25  brian
+# - modutil_DATA should not be distributed (and it reorders uninstall)
+#
+# Revision 1.1.6.46  2007/03/04 00:23:18  brian
+# - add version file creation
+#
+# Revision 1.1.6.45  2006/10/03 13:51:21  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
+# Revision 1.1.6.44  2006/10/01 21:30:13  brian
+# - distribute release and library version files
+#
+# Revision 1.1.6.43  2006/09/29 11:49:58  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
+# Revision 1.1.6.42  2006/09/27 05:15:12  brian
+# - distinguish LDADD from LDFLAGS
+#
+# Revision 1.1.6.41  2006/09/25 12:17:24  brian
+# - updates for distcheck
+#
+# Revision 1.1.6.40  2006/09/24 21:36:47  brian
+# - added lib files
+#
+# Revision 1.1.6.39  2006/09/18 17:43:07  brian
+# - added doxy rules to makefile and release notes
+#
+# Revision 1.1.6.38  2006/09/18 01:15:20  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 1.1.6.37  2006/08/26 09:15:51  brian
+# - better release file generation
+#
+# Revision 1.1.6.36  2006/07/01 11:59:37  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
+# Revision 1.1.6.35  2006/03/21 13:24:34  brian
+# - included pr.am
+#
+# Revision 1.1.6.34  2006/03/20 12:51:45  brian
+# - added missing README-alpha file
+#
+# Revision 1.1.6.33  2006/03/20 11:53:55  brian
+# - added checks for DEVELOPMENT
+#
+# Revision 1.1.6.32  2006/03/06 11:37:48  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

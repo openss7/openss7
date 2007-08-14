@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/03 22:23:03 $
+ @(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 10:47:25 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:23:03 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 10:47:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-fifo.c,v $
+ Revision 0.9.2.10  2007/08/14 10:47:25  brian
+ - GPLv3 header update
+
  Revision 0.9.2.9  2007/05/03 22:23:03  brian
  - minor updates
 
@@ -165,9 +168,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/03 22:23:03 $"
+#ident "@(#) $RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 10:47:25 $"
 
-static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/05/03 22:23:03 $";
+static char const ident[] = "$RCSfile: test-fifo.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 10:47:25 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -220,6 +223,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "FIFO";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/fifo/0";
 #else
@@ -471,7 +475,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -2465,7 +2469,6 @@ postamble_3(int child)
 	return (result);
 }
 
-
 /*
  *  =========================================================================
  *
@@ -2670,7 +2673,6 @@ Checks that a FIFO can be opened.  If O_NONBLOCK is clear, an open() for\n\
 reading only (O_RDONLY) shall block the calling thread until a thread\n\
 opens the file for writing or a signal is received."
 
-
 int
 test_case_1_6_1(int child)
 {
@@ -2832,7 +2834,6 @@ struct test_stream test_2_1_1 = { &preamble_0, &test_case_2_1_1, &postamble_0 };
 #define test_case_2_1_1_stream_1 (NULL)
 #define test_case_2_1_1_stream_2 (NULL)
 
-
 /*  I_SENDFD/I_RECVFD works on FIFOs. */
 
 static const char sref_case_2_2[] = "POSIX 1003.1 2004/SUSv3 ioctl(2p) reference page, I_RECVFD.";
@@ -2851,7 +2852,7 @@ test_case_2_2_1(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != ENXIO)
@@ -2879,7 +2880,7 @@ test_case_2_2_2(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EPROTO)
@@ -2907,7 +2908,7 @@ test_case_2_2_3(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EAGAIN)
@@ -2935,7 +2936,7 @@ test_case_2_2_4(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EPROTO)
@@ -2970,16 +2971,18 @@ preamble_test_case_2_2_5(int child)
 	state++;
 	return __RESULT_SUCCESS;
 }
+
 int
 test_case_2_2_5(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 postamble_test_case_2_2_5(int child)
 {
@@ -3023,12 +3026,13 @@ preamble_test_case_2_2_6(int child)
 	state++;
 	return __RESULT_SUCCESS;
 }
+
 int
 test_case_2_2_6(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != EINTR)
@@ -3065,7 +3069,7 @@ test_case_2_2_7_rcv(int child)
 	if (start_tt(3 * NORMAL_WAIT) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	stop_tt();
@@ -3280,7 +3284,7 @@ returned when I_STR is attempted on a hung up FIFO."
 int
 test_case_2_4_4(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
 
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3375,7 +3379,7 @@ test_case_2_4_7(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_errno != ENXIO)
@@ -3514,7 +3518,7 @@ for blocking operation, writes block until nbytes are sent."
 int
 test_case_3_1_2_wr(int child)
 {
-	char buf[4096<<2] = { 0, };
+	char buf[4096 << 2] = { 0, };
 
 	if (test_block(child) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -3882,6 +3886,7 @@ preamble_test_case_3_1_10(int child)
 	state++;
 	return __RESULT_SUCCESS;
 }
+
 int
 test_case_3_1_10(int child)
 {
@@ -3931,6 +3936,7 @@ preamble_test_case_3_1_11_wr(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_11_wr(int child)
 {
@@ -3961,6 +3967,7 @@ preamble_test_case_3_1_11_rd(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_11_rd(int child)
 {
@@ -4440,6 +4447,7 @@ preamble_test_case_3_2_10(int child)
 	state++;
 	return __RESULT_SUCCESS;
 }
+
 int
 test_case_3_2_10(int child)
 {
@@ -4490,6 +4498,7 @@ preamble_test_case_3_2_11_wr(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_2_11_wr(int child)
 {
@@ -4521,6 +4530,7 @@ preamble_test_case_3_2_11_rd(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_2_11_rd(int child)
 {
@@ -5006,6 +5016,7 @@ preamble_test_case_3_3_10(int child)
 	state++;
 	return __RESULT_SUCCESS;
 }
+
 int
 test_case_3_3_10(int child)
 {
@@ -5056,6 +5067,7 @@ preamble_test_case_3_3_11_wr(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_3_11_wr(int child)
 {
@@ -5087,6 +5099,7 @@ preamble_test_case_3_3_11_rd(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_3_11_rd(int child)
 {
@@ -5879,7 +5892,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -5910,7 +5923,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

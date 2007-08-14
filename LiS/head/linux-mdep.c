@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.23 $) $Date: 2006/03/05 04:03:03 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/05 04:03:03 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
@@ -60,6 +60,8 @@
  *****************************************************************************/
 
 #ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.23 $) $Date: 2006/03/05 04:03:03 $"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
@@ -566,19 +568,19 @@ struct super_block *lis_fs_read_super(struct super_block *sb, void *ptr, int sil
 #define LIS_FS_NAME	"LiS"
 
 struct file_system_type lis_file_system_ops = {
-      name:LIS_FS_NAME,
+	name:LIS_FS_NAME,
 #ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
-      get_sb:lis_fs_get_sb,
-      kill_sb:lis_fs_kill_sb,
-      owner:NULL,
-#else				/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
-      read_super:lis_fs_read_super,
-      owner:NULL,
-#endif				/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
+	get_sb:lis_fs_get_sb,
+	kill_sb:lis_fs_kill_sb,
+	owner:NULL,
+#else					/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
+	read_super:lis_fs_read_super,
+	owner:NULL,
+#endif					/* HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB */
 #if defined(FATTACH_VIA_MOUNT)
-      fs_flags:0,
+	fs_flags:0,
 #else
-      fs_flags:(FS_NOMOUNT | FS_SINGLE),
+	fs_flags:(FS_NOMOUNT | FS_SINGLE),
 #endif
 };
 
@@ -1618,7 +1620,8 @@ lis_fs_setup_sb(struct super_block *sb, void *ptr, int silent)
 #ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
 #ifdef HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT
 int
-lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *ptr, struct vfsmount *mnt)
+lis_fs_get_sb(struct file_system_type *fs_type, int flags, const char *dev_name, void *ptr,
+	      struct vfsmount *mnt)
 {
 #if defined(FATTACH_VIA_MOUNT) && 1
 	return get_sb_nodev(fs_type, flags, ptr, lis_fs_setup_sb, mnt);

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.58 $) $Date: 2007/03/25 18:58:10 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.6.59 $) $Date: 2007/08/14 10:46:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,68 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 18:58:10 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 1.1.6.58  2007/03/25 18:58:10  brian
-# - changes to support 2.6.20-1.2307.fc5 kernel
-#
-# Revision 1.1.6.57  2007/03/05 23:01:29  brian
-# - checking in release changes
-#
-# Revision 1.1.6.56  2007/03/04 23:29:53  brian
-# - corrected modversions directory
-#
-# Revision 1.1.6.55  2007/03/04 23:14:18  brian
-# - better search for modversions
-#
-# Revision 1.1.6.54  2007/03/03 08:39:53  brian
-# - corrections for STREAMS_VERSION
-#
-# Revision 1.1.6.53  2007/03/02 10:03:20  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 1.1.6.52  2007/02/28 06:30:10  brian
-# - updates and corrections, #ifdef instead of #if
-#
-# Revision 1.1.6.51  2006/10/30 06:39:58  brian
-# - changes to handle missing linux/compile.h on SuSE
-#
-# Revision 1.1.6.50  2006/10/27 22:38:53  brian
-# - changes for 2.6.18 build
-#
-# Revision 1.1.6.49  2006/09/18 13:20:05  brian
-# - better directory detection
-#
-# Revision 1.1.6.48  2006/09/18 01:15:20  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 1.1.6.47  2006/07/25 06:38:55  brian
-# - expanded minor device numbers and optimization and locking corrections
-#
-# Revision 1.1.6.46  2006/07/07 21:17:36  brian
-# - corrections for compile of FC5 with 2.6.17 kernel
-#
-# Revision 1.1.6.45  2006/05/08 03:12:23  brian
-# - added module id base to strconf
-#
-# Revision 1.1.6.44  2006/03/21 13:24:09  brian
-# - added problem report checks
-#
-# Revision 1.1.6.43  2006/03/14 21:09:48  brian
-# - two levels of distro specific rpm extra tags
-#
-# Revision 1.1.6.42  2006/03/09 05:51:33  brian
-# - autoconf nits and autoupdate changes
-#
-# Revision 1.1.6.41  2006/03/05 04:02:56  brian
-# - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
-# - updates for new release
-#
-# Revision 1.1.6.40  2006/02/20 11:41:09  brian
-# - added checks for 64 bit architectures
+# Last Modified $Date: 2007/08/14 10:46:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1805,6 +1744,12 @@ AC_DEFUN([_LIS_STRCONF], [dnl
 ])# _LIS_STRCONF
 # =============================================================================
 
+# =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 1.1.6.59  2007/08/14 10:46:52  brian
+# - GPLv3 header update
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>

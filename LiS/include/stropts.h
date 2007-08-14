@@ -1,26 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/05/14 08:35:09 $
+ @(#) $Id$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Foundation; version 2.1 of the License.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; version 3 of the License.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,9 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2005/05/14 08:35:09 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
+
+ -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
  Revision 1.1.1.1.12.2  2005/05/14 08:35:09  brian
@@ -89,6 +91,7 @@ extern int isastream(int fd);
 extern int pipe(int fds[2]);
 extern int putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
 extern int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+
 /** @} */
 
 /** @name STREAMS System Calls
@@ -97,11 +100,13 @@ extern int putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int ba
 extern int __lis_fattach(int fd, const char *path);
 extern int __lis_fdetach(const char *path);
 extern int __lis_getmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
-extern int __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+extern int __lis_getpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp,
+			 int *flagsp);
 extern int __lis_isastream(int fd);
 extern int __lis_pipe(int fds[2]);
 extern int __lis_putmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
-extern int __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+extern int __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band,
+			 int flags);
 /** @} */
 
 /** @name STREAMS System Calls
@@ -109,9 +114,11 @@ extern int __lis_putpmsg(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, 
   * @{ */
 extern int __lis_fdetach_r(const char *path);
 extern int __lis_getmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *flagsp);
-extern int __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp, int *flagsp);
+extern int __lis_getpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int *bandp,
+			   int *flagsp);
 extern int __lis_putmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int flags);
-extern int __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band, int flags);
+extern int __lis_putpmsg_r(int fd, struct strbuf *ctlptr, struct strbuf *dataptr, int band,
+			   int flags);
 /** @} */
 
 #ifdef __END_DECLS

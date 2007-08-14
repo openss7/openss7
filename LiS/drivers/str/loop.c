@@ -4,14 +4,14 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -53,6 +53,8 @@
  *****************************************************************************/
 
 #ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2005/12/19 03:22:18 $"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*                               -*- Mode: C -*- 
  * loop.c --- Streams loopback driver, as of Sun manual 
@@ -369,8 +371,8 @@ loop_iocdata(queue_t *wq, mblk_t *mp)
 		}
 
 		if (msgdsize(dp) != sizeof(loop_xparent_t)) {
-			printk("loop_iocdata: expected %ld bytes, got %ld\n", (long) sizeof(loop_xparent_t),
-			       (long) msgdsize(dp));
+			printk("loop_iocdata: expected %ld bytes, got %ld\n",
+			       (long) sizeof(loop_xparent_t), (long) msgdsize(dp));
 			return (-EINVAL);
 		}
 

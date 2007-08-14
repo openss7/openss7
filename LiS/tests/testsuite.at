@@ -1,11 +1,11 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
 dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.10 $) $Date: 2007/05/03 22:14:38 $
+dnl @(#) $RCSfile: testsuite.at,v $ $Name:  $($Revision: 1.1.4.11 $) $Date: 2007/08/14 10:47:20 $
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+dnl Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
@@ -33,7 +33,7 @@ dnl
 dnl --------------------------------------------------------------------------
 dnl
 dnl As an exception to the above, this software may be distributed under the
-dnl GNU General Public License (GPL) Version 2, so long as the software is
+dnl GNU General Public License (GPL) Version 3, so long as the software is
 dnl distributed with, and only used for the testing of, OpenSS7 modules,
 dnl drivers, and libraries.
 dnl
@@ -61,35 +61,7 @@ dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
 dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2007/05/03 22:14:38 $ by $Author: brian $
-dnl
-dnl --------------------------------------------------------------------------
-dnl
-dnl $Log: testsuite.at,v $
-dnl Revision 1.1.4.10  2007/05/03 22:14:38  brian
-dnl - testsuite factoring
-dnl
-dnl Revision 1.1.4.9  2006/09/18 00:48:44  brian
-dnl - updated testsuite headers
-dnl
-dnl Revision 1.1.4.8  2006/03/05 04:03:10  brian
-dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
-dnl - updates for new release
-dnl
-dnl Revision 1.1.4.7  2005/11/07 10:54:54  brian
-dnl - added SAD testing
-dnl
-dnl Revision 1.1.4.6  2005/10/23 05:01:27  brian
-dnl - test programs and modules for POSIX testing
-dnl
-dnl Revision 1.1.4.5  2005/06/19 09:39:07  brian
-dnl - commented out dummy args
-dnl
-dnl Revision 1.1.4.4  2005/05/30 14:25:54  brian
-dnl - packaged standalong test suites
-dnl
-dnl Revision 1.1.4.3  2005/05/27 07:48:35  brian
-dnl - updated test suites to match LFS package
+dnl Last Modified $Date: 2007/08/14 10:47:20 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -296,4 +268,36 @@ m4_include([testsuite-thrtst.at])
 #m4_include([dummy3.m4])
 #m4_include([dummy4.m4])
 
+dnl ==========================================================================
+dnl
+dnl $Log: testsuite.at,v $
+dnl Revision 1.1.4.11  2007/08/14 10:47:20  brian
+dnl - GPLv3 header update
+dnl
+dnl Revision 1.1.4.10  2007/05/03 22:14:38  brian
+dnl - testsuite factoring
+dnl
+dnl Revision 1.1.4.9  2006/09/18 00:48:44  brian
+dnl - updated testsuite headers
+dnl
+dnl Revision 1.1.4.8  2006/03/05 04:03:10  brian
+dnl - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
+dnl - updates for new release
+dnl
+dnl Revision 1.1.4.7  2005/11/07 10:54:54  brian
+dnl - added SAD testing
+dnl
+dnl Revision 1.1.4.6  2005/10/23 05:01:27  brian
+dnl - test programs and modules for POSIX testing
+dnl
+dnl Revision 1.1.4.5  2005/06/19 09:39:07  brian
+dnl - commented out dummy args
+dnl
+dnl Revision 1.1.4.4  2005/05/30 14:25:54  brian
+dnl - packaged standalong test suites
+dnl
+dnl Revision 1.1.4.3  2005/05/27 07:48:35  brian
+dnl - updated test suites to match LFS package
+dnl
+dnl ==========================================================================
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

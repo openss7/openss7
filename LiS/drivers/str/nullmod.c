@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:32:56 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:32:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: nullmod.c,v $
+ Revision 0.9.2.12  2007/08/14 10:46:56  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:32:56 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:32:56 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -84,7 +90,7 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:32:56 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define NULLMOD_LICENSE		"GPL v2"
@@ -157,8 +163,8 @@ STATIC struct module_info nullmod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-STATIC struct module_stat nullmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat nullmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat nullmod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat nullmod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* 
  *  -------------------------------------------------------------------------

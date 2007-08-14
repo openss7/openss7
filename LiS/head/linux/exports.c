@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.19 $) $Date: 2006/02/20 11:38:51 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,16 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 11:38:51 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
- $Log: exports.c,v $
- Revision 1.1.1.7.4.19  2006/02/20 11:38:51  brian
- - corrections for some 64bit architectures, from patches
-
+ $Log$
  *****************************************************************************/
 
 #ident "@(#) $RCSfile: exports.c,v $ $Name:  $($Revision: 1.1.1.7.4.19 $) $Date: 2006/02/20 11:38:51 $"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /************************************************************************
 *                       STREAMS Exported Symbols			*

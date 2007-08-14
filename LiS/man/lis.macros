@@ -1,10 +1,10 @@
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: lis.macros,v 1.1.6.6 2006/09/18 01:25:44 brian Exp $
+.\" @(#) $Id: lis.macros,v 1.1.6.7 2007/08/14 10:47:15 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2006  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -23,7 +23,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -52,7 +52,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/09/18 01:25:44 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/14 10:47:15 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: lis.macros,v $
+.\" Revision 1.1.6.7  2007/08/14 10:47:15  brian
+.\" - GPLv3 header update
 .\"
 .\" =========================================================================
 .de ]<
@@ -160,7 +166,7 @@ Trademarks mentioned are the property of their owners.
 .de CO
 .SH "COPYRIGHT"
 .PP
-\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -222,7 +228,7 @@ PERFORMANCE OF THIS DOCUMENTATION.
 .PP
 .\}
 .el .br
-\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corporation.
+\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corporation.
 .br
 \f(HRAll Rights Reserved.
 .ie '\\*(.T'ps' \{\
@@ -309,67 +315,84 @@ The OpenSS7 Project http://www.openss7.org/
 ..
 .de ID
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I2
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
 \f(HRCopyright\ \(co\ 1992\ UNIX International, Inc.
 .br
-\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I3
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
 \f(HRCopyright\ \(co\ 2000\ John A. Boyd Jr.  protologos, LLC
 .br
-\f(HRCopyright\ \(co\ 2001-2006\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 2001-2007\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I4
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
-\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
 .if (\n[.l]u < 80n) \{\
 .br
 .\}
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I5
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 1.1.6.6 $); $Date: 2006/09/18 01:25:44 $.
 .PP
-\f(HRCopyright\ \(co\ 1997-2006\ OpenSS7 Corp.
+\f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
 .br
 \f(HRCopyright\ \(co\ 1999-2004\ The Board of Trustees of the University of Illinois
 .if (\n[.l]u < 80n) \{\
@@ -378,6 +401,8 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de VR
 .SH "VERSIONS"
