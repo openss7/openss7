@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:02 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:05 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: pipemod.c,v $
+ Revision 0.9.2.33  2007/08/14 12:58:05  brian
+ - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:02 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:02 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -73,7 +79,7 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/07/14 01:37:02 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PIPEMOD_LICENSE		"GPL v2"
@@ -129,7 +135,7 @@ static struct module_info pipemod_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat pipemod_mstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat pipemod_mstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* 
  *  -------------------------------------------------------------------------

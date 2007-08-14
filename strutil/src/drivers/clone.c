@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/07/14 01:36:58 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.46  2007/08/14 12:58:00  brian
+ - GNUv3 header updates
+
  Revision 0.9.2.45  2007/07/14 01:36:58  brian
  - make license explicit, add documentation
 
@@ -64,9 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/07/14 01:36:58 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $"
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/07/14 01:36:58 $";
+static char const ident[] =
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $";
 
 #define _LFS_SOURCE
 
@@ -86,7 +90,7 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/07/14 01:36:58 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL v2"
@@ -165,8 +169,8 @@ LFSSTATIC struct module_info clone_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat clone_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat clone_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat clone_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat clone_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 LFSSTATIC struct qinit clone_rinit = {
 #ifdef LFS
@@ -339,7 +343,7 @@ cdev_open(struct inode *inode, struct file *file)
 }
 
 STATIC struct file_operations cdev_f_ops ____cacheline_aligned = {
-	.owner = NULL, /* yes NULL */
+	.owner = NULL,			/* yes NULL */
 	.open = cdev_open,
 };
 #endif
@@ -382,7 +386,7 @@ _register_clone(struct cdevsw *cdev)
 	cmin->n_dev = &clone_cdev;
 	if ((err = register_strnod(&clone_cdev, cmin, cdev->d_major)) < 0) {
 		_printd(("%s: could not register minor node for %s, err = %d\n", __FUNCTION__,
-			cdev->d_name, -err));
+			 cdev->d_name, -err));
 		kfree(cmin);
 		goto error;
 	}
@@ -568,7 +572,7 @@ clone_open(struct inode *inode, struct file *file)
 }
 
 LFSSTATIC struct file_operations clone_f_ops ____cacheline_aligned = {
-	.owner = NULL, /* yes NULL */
+	.owner = NULL,			/* yes NULL */
 	.open = clone_open,
 };
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/15 10:23:59 $
+ @(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:58:06 $
 
  -----------------------------------------------------------------------------
 
@@ -9,32 +9,18 @@
 
  All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written authorization
- of the copyright holder, and licensors, if any.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
- The recipient of this document, by its retention and use, warrants that the
- recipient will protect this information and keep it confidential, and will
- not disclose the information contained in this document without the written
- permission of its owner.
-
- The author reserves the right to revise this software and documentation for
- any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of the
- technical arts, or the reflection of changes in the design of any techniques,
- or procedures embodied, described, or referred to herein.  The author is
- under no obligation to provide any feature listed herein.
-
- -----------------------------------------------------------------------------
-
- As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:23:59 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-connld.c,v $
+ Revision 0.9.2.15  2007/08/14 12:58:06  brian
+ - GNUv3 header updates
+
  Revision 0.9.2.14  2007/03/15 10:23:59  brian
  - test case reporting and pushed release date one day
 
@@ -114,9 +103,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/15 10:23:59 $"
+#ident "@(#) $RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:58:06 $"
 
-static char const ident[] = "$RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/03/15 10:23:59 $";
+static char const ident[] =
+    "$RCSfile: test-connld.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:58:06 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -168,6 +158,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "CONNLD";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/nuls";
 #else
@@ -292,7 +283,8 @@ now(void)
 	if (gettimeofday(&now, NULL)) {
 		last_errno = errno;
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "***************ERROR! couldn't get time!            !  !                    \n");
+		fprintf(stdout,
+			"***************ERROR! couldn't get time!            !  !                    \n");
 		fprintf(stdout, "%20s! %-54s\n", __FUNCTION__, strerror(last_errno));
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
@@ -309,9 +301,13 @@ milliseconds(char *t)
 {
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    .               :               .  .                    \n");
-		fprintf(stdout, "                    .             %6s            .  .                    <%d>\n", t, state);
-		fprintf(stdout, "                    .               :               .  .                    \n");
+		fprintf(stdout,
+			"                    .               :               .  .                    \n");
+		fprintf(stdout,
+			"                    .             %6s            .  .                    <%d>\n",
+			t, state);
+		fprintf(stdout,
+			"                    .               :               .  .                    \n");
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -322,9 +318,13 @@ milliseconds_2nd(char *t)
 {
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    .               :   :           .  .                    \n");
-		fprintf(stdout, "                    .               : %6s        .  .                    <%d>\n", t, state);
-		fprintf(stdout, "                    .               :   :           .  .                    \n");
+		fprintf(stdout,
+			"                    .               :   :           .  .                    \n");
+		fprintf(stdout,
+			"                    .               : %6s        .  .                    <%d>\n",
+			t, state);
+		fprintf(stdout,
+			"                    .               :   :           .  .                    \n");
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -352,7 +352,9 @@ check_time(const char *t, long i, long lo, long hi)
 	tol = tol / 1000;
 	if (verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n", dlo - tol, itv, dhi + tol, t, state);
+		fprintf(stdout,
+			"                    |(%7.3g <= %7.3g <= %7.3g)|  | %6s             <%d>\n",
+			dlo - tol, itv, dhi + tol, t, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -377,7 +379,9 @@ time_event(int child, int event)
 		m = m / 1000000;
 		t += m;
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, "                    | %11.6g                    |  |                    <%d:%03d>\n", t, child, state);
+		fprintf(stdout,
+			"                    | %11.6g                    |  |                    <%d:%03d>\n",
+			t, child, state);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -403,7 +407,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -1083,19 +1087,31 @@ print_less(int child)
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
 	switch (child) {
 	case 0:
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
-		fprintf(stdout, " .  (more) .  <---->|               .               :  :                     [%d:%03d]\n", child, state);
-		fprintf(stdout, " .         .  <---->|               .               :  :                    \n");
+		fprintf(stdout,
+			" .         .  <---->|               .               :  :                    \n");
+		fprintf(stdout,
+			" .  (more) .  <---->|               .               :  :                     [%d:%03d]\n",
+			child, state);
+		fprintf(stdout,
+			" .         .  <---->|               .               :  :                    \n");
 		break;
 	case 1:
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
-		fprintf(stdout, "                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               :  |<-->  .         .   \n");
+		fprintf(stdout,
+			"                    :               .               :  |<-->  .         .   \n");
+		fprintf(stdout,
+			"                    :               .               :  |<-->  . (more)  .    [%d:%03d]\n",
+			child, state);
+		fprintf(stdout,
+			"                    :               .               :  |<-->  .         .   \n");
 		break;
 	case 2:
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
-		fprintf(stdout, "                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n", child, state);
-		fprintf(stdout, "                    :               .               |<-:--->  .         .   \n");
+		fprintf(stdout,
+			"                    :               .               |<-:--->  .         .   \n");
+		fprintf(stdout,
+			"                    :               .               |<-:--->  . (more)  .    [%d:%03d]\n",
+			child, state);
+		fprintf(stdout,
+			"                    :               .               |<-:--->  .         .   \n");
 		break;
 	}
 	fflush(stdout);
@@ -1169,7 +1185,7 @@ print_pipe(int child)
 }
 
 void
-print_open(int child, const char* name)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
 		"open()        ----->v %-30s |  |                   \n",
@@ -1706,7 +1722,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -1864,7 +1880,7 @@ test_isastream(int child)
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
 	int result;
 
 	print_poll(child, events);
@@ -2225,7 +2241,8 @@ run_stream(int child, struct test_stream *stream)
 		}
 		print_postamble(child);
 		state = 300;
-		if (stream->postamble && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
+		if (stream->postamble
+		    && (post_result = stream->postamble(child)) != __RESULT_SUCCESS) {
 			switch (post_result) {
 			case __RESULT_NOTAPPL:
 				print_notapplicable(child);
@@ -2311,7 +2328,8 @@ test_run(struct test_stream *stream[])
 			if (WIFEXITED(this_status)) {
 				if (this_pid == test_pid[0]) {
 					test_pid[0] = 0;
-					if ((status[0] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+					if ((status[0] =
+					     WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
 						if (test_pid[1])
 							kill(test_pid[1], SIGKILL);
 						if (test_pid[2])
@@ -2320,7 +2338,8 @@ test_run(struct test_stream *stream[])
 				}
 				if (this_pid == test_pid[1]) {
 					test_pid[1] = 0;
-					if ((status[1] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+					if ((status[1] =
+					     WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
 						if (test_pid[0])
 							kill(test_pid[0], SIGKILL);
 						if (test_pid[2])
@@ -2329,7 +2348,8 @@ test_run(struct test_stream *stream[])
 				}
 				if (this_pid == test_pid[2]) {
 					test_pid[2] = 0;
-					if ((status[2] = WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
+					if ((status[2] =
+					     WEXITSTATUS(this_status)) != __RESULT_SUCCESS) {
 						if (test_pid[0])
 							kill(test_pid[0], SIGKILL);
 						if (test_pid[1])
@@ -2345,7 +2365,9 @@ test_run(struct test_stream *stream[])
 						kill(test_pid[1], SIGKILL);
 					if (test_pid[2])
 						kill(test_pid[2], SIGKILL);
-					status[0] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					status[0] =
+					    (signal ==
+					     SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					test_pid[0] = 0;
 				}
 				if (this_pid == test_pid[1]) {
@@ -2354,7 +2376,9 @@ test_run(struct test_stream *stream[])
 						kill(test_pid[0], SIGKILL);
 					if (test_pid[2])
 						kill(test_pid[2], SIGKILL);
-					status[1] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					status[1] =
+					    (signal ==
+					     SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					test_pid[1] = 0;
 				}
 				if (this_pid == test_pid[2]) {
@@ -2363,7 +2387,9 @@ test_run(struct test_stream *stream[])
 						kill(test_pid[0], SIGKILL);
 					if (test_pid[1])
 						kill(test_pid[1], SIGKILL);
-					status[2] = (signal == SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
+					status[2] =
+					    (signal ==
+					     SIGKILL) ? __RESULT_INCONCLUSIVE : __RESULT_FAILURE;
 					test_pid[2] = 0;
 				}
 			} else if (WIFSTOPPED(this_status)) {
@@ -2419,13 +2445,17 @@ test_run(struct test_stream *stream[])
 	}
 	if (stop_tt() != __RESULT_SUCCESS)
 		goto inconclusive;
-	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL || status[2] == __RESULT_NOTAPPL)
+	if (status[0] == __RESULT_NOTAPPL || status[1] == __RESULT_NOTAPPL
+	    || status[2] == __RESULT_NOTAPPL)
 		return (__RESULT_NOTAPPL);
-	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED || status[2] == __RESULT_SKIPPED)
+	if (status[0] == __RESULT_SKIPPED || status[1] == __RESULT_SKIPPED
+	    || status[2] == __RESULT_SKIPPED)
 		return (__RESULT_SKIPPED);
-	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE || status[2] == __RESULT_FAILURE)
+	if (status[0] == __RESULT_FAILURE || status[1] == __RESULT_FAILURE
+	    || status[2] == __RESULT_FAILURE)
 		return (__RESULT_FAILURE);
-	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS && status[2] == __RESULT_SUCCESS)
+	if (status[0] == __RESULT_SUCCESS && status[1] == __RESULT_SUCCESS
+	    && status[2] == __RESULT_SUCCESS)
 		return (__RESULT_SUCCESS);
       inconclusive:
 	return (__RESULT_INCONCLUSIVE);
@@ -2453,9 +2483,11 @@ struct test_case {
 } tests[] = {
 	{
 		numb_case_1_1, tgrp_case_1_1, name_case_1_1, desc_case_1_1, sref_case_1_1, {
-	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+	test_case_1_1_stream_0, test_case_1_1_stream_1, test_case_1_1_stream_2},
+		    &begin_tests, &end_tests, 0, 0}, {
 		numb_case_1_2, tgrp_case_1_2, name_case_1_2, desc_case_1_2, sref_case_1_2, {
-	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2}, &begin_tests, &end_tests, 0, 0}, {
+	test_case_1_2_stream_0, test_case_1_2_stream_1, test_case_1_2_stream_2},
+		    &begin_tests, &end_tests, 0, 0}, {
 	NULL,}
 };
 
@@ -2512,7 +2544,8 @@ do_tests(int num_tests)
 				dummy = lockf(fileno(stdout), F_LOCK, 0);
 				if (verbose > 1)
 					fprintf(stdout, "\nTest Group: %s", tests[i].tgrp);
-				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname, tests[i].numb, tests[i].name);
+				fprintf(stdout, "\nTest Case %s-%s/%s: %s\n", sstdname, shortname,
+					tests[i].numb, tests[i].name);
 				if (verbose > 1)
 					fprintf(stdout, "Test Reference: %s\n", tests[i].sref);
 				if (verbose > 1)
@@ -2611,7 +2644,8 @@ do_tests(int num_tests)
 				break;
 			}
 			tests[i].result = result;
-			if (exit_on_failure && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
+			if (exit_on_failure
+			    && (result == __RESULT_FAILURE || result == __RESULT_INCONCLUSIVE))
 				aborted = 1;
 		}
 		if (summary && verbose) {
@@ -2619,10 +2653,12 @@ do_tests(int num_tests)
 			fprintf(stdout, "\n");
 			fflush(stdout);
 			dummy = lockf(fileno(stdout), F_ULOCK, 0);
-			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
+			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb;
+			     i++) {
 				if (tests[i].run) {
 					dummy = lockf(fileno(stdout), F_LOCK, 0);
-					fprintf(stdout, "Test Case %s-%s/%-10s ", sstdname, shortname, tests[i].numb);
+					fprintf(stdout, "Test Case %s-%s/%-10s ", sstdname,
+						shortname, tests[i].numb);
 					fflush(stdout);
 					dummy = lockf(fileno(stdout), F_ULOCK, 0);
 					switch (tests[i].result) {
@@ -2671,7 +2707,9 @@ do_tests(int num_tests)
 			fprintf(stdout, "========= %3d skipped       \n", skipped);
 			fprintf(stdout, "========= %3d not selected  \n", notselected);
 			fprintf(stdout, "============================\n");
-			fprintf(stdout, "========= %3d total         \n", successes + failures + inconclusive + notapplicable + skipped + notselected);
+			fprintf(stdout, "========= %3d total         \n",
+				successes + failures + inconclusive + notapplicable + skipped +
+				notselected);
 			if (!(aborted + failures))
 				fprintf(stdout, "\nDone.\n\n");
 			fflush(stdout);
@@ -2754,7 +2792,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -2785,7 +2823,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
@@ -2915,17 +2953,22 @@ main(int argc, char *argv[])
 				for (n = 0, t = tests; t->numb; t++)
 					if (!strncmp(t->numb, optarg, l)) {
 						if (verbose > 2)
-							fprintf(stdout, "Test Group: %s\n", t->tgrp);
-						fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+							fprintf(stdout, "Test Group: %s\n",
+								t->tgrp);
+						fprintf(stdout, "Test Case %s-%s/%s: %s\n",
+							sstdname, shortname, t->numb, t->name);
 						if (verbose > 2)
-							fprintf(stdout, "Test Reference: %s\n", t->sref);
+							fprintf(stdout, "Test Reference: %s\n",
+								t->sref);
 						if (verbose > 1)
 							fprintf(stdout, "%s\n\n", t->desc);
 						fflush(stdout);
 						n++;
 					}
 				if (!n) {
-					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fprintf(stderr,
+						"WARNING: specification `%s' matched no test\n",
+						optarg);
 					fflush(stderr);
 					goto bad_option;
 				}
@@ -2938,7 +2981,8 @@ main(int argc, char *argv[])
 				for (t = tests; t->numb; t++) {
 					if (verbose > 2)
 						fprintf(stdout, "Test Group: %s\n", t->tgrp);
-					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname, shortname, t->numb, t->name);
+					fprintf(stdout, "Test Case %s-%s/%s: %s\n", sstdname,
+						shortname, t->numb, t->name);
 					if (verbose > 2)
 						fprintf(stdout, "Test Reference: %s\n", t->sref);
 					if (verbose > 1)
@@ -2956,7 +3000,8 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n",
+				timer_scale);
 			break;
 		case 's':
 			summary = 1;
@@ -2978,7 +3023,9 @@ main(int argc, char *argv[])
 						// }
 					}
 				if (!n) {
-					fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+					fprintf(stderr,
+						"WARNING: specification `%s' matched no test\n",
+						optarg);
 					fflush(stderr);
 					goto bad_option;
 				}
@@ -3014,7 +3061,8 @@ main(int argc, char *argv[])
 					// }
 				}
 			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
+					optarg);
 				fflush(stderr);
 				goto bad_option;
 			}
