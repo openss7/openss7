@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.5 2007/02/14 14:09:20 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.6 2007/08/14 04:00:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/14 14:09:20 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:00:42 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tiuser.h,v $
+ Revision 0.9.2.6  2007/08/14 04:00:42  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
 #ifndef _TIUSER_H
 #define _TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -192,6 +198,7 @@ extern int __tli_t_getinfo(int fd, struct t_info *info);
 extern int __tli_t_getstate(int fd);
 extern int __tli_t_listen(int fd, struct t_call *call);
 extern int __tli_t_look(int fd);
+
 #if 0
 extern int __tli_t_nonblocking(int fd);	/* not an XTI function. */
 #endif
@@ -212,8 +219,8 @@ extern int __tli_t_sync(int fd);
 extern int __tli_t_unbind(int fd);
 extern char *__tli_t_errlist[];
 extern char *__tli_t_errstr[];
-/** @} */
 
+/** @} */
 
 #endif				/* __KERNEL__ */
 

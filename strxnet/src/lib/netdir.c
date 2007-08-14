@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/02 11:32:25 $
+ @(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 04:00:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:00:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir.c,v $
+ Revision 0.9.2.6  2007/08/14 04:00:51  brian
+ - GPLv3 header update
+
  Revision 0.9.2.5  2006/10/02 11:32:25  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/02 11:32:25 $"
+#ident "@(#) $RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 04:00:51 $"
 
 static char const ident[] =
-    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2006/10/02 11:32:25 $";
+    "$RCSfile: netdir.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 04:00:51 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -236,6 +239,7 @@ extern struct netbuf *__inet_uaddr2taddr(struct netconfig *nc, struct netbuf *ua
 
 #pragma weak __inet_netdir_mergeaddr
 extern char *__inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr);
+
 /** @} */
 
 /** @} */

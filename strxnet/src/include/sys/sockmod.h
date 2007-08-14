@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sockmod.h,v 0.9.2.7 2006/09/25 12:04:43 brian Exp $
+ @(#) $Id: sockmod.h,v 0.9.2.8 2007/08/14 04:00:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:04:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:00:45 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sockmod.h,v $
+ Revision 0.9.2.8  2007/08/14 04:00:45  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
 #ifndef __SYS_SOCKMOD_H__
 #define __SYS_SOCKMOD_H__
 
-#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockmod.h,v $ $Name:  $($Revision: 0.9.2.8 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -79,17 +85,19 @@
 
 #if 0
 /* These need to be defined in the library. */
-#define S_WINFO			0x01000 /* Waiting for T_INFO_ACK */
-#define S_WRDISABLE		0x02000 /* Write service queue disabled. */
-#define S_WUNBIND		0x04000 /* Waiting for T_OK_ACK (for T_UNBIND_REQ) */
-#define S_RBLOCKED		0x08000 /* Processing T_DISCON_IND draining messages */
-#define S_IGNORE_FLOW		0x08000 /* Processing T_DISCON_IND draining messages */
-#define S_WBLOCKED		0x10000 /* Sent T_UNBIND_REQ, waiting T_OK_ACK on receiving T_DISCON_IND */
-#define S_WUNBIND_DISCON	0x10000 /* Sent T_UNBIND_REQ, waiting T_OK_ACK on receiving T_DISCON_IND */
+#define S_WINFO			0x01000	/* Waiting for T_INFO_ACK */
+#define S_WRDISABLE		0x02000	/* Write service queue disabled. */
+#define S_WUNBIND		0x04000	/* Waiting for T_OK_ACK (for T_UNBIND_REQ) */
+#define S_RBLOCKED		0x08000	/* Processing T_DISCON_IND draining messages */
+#define S_IGNORE_FLOW		0x08000	/* Processing T_DISCON_IND draining messages */
+#define S_WBLOCKED		0x10000	/* Sent T_UNBIND_REQ, waiting T_OK_ACK on receiving
+					   T_DISCON_IND */
+#define S_WUNBIND_DISCON	0x10000	/* Sent T_UNBIND_REQ, waiting T_OK_ACK on receiving
+					   T_DISCON_IND */
 
-#define SC_WCLOSE		0x20000 /* Wait before closing (esballoc'ed msgs oustanding) */
+#define SC_WCLOSE		0x20000	/* Wait before closing (esballoc'ed msgs oustanding) */
 #define SC_NOENABLE		0x40000
-#define S_INET_LISTEN		0x40000 /* Processing PF_INET SI_LISTEN */
+#define S_INET_LISTEN		0x40000	/* Processing PF_INET SI_LISTEN */
 #define SC_KEEPOPEN		0x80000
 #endif
 
@@ -109,9 +117,8 @@ struct _si_user {
 	pthread_rwlock_t lock;
 };
 
-#define S_SIGIO		0x1 /* User has SIGIO enabled. */
-#define S_SIGURG	0x2 /* User has SIGURG enabled. */
-
+#define S_SIGIO		0x1	/* User has SIGIO enabled. */
+#define S_SIGURG	0x2	/* User has SIGURG enabled. */
 
 extern struct _si_user *_s_checkfd(int fd);
 extern struct _si_user *_s_socreate(int domain, int type, int famiy);
@@ -127,8 +134,8 @@ extern int _s_max(int a, int b);
 extern void _s_close(struct _si_user *user);
 extern int _s_getfamily(struct _si_user *user);
 extern int _s_uxpathlen(struct sockaddr_un *addr);
-extern void _s_blockallsignals(sigset_t *sigset);
-extern void _s_restoresigmask(sigset_t *sigset);
+extern void _s_blockallsignals(sigset_t * sigset);
+extern void _s_restoresigmask(sigset_t * sigset);
 extern int _s_cbuf_alloc(struct _si_user *user, char **ptr);
 #endif
 
