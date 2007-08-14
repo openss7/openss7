@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:57 $
+ @(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:57 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: h225.c,v $
+ Revision 0.9.2.18  2007/08/14 12:17:30  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.17  2007/07/14 01:33:57  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:57 $"
+#ident "@(#) $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:30 $"
 
 static char const ident[] =
-    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:57 $";
+    "$RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:30 $";
 
 /*
  *  This is an ISDN (DSS1) Layer 3 (Q.931) modules which can be pushed over a
@@ -94,7 +97,7 @@ static char const ident[] =
 #include <ss7/isdni_ioctl.h>
 
 #define ISDN_DESCRIP	"INTEGRATED SERVICES DIGITAL NETWORK (ISDN/Q.931) STREAMS DRIVER."
-#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:33:57 $"
+#define ISDN_REVISION	"OpenSS7 $RCSfile: h225.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:30 $"
 #define ISDN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISDN_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISDN_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -288,6 +291,7 @@ typedef struct cc {
 	uint maxreq;			/* max number of setup requests */
 	uint setreq;			/* cur number of setup requests */
 } cc_t;
+
 #define CC_PRIV(__q) ((struct cc *)(__q)->q_ptr)
 
 STATIC struct cc *h225_alloc_cc(queue_t *, struct cc **, dev_t *, cred_t *);
@@ -531,6 +535,7 @@ typedef struct dl {
 	h225_stats_dl_t stats;		/* data link statistics */
 	h225_stats_dl_t statsp;		/* data link statistics periods */
 } dl_t;
+
 #define DL_PRIV(__q) ((struct dl *)(__q)->q_ptr)
 
 STATIC struct dl *h225_alloc_dl(queue_t *, struct dl **, ulong, cred_t *);
@@ -850,6 +855,7 @@ STATIC INLINE void
 cc_set_state(struct cc *cc, const long newstate)
 {
 	long oldstate = cc_get_state(cc);
+
 	(void) oldstate;
 	printd(("%s: %p: %d:%d cc-state %s <- %s\n", DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor, cc_state_name(newstate), cc_state_name(oldstate)));
@@ -859,6 +865,7 @@ STATIC INLINE void
 tg_set_state(struct tg *tg, const long newstate)
 {
 	long oldstate = tg_get_state(tg);
+
 	(void) oldstate;
 	printd(("%s: %p: tg %2ld tg-state %s <- %s\n", DRV_NAME, tg, tg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
@@ -868,6 +875,7 @@ STATIC INLINE void
 fg_set_state(struct fg *fg, const long newstate)
 {
 	long oldstate = fg_get_state(fg);
+
 	(void) oldstate;
 	printd(("%s: %p: fg %2ld fg-state %s <- %s\n", DRV_NAME, fg, fg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
@@ -877,6 +885,7 @@ STATIC INLINE void
 eg_set_state(struct eg *eg, const long newstate)
 {
 	long oldstate = eg_get_state(eg);
+
 	(void) oldstate;
 	printd(("%s: %p: eg %2ld eg-state %s <- %s\n", DRV_NAME, eg, eg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
@@ -886,6 +895,7 @@ STATIC INLINE void
 xg_set_state(struct xg *xg, const long newstate)
 {
 	long oldstate = xg_get_state(xg);
+
 	(void) oldstate;
 	printd(("%s: %p: xg %2ld xg-state %s <- %s\n", DRV_NAME, xg, xg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
@@ -907,6 +917,7 @@ cc_get_uref(struct cr *cr, struct ch *ch, struct cc *cc, ulong uref)
 {
 	if (!cr->uref) {
 		struct cr *c2;
+
 		for (c2 = cc->conn.cpc; c2 && c2->uref != uref; c2 = c2->cpc.next) ;
 		if (c2)
 			return (0);
@@ -932,6 +943,7 @@ STATIC INLINE struct cr *
 cc_find_cpc_uref(struct cc *cc, ulong uref)
 {
 	struct cr *cr = NULL;
+
 	if (uref)
 		for (cr = cc->conn.cpc; cr && cr->uref != uref; cr = cr->cpc.next) ;
 	if (cr && cr->cpc.cc != cc) {
@@ -945,6 +957,7 @@ STATIC INLINE ulong
 cc_get_cref(struct cr *cr, struct cc *cc)
 {
 	static ulong reference = 0;
+
 	if (cr_get_m_state(cr) == CMS_IDLE && cr_get_i_state(cr) == CCS_IDLE) {
 		assure(!cr->cref);
 		if (!cr->cref) {
@@ -961,6 +974,7 @@ STATIC INLINE struct cr *
 cc_find_cpc_cref(struct cc *cc, ulong cref)
 {
 	struct cr *cr = NULL;
+
 	if (cref)
 		for (cr = cc->conn.cpc; cr && cr->cref != cref; cr = cr->cpc.next) ;
 	if (cr && cr->cpc.cc != cc) {
@@ -973,6 +987,7 @@ STATIC INLINE struct cc *
 cc_find_tok(struct cc *cc, ulong tok)
 {
 	struct cc *ac = cc;
+
 	if (tok)
 		for (ac = master.cc.list; ac && (ulong) ac->oq != tok; ac = ac->next) ;
 	return (ac);
@@ -1000,6 +1015,7 @@ cr_set_m_state(struct cr *cr, struct cc *cc, const long newstate)
 {
 	if (cr && cc) {
 		long oldstate = cr_get_m_state(cr);
+
 		printd(("%s: %p: cr %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, cr, cr->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -1031,6 +1047,7 @@ tg_set_m_state(struct tg *tg, struct cc *cc, const long newstate)
 {
 	if (tg && cc) {
 		long oldstate = tg_get_m_state(tg);
+
 		printd(("%s: %p: tg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, tg, tg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -1062,6 +1079,7 @@ fg_set_m_state(struct fg *fg, struct cc *cc, const long newstate)
 {
 	if (fg && cc) {
 		long oldstate = fg_get_m_state(fg);
+
 		printd(("%s: %p: fg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, fg, fg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -1093,6 +1111,7 @@ eg_set_m_state(struct eg *eg, struct cc *cc, const long newstate)
 {
 	if (eg && cc) {
 		long oldstate = eg_get_m_state(eg);
+
 		printd(("%s: %p: eg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, eg, eg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -1124,6 +1143,7 @@ xg_set_m_state(struct xg *xg, struct cc *cc, const long newstate)
 {
 	if (xg && cc) {
 		long oldstate = xg_get_m_state(xg);
+
 		printd(("%s: %p: xg %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, xg, xg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -1156,6 +1176,7 @@ cr_set_i_state(struct cr *cr, struct cc *cc, const long newstate)
 {
 	if (cr && cc) {
 		long oldstate = cr_get_i_state(cr);
+
 		printd(("%s: %p: cr %2ld cc %d:%d i-state %s <- %s\n", DRV_NAME, cr, cr->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cp_state_name(newstate),
 			cp_state_name(oldstate)));
@@ -1215,6 +1236,7 @@ STATIC INLINE void
 cr_set_c_state(struct cr *cr, const long newstate)
 {
 	long oldstate = cr_get_c_state(cr);
+
 	printd(("%s: %p: cr %2ld c-state %s <- %s\n", DRV_NAME, cr, cr->id, cp_state_name(newstate),
 		cp_state_name(oldstate)));
 	if (oldstate == U0_NULL || oldstate == N0_NULL) {
@@ -1223,6 +1245,7 @@ cr_set_c_state(struct cr *cr, const long newstate)
 		/* 
 		   has no effect if not on list because prev points to next */
 		struct ch *ch;
+
 		for (ch = cr->ch.list; ch; ch = ch->cr.next) {
 			/* 
 			   remove from idle list */
@@ -1234,6 +1257,7 @@ cr_set_c_state(struct cr *cr, const long newstate)
 	}
 	if (newstate == U0_NULL || newstate == N0_NULL) {
 		struct ch *ch, **chp;
+
 		/* 
 		   add circuit(s) to idle list */
 		/* 
@@ -1262,6 +1286,7 @@ cr_set(struct cr *cr, const ulong flags)
 {
 	int i;
 	ulong newflags = (cr->flags & flags) ^ flags;
+
 	cr->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1275,6 +1300,7 @@ cr_clr(struct cr *cr, const ulong flags)
 {
 	int i;
 	ulong newflags = (~cr->flags & flags) ^ flags;
+
 	cr->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1294,6 +1320,7 @@ tg_set(struct tg *tg, const ulong flags)
 {
 	int i;
 	ulong newflags = (tg->flags & flags) ^ flags;
+
 	tg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1306,6 +1333,7 @@ tg_clr(struct tg *tg, const ulong flags)
 {
 	int i;
 	ulong newflags = (~tg->flags & flags) ^ flags;
+
 	tg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1324,6 +1352,7 @@ fg_set(struct fg *fg, const ulong flags)
 {
 	int i;
 	ulong newflags = (fg->flags & flags) ^ flags;
+
 	fg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1336,6 +1365,7 @@ fg_clr(struct fg *fg, const ulong flags)
 {
 	int i;
 	ulong newflags = (~fg->flags & flags) ^ flags;
+
 	fg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1354,6 +1384,7 @@ eg_set(struct eg *eg, const ulong flags)
 {
 	int i;
 	ulong newflags = (eg->flags & flags) ^ flags;
+
 	eg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1366,6 +1397,7 @@ eg_clr(struct eg *eg, const ulong flags)
 {
 	int i;
 	ulong newflags = (~eg->flags & flags) ^ flags;
+
 	eg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1384,6 +1416,7 @@ xg_set(struct xg *xg, const ulong flags)
 {
 	int i;
 	ulong newflags = (xg->flags & flags) ^ flags;
+
 	xg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1396,6 +1429,7 @@ xg_clr(struct xg *xg, const ulong flags)
 {
 	int i;
 	ulong newflags = (~xg->flags & flags) ^ flags;
+
 	xg->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1418,8 +1452,10 @@ STATIC struct ch *
 h225_find_ch(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 {
 	struct ch *ch = NULL;
+
 	if (add_len) {
 		struct h225_addr add = { 0, };
+
 		if (add_len >= sizeof(add)) {
 			/* 
 			   can't trust alignment or size */
@@ -1434,6 +1470,7 @@ h225_find_ch(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 			case ISDN_SCOPE_TG:
 			{
 				struct tg *tg = NULL;
+
 				if (add.id)
 					tg = tg_lookup(add.id);
 				else if (cc->bind.type == ISDN_BIND_TG)
@@ -1446,6 +1483,7 @@ h225_find_ch(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 			case ISDN_SCOPE_FG:
 			{
 				struct fg *fg = NULL;
+
 				if (add.id)
 					fg = fg_lookup(add.id);
 				else if (cc->bind.type == ISDN_BIND_TG)
@@ -1466,8 +1504,10 @@ STATIC struct tg *
 h225_find_tg(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 {
 	struct tg *tg = NULL;
+
 	if (add_len) {
 		struct h225_addr add = { 0, };
+
 		if (add_len >= sizeof(add)) {
 			/* 
 			   can't trust alignment or size */
@@ -1476,6 +1516,7 @@ h225_find_tg(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 			case ISDN_SCOPE_CH:
 			{
 				struct ch *ch = NULL;
+
 				if (add.id)
 					ch = ch_lookup(add.id);
 				else if (cc->bind.type == ISDN_BIND_CH)
@@ -1509,8 +1550,10 @@ STATIC struct fg *
 h225_find_fg(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 {
 	struct fg *fg = NULL;
+
 	if (add_len) {
 		struct h225_addr add = { 0, };
+
 		if (add_len >= sizeof(add)) {
 			/* 
 			   can't trust alignment or size */
@@ -1519,6 +1562,7 @@ h225_find_fg(struct cc *cc, unsigned char *add_ptr, size_t add_len)
 			case ISDN_SCOPE_CH:
 			{
 				struct ch *ch = NULL;
+
 				if (add.id)
 					ch = ch_lookup(add.id);
 				else if (cc->bind.type == ISDN_BIND_CH)
@@ -1860,6 +1904,7 @@ STATIC INLINE int
 m_flush(queue_t *q, queue_t *pq, int band, int flags, int what)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | band ? FLUSHBAND : 0;
@@ -1880,6 +1925,7 @@ m_error(queue_t *q, struct cc *cc, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -1923,6 +1969,7 @@ cc_info_ack(queue_t *q, struct cc *cc)
 {
 	mblk_t *mp;
 	struct CC_info_ack *p;
+
 	ensure(cc, return (-EFAULT));
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
@@ -1948,6 +1995,7 @@ cc_bind_ack(queue_t *q, struct cc *cc, unsigned char *add_ptr, size_t add_len, u
 {
 	mblk_t *mp;
 	struct CC_bind_ack *p;
+
 	ensure(cc, return (-EFAULT));
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
@@ -1980,6 +2028,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, unsigned char *opt_ptr, size_t opt_len
 {
 	mblk_t *mp;
 	struct CC_optmgmt_ack *p;
+
 	ensure(cc, return (-EFAULT));
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
@@ -2010,6 +2059,7 @@ cc_addr_ack(queue_t *q, struct cc *cc, unsigned char *bind_ptr, size_t bind_len,
 {
 	mblk_t *mp;
 	struct CC_addr_ack *p;
+
 	ensure(cc, return (-EFAULT));
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p) + bind_len + conn_len, BPRI_MED))) {
@@ -2046,6 +2096,7 @@ cc_ok_ack(queue_t *q, struct cc *cc, long prim)
 {
 	mblk_t *mp;
 	struct CC_ok_ack *p;
+
 	ensure(cc, return (-EFAULT));
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
@@ -2071,6 +2122,7 @@ cc_error_ack(queue_t *q, struct cc *cc, ulong prim, long error)
 {
 	mblk_t *mp;
 	struct CC_error_ack *p;
+
 	ensure(cc, return (-EFAULT));
 	ensure(cc->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
@@ -2096,6 +2148,7 @@ STATIC INLINE int
 cc_setup_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2109,6 +2162,7 @@ cc_setup_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		size_t opt_len;		/* FIXME: get from message later */
 		uchar *add_ptr;		/* FIXME: get from message later */
 		size_t add_len;		/* FIXME: get from message later */
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + num_len + opt_len + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2156,6 +2210,7 @@ STATIC INLINE int
 cc_setup_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto efault);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2163,6 +2218,7 @@ cc_setup_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 		struct CC_setup_con *p;
 		struct h225_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2198,6 +2254,7 @@ STATIC INLINE int
 cc_more_info_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2205,6 +2262,7 @@ cc_more_info_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
 		struct CC_more_info_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2249,6 +2307,7 @@ STATIC INLINE int
 cc_information_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2258,6 +2317,7 @@ cc_information_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		size_t sub_len = m->cdpn.ptr ? m->cdpn.len - 1 : (m->kpf.ptr ? m->kpf.len : 0);
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + sub_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2298,11 +2358,13 @@ STATIC INLINE int
 cc_info_timeout_ind(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_info_timeout_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2331,11 +2393,13 @@ STATIC INLINE int
 cc_error_ind(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_error_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2364,6 +2428,7 @@ STATIC INLINE int
 cc_proceeding_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2372,6 +2437,7 @@ cc_proceeding_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong flags = 0;	/* FIXME: get from message later */
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2407,6 +2473,7 @@ STATIC INLINE int
 cc_alerting_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2415,6 +2482,7 @@ cc_alerting_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong flags = 0;	/* FIXME: get from message later */
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2450,6 +2518,7 @@ STATIC INLINE int
 cc_progress_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2459,6 +2528,7 @@ cc_progress_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong flags = 0;	/* FIXME: get from message later */
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2495,6 +2565,7 @@ STATIC INLINE int
 cc_disconnect_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2503,6 +2574,7 @@ cc_disconnect_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong cause = m ? m->cause : 0;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2538,6 +2610,7 @@ STATIC INLINE int
 cc_connect_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2546,6 +2619,7 @@ cc_connect_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong flags = m ? ((m->pi.loc << 16) | (m->pi.stand << 8) | (m->pi.pd)) : 0;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2580,6 +2654,7 @@ STATIC INLINE int
 cc_setup_complete_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2587,6 +2662,7 @@ cc_setup_complete_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		struct CC_setup_complete_ind *p;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2621,11 +2697,13 @@ STATIC INLINE int
 cc_notify_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_notify_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2652,6 +2730,7 @@ STATIC INLINE int
 cc_suspend_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2660,6 +2739,7 @@ cc_suspend_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong flags = 0;	/* FIXME: get from message later */
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2695,6 +2775,7 @@ STATIC INLINE int
 cc_suspend_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2702,6 +2783,7 @@ cc_suspend_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 		struct CC_suspend_con *p;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2735,6 +2817,7 @@ STATIC INLINE int
 cc_suspend_reject_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2743,6 +2826,7 @@ cc_suspend_reject_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong cause = m ? m->cause : 0;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2778,6 +2862,7 @@ STATIC INLINE int
 cc_resume_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2786,6 +2871,7 @@ cc_resume_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong flags = 0;	/* FIXME: get from message later */
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2821,6 +2907,7 @@ STATIC INLINE int
 cc_resume_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2828,6 +2915,7 @@ cc_resume_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 		struct CC_resume_con *p;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2861,6 +2949,7 @@ STATIC INLINE int
 cc_resume_reject_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2869,6 +2958,7 @@ cc_resume_reject_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong cause = m ? m->cause : 0;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2904,6 +2994,7 @@ STATIC INLINE int
 cc_reject_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2912,6 +3003,7 @@ cc_reject_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong cause = m ? m->cause : 0;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2948,6 +3040,7 @@ STATIC INLINE int
 cc_release_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2956,6 +3049,7 @@ cc_release_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 		ulong cause = m ? m->cause : 0;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -2992,6 +3086,7 @@ STATIC INLINE int
 cc_release_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
@@ -2999,6 +3094,7 @@ cc_release_con(queue_t *q, struct cr *cr, h225_msg_t * m)
 		struct CC_release_con *p;
 		uchar *opt_ptr = m ? m->opt.ptr : NULL;
 		size_t opt_len = m ? m->opt.len : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3033,11 +3129,13 @@ STATIC INLINE int
 cc_restart_con(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_restart_con *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3065,11 +3163,13 @@ STATIC INLINE int
 cc_status_ind(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_status_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3096,11 +3196,13 @@ STATIC INLINE int
 cc_datalink_failure_ind(queue_t *q, struct cr *cr)
 {
 	struct cc *cc = cr->cpc.cc;
+
 	ensure(cc, goto done);
 	ensure(cc->oq, goto efault);
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_datalink_failure_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3156,6 +3258,7 @@ dl_info_req(queue_t *q, struct dl *dl)
 {
 	mblk_t *mp;
 	dl_info_req_t *p;
+
 	ensure(dl, return (-EFAULT));
 	ensure(dl->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
@@ -3182,6 +3285,7 @@ dl_attach_req(queue_t *q, struct dl *dl, ulong ppa)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_attach_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3211,6 +3315,7 @@ dl_detach_req(queue_t *q, struct dl *dl)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_detach_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3239,6 +3344,7 @@ dl_bind_req(queue_t *q, struct dl *dl, ulong sap)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_bind_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3272,6 +3378,7 @@ dl_unbind_req(queue_t *q, struct dl *dl)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_unbind_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3300,6 +3407,7 @@ dl_subs_bind_req(queue_t *q, struct dl *dl, caddr_t sap_ptr, size_t sap_len)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_subs_bind_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + sap_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3335,6 +3443,7 @@ dl_subs_unbind_req(queue_t *q, struct dl *dl, caddr_t sap_ptr, size_t sap_len)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_subs_unbind_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + sap_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3369,6 +3478,7 @@ dl_enabmulti_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_enabmulti_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3402,6 +3512,7 @@ dl_disabmulti_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_disabmulti_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3435,6 +3546,7 @@ dl_promiscon_req(queue_t *q, struct dl *dl, ulong level)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_promiscon_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3463,6 +3575,7 @@ dl_promiscoff_req(queue_t *q, struct dl *dl, ulong level)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_promiscoff_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3495,6 +3608,7 @@ dl_connect_req(queue_t *q, struct dl *dl)
 		size_t dst_len = sizeof(dl->rem);
 		uchar *qos_ptr = NULL;
 		size_t qos_len = 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3536,6 +3650,7 @@ dl_connect_res(queue_t *q, struct dl *dl, ulong cor, ulong tok, caddr_t qos_ptr,
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_connect_res_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3570,6 +3685,7 @@ dl_token_req(queue_t *q, struct dl *dl)
 {
 	mblk_t *mp;
 	dl_token_req_t *p;
+
 	ensure(dl, return (-EFAULT));
 	ensure(dl->oq, return (-EFAULT));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
@@ -3596,6 +3712,7 @@ dl_disconnect_req(queue_t *q, struct dl *dl, ulong reason, ulong cor)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_disconnect_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3642,6 +3759,7 @@ dl_reset_req(queue_t *q, struct dl *dl)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_reset_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3670,6 +3788,7 @@ dl_reset_res(queue_t *q, struct dl *dl)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_reset_res_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3699,6 +3818,7 @@ dl_unitdata_req(queue_t *q, struct dl *dl, caddr_t dst_ptr, size_t dst_len, ulon
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_unitdata_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3735,6 +3855,7 @@ dl_udqos_req(queue_t *q, struct dl *dl, caddr_t qos_ptr, size_t qos_len)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_udqos_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + qos_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3769,6 +3890,7 @@ dl_test_req(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_l
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_test_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3804,6 +3926,7 @@ dl_test_res(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_l
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_test_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3839,6 +3962,7 @@ dl_xid_req(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_le
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_xid_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3874,6 +3998,7 @@ dl_xid_res(queue_t *q, struct dl *dl, ulong flag, caddr_t dst_ptr, size_t dst_le
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_xid_res_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3910,6 +4035,7 @@ dl_data_ack_req(queue_t *q, struct dl *dl, ulong cor, caddr_t dst_ptr, size_t ds
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_data_ack_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3954,6 +4080,7 @@ dl_reply_req(queue_t *q, struct dl *dl, ulong cor, caddr_t dst_ptr, size_t dst_l
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_reply_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -3998,6 +4125,7 @@ dl_reply_update_req(queue_t *q, struct dl *dl, ulong cor, caddr_t src_ptr, size_
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_reply_update_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + src_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -4033,6 +4161,7 @@ dl_phys_addr_req(queue_t *q, struct dl *dl, ulong type)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_phys_addr_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -4061,6 +4190,7 @@ dl_set_phys_addr_req(queue_t *q, struct dl *dl, caddr_t add_ptr, size_t add_len)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_set_phys_addr_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -4090,6 +4220,7 @@ dl_get_statistics_req(queue_t *q, struct dl *dl)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		dl_get_statistics_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -4138,6 +4269,7 @@ size_cr(uint pvar, h225_msg_t * m)
 {
 	int len = 1;
 	uint32_t cr = m->cr;
+
 	if (cr) {
 		len++;
 		cr >>= 7;
@@ -4158,6 +4290,7 @@ size_mt(uint pvar, h225_msg_t * m)
 {
 	int len = 0;
 	uint32_t mt = m->mt;
+
 	do {
 		len++;
 		mt >>= 7;
@@ -4404,6 +4537,7 @@ pack_cr(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 	uint32_t cr = m->cr;
 	uint len = 0;
 	unsigned char *lp = p++;
+
 	if (cr) {
 		ensure(p < e, return (-EFAULT));
 		*p++ = (m->crf << 7) | (cr & 0x7f);
@@ -4429,6 +4563,7 @@ pack_mt(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint32_t mt = m->mt;
 	uint len = 0;
+
 	do {
 		*p++ = mt & 0x7f;
 		len++;
@@ -4468,6 +4603,7 @@ STATIC int
 pack_cid(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len = m->cid.len;
+
 	*p++ = ISDN_IE_CALL_IDENTITY;
 	*p++ = len;
 	bcopy(m->cid.ptr, p, len);
@@ -4495,6 +4631,7 @@ STATIC int
 pack_cdpn(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	int len = m->cdpn.len;
+
 	*p++ = ISDN_IE_CALLED_PARTY_NUMBER;
 	*p++ = len + 1;
 	*p++ = 0x80 | ((m->cdpn.ntype & 0x07) << 4) | ((m->cdpn.nplan & 0xf) << 0);
@@ -4510,6 +4647,7 @@ STATIC int
 pack_cdsa(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	int len = m->cdsa.len;
+
 	*p++ = ISDN_IE_CALLED_PARTY_SUBADD;
 	*p++ = len + 1;
 	*p++ = 0x80 | ((m->cdsa.type & 0x7) << 4) | ((m->cdsa.oe & 0x1) << 3);
@@ -4525,6 +4663,7 @@ STATIC int
 pack_cgpn(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	int len = m->cgpn.len;
+
 	*p++ = ISDN_IE_CALLING_PARTY_NUMBER;
 	*p++ = len + 2;
 	*p++ = ((m->cgpn.ntype & 0x07) << 4) | ((m->cgpn.nplan & 0xf) << 0);
@@ -4541,6 +4680,7 @@ STATIC int
 pack_cgsa(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	int len = m->cgsa.len;
+
 	*p++ = ISDN_IE_CALLING_PARTY_SUBADD;
 	*p++ = len + 1;
 	*p++ = 0x80 | ((m->cgsa.type & 0x7) << 4) | ((m->cgsa.oe & 0x1) << 3);
@@ -4578,6 +4718,7 @@ STATIC int
 pack_ies(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	int ret, len = 0;
+
 	while (p < e) {
 		(void) ret;
 		fixme(("Write this function\n"));
@@ -4591,6 +4732,7 @@ h225_send_msg(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct dl *dl;
 	int err;
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	for (dl = cr->fg.fg->dl.list; dl && dl->i_state != DL_DATAXFER; dl = dl->fg.next) ;
 	if (!dl)
@@ -4598,10 +4740,12 @@ h225_send_msg(queue_t *q, struct cr *cr, h225_msg_t * m)
 	if (canput(dl->oq)) {
 		mblk_t *mp;
 		size_t size;
+
 		if ((mp = ss7_allocb(q, size, BPRI_MED))) {
 			unsigned char *p;
 			unsigned char *e;
 			ulong pvar = cr->fg.fg->proto.pvar;
+
 			mp->b_datap->db_type = M_DATA;
 			/* 
 			   fill out message */
@@ -4641,6 +4785,7 @@ STATIC INLINE int
 h225_send_alerting(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_ALERTING;
@@ -4655,6 +4800,7 @@ STATIC INLINE int
 h225_send_call_proceeding(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_CALL_PROCEEDING;
@@ -4669,6 +4815,7 @@ STATIC INLINE int
 h225_send_connect_acknowledge(queue_t *q, struct cr *cr, uchar *opt_ptr, size_t opt_len)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_CONNECT_ACKNOWLEDGE;
@@ -4683,6 +4830,7 @@ STATIC INLINE int
 h225_send_connect(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_CONNECT;
@@ -4697,6 +4845,7 @@ STATIC INLINE int
 h225_send_disconnect(queue_t *q, struct cr *cr, ulong cause)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_DISCONNECT;
@@ -4711,6 +4860,7 @@ STATIC INLINE int
 h225_send_information(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_INFORMATION;
@@ -4725,6 +4875,7 @@ STATIC INLINE int
 h225_send_notify(queue_t *q, struct cr *cr, uchar *opt_ptr, size_t opt_len)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_NOTIFY;
@@ -4739,6 +4890,7 @@ STATIC INLINE int
 h225_send_progress(queue_t *q, struct cr *cr, ulong indicator)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_PROGRESS;
@@ -4753,6 +4905,7 @@ STATIC INLINE int
 h225_send_release(queue_t *q, struct cr *cr, ulong cause)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_RELEASE;
@@ -4767,6 +4920,7 @@ STATIC INLINE int
 h225_send_release_complete(queue_t *q, struct cr *cr, ulong cause)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_RELEASE_COMPLETE;
@@ -4781,6 +4935,7 @@ STATIC INLINE int
 h225_send_resume(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_RESUME;
@@ -4795,6 +4950,7 @@ STATIC INLINE int
 h225_send_setup(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_SETUP;
@@ -4809,6 +4965,7 @@ STATIC INLINE int
 h225_send_setup_acknowledge(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_SETUP_ACKNOWLEDGE;
@@ -4823,6 +4980,7 @@ STATIC INLINE int
 h225_send_status(queue_t *q, struct cr *cr, ulong cause)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_STATUS;
@@ -4837,6 +4995,7 @@ STATIC INLINE int
 h225_send_status_enquiry(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_STATUS_ENQUIRY;
@@ -4851,6 +5010,7 @@ STATIC INLINE int
 h225_send_suspend(queue_t *q, struct cr *cr)
 {
 	h225_msg_t msg = { 0, };
+
 	ensure(cr && cr->fg.fg, return (-EFAULT));
 	msg.cr = cr->cref;
 	msg.mt = ISDN_MT_SUSPEND;
@@ -5062,6 +5222,7 @@ cr_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (struc
 	      void (*exp_fnc) (caddr_t))
 {
 	struct cr *cr = (struct cr *) data;
+
 	if (xchg(timeo, 0)) {
 		if (lis_spin_trylock(&cr->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, cr, timer, jiffies));
@@ -5090,6 +5251,7 @@ STATIC INLINE void
 cr_stop_timer(struct cr *cr, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, cr, timer, jiffies));
@@ -5130,6 +5292,7 @@ STATIC INLINE void
 __cr_timer_stop(struct cr *cr, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -5262,6 +5425,7 @@ STATIC INLINE void
 cr_timer_stop(struct cr *cr, const uint t)
 {
 	psw_t flags;
+
 	lis_spin_lock_irqsave(&cr->lock, &flags);
 	{
 		__cr_timer_stop(cr, t);
@@ -5273,6 +5437,7 @@ STATIC INLINE void
 cr_timer_start(struct cr *cr, const uint t)
 {
 	psw_t flags;
+
 	lis_spin_lock_irqsave(&cr->lock, &flags);
 	{
 		__cr_timer_stop(cr, t);
@@ -5374,6 +5539,7 @@ STATIC int
 h225_recv_alerting(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	if (!cr)
 		return (-EPROTO);	/* unexpected message */
 	switch (cr_get_c_state(cr)) {
@@ -5441,6 +5607,7 @@ STATIC int
 h225_recv_call_proceeding(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
 		return (-EPROTO);	/* unexpected message */
@@ -5494,6 +5661,7 @@ STATIC int
 h225_recv_connect(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
 		return (-EPROTO);	/* unexpected message */
@@ -5560,6 +5728,7 @@ STATIC int
 h225_recv_connect_acknowledge(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
@@ -5584,6 +5753,7 @@ STATIC int
 h225_recv_disconnect(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
@@ -5692,6 +5862,7 @@ STATIC int
 h225_recv_information(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
@@ -5776,6 +5947,7 @@ STATIC int
 h225_recv_notify(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	if (!(m->cflags & ISDN_IEF_NI))
 		goto enxio;
@@ -5812,6 +5984,7 @@ STATIC int
 h225_recv_progress(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	if (!(m->cflags & ISDN_IEF_PI))
 		goto enxio;
@@ -5864,6 +6037,7 @@ STATIC int
 h225_recv_release(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	if (!(m->cflags & ISDN_IEF_CAUSE))
 		goto enxio;
@@ -5968,6 +6142,7 @@ STATIC int
 h225_recv_release_complete(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	if (!cr)
 		return (QR_DONE);	/* ignore */
 	switch (cr_get_c_state(cr)) {
@@ -6012,6 +6187,7 @@ STATIC int
 h225_recv_resume(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	switch (cr_get_c_state(cr)) {
 	case N0_NULL:
 		if ((err = cc_resume_ind(q, cr, m)) < 0)
@@ -6035,6 +6211,7 @@ STATIC int
 h225_recv_resume_acknowledge(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	if (!(m->cflags & ISDN_IEF_CI))
 		goto enxio;
@@ -6067,6 +6244,7 @@ STATIC int
 h225_recv_resume_reject(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	if (!(m->cflags & ISDN_IEF_CAUSE))
 		goto enxio;
@@ -6100,6 +6278,7 @@ STATIC int
 h225_recv_setup(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	switch (cr_get_c_state(cr)) {
 	case N0_NULL:
 		if ((err = cc_setup_ind(q, cr, m)) < 0)	/* with user selected B channel */
@@ -6176,6 +6355,7 @@ STATIC int
 h225_recv_status(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	if (!(m->cflags & ISDN_IEF_CAUSE) || !(m->cflags & ISDN_IEF_CS))
 		goto enxio;
 	if (!h225_check_cause(q, m) || !h225_check_cs(q, m))
@@ -6255,6 +6435,7 @@ h225_recv_status_enquiry(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	fixme(("Process message\n"));
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
@@ -6294,6 +6475,7 @@ STATIC int
 h225_recv_suspend_acknowledge(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
@@ -6319,6 +6501,7 @@ STATIC int
 h225_recv_suspend_reject(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	switch (cr_get_c_state(cr)) {
 	case U0_NULL:
@@ -6403,6 +6586,7 @@ STATIC int
 h225_recv_unrecognized_message(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	int err;
+
 	fixme(("Process message\n"));
 	if (cr) {
 		switch (cr_get_c_state(cr)) {
@@ -6456,6 +6640,7 @@ h225_recv_unexpected_message(queue_t *q, struct cr *cr, h225_msg_t * m)
 {
 	struct dl *dl = DL_PRIV(q);
 	int err;
+
 	if (!cr && !(cr = h225_alloc_cr(m->cr, NULL, dl->fg.fg, NULL, 0)))
 		return (-ENOMEM);
 	if (dl->fg.fg->proto.popt & ISDN_POPT_REL) {
@@ -6503,6 +6688,7 @@ STATIC int
 unpack_cr(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p < e + (len = *p++))) {
 		if (len) {
 			m->crf = *p >> 7;
@@ -6559,6 +6745,7 @@ STATIC int
 unpack_shift(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint codeset;
+
 	p--;
 	if ((codeset = (*p >> 0) & 0x7) < 4)
 		return (-EPROTO);
@@ -6590,6 +6777,7 @@ STATIC int
 unpack_cid(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++))) {
 		m->cid.ptr = p;
 		m->cid.len = len;
@@ -6607,6 +6795,7 @@ STATIC int
 unpack_cs(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len == 1)) {
 		m->cs.coding_standard = *p >> 6;
 		m->cs.call_state = *p & 0x3f;
@@ -6624,6 +6813,7 @@ STATIC int
 unpack_cdpn(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 2) && (p <= e + (len = *p++)) && (len > 1)) {
 		m->cdpn.nplan = *p & 0x0f;
 		m->cdpn.ntype = (*p++ >> 4) & 0x7;
@@ -6643,6 +6833,7 @@ STATIC int
 unpack_cdsa(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 2) && (p <= e + (len = *p++)) && (len > 1)) {
 		m->cdsa.oe = (*p & 0x08) >> 3;
 		m->cdsa.type = (*p++ & 0x70) >> 4;
@@ -6662,8 +6853,10 @@ STATIC int
 unpack_cgpn(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 2) && (p <= e + (len = *p++)) && (len > 1)) {
 		uint hlen = 1;
+
 		m->cgpn.nplan = *p & 0x0f;
 		m->cgpn.ntype = (*p >> 4) & 0x7;
 		if (!(*p++ & 0x80)) {
@@ -6690,6 +6883,7 @@ STATIC int
 unpack_cgsa(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 2) && (p <= e + (len = *p++)) && (len > 1)) {
 		m->cgsa.oe = (*p & 0x08) >> 3;
 		m->cgsa.type = (*p++ & 0x79) >> 4;
@@ -6720,6 +6914,7 @@ STATIC int
 unpack_ci(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len, pos = 0;
+
 	if ((p < e + 2) && (p <= e + (len = *p++)) && (len > 0)) {
 		pos++;
 		m->ci.ichan = (*p & 0x3) >> 0;
@@ -6758,6 +6953,7 @@ unpack_ci(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 			} while (0);
 		if (m->ci.type != 0 && len > pos) {
 			uint slot = 0;
+
 			if (len < pos)
 				goto emsgsize;
 			m->ci.cs.type = (*p & 0x0f) >> 0;
@@ -6831,6 +7027,7 @@ STATIC int
 unpack_dt(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++)) && (len == 6)) {
 		m->dt.yr = *p++;
 		m->dt.mo = *p++;
@@ -6852,6 +7049,7 @@ STATIC int
 unpack_disp(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		m->disp.ptr = p;
 		m->disp.len = len;
@@ -6869,6 +7067,7 @@ STATIC int
 unpack_hlc(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len, pos = 0;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		pos++;
 		if (len < pos)
@@ -6902,6 +7101,7 @@ STATIC int
 unpack_kpf(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		m->kpf.ptr = p;
 		m->kpf.len = len;
@@ -6943,10 +7143,12 @@ unpack_nsf(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 	/* 
 	   there can be 4 of these in a message */
 	uint len, i = m->nsf_numb;
+
 	if (i > 3)
 		goto eproto;
 	if ((p < e) && (p <= e + (len = *p++))) {
 		uint ilen;
+
 		if (p <= e + (ilen = *p++) && ilen) {
 			m->nsf[i].niplan = (*p >> 0) & 0x0f;
 			m->nsf[i].nitype = (*p >> 4) & 0x07;
@@ -6976,6 +7178,7 @@ STATIC int
 unpack_ni(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++)) && (len == 1)) {
 		m->ni = *p++;
 		m->cflags |= ISDN_IEF_NI;
@@ -6992,6 +7195,7 @@ STATIC int
 unpack_pi(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++)) && (len == 2)) {
 		m->pi.loc = (*p >> 0) & 0x0f;
 		m->pi.stand = (*p >> 5) & 0x03;
@@ -7023,6 +7227,7 @@ STATIC int
 unpack_ri(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len == 1)) {
 		m->ri.clas = (*p >> 0) & 0x07;
 		m->cflags |= ISDN_IEF_RI;
@@ -7039,6 +7244,7 @@ STATIC int
 unpack_seg(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len > 1)) {
 		m->seg.rem = (*p >> 0) & 0x7f;
 		m->seg.first = (*p >> 7) & 0x01;
@@ -7069,6 +7275,7 @@ STATIC int
 unpack_sig(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len == 2)) {
 		m->sig = *p;
 		m->cflags |= ISDN_IEF_SIG;
@@ -7085,6 +7292,7 @@ STATIC int
 unpack_tns(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len > 0)) {
 		m->tns.niplan = (*p >> 0) & 0x0f;
 		m->tns.nitype = (*p >> 4) & 0x07;
@@ -7107,6 +7315,7 @@ STATIC int
 unpack_uui(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len > 1)) {
 		m->uui.pd = *p++;
 		m->uui.ui.ptr = p;
@@ -7128,6 +7337,7 @@ STATIC int
 unpack_cug(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len > 1)) {
 		m->cug.cugi = (*p++ >> 0) & 0x07;
 		m->cug.code.ptr = p;
@@ -7146,6 +7356,7 @@ STATIC int
 unpack_eetd(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7163,6 +7374,7 @@ STATIC int
 unpack_ir(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7180,6 +7392,7 @@ STATIC int
 unpack_plbp(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7197,6 +7410,7 @@ STATIC int
 unpack_plws(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7214,6 +7428,7 @@ STATIC int
 unpack_ps(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7231,6 +7446,7 @@ STATIC int
 unpack_rdn(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7240,6 +7456,7 @@ unpack_rdn(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 	return (-EMSGSIZE);
 	if ((p < e + 1) && (p <= e + (len = *p++)) && (len > 1)) {
 		uint pos = 0;
+
 		m->rdn.nplan = (*p >> 0) & 0x0f;
 		m->rdn.ntype = (*p >> 4) & 0x07;
 		pos++;
@@ -7276,6 +7493,7 @@ STATIC int
 unpack_rci(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7293,6 +7511,7 @@ STATIC int
 unpack_tdsi(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if ((p < e) && (p <= e + (len = *p++))) {
 		ptrace(("%s: PROTO: Packet-mode only IE encountered\n", DRV_NAME));
 		/* 
@@ -7310,6 +7529,7 @@ STATIC int
 unpack_res(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if (p[-1] & 0x80)
 		return (0);
 	if ((p < e) && (p <= e + (len = *p++))) {
@@ -7329,6 +7549,7 @@ STATIC int
 unpack_unknown(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if (p[-1] & 0x80)
 		return (0);
 	if ((p < e) && (p <= e + (len = *p++))) {
@@ -7348,6 +7569,7 @@ STATIC int
 unpack_esc(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	uint len;
+
 	if (p[-1] & 0x80)
 		return (0);
 	if ((p < e) && (p <= e + (len = *p++))) {
@@ -7363,8 +7585,10 @@ STATIC int
 unpack_ies(uint pvar, unsigned char *p, unsigned char *e, h225_msg_t * m)
 {
 	int ret, len = 0;
+
 	while (p < e) {
 		uint ie;
+
 		len++;
 		ie = *p++;
 		switch (m->codeset) {
@@ -7537,6 +7761,7 @@ h225_dec_msg(queue_t *q, mblk_t *mp, h225_msg_t * m)
 	unsigned char *p;
 	unsigned char *e;
 	int ret;
+
 	if (!fg)
 		goto efault;
 	if (!pullupmsg(mp, -1))
@@ -7607,6 +7832,7 @@ STATIC int
 cr_t302_timeout(struct cr *cr)
 {
 	int err;
+
 	if (cr_get_c_state(cr) == U25_OVERLAP_RECEIVING) {
 		if ((err = cc_info_timeout_ind(NULL, cr)) < 0)
 			goto error;
@@ -7632,6 +7858,7 @@ STATIC int
 cr_t303_timeout(struct cr *cr)
 {
 	int err;
+
 	if (cr_get_c_state(cr) == U1_CALL_INITIATED) {
 		if ((cr->statem.t303_count ^= 1)) {
 			/* 
@@ -7667,6 +7894,7 @@ cr_t304_timeout(struct cr *cr)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (cr_get_c_state(cr) == U2_OVERLAP_SENDING) {
 		if ((err = h225_send_disconnect(NULL, cr, cause)) < 0)
 			goto error;
@@ -7693,6 +7921,7 @@ cr_t305_timeout(struct cr *cr)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (cr_get_c_state(cr) == U11_DISCONNECT_REQUEST) {
 		if ((err = h225_send_release(NULL, cr, cause)) < 0)
 			goto error;
@@ -7727,6 +7956,7 @@ STATIC int
 cr_t307_timeout(struct cr *cr)
 {
 	int err = QR_DONE;
+
 	switch (cr_get_c_state(cr)) {
 	case N0_NULL:
 		// h225_bchan_release(q); /* Huh? */
@@ -7751,6 +7981,7 @@ cr_t308_timeout(struct cr *cr)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (cr_get_c_state(cr) == U19_RELEASE_REQUEST) {
 		if ((cr->statem.t308_count ^= 1)) {
 			/* 
@@ -7787,6 +8018,7 @@ STATIC int
 cr_t309_timeout(struct cr *cr)
 {
 	int err;
+
 	if (cr_get_c_state(cr) != U0_NULL) {
 		if ((err = cc_datalink_failure_ind(NULL, cr)) < 0)
 			goto error;
@@ -7811,6 +8043,7 @@ cr_t310_timeout(struct cr *cr)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (cr_get_c_state(cr) == U3_OUTGOING_CALL_PROCEEDING) {
 		if ((err = h225_send_disconnect(NULL, cr, cause)) < 0)
 			goto error;
@@ -7846,6 +8079,7 @@ cr_t313_timeout(struct cr *cr)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (cr_get_c_state(cr) == U8_CONNECT_REQUEST) {
 		if ((err = h225_send_disconnect(NULL, cr, cause)) < 0)
 			goto error;
@@ -7903,6 +8137,7 @@ cr_t318_timeout(struct cr *cr)
 {
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (cr_get_c_state(cr) == U17_RESUME_REQUEST) {
 		if ((err = cc_resume_con(NULL, cr, NULL)) < 0)	/* to error */
 			goto error;
@@ -7926,6 +8161,7 @@ STATIC int
 cr_t319_timeout(struct cr *cr)
 {
 	int err;
+
 	if (cr_get_c_state(cr) == U15_SUSPEND_REQUEST) {
 		if ((err = cc_suspend_con(NULL, cr, NULL)) < 0)	/* to error */
 			goto error;
@@ -7990,6 +8226,7 @@ dl_data_ind(queue_t *q, mblk_t *dp)
 	struct cr *cr = NULL;
 	int err;
 	h225_msg_t msg = { 0, };
+
 	if (!fg)
 		goto disable;
 	if ((err = h225_dec_msg(q, dp, &msg)))
@@ -8209,6 +8446,7 @@ dl_info_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_info_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->dl_qos_offset)
@@ -8237,6 +8475,7 @@ dl_bind_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_bind_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->dl_addr_offset)
@@ -8265,6 +8504,7 @@ dl_subs_bind_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_subs_bind_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (dl_get_state(dl) != DL_SUBS_BIND_PND)
@@ -8290,6 +8530,7 @@ dl_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_ok_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (p->dl_correct_primitive) {
@@ -8335,6 +8576,7 @@ dl_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_error_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (p->dl_error_primitive) {
@@ -8427,6 +8669,7 @@ dl_connect_ind(queue_t *q, mblk_t *mp)
 	struct cr *cr;
 	int err;
 	dl_connect_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	for (cr = dl->fg.fg->cr.list; cr; cr = cr->fg.next) {
@@ -8458,6 +8701,7 @@ dl_connect_con(queue_t *q, mblk_t *mp)
 	int err;
 	ulong cause = 0;		/* FIXME */
 	dl_connect_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	for (cr = dl->fg.fg->cr.list; cr; cr = cr->fg.next) {
@@ -8493,6 +8737,7 @@ dl_token_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_token_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	dl->tok = p->dl_token;
@@ -8516,6 +8761,7 @@ dl_disconnect_ind(queue_t *q, mblk_t *mp)
 	struct cr *cr;
 	int err;
 	dl_disconnect_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	for (cr = dl->fg.fg->cr.list; cr; cr = cr->fg.next) {
@@ -8577,6 +8823,7 @@ dl_reset_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reset_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	fixme(("Notify L3?\n"));
@@ -8595,6 +8842,7 @@ dl_reset_con(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reset_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	dl_set_state(dl, DL_DATAXFER);
@@ -8614,6 +8862,7 @@ dl_unitdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_unitdata_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8633,6 +8882,7 @@ dl_uderror_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_uderror_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8651,6 +8901,7 @@ dl_test_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_test_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8670,6 +8921,7 @@ dl_test_con(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_test_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8689,6 +8941,7 @@ dl_xid_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_xid_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8708,6 +8961,7 @@ dl_xid_con(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_xid_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8727,6 +8981,7 @@ dl_data_ack_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_data_ack_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8746,6 +9001,7 @@ dl_data_ack_status_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_data_ack_status_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8765,6 +9021,7 @@ dl_reply_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reply_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8784,6 +9041,7 @@ dl_reply_status_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reply_status_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8803,6 +9061,7 @@ dl_reply_update_status_ind(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reply_update_status_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8822,6 +9081,7 @@ dl_phys_addr_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_phys_addr_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8841,6 +9101,7 @@ dl_get_statistics_ack(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_get_statistics_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	(void) dl;
@@ -8882,6 +9143,7 @@ cc_info_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	int err;
 	struct CC_info_ack *p = (typeof(p)) mp->b_rptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -8909,6 +9171,7 @@ cc_optmgmt_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	int err;
 	struct CC_optmgmt_req *p = (typeof(p)) mp->b_wptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -8940,6 +9203,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	size_t add_len;
 	struct CC_bind_req *p = (typeof(p)) mp->b_rptr;
 	struct h225_addr add = { ISDN_SCOPE_DF, 0, 0 };
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -8961,6 +9225,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISDN_SCOPE_DF:
 	{
 		struct df *df;
+
 		df = &master;
 		/* 
 		   bind to default */
@@ -8989,6 +9254,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISDN_SCOPE_XG:
 	{
 		struct xg *xg;
+
 		if (add.id) {
 			for (xg = master.xg.list; xg && xg->id != add.id; xg = xg->next) ;
 			if (!xg)
@@ -9025,6 +9291,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISDN_SCOPE_EG:
 	{
 		struct eg *eg;
+
 		if (add.id) {
 			for (eg = master.eg.list; eg && eg->id != add.id; eg = eg->next) ;
 			if (!eg)
@@ -9061,6 +9328,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISDN_SCOPE_FG:
 	{
 		struct fg *fg;
+
 		if (add.id) {
 			for (fg = master.fg.list; fg && fg->id != add.id; fg = fg->next) ;
 			if (!fg)
@@ -9097,6 +9365,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISDN_SCOPE_TG:
 	{
 		struct tg *tg;
+
 		if (add.id) {
 			for (tg = master.tg.list; tg && tg->id != add.id; tg = tg->next) ;
 			if (!tg)
@@ -9133,6 +9402,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISDN_SCOPE_CH:
 	{
 		struct ch *ch;
+
 		if (add.id) {
 			for (ch = master.ch.list; ch && ch->id != add.id; ch = ch->next) ;
 			if (!ch)
@@ -9199,6 +9469,7 @@ cc_unbind_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	int err;
 	struct CC_unbind_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cc_get_state(cc) != CCS_IDLE)
@@ -9267,6 +9538,7 @@ cc_addr_req(queue_t *q, mblk_t *mp)
 	unsigned char *bind_ptr = (unsigned char *) &bind, *conn_ptr = (unsigned char *) &conn;
 	size_t bind_len = sizeof(bind), conn_len = sizeof(conn);
 	ulong cref;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
@@ -9365,6 +9637,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	size_t cdpn_len, opt_len, add_len;
 	struct CC_setup_req *p = (typeof(p)) mp->b_rptr;
 	struct h225_addr add = { ISDN_SCOPE_DF, 0, 0 };
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	cdpn_ptr = mp->b_rptr + p->cc_cdpn_offset;
@@ -9525,6 +9798,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			case ISDN_BIND_EG:
 			{
 				struct fg *fg;
+
 				for (ch = NULL, fg = cc->bind.u.eg->fg.list; fg; fg = fg->eg.next)
 					for (ch = fg->ch.list; ch && ch->id != add.id;
 					     ch = ch->fg.next) ;
@@ -9536,6 +9810,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 			{
 				struct eg *eg;
 				struct fg *fg;
+
 				for (ch = NULL, eg = cc->bind.u.xg->eg.list; eg; eg = eg->xg.next)
 					for (fg = eg->fg.list; fg; fg = fg->eg.next)
 						for (ch = fg->ch.list; ch && ch->id != add.id;
@@ -9634,6 +9909,7 @@ cc_more_info_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_more_info_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -9704,6 +9980,7 @@ cc_information_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr, *sub_ptr;
 	size_t opt_len, sub_len;
 	struct CC_information_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	sub_ptr = mp->b_rptr + p->cc_subn_offset;
@@ -9792,6 +10069,7 @@ cc_setup_res(queue_t *q, mblk_t *mp)
 	struct cr *cr;
 	struct CC_setup_res *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cc_get_state(cc) != CCS_WRES_SIND)
@@ -9838,6 +10116,7 @@ cc_proceeding_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_proceeding_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -9923,6 +10202,7 @@ cc_alerting_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_alerting_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10019,6 +10299,7 @@ cc_progress_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_progress_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10108,6 +10389,7 @@ cc_disconnect_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_disconnect_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10208,6 +10490,7 @@ cc_connect_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_connect_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10312,6 +10595,7 @@ cc_setup_complete_req(queue_t *q, mblk_t *mp)
 	size_t opt_len;
 	struct CC_setup_complete_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10386,6 +10670,7 @@ cc_notify_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_notify_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10462,6 +10747,7 @@ cc_suspend_req(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_suspend_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10532,6 +10818,7 @@ cc_suspend_res(queue_t *q, mblk_t *mp)
 	unsigned char *opt_ptr;
 	size_t opt_len;
 	struct CC_suspend_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -10588,6 +10875,7 @@ cc_suspend_reject_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	struct CC_suspend_reject_req *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10612,6 +10900,7 @@ cc_resume_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	struct CC_resume_req *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10643,6 +10932,7 @@ cc_resume_res(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	struct CC_resume_res *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10667,6 +10957,7 @@ cc_resume_reject_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	struct CC_resume_reject_req *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10693,6 +10984,7 @@ cc_reject_req(queue_t *q, mblk_t *mp)
 	struct CC_reject_req *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10727,6 +11019,7 @@ cc_release_req(queue_t *q, mblk_t *mp)
 	struct cr *cr;
 	int err;
 	ulong cause = 0;		/* FIXME */
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10776,6 +11069,7 @@ cc_release_res(queue_t *q, mblk_t *mp)
 	struct CC_release_res *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
 	int err;
+
 	(void) cc;
 	(void) p;
 	(void) cr;
@@ -10795,6 +11089,7 @@ cc_restart_req(queue_t *q, mblk_t *mp)
 	struct CC_restart_req *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	fixme(("Write this function\n"));
@@ -10827,6 +11122,7 @@ cc_stop_req(queue_t *q, mblk_t *mp)
 	struct CC_stop_req *p = (typeof(p)) mp->b_rptr;
 	struct cr *cr;
 	int err;
+
 	(void) cc;
 	(void) p;
 	(void) cr;
@@ -10845,6 +11141,7 @@ cc_unsupported_prim(queue_t *q, mblk_t *mp)
 {
 	struct cc *cc = CC_PRIV(q);
 	ulong prim = *((ulong *) mp->b_rptr);
+
 	return cc_error_ack(q, cc, prim, CCNOTSUPP);
 }
 
@@ -10858,6 +11155,7 @@ cc_unknown_prim(queue_t *q, mblk_t *mp)
 {
 	struct cc *cc = CC_PRIV(q);
 	ulong prim = *((ulong *) mp->b_rptr);
+
 	return cc_error_ack(q, cc, prim, CCBADPRIM);
 }
 
@@ -10889,6 +11187,7 @@ STATIC int
 h225_opt_get_ch(h225_option_t * arg, struct ch *ch, int size)
 {
 	h225_opt_conf_ch_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!ch)
@@ -10900,6 +11199,7 @@ STATIC int
 h225_opt_get_tg(h225_option_t * arg, struct tg *tg, int size)
 {
 	h225_opt_conf_tg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!tg)
@@ -10911,6 +11211,7 @@ STATIC int
 h225_opt_get_fg(h225_option_t * arg, struct fg *fg, int size)
 {
 	h225_opt_conf_fg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!fg)
@@ -10922,6 +11223,7 @@ STATIC int
 h225_opt_get_eg(h225_option_t * arg, struct eg *eg, int size)
 {
 	h225_opt_conf_eg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!eg)
@@ -10933,6 +11235,7 @@ STATIC int
 h225_opt_get_xg(h225_option_t * arg, struct xg *xg, int size)
 {
 	h225_opt_conf_xg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!xg)
@@ -10944,6 +11247,7 @@ STATIC int
 h225_opt_get_dl(h225_option_t * arg, struct dl *dl, int size)
 {
 	h225_opt_conf_dl_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!dl)
@@ -10955,6 +11259,7 @@ STATIC int
 h225_opt_get_df(h225_option_t * arg, df_t * df, int size)
 {
 	h225_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -10971,6 +11276,7 @@ STATIC int
 h225_opt_set_ch(h225_option_t * arg, struct ch *ch, int size)
 {
 	h225_opt_conf_ch_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!ch)
@@ -10983,6 +11289,7 @@ STATIC int
 h225_opt_set_tg(h225_option_t * arg, struct tg *tg, int size)
 {
 	h225_opt_conf_tg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!tg)
@@ -10995,6 +11302,7 @@ STATIC int
 h225_opt_set_fg(h225_option_t * arg, struct fg *fg, int size)
 {
 	h225_opt_conf_fg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!fg)
@@ -11007,6 +11315,7 @@ STATIC int
 h225_opt_set_eg(h225_option_t * arg, struct eg *eg, int size)
 {
 	h225_opt_conf_eg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!eg)
@@ -11019,6 +11328,7 @@ STATIC int
 h225_opt_set_xg(h225_option_t * arg, struct xg *xg, int size)
 {
 	h225_opt_conf_xg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!xg)
@@ -11031,6 +11341,7 @@ STATIC int
 h225_opt_set_dl(h225_option_t * arg, struct dl *dl, int size)
 {
 	h225_opt_conf_dl_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!dl)
@@ -11043,6 +11354,7 @@ STATIC int
 h225_opt_set_df(h225_option_t * arg, df_t * df, int size)
 {
 	h225_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -11060,6 +11372,7 @@ STATIC int
 h225_get_ch(h225_config_t * arg, struct ch *ch, int size)
 {
 	h225_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!ch || size < sizeof(*arg))
@@ -11082,6 +11395,7 @@ h225_get_tg(h225_config_t * arg, struct tg *tg, int size)
 	h225_conf_dl_t *dlc;
 	h225_conf_ch_t *chc;
 	h225_conf_tg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!tg)
@@ -11130,6 +11444,7 @@ h225_get_fg(h225_config_t * arg, struct fg *fg, int size)
 	h225_conf_dl_t *dlc;
 	h225_conf_ch_t *chc;
 	h225_conf_fg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!fg)
@@ -11179,6 +11494,7 @@ h225_get_eg(h225_config_t * arg, struct eg *eg, int size)
 	h225_conf_fg_t *fgc;
 	h225_conf_tg_t *tgc;
 	h225_conf_eg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!eg)
@@ -11220,6 +11536,7 @@ h225_get_xg(h225_config_t * arg, struct xg *xg, int size)
 	struct eg *eg;
 	h225_conf_eg_t *egc;
 	h225_conf_xg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!xg)
@@ -11247,6 +11564,7 @@ STATIC int
 h225_get_dl(h225_config_t * arg, struct dl *dl, int size)
 {
 	h225_conf_dl_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!dl)
@@ -11270,6 +11588,7 @@ h225_get_df(h225_config_t * arg, df_t * df, int size)
 	struct xg *xg;
 	h225_conf_xg_t *xgc;
 	h225_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!df)
@@ -11304,6 +11623,7 @@ h225_add_ch(h225_config_t * arg, struct ch *ch, int size, int force, int test)
 	struct tg *tg = NULL;
 	struct fg *fg = NULL;
 	h225_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (ch || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->tgid)
@@ -11332,6 +11652,7 @@ h225_add_tg(h225_config_t * arg, struct tg *tg, int size, int force, int test)
 {
 	struct eg *eg = NULL;
 	h225_conf_tg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (tg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->egid)
@@ -11350,6 +11671,7 @@ h225_add_fg(h225_config_t * arg, struct fg *fg, int size, int force, int test)
 {
 	struct eg *eg = NULL;
 	h225_conf_fg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (fg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->egid)
@@ -11369,6 +11691,7 @@ h225_add_eg(h225_config_t * arg, struct eg *eg, int size, int force, int test)
 {
 	struct xg *xg = NULL;
 	h225_conf_eg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (eg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->xgid)
@@ -11387,6 +11710,7 @@ STATIC int
 h225_add_xg(h225_config_t * arg, struct xg *xg, int size, int force, int test)
 {
 	h225_conf_xg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (xg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!test) {
@@ -11404,6 +11728,7 @@ h225_add_dl(h225_config_t * arg, struct dl *dl, int size, int force, int test)
 	struct tg *tg = NULL;
 	struct fg *fg = NULL;
 	h225_conf_dl_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (dl || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->fgid)
@@ -11443,6 +11768,7 @@ STATIC int
 h225_add_df(h225_config_t * arg, df_t * df, int size, int force, int test)
 {
 	h225_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	return (-EINVAL);
@@ -11457,6 +11783,7 @@ h225_cha_ch(h225_config_t * arg, struct ch *ch, int size, int force, int test)
 {
 	struct ch *c;
 	h225_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->tgid && cnf->tgid != ch->tg.tg->id)
@@ -11489,6 +11816,7 @@ STATIC int
 h225_cha_tg(h225_config_t * arg, struct tg *tg, int size, int force, int test)
 {
 	h225_conf_tg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->egid && cnf->egid != tg->eg.eg->id)
@@ -11523,6 +11851,7 @@ STATIC int
 h225_cha_fg(h225_config_t * arg, struct fg *fg, int size, int force, int test)
 {
 	h225_conf_fg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!fg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->egid && cnf->egid != fg->eg.eg->id)
@@ -11558,6 +11887,7 @@ STATIC int
 h225_cha_eg(h225_config_t * arg, struct eg *eg, int size, int force, int test)
 {
 	h225_conf_eg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!eg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->xgid && cnf->xgid != eg->xg.xg->id)
@@ -11593,6 +11923,7 @@ STATIC int
 h225_cha_xg(h225_config_t * arg, struct xg *xg, int size, int force, int test)
 {
 	h225_conf_xg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!xg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
@@ -11622,6 +11953,7 @@ STATIC int
 h225_cha_dl(h225_config_t * arg, struct dl *dl, int size, int force, int test)
 {
 	h225_conf_dl_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!dl || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->muxid && cnf->muxid != dl->u.mux.index)
@@ -11650,6 +11982,7 @@ STATIC int
 h225_cha_df(h225_config_t * arg, df_t * df, int size, int force, int test)
 {
 	h225_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
@@ -11836,6 +12169,7 @@ STATIC int
 h225_del_df(h225_config_t * arg, df_t * df, int size, int force, int test)
 {
 	h225_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
@@ -11964,6 +12298,7 @@ STATIC int
 h225_sta_dl(h225_statem_t * arg, struct dl *dl, int size)
 {
 	h225_statem_dl_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!dl || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	arg->flags = dl->flags;
@@ -12372,6 +12707,7 @@ STATIC int
 h225_statp_get_ch(h225_stats_t * arg, struct ch *ch, int size)
 {
 	h225_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = ch->statsp;
@@ -12381,6 +12717,7 @@ STATIC int
 h225_statp_get_tg(h225_stats_t * arg, struct tg *tg, int size)
 {
 	h225_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = tg->statsp;
@@ -12390,6 +12727,7 @@ STATIC int
 h225_statp_get_fg(h225_stats_t * arg, struct fg *fg, int size)
 {
 	h225_stats_fg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!fg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = fg->statsp;
@@ -12399,6 +12737,7 @@ STATIC int
 h225_statp_get_eg(h225_stats_t * arg, struct eg *eg, int size)
 {
 	h225_stats_eg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!eg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = eg->statsp;
@@ -12408,6 +12747,7 @@ STATIC int
 h225_statp_get_xg(h225_stats_t * arg, struct xg *xg, int size)
 {
 	h225_stats_xg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!xg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = xg->statsp;
@@ -12417,6 +12757,7 @@ STATIC int
 h225_statp_get_dl(h225_stats_t * arg, struct dl *dl, int size)
 {
 	h225_stats_dl_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!dl || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = dl->statsp;
@@ -12426,6 +12767,7 @@ STATIC int
 h225_statp_get_df(h225_stats_t * arg, df_t * df, int size)
 {
 	h225_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = df->statsp;
@@ -12440,6 +12782,7 @@ STATIC int
 h225_statp_set_ch(h225_stats_t * arg, struct ch *ch, int size)
 {
 	h225_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	ch->statsp = *sta;
@@ -12449,6 +12792,7 @@ STATIC int
 h225_statp_set_tg(h225_stats_t * arg, struct tg *tg, int size)
 {
 	h225_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	tg->statsp = *sta;
@@ -12458,6 +12802,7 @@ STATIC int
 h225_statp_set_fg(h225_stats_t * arg, struct fg *fg, int size)
 {
 	h225_stats_fg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!fg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	fg->statsp = *sta;
@@ -12467,6 +12812,7 @@ STATIC int
 h225_statp_set_eg(h225_stats_t * arg, struct eg *eg, int size)
 {
 	h225_stats_eg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!eg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	eg->statsp = *sta;
@@ -12476,6 +12822,7 @@ STATIC int
 h225_statp_set_xg(h225_stats_t * arg, struct xg *xg, int size)
 {
 	h225_stats_xg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!xg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	xg->statsp = *sta;
@@ -12485,6 +12832,7 @@ STATIC int
 h225_statp_set_dl(h225_stats_t * arg, struct dl *dl, int size)
 {
 	h225_stats_dl_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!dl || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	dl->statsp = *sta;
@@ -12494,6 +12842,7 @@ STATIC int
 h225_statp_set_df(h225_stats_t * arg, df_t * df, int size)
 {
 	h225_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	df->statsp = *sta;
@@ -12508,6 +12857,7 @@ STATIC int
 h225_stat_get_ch(h225_stats_t * arg, struct ch *ch, int size)
 {
 	h225_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = ch->stats;
@@ -12517,6 +12867,7 @@ STATIC int
 h225_stat_get_tg(h225_stats_t * arg, struct tg *tg, int size)
 {
 	h225_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = tg->stats;
@@ -12526,6 +12877,7 @@ STATIC int
 h225_stat_get_fg(h225_stats_t * arg, struct fg *fg, int size)
 {
 	h225_stats_fg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!fg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = fg->stats;
@@ -12535,6 +12887,7 @@ STATIC int
 h225_stat_get_eg(h225_stats_t * arg, struct eg *eg, int size)
 {
 	h225_stats_eg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!eg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = eg->stats;
@@ -12544,6 +12897,7 @@ STATIC int
 h225_stat_get_xg(h225_stats_t * arg, struct xg *xg, int size)
 {
 	h225_stats_xg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!xg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = xg->stats;
@@ -12553,6 +12907,7 @@ STATIC int
 h225_stat_get_dl(h225_stats_t * arg, struct dl *dl, int size)
 {
 	h225_stats_dl_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!dl || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = dl->stats;
@@ -12562,6 +12917,7 @@ STATIC int
 h225_stat_get_df(h225_stats_t * arg, df_t * df, int size)
 {
 	h225_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = df->stats;
@@ -12577,6 +12933,7 @@ h225_stat_clr_ch(h225_stats_t * arg, struct ch *ch, int size)
 {
 	uchar *s, *d;
 	h225_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12589,6 +12946,7 @@ h225_stat_clr_tg(h225_stats_t * arg, struct tg *tg, int size)
 {
 	uchar *s, *d;
 	h225_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12601,6 +12959,7 @@ h225_stat_clr_fg(h225_stats_t * arg, struct fg *fg, int size)
 {
 	uchar *s, *d;
 	h225_stats_fg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!fg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12613,6 +12972,7 @@ h225_stat_clr_eg(h225_stats_t * arg, struct eg *eg, int size)
 {
 	uchar *s, *d;
 	h225_stats_eg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!eg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12625,6 +12985,7 @@ h225_stat_clr_xg(h225_stats_t * arg, struct xg *xg, int size)
 {
 	uchar *s, *d;
 	h225_stats_xg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!xg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12637,6 +12998,7 @@ h225_stat_clr_dl(h225_stats_t * arg, struct dl *dl, int size)
 {
 	uchar *s, *d;
 	h225_stats_dl_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!dl || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12649,6 +13011,7 @@ h225_stat_clr_df(h225_stats_t * arg, df_t * df, int size)
 {
 	uchar *s, *d;
 	h225_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -12675,6 +13038,7 @@ h225_iocgoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		h225_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case ISDN_OBJ_TYPE_CH:
@@ -12708,6 +13072,7 @@ h225_iocsoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		h225_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case ISDN_OBJ_TYPE_CH:
@@ -12742,6 +13107,7 @@ h225_iocgconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		h225_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			switch (arg->type) {
 			case ISDN_OBJ_TYPE_CH:
@@ -12775,6 +13141,7 @@ h225_iocsconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		h225_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case ISDN_ADD:
@@ -12848,6 +13215,7 @@ h225_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		h225_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case ISDN_ADD:
@@ -12921,6 +13289,7 @@ h225_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		h225_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case ISDN_ADD:
@@ -12996,6 +13365,7 @@ h225_iocgstatem(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		h225_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		lis_spin_lock_irqsave(&master.lock, &flags);
@@ -13039,6 +13409,7 @@ h225_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		h225_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		(void) arg;
 		return (-EOPNOTSUPP);
 	}
@@ -13059,6 +13430,7 @@ h225_iocgstatsp(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		h225_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		lis_spin_lock_irqsave(&master.lock, &flags);
@@ -13105,6 +13477,7 @@ h225_iocsstatsp(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		h225_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		lis_spin_lock_irqsave(&master.lock, &flags);
@@ -13151,6 +13524,7 @@ h225_iocgstats(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		h225_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		lis_spin_lock_irqsave(&master.lock, &flags);
@@ -13197,6 +13571,7 @@ h225_ioccstats(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		h225_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		lis_spin_lock_irqsave(&master.lock, &flags);
@@ -13242,6 +13617,7 @@ h225_iocgnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		h225_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&master.lock, &flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
@@ -13288,6 +13664,7 @@ h225_iocsnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		h225_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&master.lock, &flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
@@ -13334,6 +13711,7 @@ h225_ioccnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		h225_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&master.lock, &flags);
 		switch (arg->type) {
 		case ISDN_OBJ_TYPE_CH:
@@ -13378,6 +13756,7 @@ h225_ioccmgmt(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		h225_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		switch (arg->cmd) {
 		case ISDN_MGMT_BLOCK:
 			switch (arg->type) {
@@ -13469,6 +13848,7 @@ h225_ioccpass(queue_t *q, mblk_t *mp)
 		h225_pass_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		mblk_t *bp, *dp;
 		struct dl *dl;
+
 		for (dl = master.dl.list; dl && dl->u.mux.index != arg->muxid; dl = dl->next) ;
 		if (!dl || !dl->oq)
 			return (-EINVAL);
@@ -13515,12 +13895,14 @@ cc_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	(void) cc;
 	switch (type) {
 	case __SID:
 	{
 		struct dl *dl;
 		struct linkblk *lb;
+
 		if (!(lb = arg)) {
 			swerr();
 			ret = -EINVAL;
@@ -13685,6 +14067,7 @@ cc_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct cc *cc = CC_PRIV(q);
 	ulong oldstate = cc_get_state(cc);
+
 	switch (*(ulong *) mp->b_rptr) {
 	case CC_INFO_REQ:
 		printd(("%s: %p: -> CC_INFO_REQ\n", DRV_NAME, cc));
@@ -13864,6 +14247,7 @@ dl_r_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct dl *dl = DL_PRIV(q);
 	ulong oldstate = dl_get_state(dl);
+
 	switch (*((ulong *) mp->b_rptr)) {
 	case DL_INFO_ACK:
 		printd(("%s: %p: DL_INFO_ACK <-\n", DRV_NAME, dl));
@@ -14007,6 +14391,7 @@ dl_r_error(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	struct cr *cr;
 	int err;
+
 	/* 
 	   treat the same as a disconnect */
 	for (cr = dl->fg.fg->cr.list; cr; cr = cr->fg.next) {
@@ -14154,6 +14539,7 @@ h225_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct cc *cc, **ip = &master.cc.list;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -14171,10 +14557,12 @@ h225_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	lis_spin_lock_irqsave(&h225_lock, &flags);
 	for (; *ip; ip = (typeof(ip)) & (*ip)->next) {
 		major_t dmajor = (*ip)->u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*ip)->u.dev.cminor;
+
 			if (cminor < dminor) {
 				if (++cminor >= NMINORS) {
 					if (++mindex >= H225_CMAJORS
@@ -14215,6 +14603,7 @@ h225_close(queue_t *q, int flag, cred_t *crp)
 	head_t *h = (head_t *) cc;
 	str_t *s = (str_t *) cc;
 	psw_t flags;
+
 	(void) flag;
 	(void) crp;
 	(void) h;
@@ -14342,6 +14731,7 @@ STATIC int
 h225_term_caches(void)
 {
 	int err = 0;
+
 	if (h225_cc_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(h225_cc_cachep)) {
@@ -14434,6 +14824,7 @@ STATIC struct cc *
 h225_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 {
 	struct cc *cc;
+
 	printd(("%s: %s: create cc dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
 	if ((cc = kmem_cache_alloc(h225_cc_cachep, GFP_ATOMIC))) {
@@ -14478,6 +14869,7 @@ h225_free_cc(queue_t *q)
 {
 	struct cc *cc = CC_PRIV(q);
 	psw_t flags;
+
 	ensure(cc, return);
 	printd(("%s: %s: %p: free cc %d:%d\n", DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
@@ -14488,6 +14880,7 @@ h225_free_cc(queue_t *q)
 		struct fg *fg;
 		struct eg *eg;
 		struct xg *xg;
+
 		/* 
 		   stopping bufcalls */
 		ss7_unbufcall((str_t *) cc);
@@ -14602,6 +14995,7 @@ h225_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 	/* 
 	   create a call reference with a list of channels and user reference */
 	struct cr *cr, **crp;
+
 	printd(("%s: %s: create cr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((cr = kmem_cache_alloc(h225_cr_cachep, GFP_ATOMIC))) {
 		bzero(cr, sizeof(*cr));
@@ -14633,6 +15027,7 @@ h225_alloc_cr(ulong id, struct cc *cc, struct fg *fg, struct ch **chp, size_t nc
 		   add channels to call */
 		while ((--nch) >= 0) {
 			struct ch *ch;
+
 			if ((ch = chp[nch])) {
 				if (ch->idle.fg) {
 					/* 
@@ -14678,12 +15073,14 @@ h225_free_cr(struct cr *cr)
 	   free a call reference, this is done when call are released as well as when channels are
 	   being removed from under active calls */
 	psw_t flags;
+
 	ensure(cr, return);
 	printd(("%s: %s: %p free cr->id = %ld\n", DRV_NAME, __FUNCTION__, cr, cr->id));
 	lis_spin_lock_irqsave(&cr->lock, &flags);
 	{
 		struct ch *ch;
 		struct fg *fg;
+
 		/* 
 		   stop all timers */
 		__cr_timer_stop(cr, tall);
@@ -14804,6 +15201,7 @@ STATIC INLINE struct cr *
 cr_lookup(ulong id, struct fg *fg)
 {
 	struct cr *cr;
+
 	for (cr = fg->cr.list; cr && cr->id != id; cr = cr->fg.next) ;
 	return (cr);
 }
@@ -14812,6 +15210,7 @@ cr_get_id(ulong id, struct fg *fg)
 {
 	static ulong sequence = 0;
 	struct cr *cr;
+
 	if (!id) {
 		if (!(id = ++sequence))
 			id = ++sequence;
@@ -14835,6 +15234,7 @@ h225_alloc_ch(ulong id, struct fg *fg, struct tg *tg, ulong ts)
 {
 	struct ch *ch, **chp;
 	struct eg *eg = fg->eg.eg;
+
 	assure(eg == tg->eg.eg);
 	printd(("%s: %s: create ch->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((ch = kmem_cache_alloc(h225_ch_cachep, GFP_ATOMIC))) {
@@ -14892,6 +15292,7 @@ h225_free_ch(struct ch *ch)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(ch, return);
 	printd(("%s: %s: %p free ch->id = %ld\n", DRV_NAME, __FUNCTION__, ch, ch->id));
 	lis_spin_lock_irqsave(&ch->lock, &flags);
@@ -15030,6 +15431,7 @@ STATIC struct ch *
 ch_lookup(ulong id)
 {
 	struct ch *ch;
+
 	for (ch = master.ch.list; ch && ch->id != id; ch = ch->next) ;
 	return (ch);
 }
@@ -15037,6 +15439,7 @@ STATIC ulong
 ch_get_id(ulong id)
 {
 	struct ch *ch;
+
 	if (!id) {
 		id = 1;
 		for (ch = master.ch.list; ch; ch = ch->next)
@@ -15057,6 +15460,7 @@ STATIC struct tg *
 h225_alloc_tg(ulong id, struct eg *eg)
 {
 	struct tg *tg, **tgp;
+
 	printd(("%s: %s: create tg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((tg = kmem_cache_alloc(h225_tg_cachep, GFP_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
@@ -15113,6 +15517,7 @@ h225_free_tg(struct tg *tg)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(tg, return);
 	printd(("%s: %s: %p free tg->id = %ld\n", DRV_NAME, __FUNCTION__, tg, tg->id));
 	lis_spin_lock_irqsave(&tg->lock, &flags);
@@ -15237,6 +15642,7 @@ STATIC struct tg *
 tg_lookup(ulong id)
 {
 	struct tg *tg;
+
 	for (tg = master.tg.list; tg && tg->id != id; tg = tg->next) ;
 	return (tg);
 }
@@ -15244,6 +15650,7 @@ STATIC ulong
 tg_get_id(ulong id)
 {
 	struct tg *tg;
+
 	if (!id) {
 		id = 1;
 		for (tg = master.tg.list; tg; tg = tg->next)
@@ -15264,6 +15671,7 @@ STATIC struct fg *
 h225_alloc_fg(ulong id, struct eg *eg)
 {
 	struct fg *fg, **fgp;
+
 	printd(("%s: %s: create fg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((fg = kmem_cache_alloc(h225_fg_cachep, GFP_ATOMIC))) {
 		bzero(fg, sizeof(*fg));
@@ -15318,6 +15726,7 @@ h225_free_fg(struct fg *fg)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(fg, return);
 	printd(("%s: %s: %p free fg->id = %ld\n", DRV_NAME, __FUNCTION__, fg, fg->id));
 	lis_spin_lock_irqsave(&fg->lock, &flags);
@@ -15437,6 +15846,7 @@ STATIC struct fg *
 fg_lookup(ulong id)
 {
 	struct fg *fg;
+
 	for (fg = master.fg.list; fg && fg->id != id; fg = fg->next) ;
 	return (fg);
 }
@@ -15444,6 +15854,7 @@ STATIC ulong
 fg_get_id(ulong id)
 {
 	struct fg *fg;
+
 	if (!id) {
 		id = 1;
 		for (fg = master.fg.list; fg; fg = fg->next)
@@ -15464,6 +15875,7 @@ STATIC struct eg *
 h225_alloc_eg(ulong id, struct xg *xg)
 {
 	struct eg *eg, **egp;
+
 	printd(("%s: %s: create eg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((eg = kmem_cache_alloc(h225_eg_cachep, GFP_ATOMIC))) {
 		bzero(eg, sizeof(*eg));
@@ -15518,6 +15930,7 @@ h225_free_eg(struct eg *eg)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(eg, return);
 	printd(("%s: %s: %p free eg->id = %ld\n", DRV_NAME, __FUNCTION__, eg, eg->id));
 	lis_spin_lock_irqsave(&eg->lock, &flags);
@@ -15630,6 +16043,7 @@ STATIC struct eg *
 eg_lookup(ulong id)
 {
 	struct eg *eg;
+
 	for (eg = master.eg.list; eg && eg->id != id; eg = eg->next) ;
 	return (eg);
 }
@@ -15637,6 +16051,7 @@ STATIC ulong
 eg_get_id(ulong id)
 {
 	struct eg *eg;
+
 	if (!id) {
 		id = 1;
 		for (eg = master.eg.list; eg; eg = eg->next)
@@ -15658,6 +16073,7 @@ h225_alloc_xg(ulong id)
 {
 	struct xg *xg, **xgp;
 	struct df *df = &master;
+
 	printd(("%s: %s: create xg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((xg = kmem_cache_alloc(h225_xg_cachep, GFP_ATOMIC))) {
 		bzero(xg, sizeof(*xg));
@@ -15707,6 +16123,7 @@ h225_free_xg(struct xg *xg)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(xg, return);
 	printd(("%s: %s: %p free xg->id = %ld\n", DRV_NAME, __FUNCTION__, xg, xg->id));
 	lis_spin_lock_irqsave(&xg->lock, &flags);
@@ -15803,6 +16220,7 @@ STATIC struct xg *
 xg_lookup(ulong id)
 {
 	struct xg *xg;
+
 	for (xg = master.xg.list; xg && xg->id != id; xg = xg->next) ;
 	return (xg);
 }
@@ -15810,6 +16228,7 @@ STATIC ulong
 xg_get_id(ulong id)
 {
 	struct xg *xg;
+
 	if (!id) {
 		id = 1;
 		for (xg = master.xg.list; xg; xg = xg->next)
@@ -15830,6 +16249,7 @@ STATIC struct dl *
 h225_alloc_dl(queue_t *q, struct dl **mpp, ulong index, cred_t *crp)
 {
 	struct dl *dl;
+
 	printd(("%s: %s: create dl index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((dl = kmem_cache_alloc(h225_dl_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
@@ -15884,6 +16304,7 @@ STATIC void
 h225_unlink_dl(struct dl *dl)
 {
 	struct df *df = &master;
+
 	dl->id = 0;
 	/* 
 	   unlink from transmission group */
@@ -15913,6 +16334,7 @@ h225_free_dl(queue_t *q)
 {
 	struct dl *dl = DL_PRIV(q);
 	psw_t flags;
+
 	ensure(dl, return);
 	printd(("%s: %s: %p free dl index = %lu\n", DRV_NAME, __FUNCTION__, dl, dl->u.mux.index));
 	lis_spin_lock_irqsave(&dl->lock, &flags);
@@ -15977,6 +16399,7 @@ STATIC struct dl *
 dl_lookup(ulong id)
 {
 	struct dl *dl;
+
 	for (dl = master.dl.list; dl && dl->id != id; dl = dl->next) ;
 	return (dl);
 }
@@ -15984,6 +16407,7 @@ STATIC ulong
 dl_get_id(ulong id)
 {
 	static ulong identifier = 0;
+
 	if (!id) {
 		id = ++identifier;
 	}
@@ -16004,6 +16428,7 @@ dl_get_id(ulong id)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -16012,6 +16437,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the H225 driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -16038,6 +16464,7 @@ STATIC int
 h225_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&h225_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -16047,6 +16474,7 @@ STATIC int
 h225_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&h225_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -16064,6 +16492,7 @@ STATIC int
 h225_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &h225info, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -16079,6 +16508,7 @@ STATIC int
 h225_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -16090,6 +16520,7 @@ MODULE_STATIC void __exit
 dlterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (h225_majors[mindex]) {
 			if ((err = h225_unregister_strdev(h225_majors[mindex])))
@@ -16108,6 +16539,7 @@ MODULE_STATIC int __init
 dlinit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = h225_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

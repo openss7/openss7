@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:12 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:18:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n2.c,v $
+ Revision 0.9.2.11  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.10  2007/07/14 01:35:12  brian
  - make license explicit, add documentation
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:12 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:18:51 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:12 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:18:51 $";
 
 #include <sys/os7/compat.h>
 
@@ -176,11 +179,13 @@ MODULE_STATIC struct streamtab sscop_info = {
  *  =========================================================================
  */
 
-static inline mblk_t *t_info_ack(queue_t * q)
+static inline mblk_t *
+t_info_ack(queue_t *q)
 {
 	mblk_t *mp;
 	struct T_info_ack *p;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_info_ack *) mp->b_wptr;
@@ -199,10 +204,12 @@ static inline mblk_t *t_info_ack(queue_t * q)
 	}
 	return (mp);
 }
-static inline mblk_t *t_ok_ack(int prim)
+static inline mblk_t *
+t_ok_ack(int prim)
 {
 	mblk_t *mp;
 	struct T_ok_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -212,10 +219,12 @@ static inline mblk_t *t_ok_ack(int prim)
 	}
 	return (mp);
 }
-static inline mblk_t *t_error_ack(int prim, int err)
+static inline mblk_t *
+t_error_ack(int prim, int err)
 {
 	mblk_t *mp;
 	struct T_error_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_error_ack *) mp->b_wptr;
@@ -227,10 +236,12 @@ static inline mblk_t *t_error_ack(int prim, int err)
 	}
 	return (mp);
 }
-static inline mblk_t *t_optmgmt_ack(caddr_t opt_ptr, size_t opt_len, uint flags)
+static inline mblk_t *
+t_optmgmt_ack(caddr_t opt_ptr, size_t opt_len, uint flags)
 {
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
+
 	if ((mp = allocb(sizeof(*p) + opt_len, BRPI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_optmgmt_ack) mp->b_wptr;
@@ -244,13 +255,15 @@ static inline mblk_t *t_optmgmt_ack(caddr_t opt_ptr, size_t opt_len, uint flags)
 	}
 	return (mp);
 }
-static inline mblk_t *t_addr_ack(queue_t * q)
+static inline mblk_t *
+t_addr_ack(queue_t *q)
 {
 	mblk_t *mp;
 	struct T_addr_ack *p;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const size_t loc_len = sp->sport ? (sizeof(uint16_t) + sizeof(uint32_t)) : 0;
 	const size_t rem_len = sp->dport ? (sizeof(uint16_t) + sizeof(uint32_t)) : 0;
+
 	if ((mp = allocb(sizeof(*p) + loc_len + rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_addr_ack *) mp->b_wptr;
@@ -267,12 +280,14 @@ static inline mblk_t *t_addr_ack(queue_t * q)
 	}
 	return (mp);
 }
-static inline mblk_t *t_bind_ack(queue_t * q)
+static inline mblk_t *
+t_bind_ack(queue_t *q)
 {
 	mblk_t *mp;
 	struct T_bind_ack *p;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const size_t add_len = sp->sport ? (sizeof(uint16_t) + sizeof(uint32_t)) : 0;
+
 	if ((mp = allocb(sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_bind_ack *) mp->b_wptr;
@@ -285,7 +300,8 @@ static inline mblk_t *t_bind_ack(queue_t * q)
 	}
 	return (mp);
 }
-static inline mblk_t *t_conn_ind(dst_ptr, dst_len, opt_ptr, opt_len)
+static inline mblk_t *
+t_conn_ind(dst_ptr, dst_len, opt_ptr, opt_len)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	caddr_t opt_ptr;
@@ -293,6 +309,7 @@ static inline mblk_t *t_conn_ind(dst_ptr, dst_len, opt_ptr, opt_len)
 {
 	mblk_t *mp;
 	struct T_conn_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_conn_ind *) mp->b_wptr;
@@ -309,10 +326,12 @@ static inline mblk_t *t_conn_ind(dst_ptr, dst_len, opt_ptr, opt_len)
 	}
 	return (mp);
 }
-static inline mblk_t *t_data_ind(uint flag, mblk_t * dp)
+static inline mblk_t *
+t_data_ind(uint flag, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_data_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_data_ind *) mp->b_wptr;
@@ -323,10 +342,12 @@ static inline mblk_t *t_data_ind(uint flag, mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *t_exdata_ind(uint flag, mblk_t * dp)
+static inline mblk_t *
+t_exdata_ind(uint flag, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_exdata_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_exdata_ind *) mp->b_wptr;
@@ -337,7 +358,8 @@ static inline mblk_t *t_exdata_ind(uint flag, mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *t_unitdata_ind(src_ptr, src_len, opt_ptr, opt_len)
+static inline mblk_t *
+t_unitdata_ind(src_ptr, src_len, opt_ptr, opt_len)
 	caddr_t src_ptr;
 	size_t src_len;
 	caddr_t opt_ptr;
@@ -345,6 +367,7 @@ static inline mblk_t *t_unitdata_ind(src_ptr, src_len, opt_ptr, opt_len)
 {
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + src_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_unitdata_ind *) mp->b_wptr;
@@ -361,7 +384,8 @@ static inline mblk_t *t_unitdata_ind(src_ptr, src_len, opt_ptr, opt_len)
 	}
 	return (mp);
 }
-static inline mblk_t *t_uderror_ind(dst_ptr, dst_len, opt_ptr, opt_len, type)
+static inline mblk_t *
+t_uderror_ind(dst_ptr, dst_len, opt_ptr, opt_len, type)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	caddr_t opt_ptr;
@@ -370,6 +394,7 @@ static inline mblk_t *t_uderror_ind(dst_ptr, dst_len, opt_ptr, opt_len, type)
 {
 	mblk_t *mp;
 	struct T_uderror_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_uderror_ind *) mp->b_wptr;
@@ -387,10 +412,12 @@ static inline mblk_t *t_uderror_ind(dst_ptr, dst_len, opt_ptr, opt_len, type)
 	}
 	return (mp);
 }
-static inline mblk_t *t_discon_ind(int reason, uint seq)
+static inline mblk_t *
+t_discon_ind(int reason, uint seq)
 {
 	mblk_t *mp;
 	struct T_discon_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_discon_ind *) mp->b_wptr;
@@ -401,10 +428,12 @@ static inline mblk_t *t_discon_ind(int reason, uint seq)
 	}
 	return (mp);
 }
-static inline mblk_t *t_ordrel_ind(void)
+static inline mblk_t *
+t_ordrel_ind(void)
 {
 	mblk_t *mp;
 	struct T_ordrel_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ordrel_ind *) mp->b_wptr;
@@ -421,10 +450,12 @@ static inline mblk_t *t_ordrel_ind(void)
  *
  *  =========================================================================
  */
-static inline mblk_t *n_info_req(void)
+static inline mblk_t *
+n_info_req(void)
 {
 	mblk_t *mp;
 	N_info_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_info_req_t *) mp->b_wptr;
@@ -433,10 +464,12 @@ static inline mblk_t *n_info_req(void)
 	}
 	return (mp);
 }
-static inline mblk_t *m_optmgnt_req(qos_ptr, qos_len, flags)
+static inline mblk_t *
+m_optmgnt_req(qos_ptr, qos_len, flags)
 {
 	mblk_t *mp;
 	N_optmgmt_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_optmgmt_req_t *) mp->b_wptr;
@@ -450,7 +483,8 @@ static inline mblk_t *m_optmgnt_req(qos_ptr, qos_len, flags)
 	}
 	return (mp);
 }
-static inline mblk_t *n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len)
+static inline mblk_t *
+n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len)
 	caddr_t add_ptr;
 	size_t add_len;
 	uint cons;
@@ -460,6 +494,7 @@ static inline mblk_t *n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len
 {
 	mblk_t *mp;
 	N_bind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_bind_req_t *) mp->b_wptr;
@@ -478,10 +513,12 @@ static inline mblk_t *n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len
 	}
 	return (mp);
 }
-static inline mblk_t *n_unbind_req(void)
+static inline mblk_t *
+n_unbind_req(void)
 {
 	mblk_t *mp;
 	N_unbind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unbind_req_t *) mp->b_wptr;
@@ -490,10 +527,12 @@ static inline mblk_t *n_unbind_req(void)
 	}
 	return (mp);
 }
-static inline mblk_t *n_datack_req(void)
+static inline mblk_t *
+n_datack_req(void)
 {
 	mblk_t *mp;
 	N_datack_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unbind_req_t *) mp->b_wptr;
@@ -502,13 +541,15 @@ static inline mblk_t *n_datack_req(void)
 	}
 	return (mp);
 }
-static inline mblk_t *n_unitdata_req(dst_ptr, dst_len, dp)
+static inline mblk_t *
+n_unitdata_req(dst_ptr, dst_len, dp)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	mblk_t *dp;
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unitdata_req_t *) mp->b_wptr;
@@ -537,7 +578,8 @@ static inline mblk_t *n_unitdata_req(dst_ptr, dst_len, dp)
  *  SEND BGN
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_bgn(sp)
+static inline int
+sscop_send_bgn(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -547,7 +589,8 @@ static inline int sscop_send_bgn(sp)
  *  SEND BGAK
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_bgak(sp)
+static inline int
+sscop_send_bgak(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -557,7 +600,8 @@ static inline int sscop_send_bgak(sp)
  *  SEND END
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_end(sp)
+static inline int
+sscop_send_end(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -567,7 +611,8 @@ static inline int sscop_send_end(sp)
  *  SEND ENDAK
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_endak(sp)
+static inline int
+sscop_send_endak(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -577,7 +622,8 @@ static inline int sscop_send_endak(sp)
  *  SEND RS
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_rs(sp)
+static inline int
+sscop_send_rs(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -587,7 +633,8 @@ static inline int sscop_send_rs(sp)
  *  SEND RSAK
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_rsak(sp)
+static inline int
+sscop_send_rsak(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -597,7 +644,8 @@ static inline int sscop_send_rsak(sp)
  *  SEND BGREJ
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_bgrej(sp)
+static inline int
+sscop_send_bgrej(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -607,7 +655,8 @@ static inline int sscop_send_bgrej(sp)
  *  SEND SD
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_sd(sp)
+static inline int
+sscop_send_sd(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -617,7 +666,8 @@ static inline int sscop_send_sd(sp)
  *  SEND ER
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_er(sp)
+static inline int
+sscop_send_er(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -627,7 +677,8 @@ static inline int sscop_send_er(sp)
  *  SEND POLL
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_poll(sp)
+static inline int
+sscop_send_poll(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -637,7 +688,8 @@ static inline int sscop_send_poll(sp)
  *  SEND STAT
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_stat(sp)
+static inline int
+sscop_send_stat(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -647,7 +699,8 @@ static inline int sscop_send_stat(sp)
  *  SEND USTAT
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_ustat(sp)
+static inline int
+sscop_send_ustat(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -657,7 +710,8 @@ static inline int sscop_send_ustat(sp)
  *  SEND UD
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_ud(sp)
+static inline int
+sscop_send_ud(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -667,7 +721,8 @@ static inline int sscop_send_ud(sp)
  *  SEND MD
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_md(sp)
+static inline int
+sscop_send_md(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
@@ -677,7 +732,8 @@ static inline int sscop_send_md(sp)
  *  SEND ERAK
  *  -------------------------------------------------------------------------
  */
-static inline int sscop_send_erak(sp)
+static inline int
+sscop_send_erak(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-sdt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/07 01:18:13 $
+ @(#) $RCSfile: test-x400p-sdt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:20:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/07 01:18:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:20:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p-sdt.c,v $
+ Revision 0.9.2.7  2007/08/14 12:20:14  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.6  2006/03/07 01:18:13  brian
  - 64bit issues
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p-sdt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/07 01:18:13 $"
+#ident "@(#) $RCSfile: test-x400p-sdt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:20:14 $"
 
-static char const ident[] = "$RCSfile: test-x400p-sdt.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/03/07 01:18:13 $";
+static char const ident[] = "$RCSfile: test-x400p-sdt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:20:14 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -111,6 +114,7 @@ const char *
 lmi_strreason(unsigned int reason)
 {
 	const char *r;
+
 	switch (reason) {
 	default:
 	case LMI_UNSPEC:
@@ -241,6 +245,7 @@ do_lmi_get_msg(int fd)
 	char dbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
 	union SDT_primitives *s = (union SDT_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = 0;
 	ctrl.buf = cbuf;
@@ -261,6 +266,7 @@ do_lmi_get_msg(int fd)
 			case LMI_INFO_ACK:
 			{
 				int ppalen = ctrl.len - sizeof(p->info_ack);
+
 				printf("LMI_INFO_ACK:\n");
 				printf("Version = 0x%08lx\n", p->info_ack.lmi_version);
 				printf("State = %lu\n", p->info_ack.lmi_state);
@@ -269,18 +275,14 @@ do_lmi_get_msg(int fd)
 				printf("Header len = %lu\n", p->info_ack.lmi_header_len);
 				printf("PPA style = %lu\n", p->info_ack.lmi_ppa_style);
 				printf("PPA length = %d\n", ppalen);
-				printf("  card = %d\n",
-				       (*((ushort *) (&p->info_ack + 1)) >> 12) & 0xf);
-				printf("  span = %d\n",
-				       (*((ushort *) (&p->info_ack + 1)) >> 8) & 0xf);
-				printf("  chan = %d\n",
-				       (*((ushort *) (&p->info_ack + 1)) >> 0) & 0xff);
+				printf("  card = %d\n", (*((ushort *) (&p->info_ack + 1)) >> 12) & 0xf);
+				printf("  span = %d\n", (*((ushort *) (&p->info_ack + 1)) >> 8) & 0xf);
+				printf("  chan = %d\n", (*((ushort *) (&p->info_ack + 1)) >> 0) & 0xff);
 				return;
 			}
 			case LMI_OK_ACK:
 				printf("LMI_OK_ACK:\n");
-				printf("Correct primitive = %ld\n",
-				       p->ok_ack.lmi_correct_primitive);
+				printf("Correct primitive = %ld\n", p->ok_ack.lmi_correct_primitive);
 				printf("State = %ld\n", p->ok_ack.lmi_state);
 				return;
 			case LMI_ERROR_ACK:
@@ -288,8 +290,7 @@ do_lmi_get_msg(int fd)
 				printf("Error number = %lu\n", p->error_ack.lmi_errno);
 				printf("Error string = %s\n", strerror(p->error_ack.lmi_errno));
 				printf("Reason number = %lu\n", p->error_ack.lmi_reason);
-				printf("Reason string = %s\n",
-				       lmi_strreason(p->error_ack.lmi_reason));
+				printf("Reason string = %s\n", lmi_strreason(p->error_ack.lmi_reason));
 				printf("Error primitive = %lu\n", p->error_ack.lmi_error_primitive);
 				printf("State = %lu\n", p->error_ack.lmi_state);
 				return;
@@ -298,8 +299,7 @@ do_lmi_get_msg(int fd)
 				printf("Error number = %lu\n", p->error_ind.lmi_errno);
 				printf("Error string = %s\n", strerror(p->error_ind.lmi_errno));
 				printf("Reason number = %lu\n", p->error_ind.lmi_reason);
-				printf("Reason string = %s\n",
-				       lmi_strreason(p->error_ind.lmi_reason));
+				printf("Reason string = %s\n", lmi_strreason(p->error_ind.lmi_reason));
 				printf("State = %lu\n", p->error_ind.lmi_state);
 				goto do_get_again;
 			case LMI_ENABLE_CON:
@@ -344,9 +344,9 @@ do_lmi_get_msg(int fd)
 				printf("SDT_RC_SIGNAL_UNIT_IND:\n");
 				if (data.len > 0) {
 					int i;
-					uint8_t *c = (uint8_t *)data.buf;
-					printf("Message[%d x %lu]: ", data.len,
-					       s->rc_signal_unit_ind.sdt_count);
+					uint8_t *c = (uint8_t *) data.buf;
+
+					printf("Message[%d x %lu]: ", data.len, s->rc_signal_unit_ind.sdt_count);
 					for (i = 0; i < data.len; i++, c++)
 						printf("%02X ", *c);
 					printf("\n");
@@ -371,8 +371,7 @@ do_lmi_get_msg(int fd)
 				printf("SDT_TXC_TRANSMISSION_REQUEST_IND:\n");
 				return;
 			default:
-				printf("Unrecognized response primitive %ld!\n",
-				       (long) p->lmi_primitive);
+				printf("Unrecognized response primitive %ld!\n", (long) p->lmi_primitive);
 				goto do_get_again;
 			}
 		}
@@ -386,6 +385,7 @@ info_req(int fd)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->info_req);
 	ctrl.buf = cbuf;
@@ -407,6 +407,7 @@ attach_req(int fd, uint16_t ppa)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->attach_req) + sizeof(ppa);
 	ctrl.buf = cbuf;
@@ -429,6 +430,7 @@ detach_req(int fd)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->detach_req);
 	ctrl.buf = cbuf;
@@ -450,6 +452,7 @@ enable_req(int fd)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->enable_req);
 	ctrl.buf = cbuf;
@@ -471,6 +474,7 @@ disable_req(int fd)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->disable_req);
 	ctrl.buf = cbuf;
@@ -492,6 +496,7 @@ sdt_daedt_start(int fd)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union SDT_primitives *p = (union SDT_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->daedt_start_req);
 	ctrl.buf = cbuf;
@@ -513,6 +518,7 @@ sdt_daedr_start(int fd)
 	struct strbuf ctrl;
 	char cbuf[BUFSIZE];
 	union SDT_primitives *p = (union SDT_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.len = sizeof(p->daedr_start_req);
 	ctrl.buf = cbuf;
@@ -568,6 +574,7 @@ sdt_write(int fd)
 #endif
 	// int i;
 	int ret;
+
 	// for (i = 0; i < 10; i++) {
 	printf("\nAttempting write\n");
 	ret = write(fd, buf, len);
@@ -577,6 +584,7 @@ sdt_write(int fd)
 		exit(2);
 	} else {
 		int i;
+
 		printf("Write succeeded, wrote %d bytes!\n", ret);
 		printf("Message[%ld]: ", (long) len);
 		for (i = 0; i < len; i++) {
@@ -592,6 +600,7 @@ sdt_read(int fd)
 {
 	uint8_t buf[256];
 	int i, ret;
+
 	i = 0;
 	printf("\nAttempting read\n");
 	for (;;) {
@@ -613,6 +622,7 @@ sdt_read(int fd)
 		if (ret > 0) {
 			int i;
 			uint8_t *c = buf;
+
 			printf("Message[%d]: ", ret);
 			for (i = 0; i < ret; i++, c++) {
 				printf("%02X ", *c);
@@ -627,6 +637,7 @@ sdt_ioctl(int fd, int cmd, void *arg, int len)
 {
 	struct strioctl ctl = { cmd, 0, len, arg };
 	int ret;
+
 	ret = ioctl(fd, I_STR, &ctl);
 	if (ret < 0) {
 		printf("return = %d\n", ret);
@@ -641,6 +652,7 @@ void
 do_ioctl(int fd, int cmd, int arg)
 {
 	int ret;
+
 	ret = ioctl(fd, cmd, arg);
 	if (ret < 0) {
 		printf("return = %d\n", ret);
@@ -656,6 +668,7 @@ sdl_config(int fd)
 	unsigned char buf[256];
 	sdl_config_t *c = (sdl_config_t *) buf;
 	sdl_statem_t *s = (sdl_statem_t *) buf;
+
 	sdt_ioctl(fd, SDL_IOCGCONFIG, buf, sizeof(sdl_config_t));
 	printf("Config:\n");
 	printf("  ifflags       = %lu\n", c->ifflags);
@@ -689,6 +702,7 @@ sdt_config(int fd)
 	unsigned char buf[256];
 	sdt_config_t *c = (sdt_config_t *) buf;
 	sdt_statem_t *s = (sdt_statem_t *) buf;
+
 	printf("Getting configuration\n");
 	sdt_ioctl(fd, SDT_IOCGCONFIG, buf, sizeof(sdt_config_t));
 	printf("Config:\n");
@@ -727,6 +741,7 @@ sdl_stats(int fd)
 {
 	unsigned char buf[256];
 	sdl_stats_t *s = (sdl_stats_t *) buf;
+
 	printf("Attempting stats collection\n");
 	sdt_ioctl(fd, SDL_IOCGSTATS, buf, sizeof(sdl_stats_t));
 	printf("Stats:\n");
@@ -746,6 +761,7 @@ sdt_stats(int fd)
 {
 	unsigned char buf[256];
 	sdt_stats_t *s = (sdt_stats_t *) buf;
+
 	printf("Attempting stats collection\n");
 	sdt_ioctl(fd, SDT_IOCGSTATS, buf, sizeof(sdt_stats_t));
 	printf("Stats:\n");
@@ -884,6 +900,7 @@ do_tests(void)
 
 	{
 		int i;
+
 		for (i = 0; i < 2000; i++) {
 			sleep(1);
 			sdt_stats(pfd[0]);
@@ -950,7 +967,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -979,7 +996,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }
@@ -1031,6 +1048,7 @@ main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -1044,6 +1062,7 @@ main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "qvhVC?");

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:57 $
+ @(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:47 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:14:57 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_n.c,v $
+ Revision 0.9.2.5  2007/08/14 12:19:47  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/03/15 10:14:57  brian
  - test case reporting and release date
 
@@ -85,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:57 $"
+#ident "@(#) $RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:47 $"
 
-static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:57 $";
+static char const ident[] = "$RCSfile: test-etsi_n.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:47 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -217,6 +234,7 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "RFC 2960, SCTP-IG, ETSI TS 102 144";
 static const char *sstdname = "RFC2960/TS102144";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_t";
 #else
@@ -620,7 +638,7 @@ addr_t addrs[4];
 struct sockaddr_in addrs[4][3];
 #endif				/* SCTP_VERSION_2 */
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -5289,6 +5307,7 @@ preamble_pt_initialized_iut(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int
 preamble_pt_initialized_pt(int child)
 {
@@ -5322,6 +5341,7 @@ preamble_pt_established_iut(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int
 preamble_pt_established_pt(int child)
 {
@@ -5528,6 +5548,7 @@ preamble_pt_closed_iut(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int
 preamble_pt_closed_pt(int child)
 {
@@ -5579,6 +5600,7 @@ postamble_iut_unint_iut(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_iut_unint_pt(int child)
 {
@@ -5608,6 +5630,7 @@ postamble_iut_bound_iut(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_iut_bound_pt(int child)
 {
@@ -5645,6 +5668,7 @@ postamble_iut_cookie_wait_iut(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_iut_cookie_wait_pt(int child)
 {
@@ -5660,6 +5684,7 @@ postamble_iut_cookie_echoed_iut(int child)
 {
 	return postamble_iut_cookie_wait_iut(child);
 }
+
 int
 postamble_iut_cookie_echoed_pt(int child)
 {
@@ -5676,6 +5701,7 @@ postamble_iut_established_iut(int child)
 {
 	return postamble_iut_cookie_wait_iut(child);
 }
+
 int
 postamble_iut_established_pt(int child)
 {
@@ -5688,6 +5714,7 @@ postamble_iut_listen_iut(int child)
 {
 	return postamble_iut_bound_iut(child);
 }
+
 int
 postamble_iut_listen_pt(int child)
 {
@@ -5699,6 +5726,7 @@ postamble_pt_initialized_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_pt_initialized_pt(int child)
 {
@@ -5710,6 +5738,7 @@ postamble_pt_established_iut(int child)
 {
 	return postamble_iut_established_iut(child);
 }
+
 int
 postamble_pt_established_pt(int child)
 {
@@ -5721,6 +5750,7 @@ postamble_iut_shutdown_received_iut(int child)
 {
 	return postamble_pt_established_iut(child);
 }
+
 int
 postamble_iut_shutdown_received_pt(int child)
 {
@@ -5732,6 +5762,7 @@ postamble_iut_shutdown_ack_sent_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_iut_shutdown_ack_sent_pt(int child)
 {
@@ -5747,6 +5778,7 @@ postamble_iut_shutdown_pending_iut(int child)
 {
 	return postamble_pt_established_iut(child);
 }
+
 int
 postamble_iut_shutdown_pending_pt(int child)
 {
@@ -5758,6 +5790,7 @@ postamble_iut_shutdown_sent_iut(int child)
 {
 	return postamble_pt_established_iut(child);
 }
+
 int
 postamble_iut_shutdown_sent_pt(int child)
 {
@@ -5769,6 +5802,7 @@ postamble_iut_closed_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_iut_closed_pt(int child)
 {
@@ -5780,6 +5814,7 @@ postamble_pt_closed_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_pt_closed_pt(int child)
 {
@@ -11050,7 +11085,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -11081,7 +11116,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

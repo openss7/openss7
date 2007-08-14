@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: chi.h,v 0.9.2.5 2007/02/13 14:05:28 brian Exp $
+ @(#) $Id: chi.h,v 0.9.2.6 2007/08/14 12:17:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 14:05:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: chi.h,v $
+ Revision 0.9.2.6  2007/08/14 12:17:09  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.5  2007/02/13 14:05:28  brian
  - corrected ulong and long for 32-bit compat
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_CHI_H__
 #define __SS7_CHI_H__
 
-#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: chi.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

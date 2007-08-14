@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:33:55 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.21  2007/08/14 12:17:27  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.20  2007/07/14 01:33:55  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:33:55 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:33:55 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $";
 
 #include <sys/os7/compat.h>
 
@@ -91,7 +94,7 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:33:55 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -297,6 +300,7 @@ struct dl {
 	struct lapd_stats_dl stats;	/* DL statistics */
 	struct lapd_notify_dl notify;	/* DL notifications */
 };
+
 #define DL_PRIV(__q) ((struct dl *)(__q)->q_ptr)
 
 #define DLF_AUTO_XID		0x00000001
@@ -381,6 +385,7 @@ struct cd {
 	struct lapd_stats_cd stats;	/* CD statistics */
 	struct lapd_notify_cd notify;	/* CD notifications */
 };
+
 #define CD_PRIV(__q) ((struct cd *)(__q)->q_ptr)
 
 STATIC struct cd *cd_lookup(ulong);
@@ -478,6 +483,7 @@ STATIC INLINE ulong
 dl_set_state(struct dl *dl, ulong newstate)
 {
 	ulong oldstate = dl_get_state(dl);
+
 	(void) oldstate;
 	dl->info.dl_current_state = dl->i_state = newstate;
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, dl, dl_state_name(newstate),
@@ -525,6 +531,7 @@ STATIC INLINE ulong
 cd_set_state(struct cd *cd, ulong newstate)
 {
 	ulong oldstate = cd_get_state(cd);
+
 	(void) oldstate;
 	cd->info.cd_state = cd->i_state = newstate;
 	printd(("%s: %p: %s <- %s\n", DRV_NAME, cd, cd_state_name(newstate),
@@ -638,6 +645,7 @@ STATIC void
 dl_bind_link(struct dl *dl, struct cd *cd)
 {
 	int i;
+
 	ensure(dl, return);
 	ensure(cd, return);
 	unless(dl->bind.cd, return);
@@ -665,6 +673,7 @@ STATIC void
 dl_conn_link(struct dl *dl, struct cd *cd)
 {
 	int i;
+
 	ensure(dl, return);
 	ensure(cd, return);
 	unless(dl->conn.cd, return);
@@ -692,6 +701,7 @@ STATIC void
 dl_list_link(struct dl *dl, struct cd *cd)
 {
 	int i;
+
 	ensure(dl, return);
 	ensure(cd, return);
 	unless(dl->list.cd, return);
@@ -775,6 +785,7 @@ STATIC INLINE void
 __dl_timer_stop(struct dl *dl, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -814,6 +825,7 @@ STATIC INLINE void
 dl_timer_stop(struct dl *dl, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&dl->lock, flags);
 	{
 		__dl_timer_stop(dl, t);
@@ -824,6 +836,7 @@ STATIC INLINE void
 dl_timer_start(struct dl *dl, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&dl->lock, flags);
 	{
 		__dl_timer_stop(dl, t);
@@ -858,6 +871,7 @@ STATIC INLINE void
 __cd_timer_stop(struct cd *cd, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -885,6 +899,7 @@ STATIC INLINE void
 cd_timer_stop(struct cd *cd, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		__cd_timer_stop(cd, t);
@@ -895,6 +910,7 @@ STATIC INLINE void
 cd_timer_start(struct cd *cd, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		__cd_timer_stop(cd, t);
@@ -935,6 +951,7 @@ STATIC int
 m_hangup(queue_t *q, struct dl *dl)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 0, BPRI_MED))) {
 		mp->b_datap->db_type = M_HANGUP;
 		printd(("%s: %p: <- M_HANGUP\n", DRV_NAME, dl));
@@ -953,6 +970,7 @@ STATIC int
 m_error(queue_t *q, struct dl *dl, uint8_t rerr, uint8_t werr)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = rerr;
@@ -974,6 +992,7 @@ m_hangup_all(queue_t *q, struct cd *cd)
 {
 	struct dl *dl;
 	int err;
+
 	fixme(("re-write this function\n"));
 	/* 
 	   this function should also detach the dl */
@@ -992,6 +1011,7 @@ m_error_all(queue_t *q, struct cd *cd, uint8_t rerr, uint8_t werr)
 {
 	struct dl *dl;
 	int err;
+
 	fixme(("re-write this function\n"));
 	/* 
 	   this function should also detach the dl */
@@ -1012,6 +1032,7 @@ dl_info_ack(queue_t *q, struct dl *dl)
 	dl_info_ack_t *p;
 	size_t alen, blen = 0;
 	caddr_t aptr, bptr = NULL;
+
 	if (dl_get_state(dl) > DL_UNATTACHED) {
 		alen = sizeof(dl->dlc);
 		aptr = (caddr_t) (&dl->dlc);
@@ -1057,6 +1078,7 @@ dl_bind_ack(queue_t *q, struct dl *dl, struct cd *cd)
 	dl_bind_ack_t *p;
 	size_t add_len = 0;
 	caddr_t add_ptr = NULL;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1101,6 +1123,7 @@ dl_subs_bind_ack(queue_t *q, struct dl *dl, uchar tei)
 	dl_subs_bind_ack_t *p;
 	size_t sap_len = sizeof(tei);
 	caddr_t sap_ptr = (caddr_t) &tei;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + sap_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1140,6 +1163,7 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 	mblk_t *mp;
 	dl_ok_ack_t *p;
 	int err;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1175,6 +1199,7 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 				uchar sapi = (cp->b_rptr[0] >> 2) & 0x3f;
 				uchar tei = (cp->b_rptr[1] >> 1) & 0x7f;
 				uchar pf = (cp->b_rptr[3] & 0x01);
+
 				if ((err = send_UA_res(q, cd, sapi, tei, pf)) < 0) {
 					freemsg(mp);
 					return (err);
@@ -1221,6 +1246,7 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 				uchar sapi = (cp->b_rptr[0] >> 2) & 0x3f;
 				uchar tei = (cp->b_rptr[1] >> 1) & 0x7f;
 				uchar pf = (cp->b_rptr[3] & 0x01);
+
 				if ((err = send_DM_res(q, cd, sapi, tei, pf)) < 0) {
 					freemsg(mp);
 					return (err);
@@ -1243,6 +1269,7 @@ dl_ok_ack(queue_t *q, struct dl *dl, ulong prim, struct cd *cd, struct dl *ap, m
 				uchar sapi = dl->dlc.dl_sap;
 				uchar tei = dl->dlc.dl_tei;
 				uchar pf = 1;
+
 				if ((err = send_DISC_cmd(q, cd, sapi, tei, pf))) {
 					freemsg(mp);
 					return (err);
@@ -1288,6 +1315,7 @@ dl_error_ack(queue_t *q, struct dl *dl, ulong prim, ulong error, ulong reason)
 {
 	mblk_t *mp;
 	dl_error_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1319,6 +1347,7 @@ dl_connect_ind(queue_t *q, struct dl *dl, mblk_t *cp, size_t cda_len, caddr_t cd
 {
 	mblk_t *mp;
 	dl_connect_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + cda_len + cga_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1359,6 +1388,7 @@ dl_connect_con(queue_t *q, struct dl *dl, size_t res_len, caddr_t res_ptr)
 {
 	mblk_t *mp;
 	dl_connect_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1395,6 +1425,7 @@ dl_token_ack(queue_t *q, struct dl *dl)
 {
 	mblk_t *mp;
 	dl_token_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1418,6 +1449,7 @@ dl_disconnect_ind(queue_t *q, struct dl *dl, ulong orig, ulong reason, mblk_t *c
 {
 	mblk_t *mp;
 	dl_disconnect_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1453,6 +1485,7 @@ dl_reset_ind(queue_t *q, struct dl *dl, ulong orig, ulong reason)
 {
 	mblk_t *mp;
 	dl_reset_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1478,6 +1511,7 @@ dl_reset_con(queue_t *q, struct dl *dl)
 {
 	mblk_t *mp;
 	dl_reset_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1503,6 +1537,7 @@ dl_unitdata_ind(queue_t *q, struct dl *dl, mblk_t *dp, size_t dst_len, caddr_t d
 {
 	mblk_t *mp;
 	dl_unitdata_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1540,6 +1575,7 @@ dl_uderror_ind(queue_t *q, struct dl *dl, ulong errno, ulong reason, size_t dst_
 {
 	mblk_t *mp;
 	dl_uderror_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1572,6 +1608,7 @@ dl_test_ind(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_p
 {
 	mblk_t *mp;
 	dl_test_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1609,6 +1646,7 @@ dl_test_con(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_p
 {
 	mblk_t *mp;
 	dl_test_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1646,6 +1684,7 @@ dl_xid_ind(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_pt
 {
 	mblk_t *mp;
 	dl_xid_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1683,6 +1722,7 @@ dl_xid_con(queue_t *q, struct dl *dl, ulong flag, size_t dst_len, caddr_t dst_pt
 {
 	mblk_t *mp;
 	dl_xid_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1720,6 +1760,7 @@ dl_data_ack_ind(queue_t *q, struct dl *dl, size_t dst_len, caddr_t dst_ptr, size
 {
 	mblk_t *mp;
 	dl_data_ack_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1757,6 +1798,7 @@ dl_data_ack_status_ind(queue_t *q, struct dl *dl, ulong corr, ulong status)
 {
 	mblk_t *mp;
 	dl_data_ack_status_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1782,6 +1824,7 @@ dl_reply_ind(queue_t *q, struct dl *dl, size_t dst_len, caddr_t dst_ptr, size_t 
 {
 	mblk_t *mp;
 	dl_reply_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1819,6 +1862,7 @@ dl_reply_status_ind(queue_t *q, struct dl *dl, ulong corr, ulong status)
 {
 	mblk_t *mp;
 	dl_reply_status_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1843,6 +1887,7 @@ dl_reply_update_status_ind(queue_t *q, struct dl *dl, ulong corr, ulong status)
 {
 	mblk_t *mp;
 	dl_reply_update_status_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1867,6 +1912,7 @@ dl_phys_addr_ack(queue_t *q, struct dl *dl, size_t add_len, caddr_t add_ptr)
 {
 	mblk_t *mp;
 	dl_phys_addr_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1895,6 +1941,7 @@ dl_get_statistics_ack(queue_t *q, struct dl *dl, size_t sta_len, caddr_t sta_ptr
 {
 	mblk_t *mp;
 	dl_get_statistics_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + sta_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1931,6 +1978,7 @@ cd_info_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_info_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1953,6 +2001,7 @@ cd_attach_req(queue_t *q, struct cd *cd, struct dl *dl)
 {
 	mblk_t *mp;
 	cd_attach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1977,6 +2026,7 @@ cd_detach_req(queue_t *q, struct cd *cd, struct dl *dl)
 {
 	mblk_t *mp;
 	cd_detach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2000,6 +2050,7 @@ cd_enable_req(queue_t *q, struct cd *cd, struct dl *dl)
 {
 	mblk_t *mp;
 	cd_enable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2027,6 +2078,7 @@ cd_disable_req(queue_t *q, struct cd *cd, struct dl *dl, ulong disposal)
 {
 	mblk_t *mp;
 	cd_disable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2052,6 +2104,7 @@ cd_allow_input_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_allow_input_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2075,6 +2128,7 @@ cd_read_req(queue_t *q, struct cd *cd, ulong msec)
 {
 	mblk_t *mp;
 	cd_read_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2100,6 +2154,7 @@ cd_unitdata_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst_l
 {
 	mblk_t *mp;
 	cd_unitdata_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2132,6 +2187,7 @@ cd_write_read_req(queue_t *q, struct cd *cd, ulong atype, ulong prio, size_t dst
 {
 	mblk_t *mp;
 	cd_write_read_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2166,6 +2222,7 @@ cd_halt_input_req(queue_t *q, struct cd *cd, ulong disposal)
 {
 	mblk_t *mp;
 	cd_halt_input_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2190,6 +2247,7 @@ cd_abort_output_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_abort_output_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2213,6 +2271,7 @@ cd_mux_name_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_mux_name_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2236,6 +2295,7 @@ cd_modem_sig_req(queue_t *q, struct cd *cd, ulong sigs)
 {
 	mblk_t *mp;
 	cd_modem_sig_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2259,6 +2319,7 @@ cd_modem_sig_poll(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_modem_sig_poll_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2320,8 +2381,10 @@ build_msg(queue_t *q, ulong prio, size_t len)
 {
 	mblk_t *mp;
 	cd_unitdata_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mblk_t *bp;
+
 		if ((bp = ss7_allocb(q, len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = prio;
@@ -2356,8 +2419,10 @@ send_I_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr, uin
 	   RR, RNR, REJ (or FRMR or DM in LAPB) frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_I_header(mp->b_cont, sapi, cr, tei, pf, nr, ns);
 			linkb(mp, dp);
 			putnext(cd->oq, mp);
@@ -2380,8 +2445,10 @@ send_RR_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 	   RR, RNR, REJ frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_S_header(mp->b_cont, sapi, cr, tei, pf, nr, 0x00);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2400,8 +2467,10 @@ send_RR_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_S_header(mp->b_cont, sapi, cr, tei, pf, nr, 0x00);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2423,8 +2492,10 @@ send_RNR_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 	   RR, RNR, REJ frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_S_header(mp->b_cont, sapi, cr, tei, pf, nr, 0x01);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2443,8 +2514,10 @@ send_RNR_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_S_header(mp->b_cont, sapi, cr, tei, pf, nr, 0x01);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2466,8 +2539,10 @@ send_REJ_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 	   RR, RNR, REJ frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_S_header(mp->b_cont, sapi, cr, tei, pf, nr, 0x02);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2486,8 +2561,10 @@ send_REJ_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uint nr)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 4))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_S_header(mp->b_cont, sapi, cr, tei, pf, nr, 0x02);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2506,8 +2583,10 @@ send_UI_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, mblk_t *dp)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			/* 
 			   the P bit shall be set to zero */
 			assure(pf == 0);
@@ -2530,8 +2609,10 @@ send_DM_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x03);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2553,8 +2634,10 @@ send_DISC_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 	   next UA or DM frame it transmits */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x10);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2573,8 +2656,10 @@ send_UA_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x18);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2598,8 +2683,10 @@ send_SABME_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf)
 	   no information field is permitted with a SAMBE */
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x1b);
 			putnext(cd->oq, mp);
 			return (QR_DONE);
@@ -2619,8 +2706,10 @@ send_FRMR_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, uchar *ct
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x21);
 			*mp->b_wptr++ = ctl[0];
 			*mp->b_wptr++ = ctl[1];
@@ -2644,8 +2733,10 @@ send_XID_cmd(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, mblk_t *dp
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x2b);
 			linkb(mp, dp);
 			putnext(cd->oq, mp);
@@ -2665,8 +2756,10 @@ send_XID_res(queue_t *q, struct cd *cd, uint sapi, uint tei, uint pf, mblk_t *dp
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 3))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 1 : 0;
+
 			build_U_header(mp->b_cont, sapi, cr, tei, pf, 0x2b);
 			linkb(mp, dp);
 			putnext(cd->oq, mp);
@@ -2695,8 +2788,10 @@ send_TEI_i_req(queue_t *q, struct cd *cd, ushort ref, uchar ai)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 8))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = ref;
@@ -2715,8 +2810,10 @@ send_TEI_i_ack(queue_t *q, struct cd *cd, ushort ref, uchar ai)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 8))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = ref;
@@ -2735,8 +2832,10 @@ send_TEI_i_rej(queue_t *q, struct cd *cd, ushort ref, uchar ai)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 8))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = ref;
@@ -2755,8 +2854,10 @@ send_TEI_c_req(queue_t *q, struct cd *cd, uchar ai)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 8))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = 0;
@@ -2775,8 +2876,10 @@ send_TEI_c_res(queue_t *q, struct cd *cd, ushort ref, uchar *ai_ptr, size_t ai_l
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 7 + ai_len))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = ref;
@@ -2796,8 +2899,10 @@ send_TEI_i_rmv(queue_t *q, struct cd *cd, uchar ai)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 8))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = 0;
@@ -2816,8 +2921,10 @@ send_TEI_i_ver(queue_t *q, struct cd *cd, uchar ai)
 {
 	if (canputnext(cd->oq)) {
 		mblk_t *mp;
+
 		if ((mp = build_msg(q, 0, 8))) {
 			uint cr = (cd->mode != CD_MODE_NTWK) ? 0 : 1;
+
 			build_U_header(mp->b_cont, TEI_MGMT_SAPI, cr, TEI_MGMT_TEI, 0, 0x00);
 			*mp->b_cont->b_wptr++ = MEI;
 			*mp->b_cont->b_wptr++ = 0;
@@ -2962,6 +3069,7 @@ recv_UI_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 		ulong ref;
 		uchar ai;
 		int err;
+
 		ref = mp->b_rptr[5];
 		ref <<= 8;
 		ref |= mp->b_rptr[4];
@@ -3088,6 +3196,7 @@ STATIC int
 recv_DM_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	struct dl *dl;
+
 	/* 
 	   Upon reception of a DM response with the F bit set to 1, the originator of the SABME
 	   command shall indicate this to layer 3 by means of a DL-RELEASE indication primitive,
@@ -3146,6 +3255,7 @@ STATIC int
 recv_DISC_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	struct dl *dl;
+
 	/* 
 	   a dl entity receiving a DISC with the P bit set to 1 shall set the F bit to 1 in the
 	   next UA or DM frame it transmits */
@@ -3195,6 +3305,7 @@ STATIC int
 recv_UA_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 {
 	struct dl *dl;
+
 	/* 
 	   upon reception of a UA response with the F-bit set to 1, the originator of the SABME
 	   command shall: reset timer T200; start timer T203, if implemented; set V(S), V(R) and
@@ -3208,6 +3319,7 @@ recv_UA_res(queue_t *q, mblk_t *mp, struct cd *cd, uint sapi, uint tei, uint pf)
 		struct lapd_addr a = { dl_sap:sapi, dl_tei:tei, };
 		size_t alen = sizeof(a);
 		caddr_t aptr = (caddr_t) &a;
+
 		return dl_connect_con(q, dl, alen, aptr);
 	}
       unexpected:
@@ -3223,6 +3335,7 @@ STATIC int
 recv_SABME_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uchar sapi, uchar tei, uint pf)
 {
 	struct dl *dl;
+
 	/* 
 	   a dl entity receiving a SABME with the P bit set to 1 shall set the F bit to 1 in the
 	   next UA or DM frame it transmits */
@@ -3243,6 +3356,7 @@ recv_SABME_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uchar sapi, uchar tei, uin
 		/* 
 		   dl in listening state */
 		mblk_t *cp;
+
 		for (cp = dl->conq.q_head;
 		     cp && (((cp->b_rptr[0] >> 2) & 0x3f) != sapi
 			    || ((cp->b_rptr[1] >> 1) & 0x7f) != tei); cp = cp->b_next) ;
@@ -3253,6 +3367,7 @@ recv_SABME_cmd(queue_t *q, mblk_t *mp, struct cd *cd, uchar sapi, uchar tei, uin
 			struct lapd_addr a = { dl_sap:sapi, dl_tei:tei, };
 			size_t alen = sizeof(a);
 			caddr_t aptr = (caddr_t) &a;
+
 			return dl_connect_ind(q, dl, mp, alen, aptr, alen, aptr);
 		}
 	}
@@ -3309,6 +3424,7 @@ recv_msg(queue_t *q, mblk_t *mp)
 	size_t dlen = msgdsize(mp);
 	int err;
 	uint sapi, cr, tei, ctl, ns, nr, s, m, pf;
+
 	(void) recv_msg;
 	if (dlen < 3)
 		goto discard;
@@ -3448,6 +3564,7 @@ STATIC int
 lapd_term_caches(void)
 {
 	int err = 0;
+
 	if (dl_priv_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(dl_priv_cachep)) {
@@ -3510,6 +3627,7 @@ STATIC INLINE struct dl *
 __dl_lookup(ulong id)
 {
 	struct dl *dl;
+
 	for (dl = master.dl.list; dl && dl->id != id; dl = dl->next) ;
 	return (dl);
 }
@@ -3518,6 +3636,7 @@ dl_lookup(ulong id)
 {
 	struct dl *dl;
 	psw_t flags;
+
 	spin_lock_irqsave(&master.lock, flags);
 	dl = __dl_lookup(id);
 	spin_unlock_irqrestore(&master.lock, flags);
@@ -3546,6 +3665,7 @@ dl_get_id(ulong id)
 	if (!id) {
 		static ulong sequence = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&master.lock, flags);
 		while (__dl_lookup(++sequence)) ;
 		id = sequence;
@@ -3559,6 +3679,7 @@ dl_alloc_priv(queue_t *q, struct dl **dlp, dev_t *devp, cred_t *crp, int style)
 	struct dl *dl;
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
+
 	printd(("%s: create dl dev = %d:%d\n", DRV_NAME, cmajor, cminor));
 	if ((dl = kmem_cache_alloc(dl_priv_cachep, GFP_ATOMIC))) {
 		bzero(dl, sizeof(*dl));
@@ -3612,6 +3733,7 @@ STATIC void
 dl_free_priv(struct dl *dl)
 {
 	psw_t flags;
+
 	ensure(dl, return);
 	printd(("%s: %p: free dl dev = %d:%d\n", DRV_NAME, dl, dl->u.dev.cmajor, dl->u.dev.cminor));
 	spin_lock_irqsave(&dl->lock, flags);
@@ -3671,6 +3793,7 @@ STATIC INLINE struct cd *
 __cd_lookup(ulong id)
 {
 	struct cd *cd;
+
 	for (cd = master.cd.list; cd && cd->id != id; cd = cd->next) ;
 	return (cd);
 }
@@ -3678,8 +3801,10 @@ STATIC struct cd *
 cd_lookup(ulong id)
 {
 	struct cd *cd = NULL;
+
 	if (id) {
 		psw_t flags;
+
 		spin_lock_irqsave(&master.lock, flags);
 		cd = __cd_lookup(id);
 		spin_unlock_irqrestore(&master.lock, flags);
@@ -3709,6 +3834,7 @@ cd_get_id(ulong id)
 	if (!id) {
 		static ulong sequence = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&master.lock, flags);
 		while (__cd_lookup(++sequence)) ;
 		id = sequence;
@@ -3720,6 +3846,7 @@ STATIC struct cd *
 dl_alloc_link(queue_t *q, struct cd **cdp, ulong index, cred_t *crp)
 {
 	struct cd *cd;
+
 	printd(("%s: create cd mux = %lu\n", DRV_NAME, index));
 	if ((cd = kmem_cache_alloc(dl_link_cachep, GFP_ATOMIC))) {
 		bzero(cd, sizeof(*cd));
@@ -3761,12 +3888,14 @@ STATIC void
 dl_free_link(struct cd *cd)
 {
 	psw_t flags;
+
 	ensure(cd, return);
 	printd(("%s: %p: free cd mux = %lu\n", DRV_NAME, cd, cd->u.mux.index));
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		int i;
 		struct dl *dl;
+
 		ss7_unbufcall((struct str *) cd);
 		flushq(cd->oq, FLUSHALL);
 		flushq(cd->iq, FLUSHALL);
@@ -3850,6 +3979,7 @@ STATIC int
 dl_t200_timeout(struct dl *dl)
 {
 	int err;
+
 	switch (dl->state) {
 	case LAPD_WAIT_ESTABLISH:
 		switch (dl_get_state(dl)) {
@@ -3959,6 +4089,7 @@ dl_data_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	size_t dlen = msgdsize(mp);
+
 	if (dlen < dl->info.dl_min_sdu || dlen > dl->info.dl_max_sdu)
 		goto eproto;
 	switch (dl_get_state(dl)) {
@@ -3988,6 +4119,7 @@ dl_info_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_info_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	return dl_info_ack(q, dl);
@@ -4011,6 +4143,7 @@ dl_attach_req(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	struct cd *cd;
 	dl_attach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (dl_get_state(dl) != DL_UNATTACHED)
@@ -4051,6 +4184,7 @@ dl_detach_req(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	struct cd *cd;
 	dl_detach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (dl_get_state(dl) != DL_UNBOUND)
@@ -4082,6 +4216,7 @@ dl_bind_req(queue_t *q, mblk_t *mp)
 	struct cd *cd = dl->cd.cd;
 	int hash;
 	dl_bind_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (dl_get_state(dl) != DL_UNBOUND)
@@ -4198,6 +4333,7 @@ dl_unbind_req(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	struct cd *cd;
 	dl_unbind_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (dl_get_state(dl) != DL_IDLE)
@@ -4228,6 +4364,7 @@ dl_subs_bind_req(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	dl_subs_bind_req_t *p = (typeof(p)) mp->b_rptr;
 	uchar tei;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (dl_get_state(dl) != DL_IDLE)
@@ -4252,6 +4389,7 @@ dl_subs_bind_req(queue_t *q, mblk_t *mp)
 	if (dl->conind) {
 		struct dl *d2;
 		int slot = ((dl->dlc.dl_sap + tei) & DL_BIND_HASHMASK);
+
 		for (d2 = dl->cd.cd->list.hash[slot]; d2; d2 = d2->list.next)
 			if (d2->dlc.dl_sap == dl->dlc.dl_sap && d2->dlc.dl_tei == tei)
 				goto bound;
@@ -4287,6 +4425,7 @@ dl_subs_unbind_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_subs_unbind_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	dl_set_state(dl, DL_SUBS_UNBIND_PND);
@@ -4307,6 +4446,7 @@ dl_enabmulti_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_enabmulti_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupported;
@@ -4326,6 +4466,7 @@ dl_disabmulti_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_disabmulti_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupported;
@@ -4345,6 +4486,7 @@ dl_promiscon_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_promiscon_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupported;
@@ -4364,6 +4506,7 @@ dl_promiscoff_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_promiscoff_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	goto notsupported;
@@ -4390,6 +4533,7 @@ dl_connect_req(queue_t *q, mblk_t *mp)
 	struct cd *cd = dl->cd.cd;
 	uchar tei;
 	int err;
+
 	if (dl_get_state(dl) != DL_IDLE)
 		goto outstate;
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
@@ -4478,6 +4622,7 @@ dl_connect_res(queue_t *q, mblk_t *mp)
 	dl_connect_res_t *p = (typeof(p)) mp->b_rptr;
 	struct dl *ap = dl;
 	mblk_t *cp;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (dl_get_state(dl) != DL_INCON_PENDING)
@@ -4497,7 +4642,9 @@ dl_connect_res(queue_t *q, mblk_t *mp)
 	}
 	if (!p->dl_correlation)
 		goto badcorr;
-	for (cp = dl->conq.q_head; cp && ((uint32_t) p->dl_correlation != (uint32_t) (typeof(p->dl_correlation)) (long) cp);
+	for (cp = dl->conq.q_head;
+	     cp
+	     && ((uint32_t) p->dl_correlation != (uint32_t) (typeof(p->dl_correlation)) (long) cp);
 	     cp = cp->b_next) ;
 	if (!cp)
 		goto badcorr;
@@ -4526,6 +4673,7 @@ dl_token_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_token_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4543,6 +4691,7 @@ dl_disconnect_req(queue_t *q, mblk_t *mp)
 	struct cd *cd = dl->cd.cd;
 	dl_disconnect_req_t *p = (typeof(p)) mp->b_rptr;
 	mblk_t *cp = NULL;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	switch (dl_get_state(dl)) {
@@ -4553,7 +4702,9 @@ dl_disconnect_req(queue_t *q, mblk_t *mp)
 		if (!p->dl_correlation)
 			goto badcorr;
 		for (cp = dl->conq.q_head;
-		     cp && ((uint32_t) p->dl_correlation != (uint32_t) (typeof(p->dl_correlation)) (long) cp); cp = cp->b_next) ;
+		     cp
+		     && ((uint32_t) p->dl_correlation !=
+			 (uint32_t) (typeof(p->dl_correlation)) (long) cp); cp = cp->b_next) ;
 		if (!cp)
 			goto badcorr;
 		dl_set_state(dl, DL_DISCON9_PENDING);
@@ -4593,6 +4744,7 @@ dl_reset_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reset_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4608,6 +4760,7 @@ dl_reset_res(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reset_res_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	dl_set_state(dl, DL_RESET_RES_PENDING);
@@ -4625,6 +4778,7 @@ dl_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_unitdata_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
 	switch (dl_get_state(dl)) {
@@ -4669,6 +4823,7 @@ dl_udqos_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_udqos_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4684,6 +4839,7 @@ dl_test_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_test_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4699,6 +4855,7 @@ dl_test_res(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_test_res_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4714,6 +4871,7 @@ dl_xid_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_xid_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4729,6 +4887,7 @@ dl_xid_res(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_xid_res_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4744,6 +4903,7 @@ dl_data_ack_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_data_ack_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4759,6 +4919,7 @@ dl_reply_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reply_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4774,6 +4935,7 @@ dl_reply_update_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_reply_update_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4789,6 +4951,7 @@ dl_phys_addr_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_phys_addr_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4804,6 +4967,7 @@ dl_set_phys_addr_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_set_phys_addr_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4819,6 +4983,7 @@ dl_get_statistics_req(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
 	dl_get_statistics_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto badprim;
       badprim:
@@ -4854,6 +5019,7 @@ cd_info_ack(queue_t *q, mblk_t *mp)
 	cd_info_ack_t *p = (typeof(p)) mp->b_rptr;
 	struct dl *dl;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd->info = *p;		/* just adopt the state */
@@ -4892,6 +5058,7 @@ cd_ok_ack(queue_t *q, mblk_t *mp)
 	cd_ok_ack_t *p = (typeof(p)) mp->b_rptr;
 	struct dl *dl;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd_set_state(cd, p->cd_state);
@@ -4926,6 +5093,7 @@ cd_error_ack(queue_t *q, mblk_t *mp)
 	cd_error_ack_t *p = (typeof(p)) mp->b_rptr;
 	struct dl *dl;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	switch (p->cd_error_primitive) {
@@ -4973,6 +5141,7 @@ cd_enable_con(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	cd_enable_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd_set_state(cd, p->cd_state);
@@ -5000,6 +5169,7 @@ cd_disable_con(queue_t *q, mblk_t *mp)
 	cd_disable_con_t *p = (typeof(p)) mp->b_rptr;
 	struct dl *dl;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (p->cd_state != CD_DISABLED)
@@ -5028,6 +5198,7 @@ cd_error_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	cd_error_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd_set_state(cd, p->cd_state);
@@ -5092,6 +5263,7 @@ cd_unitdata_ack(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	cd_unitdata_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	fixme(("input to state machine\n"));
@@ -5109,6 +5281,7 @@ cd_unitdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	cd_unitdata_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	fixme(("input to state machine\n"));
@@ -5126,6 +5299,7 @@ cd_bad_frame_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	cd_bad_frame_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	fixme(("input to state machine\n"));
@@ -5143,6 +5317,7 @@ cd_modem_sig_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
 	cd_modem_sig_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	fixme(("input to state machine\n"));
@@ -5171,6 +5346,7 @@ lapd_iocgoptions(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_option_dl *opt = (typeof(opt)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*opt)) < 0)
@@ -5182,6 +5358,7 @@ lapd_iocgoptions(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_option_cd *opt = (typeof(opt)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*opt)) < 0)
@@ -5206,6 +5383,7 @@ lapd_iocsoptions(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_option_dl *opt = (typeof(opt)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*opt)) < 0)
@@ -5218,6 +5396,7 @@ lapd_iocsoptions(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_option_cd *opt = (typeof(opt)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*opt)) < 0)
@@ -5243,6 +5422,7 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_config_dl *cnf = (typeof(cnf)) (hdr + 1);
+
 		if ((size -= sizeof(*cnf)) < 0)
 			return (-EFAULT);
 		switch (hdr->cmd) {
@@ -5317,6 +5497,7 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_config_cd *cnf = (typeof(cnf)) (hdr + 1);
+
 		if ((size -= sizeof(*cnf)) < 0)
 			return (-EFAULT);
 		switch (hdr->cmd) {
@@ -5327,6 +5508,7 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 			if (hdr->id) {
 				struct dl *dl;
 				struct lapd_config_dl *cdl;
+
 				/* 
 				   get specific object */
 				if (!cd)
@@ -5430,6 +5612,7 @@ lapd_iocxconfig(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size, in
 	{
 		struct df *df = df_lookup(hdr->id);
 		struct lapd_config_df *cnf = (typeof(cnf)) (hdr + 1);
+
 		if ((size -= sizeof(*cnf)) < 0)
 			return (-EFAULT);
 		switch (hdr->cmd) {
@@ -5558,6 +5741,7 @@ lapd_iocgstatem(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_statem_dl *sta = (typeof(sta)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5569,6 +5753,7 @@ lapd_iocgstatem(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_statem_cd *sta = (typeof(sta)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5593,6 +5778,7 @@ lapd_ioccmreset(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_statem_dl *sta = (typeof(sta)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5604,6 +5790,7 @@ lapd_ioccmreset(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_statem_cd *sta = (typeof(sta)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5628,6 +5815,7 @@ lapd_iocgstatsp(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_stats_dl *per = (typeof(per)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*per)) < 0)
@@ -5639,6 +5827,7 @@ lapd_iocgstatsp(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_stats_cd *per = (typeof(per)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*per)) < 0)
@@ -5663,6 +5852,7 @@ lapd_iocsstatsp(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_stats_dl *per = (typeof(per)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*per)) < 0)
@@ -5674,6 +5864,7 @@ lapd_iocsstatsp(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_stats_cd *per = (typeof(per)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*per)) < 0)
@@ -5698,6 +5889,7 @@ lapd_iocgstats(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_stats_dl *sta = (typeof(sta)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5709,6 +5901,7 @@ lapd_iocgstats(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_stats_cd *sta = (typeof(sta)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5733,6 +5926,7 @@ lapd_ioccstats(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_stats_dl *sta = (typeof(sta)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5744,6 +5938,7 @@ lapd_ioccstats(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_stats_cd *sta = (typeof(sta)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*sta)) < 0)
@@ -5768,6 +5963,7 @@ lapd_iocgnotify(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_notify_dl *not = (typeof(not)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*not)) < 0)
@@ -5779,6 +5975,7 @@ lapd_iocgnotify(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_notify_cd *not = (typeof(not)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*not)) < 0)
@@ -5803,6 +6000,7 @@ lapd_iocsnotify(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_notify_dl *not = (typeof(not)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*not)) < 0)
@@ -5814,6 +6012,7 @@ lapd_iocsnotify(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_notify_cd *not = (typeof(not)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*not)) < 0)
@@ -5838,6 +6037,7 @@ lapd_ioccnotify(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct dl *dl = dl_lookup(hdr->id);
 		struct lapd_notify_dl *not = (typeof(not)) (hdr + 1);
+
 		if (!dl)
 			return (-EINVAL);
 		if ((size -= sizeof(*not)) < 0)
@@ -5849,6 +6049,7 @@ lapd_ioccnotify(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	{
 		struct cd *cd = cd_lookup(hdr->id);
 		struct lapd_notify_cd *not = (typeof(not)) (hdr + 1);
+
 		if (!cd)
 			return (-EINVAL);
 		if ((size -= sizeof(*not)) < 0)
@@ -5872,6 +6073,7 @@ lapd_ioccmgmt(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	case LAPD_OBJ_TYPE_DL:
 	{
 		struct dl *dl = dl_lookup(hdr->id);
+
 		if (!dl)
 			return (-EINVAL);
 		return (QR_DONE);
@@ -5879,6 +6081,7 @@ lapd_ioccmgmt(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	case LAPD_OBJ_TYPE_CD:
 	{
 		struct cd *cd = cd_lookup(hdr->id);
+
 		if (!cd)
 			return (-EINVAL);
 		return (QR_DONE);
@@ -5899,6 +6102,7 @@ lapd_ioccpass(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	case LAPD_OBJ_TYPE_DL:
 	{
 		struct dl *dl = dl_lookup(hdr->id);
+
 		if (!dl)
 			return (-EINVAL);
 		return (QR_DONE);
@@ -5906,6 +6110,7 @@ lapd_ioccpass(queue_t *q, struct dl *dl, struct lapd_iochdr *hdr, int size)
 	case LAPD_OBJ_TYPE_CD:
 	{
 		struct cd *cd = cd_lookup(hdr->id);
+
 		if (!cd)
 			return (-EINVAL);
 		return (QR_DONE);
@@ -5939,12 +6144,14 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
 	psw_t flags;
+
 	(void) dl;
 	switch (type) {
 	case _IOC_TYPE(__SID):
 	{
 		struct linkblk *lb;
 		struct cd *cd, **cdp;
+
 		if (!(lb = arg)) {
 			swerr();
 			ret = (-EINVAL);
@@ -6015,6 +6222,7 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 	case LAPD_IOC_MAGIC:
 	{
 		struct lapd_iochdr *hdr;
+
 		if (!(hdr = arg) || count < size || (count -= sizeof(*hdr)) < 0) {
 			ret = (-EFAULT);
 			break;
@@ -6099,6 +6307,7 @@ dl_w_ioctl(queue_t *q, mblk_t *mp)
 	case HDLC_IOC_MAGIC:
 	{
 		struct cd *cd;
+
 		if (!(cd = dl->cd.cd)) {
 			/* 
 			   not attached to ppa */
@@ -6175,6 +6384,7 @@ dl_w_proto(queue_t *q, mblk_t *mp)
 	struct dl *dl = DL_PRIV(q);
 	ulong prim;
 	int rtn;
+
 	dl->i_oldstate = dl_get_state(dl);
 	if (mp->b_wptr < mp->b_rptr + sizeof(prim))
 		return (-EMSGSIZE);
@@ -6310,6 +6520,7 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 	struct cd *cd = CD_PRIV(q);
 	ulong prim;
 	int rtn;
+
 	cd->i_oldstate = cd_get_state(cd);
 	if (mp->b_wptr > mp->b_rptr + sizeof(prim))
 		return (-EMSGSIZE);
@@ -6375,6 +6586,7 @@ STATIC INLINE int
 dl_w_data(queue_t *q, mblk_t *mp)
 {
 	struct dl *dl = DL_PRIV(q);
+
 	(void) dl;
 	printd(("%s: %p: -> M_DATA [%d]\n", DRV_NAME, dl, msgdsize(mp)));
 	return dl_data_req(q, mp);
@@ -6383,6 +6595,7 @@ STATIC INLINE int
 cd_r_data(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
+
 	(void) cd;
 	printd(("%s: %p: M_DATA [%d] <-\n", DRV_NAME, cd, msgdsize(mp)));
 	return cd_data_ind(q, mp);
@@ -6399,6 +6612,7 @@ STATIC INLINE int
 cd_r_error(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
+
 	printd(("%s: %p: M_ERROR <-\n", DRV_NAME, cd));
 	return m_error_all(q, cd, ((uchar *) mp->b_rptr)[0], ((uchar *) mp->b_rptr++)[1]);
 }
@@ -6406,6 +6620,7 @@ STATIC INLINE int
 cd_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = CD_PRIV(q);
+
 	printd(("%s: %p: M_HANGUP <-\n", DRV_NAME, cd));
 	return m_hangup_all(q, cd);
 }
@@ -6520,6 +6735,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	minor_t bminor = cminor;
 	struct dl *dl, **dlp = &master.dl.list;
+
 	MOD_INC_USE_COUNT;
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -6541,6 +6757,7 @@ dl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	for (dlp = &master.dl.list; *dlp; dlp = &(*dlp)->next) {
 		major_t dmajor = (*dlp)->u.dev.cmajor;
 		minor_t dminor = (*dlp)->u.dev.cminor;
+
 		if (!dmajor)
 			continue;	/* skip headless opens */
 		if (!cmajor || cmajor != dmajor || cminor < dminor)
@@ -6586,6 +6803,7 @@ dl_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct dl *dl = DL_PRIV(q);
 	psw_t flags;
+
 	(void) flag;
 	(void) crp;
 	printd(("%s: closing character device %d:%d\n", DRV_NAME, dl->u.dev.cmajor,
@@ -6611,6 +6829,7 @@ dl_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -6619,6 +6838,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the DL driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -6645,6 +6865,7 @@ STATIC int
 dl_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&dl_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -6654,6 +6875,7 @@ STATIC int
 dl_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&dl_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -6671,6 +6893,7 @@ STATIC int
 dl_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &dl_lapdinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -6686,6 +6909,7 @@ STATIC int
 dl_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -6697,6 +6921,7 @@ MODULE_STATIC void __exit
 dlterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (lapd_majors[mindex]) {
 			if ((err = dl_unregister_strdev(lapd_majors[mindex])))
@@ -6715,6 +6940,7 @@ MODULE_STATIC int __init
 dlinit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = lapd_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:14 $
+ @(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:45 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:20:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_cd.c,v $
+ Revision 0.9.2.2  2007/08/14 12:18:45  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.1  2007/08/12 15:20:14  brian
  - added new files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:14 $"
+#ident "@(#) $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:45 $"
 
-static char const ident[] = "$RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:14 $";
+static char const ident[] =
+    "$RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:45 $";
 
 /*
  *  This is the SDT-CD STREAMS pushable module.  It's purpose is to convert from a general purpose
@@ -93,7 +97,7 @@ static char const ident[] = "$RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.1
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:14 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_cd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:45 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corpopration.  All Rights Reserved."
 #define SDT_DEVICE	"Provides OpenSS7 SDT-CD module."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2338,22 +2342,22 @@ cd_error_ind(struct cd *cd, queue_t *q, mblk_t *mp)
 		goto protoshort;
 	cd_set_m_state(cd, p->cd_state);
 	if (p->cd_errno == CD_DISC)
-	if (p->cd_errno == CD_EVENT) {
-		switch(p->cd_explanation) {
-		case CD_HDLC_IDLE:
-			return sdt_txc_transmission_request_ind(cd->sdt, q, mp);
-		case CD_DEVERR: /* congestion accept */
-			return sdt_rc_congestion_accept_ind(cd->sdt, q, mp);
-		case CD_DEVERR+1: /* congestion discard */
-			return sdt_rc_congestion_discard_ind(cd->sdt, q, mp);
-		case CD_DEVERR+2: /* no congestion */
-			return sdt_rc_no_congestion_ind(cd->sdt, q, mp);
-		case CD_DEVERR+3: /* correct su */
-			return sdt_iac_correct_su_ind(cd->sdt, q, mp);
-		case CD_DEVERR+4: /* abort proving */
-			return sdt_iac_abort_proving_ind(cd->sdt, q, mp);
+		if (p->cd_errno == CD_EVENT) {
+			switch (p->cd_explanation) {
+			case CD_HDLC_IDLE:
+				return sdt_txc_transmission_request_ind(cd->sdt, q, mp);
+			case CD_DEVERR:	/* congestion accept */
+				return sdt_rc_congestion_accept_ind(cd->sdt, q, mp);
+			case CD_DEVERR + 1:	/* congestion discard */
+				return sdt_rc_congestion_discard_ind(cd->sdt, q, mp);
+			case CD_DEVERR + 2:	/* no congestion */
+				return sdt_rc_no_congestion_ind(cd->sdt, q, mp);
+			case CD_DEVERR + 3:	/* correct su */
+				return sdt_iac_correct_su_ind(cd->sdt, q, mp);
+			case CD_DEVERR + 4:	/* abort proving */
+				return sdt_iac_abort_proving_ind(cd->sdt, q, mp);
+			}
 		}
-	}
 	freemsg(mp);
 	return (0);
       protoshort:

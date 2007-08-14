@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:18:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:16 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:55 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tr.c,v $
+ Revision 0.9.2.13  2007/08/14 12:18:55  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:18:55 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:35:16 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:18:55 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -68,7 +74,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date"
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -231,9 +237,11 @@ static uint tr_next_transaction_id = 1;
  *  =========================================================================
  */
 
-static inline mblk_t *m_error(int r_error, int w_error)
+static inline mblk_t *
+m_error(int r_error, int w_error)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = r_error;
@@ -241,17 +249,21 @@ static inline mblk_t *m_error(int r_error, int w_error)
 	}
 	return (mp);
 }
-static inline mblk_t *m_hangup(void)
+static inline mblk_t *
+m_hangup(void)
 {
 	mblk_t *mp;
+
 	if ((mp = allogb(0, BPRI_HI))) {
 		mp->b_datap->db_type = M_HANGUP;
 	}
 	return (mp);
 }
-static inline mblk_t *m_flush(int flags, int band)
+static inline mblk_t *
+m_flush(int flags, int band)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags;
@@ -272,10 +284,12 @@ static inline mblk_t *m_flush(int flags, int band)
  *  TR_INFO_ACK		 Information acknowledgement
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_info_ack(void)
+static inline mblk_t *
+tr_info_ack(void)
 {
 	mblk_t *mp;
 	TR_info_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_info_ack_t *) mp->b_wptr;
@@ -292,10 +306,12 @@ static inline mblk_t *tr_info_ack(void)
  *  TR_BIND_ACK		 Bound to global title
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_bind_ack(void)
+static inline mblk_t *
+tr_bind_ack(void)
 {
 	mblk_t *mp;
 	TR_bind_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_bind_ack_t *) mp->b_wptr;
@@ -312,10 +328,12 @@ static inline mblk_t *tr_bind_ack(void)
  *  TR_OK_ACK		 Success acknowledgement
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_ok_ack(void)
+static inline mblk_t *
+tr_ok_ack(void)
 {
 	mblk_t *mp;
 	TR_ok_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_ok_ack_t *) mp->b_wptr;
@@ -332,10 +350,12 @@ static inline mblk_t *tr_ok_ack(void)
  *  TR_ERROR_ACK	 Error acknowledgement
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_error_ack(void)
+static inline mblk_t *
+tr_error_ack(void)
 {
 	mblk_t *mp;
 	TR_error_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_error_ack_t *) mp->b_wptr;
@@ -352,10 +372,12 @@ static inline mblk_t *tr_error_ack(void)
  *  TR_UNIDIR_IND	 Unidirectional Indication
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_unidir_ind(void)
+static inline mblk_t *
+tr_unidir_ind(void)
 {
 	mblk_t *mp;
 	TR_unidir_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_unidir_ind_t *) mp->b_wptr;
@@ -372,10 +394,12 @@ static inline mblk_t *tr_unidir_ind(void)
  *  TR_QUERY_W_PERM_IND	 Incoming Query with permission to continue
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_query_w_perm_ind(void)
+static inline mblk_t *
+tr_query_w_perm_ind(void)
 {
 	mblk_t *mp;
 	TR_query_w_perm_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_query_w_perm_ind_t *) mp->b_wptr;
@@ -392,10 +416,12 @@ static inline mblk_t *tr_query_w_perm_ind(void)
  *  TR_QUERY_WO_PERM_IND Incoming Query without permission to continue
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_query_wo_perm_ind(void)
+static inline mblk_t *
+tr_query_wo_perm_ind(void)
 {
 	mblk_t *mp;
 	TR_query_wo_perm_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_query_wo_perm_ind_t *) mp->b_wptr;
@@ -412,10 +438,12 @@ static inline mblk_t *tr_query_wo_perm_ind(void)
  *  TR_RESP_IND		 Incoming Response
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_resp_ind(void)
+static inline mblk_t *
+tr_resp_ind(void)
 {
 	mblk_t *mp;
 	TR_resp_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_resp_ind_t *) mp->b_wptr;
@@ -432,10 +460,12 @@ static inline mblk_t *tr_resp_ind(void)
  *  TR_CONV_W_PERM_IND	 Incoming Conversation with permission to continue
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_conv_w_perm_ind(void)
+static inline mblk_t *
+tr_conv_w_perm_ind(void)
 {
 	mblk_t *mp;
 	TR_conv_w_perm_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_conv_w_perm_ind_t *) mp->b_wptr;
@@ -452,10 +482,12 @@ static inline mblk_t *tr_conv_w_perm_ind(void)
  *  TR_CONV_WO_PERM_IND	 Incoming Conversation without permission to continue
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_conv_wo_perm_ind(void)
+static inline mblk_t *
+tr_conv_wo_perm_ind(void)
 {
 	mblk_t *mp;
 	TR_conv_wo_perm_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_conv_wo_perm_ind_t *) mp->b_wptr;
@@ -472,10 +504,12 @@ static inline mblk_t *tr_conv_wo_perm_ind(void)
  *  TR_CONV_W_PERM_CON	 Incoming Conversation with permission to continue
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_conv_w_perm_con(void)
+static inline mblk_t *
+tr_conv_w_perm_con(void)
 {
 	mblk_t *mp;
 	TR_conv_w_perm_con_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_conv_w_perm_con_t *) mp->b_wptr;
@@ -492,10 +526,12 @@ static inline mblk_t *tr_conv_w_perm_con(void)
  *  TR_CONV_WO_PERM_CON	 Incoming Conversation without permission to continue
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_conv_wo_perm_con(void)
+static inline mblk_t *
+tr_conv_wo_perm_con(void)
 {
 	mblk_t *mp;
 	TR_conv_wo_perm_con_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_conv_wo_perm_con_t *) mp->b_wptr;
@@ -512,10 +548,12 @@ static inline mblk_t *tr_conv_wo_perm_con(void)
  *  TR_ABORT_IND	 Abort indication
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *tr_abort_ind(void)
+static inline mblk_t *
+tr_abort_ind(void)
 {
 	mblk_t *mp;
 	TR_abort_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_abort_ind_t *) mp->b_wptr;
@@ -541,7 +579,8 @@ static inline mblk_t *tr_abort_ind(void)
  *  N_INFO_REQ	     5 - Information Request
  *  -------------------------------------------------------------------------
  */
-static int sccp_info_req(void)
+static int
+sccp_info_req(void)
 {
 	return n_info_req();
 }
@@ -550,9 +589,10 @@ static int sccp_info_req(void)
  *  N_BIND_REQ	     6 - Bind a NS user to network address
  *  -------------------------------------------------------------------------
  */
-static int sccp_bind_req(uint flags, sccp_addr_t * bnd, uint32_t ssn)
+static int
+sccp_bind_req(uint flags, sccp_addr_t * bnd, uint32_t ssn)
 {
-	return n_bind_req(flags, 0, (caddr_t) bnd, bnd ? sizeof(*bind) : 0, (caddr_t) & ssn,
+	return n_bind_req(flags, 0, (caddr_t) bnd, bnd ? sizeof(*bind) : 0, (caddr_t) &ssn,
 			  sizeof(ssn));
 }
 
@@ -560,7 +600,8 @@ static int sccp_bind_req(uint flags, sccp_addr_t * bnd, uint32_t ssn)
  *  N_UNBIND_REQ     7 - Unbind NS user from network address
  *  -------------------------------------------------------------------------
  */
-static int sccp_unbind_req(void)
+static int
+sccp_unbind_req(void)
 {
 	return n_unbind_req();
 }
@@ -569,7 +610,8 @@ static int sccp_unbind_req(void)
  *  N_UNITDATA_REQ   8 - Connection-less data send request
  *  -------------------------------------------------------------------------
  */
-static int sccp_unitdata_req(sccp_addr_t * dst, mblk_t * dp)
+static int
+sccp_unitdata_req(sccp_addr_t * dst, mblk_t *dp)
 {
 	return n_unitdata_req((caddr_t) dst, dst ? sizeof(*dst) : 0, dp);
 }
@@ -578,7 +620,8 @@ static int sccp_unitdata_req(sccp_addr_t * dst, mblk_t * dp)
  *  N_OPTMGMT_REQ    9 - Options Management request
  *  -------------------------------------------------------------------------
  */
-static int sccp_optmgmt_req(uint flags, caddr_t qos_ptr, size_t qos_len)
+static int
+sccp_optmgmt_req(uint flags, caddr_t qos_ptr, size_t qos_len)
 {
 	return n_optmgmt_req(flags, qos_ptr, qos_len);
 }
@@ -591,10 +634,12 @@ static int sccp_optmgmt_req(uint flags, caddr_t qos_ptr, size_t qos_len)
  *  =========================================================================
  */
 
-static inline mblk_t *tr_enc_uni(mblk_t * dp)
+static inline mblk_t *
+tr_enc_uni(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -604,10 +649,12 @@ static inline mblk_t *tr_enc_uni(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_qry_invoke(mblk_t * dp)
+static inline mblk_t *
+tr_enc_qry_invoke(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -617,10 +664,12 @@ static inline mblk_t *tr_enc_qry_invoke(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_qwp_invoke(mblk_t * dp)
+static inline mblk_t *
+tr_enc_qwp_invoke(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -630,10 +679,12 @@ static inline mblk_t *tr_enc_qwp_invoke(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_res_reply(mblk_t * dp)
+static inline mblk_t *
+tr_enc_res_reply(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -643,10 +694,12 @@ static inline mblk_t *tr_enc_res_reply(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_cnv_invoke(mblk_t * dp)
+static inline mblk_t *
+tr_enc_cnv_invoke(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -656,10 +709,12 @@ static inline mblk_t *tr_enc_cnv_invoke(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_cwp_invoke(mblk_t * dp)
+static inline mblk_t *
+tr_enc_cwp_invoke(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -669,10 +724,12 @@ static inline mblk_t *tr_enc_cwp_invoke(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_cnv_reply(mblk_t * dp)
+static inline mblk_t *
+tr_enc_cnv_reply(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -682,10 +739,12 @@ static inline mblk_t *tr_enc_cnv_reply(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_cwp_reply(mblk_t * dp)
+static inline mblk_t *
+tr_enc_cwp_reply(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -695,10 +754,12 @@ static inline mblk_t *tr_enc_cwp_reply(mblk_t * dp)
 	}
 	return (mp);
 }
-static inline mblk_t *tr_enc_abort_reject(mblk_t * dp)
+static inline mblk_t *
+tr_enc_abort_reject(mblk_t *dp)
 {
 	mblk_t *mp;
 	size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		/* 
@@ -728,9 +789,11 @@ static int (*tr_o_events[]) (queue_t *, mblk_t *) = {
 	    tr_o_cwp_rep,	/* TRE_CWP_REP 0x08 - Conv w perm (Reply) */
 	    tr_o_abt_rej	/* TRE_ABT_REJ 0x09 - Abort (Reject) */
 };
-static inline int tr_o_proto(queue_t * q, mblk_t * mp)
+static inline int
+tr_o_proto(queue_t *q, mblk_t *mp)
 {
 	tr_event_t *m = (tr_event_t *) mp->b_wptr;
+
 	return (*tr_o_events[m->event]) (q, mp);
 }
 
@@ -747,10 +810,12 @@ static inline int tr_o_proto(queue_t * q, mblk_t * mp)
  *  TRE_UNI_INV	    0x01 - Unidirectional (Invoke)	
  *  ----------------------------------------------------
  */
-static int tr_i_uni_inv(queue_t * q, mblk_t * mp)
+static int
+tr_i_uni_inv(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -766,10 +831,12 @@ static int tr_i_uni_inv(queue_t * q, mblk_t * mp)
  *  the TR-User on single-threaded streams).  Mark without permission and
  *  reject TR-User attempts at conversation.
  */
-static int tr_i_qry_inv(queue_t * q, mblk_t * mp)
+static int
+tr_i_qry_inv(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -785,10 +852,12 @@ static int tr_i_qry_inv(queue_t * q, mblk_t * mp)
  *  the TR-User on single-threaded streams).  Mark with permission and permit
  *  TR-User attempts at conversation.
  */
-static int tr_i_qwp_inv(queue_t * q, mblk_t * mp)
+static int
+tr_i_qwp_inv(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -803,10 +872,12 @@ static int tr_i_qwp_inv(queue_t * q, mblk_t * mp)
  *  Close a transaction.  Pass response to user (with transaction id on
  *  multiple-threaded streams).
  */
-static int tr_i_rsp_rep(queue_t * q, mblk_t * mp)
+static int
+tr_i_rsp_rep(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -826,10 +897,12 @@ static int tr_i_rsp_rep(queue_t * q, mblk_t * mp)
  *  If conversation is not permitted, reject the invoke and abort the
  *  transaction.  Pass an abort to the user.
  */
-static int tr_i_cnv_inv(queue_t * q, mblk_t * mp)
+static int
+tr_i_cnv_inv(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -849,10 +922,12 @@ static int tr_i_cnv_inv(queue_t * q, mblk_t * mp)
  *  If conversation is not permitted, reject the invoke and abort the
  *  transaction.  Pass an abort to the user.
  */
-static int tr_i_cwp_inv(queue_t * q, mblk_t * mp)
+static int
+tr_i_cwp_inv(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -866,10 +941,12 @@ static int tr_i_cwp_inv(queue_t * q, mblk_t * mp)
  *
  *  Close the conversation and deallocate the correlation id.
  */
-static int tr_i_cnv_rep(queue_t * q, mblk_t * mp)
+static int
+tr_i_cnv_rep(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -883,10 +960,12 @@ static int tr_i_cnv_rep(queue_t * q, mblk_t * mp)
  *
  *  Close the conversation and deallocate the correlation id.
  */
-static int tr_i_cwp_rep(queue_t * q, mblk_t * mp)
+static int
+tr_i_cwp_rep(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -901,10 +980,12 @@ static int tr_i_cwp_rep(queue_t * q, mblk_t * mp)
  *  Abort the conversation and the transaction.  Deallocate transaction id and
  *  all correlation ids.
  */
-static int tr_i_abt_rej(queue_t * q, mblk_t * mp)
+static int
+tr_i_abt_rej(queue_t *q, mblk_t *mp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	/* 
 	 *  FIXME: process event...
 	 */
@@ -923,9 +1004,11 @@ static int (*tr_i_events[]) (queue_t *, mblk_t *) = {
 	    tr_i_cwp_rep,	/* TRE_CWP_REP 0x08 - Conv w perm (Reply) */
 	    tr_i_abt_rej	/* TRE_ABT_REJ 0x09 - Abort (Reject) */
 };
-static inline int tr_i_proto(queue_t * q, mblk_t * mp)
+static inline int
+tr_i_proto(queue_t *q, mblk_t *mp)
 {
 	tr_event_t *e = (tr_event_t *) mp->b_rptr;
+
 	return (*tr_i_events[e->event]) (q, mp);
 }
 
@@ -937,31 +1020,38 @@ static inline int tr_i_proto(queue_t * q, mblk_t * mp)
  *  =========================================================================
  */
 
-static inline int sccp_dec_uni(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_uni(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
-static inline int sccp_dec_qry(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_qry(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
-static inline int sccp_dec_qwp(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_qwp(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
-static inline int sccp_dec_cnv(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_cnv(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
-static inline int sccp_dec_cwp(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_cwp(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
-static inline int sccp_dec_res(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_res(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
-static inline int sccp_dec_abt(caddr_t p, caddr_t e, tr_event_t * e)
+static inline int
+sccp_dec_abt(caddr_t p, caddr_t e, tr_event_t * e)
 {
 	return (0);
 }
@@ -977,10 +1067,12 @@ static inline int sccp_dec_abt(caddr_t p, caddr_t e, tr_event_t * e)
  *  N_INFO_ACK	    16 - Information Acknowledgement
  *  ----------------------------------------------------------------
  */
-static int sccp_info_ack(queue_t * q, mblk_t * pdu)
+static int
+sccp_info_ack(queue_t *q, mblk_t *pdu)
 {
 	sccp_t *sccp = (sccp_t *) q->q_ptr;
 	N_info_ack_t *p = (N_info_ack_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr = pdu->b_rptr < sizeof(*p))
 		return m_error_all(q, pdu, EFAULT, EFAULT);
 	sccp->flags = p->OPTIONS_flags;
@@ -989,6 +1081,7 @@ static int sccp_info_ack(queue_t * q, mblk_t * pdu)
 	sccp->nodu = p->NODU_size;
 	if (p->ADDR_length >= sizeof(sccp_addr_t)) {
 		sccp_addr_t *add = (sccp_addr_t *) (pdu->b_rptr + p->ADDR_offset);
+
 		bcopy(add, sccp->bnd, sizeof(*add) + add->alen);
 	}
 	if (p->PROTOID_length == 1)
@@ -1002,16 +1095,19 @@ static int sccp_info_ack(queue_t * q, mblk_t * pdu)
  *  N_BIND_ACK	    17 - NS User bound to network address
  *  ----------------------------------------------------------------
  */
-static int sccp_bind_ack(queue_t * q, mblk_t * pdu)
+static int
+sccp_bind_ack(queue_t *q, mblk_t *pdu)
 {
 	sccp_t *sccp = (sccp_t *) q->q_ptr;
 	N_bind_ack_t *p = (N_bind_ack_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return m_error_ack(q, pdu, EFAULT, EFAULT);
 	if (sccp->state != NS_WACK_BREQ)
 		return m_error_ack(q, pdu, EPROTO, EPROTO);
 	if (p->ADDR_length >= sizeof(sccp_addr_t)) {
 		sccp_addr_t *add = (sccp_addr_t *) (pdu->b_rptr + p->ADDR_offset);
+
 		bcopy(add, sccp->bnd, sizeof(*add) + add->alen);
 	}
 	if (p->PROTOID_length == 1)
@@ -1025,10 +1121,12 @@ static int sccp_bind_ack(queue_t * q, mblk_t * pdu)
  *  N_ERROR_ACK	    18 - Error Acknowledgement
  *  ----------------------------------------------------------------
  */
-static int sccp_error_ack(queue_t * q, mblk_t * pdu)
+static int
+sccp_error_ack(queue_t *q, mblk_t *pdu)
 {
 	sccp_t *sccp = (sccp_t *) q->q_ptr;
 	N_error_ack_t *p = (N_error_ack_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return m_error_ack(q, pdu, EFAULT, EFAULT);
 	switch (sccp->state) {
@@ -1072,10 +1170,12 @@ static int sccp_error_ack(queue_t * q, mblk_t * pdu)
  *  N_OK_ACK	    19 - Success Acknowledgement
  *  ----------------------------------------------------------------
  */
-static int sccp_ok_ack(queue_t * q, mblk_t * mp)
+static int
+sccp_ok_ack(queue_t *q, mblk_t *mp)
 {
 	sccp_t *sccp = (sccp_t *) q->q_ptr;
 	N_ok_ack_t *p = (N_ok_ack_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return m_error_ack(q, pdu, EFAULT, EFAULT);
 	switch (sccp->state) {
@@ -1107,10 +1207,12 @@ static int sccp_ok_ack(queue_t * q, mblk_t * mp)
  *  N_UNITDATA_IND  20 - Connection-less data receive indication
  *  ----------------------------------------------------------------
  */
-static int sccp_unitdata_ind(queue_t * q, mblk_t * pdu)
+static int
+sccp_unitdata_ind(queue_t *q, mblk_t *pdu)
 {
 	sccp_t *sccp = (sccp_t *) q->q_ptr;
 	N_unitdata_ind_t *p = (N_unitdata_ind_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return m_error_all(q, pdu, EFAULT, EFAULT);
 	if (p->SRC_length < sizeof(sccp_addr_t))
@@ -1126,12 +1228,14 @@ static int sccp_unitdata_ind(queue_t * q, mblk_t * pdu)
  *  N_UDERROR_IND   21 - UNITDATA Error Indication
  *  ----------------------------------------------------------------
  */
-static int sccp_uderror_ind(queue_t * q, mblk_t * pdu)
+static int
+sccp_uderror_ind(queue_t *q, mblk_t *pdu)
 {
 	tr_t *tr;
 	int ecode;
 	sccp_t *sccp = (sccp_t *) q->q_ptr;
 	N_uderror_ind_t *p = (N_uderror_ind_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return m_error_all(q, pdu, EFAULT, EFAULT);
 	if (p->DEST_length < sizeof(sccp_addr_t))
@@ -1186,7 +1290,8 @@ int (*sccp_dprim[]) (queue_t *, mblk_t *) = {
 #define SCCP_DSTR_LAST	N_RESET_CON
 };
 
-static int tr_r_data(queue_t * q, mblk_t * mp)
+static int
+tr_r_data(queue_t *q, mblk_t *mp)
 {
 	/* 
 	 *  This is an SCCP unitdata message from below.  We don't get SCCP
@@ -1195,7 +1300,8 @@ static int tr_r_data(queue_t * q, mblk_t * mp)
 	freemsg(mp);
 	return (0);
 }
-static int tr_r_proto(queue_t * q, mblk_t * mp);
+static int tr_r_proto(queue_t *q, mblk_t *mp);
+
 {
 }
 
@@ -1209,7 +1315,8 @@ static int tr_r_proto(queue_t * q, mblk_t * mp);
 /*
  *  TR Options parsing.
  */
-static int parse_options(queue_t * q, mblk_t * pdu, int prim, caddr_t opt_ptr, size_t opt_len)
+static int
+parse_options(queue_t *q, mblk_t *pdu, int prim, caddr_t opt_ptr, size_t opt_len)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
@@ -1225,11 +1332,13 @@ static int parse_options(queue_t * q, mblk_t * pdu, int prim, caddr_t opt_ptr, s
  *  TR_INFO_REQ           0 - Information request                     
  *  ---------------------------------------------------------------
  */
-static int user_info_req(queue_t * q, mblk_t * pdu)
+static int
+user_info_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_info_req_t *p = (TR_info_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_INFO_REQ, -EMSGSIZE);
 	/* 
@@ -1243,11 +1352,13 @@ static int user_info_req(queue_t * q, mblk_t * pdu)
  *  TR_BIND_REQ           1 - Bind to network address                 
  *  ---------------------------------------------------------------
  */
-static int user_bind_req(queue_t * q, mblk_t * pdu)
+static int
+user_bind_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_bind_req_t *p = (TR_bind_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1262,11 +1373,13 @@ static int user_bind_req(queue_t * q, mblk_t * pdu)
  *  TR_UNBIND_REQ         2 - Unbind from network address             
  *  ---------------------------------------------------------------
  */
-static int user_unbind_req(queue_t * q, mblk_t * pdu)
+static int
+user_unbind_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_unbind_req_t *p = (TR_unbind_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1281,11 +1394,13 @@ static int user_unbind_req(queue_t * q, mblk_t * pdu)
  *  TR_UNIDIR_REQ         3 - Unidirectional request                  
  *  ---------------------------------------------------------------
  */
-static int user_unidir_req(queue_t * q, mblk_t * pdu)
+static int
+user_unidir_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_unidir_req_t *p = (TR_unidir_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1300,11 +1415,13 @@ static int user_unidir_req(queue_t * q, mblk_t * pdu)
  *  TR_BEGIN_REQ          4 - Begin transaction request               
  *  ---------------------------------------------------------------
  */
-static int user_begin_req(queue_t * q, mblk_t * pdu)
+static int
+user_begin_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_begin_req_t *p = (TR_begin_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1319,11 +1436,13 @@ static int user_begin_req(queue_t * q, mblk_t * pdu)
  *  TR_QUERY_W_PERM_REQ   5 - Begin transaction request               
  *  ---------------------------------------------------------------
  */
-static int user_query_w_perm_req(queue_t * q, mblk_t * pdu)
+static int
+user_query_w_perm_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_query_w_perm_req_t *p = (TR_query_w_perm_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1338,11 +1457,13 @@ static int user_query_w_perm_req(queue_t * q, mblk_t * pdu)
  *  TR_QUERY_WO_PERM_REQ  6 - Begin transaction request               
  *  ---------------------------------------------------------------
  */
-static int user_query_wo_perm_req(queue_t * q, mblk_t * pdu)
+static int
+user_query_wo_perm_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_query_wo_perm_req_t *p = (TR_query_wo_perm_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1357,11 +1478,13 @@ static int user_query_wo_perm_req(queue_t * q, mblk_t * pdu)
  *  TR_END_REQ            7 - End transaction request                 
  *  ---------------------------------------------------------------
  */
-static int user_end_req(queue_t * q, mblk_t * pdu)
+static int
+user_end_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_end_req_t *p = (TR_end_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1376,11 +1499,13 @@ static int user_end_req(queue_t * q, mblk_t * pdu)
  *  TR_RESP_REQ           8 - End transaction request                 
  *  ---------------------------------------------------------------
  */
-static int user_resp_req(queue_t * q, mblk_t * pdu)
+static int
+user_resp_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_resp_req_t *p = (TR_resp_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1395,11 +1520,13 @@ static int user_resp_req(queue_t * q, mblk_t * pdu)
  *  TR_CONTINUE_REQ       9 - Continue transaction request            
  *  ---------------------------------------------------------------
  */
-static int user_continue_req(queue_t * q, mblk_t * pdu)
+static int
+user_continue_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_continue_req_t *p = (TR_continue_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1414,11 +1541,13 @@ static int user_continue_req(queue_t * q, mblk_t * pdu)
  *  TR_CONTINUE_RES      10 - Continue transaction response           
  *  ---------------------------------------------------------------
  */
-static int user_continue_res(queue_t * q, mblk_t * pdu)
+static int
+user_continue_res(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_continue_res_t *p = (TR_continue_res_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1433,11 +1562,13 @@ static int user_continue_res(queue_t * q, mblk_t * pdu)
  *  TR_CONV_W_PERM_REQ   11 - Continue transaction request            
  *  ---------------------------------------------------------------
  */
-static int user_conv_w_perm_req(queue_t * q, mblk_t * pdu)
+static int
+user_conv_w_perm_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_conv_w_perm_req_t *p = (TR_conv_w_perm_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1452,11 +1583,13 @@ static int user_conv_w_perm_req(queue_t * q, mblk_t * pdu)
  *  TR_CONV_WO_PERM_REQ  12 - Continue transaction request            
  *  ---------------------------------------------------------------
  */
-static int user_conv_wo_perm_req(queue_t * q, mblk_t * pdu)
+static int
+user_conv_wo_perm_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_conv_wo_perm_req_t *p = (TR_conv_wo_perm_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1471,11 +1604,13 @@ static int user_conv_wo_perm_req(queue_t * q, mblk_t * pdu)
  *  TR_CONV_W_PERM_RES   13 - Continue transaction response           
  *  ---------------------------------------------------------------
  */
-static int user_conv_w_perm_res(queue_t * q, mblk_t * pdu)
+static int
+user_conv_w_perm_res(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_conv_w_perm_res_t *p = (TR_conv_w_perm_res_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1490,11 +1625,13 @@ static int user_conv_w_perm_res(queue_t * q, mblk_t * pdu)
  *  TR_CONV_WO_PERM_RES  14 - Continue transaction response           
  *  ---------------------------------------------------------------
  */
-static int user_conv_wo_perm_res(queue_t * q, mblk_t * pdu)
+static int
+user_conv_wo_perm_res(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_conv_wo_perm_res_t *p = (TR_conv_wo_perm_res_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1509,11 +1646,13 @@ static int user_conv_wo_perm_res(queue_t * q, mblk_t * pdu)
  *  TR_ABORT_REQ         15 - Abort transaction request               
  *  ---------------------------------------------------------------
  */
-static int user_abort_req(queue_t * q, mblk_t * pdu)
+static int
+user_abort_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	tr_t *tr = (tr_t *) q->q_ptr;
 	TR_abort_req_t *p = (TR_abort_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		return tr_error_ack_reply(q, TR_BIND_REQ, -EMSGSIZE);
 	/* 
@@ -1545,9 +1684,11 @@ int (*user_dprim[]) (queue_t *, mblk_t *) = {
 #define USER_DSTR_LAST  TR_ABORT_REQ
 };
 
-static int tr_w_data(queue_t * q, mblk_t * pdu)
+static int
+tr_w_data(queue_t *q, mblk_t *pdu)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
+
 	if (tr->state != TRS_XACT_OPEN) {
 		/* 
 		 *  If we are not in a connection oriented state, we return an
@@ -1555,6 +1696,7 @@ static int tr_w_data(queue_t * q, mblk_t * pdu)
 		 *  will fail.
 		 */
 		mblk_t *mp;
+
 		if (!(mp = m_error(0, EPROTO)))
 			return (-ENOBUFS);
 		qreply(q, mp);
@@ -1570,9 +1712,11 @@ static int tr_w_data(queue_t * q, mblk_t * pdu)
 	 */
 	return (0);
 }
-static int tr_w_proto(queue_t * q, mblk_t * mp)
+static int
+tr_w_proto(queue_t *q, mblk_t *mp)
 {
 	uint32_t prim = *((uint32_t *) mp->b_rptr);
+
 	if (USER_DSTR_FIRST <= prim && prim <= USER_DSTR_LAST && user_dprim[prim])
 		return (*user_dprim[prim]) (q, mp);
 	/* 
@@ -1589,10 +1733,12 @@ static int tr_w_proto(queue_t * q, mblk_t * mp)
  *  =========================================================================
  *  We have no defined module to module controls for either TR or SCCP.
  */
-static int tr_r_ctl(queue_t * q, mblk_t * pdu)
+static int
+tr_r_ctl(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	mblk_t *mp;
+
 	if ((err = m_error_all(q, NULL, EFAULT, EFAULT)))
 		return (err);
 	if (!(mp = sccp_unbind_req()))
@@ -1601,7 +1747,8 @@ static int tr_r_ctl(queue_t * q, mblk_t * pdu)
 	freemsg(pdu);
 	return (0);
 }
-static int tr_w_ctl(queue_t * q, mblk_t * pdu)
+static int
+tr_w_ctl(queue_t *q, mblk_t *pdu)
 {
 	/* 
 	 *  FIXME: Remove this TR-User from the SCCP-Provider...
@@ -1623,7 +1770,8 @@ static int tr_w_ctl(queue_t * q, mblk_t * pdu)
  *  error ensures that we will respond with an M_ERROR later when resources
  *  are available.
  */
-static int tr_r_error(queue_t * q, mblk_t * pdu)
+static int
+tr_r_error(queue_t *q, mblk_t *pdu)
 {
 	/* 
 	 *  FIXME: Notify this SCCP-Provider's management stream that the
@@ -1646,7 +1794,8 @@ static int tr_r_error(queue_t * q, mblk_t * pdu)
  *  error ensures that we will respond with an M_HANGUP later when resources
  *  are available.
  */
-static int tr_r_hangup(queue_t * q, mblk_t * pdu)
+static int
+tr_r_hangup(queue_t *q, mblk_t *pdu)
 {
 	/* 
 	 *  FIXME: Notify this SCCP-Provider's management stream that the
@@ -1671,9 +1820,11 @@ static int tr_r_hangup(queue_t * q, mblk_t * pdu)
  *  We want to take flushes from below and turn them back around back down to
  *  the SCCP provider.
  */
-static int tr_r_flush(queue_t * q, mblk_t * pdu)
+static int
+tr_r_flush(queue_t *q, mblk_t *pdu)
 {
 	int err;
+
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
 			flushband(q, mp->b_rptr[1], FLUSHDATA);
@@ -1704,7 +1855,8 @@ static int tr_r_flush(queue_t * q, mblk_t * pdu)
  *  We want to take flushes from above and turn them back around back up to
  *  the TR User.
  */
-static int tr_w_flush(queue_t * q, mblk_t * pdu)
+static int
+tr_w_flush(queue_t *q, mblk_t *pdu)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
@@ -1732,7 +1884,8 @@ static int tr_w_flush(queue_t * q, mblk_t * pdu)
  *  M_FLUSH internal from below.
  *  -------------------------------------------------------------------------
  */
-static int tr_i_flush(queue_t * q, mblk_t * pdu)
+static int
+tr_i_flush(queue_t *q, mblk_t *pdu)
 {
 	if (*mp->b_rptr & FLUSHR) {
 		if (*mp->b_rptr & FLUSHBAND)
@@ -1747,7 +1900,8 @@ static int tr_i_flush(queue_t * q, mblk_t * pdu)
  *  M_FLUSH internal from above.
  *  -------------------------------------------------------------------------
  */
-static int tr_o_flush(queue_t * q, mblk_t * pdu)
+static int
+tr_o_flush(queue_t *q, mblk_t *pdu)
 {
 	if (*mp->b_rptr & FLUSHW) {
 		if (*mp->b_rptr & FLUSHBAND)
@@ -1780,11 +1934,13 @@ static int tr_o_flush(queue_t * q, mblk_t * pdu)
  *  addresses the SCCP Provider might be currently bound to.  This permits the
  *  caller to bind the SCCP Provider.
  */
-static inline int tr_i_link(queue_t * q, mblk_t * mp, struct linkblk *lp)
+static inline int
+tr_i_link(queue_t *q, mblk_t *mp, struct linkblk *lp)
 {
 	mblk_t *mp;
 	sccp_t *sccp;
 	queue_t *lq;
+
 	ensure(lp, return (-EFAULT));
 	lq = RD(lp->l_qbot);
 	if (!(mp = sccp_info_req()))
@@ -1820,14 +1976,16 @@ static inline int tr_i_link(queue_t * q, mblk_t * mp, struct linkblk *lp)
  *  This might result in a SIG_PIPE signal being sent to the process if the
  *  TR-User is a stream head.
  */
-static inline int tr_i_unlink(queue_t * q, struct linkblk *lp)
+static inline int
+tr_i_unlink(queue_t *q, struct linkblk *lp)
 {
 	int err;
 	sccp_t *sccp;
 	uint muxid;
+
 	ensure(lp, return (-EFAULT));
 	muxid = lp->l_index;
-	for (sccp = sccp_links; sccp && sccp->muxid != muxid; sccp = sccp->next);
+	for (sccp = sccp_links; sccp && sccp->muxid != muxid; sccp = sccp->next) ;
 	if (!sccp)
 		return (-EINVAL);
 	if ((err = m_flush_all(q, NULL, FLUSHW, 0)))
@@ -1836,6 +1994,7 @@ static inline int tr_i_unlink(queue_t * q, struct linkblk *lp)
 		return (err);
 	if (sccp->state == NS_IDLE) {
 		mblk_t *mp;
+
 		if (!(mp = sccp_unbind_req()))
 			return (-ENOBUFS);
 		sccp->state = NS_WACK_UREQ;
@@ -1847,12 +2006,14 @@ static inline int tr_i_unlink(queue_t * q, struct linkblk *lp)
 	kfree(sccp);
 	return (0);
 }
-static int tr_w_ioctl(queue_t * q, mblk_t * pdu)
+static int
+tr_w_ioctl(queue_t *q, mblk_t *pdu)
 {
 	int ret = -EINVAL;
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	struct iocblk *iocp = (struct iocblk *) mp->b_wptr;
 	int cmd = iocp->ioc_cmd;
+
 	switch (_IOC_TYPE(cmd)) {
 	case __SID:
 		switch (cmd) {
@@ -1877,6 +2038,7 @@ static int tr_w_ioctl(queue_t * q, mblk_t * pdu)
 	case TR_IOC_MAGIC:
 		if (iocp->ioc_count >= _IOC_SIZE(cmd)) {
 			int nr = _IOC_NR(cmd);
+
 			ret = -EOPNOTSUPP;
 			if (0 <= nr && nr < sizeof(tr_ioctl) / sizeof(int (*)(void))
 			    && tr_ioctl[nr])
@@ -1910,7 +2072,8 @@ static int tr_l_rput(queue_t *, mblk_t *);
 static int tr_u_rsrv(queue_t *);
 static int tr_l_rsrv(queue_t *);
 
-static inline int tr_recover(queue_t * q, mblk_t * mp, int err)
+static inline int
+tr_recover(queue_t *q, mblk_t *mp, int err)
 {
 	switch (err) {
 	case -EBUSY:
@@ -1928,7 +2091,8 @@ static inline int tr_recover(queue_t * q, mblk_t * mp, int err)
  *  READ PUT and SERVICE (Message from below SCCP-Provider --> TR)
  *  -------------------------------------------------------------------------
  */
-static inline int tr_rd(queue_t * q, mblk_t * mp)
+static inline int
+tr_rd(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -1947,9 +2111,11 @@ static inline int tr_rd(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static int tr_l_rput(queue_t * q, mblk_t * mp)
+static int
+tr_l_rput(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
 		return (0);
@@ -1958,11 +2124,14 @@ static int tr_l_rput(queue_t * q, mblk_t * mp)
 		return (tr_recover(q, mp, err));
 	return (0);
 }
-static int tr_l_rsrv(queue_t * q)
+static int
+tr_l_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while ((mp = getq(q))) {
 		int err;
+
 		if (!(err = tr_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
@@ -1977,7 +2146,8 @@ static int tr_l_rsrv(queue_t * q)
  *  WRITE PUT and SERVICE (Message from above TR-User --> TR)
  *  -------------------------------------------------------------------------
  */
-static inline int tr_wr(queue_t * q, mblk_t * mp)
+static inline int
+tr_wr(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db - type) {
 	case M_DATA:
@@ -1994,9 +2164,11 @@ static inline int tr_wr(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static int tr_u_wput(queue_t * q, mblk_t * mp)
+static int
+tr_u_wput(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
 		return (0);
@@ -2005,11 +2177,14 @@ static int tr_u_wput(queue_t * q, mblk_t * mp)
 		return (tr_recover(q, mp, err));
 	return (0);
 }
-static int tr_u_wsrv(queue_t * q)
+static int
+tr_u_wsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while ((mp = getq(q))) {
 		int err;
+
 		if (!(err = tr_wr(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
@@ -2024,15 +2199,18 @@ static int tr_u_wsrv(queue_t * q)
  *  READ SERVICE (Event from below as input to TR State Machines)
  *  -------------------------------------------------------------------------
  */
-static inline int tr_input(queue_t * q, mblk_t * mp)
+static inline int
+tr_input(queue_t *q, mblk_t *mp)
 {
 	uint type = mp->b_datap->db_type;
+
 	if (M_DATA <= type && type <= M_STOPI && tr_input_ops[type])
 		return (*tr_input_ops[type]) (q, mp);
 	putnext(q, mp);
 	return (0);
 }
-static inline int tr_input(queue_t * q, mblk_t * mp)
+static inline int
+tr_input(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -2046,11 +2224,14 @@ static inline int tr_input(queue_t * q, mblk_t * mp)
 	putnext(q, mp);
 	return (0);
 }
-static int tr_u_rsrv(queue_t * q)
+static int
+tr_u_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while ((mp = getq(q))) {
 		int err;
+
 		if (!(err = tr_input(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
@@ -2064,7 +2245,8 @@ static int tr_u_rsrv(queue_t * q)
  *  WRITE SERVICE (Event from above as output from TR State Machines)
  *  -------------------------------------------------------------------------
  */
-static inline int tr_output(queue_t * q, mblk_t * mp)
+static inline int
+tr_output(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -2078,11 +2260,14 @@ static inline int tr_output(queue_t * q, mblk_t * mp)
 	putnext(q, mp);
 	return (0);
 }
-static int tr_l_wsrv(queue_t * q)
+static int
+tr_l_wsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while ((mp = getq(q))) {
 		int err;
+
 		if (!(err = tr_output(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)
@@ -2102,7 +2287,8 @@ static int tr_l_wsrv(queue_t * q)
 static int tr_open(queue_t *, dev_t *, int, int, cred_t *);
 static int tr_close(queue_t *, int, cred_t *);
 
-static int tr_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp);
+static int tr_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp);
+
 {
 	tr_t *tr, **trp = &tr_opens;
 	int cmajor = getmajor(*devp);
@@ -2122,6 +2308,7 @@ static int tr_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
 	}
 	for (; cminor <= TR_NMINOR && *trp; trp = &(*trp)->next) {
 		int dminor = getminor((*trp)->devid);
+
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {
@@ -2148,9 +2335,11 @@ static int tr_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp)
 	*trp = tr;
 	return (0);
 }
-static int tr_close(queue_t * q, int flag, cred_t * crp)
+static int
+tr_close(queue_t *q, int flag, cred_t *crp)
 {
 	tr_t *tr = (tr_t *) q->q_ptr;
+
 	if (!tr)
 		return (EIO);
 	if (q == tr_lmq)
@@ -2161,6 +2350,7 @@ static int tr_close(queue_t * q, int flag, cred_t * crp)
 		 *  using on the lower half.
 		 */
 		sccp_t *sccp = tr->sccp;
+
 		if ((--tr->sccp->use_count) <= 0) {
 			/* 
 			 *  Unbind the SCCP stream if it is not being used by
@@ -2168,6 +2358,7 @@ static int tr_close(queue_t * q, int flag, cred_t * crp)
 			 */
 			mblk_t *mp;
 			N_unbind_req_t *p;
+
 			if (!(mp = allocb(sizeof(*p), BPRI_MED)))
 				return (ENOSR);
 			mp->b_datap->db_type = M_PCPROTO;
@@ -2202,12 +2393,14 @@ static int tr_close(queue_t * q, int flag, cred_t * crp)
 static int tr_initialized = 0;
 
 #ifndef LIS_REGISTERED
-static inline int tr_init(void)
+static inline int
+tr_init(void)
 #else
 __initfunc(int tr_init(void))
 #endif
 {
 	int err;
+
 	if (tr_initialized)
 		return (0);
 	tr_initialized = 1;
@@ -2222,7 +2415,8 @@ __initfunc(int tr_init(void))
 }
 
 #ifndef LIS_REGISTERED
-static inline void tr_terminate(void)
+static inline void
+tr_terminate(void)
 #else
 __initfunc(void tr_terminate(void))
 #endif
@@ -2246,11 +2440,14 @@ __initfunc(void tr_terminate(void))
  */
 
 #ifdef MODULE
-int init_module(void)
+int
+init_module(void)
 {
 	return tr_init();
 }
-void cleanup_module(void)
+
+void
+cleanup_module(void)
 {
 	tr_terminate();
 }

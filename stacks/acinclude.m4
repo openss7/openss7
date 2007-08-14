@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.68 $) $Date: 2007/07/22 01:10:10 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.69 $) $Date: 2007/08/14 12:16:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,55 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/22 01:10:10 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 0.9.2.68  2007/07/22 01:10:10  brian
-# - corrections for RHAS4 irq_handler_t and XEN paddr_t
-#
-# Revision 0.9.2.67  2007/05/18 00:00:33  brian
-# - check for nf_reset
-#
-# Revision 0.9.2.66  2007/03/25 18:59:09  brian
-# - changes to support 2.6.20-1.2307.fc5 kernel
-#
-# Revision 0.9.2.65  2007/03/05 23:01:45  brian
-# - checking in release changes
-#
-# Revision 0.9.2.64  2007/03/04 23:41:31  brian
-# - additional include path
-#
-# Revision 0.9.2.63  2007/03/04 23:29:57  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.62  2007/03/04 23:14:21  brian
-# - better search for modversions
-#
-# Revision 0.9.2.61  2007/03/02 10:03:49  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 0.9.2.60  2007/02/28 06:30:34  brian
-# - updates and corrections, #ifdef instead of #if
-#
-# Revision 0.9.2.59  2006/12/29 05:51:03  brian
-# - changes for successful master build
-#
-# Revision 0.9.2.58  2006/12/27 16:35:57  brian
-# - added slpmod module and fixups for make check target
-#
-# Revision 0.9.2.57  2006/12/23 13:06:58  brian
-# - manual page and other package updates for release
-#
-# Revision 0.9.2.56  2006/12/18 10:50:55  brian
-# - subpackaging changes for release
-#
-# Revision 0.9.2.55  2006/10/27 22:57:17  brian
-# - changes for build on 2.6.18 kernel
-#
-# Revision 0.9.2.54  2006/10/17 12:12:40  brian
-# - working up new packages
+# Last Modified $Date: 2007/08/14 12:16:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -249,15 +201,15 @@ AC_DEFUN([_SS7_OPTIONS], [dnl
 AC_DEFUN([_SS7_CHECK_INET], [dnl
     AC_ARG_WITH([udp],
 	AS_HELP_STRING([--with-udp],
-	    [include udp version 2 driver in build.  @<:@default=no@:>@]),
+	    [include udp release 2 driver in build.  @<:@default=no@:>@]),
 	[with_udp="$withval"],
 	[with_udp='no'])
-    AC_MSG_CHECKING([for UDP Version 2 driver])
+    AC_MSG_CHECKING([for UDP Release 2 driver])
     if test :"$with_udp" = :yes ; then
 	ss7_cv_udp_v2='yes'
 	AC_DEFINE([UDP_VERSION_2], [1], [
-	    Define for UDP Version 2.  This define is needed by test programs and other programs
-	    that need to determine if the UDP Version 2 driver is included in the build or not.])
+	    Define for UDP Release 2.  This define is needed by test programs and other programs
+	    that need to determine if the UDP Release 2 driver is included in the build or not.])
     else
 	ss7_cv_udp_v2='yes'
     fi
@@ -265,15 +217,15 @@ AC_DEFUN([_SS7_CHECK_INET], [dnl
     AM_CONDITIONAL([WITH_UDP], [test :"$ss7_cv_udp_v2" = :yes])dnl
     AC_ARG_WITH([raw],
 	AS_HELP_STRING([--with-raw],
-	    [include raw version 2 driver in build.  @<:@default=no@:>@]),
+	    [include raw release 2 driver in build.  @<:@default=no@:>@]),
 	[with_raw="$withval"],
 	[with_raw='no'])
-    AC_MSG_CHECKING([for RAW Version 2 driver])
+    AC_MSG_CHECKING([for RAW Release 2 driver])
     if test :"$with_raw" = :yes ; then
 	ss7_cv_raw_v2='yes'
 	AC_DEFINE([RAW_VERSION_2], [1], [
-	    Define for RAW Version 2.  This define is needed by test programs and other programs
-	    that need to determine if the RAW Version 2 driver is included in the build or not.])
+	    Define for RAW Release 2.  This define is needed by test programs and other programs
+	    that need to determine if the RAW Release 2 driver is included in the build or not.])
     else
 	ss7_cv_raw_v2='yes'
     fi
@@ -281,15 +233,15 @@ AC_DEFUN([_SS7_CHECK_INET], [dnl
     AM_CONDITIONAL([WITH_RAW], [test :"$ss7_cv_raw_v2" = :yes])dnl
     AC_ARG_WITH([tcp],
 	AS_HELP_STRING([--with-tcp],
-	    [include tcp version 2 driver in build.  @<:@default=no@:>@]),
+	    [include tcp release 2 driver in build.  @<:@default=no@:>@]),
 	[with_tcp="$withval"],
 	[with_tcp='no'])
-    AC_MSG_CHECKING([for TCP Version 2 driver])
+    AC_MSG_CHECKING([for TCP Release 2 driver])
     if test :"$with_tcp" = :yes ; then
 	ss7_cv_tcp_v2='yes'
 	AC_DEFINE([TCP_VERSION_2], [1], [
-	    Define for TCP Version 2.  This define is needed by test programs and other programs
-	    that need to determine if the TCP Version 2 driver is included in the build or not.])
+	    Define for TCP Release 2.  This define is needed by test programs and other programs
+	    that need to determine if the TCP Release 2 driver is included in the build or not.])
     else
 	ss7_cv_tcp_v2='yes'
     fi
@@ -307,7 +259,7 @@ AC_DEFUN([_SS7_CHECK_SCTP], [dnl
 	with_sctp='no'
 	ss7_cv_sctp_version=2
 	AC_DEFINE([SCTP_VERSION_2], [1], [
-	    Define for SCTP Version 2.  This define is needed by test programs
+	    Define for SCTP Release 2.  This define is needed by test programs
 	    and other programs that need to determine the difference between
 	    the address format and options conventions for the two versions.])
     fi
@@ -322,7 +274,7 @@ AC_DEFUN([_SS7_CHECK_SCTP], [dnl
     AM_CONDITIONAL([WITH_SCTP], [test :"$ss7_cv_sctp_version" = :1])dnl
     AM_CONDITIONAL([WITH_SCTP2], [test :"$ss7_cv_sctp_version" = :2])dnl
     AC_DEFINE_UNQUOTED([SCTP_VERSION], [$ss7_cv_sctp_version], [
-	Define to 1 for SCTP Version 1.  Define to 2 for SCTP Version 2.  This
+	Define to 1 for SCTP Version 1.  Define to 2 for SCTP Release 2.  This
 	define is needed by test programs that must determine the difference
 	between the address format and options conventions for the two
 	versions.])
@@ -1634,6 +1586,57 @@ AC_DEFUN([_SS7_], [dnl
 ])# _SS7_
 # =============================================================================
 
+# =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.69  2007/08/14 12:16:53  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.68  2007/07/22 01:10:10  brian
+# - corrections for RHAS4 irq_handler_t and XEN paddr_t
+#
+# Revision 0.9.2.67  2007/05/18 00:00:33  brian
+# - check for nf_reset
+#
+# Revision 0.9.2.66  2007/03/25 18:59:09  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
+# Revision 0.9.2.65  2007/03/05 23:01:45  brian
+# - checking in release changes
+#
+# Revision 0.9.2.64  2007/03/04 23:41:31  brian
+# - additional include path
+#
+# Revision 0.9.2.63  2007/03/04 23:29:57  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.62  2007/03/04 23:14:21  brian
+# - better search for modversions
+#
+# Revision 0.9.2.61  2007/03/02 10:03:49  brian
+# - updates to common build process and versions for all exported symbols
+#
+# Revision 0.9.2.60  2007/02/28 06:30:34  brian
+# - updates and corrections, #ifdef instead of #if
+#
+# Revision 0.9.2.59  2006/12/29 05:51:03  brian
+# - changes for successful master build
+#
+# Revision 0.9.2.58  2006/12/27 16:35:57  brian
+# - added slpmod module and fixups for make check target
+#
+# Revision 0.9.2.57  2006/12/23 13:06:58  brian
+# - manual page and other package updates for release
+#
+# Revision 0.9.2.56  2006/12/18 10:50:55  brian
+# - subpackaging changes for release
+#
+# Revision 0.9.2.55  2006/10/27 22:57:17  brian
+# - changes for build on 2.6.18 kernel
+#
+# Revision 0.9.2.54  2006/10/17 12:12:40  brian
+# - working up new packages
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>

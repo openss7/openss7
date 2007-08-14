@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:35:00 $
+ @(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:44 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_mod.c,v $
+ Revision 0.9.2.12  2007/08/14 12:18:44  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.11  2007/07/14 01:35:00  brian
  - make license explicit, add documentation
 
@@ -64,16 +67,17 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:35:00 $"
+#ident "@(#) $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:44 $"
 
-static char const ident[] = "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:35:00 $";
+static char const ident[] =
+    "$RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:44 $";
 
 #include <sys/os7/compat.h>
 
 #include <sys/cdi.h>
 
 #define CDI_DESCRIP	"CDI SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/07/14 01:35:00 $"
+#define CDI_REVISION	"OpenSS7 $RCSfile: cdi_mod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:44 $"
 #define CDI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CDI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,6 +131,7 @@ extern cdi_t *
 cd_alloc_priv(queue_t *q)
 {
 	cdi_t *cd;
+
 	if ((cd = kmem_cache_alloc(cd_cachep, GFP_ATOMIC))) {
 		MOD_INC_USE_COUNT;
 		bzero(cd, sizeof(*cd));
@@ -143,6 +148,7 @@ extern void
 cd_free_priv(queue_t *q)
 {
 	cdi_t *cd = CD_PRIV(q);
+
 	MOD_DEC_USE_COUNT;
 	if (cd->rbid)
 		unbufcall(xchg(&cd->rbid, 0));
@@ -163,6 +169,7 @@ STATIC INLINE void
 cd_init(void)
 {
 	int modnum;
+
 	unless(cd_minfo.mi_idnum, return);
 	cmn_err(CE_NOTE, SDL_BANNER);	/* console splash */
 	cd_init_caches();

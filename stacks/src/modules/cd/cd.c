@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:33:53 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:17:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.14  2007/08/14 12:17:22  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.13  2007/07/14 01:33:53  brian
  - make license explicit, add documentation
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:33:53 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:17:22 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:33:53 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:17:22 $";
 
 //#define EXPORT_SYMTAB
 
@@ -88,7 +91,7 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:33:53 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:17:22 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2090,7 +2093,7 @@ cd_write(queue_t *q, mblk_t *mp)
 	   let cd_wakeup pull from the queue */
 	return (-EAGAIN);
       discard:
-	return (0);	/* silent discard */
+	return (0);		/* silent discard */
 }
 
 /*

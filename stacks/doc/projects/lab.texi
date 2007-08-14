@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: lab.texi,v 0.9.2.7 2006/08/26 09:16:54 brian Exp $
+% @(#) $Id: lab.texi,v 0.9.2.8 2007/08/14 12:16:56 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2006/08/26 09:16:54 $ by $Author: brian $
+% Last Modified $Date: 2007/08/14 12:16:56 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: lab.texi,v $
+% Revision 0.9.2.8  2007/08/14 12:16:56  brian
+% - GPLv3 header updates
+%
 % Revision 0.9.2.7  2006/08/26 09:16:54  brian
 % - better release file generation
 %
@@ -269,7 +272,7 @@ The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software p
 developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
 Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
 OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
-License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+License.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
 software under terms less restrictive than the GPL.
 
 @subsubheading SS7/SIGTRAN/VoIP Security Network
@@ -377,6 +380,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: lab.texi,v $
+Revision 0.9.2.8  2007/08/14 12:16:56  brian
+- GPLv3 header updates
+
 Revision 0.9.2.7  2006/08/26 09:16:54  brian
 - better release file generation
 

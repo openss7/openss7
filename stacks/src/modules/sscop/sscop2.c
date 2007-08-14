@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop2.c,v $
+ Revision 0.9.2.16  2007/08/14 12:18:50  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.15  2007/07/14 01:35:11  brian
  - make license explicit, add documentation
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $"
+#ident "@(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $"
 
 static char const ident[] =
-    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $";
+    "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $";
 
 #include <sys/os7/compat.h>
 
@@ -263,6 +266,7 @@ s_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	uint oldstate = sp->i_state;
+
 	switch (*((long *) mp->b_rptr)) {
 	case N_CONN_REQ:
 		rtn = n_conn_req(sp, mp);
@@ -318,6 +322,7 @@ s_r_proto(queue_t q, mblk_t *mp)
 {
 	int rtn;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	switch (*((long *) mp->b_rptr)) {
 	case N_INFO_ACK:
 		rtn = l_info_ack(sp, mp);
@@ -463,6 +468,7 @@ s_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn = 0;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	ensure(q, return (-EFAULT));
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -514,6 +520,7 @@ s_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn = 0;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	ensure(q, return (-EFAULT));
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -599,6 +606,7 @@ static sscop_t *
 s_alloc_priv(queue_t *q)
 {
 	sscop_t *sp;
+
 	if ((sp = kmem_cache_alloc(s_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
 		RD(q)->q_ptr = WR(q)->q_ptr = sp;
@@ -614,6 +622,7 @@ static void
 s_free_priv(queue_t *q)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	bufq_purge(&sl->rb);
 	bufq_purge(&sl->tb);
 	bufq_purge(&sl->rtb);
@@ -665,6 +674,7 @@ s_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -689,6 +699,7 @@ STATIC int
 aa_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&aa_fmod)) < 0)
 		return (err);
 	return (0);
@@ -698,6 +709,7 @@ STATIC int
 aa_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&aa_fmod)) < 0)
 		return (err);
 	return (0);
@@ -715,6 +727,7 @@ STATIC int
 aa_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sscopinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -728,6 +741,7 @@ STATIC int
 aa_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sscopinfo)) < 0)
 		return (err);
 	return (0);
@@ -739,6 +753,7 @@ MODULE_STATIC int __init
 sscopinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = aa_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -758,6 +773,7 @@ MODULE_STATIC void __exit
 sscopterminate(void)
 {
 	int err;
+
 	if ((err = aa_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = aa_term_caches()))

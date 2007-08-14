@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/17 01:56:20 $
+ @(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:42 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:20 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:42 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp_msg.c,v $
+ Revision 0.9.2.12  2007/08/14 12:18:42  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/17 01:56:20 $"
+#ident "@(#) $RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:42 $"
 
-static char const ident[] = "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/06/17 01:56:20 $";
+static char const ident[] =
+    "$RCSfile: sctp_msg.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 12:18:42 $";
 
 #define __NO_VERSION__
 
@@ -458,7 +465,7 @@ sctp_frag_chunk(bq, mp, mps)
 	assert(mp);
 
 	rare();
-	/*
+	/* 
 	 *  This should be extremely rare, now that we are fragmenting in
 	 *  sctp_send_data.  This fragmentation only occurs if the path MTU
 	 *  has dropped since we buffered data for transmission.  It is
@@ -1094,7 +1101,7 @@ sctp_assoc_timedout(sp, sd, rmax)
 		if (sd->dst_cache)
 			dst_negative_advice(&sd->dst_cache);
 		if (sd->retransmits == sd->max_retrans + 1) {
-			/*
+			/* 
 			 *  IMPLEMENTATION NOTE:-  When max_retrans and
 			 *  rto_max are set to zero, we are cruel on
 			 *  destinations that drop a single packet due to
@@ -1530,7 +1537,7 @@ sctp_send_data(sp, st, flags, dp)
 		if (!(sd = sctp_route_normal(sp)))
 			return (-EHOSTUNREACH);
 
-		/*
+		/* 
 		 *  If there is not enough room in the current send window to handle all or at
 		 *  least 1/2 MTU of the data and the current send backlog then return (-EBUSY)
 		 *  and put the message back on the queue so that backpressure will result.  We
@@ -1599,7 +1606,7 @@ sctp_send_data(sp, st, flags, dp)
 				dlen = mlen;	/* use entire */
 				dflags |= flags & SCTPCB_FLAG_LAST_FRAG;
 
-				/*
+				/* 
 				 *  If we have an existing SDU being built that hasn't
 				 *  been transmitted yet, we just tack data onto it.  We
 				 *  concatenate only to an MTU.
@@ -1661,7 +1668,7 @@ sctp_send_data(sp, st, flags, dp)
 				mp->b_cont = bp;
 
 				normal(cb->dlen == msgdsize(mp->b_cont));
-				/*
+				/* 
 				 *  Remember where we can add more data in case data
 				 *  completing a SDU comes before we are forced to bundle the
 				 *  DATA.
@@ -2727,7 +2734,7 @@ sctp_discon_req(sp, cp)
 	sctp_t *sp;
 	mblk_t *cp;
 {
-	/*
+	/* 
 	 *  Caller must ensure that sp and cp (if any) are correct and
 	 *  appropriate.
 	 */
@@ -2970,7 +2977,7 @@ sctp_dest_calc(sp)
 			sctp_rtt_calc(sd, sd->when);
 			sd->when = 0;
 		}
-		/*
+		/* 
 		 *  NOTE:- first we grow the congestion window according to
 		 *  whatever TSNs were cummulatively acked to the destination
 		 *  and then we back off if the destination is dropping (as
@@ -3081,7 +3088,7 @@ sctp_cumm_ack(sp, ack)
 				bufq_queue(&sp->ackq, bufq_dequeue(&sp->rtxq));
 			else
 				freemsg(bufq_dequeue(&sp->rtxq));
-			/*
+			/* 
 			 *  Need to back-enable the write queue if required.
 			 */
 			if (sp->wq->q_count)
@@ -3384,7 +3391,7 @@ sctp_recv_data(sp, mp)
 	}
 	/* RFC 2960 6.2 */
 	if (sp->ndups) {
-		/*
+		/* 
 		 *  IMPLEMENTATION NOTE:- If we are receiving duplicates the
 		 *  probability is high that our SACKs aren't getting through
 		 *  (or have been delayed too long).  If we do not have a sack
@@ -3419,7 +3426,7 @@ sctp_recv_data(sp, mp)
 	/* RFC 2960 6.2 */
 	if (newd) {
 		sp->sackf += ((sp->sackf & 0x3) < 3) ? SCTP_SACKF_NEW : 0;
-		/*
+		/* 
 		 *  IMPLEMENTATION NOTE:-  The SACK timer is probably too
 		 *  slow.  For unidirectional operation, the sender may have
 		 *  timed out before we send a sack.  We should really not
@@ -3442,7 +3449,7 @@ sctp_recv_data(sp, mp)
 	if (sp->s_state == SCTP_SHUTDOWN_SENT)
 		sctp_send_shutdown(sp);
       done:
-	/*
+	/* 
 	 *  We should not break with ENOBUFS or ENOMEM or EBUSY
 	 *  here... I'm not sure that we have left the buffer in a
 	 *  state where it can be put back on the queue and processed
@@ -3459,7 +3466,7 @@ sctp_recv_data(sp, mp)
 	}
 	return (err);
       outstate:
-	/*
+	/* 
 	 *  We have received DATA in the wrong s_state.  If so, it is probably
 	 *  an old packet that was stuck in the network and just got delivered
 	 *  to us.  Nevertheless we should just ignore any message containing
@@ -3531,7 +3538,7 @@ sctp_cleanup_read(sp)
 					st->x.more = more;
 				if (!need_sack)
 					continue;
-				/*
+				/* 
 				 *  Should really do SWS here.
 				 */
 				sp->sackf |= SCTP_SACKF_NOD;
@@ -3571,7 +3578,7 @@ sctp_recv_sack(sp, mp)
 			rare();
 			return 0;
 		}
-		/*
+		/* 
 		 *  If the receive window is increasing and we have data in the write
 		 *  queue, we might need to backenable.
 		 */
@@ -3581,7 +3588,7 @@ sctp_recv_sack(sp, mp)
 		/* RFC 2960 6.2.1 (D) ii) */
 		sp->p_rwnd = rwnd;	/* we keep in_flight separate from a_rwnd */
 
-		/*
+		/* 
 		 *  advance the cummulative ack point and check need to perform
 		 *  per-round-trip and cwnd calcs
 		 */
@@ -3589,7 +3596,7 @@ sctp_recv_sack(sp, mp)
 
 		if (ndups) {
 			// sp->sackf |= SCTP_SACKF_DUP;
-			/*
+			/* 
 			 *  TODO: we could look through the list of duplicate TSNs.
 			 *  Duplicate TSNs really means that the peer's SACKs aren't
 			 *  getting back to us.  But there is nothing really that we
@@ -3624,7 +3631,7 @@ sctp_recv_sack(sp, mp)
 					sp->in_flight =
 					    sp->in_flight > dlen ? sp->in_flight - dlen : 0;
 				}
-				/* RFC 2960 6.3.2 (R4) *//* reneg */
+/* RFC 2960 6.3.2 (R4) *//* reneg */
 				if (cb->flags & SCTPCB_FLAG_SACKED) {
 					sctp_daddr_t *sd = cb->daddr;
 
@@ -3718,7 +3725,7 @@ sctp_recv_sack(sp, mp)
 						sp->in_flight =
 						    sp->in_flight > dlen ? sp->in_flight - dlen : 0;
 					}
-					/* RFC 2960 6.3.2 (R4) *//* reneg */
+/* RFC 2960 6.3.2 (R4) *//* reneg */
 					if (cb->flags & SCTPCB_FLAG_SACKED) {
 						sctp_daddr_t *sd = cb->daddr;
 
@@ -3744,7 +3751,7 @@ sctp_recv_sack(sp, mp)
 		    && !bufq_head(&sp->sndq)
 		    && !bufq_head(&sp->rtxq)) {
 			seldom();
-			/*
+			/* 
 			 *  After receiving a cummulative ack, I want to check if the
 			 *  sndq and rtxq is empty and a SHUTDOWN or SHUTDOWN-ACK is
 			 *  pending.  If so, I want to issue these primitives.
@@ -3770,7 +3777,7 @@ sctp_recv_sack(sp, mp)
 		}
 	} else {
 		rare();
-		/*
+		/* 
 		 *  We may have received a SACK in the wrong s_state.  Because
 		 *  SACKs are completely advisory, there is no reason to get
 		 *  too upset about this.  Simply ignore them.  No need to
@@ -3838,7 +3845,7 @@ sctp_recv_error(sp, mp)
 			assert(sd);
 
 			seldom();
-			/*
+			/* 
 			 *  We can try again with cookie preservative,
 			 *  and then we can keep trying until we have
 			 *  tried as many times as we can...
@@ -3872,7 +3879,7 @@ sctp_recv_error(sp, mp)
 
 	case SCTP_CAUSE_INVALID_PARM:
 	case SCTP_CAUSE_BAD_ADDRESS:
-		/*
+		/* 
 		 *  If the sender of the ERROR has already given us a valid
 		 *  INIT-ACK then we can ignore these errors.
 		 */
@@ -3884,7 +3891,7 @@ sctp_recv_error(sp, mp)
 	case SCTP_CAUSE_MISSING_PARM:
 	case SCTP_CAUSE_NO_RESOURCE:
 	case SCTP_CAUSE_INVALID_STR:
-		/*
+		/* 
 		 *  These errors are bad.  If we don't get an abort with them
 		 *  then we must abort the association.
 		 */
@@ -4058,7 +4065,7 @@ sctp_recv_init(sp, mp)
 			}
 			goto init_bad_parm;
 		case SCTP_PTYPE_ADDR_TYPE:
-			/*
+			/* 
 			 *  Ensure that address types supported includes IPv4.
 			 *  Actually address types must include IPv4 so we
 			 *  just ignore.
@@ -4337,7 +4344,7 @@ sctp_recv_cookie_echo(sp, mp)
 
       recv_cookie_echo_action_a:
 	rare();
-	/*
+	/* 
 	 *  RFC 2960 5.2.4 Action (A)
 	 *
 	 *  In this case, the peer may have restarted.  When the endpoint
@@ -4367,11 +4374,11 @@ sctp_recv_cookie_echo(sp, mp)
 	case SCTP_SHUTDOWN_RECEIVED:
 	case SCTP_SHUTDOWN_RECVWAIT:
 		rare();
-		/*
+		/* 
 		 *  We trash all existing data in queue.
 		 */
 		sctp_disconnect(sp);
-		/*
+		/* 
 		 *  Notify user of reset or disconnect
 		 */
 		if (sp->ops->sctp_reset_ind) {
@@ -4403,7 +4410,7 @@ sctp_recv_cookie_echo(sp, mp)
 
       recv_cookie_echo_action_b:
 	rare();
-	/*
+	/* 
 	 *  RFC 2960 5.2.4 Action (B)
 	 *
 	 *  In this case, both sides may be attempting to start and
@@ -4422,7 +4429,7 @@ sctp_recv_cookie_echo(sp, mp)
 			rare();
 			untimeout(xchg(&sp->timer_init, 0));
 		}
-		/*
+		/* 
 		 *  We haven't got an INIT ACK yet so we need some
 		 *  stuff from the cookie
 		 */
@@ -4460,7 +4467,7 @@ sctp_recv_cookie_echo(sp, mp)
 
       recv_cookie_echo_action_c:
 	rare();
-	/*
+	/* 
 	 *  RFC 2960 5.2.4 Action (C)
 	 *
 	 *  In this case, the local endpoint's cookie has arrived late.
@@ -4483,7 +4490,7 @@ sctp_recv_cookie_echo(sp, mp)
 	return (0);
 
       recv_cookie_echo_action_d:
-	/*
+	/* 
 	 *  RFC 2960 5.2.4 Action (D)
 	 *
 	 *  When both local and remote tags match the endpoint should always
@@ -4697,7 +4704,7 @@ sctp_recv_shutdown(sp, mp)
 
 	if (sp->ngaps) {
 		rare();
-		/*
+		/* 
 		 *  Check sanity of sender: if we have gaps in our acks to the
 		 *  peer and the peer sends a SHUTDOWN, then it is in error.
 		 *  The peer cannot send SHUTDOWN when it has unacknowledged
@@ -4718,7 +4725,7 @@ sctp_recv_shutdown(sp, mp)
 	}
 	if (before(ack, sp->t_ack)) {
 		rare();
-		/*
+		/* 
 		 *  If the SHUTDOWN acknowledges our sent data chunks that
 		 *  have already been acknowledged, then it is an old (or
 		 *  erroneous) message and we will ignore it.

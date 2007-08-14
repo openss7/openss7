@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:58 $
+ @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:48 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_t.c,v $
+ Revision 0.9.2.5  2007/08/14 12:19:48  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/03/15 10:14:58  brian
  - test case reporting and release date
 
@@ -85,9 +102,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:58 $"
+#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:48 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:58 $";
+static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:48 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -219,6 +236,7 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "RFC 2960, SCTP-IG, ETSI TS 102 144";
 static const char *sstdname = "RFC2960/TS102144";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_t";
 static char modname[256] = "sctp_t";
@@ -241,12 +259,13 @@ static int server_host_specified = 0;
 
 static int verbose = 1;
 
-static int client_exec = 0; /* execute client side */
-static int server_exec = 0; /* execute server side */
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 static int last_prim = 0;
@@ -745,8 +764,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -1423,28 +1443,28 @@ terrno_string(ulong terr, long uerr)
 	}
 }
 
-#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
-#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
-#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
-#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
-#define ICMP_ECHO		8	/* Echo Request			*/
-#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
-#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
-#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
-#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
-#define ICMP_INFO_REQUEST	15	/* Information Request		*/
-#define ICMP_INFO_REPLY		16	/* Information Reply		*/
-#define ICMP_ADDRESS		17	/* Address Mask Request		*/
-#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define ICMP_ECHOREPLY		0	/* Echo Reply */
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable */
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench */
+#define ICMP_REDIRECT		5	/* Redirect (change route) */
+#define ICMP_ECHO		8	/* Echo Request */
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded */
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem */
+#define ICMP_TIMESTAMP		13	/* Timestamp Request */
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply */
+#define ICMP_INFO_REQUEST	15	/* Information Request */
+#define ICMP_INFO_REPLY		16	/* Information Reply */
+#define ICMP_ADDRESS		17	/* Address Mask Request */
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply */
 #define NR_ICMP_TYPES		18
 
 /* Codes for UNREACH. */
-#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
-#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
-#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
-#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
-#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
-#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNREACH	0	/* Network Unreachable */
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable */
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable */
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable */
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set */
+#define ICMP_SR_FAILED		5	/* Source Route failed */
 #define ICMP_NET_UNKNOWN	6
 #define ICMP_HOST_UNKNOWN	7
 #define ICMP_HOST_ISOLATED	8
@@ -1458,14 +1478,14 @@ terrno_string(ulong terr, long uerr)
 #define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
 
 /* Codes for REDIRECT. */
-#define ICMP_REDIR_NET		0	/* Redirect Net			*/
-#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
-#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
-#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+#define ICMP_REDIR_NET		0	/* Redirect Net */
+#define ICMP_REDIR_HOST		1	/* Redirect Host */
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS */
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS */
 
 /* Codes for TIME_EXCEEDED. */
-#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
-#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+#define ICMP_EXC_TTL		0	/* TTL count exceeded */
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded */
 
 char *
 etype_string(t_uscalar_t etype)
@@ -4680,7 +4700,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if ((verbose && show) || verbose > 4)
-		print_tx_prim(child, prim_string(p->type));
+			print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_EXDATA_REQ:
 		ctrl->len = sizeof(p->exdata_req);
@@ -5496,18 +5516,18 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			}
 			if (p->optdata_ind.OPT_length) {
 				struct t_opthdr *oh;
-				unsigned char *op = (unsigned char *)p + p->optdata_ind.OPT_offset;
+				unsigned char *op = (unsigned char *) p + p->optdata_ind.OPT_offset;
 				int olen = p->optdata_ind.OPT_length;
 
 				for (oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0); oh; oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0)) {
 					if (oh->level == T_INET_SCTP) {
 						switch (oh->name) {
 						case T_SCTP_SID:
-							sid[child]= (*((t_scalar_t *)(oh +1))) & 0xffff;
+							sid[child] = (*((t_scalar_t *) (oh + 1))) & 0xffff;
 							opt_data.sid_val = sid[child];
 							break;
 						case T_SCTP_PPI:
-							ppi[child]= (*((t_scalar_t *)(oh +1))) & 0xffffffff;
+							ppi[child] = (*((t_scalar_t *) (oh + 1))) & 0xffffffff;
 							opt_data.ppi_val = ppi[child];
 							break;
 						}
@@ -6253,6 +6273,7 @@ preamble_pt_initialized_iut(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int
 preamble_pt_initialized_pt(int child)
 {
@@ -6286,6 +6307,7 @@ preamble_pt_established_iut(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int
 preamble_pt_established_pt(int child)
 {
@@ -6492,6 +6514,7 @@ preamble_pt_closed_iut(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 int
 preamble_pt_closed_pt(int child)
 {
@@ -6543,6 +6566,7 @@ postamble_iut_unint_iut(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_iut_unint_pt(int child)
 {
@@ -6572,6 +6596,7 @@ postamble_iut_bound_iut(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_iut_bound_pt(int child)
 {
@@ -6609,6 +6634,7 @@ postamble_iut_cookie_wait_iut(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_iut_cookie_wait_pt(int child)
 {
@@ -6624,6 +6650,7 @@ postamble_iut_cookie_echoed_iut(int child)
 {
 	return postamble_iut_cookie_wait_iut(child);
 }
+
 int
 postamble_iut_cookie_echoed_pt(int child)
 {
@@ -6640,6 +6667,7 @@ postamble_iut_established_iut(int child)
 {
 	return postamble_iut_cookie_wait_iut(child);
 }
+
 int
 postamble_iut_established_pt(int child)
 {
@@ -6652,6 +6680,7 @@ postamble_iut_listen_iut(int child)
 {
 	return postamble_iut_bound_iut(child);
 }
+
 int
 postamble_iut_listen_pt(int child)
 {
@@ -6663,6 +6692,7 @@ postamble_pt_initialized_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_pt_initialized_pt(int child)
 {
@@ -6674,6 +6704,7 @@ postamble_pt_established_iut(int child)
 {
 	return postamble_iut_established_iut(child);
 }
+
 int
 postamble_pt_established_pt(int child)
 {
@@ -6685,6 +6716,7 @@ postamble_iut_shutdown_received_iut(int child)
 {
 	return postamble_pt_established_iut(child);
 }
+
 int
 postamble_iut_shutdown_received_pt(int child)
 {
@@ -6696,6 +6728,7 @@ postamble_iut_shutdown_ack_sent_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_iut_shutdown_ack_sent_pt(int child)
 {
@@ -6711,6 +6744,7 @@ postamble_iut_shutdown_pending_iut(int child)
 {
 	return postamble_pt_established_iut(child);
 }
+
 int
 postamble_iut_shutdown_pending_pt(int child)
 {
@@ -6722,6 +6756,7 @@ postamble_iut_shutdown_sent_iut(int child)
 {
 	return postamble_pt_established_iut(child);
 }
+
 int
 postamble_iut_shutdown_sent_pt(int child)
 {
@@ -6733,6 +6768,7 @@ postamble_iut_closed_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_iut_closed_pt(int child)
 {
@@ -6744,6 +6780,7 @@ postamble_pt_closed_iut(int child)
 {
 	return postamble_iut_listen_iut(child);
 }
+
 int
 postamble_pt_closed_pt(int child)
 {
@@ -12037,7 +12074,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -12068,7 +12105,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
@@ -12174,6 +12211,7 @@ main(int argc, char *argv[])
 	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char hostbufc[HOST_BUF_LEN];
 	char hostbufs[HOST_BUF_LEN];
+
 #if 0
 	struct hostent *haddr;
 #endif

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tiuser.h,v 0.9.2.4 2007/02/13 14:05:27 brian Exp $
+ @(#) $Id: tiuser.h,v 0.9.2.5 2007/08/14 12:17:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/13 14:05:27 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tiuser.h,v $
+ Revision 0.9.2.5  2007/08/14 12:17:08  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/02/13 14:05:27  brian
  - corrected ulong and long for 32-bit compat
 
@@ -70,7 +73,7 @@
 #ifndef _TIUSER_H
 #define _TIUSER_H
 
-#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tiuser.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -210,6 +213,7 @@ extern int __tli_t_getinfo(int fd, struct t_info *info);
 extern int __tli_t_getstate(int fd);
 extern int __tli_t_listen(int fd, struct t_call *call);
 extern int __tli_t_look(int fd);
+
 #if 0
 extern int __tli_t_nonblocking(int fd);	/* not an XTI function. */
 #endif
@@ -230,8 +234,8 @@ extern int __tli_t_sync(int fd);
 extern int __tli_t_unbind(int fd);
 extern char *__tli_t_errlist[];
 extern char *__tli_t_errstr[];
-/** @} */
 
+/** @} */
 
 #endif				/* __KERNEL__ */
 

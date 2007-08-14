@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_send.h,v 0.9.2.3 2007/06/17 01:56:29 brian Exp $
+ @(#) $Id: sscop_send.h,v 0.9.2.4 2007/08/14 12:18:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_send.h,v $
+ Revision 0.9.2.4  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.3  2007/06/17 01:56:29  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SSCOP_SEND_H__
 #define __SSCOP_SEND_H__
 
-#ident "@(#) $RCSfile: sscop_send.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sscop_send.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -71,7 +74,8 @@
  *  SEND BGN.request N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_bgn(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_bgn(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -80,6 +84,7 @@ static __inline__ int sscop_send_bgn(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = 4 + uu_len + plen;
 	const uint32_t ptype = (plen << 6) | SSCOP_BGN;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -97,7 +102,8 @@ static __inline__ int sscop_send_bgn(sp, uu_ptr, uu_len)
  *  SEND BGAK.request N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_bgak(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_bgak(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -107,6 +113,7 @@ static __inline__ int sscop_send_bgak(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_BGAK;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -130,7 +137,8 @@ static __inline__ int sscop_send_bgak(sp, uu_ptr, uu_len)
  *  SEND BGREJ.request SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_bgrej(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_bgrej(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -140,6 +148,7 @@ static __inline__ int sscop_send_bgrej(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_BGREJ;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -161,7 +170,8 @@ static __inline__ int sscop_send_bgrej(sp, uu_ptr, uu_len)
  *  SEND END.request [src] SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_end(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_end(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -171,6 +181,7 @@ static __inline__ int sscop_send_end(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_END;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -192,7 +203,8 @@ static __inline__ int sscop_send_end(sp, uu_ptr, uu_len)
  *  SEND ENDAK.request ()
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_endak(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_endak(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -202,6 +214,7 @@ static __inline__ int sscop_send_endak(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_ENDAK;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -223,7 +236,8 @@ static __inline__ int sscop_send_endak(sp, uu_ptr, uu_len)
  *  SEND RS.request N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_rs(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_rs(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -233,6 +247,7 @@ static __inline__ int sscop_send_rs(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_RS;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -254,7 +269,8 @@ static __inline__ int sscop_send_rs(sp, uu_ptr, uu_len)
  *  SEND RSAK.request N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_rsak(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_rsak(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -264,6 +280,7 @@ static __inline__ int sscop_send_rsak(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_RSAK;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -285,7 +302,8 @@ static __inline__ int sscop_send_rsak(sp, uu_ptr, uu_len)
  *  SEND ER.request N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_er(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_er(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -295,6 +313,7 @@ static __inline__ int sscop_send_er(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_ER;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -316,7 +335,8 @@ static __inline__ int sscop_send_er(sp, uu_ptr, uu_len)
  *  SEND ERAK.request N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_erak(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_erak(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -326,6 +346,7 @@ static __inline__ int sscop_send_erak(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_ERAK;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -347,7 +368,8 @@ static __inline__ int sscop_send_erak(sp, uu_ptr, uu_len)
  *  SEND SD.request N(S), OOS, MU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_sd(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_sd(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -356,6 +378,7 @@ static __inline__ int sscop_send_sd(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = 4 + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_SD;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -374,11 +397,13 @@ static __inline__ int sscop_send_sd(sp, uu_ptr, uu_len)
  *  SEND POLL.request N(S), N(PS), N(SQ)
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_poll(sp)
+static __inline__ int
+sscop_send_poll(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
 	static const size_t blen = 8;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = htonl(sp->nps & 0xffffff);
@@ -393,13 +418,16 @@ static __inline__ int sscop_send_poll(sp)
  *  SEND STAT.indicaiton N(R), N(MR), N(PS), N(SQ), N(SS), [list]
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_stat(sp)
+static __inline__ int
+sscop_send_stat(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
 	const size_t blen = 12 + 4 * lnum;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		int i;
+
 		mp->b_datap->db_type = M_DATA;
 		for (i = 0; i < lnum; i++)
 			*((uint32_t *) mp->b_wptr)++ = htonl(sp->le[i] & 0xffffff);
@@ -416,11 +444,13 @@ static __inline__ int sscop_send_stat(sp)
  *  SEND USTAT.request N(R), N(MR), N(PS), N(SQ), N(SS), [list]
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_ustat(sp)
+static __inline__ int
+sscop_send_ustat(sp)
 	const struct sscop *sp;
 {
 	mblk_t *mp;
 	static const size_t blen = 16;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bzero(mp->b_wptr, plen);
@@ -444,7 +474,8 @@ static __inline__ int sscop_send_ustat(sp)
  *  SEND UD.request MU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_ud(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_ud(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -454,6 +485,7 @@ static __inline__ int sscop_send_ud(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_UD;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);
@@ -475,7 +507,8 @@ static __inline__ int sscop_send_ud(sp, uu_ptr, uu_len)
  *  SEND MD.request MU
  *  -------------------------------------------------------------------------
  */
-static __inline__ int sscop_send_md(sp, uu_ptr, uu_len)
+static __inline__ int
+sscop_send_md(sp, uu_ptr, uu_len)
 	const struct sscop *sp;
 	const caddr_t uu_ptr;
 	const size_t uu_len;
@@ -485,6 +518,7 @@ static __inline__ int sscop_send_md(sp, uu_ptr, uu_len)
 	const size_t plen = (4 - (uu_len & 0x3)) & 0x3;
 	const size_t blen = sizeof(*m) + uu_len + plen;
 	const u8 ptype = (plen << 6) | SSCOP_MD;
+
 	if ((mp = allocb(blen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		bcopy(uu_ptr, mp->b_wptr, uu_len);

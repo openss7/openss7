@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/03 13:35:26 $
+ @(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:06 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:26 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_tpi.c,v $
+ Revision 0.9.2.27  2007/08/14 12:18:06  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.26  2007/08/03 13:35:26  brian
  - manual updates, put ss7 modules in public release
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/03 13:35:26 $"
+#ident "@(#) $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:06 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/03 13:35:26 $";
+    "$RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:06 $";
 
 /*
  *  This is a MTP TPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -114,7 +117,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_TPI_DESCRIP		"SS7 Message Transfer Part (MTP) TPI STREAMS MODULE."
-#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/03 13:35:26 $"
+#define MTP_TPI_REVISION	"LfS $RCSfile: mtp_tpi.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:06 $"
 #define MTP_TPI_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -732,7 +735,9 @@ t_discon_ind(struct mtp *mtp, queue_t *q, mblk_t *bp, t_scalar_t reason, mblk_t 
 	mblk_t *mp;
 	size_t msg_len = sizeof(*p);
 
-	if (mtp_chk_state(mtp, (TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))) {
+	if (mtp_chk_state
+	    (mtp,
+	     (TSF_WCON_CREQ | TSF_WRES_CIND | TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))) {
 		if (likely((mp = mi_allocb(q, msg_len, BPRI_MED)) != NULL)) {
 			if (likely(canputnext(mtp->rq))) {
 				DB_TYPE(mp) = M_PROTO;
@@ -850,7 +855,6 @@ t_info_ack(struct mtp *mtp, queue_t *q, mblk_t *msg)
 {
 	struct T_info_ack *p;
 	mblk_t *mp;
-
 
 	if (likely((mp = mi_allocb(q, sizeof(*p), BPRI_MED)) != NULL)) {
 		DB_TYPE(mp) = M_PCPROTO;
@@ -1620,7 +1624,7 @@ t_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	return mtp_transfer_req(mtp, q, NULL, &mtp->dst, mtp->options.mp, mtp->options.sls, mp);
       baddata:
-	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong)dlen);
+	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong) dlen);
 	goto error;
       outstate:
 	mi_strlog(q, 0, SL_TRACE, "would place i/f out of state");

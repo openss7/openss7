@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/13 15:22:11 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:17:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:22:11 $ by $Author: brian $
+# Last Modified $Date: 2007/08/14 12:17:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,7 @@ if DEVELOPMENT
 info_TEXINFOS		+= tri.texi
 
 tri_TEXINFOS		= \
+			  tr.h \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/fdl.texi
@@ -120,6 +121,9 @@ include ../../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.19  2007/08/14 12:17:07  brian
+## - GPLv3 header updates
+##
 ## Revision 0.9.2.18  2007/08/13 15:22:11  brian
 ## - header updates, added references
 ##

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.12 2007/07/21 20:09:43 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.13 2007/08/14 12:17:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/21 20:09:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdli_ioctl.h,v $
+ Revision 0.9.2.13  2007/08/14 12:17:10  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.12  2007/07/21 20:09:43  brian
  - added pass structure
 
@@ -61,7 +64,7 @@
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.12 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -310,7 +313,7 @@ typedef struct sdl_notify {
  *  PASS
  */
 typedef struct sdl_pass {
-	sdl_long index;		/* lower multiplex index */
+	sdl_long index;			/* lower multiplex index */
 	sdl_ulong cmd;			/* embedded input-output control comand */
 	/* followed by cmd specific structure */
 } sdl_pass_t;

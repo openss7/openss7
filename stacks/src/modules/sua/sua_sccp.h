@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_sccp.h,v 0.9.2.2 2007/06/17 01:56:31 brian Exp $
+ @(#) $Id: sua_sccp.h,v 0.9.2.3 2007/08/14 12:18:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:31 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_sccp.h,v $
+ Revision 0.9.2.3  2007/08/14 12:18:53  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.2  2007/06/17 01:56:31  brian
  - updates for release, remove any later language
 
@@ -73,7 +76,7 @@
 #ifndef __SUA_SCCP_H__
 #define __SUA_SCCP_H__
 
-#ident "@(#) $RCSfile: sua_sccp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sua_sccp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -89,7 +92,8 @@
  *  N_CONN_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_conn_req(flags, dst_ptr, dst_len, qos_ptr, qos_len)
+static __inline__ mblk_t *
+n_conn_req(flags, dst_ptr, dst_len, qos_ptr, qos_len)
 	uint flags;
 	caddr_t dst_ptr;
 	size_t dst_len;
@@ -98,6 +102,7 @@ static __inline__ mblk_t *n_conn_req(flags, dst_ptr, dst_len, qos_ptr, qos_len)
 {
 	mblk_t *mp;
 	N_conn_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_conn_req_t *) mp->b_wptr;
@@ -120,7 +125,8 @@ static __inline__ mblk_t *n_conn_req(flags, dst_ptr, dst_len, qos_ptr, qos_len)
  *  N_CONN_RES
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_conn_res(tok, seq, flags, res_ptr, res_len, qos_ptr, qos_len)
+static __inline__ mblk_t *
+n_conn_res(tok, seq, flags, res_ptr, res_len, qos_ptr, qos_len)
 	uint tok;
 	uint seq;
 	uint flags;
@@ -131,6 +137,7 @@ static __inline__ mblk_t *n_conn_res(tok, seq, flags, res_ptr, res_len, qos_ptr,
 {
 	mblk_t *mp;
 	N_conn_res_t *p;
+
 	if ((mp = allocb(sizeof(*p) + res_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_conn_res_t *) mp->b_wptr;
@@ -155,7 +162,8 @@ static __inline__ mblk_t *n_conn_res(tok, seq, flags, res_ptr, res_len, qos_ptr,
  *  N_DISCON_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_discon_req(reason, seq, res_ptr, res_len)
+static __inline__ mblk_t *
+n_discon_req(reason, seq, res_ptr, res_len)
 	uint reason;
 	uint seq;
 	caddr_t res_ptr;
@@ -163,6 +171,7 @@ static __inline__ mblk_t *n_discon_req(reason, seq, res_ptr, res_len)
 {
 	mblk_t *mp;
 	N_discon_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_discon_req_t *) mp->b_wptr;
@@ -182,10 +191,12 @@ static __inline__ mblk_t *n_discon_req(reason, seq, res_ptr, res_len)
  *  N_DATA_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_data_req(uint flags, mblk_t * db)
+static __inline__ mblk_t *
+n_data_req(uint flags, mblk_t *db)
 {
 	mblk_t *mp;
 	N_data_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_data_req_t *) mp->b_wptr;
@@ -201,10 +212,12 @@ static __inline__ mblk_t *n_data_req(uint flags, mblk_t * db)
  *  N_EXDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_exdata_req(mblk_t * db)
+static __inline__ mblk_t *
+n_exdata_req(mblk_t *db)
 {
 	mblk_t *mp;
 	N_exdata_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_exdata_req_t *) mp->b_wptr;
@@ -219,10 +232,12 @@ static __inline__ mblk_t *n_exdata_req(mblk_t * db)
  *  N_INFO_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_info_req(void)
+static __inline__ mblk_t *
+n_info_req(void)
 {
 	mblk_t *mp;
 	N_info_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_info_req_t *) mp->b_wptr;
@@ -236,7 +251,8 @@ static __inline__ mblk_t *n_info_req(void)
  *  N_BIND_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_bind_req(flags, conind, add_ptr, add_len, pro_ptr, pro_len)
+static __inline__ mblk_t *
+n_bind_req(flags, conind, add_ptr, add_len, pro_ptr, pro_len)
 	uint flags;
 	uint conind;
 	caddr_t addr_ptr;
@@ -246,6 +262,7 @@ static __inline__ mblk_t *n_bind_req(flags, conind, add_ptr, add_len, pro_ptr, p
 {
 	mblk_t *mp;
 	N_bind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_bind_req_t *) mp->b_wptr;
@@ -269,10 +286,12 @@ static __inline__ mblk_t *n_bind_req(flags, conind, add_ptr, add_len, pro_ptr, p
  *  N_UNBIND_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_unbind_req(void)
+static __inline__ mblk_t *
+n_unbind_req(void)
 {
 	mblk_t *mp;
 	N_unbind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unbind_req_t *) mp->b_wptr;
@@ -286,13 +305,15 @@ static __inline__ mblk_t *n_unbind_req(void)
  *  N_UNITDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_unitdata_req(dst_ptr, dst_len, db)
+static __inline__ mblk_t *
+n_unitdata_req(dst_ptr, dst_len, db)
 	caddr_t dst_ptr;
 	size_t dst_len;
 	mblk_t *db;
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unitdata_req_t *) mp->b_wptr;
@@ -313,13 +334,15 @@ static __inline__ mblk_t *n_unitdata_req(dst_ptr, dst_len, db)
  *  N_OPTMGMT_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_optmgmt_req(flags, qos_ptr, qos_len)
+static __inline__ mblk_t *
+n_optmgmt_req(flags, qos_ptr, qos_len)
 	uint flags;
 	caddr_t qos_ptr;
 	size_t qos_len;
 {
 	mblk_t *mp;
 	N_optmgmt_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_optmgmt_req_t *) mp->b_wptr;
@@ -338,10 +361,12 @@ static __inline__ mblk_t *n_optmgmt_req(flags, qos_ptr, qos_len)
  *  N_DATACK_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_datack_req(void)
+static __inline__ mblk_t *
+n_datack_req(void)
 {
 	mblk_t *mp;
 	N_datack_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_datack_req_t *) mp->b_wptr;
@@ -355,10 +380,12 @@ static __inline__ mblk_t *n_datack_req(void)
  *  N_RESET_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_reset_req(uint reason)
+static __inline__ mblk_t *
+n_reset_req(uint reason)
 {
 	mblk_t *mp;
 	N_reset_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_reset_req_t *) mp->b_wptr;
@@ -373,10 +400,12 @@ static __inline__ mblk_t *n_reset_req(uint reason)
  *  N_RESET_RES
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *n_reset_res(void)
+static __inline__ mblk_t *
+n_reset_res(void)
 {
 	mblk_t *mp;
 	N_reset_res_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_reset_res_t *) mp->b_wptr;

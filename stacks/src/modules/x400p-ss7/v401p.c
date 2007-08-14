@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/25 12:19:07 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:19:01 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/25 12:19:07 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.6  2007/08/14 12:19:01  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.5  2007/05/25 12:19:07  brian
  - check for pm_message_t
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/25 12:19:07 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:19:01 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/05/25 12:19:07 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:19:01 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -326,6 +329,7 @@ static int vp_t1_slot_map[] = {
 	-1, 18, 19, 20,
 	-1, 21, 22, 23
 };
+
 /* Map from Tormenta channel to E1 time slot (less 1). */
 static int vp_e1_slot_map[] = {
 	-1, 0, 1, 2,
@@ -337,6 +341,7 @@ static int vp_e1_slot_map[] = {
 	23, 24, 25, 26,
 	27, 28, 29, 30
 };
+
 /* Map from T1 time slot (less 1) to Tormenta channel. */
 static int vp_t1_chan_map[] = {
 	1, 2, 3,
@@ -348,6 +353,7 @@ static int vp_t1_chan_map[] = {
 	25, 26, 27,
 	29, 30, 31
 };
+
 /* Map from E1 time slot (less 1) to Tormenta channel. */
 static int vp_e1_chan_map[] = {
 	1, 2, 3, 4,
@@ -360,10 +366,10 @@ static int vp_e1_chan_map[] = {
 	29, 30, 31
 };
 
-#define VP_T1_TS_VALID_MASK	0x00ffffff /* Mask of valid T1 time slots. */
-#define VP_E1_TS_VALID_MASK	0x7fffffff /* Mask of valid E1 time slots. */
-#define VP_T1_CHAN_VALID_MASK	0xeeeeeeee /* Mask of valid T1 Tormenta channels. */
-#define VP_E1_CHAN_VALID_MASK	0xfffffffe /* Mask of valid E1 Tormenta channels. */
+#define VP_T1_TS_VALID_MASK	0x00ffffff	/* Mask of valid T1 time slots. */
+#define VP_E1_TS_VALID_MASK	0x7fffffff	/* Mask of valid E1 time slots. */
+#define VP_T1_CHAN_VALID_MASK	0xeeeeeeee	/* Mask of valid T1 Tormenta channels. */
+#define VP_E1_CHAN_VALID_MASK	0xfffffffe	/* Mask of valid E1 Tormenta channels. */
 
 unsigned modID_t modid = DRV_ID;
 unsigned major_t major = DRV_ID;
@@ -412,8 +418,10 @@ struct vp {
 	uint32_t smask;			/* Mask of enabled spans. */
 	uint32_t cmask;			/* Mask of enabled channels (for any span). */
 	uint32_t xmask;			/* Mask of cross-connected channels (for any span). */
-	int txdccs;			/* Number of digital cross-connects to this card from other cards. */
-	int rxdccs;			/* Number of digital cross-connects from this card to other cards. */
+	int txdccs;			/* Number of digital cross-connects to this card from other 
+					   cards. */
+	int rxdccs;			/* Number of digital cross-connects from this card to other 
+					   cards. */
 	struct sp spans[4];		/* Only four of 'em for now. */
 	volatile uint8_t *map[32][4];	/* Digital cross-connect map from this card. */
 };
@@ -1136,7 +1144,6 @@ vp_wsrv(queue_t *q)
  * and pushes the mark to the tail.  As blocks are freed, it pushes the head toward the mark.  RX
  * ISR pushes the tail but short of the head. */
 
-
 /*
  *  STREAMS open and close.
  *  =======================
@@ -1236,15 +1243,14 @@ vp_qclose(queue_t *q, int oflags, cred_t *crp)
  */
 
 /* Firmware */
-#define GPIOC		(0x54 >> 1) /* GPIO control register */
-#define GPIO_WRITE	(0x0004000) /* GPIO4 data */
-#define GPIO_PROGRAM	(0x0020000) /* GPIO5 data */
-#define GPIO_INIT	(0x0100000) /* GPIO6 data */
-#define GPIO_DONE	(0x0800000) /* GPIO7 data */
+#define GPIOC		(0x54 >> 1)	/* GPIO control register */
+#define GPIO_WRITE	(0x0004000)	/* GPIO4 data */
+#define GPIO_PROGRAM	(0x0020000)	/* GPIO5 data */
+#define GPIO_INIT	(0x0100000)	/* GPIO6 data */
+#define GPIO_DONE	(0x0800000)	/* GPIO7 data */
 
 #define INTCSR		(0x4c >> 1)
 #define PLX_INTENA	0x43
-
 
 /* Xilinx */
 #define SYNREG	0x400
@@ -1267,7 +1273,8 @@ vp_qclose(queue_t *q, int oflags, cred_t *crp)
 #define	    MASTER	0x08	/* External Synchronzation Enable (MASTER signal) */
 #define	    E1DIV	0x10	/* Select E1 Divisor Mode (0 for T1, 1 for E1) */
 #define	    REMSLB	0x20	/* Remote serial loopback (When set, TSER is driven from RSER) */
-#define	    LOCSLB	0x40	/* Local serial loopback (When set, Rx buffers driven from Tx buffers) */
+#define	    LOCSLB	0x40	/* Local serial loopback (When set, Rx buffers driven from Tx
+				   buffers) */
 #define	    INTACK	0x80	/* Interrupt Acknowledge */
 
 #define LEDREG	0x402		/* R4 G4 R3 G3 R2 G2 R1 G1 */
@@ -1374,8 +1381,9 @@ vp_tx_tasklet(unsigned long data)
 				if (!(smask & 0x01))
 					continue;
 				for (cmask = mx->cmask[span], byte = frame + spans + (spans - span),
-				     chan = 1, slot = frame + span; chan < 32; byte += spans, chan++,
-				     slot += ((vp->span[span].flags & VPF_E1) || (chan & 0x3)) ? spans : 0,
+				     chan = 1, slot = frame + span; chan < 32;
+				     byte += spans, chan++, slot += ((vp->span[span].flags & VPF_E1)
+								     || (chan & 0x3)) ? spans : 0,
 				     cmask >>= 1) {
 					if (!(cmask & 0x01))
 						continue;
@@ -1397,11 +1405,11 @@ vp_tx_tasklet(unsigned long data)
 static streamscall __hot_read void
 vp_rx_free(caddr_t arg)
 {
-	struct vp *vp = (struct vp *)arg;
+	struct vp *vp = (struct vp *) arg;
 	struct mx *mx;
 
 	for (mx = vp->mx; mx; mx = mp->vp_next)
-		mx->rflags &= ~0x01; /* needs protection */
+		mx->rflags &= ~0x01;	/* needs protection */
 }
 
 /**
@@ -1694,13 +1702,13 @@ vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
 					vp->map[c1][span1] = NULL;
 					mapused = 0;
 					for (span = 0; span < vp->spans; span++)
-						mapused |= (long)vp->map[c1][span];
+						mapused |= (long) vp->map[c1][span];
 					if (!mapused)
 						vp->xmask &= ~(1 << c1);
 					vp->map[c2][span2] = NULL;
 					mapused = 0;
 					for (span = 0; span < vp->spans; span++)
-						mapused |= (long)vp->map[c2][span];
+						mapused |= (long) vp->map[c2][span];
 					if (!mapused)
 						vp->xmask &= ~(1 << c2);
 				}
@@ -1737,7 +1745,7 @@ vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
 					vp1->map[c1][span1] = NULL;
 					mapused = 0;
 					for (span = 0; span < vp1->spans; span++)
-						mapused |= (long)vp1->map[c1][span];
+						mapused |= (long) vp1->map[c1][span];
 					if (!mapused)
 						vp1->xmask &= ~(1 << c1);
 					vp1->rxdccs--;
@@ -1745,7 +1753,7 @@ vp_cross_disconnect(uint32_t addr1, uint32_t addr2, uint32_t chans)
 					vp2->map[c2][span2] = NULL;
 					mapused = 0;
 					for (span = 0; span < vp2->spans; span++)
-						mapused |= (long)vp2->map[c2][span];
+						mapused |= (long) vp2->map[c2][span];
 					if (!mapused)
 						vp2->xmask &= ~(1 << c2);
 					vp2->rxdccs--;
@@ -1811,7 +1819,7 @@ vp_daccs(struct vp *vp)
 		if (rxdccs)
 			spin_lock(&vp_daccs_lock);
 		for (byte = 0; byte < 1024; byte += 128) {
-			for (xmask = xmask_save, slot = (byte>>2) + 1, chan = 1;
+			for (xmask = xmask_save, slot = (byte >> 2) + 1, chan = 1;
 			     chan < 32; slot++, chan++, xmask <<= 1) {
 				if (xmask & 0x01) {
 					uint32_t data = buf[slot];
@@ -2496,7 +2504,6 @@ static struct streamtab v400mxinfo = {
 	.st_rdinit = &vp_rinit,
 	.st_wrinit = &vp_winit,
 };
-
 
 static struct cdevsw vp_cdev = {
 	.d_name = DRV_NAME,

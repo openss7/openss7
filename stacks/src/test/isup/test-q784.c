@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/31 21:04:41 $
+ @(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 12:19:37 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q784.c,v $
+ Revision 0.9.2.9  2007/08/14 12:19:37  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.8  2006/10/31 21:04:41  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -75,10 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/31 21:04:41 $"
+#ident "@(#) $RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 12:19:37 $"
 
-static char const ident[] =
-    "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/10/31 21:04:41 $";
+static char const ident[] = "$RCSfile: test-q784.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 12:19:37 $";
 
 /* 
  *  This is a ferry-clip Q.784 conformance test program for testing the
@@ -324,8 +326,7 @@ struct msg pmsg = {
 	{"17804901241", 11, 0},
 	{"555", 3, 0},
 	0,
-	(ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	 ISUP_FCI_ORIGINATING_ACCESS_ISDN) >> 8,
+	(ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN) >> 8,
 	(ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24,
 	ISUP_CALL_TYPE_SPEECH,
 	0,
@@ -354,8 +355,7 @@ struct msg imsg = {
 	{{0,}, 24, 0},
 	{{0,}, 24, 0},
 	0,
-	(ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	 ISUP_FCI_ORIGINATING_ACCESS_ISDN) >> 8,
+	(ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN) >> 8,
 	(ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24,
 	ISUP_CALL_TYPE_SPEECH,
 	0,
@@ -536,6 +536,7 @@ now(void)
 {
 	long ret;
 	struct timeval now;
+
 	if (gettimeofday(&now, NULL)) {
 		printf("***************ERROR: couldn't get time!\n");
 		printf("                      %s: %s\n", __FUNCTION__, strerror(errno));
@@ -552,8 +553,7 @@ static long
 milliseconds(char *t)
 {
 	printf("                    .  .              :                .                    \n");
-	printf("                    .  .            %6s             .                    (%d)\n", t,
-	       state);
+	printf("                    .  .            %6s             .                    (%d)\n", t, state);
 	printf("                    .  .              :                .                    \n");
 	FFLUSH(stdout);
 	return now();
@@ -562,8 +562,7 @@ static long
 milliseconds_2nd(char *t)
 {
 	printf("                    .  .              :   :            .                    \n");
-	printf("                    .  .              : %6s         .                    (%d)\n", t,
-	       state);
+	printf("                    .  .              : %6s         .                    (%d)\n", t, state);
 	printf("                    .  .              :   :            .                    \n");
 	FFLUSH(stdout);
 	return now();
@@ -579,6 +578,7 @@ static int
 check_time(const char *t, long i, long lo, long hi)
 {
 	float tol, dlo, dhi, itv;
+
 	itv = i * timer_scale;
 	dlo = lo;
 	dhi = hi;
@@ -587,8 +587,7 @@ check_time(const char *t, long i, long lo, long hi)
 	dlo = dlo / 1000;
 	dhi = dhi / 1000;
 	tol = tol / 1000;
-	printf("                    |  |(%7.3g <= %7.3g <= %7.3g)| %s             (%d)\n",
-	       dlo - tol, itv, dhi + tol, t, state);
+	printf("                    |  |(%7.3g <= %7.3g <= %7.3g)| %s             (%d)\n", dlo - tol, itv, dhi + tol, t, state);
 	FFLUSH(stdout);
 	if (dlo - tol <= itv && itv <= dhi + tol)
 		return SUCCESS;
@@ -602,6 +601,7 @@ time_event(int event)
 	if (verbose) {
 		float t, m;
 		struct timeval now;
+
 		gettimeofday(&now, NULL);
 		if (!test_start)
 			test_start = now.tv_sec;
@@ -609,9 +609,7 @@ time_event(int event)
 		m = now.tv_usec;
 		m = m / 1000000;
 		t += m;
-		printf
-		    ("                    |  | %11.6g                   |                    (%d)\n",
-		     t, state);
+		printf("                    |  | %11.6g                   |                    (%d)\n", t, state);
 		FFLUSH(stdout);
 	}
 	return (event);
@@ -632,6 +630,7 @@ timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -654,6 +653,7 @@ start_tt(long duration)
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
+
 	if (timer_sethandler())
 		return FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -665,6 +665,7 @@ static int
 start_st(long duration)
 {
 	long sdur = (duration + timer_scale - 1) / timer_scale;
+
 	return start_tt(sdur);
 }
 
@@ -674,6 +675,7 @@ stop_tt(void)
 	struct itimerval setting = { {0, 0}, {0, 0} };
 	sigset_t mask;
 	struct sigaction act;
+
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return FAILURE;
 	act.sa_handler = SIG_DFL;
@@ -1003,18 +1005,17 @@ send(int msg)
 	int i;
 	char cbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*pt_dat), 0, (char *)pt_dat };
+	struct strbuf data = { sizeof(*pt_dat), 0, (char *) pt_dat };
 	union MTP_primitives *m = (typeof(m)) cbuf;
 	unsigned char *d = pt_dat;
 	unsigned char *p = pt_dat;
+
 	/* precharge buffer */
 	*d++ = pmsg.cic;
 	*d++ = pmsg.cic >> 8;
 	switch (msg) {
 	case IAM:
-		printf
-		    ("                    |<-+---------------------%3ld--IAM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--IAM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_IAM;
 		*d++ = pmsg.nci;
@@ -1023,7 +1024,8 @@ send(int msg)
 		*d++ = pmsg.cpc;
 		*d++ = pmsg.tmr;
 		p = d + 2;
-		*d = p - d; d++;	/* pointer to cdpn */
+		*d = p - d;
+		d++;		/* pointer to cdpn */
 		pmsg.cdpn.len = strnlen(pmsg.cdpn.num, 24);
 		*p++ = 3 + ((pmsg.cdpn.len + 1) >> 1) + 1;	/* pointer to optional parameters */
 		*p++ = 2 + ((pmsg.cdpn.len + 1) >> 1);	/* cdpn len */
@@ -1032,7 +1034,8 @@ send(int msg)
 		for (i = 0; i < pmsg.cdpn.len; i += 2)
 			*p++ = (pmsg.cdpn.num[i] & 0x0f) | ((pmsg.cdpn.num[i + 1] & 0x0f) << 4);
 		/* optional parameters */
-		*d = p - d; d++;
+		*d = p - d;
+		d++;
 		/* O cgpn */
 		*p++ = ISUP_PT_CGPN;
 		pmsg.cdpn.len = strnlen(pmsg.cgpn.num, 24);
@@ -1045,13 +1048,12 @@ send(int msg)
 		*p++ = 0;	/* end of optional parameters */
 		goto send_isup;
 	case SAM:
-		printf
-		    ("                    |<-+---------------------%3ld--SAM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--SAM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_SAM;
 		p = d + 2;
-		*d = p - d; d++;	/* pointer to subn */
+		*d = p - d;
+		d++;		/* pointer to subn */
 		pmsg.subn.len = strnlen(pmsg.subn.num, 100) + 1;
 		*p++ = 1 + ((pmsg.subn.len + 1) >> 1);	/* subn len */
 		*p++ = (pmsg.subn.len & 0x1) ? 0x80 : 0x00;
@@ -1062,18 +1064,14 @@ send(int msg)
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case INR:
-		printf
-		    ("                    |<-+---------------------%3ld--INR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--INR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_INR;
 		*d++ = pmsg.inri;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case INF:
-		printf
-		    ("                    |<-+---------------------%3ld--INF--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--INF--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_INF;
 		*d++ = pmsg.infi;
@@ -1083,21 +1081,15 @@ send(int msg)
 		*d++ = ISUP_MT_COT;
 		*d++ = pmsg.coti;	/* success = 1, failure = 0 */
 		if (pmsg.coti) {
-			printf
-			    ("                    |<-+---------------------%3ld--COT--| (success)          (%d)\n",
-			     pmsg.cic, state);
+			printf("                    |<-+---------------------%3ld--COT--| (success)          (%d)\n", pmsg.cic, state);
 			FFLUSH(stdout);
 		} else {
-			printf
-			    ("                    |<-+---------------------%3ld--COT--| (failure)          (%d)\n",
-			     pmsg.cic, state);
+			printf("                    |<-+---------------------%3ld--COT--| (failure)          (%d)\n", pmsg.cic, state);
 			FFLUSH(stdout);
 		}
 		goto send_isup;
 	case ACM:
-		printf
-		    ("                    |<-+---------------------%3ld--ACM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--ACM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_ACM;
 		*d++ = pmsg.bci;
@@ -1105,9 +1097,7 @@ send(int msg)
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CON:
-		printf
-		    ("                    |<-+---------------------%3ld--CON--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CON--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CON;
 		*d++ = pmsg.bci;
@@ -1115,25 +1105,19 @@ send(int msg)
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FOT:
-		printf
-		    ("                    |<-+---------------------%3ld--FOT--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FOT--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FOT;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case ANM:
-		printf
-		    ("                    |<-+---------------------%3ld--ANM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--ANM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_ANM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case REL:
-		printf
-		    ("                    |<-+---------------------%3ld--REL--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--REL--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_REL;
 		*d++ = 2;	/* causv pointer */
@@ -1143,77 +1127,57 @@ send(int msg)
 			*d++ = pmsg.caus.buf[i];
 		goto send_isup;
 	case SUS:
-		printf
-		    ("                    |<-+---------------------%3ld--SUS--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--SUS--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_SUS;
 		*d++ = pmsg.sris;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case RES:
-		printf
-		    ("                    |<-+---------------------%3ld--RES--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--RES--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_RES;
 		*d++ = pmsg.sris;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case RLC:
-		printf
-		    ("                    |<-+---------------------%3ld--RLC--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--RLC--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_RLC;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CCR:
-		printf
-		    ("                    |<-+---------------------%3ld--CCR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CCR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CCR;
 		goto send_isup;
 	case RSC:
-		printf
-		    ("                    |<-+---------------------%3ld--RSC--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--RSC--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_RSC;
 		goto send_isup;
 	case BLO:
-		printf
-		    ("                    |<-+---------------------%3ld--BLO--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--BLO--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_BLO;
 		goto send_isup;
 	case UBL:
-		printf
-		    ("                    |<-+---------------------%3ld--UBL--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--UBL--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_UBL;
 		goto send_isup;
 	case BLA:
-		printf
-		    ("                    |<-+---------------------%3ld--BLA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--BLA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_BLA;
 		goto send_isup;
 	case UBA:
-		printf
-		    ("                    |<-+---------------------%3ld--UBA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--UBA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_UBA;
 		goto send_isup;
 	case GRS:
-		printf
-		    ("                    |<-+---------------------%3ld--GRS--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--GRS--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_GRS;
 		*d++ = 1;
@@ -1222,9 +1186,7 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CGB:
-		printf
-		    ("                    |<-+---------------------%3ld--CGB--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CGB--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CGB;
 		*d++ = pmsg.cgi;
@@ -1234,9 +1196,7 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CGU:
-		printf
-		    ("                    |<-+---------------------%3ld--CGU--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CGU--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CGU;
 		*d++ = pmsg.cgi;
@@ -1246,9 +1206,7 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CGBA:
-		printf
-		    ("                    |<-+---------------------%3ld--CGBA-|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CGBA-|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CGBA;
 		*d++ = pmsg.cgi;
@@ -1258,9 +1216,7 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CGUA:
-		printf
-		    ("                    |<-+---------------------%3ld--CGUA-|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CGUA-|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CGUA;
 		*d++ = pmsg.cgi;
@@ -1270,105 +1226,81 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CMR:
-		printf
-		    ("                    |<-+---------------------%3ld--CMR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CMR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CMR;
 		*d++ = pmsg.cmi;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CMC:
-		printf
-		    ("                    |<-+---------------------%3ld--CMC--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CMC--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CMC;
 		*d++ = pmsg.cmi;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CMRJ:
-		printf
-		    ("                    |<-+---------------------%3ld--CMRJ-|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CMRJ-|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CMRJ;
 		*d++ = pmsg.cmi;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAR:
-		printf
-		    ("                    |<-+---------------------%3ld--FAR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FAR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FAR;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAA:
-		printf
-		    ("                    |<-+---------------------%3ld--FAA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FAA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FAA;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FRJ:
-		printf
-		    ("                    |<-+---------------------%3ld--FRJ--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FRJ--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FRJ;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAD:
-		printf
-		    ("                    |<-+---------------------%3ld--FAD--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FAD--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FAD;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAI:
-		printf
-		    ("                    |<-+---------------------%3ld--FAI--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FAI--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FAI;
 		*d++ = pmsg.faci;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case LPA:
-		printf
-		    ("                    |<-+---------------------%3ld--LPA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--LPA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_LPA;
 		goto send_isup;
 	case DRS:
-		printf
-		    ("                    |<-+---------------------%3ld--DRS--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--DRS--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_DRS;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case PAM:
-		printf
-		    ("                    |<-+---------------------%3ld--PAM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--PAM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_PAM;
 		for (i = 0; i < pmsg.pam.len; i++)
 			*d++ = pmsg.pam.buf[i];
 		goto send_isup;
 	case GRA:
-		printf
-		    ("                    |<-+---------------------%3ld--GRA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--GRA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_GRA;
 		*d++ = 1;
@@ -1377,9 +1309,7 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CQM:
-		printf
-		    ("                    |<-+---------------------%3ld--CQM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CQM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CQM;
 		*d++ = 1;
@@ -1388,9 +1318,7 @@ send(int msg)
 			*d++ = pmsg.rs.buf[i];
 		goto send_isup;
 	case CQR:
-		printf
-		    ("                    |<-+---------------------%3ld--CQR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CQR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CQR;
 		*d++ = 2;
@@ -1403,18 +1331,14 @@ send(int msg)
 			*d++ = pmsg.csi.buf[i];
 		goto send_isup;
 	case CPG:
-		printf
-		    ("                    |<-+---------------------%3ld--CPG--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CPG--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CPG;
 		*d++ = pmsg.evnt;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case USR:
-		printf
-		    ("                    |<-+---------------------%3ld--USR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--USR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_USR;
 		*d++ = 2;
@@ -1424,16 +1348,12 @@ send(int msg)
 			*d++ = pmsg.uui.buf[i];
 		goto send_isup;
 	case UCIC:
-		printf
-		    ("                    |<-+---------------------%3ld--UCIC-|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--UCIC-|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_UCIC;
 		goto send_isup;
 	case CFN:
-		printf
-		    ("                    |<-+---------------------%3ld--CFN--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CFN--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CFN;
 		*d++ = 2;
@@ -1443,94 +1363,70 @@ send(int msg)
 			*d++ = pmsg.caus.buf[i];
 		goto send_isup;
 	case OLM:
-		printf
-		    ("                    |<-+---------------------%3ld--OLM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--OLM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_OLM;
 		goto send_isup;
 	case CRG:
-		printf
-		    ("                    |<-+---------------------%3ld--CRG--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CRG--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CRG;
 		goto send_isup;
 	case NRM:
-		printf
-		    ("                    |<-+---------------------%3ld--NRM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--NRM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_NRM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case FAC:
-		printf
-		    ("                    |<-+---------------------%3ld--FAC--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--FAC--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_FAC;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case UPT:
-		printf
-		    ("                    |<-+---------------------%3ld--UPT--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--UPT--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_UPT;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case UPA:
-		printf
-		    ("                    |<-+---------------------%3ld--UPA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--UPA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_UPA;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case IDR:
-		printf
-		    ("                    |<-+---------------------%3ld--IDR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--IDR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_IDR;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case IRS:
-		printf
-		    ("                    |<-+---------------------%3ld--IRS--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--IRS--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_IRS;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case SGM:
-		printf
-		    ("                    |<-+---------------------%3ld--SGM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--SGM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_SGM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CRA:
-		printf
-		    ("                    |<-+---------------------%3ld--CRA--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CRA--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CRA;
 		goto send_isup;
 	case CRM:
-		printf
-		    ("                    |<-+---------------------%3ld--CRM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CRM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CRM;
 		*d++ = pmsg.nci;
 		goto send_isup;
 	case CVR:
-		printf
-		    ("                    |<-+---------------------%3ld--CVR--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CVR--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CVR;
 		*d++ = pmsg.cvri;
@@ -1538,62 +1434,46 @@ send(int msg)
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case CVT:
-		printf
-		    ("                    |<-+---------------------%3ld--CVT--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CVT--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CVT;
 		goto send_isup;
 	case EXM:
-		printf
-		    ("                    |<-+---------------------%3ld--EXM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--EXM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_EXM;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case NON:
-		printf
-		    ("                    |<-+---------------------%3ld--NON--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--NON--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_NON;
 		*d++ = pmsg.ton;
 		*d++ = 0;	/* eop */
 		goto send_isup;
 	case LLM:
-		printf
-		    ("                    |<-+---------------------%3ld--LLM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--LLM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_LLM;
 		goto send_isup;
 	case CAK:
-		printf
-		    ("                    |<-+---------------------%3ld--CAK--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--CAK--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_CAK;
 		goto send_isup;
 	case TCM:
-		printf
-		    ("                    |<-+---------------------%3ld--TCM--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--TCM--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_TCM;
 		*d++ = pmsg.cri;
 		goto send_isup;
 	case MCP:
-		printf
-		    ("                    |<-+---------------------%3ld--MCP--|                    (%d)\n",
-		     pmsg.cic, state);
+		printf("                    |<-+---------------------%3ld--MCP--|                    (%d)\n", pmsg.cic, state);
 		FFLUSH(stdout);
 		*d++ = ISUP_MT_MCP;
 		goto send_isup;
 	case PAUSE:
-		printf
-		    ("                    |<-+--------------------------TFP--|                    (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------TFP--|                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->pause_ind.mtp_primitive = MTP_PAUSE_IND;
 		m->pause_ind.mtp_addr_offset = sizeof(m->pause_ind);
@@ -1603,9 +1483,7 @@ send(int msg)
 		data.len = 0;
 		goto send_mtp;
 	case RESUME:
-		printf
-		    ("                    |<-+--------------------------TFA--|                    (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------TFA--|                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->resume_ind.mtp_primitive = MTP_RESUME_IND;
 		m->resume_ind.mtp_addr_offset = sizeof(m->resume_ind);
@@ -1615,18 +1493,14 @@ send(int msg)
 		data.len = 0;
 		goto send_mtp;
 	case RESTART_COMPLETE:
-		printf
-		    ("                    |<-+--------------------------TRA--|                    (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------TRA--|                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->pause_ind.mtp_primitive = MTP_RESTART_COMPLETE_IND;
 		ctrl.len = sizeof(m->restart_complete_ind);
 		data.len = 0;
 		goto send_mtp;
 	case USER_PART_UNKNOWN:
-		printf
-		    ("                    |<-+--------------------------UPU--| (unknown)          (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------UPU--| (unknown)          (%d)\n", state);
 		FFLUSH(stdout);
 		ctrl.len = sizeof(m->status_ind) + sizeof(mtp_addr_t);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
@@ -1639,9 +1513,7 @@ send(int msg)
 		data.len = 0;
 		goto send_mtp;
 	case USER_PART_UNEQUIPPED:
-		printf
-		    ("                    |<-+--------------------------UPU--| (unequipped)       (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------UPU--| (unequipped)       (%d)\n", state);
 		FFLUSH(stdout);
 		ctrl.len = sizeof(m->status_ind) + sizeof(mtp_addr_t);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
@@ -1654,9 +1526,7 @@ send(int msg)
 		data.len = 0;
 		goto send_mtp;
 	case USER_PART_UNAVAILABLE:
-		printf
-		    ("                    |<-+--------------------------UPU--| (unavailable)      (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------UPU--| (unavailable)      (%d)\n", state);
 		FFLUSH(stdout);
 		ctrl.len = sizeof(m->status_ind) + sizeof(mtp_addr_t);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
@@ -1669,9 +1539,7 @@ send(int msg)
 		data.len = 0;
 		goto send_mtp;
 	case CONGESTION:
-		printf
-		    ("                    |<-+--------------------------TFC--|                    (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------TFC--|                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->status_ind.mtp_primitive = MTP_STATUS_IND;
 		m->status_ind.mtp_type = MTP_STATUS_TYPE_CONG;
@@ -1683,43 +1551,29 @@ send(int msg)
 		data.len = 0;
 		goto send_mtp;
 	case IBI:
-		printf
-		    ("<<<<<<<<<<<<<<<<<<<<|<<|<<< IN-BAND INFORMATION <<<<<<<|<<<<<<<<<<<<<<<<<<<<(%d)\n",
-		     state);
+		printf("<<<<<<<<<<<<<<<<<<<<|<<|<<< IN-BAND INFORMATION <<<<<<<|<<<<<<<<<<<<<<<<<<<<(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case RINGING:
-		printf
-		    ("<<<<<<<<<<<<<<<<<<<<|<<|<<<<<<<<< RINGING <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<<<(%d)\n",
-		     state);
+		printf("<<<<<<<<<<<<<<<<<<<<|<<|<<<<<<<<< RINGING <<<<<<<<<<<<<|<<<<<<<<<<<<<<<<<<<<(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case COMMUNICATION:
-		printf
-		    ("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n",
-		     state);
+		printf("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case TONE:
-		printf
-		    ("^<^<^<^<^<^<^<^<^<^<|<^|^<^<^< CONTINUITY TONE <^<^<^<^|^<^<^<^<^<^<^<^<^<^<(%d)\n",
-		     state);
+		printf("^<^<^<^<^<^<^<^<^<^<|<^|^<^<^< CONTINUITY TONE <^<^<^<^|^<^<^<^<^<^<^<^<^<^<(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case LOOPBACK:
-		printf
-		    ("                    |__|_______________________________|_                   \n");
-		printf
-		    ("                    |<<|_______________________________|_| LOOPBACK         (%d)\n",
-		     state);
-		printf
-		    ("                    |  |                               |                    \n");
+		printf("                    |__|_______________________________|_                   \n");
+		printf("                    |<<|_______________________________|_| LOOPBACK         (%d)\n", state);
+		printf("                    |  |                               |                    \n");
 		FFLUSH(stdout);
 		return (SUCCESS);
 	default:
-		printf
-		    ("                    |<-+--------------------------\?\?\?--|                    (%d)\n",
-		     state);
+		printf("                    |<-+--------------------------\?\?\?--|                    (%d)\n", state);
 		FFLUSH(stdout);
 		return (FAILURE);
 	}
@@ -1743,14 +1597,12 @@ send(int msg)
 	ctrl.maxlen = BUFSIZE;
 	ctrl.buf = cbuf;
 	data.maxlen = BUFSIZE;
-	data.buf = (char *)pt_dat;
+	data.buf = (char *) pt_dat;
 	if (putmsg(pt_fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, 0) < 0) {
 		if (errno == EAGAIN || errno == EINTR)
 			return FAILURE;
-		printf
-		    ("                    |<-+--------------------******** ERROR: putmsg failed                                         \n");
-		printf("                                                          : %-13s:%40s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                    |<-+--------------------******** ERROR: putmsg failed                                         \n");
+		printf("                                                          : %-13s:%40s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -1767,6 +1619,7 @@ iut_cpc_signal(int action)
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union CC_primitives *m = (union CC_primitives *) cbuf;
 	unsigned char *c;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.buf = cbuf;
 	data.maxlen = BUFSIZE;
@@ -1774,9 +1627,7 @@ iut_cpc_signal(int action)
 	switch (action) {
 	case INFO_REQ:
 		if (verbose) {
-			printf
-			    ("---INFO------------>|  |                               |                    (%d)\n",
-			     state);
+			printf("---INFO------------>|  |                               |                    (%d)\n", state);
 			FFLUSH(stdout);
 		}
 		m->cc_primitive = CC_INFO_REQ;
@@ -1785,9 +1636,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case OPTMGMT_REQ:
 		if (verbose) {
-			printf
-			    ("---OPTMGMT--------->|  |                               |                    (%d)\n",
-			     state);
+			printf("---OPTMGMT--------->|  |                               |                    (%d)\n", state);
 			FFLUSH(stdout);
 		}
 		m->cc_primitive = CC_OPTMGMT_REQ;
@@ -1802,28 +1651,16 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case BIND_REQ:
 		if (verbose > 1) {
-			printf
-			    ("---BIND------------>|  |                               |                    (%d)\n",
-			     state);
+			printf("---BIND------------>|  |                               |                    (%d)\n", state);
 			FFLUSH(stdout);
 			if (verbose > 2) {
 				if (cprim.addr.len) {
-					printf
-					    (" addr scope =    %2s |  |                               |                    \n",
-					     scope_string(cprim.addr.add.scope));
-					printf
-					    (" addr id    = %5ld |  |                               |                    \n",
-					     cprim.addr.add.id);
-					printf
-					    (" addr cic   = %5ld |  |                               |                    \n",
-					     cprim.addr.add.cic);
+					printf(" addr scope =    %2s |  |                               |                    \n", scope_string(cprim.addr.add.scope));
+					printf(" addr id    = %5ld |  |                               |                    \n", cprim.addr.add.id);
+					printf(" addr cic   = %5ld |  |                               |                    \n", cprim.addr.add.cic);
 				}
-				printf
-				    (" setup inds = %5ld |  |                               |                    \n",
-				     cprim.setup_ind);
-				printf
-				    (" flags      =  %4lx |  |                               |                    \n",
-				     cprim.bind_flags);
+				printf(" setup inds = %5ld |  |                               |                    \n", cprim.setup_ind);
+				printf(" flags      =  %4lx |  |                               |                    \n", cprim.bind_flags);
 				FFLUSH(stdout);
 			}
 		}
@@ -1839,9 +1676,7 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case UNBIND_REQ:
 		if (verbose > 1)
-			printf
-			    ("---UNBIND---------->|  |                               |                    (%d)\n",
-			     state);
+			printf("---UNBIND---------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_UNBIND_REQ;
 		ctrl.len = sizeof(m->unbind_req);
@@ -1849,12 +1684,8 @@ iut_cpc_signal(int action)
 		goto signal_msg;
 	case ADDR_REQ:
 		if (verbose) {
-			printf
-			    ("---ADDR------------>|  |                               |                    (%d)\n",
-			     state);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("---ADDR------------>|  |                               |                    (%d)\n", state);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_ADDR_REQ;
@@ -1863,13 +1694,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case SETUP_REQ:
-		printf
-		    ("---SETUP----------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---SETUP----------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SETUP_REQ;
 		m->setup_req.cc_user_ref = cprim.user_ref;
@@ -1878,11 +1705,9 @@ iut_cpc_signal(int action)
 		m->setup_req.cc_cdpn_length = cprim.cdpn.len;
 		m->setup_req.cc_cdpn_offset = cprim.cdpn.len ? sizeof(m->setup_req) : 0;
 		m->setup_req.cc_opt_length = cprim.opt.len;
-		m->setup_req.cc_opt_offset =
-		    cprim.opt.len ? sizeof(m->setup_req) + cprim.cdpn.len : 0;
+		m->setup_req.cc_opt_offset = cprim.opt.len ? sizeof(m->setup_req) + cprim.cdpn.len : 0;
 		m->setup_req.cc_addr_length = cprim.addr.len;
-		m->setup_req.cc_addr_offset =
-		    cprim.addr.len ? sizeof(m->setup_req) + cprim.cdpn.len + cprim.opt.len : 0;
+		m->setup_req.cc_addr_offset = cprim.addr.len ? sizeof(m->setup_req) + cprim.cdpn.len + cprim.opt.len : 0;
 		c = (unsigned char *) (&m->setup_req + 1);
 		bcopy(cprim.cdpn.buf, c, cprim.cdpn.len);
 		c += cprim.cdpn.len;
@@ -1894,13 +1719,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case MORE_INFO_REQ:
-		printf
-		    ("---MORE-INFO------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---MORE-INFO------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_MORE_INFO_REQ;
 		m->more_info_req.cc_call_ref = cprim.call_ref;
@@ -1913,21 +1734,16 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case INFORMATION_REQ:
-		printf
-		    ("---INFORMATION----->|  |                               |                    (%d)\n",
-		     state);
+		printf("---INFORMATION----->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_INFORMATION_REQ;
 		m->information_req.cc_user_ref = cprim.user_ref;
 		m->information_req.cc_subn_length = cprim.subn.len;
 		m->information_req.cc_subn_offset = cprim.subn.len ? sizeof(m->information_req) : 0;
 		m->information_req.cc_opt_length = cprim.opt.len;
-		m->information_req.cc_opt_offset =
-		    cprim.opt.len ? sizeof(m->information_req) + cprim.subn.len : 0;
+		m->information_req.cc_opt_offset = cprim.opt.len ? sizeof(m->information_req) + cprim.subn.len : 0;
 		c = (unsigned char *) (&m->information_req + 1);
 		bcopy(cprim.subn.buf, c, cprim.subn.len);
 		c += cprim.subn.len;
@@ -1937,9 +1753,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case CONT_CHECK_REQ:
-		printf
-		    ("---CONT CHECK------>|  |                               |                    (%d)\n",
-		     state);
+		printf("---CONT CHECK------>|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONT_CHECK_REQ;
 		m->cont_check_req.cc_addr_length = cprim.addr.len;
@@ -1950,13 +1764,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case CONT_TEST_REQ:
-		printf
-		    ("---CONT-TEST------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---CONT-TEST------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONT_TEST_REQ;
 		m->cont_test_req.cc_token_value = cprim.token_value;
@@ -1965,16 +1775,10 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case CONT_REPORT_REQ:
-		printf
-		    ("---CONT REPORT----->|  |                               |                    (%d)\n",
-		     state);
+		printf("---CONT REPORT----->|  |                               |                    (%d)\n", state);
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONT_REPORT_REQ;
@@ -1985,13 +1789,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case SETUP_RES:
-		printf
-		    ("---SETUP OK-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---SETUP OK-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SETUP_RES;
 		m->setup_res.cc_call_ref = cprim.call_ref;
@@ -2000,13 +1800,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case PROCEEDING_REQ:
-		printf
-		    ("---PROCEEDING------>|  |                               |                    (%d)\n",
-		     state);
+		printf("---PROCEEDING------>|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_PROCEEDING_REQ;
 		m->proceeding_req.cc_call_ref = cprim.call_ref;
@@ -2020,13 +1816,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case ALERTING_REQ:
-		printf
-		    ("---ALERTING-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---ALERTING-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_ALERTING_REQ;
 		m->alerting_req.cc_call_ref = cprim.call_ref;
@@ -2040,13 +1832,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case PROGRESS_REQ:
-		printf
-		    ("---PROGRESS-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---PROGRESS-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_PROGRESS_REQ;
 		m->progress_req.cc_call_ref = cprim.call_ref;
@@ -2061,13 +1849,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case IBI_REQ:
-		printf
-		    ("---IBI------------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---IBI------------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_IBI_REQ;
 		m->ibi_req.cc_call_ref = cprim.call_ref;
@@ -2081,13 +1865,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case CONNECT_REQ:
-		printf
-		    ("---CONNECT--------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---CONNECT--------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONNECT_REQ;
 		m->connect_req.cc_call_ref = cprim.call_ref;
@@ -2101,19 +1881,14 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case SETUP_COMPLETE_REQ:
-		printf
-		    ("---SETUP-COMPLETE-->|  |                               |                    (%d)\n",
-		     state);
+		printf("---SETUP-COMPLETE-->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SETUP_COMPLETE_REQ;
 		m->setup_complete_req.cc_call_ref = cprim.call_ref;
 		m->setup_complete_req.cc_opt_length = cprim.opt.len;
-		m->setup_complete_req.cc_opt_offset =
-		    cprim.opt.len ? sizeof(m->setup_complete_req) : 0;
+		m->setup_complete_req.cc_opt_offset = cprim.opt.len ? sizeof(m->setup_complete_req) : 0;
 		c = (unsigned char *) (&m->setup_complete_req + 1);
 		bcopy(cprim.opt.buf, c, cprim.opt.len);
 		c += cprim.opt.len;
@@ -2121,13 +1896,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case FORWXFER_REQ:
-		printf
-		    ("---FORWXFER-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---FORWXFER-------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_FORWXFER_REQ;
 		m->forwxfer_req.cc_call_ref = cprim.call_ref;
@@ -2140,13 +1911,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case SUSPEND_REQ:
-		printf
-		    ("---SUSPEND--------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---SUSPEND--------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SUSPEND_REQ;
 		m->suspend_req.cc_call_ref = cprim.call_ref;
@@ -2160,13 +1927,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case SUSPEND_RES:
-		printf
-		    ("---SUSPEND-OK------>|  |                               |                    (%d)\n",
-		     state);
+		printf("---SUSPEND-OK------>|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SUSPEND_RES;
 		m->suspend_res.cc_call_ref = cprim.call_ref;
@@ -2179,20 +1942,15 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case SUSPEND_REJECT_REQ:
-		printf
-		    ("---SUSPEND-REJECT-->|  |                               |                    (%d)\n",
-		     state);
+		printf("---SUSPEND-REJECT-->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SUSPEND_REJECT_REQ;
 		m->suspend_reject_req.cc_call_ref = cprim.call_ref;
 		m->suspend_reject_req.cc_cause = cprim.cause;
 		m->suspend_reject_req.cc_opt_length = cprim.opt.len;
-		m->suspend_reject_req.cc_opt_offset =
-		    cprim.opt.len ? sizeof(m->suspend_reject_req) : 0;
+		m->suspend_reject_req.cc_opt_offset = cprim.opt.len ? sizeof(m->suspend_reject_req) : 0;
 		c = (unsigned char *) (&m->suspend_reject_req + 1);
 		bcopy(cprim.opt.buf, c, cprim.opt.len);
 		c += cprim.opt.len;
@@ -2200,13 +1958,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RESUME_REQ:
-		printf
-		    ("---RESUME---------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---RESUME---------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESUME_REQ;
 		m->resume_req.cc_call_ref = cprim.call_ref;
@@ -2220,13 +1974,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RESUME_RES:
-		printf
-		    ("---RESUME-OK------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---RESUME-OK------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESUME_RES;
 		m->resume_res.cc_call_ref = cprim.call_ref;
@@ -2239,20 +1989,15 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RESUME_REJECT_REQ:
-		printf
-		    ("---RESUME-REJECT--->|  |                               |                    (%d)\n",
-		     state);
+		printf("---RESUME-REJECT--->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESUME_REJECT_REQ;
 		m->resume_reject_req.cc_call_ref = cprim.call_ref;
 		m->resume_reject_req.cc_cause = cprim.cause;
 		m->resume_reject_req.cc_opt_length = cprim.opt.len;
-		m->resume_reject_req.cc_opt_offset =
-		    cprim.opt.len ? sizeof(m->resume_reject_req) : 0;
+		m->resume_reject_req.cc_opt_offset = cprim.opt.len ? sizeof(m->resume_reject_req) : 0;
 		c = (unsigned char *) (&m->resume_reject_req + 1);
 		bcopy(cprim.opt.buf, c, cprim.opt.len);
 		c += cprim.opt.len;
@@ -2260,13 +2005,9 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case REJECT_REQ:
-		printf
-		    ("---REJECT---------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---REJECT---------->|  |                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_REJECT_REQ;
 		m->reject_req.cc_call_ref = cprim.call_ref;
@@ -2280,16 +2021,10 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RELEASE_REQ:
-		printf
-		    ("---RELEASE--------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---RELEASE--------->|  |                               |                    (%d)\n", state);
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RELEASE_REQ;
@@ -2305,16 +2040,10 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RELEASE_RES:
-		printf
-		    ("---RELEASE OK------>|  |                               |                    (%d)\n",
-		     state);
+		printf("---RELEASE OK------>|  |                               |                    (%d)\n", state);
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RELEASE_RES;
@@ -2329,9 +2058,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RESET_REQ:
-		printf
-		    ("---RESET----------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---RESET----------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESET_REQ;
 		m->reset_req.cc_flags = cprim.flags;
@@ -2344,9 +2071,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case RESET_RES:
-		printf
-		    ("---RESET OK-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---RESET OK-------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESET_RES;
 		m->reset_res.cc_flags = cprim.flags;
@@ -2358,9 +2083,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case BLOCKING_REQ:
-		printf
-		    ("---BLOCKING-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---BLOCKING-------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_BLOCKING_REQ;
 		m->blocking_req.cc_flags = cprim.flags;
@@ -2372,9 +2095,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case BLOCKING_RES:
-		printf
-		    ("---BLOCKING-OK----->|  |                               |                    (%d)\n",
-		     state);
+		printf("---BLOCKING-OK----->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_BLOCKING_RES;
 		m->blocking_res.cc_flags = cprim.flags;
@@ -2386,9 +2107,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case UNBLOCKING_REQ:
-		printf
-		    ("---UNBLOCKING------>|  |                               |                    (%d)\n",
-		     state);
+		printf("---UNBLOCKING------>|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_UNBLOCKING_REQ;
 		m->unblocking_req.cc_flags = cprim.flags;
@@ -2400,9 +2119,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case UNBLOCKING_RES:
-		printf
-		    ("---UNBLOCKING-OK--->|  |                               |                    (%d)\n",
-		     state);
+		printf("---UNBLOCKING-OK--->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_UNBLOCKING_RES;
 		m->unblocking_res.cc_flags = cprim.flags;
@@ -2414,9 +2131,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case QUERY_REQ:
-		printf
-		    ("---QUERY----------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---QUERY----------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_QUERY_REQ;
 		m->query_req.cc_flags = cprim.flags;
@@ -2428,9 +2143,7 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case QUERY_RES:
-		printf
-		    ("---QUERY OK-------->|  |                               |                    (%d)\n",
-		     state);
+		printf("---QUERY OK-------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_QUERY_RES;
 		m->query_res.cc_flags = cprim.flags;
@@ -2442,51 +2155,35 @@ iut_cpc_signal(int action)
 		data.len = 0;
 		goto signal_msg;
 	case IBI:
-		printf
-		    (">>>>>>>>>>>>>>>>>>>>|>>|>>> IN-BAND INFORMATION >>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n",
-		     state);
+		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>> IN-BAND INFORMATION >>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case RINGING:
-		printf
-		    (">>>>>>>>>>>>>>>>>>>>|>>|>>>>>>>>> RINGING >>>>>>>>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n",
-		     state);
+		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>>>>>>>> RINGING >>>>>>>>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case COMMUNICATION:
-		printf
-		    ("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n",
-		     state);
+		printf("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case TONE:
-		printf
-		    ("^>^>^>^>^>^>^>^>^>^>|>^|^>^>^> CONTINUITY TONE >^>^>^>^|^>^>^>^>^>^>^>^>^>^>(%d)\n",
-		     state);
+		printf("^>^>^>^>^>^>^>^>^>^>|>^|^>^>^> CONTINUITY TONE >^>^>^>^|^>^>^>^>^>^>^>^>^>^>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case LOOPBACK:
-		printf
-		    ("                   _|__|_______________________________|                    \n");
-		printf
-		    ("         LOOPBACK |_|__|_____________________________>>|                    (%d)\n",
-		     state);
-		printf
-		    ("                    |  |                               |                    \n");
+		printf("                   _|__|_______________________________|                    \n");
+		printf("         LOOPBACK |_|__|_____________________________>>|                    (%d)\n", state);
+		printf("                    |  |                               |                    \n");
 		FFLUSH(stdout);
 		return (SUCCESS);
 	default:
-		printf
-		    ("\?\?\?\?--------------->|  |                               |                    (%d)\n",
-		     state);
+		printf("\?\?\?\?--------------->|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		return FAILURE;
 	}
       signal_msg:
-	if ((ret =
-	     putmsg(iut_cpc_fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, RS_HIPRI)) < 0) {
-		printf
-		    ("************** ERROR: putmsg failed                                         \n");
+	if ((ret = putmsg(iut_cpc_fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, RS_HIPRI)) < 0) {
+		printf("************** ERROR: putmsg failed                                         \n");
 		printf("                    : %-13s:%40s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return (FAILURE);
@@ -2504,6 +2201,7 @@ iut_signal(int action, int fd)
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union CC_primitives *m = (union CC_primitives *) cbuf;
 	unsigned char *c;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.buf = cbuf;
 	data.maxlen = BUFSIZE;
@@ -2511,9 +2209,7 @@ iut_signal(int action, int fd)
 	switch (action) {
 	case INFO_REQ:
 		if (verbose)
-			printf
-			    ("---INFO-------------+->|                               |                    (%d)\n",
-			     state);
+			printf("---INFO-------------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_INFO_REQ;
 		ctrl.len = sizeof(m->info_req);
@@ -2521,9 +2217,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case OPTMGMT_REQ:
 		if (verbose)
-			printf
-			    ("---OPTMGMT----------+->|                               |                    (%d)\n",
-			     state);
+			printf("---OPTMGMT----------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_OPTMGMT_REQ;
 		m->optmgmt_req.cc_opt_length = mprim.opt.len;
@@ -2537,28 +2231,16 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case BIND_REQ:
 		if (verbose > 1) {
-			printf
-			    ("---BIND-------------+->|                               |                    (%d)\n",
-			     state);
+			printf("---BIND-------------+->|                               |                    (%d)\n", state);
 			FFLUSH(stdout);
 			if (verbose > 2) {
 				if (mprim.addr.len) {
-					printf
-					    (" addr scope =    %2s |  |                               |                    \n",
-					     scope_string(mprim.addr.add.scope));
-					printf
-					    (" addr id    = %5ld |  |                               |                    \n",
-					     mprim.addr.add.id);
-					printf
-					    (" addr cic   = %5ld |  |                               |                    \n",
-					     mprim.addr.add.cic);
+					printf(" addr scope =    %2s |  |                               |                    \n", scope_string(mprim.addr.add.scope));
+					printf(" addr id    = %5ld |  |                               |                    \n", mprim.addr.add.id);
+					printf(" addr cic   = %5ld |  |                               |                    \n", mprim.addr.add.cic);
 				}
-				printf
-				    (" setup inds = %5ld |  |                               |                    \n",
-				     mprim.setup_ind);
-				printf
-				    (" flags      =  %4lx |  |                               |                    \n",
-				     mprim.bind_flags);
+				printf(" setup inds = %5ld |  |                               |                    \n", mprim.setup_ind);
+				printf(" flags      =  %4lx |  |                               |                    \n", mprim.bind_flags);
 				FFLUSH(stdout);
 			}
 		}
@@ -2574,9 +2256,7 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case UNBIND_REQ:
 		if (verbose > 1)
-			printf
-			    ("---UNBIND-----------+->|                               |                    (%d)\n",
-			     state);
+			printf("---UNBIND-----------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_UNBIND_REQ;
 		ctrl.len = sizeof(m->unbind_req);
@@ -2584,22 +2264,16 @@ iut_signal(int action, int fd)
 		goto signal_msg;
 	case ADDR_REQ:
 		if (verbose)
-			printf
-			    ("---ADDR-------------+->|                               |                    (%d)\n",
-			     state);
+			printf("---ADDR-------------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_ADDR_REQ;
 		ctrl.len = sizeof(m->addr_req);
 		data.len = 0;
 		goto signal_msg;
 	case SETUP_REQ:
-		printf
-		    ("---SETUP------------+->|                               |                    (%d)\n",
-		     state);
+		printf("---SETUP------------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SETUP_REQ;
 		m->setup_req.cc_user_ref = mprim.user_ref;
@@ -2608,11 +2282,9 @@ iut_signal(int action, int fd)
 		m->setup_req.cc_cdpn_length = mprim.cdpn.len;
 		m->setup_req.cc_cdpn_offset = mprim.cdpn.len ? sizeof(m->setup_req) : 0;
 		m->setup_req.cc_opt_length = mprim.opt.len;
-		m->setup_req.cc_opt_offset =
-		    mprim.opt.len ? sizeof(m->setup_req) + mprim.cdpn.len : 0;
+		m->setup_req.cc_opt_offset = mprim.opt.len ? sizeof(m->setup_req) + mprim.cdpn.len : 0;
 		m->setup_req.cc_addr_length = mprim.addr.len;
-		m->setup_req.cc_addr_offset =
-		    mprim.addr.len ? sizeof(m->setup_req) + mprim.cdpn.len + mprim.opt.len : 0;
+		m->setup_req.cc_addr_offset = mprim.addr.len ? sizeof(m->setup_req) + mprim.cdpn.len + mprim.opt.len : 0;
 		c = (unsigned char *) (&m->setup_req + 1);
 		bcopy(mprim.cdpn.buf, c, mprim.cdpn.len);
 		c += mprim.cdpn.len;
@@ -2624,13 +2296,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case MORE_INFO_REQ:
-		printf
-		    ("---MORE-INFO--------+->|                               |                    (%d)\n",
-		     state);
+		printf("---MORE-INFO--------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_MORE_INFO_REQ;
 		m->more_info_req.cc_call_ref = mprim.call_ref;
@@ -2643,21 +2311,16 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case INFORMATION_REQ:
-		printf
-		    ("---INFORMATION------+->|                               |                    (%d)\n",
-		     state);
+		printf("---INFORMATION------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_INFORMATION_REQ;
 		m->information_req.cc_user_ref = mprim.user_ref;
 		m->information_req.cc_subn_length = mprim.subn.len;
 		m->information_req.cc_subn_offset = mprim.subn.len ? sizeof(m->information_req) : 0;
 		m->information_req.cc_opt_length = mprim.opt.len;
-		m->information_req.cc_opt_offset =
-		    mprim.opt.len ? sizeof(m->information_req) + mprim.subn.len : 0;
+		m->information_req.cc_opt_offset = mprim.opt.len ? sizeof(m->information_req) + mprim.subn.len : 0;
 		c = (unsigned char *) (&m->information_req + 1);
 		bcopy(mprim.subn.buf, c, mprim.subn.len);
 		c += mprim.subn.len;
@@ -2667,9 +2330,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case CONT_CHECK_REQ:
-		printf
-		    ("---CONT CHECK-------+->|                               |                    (%d)\n",
-		     state);
+		printf("---CONT CHECK-------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONT_CHECK_REQ;
 		m->cont_check_req.cc_addr_length = mprim.addr.len;
@@ -2680,13 +2341,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case CONT_TEST_REQ:
-		printf
-		    ("---CONT-TEST--------+->|                               |                    (%d)\n",
-		     state);
+		printf("---CONT-TEST--------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONT_TEST_REQ;
 		m->cont_test_req.cc_call_ref = mprim.call_ref;
@@ -2695,16 +2352,10 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case CONT_REPORT_REQ:
-		printf
-		    ("---CONT REPORT------+->|                               |                    (%d)\n",
-		     state);
+		printf("---CONT REPORT------+->|                               |                    (%d)\n", state);
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONT_REPORT_REQ;
@@ -2715,13 +2366,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case SETUP_RES:
-		printf
-		    ("---SETUP OK---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---SETUP OK---------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SETUP_RES;
 		m->setup_res.cc_call_ref = mprim.call_ref;
@@ -2730,13 +2377,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case PROCEEDING_REQ:
-		printf
-		    ("---PROCEEDING-------+->|                               |                    (%d)\n",
-		     state);
+		printf("---PROCEEDING-------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_PROCEEDING_REQ;
 		m->proceeding_req.cc_call_ref = mprim.call_ref;
@@ -2750,13 +2393,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case ALERTING_REQ:
-		printf
-		    ("---ALERTING---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---ALERTING---------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_ALERTING_REQ;
 		m->alerting_req.cc_call_ref = mprim.call_ref;
@@ -2770,13 +2409,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case PROGRESS_REQ:
-		printf
-		    ("---PROGRESS---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---PROGRESS---------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_PROGRESS_REQ;
 		m->progress_req.cc_call_ref = mprim.call_ref;
@@ -2791,13 +2426,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case IBI_REQ:
-		printf
-		    ("---IBI--------------+->|                               |                    (%d)\n",
-		     state);
+		printf("---IBI--------------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_IBI_REQ;
 		m->ibi_req.cc_call_ref = mprim.call_ref;
@@ -2812,13 +2443,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case CONNECT_REQ:
-		printf
-		    ("---CONNECT----------+->|                               |                    (%d)\n",
-		     state);
+		printf("---CONNECT----------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_CONNECT_REQ;
 		m->connect_req.cc_call_ref = mprim.call_ref;
@@ -2832,19 +2459,14 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case SETUP_COMPLETE_REQ:
-		printf
-		    ("---SETUP-COMPLETE---+->|                               |                    (%d)\n",
-		     state);
+		printf("---SETUP-COMPLETE---+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SETUP_COMPLETE_REQ;
 		m->setup_complete_req.cc_call_ref = mprim.call_ref;
 		m->setup_complete_req.cc_opt_length = mprim.opt.len;
-		m->setup_complete_req.cc_opt_offset =
-		    mprim.opt.len ? sizeof(m->setup_complete_req) : 0;
+		m->setup_complete_req.cc_opt_offset = mprim.opt.len ? sizeof(m->setup_complete_req) : 0;
 		c = (unsigned char *) (&m->setup_complete_req + 1);
 		bcopy(mprim.opt.buf, c, mprim.opt.len);
 		c += mprim.opt.len;
@@ -2852,13 +2474,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case FORWXFER_REQ:
-		printf
-		    ("---FORWXFER---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---FORWXFER---------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_FORWXFER_REQ;
 		m->forwxfer_req.cc_call_ref = mprim.call_ref;
@@ -2871,13 +2489,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case SUSPEND_REQ:
-		printf
-		    ("---SUSPEND----------+->|                               |                    (%d)\n",
-		     state);
+		printf("---SUSPEND----------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SUSPEND_REQ;
 		m->suspend_req.cc_call_ref = mprim.call_ref;
@@ -2891,13 +2505,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case SUSPEND_RES:
-		printf
-		    ("---SUSPEND-OK-------+->|                               |                    (%d)\n",
-		     state);
+		printf("---SUSPEND-OK-------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SUSPEND_RES;
 		m->suspend_res.cc_call_ref = mprim.call_ref;
@@ -2910,20 +2520,15 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case SUSPEND_REJECT_REQ:
-		printf
-		    ("---SUSPEND-REJECT---+->|                               |                    (%d)\n",
-		     state);
+		printf("---SUSPEND-REJECT---+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_SUSPEND_REJECT_REQ;
 		m->suspend_reject_req.cc_call_ref = mprim.call_ref;
 		m->suspend_reject_req.cc_cause = mprim.cause;
 		m->suspend_reject_req.cc_opt_length = mprim.opt.len;
-		m->suspend_reject_req.cc_opt_offset =
-		    mprim.opt.len ? sizeof(m->suspend_reject_req) : 0;
+		m->suspend_reject_req.cc_opt_offset = mprim.opt.len ? sizeof(m->suspend_reject_req) : 0;
 		c = (unsigned char *) (&m->suspend_reject_req + 1);
 		bcopy(mprim.opt.buf, c, mprim.opt.len);
 		c += mprim.opt.len;
@@ -2931,13 +2536,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RESUME_REQ:
-		printf
-		    ("---RESUME-----------+->|                               |                    (%d)\n",
-		     state);
+		printf("---RESUME-----------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESUME_REQ;
 		m->resume_req.cc_call_ref = mprim.call_ref;
@@ -2951,13 +2552,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RESUME_RES:
-		printf
-		    ("---RESUME-OK--------+->|                               |                    (%d)\n",
-		     state);
+		printf("---RESUME-OK--------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESUME_RES;
 		m->resume_res.cc_call_ref = mprim.call_ref;
@@ -2970,20 +2567,15 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RESUME_REJECT_REQ:
-		printf
-		    ("---RESUME-REJECT----+->|                               |                    (%d)\n",
-		     state);
+		printf("---RESUME-REJECT----+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESUME_REJECT_REQ;
 		m->resume_reject_req.cc_call_ref = mprim.call_ref;
 		m->resume_reject_req.cc_cause = mprim.cause;
 		m->resume_reject_req.cc_opt_length = mprim.opt.len;
-		m->resume_reject_req.cc_opt_offset =
-		    mprim.opt.len ? sizeof(m->resume_reject_req) : 0;
+		m->resume_reject_req.cc_opt_offset = mprim.opt.len ? sizeof(m->resume_reject_req) : 0;
 		c = (unsigned char *) (&m->resume_reject_req + 1);
 		bcopy(mprim.opt.buf, c, mprim.opt.len);
 		c += mprim.opt.len;
@@ -2991,16 +2583,10 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RELEASE_REQ:
-		printf
-		    ("---RELEASE----------+->|                               |                    (%d)\n",
-		     state);
+		printf("---RELEASE----------+->|                               |                    (%d)\n", state);
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RELEASE_REQ;
@@ -3016,13 +2602,9 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case REJECT_REQ:
-		printf
-		    ("---REJECT-----------+->|                               |                    (%d)\n",
-		     state);
+		printf("---REJECT-----------+->|                               |                    (%d)\n", state);
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_REJECT_REQ;
 		m->reject_req.cc_call_ref = mprim.call_ref;
@@ -3036,16 +2618,10 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RELEASE_RES:
-		printf
-		    ("---RELEASE OK-------+->|                               |                    (%d)\n",
-		     state);
+		printf("---RELEASE OK-------+->|                               |                    (%d)\n", state);
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RELEASE_RES;
@@ -3060,9 +2636,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RESET_REQ:
-		printf
-		    ("---RESET------------+->|                               |                    (%d)\n",
-		     state);
+		printf("---RESET------------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESET_REQ;
 		m->reset_req.cc_flags = mprim.flags;
@@ -3075,9 +2649,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case RESET_RES:
-		printf
-		    ("---RESET OK---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---RESET OK---------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_RESET_RES;
 		m->reset_res.cc_flags = mprim.flags;
@@ -3089,9 +2661,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case BLOCKING_REQ:
-		printf
-		    ("---BLOCKING---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---BLOCKING---------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_BLOCKING_REQ;
 		m->blocking_req.cc_flags = mprim.flags;
@@ -3103,9 +2673,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case BLOCKING_RES:
-		printf
-		    ("---BLOCKING-OK------+->|                               |                    (%d)\n",
-		     state);
+		printf("---BLOCKING-OK------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_BLOCKING_RES;
 		m->blocking_res.cc_flags = mprim.flags;
@@ -3117,9 +2685,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case UNBLOCKING_REQ:
-		printf
-		    ("---UNBLOCKING-------+->|                               |                    (%d)\n",
-		     state);
+		printf("---UNBLOCKING-------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_UNBLOCKING_REQ;
 		m->unblocking_req.cc_flags = mprim.flags;
@@ -3131,9 +2697,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case UNBLOCKING_RES:
-		printf
-		    ("---UNBLOCKING-OK----+->|                               |                    (%d)\n",
-		     state);
+		printf("---UNBLOCKING-OK----+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_UNBLOCKING_RES;
 		m->unblocking_res.cc_flags = mprim.flags;
@@ -3145,9 +2709,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case QUERY_REQ:
-		printf
-		    ("---QUERY------------+->|                               |                    (%d)\n",
-		     state);
+		printf("---QUERY------------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_QUERY_REQ;
 		m->query_req.cc_flags = mprim.flags;
@@ -3159,9 +2721,7 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case QUERY_RES:
-		printf
-		    ("---QUERY OK---------+->|                               |                    (%d)\n",
-		     state);
+		printf("---QUERY OK---------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		m->cc_primitive = CC_QUERY_RES;
 		m->query_res.cc_flags = mprim.flags;
@@ -3173,50 +2733,35 @@ iut_signal(int action, int fd)
 		data.len = 0;
 		goto signal_msg;
 	case IBI:
-		printf
-		    (">>>>>>>>>>>>>>>>>>>>|>>|>>> IN-BAND INFORMATION >>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n",
-		     state);
+		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>> IN-BAND INFORMATION >>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case RINGING:
-		printf
-		    (">>>>>>>>>>>>>>>>>>>>|>>|>>>>>>>>> RINGING >>>>>>>>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n",
-		     state);
+		printf(">>>>>>>>>>>>>>>>>>>>|>>|>>>>>>>>> RINGING >>>>>>>>>>>>>|>>>>>>>>>>>>>>>>>>>>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case COMMUNICATION:
-		printf
-		    ("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n",
-		     state);
+		printf("<><><><><><><><><><>|><|><><><> COMMUNICATION ><><><><>|<><><><><><><><><><>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case TONE:
-		printf
-		    ("^>^>^>^>^>^>^>^>^>^>|>^|^>^>^> CONTINUITY TONE >^>^>^>^|^>^>^>^>^>^>^>^>^>^>(%d)\n",
-		     state);
+		printf("^>^>^>^>^>^>^>^>^>^>|>^|^>^>^> CONTINUITY TONE >^>^>^>^|^>^>^>^>^>^>^>^>^>^>(%d)\n", state);
 		FFLUSH(stdout);
 		return (SUCCESS);
 	case LOOPBACK:
-		printf
-		    ("                   _|__|_______________________________|                    \n");
-		printf
-		    ("         LOOPBACK |_|__|_____________________________>>|                    (%d)\n",
-		     state);
-		printf
-		    ("                    |  |                               |                    \n");
+		printf("                   _|__|_______________________________|                    \n");
+		printf("         LOOPBACK |_|__|_____________________________>>|                    (%d)\n", state);
+		printf("                    |  |                               |                    \n");
 		FFLUSH(stdout);
 		return (SUCCESS);
 	default:
-		printf
-		    ("\?\?\?\?----------------+->|                               |                    (%d)\n",
-		     state);
+		printf("\?\?\?\?----------------+->|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		return FAILURE;
 	}
       signal_msg:
 	if ((ret = putmsg(fd, ctrl.len ? &ctrl : NULL, data.len ? &data : NULL, RS_HIPRI)) < 0) {
-		printf
-		    ("***************** ERROR: putmsg failed                                         \n");
+		printf("***************** ERROR: putmsg failed                                         \n");
 		printf("                       : %-13s:%40s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return (FAILURE);
@@ -3247,16 +2792,15 @@ pt_decode_data(struct strbuf data)
 	int ret;
 	ulong mt;
 	ulong x, y;
-	unsigned char *d = (unsigned char *)data.buf, *p = (unsigned char *)data.buf, *e = (unsigned char *)data.buf + data.len;
+	unsigned char *d = (unsigned char *) data.buf, *p = (unsigned char *) data.buf, *e = (unsigned char *) data.buf + data.len;
+
 	x = *d++;
 	y = *d++;
 	imsg.cic = x | (y << 8);
 	mt = *d++;
 	switch (mt) {
 	case ISUP_MT_IAM:
-		printf
-		    ("                    |--+-IAM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-IAM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (IAM);
 		imsg.nci = *d++;
@@ -3273,7 +2817,8 @@ pt_decode_data(struct strbuf data)
 		imsg.tmr = *d++;
 		if (d > e)
 			goto decode_error;
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e)
 			goto decode_error;
 		imsg.cdpn.len = (*p++ - 2) << 1;
@@ -3293,12 +2838,11 @@ pt_decode_data(struct strbuf data)
 		imsg.cdpn.num[imsg.cdpn.len] = '\0';
 		goto decode_opt;
 	case ISUP_MT_SAM:
-		printf
-		    ("                    |--+-SAM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-SAM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (SAM);
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e)
 			goto decode_error;
 		imsg.subn.len = (*p++ - 2) << 1;
@@ -3318,9 +2862,7 @@ pt_decode_data(struct strbuf data)
 		imsg.subn.num[imsg.subn.len] = '\0';
 		goto decode_opt;
 	case ISUP_MT_INR:
-		printf
-		    ("                    |--+-INR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-INR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (INR);
 		imsg.inri = *d++;
@@ -3328,9 +2870,7 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_INF:
-		printf
-		    ("                    |--+-INF--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-INF--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (INF);
 		imsg.infi = *d++;
@@ -3341,21 +2881,15 @@ pt_decode_data(struct strbuf data)
 		ret = (COT);
 		imsg.coti = *d++;
 		if (imsg.coti) {
-			printf
-			    ("          (success) |--+-COT--%3ld--------------------->|                    (%d)\n",
-			     imsg.cic, state);
+			printf("          (success) |--+-COT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 			FFLUSH(stdout);
 		} else {
-			printf
-			    ("          (failure) |--+-COT--%3ld--------------------->|                    (%d)\n",
-			     imsg.cic, state);
+			printf("          (failure) |--+-COT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 			FFLUSH(stdout);
 		}
 		goto decode_none;
 	case ISUP_MT_ACM:
-		printf
-		    ("                    |--+-ACM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-ACM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (ACM);
 	      decode_bci:
@@ -3365,34 +2899,27 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_CON:
-		printf
-		    ("                    |--+-CON--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CON--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CON);
 		goto decode_bci;
 	case ISUP_MT_FOT:
-		printf
-		    ("                    |--+-FOT--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FOT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FOT);
 		goto decode_opt;
 	case ISUP_MT_ANM:
-		printf
-		    ("                    |--+-ANM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-ANM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (ANM);
 		goto decode_opt;
 	case ISUP_MT_REL:
-		printf
-		    ("                    |--+-REL--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-REL--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (REL);
 	      decode_caus:
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e)
 			goto decode_error;
 		imsg.caus.len = *p++;
@@ -3407,9 +2934,7 @@ pt_decode_data(struct strbuf data)
 		}
 		goto decode_opt;
 	case ISUP_MT_SUS:
-		printf
-		    ("                    |--+-SUS--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-SUS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (SUS);
 		imsg.sris = *d++;
@@ -3417,9 +2942,7 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_RES:
-		printf
-		    ("                    |--+-RES--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-RES--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (RES);
 		imsg.sris = *d++;
@@ -3427,62 +2950,47 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_RLC:
-		printf
-		    ("                    |--+-RLC--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-RLC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (RLC);
 		goto decode_opt;
 	case ISUP_MT_CCR:
-		printf
-		    ("                    |--+-CCR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CCR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CCR);
 		goto decode_none;
 	case ISUP_MT_RSC:
-		printf
-		    ("                    |--+-RSC--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-RSC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (RSC);
 		goto decode_none;
 	case ISUP_MT_BLO:
-		printf
-		    ("                    |--+-BLO--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-BLO--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (BLO);
 		goto decode_none;
 	case ISUP_MT_UBL:
-		printf
-		    ("                    |--+-UBL--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-UBL--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (UBL);
 		goto decode_none;
 	case ISUP_MT_BLA:
-		printf
-		    ("                    |--+-BLA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-BLA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (BLA);
 		goto decode_none;
 	case ISUP_MT_UBA:
-		printf
-		    ("                    |--+-UBA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-UBA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (UBA);
 		goto decode_none;
 	case ISUP_MT_GRS:
-		printf
-		    ("                    |--+-GRS--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-GRS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (GRS);
 	      decode_rs:
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e) {
 			printf("**** ERROR: pointer out of range p = %p, e = %p\n", p, e);
 			FFLUSH(stdout);
@@ -3509,9 +3017,7 @@ pt_decode_data(struct strbuf data)
 		}
 		goto done;
 	case ISUP_MT_CGB:
-		printf
-		    ("                    |--+-CGB--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CGB--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CGB);
 	      decode_cgi:
@@ -3520,30 +3026,22 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_rs;
 	case ISUP_MT_CGU:
-		printf
-		    ("                    |--+-CGU--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CGU--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CGU);
 		goto decode_cgi;
 	case ISUP_MT_CGBA:
-		printf
-		    ("                    |--+-CGBA-%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CGBA-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CGBA);
 		goto decode_cgi;
 	case ISUP_MT_CGUA:
-		printf
-		    ("                    |--+-CGUA-%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CGUA-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CGUA);
 		goto decode_cgi;
 	case ISUP_MT_CMR:
-		printf
-		    ("                    |--+-CMR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CMR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CMR);
 		imsg.cmi = *d++;
@@ -3551,9 +3049,7 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_CMC:
-		printf
-		    ("                    |--+-CMC--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CMC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CMC);
 		imsg.cmi = *d++;
@@ -3561,9 +3057,7 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_CMRJ:
-		printf
-		    ("                    |--+-CMRJ-%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CMRJ-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CMRJ);
 		imsg.cmi = *d++;
@@ -3571,9 +3065,7 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_FAR:
-		printf
-		    ("                    |--+-FAR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FAR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FAR);
 	      decode_faci:
@@ -3582,51 +3074,37 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_FAA:
-		printf
-		    ("                    |--+-FAA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FAA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FAA);
 		goto decode_faci;
 	case ISUP_MT_FRJ:
-		printf
-		    ("                    |--+-FRJ--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FRJ--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FRJ);
 		goto decode_faci;
 	case ISUP_MT_FAD:
-		printf
-		    ("                    |--+-FAD--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FAD--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FAD);
 		goto decode_faci;
 	case ISUP_MT_FAI:
-		printf
-		    ("                    |--+-FAI--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FAI--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FAI);
 		goto decode_faci;
 	case ISUP_MT_LPA:
-		printf
-		    ("                    |--+-LPA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-LPA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (LPA);
 		goto decode_none;
 	case ISUP_MT_DRS:
-		printf
-		    ("                    |--+-DRS--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-DRS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (DRS);
 		goto decode_opt;
 	case ISUP_MT_PAM:
-		printf
-		    ("                    |--+-PAM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-PAM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (PAM);
 		pmsg.pam.len = data.len - (data.buf - (char *) d);
@@ -3634,26 +3112,21 @@ pt_decode_data(struct strbuf data)
 		d += pmsg.pam.len;
 		break;
 	case ISUP_MT_GRA:
-		printf
-		    ("                    |--+-GRA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-GRA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (GRA);
 		goto decode_rs;
 	case ISUP_MT_CQM:
-		printf
-		    ("                    |--+-CQM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CQM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CQM);
 		goto decode_rs;
 	case ISUP_MT_CQR:
-		printf
-		    ("                    |--+-CQR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CQR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CQR);
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e)
 			goto decode_error;
 		imsg.rs.len = *p++;
@@ -3666,7 +3139,8 @@ pt_decode_data(struct strbuf data)
 			if (p > e)
 				goto decode_error;
 		}
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e)
 			goto decode_error;
 		imsg.csi.len = *p++;
@@ -3679,9 +3153,7 @@ pt_decode_data(struct strbuf data)
 		}
 		goto done;
 	case ISUP_MT_CPG:
-		printf
-		    ("                    |--+-CPG--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CPG--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CPG);
 		imsg.evnt = *d++;
@@ -3689,12 +3161,11 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_USR:
-		printf
-		    ("                    |--+-USR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-USR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (USR);
-		p = d + *d; d++;
+		p = d + *d;
+		d++;
 		if (p > e)
 			goto decode_error;
 		imsg.uui.len = *p++;
@@ -3707,101 +3178,73 @@ pt_decode_data(struct strbuf data)
 		}
 		goto decode_opt;
 	case ISUP_MT_UCIC:
-		printf
-		    ("                    |--+-UCIC-%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-UCIC-%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (UCIC);
 		goto decode_none;
 	case ISUP_MT_CFN:
-		printf
-		    ("                    |--+-CFN--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CFN--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CFN);
 		goto decode_caus;
 	case ISUP_MT_OLM:
-		printf
-		    ("                    |--+-OLM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-OLM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (OLM);
 		goto decode_none;
 	case ISUP_MT_CRG:
-		printf
-		    ("                    |--+-CRG--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CRG--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CRG);
 		goto decode_none;
 	case ISUP_MT_NRM:
-		printf
-		    ("                    |--+-NRM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-NRM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (NRM);
 		goto decode_opt;
 	case ISUP_MT_FAC:
-		printf
-		    ("                    |--+-FAC--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-FAC--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (FAC);
 		goto decode_opt;
 	case ISUP_MT_UPT:
-		printf
-		    ("                    |--+-UPT--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-UPT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (UPT);
 		goto decode_opt;
 	case ISUP_MT_UPA:
-		printf
-		    ("                    |--+-UPA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-UPA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (UPA);
 		goto decode_opt;
 	case ISUP_MT_IDR:
-		printf
-		    ("                    |--+-IDR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-IDR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (IDR);
 		goto decode_opt;
 	case ISUP_MT_IRS:
-		printf
-		    ("                    |--+-IRS--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-IRS--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (IRS);
 		goto decode_opt;
 	case ISUP_MT_SGM:
-		printf
-		    ("                    |--+-SGM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-SGM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (SGM);
 		goto decode_opt;
 	case ISUP_MT_CRA:
-		printf
-		    ("                    |--+-CRA--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CRA--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CRA);
 		goto decode_none;
 	case ISUP_MT_CRM:
-		printf
-		    ("                    |--+-CRM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CRM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CRM);
 		imsg.nci = *d++;
 		goto decode_none;
 	case ISUP_MT_CVR:
-		printf
-		    ("                    |--+-CVR--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CVR--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CVR);
 		imsg.cvri = *d++;
@@ -3812,23 +3255,17 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_CVT:
-		printf
-		    ("                    |--+-CVT--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CVT--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CVT);
 		goto decode_none;
 	case ISUP_MT_EXM:
-		printf
-		    ("                    |--+-EXM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-EXM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (EXM);
 		goto decode_opt;
 	case ISUP_MT_NON:
-		printf
-		    ("                    |--+-NON--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-NON--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (NON);
 		imsg.ton = *d++;
@@ -3836,38 +3273,28 @@ pt_decode_data(struct strbuf data)
 			goto decode_error;
 		goto decode_opt;
 	case ISUP_MT_LLM:
-		printf
-		    ("                    |--+-LLM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-LLM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (LLM);
 		goto decode_none;
 	case ISUP_MT_CAK:
-		printf
-		    ("                    |--+-CAK--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-CAK--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (CAK);
 		goto decode_none;
 	case ISUP_MT_TCM:
-		printf
-		    ("                    |--+-TCM--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-TCM--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (TCM);
 		imsg.cri = *d++;
 		goto decode_none;
 	case ISUP_MT_MCP:
-		printf
-		    ("                    |--+-MCP--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-MCP--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (MCP);
 		goto decode_none;
 	default:
-		printf
-		    ("                    |--+-\?\?\?--%3ld--------------------->|                    (%d)\n",
-		     imsg.cic, state);
+		printf("                    |--+-\?\?\?--%3ld--------------------->|                    (%d)\n", imsg.cic, state);
 		FFLUSH(stdout);
 		ret = (UNKNOWN);
 		break;
@@ -3886,14 +3313,14 @@ pt_decode_data(struct strbuf data)
 		goto decode_error;
 	goto done;
       decode_opt:
-	p = d + *d; d++;
+	p = d + *d;
+	d++;
 	if (p > e)
 		goto decode_error;
 	if (*p++) ;		/* have optional parameters */
 	goto done;
       decode_error:
-	printf("                    |XX+XXXXXXX DECODE ERROR XXXXXXXXXX|                    (%d)\n",
-	       state);
+	printf("                    |XX+XXXXXXX DECODE ERROR XXXXXXXXXX|                    (%d)\n", state);
 	FFLUSH(stdout);
 	ret = DECODEERROR;
 	goto done;
@@ -3903,6 +3330,7 @@ static int
 pt_decode_msg(struct strbuf ctrl, struct strbuf data)
 {
 	union MTP_primitives *m = (union MTP_primitives *) ctrl.buf;
+
 	switch (m->mtp_primitive) {
 	case MTP_TRANSFER_REQ:
 		return pt_decode_data(data);
@@ -3923,12 +3351,11 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 	union CC_primitives *m = (union CC_primitives *) ctrl.buf;
 	struct isup_addr *a;
 	char *s;
+
 	switch (m->cc_primitive) {
 	case CC_OK_ACK:
 		if (show_acks || verbose > 1)
-			printf
-			    ("<--OK---------------|  |                               |                    (%d)\n",
-			     state);
+			printf("<--OK---------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_OK_ACK;
 		break;
@@ -3980,55 +3407,38 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_INFO_ACK:
 		if (verbose)
-			printf
-			    ("<--INFO-------------|  |                               |                    (%d)\n",
-			     state);
+			printf("<--INFO-------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_INFO_ACK;
 		break;
 	case CC_BIND_ACK:
 		if (verbose > 1) {
-			printf
-			    ("<--BIND-------------|  |                               |                    (%d)\n",
-			     state);
+			printf("<--BIND-------------|  |                               |                    (%d)\n", state);
 			FFLUSH(stdout);
 		}
 		cprim.addr.len = m->bind_ack.cc_addr_length;
-		bcopy((char *) &m->bind_ack + m->bind_ack.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->bind_ack + m->bind_ack.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		cprim.setup_ind = m->bind_ack.cc_setup_ind;
 		if (verbose > 2) {
 			if (cprim.addr.len) {
-				printf
-				    (" addr scope =    %2s |  |                               |                    \n",
-				     scope_string(cprim.addr.add.scope));
-				printf
-				    (" addr id    = %5ld |  |                               |                    \n",
-				     cprim.addr.add.id);
-				printf
-				    (" addr cic   = %5ld |  |                               |                    \n",
-				     cprim.addr.add.cic);
+				printf(" addr scope =    %2s |  |                               |                    \n", scope_string(cprim.addr.add.scope));
+				printf(" addr id    = %5ld |  |                               |                    \n", cprim.addr.add.id);
+				printf(" addr cic   = %5ld |  |                               |                    \n", cprim.addr.add.cic);
 			}
-			printf
-			    (" setup inds = %5ld |  |                               |                    \n",
-			     cprim.setup_ind);
+			printf(" setup inds = %5ld |  |                               |                    \n", cprim.setup_ind);
 			FFLUSH(stdout);
 		}
 		ret = CPC_BIND_ACK;
 		break;
 	case CC_OPTMGMT_ACK:
 		if (verbose)
-			printf
-			    ("<--OPTMGMT----------|  |                               |                    (%d)\n",
-			     state);
+			printf("<--OPTMGMT----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_OPTMGMT_ACK;
 		break;
 	case CC_ADDR_ACK:
 		if (verbose)
-			printf
-			    ("<--ADDR-------------|  |                               |                    (%d)\n",
-			     state);
+			printf("<--ADDR-------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_ADDR_ACK;
 		break;
@@ -4037,210 +3447,143 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		cprim.user_ref = m->call_reattempt_ind.cc_user_ref;
 		switch ((cprim.reason = m->call_reattempt_ind.cc_reason)) {
 		case ISUP_REATTEMPT_DUAL_SIEZURE:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (dual siezure)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (dual siezure)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_RESET:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (reset)                       |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (reset)                       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_BLOCKING:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (blocking)                    |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (blocking)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_T24_TIMEOUT:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (t24 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (t24 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_UNEXPECTED:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (unexpected message)          |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (unexpected message)          |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_COT_FAILURE:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (continuity check failure)    |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (continuity check failure)    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_CIRCUIT_BUSY:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (circuit busy)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (circuit busy)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--CALL-REATTEMPT---|  | (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---|  | (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		}
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 		break;
 	case CC_SETUP_IND:
-		printf
-		    ("<--SETUP------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--SETUP------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_SETUP_IND;
 		cprim.user_ref = 0;
 		cprim.call_ref = m->setup_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.call_type = m->setup_ind.cc_call_type;
 		cprim.call_flags = m->setup_ind.cc_call_flags;
 		cprim.cdpn.len = m->setup_ind.cc_cdpn_length;
-		bcopy((char *) &m->setup_ind + m->setup_ind.cc_cdpn_offset, &cprim.cdpn.buf,
-		      cprim.cdpn.len);
+		bcopy((char *) &m->setup_ind + m->setup_ind.cc_cdpn_offset, &cprim.cdpn.buf, cprim.cdpn.len);
 		cprim.addr.len = m->setup_ind.cc_addr_length;
-		bcopy((char *) &m->setup_ind + m->setup_ind.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->setup_ind + m->setup_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		cprim.opt.len = m->setup_ind.cc_opt_length;
-		bcopy((char *) &m->setup_ind + m->setup_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->setup_ind + m->setup_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_MORE_INFO_IND:
-		printf
-		    ("<--MORE-INFO--------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--MORE-INFO--------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_MORE_INFO_IND;
 		cprim.user_ref = m->more_info_ind.cc_user_ref;
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 		cprim.opt.len = m->more_info_ind.cc_opt_length;
-		bcopy((char *) &m->more_info_ind + m->more_info_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->more_info_ind + m->more_info_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_INFORMATION_IND:
-		printf
-		    ("<--INFORMATION------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--INFORMATION------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_INFORMATION_IND;
 		cprim.call_ref = m->information_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.subn.len = m->information_ind.cc_subn_length;
-		bcopy((char *) &m->information_ind + m->information_ind.cc_subn_offset,
-		      &cprim.subn.buf, cprim.subn.len);
+		bcopy((char *) &m->information_ind + m->information_ind.cc_subn_offset, &cprim.subn.buf, cprim.subn.len);
 		cprim.opt.len = m->information_ind.cc_opt_length;
-		bcopy((char *) &m->information_ind + m->information_ind.cc_opt_offset,
-		      &cprim.opt.buf, cprim.opt.len);
+		bcopy((char *) &m->information_ind + m->information_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_CONT_CHECK_IND:
-		printf
-		    ("<--CONT-CHECK-------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--CONT-CHECK-------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_CONT_CHECK_IND;
 		cprim.call_ref = m->cont_check_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.addr.len = m->cont_check_ind.cc_addr_length;
-		bcopy((char *) &m->cont_check_ind + m->cont_check_ind.cc_addr_offset,
-		      &cprim.addr.add, cprim.addr.len);
+		bcopy((char *) &m->cont_check_ind + m->cont_check_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_CONT_TEST_IND:
-		printf
-		    ("<--CONT-TEST--------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--CONT-TEST--------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_CONT_TEST_IND;
 		cprim.call_ref = m->cont_test_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.addr.len = m->cont_test_ind.cc_addr_length;
-		bcopy((char *) &m->cont_test_ind + m->cont_test_ind.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->cont_test_ind + m->cont_test_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_CONT_REPORT_IND:
-		printf
-		    ("<--CONT-REPORT------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--CONT-REPORT------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_CONT_REPORT_IND;
 		cprim.call_ref = m->cont_report_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.result = m->cont_report_ind.cc_result;
 		break;
 	case CC_SETUP_CON:
-		printf
-		    ("<--SETUP-OK---------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--SETUP-OK---------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_SETUP_CON;
 		cprim.user_ref = m->setup_con.cc_user_ref;
 		cprim.call_ref = m->setup_con.cc_call_ref;
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		cprim.addr.len = m->setup_con.cc_addr_length;
-		bcopy((char *) &m->setup_con + m->setup_con.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->setup_con + m->setup_con.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_PROCEEDING_IND:
-		printf
-		    ("<--PROCEEDING-------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--PROCEEDING-------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_PROCEEDING_IND;
 		cprim.call_ref = m->proceeding_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.flags = m->proceeding_ind.cc_flags;
 		cprim.opt.len = m->proceeding_ind.cc_opt_length;
-		bcopy((char *) &m->proceeding_ind + m->proceeding_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->proceeding_ind + m->proceeding_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_ALERTING_IND:
-		printf
-		    ("<--ALERTING---------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--ALERTING---------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_ALERTING_IND;
 		cprim.call_ref = m->alerting_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.flags = m->alerting_ind.cc_flags;
 		cprim.opt.len = m->alerting_ind.cc_opt_length;
-		bcopy((char *) &m->alerting_ind + m->alerting_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->alerting_ind + m->alerting_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_PROGRESS_IND:
 		ret = CPC_PROGRESS_IND;
@@ -4248,228 +3591,156 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		cprim.event = m->progress_ind.cc_event;
 		cprim.flags = m->progress_ind.cc_flags;
 		cprim.opt.len = m->progress_ind.cc_opt_length;
-		bcopy((char *) &m->progress_ind + m->progress_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->progress_ind + m->progress_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		switch (m->progress_ind.cc_event & ISUP_EVNT_MASK) {
 		case ISUP_EVNT_ALERTING:
-			printf
-			    ("<--PROGRESS---------|  | (alerting)                    |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (alerting)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_PROGRESS:
-			printf
-			    ("<--PROGRESS---------|  | (progress)                    |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (progress)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_IBI:
-			printf
-			    ("<--PROGRESS---------|  | (in-band info avail)          |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (in-band info avail)          |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_CFB:
-			printf
-			    ("<--PROGRESS---------|  | (call forwarded busy)         |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (call forwarded busy)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_CFNA:
-			printf
-			    ("<--PROGRESS---------|  | (call fowarded no reply)      |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (call fowarded no reply)      |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_CFU:
-			printf
-			    ("<--PROGRESS---------|  | (call forwarded uncond)       |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (call forwarded uncond)       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--PROGRESS---------|  | (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------|  | (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		}
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		break;
 	case CC_IBI_IND:
-		printf
-		    ("<--IBI--------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--IBI--------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_IBI_IND;
 		cprim.call_ref = m->ibi_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.flags = m->ibi_ind.cc_flags;
 		cprim.opt.len = m->ibi_ind.cc_opt_length;
-		bcopy((char *) &m->ibi_ind + m->ibi_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->ibi_ind + m->ibi_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_CONNECT_IND:
-		printf
-		    ("<--CONNECT----------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--CONNECT----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_CONNECT_IND;
 		cprim.call_ref = m->connect_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.flags = m->connect_ind.cc_flags;
 		cprim.opt.len = m->connect_ind.cc_opt_length;
-		bcopy((char *) &m->connect_ind + m->connect_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->connect_ind + m->connect_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_SETUP_COMPLETE_IND:
-		printf
-		    ("<--SETUP-COMPLETE---|  |                               |                    (%d)\n",
-		     state);
+		printf("<--SETUP-COMPLETE---|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_SETUP_COMPLETE_IND;
 		cprim.call_ref = m->setup_complete_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.opt.len = m->setup_complete_ind.cc_opt_length;
-		bcopy((char *) &m->setup_complete_ind + m->setup_complete_ind.cc_opt_offset,
-		      &cprim.opt.buf, cprim.opt.len);
+		bcopy((char *) &m->setup_complete_ind + m->setup_complete_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_FORWXFER_IND:
-		printf
-		    ("<--FORWXFER---------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--FORWXFER---------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_FORWXFER_IND;
 		cprim.call_ref = m->forwxfer_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.opt.len = m->forwxfer_ind.cc_opt_length;
-		bcopy((char *) &m->forwxfer_ind + m->forwxfer_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->forwxfer_ind + m->forwxfer_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_SUSPEND_IND:
-		printf
-		    ("<--SUSPEND----------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--SUSPEND----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_SUSPEND_IND;
 		cprim.call_ref = m->suspend_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.flags = m->suspend_ind.cc_flags;
 		cprim.opt.len = m->suspend_ind.cc_opt_length;
-		bcopy((char *) &m->suspend_ind + m->suspend_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->suspend_ind + m->suspend_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_SUSPEND_CON:
-		printf
-		    ("<--SUSPEND-OK-------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--SUSPEND-OK-------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_SUSPEND_CON;
 		cprim.call_ref = m->suspend_con.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.opt.len = m->suspend_con.cc_opt_length;
-		bcopy((char *) &m->suspend_con + m->suspend_con.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->suspend_con + m->suspend_con.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_SUSPEND_REJECT_IND:
-		printf
-		    ("<--SUSPEND-REJECT---|  |                               |                    (%d)\n",
-		     state);
+		printf("<--SUSPEND-REJECT---|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_SUSPEND_REJECT_IND;
 		cprim.call_ref = m->suspend_reject_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.cause = m->suspend_reject_ind.cc_cause;
 		cprim.opt.len = m->suspend_reject_ind.cc_opt_length;
-		bcopy((char *) &m->suspend_reject_ind + m->suspend_reject_ind.cc_opt_offset,
-		      &cprim.opt.buf, cprim.opt.len);
+		bcopy((char *) &m->suspend_reject_ind + m->suspend_reject_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_RESUME_IND:
-		printf
-		    ("<--RESUME-----------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RESUME-----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RESUME_IND;
 		cprim.call_ref = m->resume_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.flags = m->resume_ind.cc_flags;
 		cprim.opt.len = m->resume_ind.cc_opt_length;
-		bcopy((char *) &m->resume_ind + m->resume_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->resume_ind + m->resume_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_RESUME_CON:
-		printf
-		    ("<--RESUME-OK--------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RESUME-OK--------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RESUME_CON;
 		cprim.call_ref = m->resume_con.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.opt.len = m->resume_con.cc_opt_length;
-		bcopy((char *) &m->resume_con + m->resume_con.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->resume_con + m->resume_con.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_RESUME_REJECT_IND:
-		printf
-		    ("<--RESUME-REJECT----|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RESUME-REJECT----|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RESUME_REJECT_IND;
 		cprim.call_ref = m->resume_reject_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		cprim.cause = m->resume_reject_ind.cc_cause;
 		cprim.opt.len = m->resume_reject_ind.cc_opt_length;
-		bcopy((char *) &m->resume_reject_ind + m->resume_reject_ind.cc_opt_offset,
-		      &cprim.opt.buf, cprim.opt.len);
+		bcopy((char *) &m->resume_reject_ind + m->resume_reject_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_REJECT_IND:
-		printf
-		    ("<--REJECT-----------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--REJECT-----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_REJECT_IND;
 		cprim.user_ref = m->reject_ind.cc_user_ref;
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
 		cprim.cause = m->reject_ind.cc_cause;
 		cprim.opt.len = m->reject_ind.cc_opt_length;
-		bcopy((char *) &m->reject_ind + m->reject_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->reject_ind + m->reject_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_CALL_FAILURE_IND:
 		ret = CPC_CALL_FAILURE_IND;
@@ -4478,228 +3749,158 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		cprim.cause = m->call_failure_ind.cc_cause;
 		switch (m->call_failure_ind.cc_reason) {
 		case ISUP_CALL_FAILURE_COT_FAILURE:
-			printf
-			    ("<--CALL-FAILURE-----|  | (continuity check failure)    |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (continuity check failure)    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RESET:
-			printf
-			    ("<--CALL-FAILURE-----|  | (reset)                       |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (reset)                       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RECV_RLC:
-			printf
-			    ("<--CALL-FAILURE-----|  | (received RLC)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (received RLC)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_BLOCKING:
-			printf
-			    ("<--CALL-FAILURE-----|  | (blocking)                    |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (blocking)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T2_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t2 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t2 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T3_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t3 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t3 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T6_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t6 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t6 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T7_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t7 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t7 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T8_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t8 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t8 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T9_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t9 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t9 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T35_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t35 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t35 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T38_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----|  | (t38 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (t38 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_CIRCUIT_BUSY:
-			printf
-			    ("<--CALL-FAILURE-----|  | (circuit busy)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (circuit busy)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--CALL-FAILURE-----|  | (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----|  | (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		}
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		break;
 	case CC_RELEASE_IND:
-		printf
-		    ("<--RELEASE----------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RELEASE----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RELEASE_IND;
 		cprim.user_ref = m->release_ind.cc_user_ref;
 		cprim.call_ref = m->release_ind.cc_call_ref;
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		cprim.cause = m->release_ind.cc_cause;
 		cprim.opt.len = m->release_ind.cc_opt_length;
-		bcopy((char *) &m->release_ind + m->release_ind.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->release_ind + m->release_ind.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_RELEASE_CON:
-		printf
-		    ("<--RELEASE-OK-------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RELEASE-OK-------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RELEASE_CON;
 		cprim.user_ref = m->release_con.cc_user_ref;
 		cprim.call_ref = m->release_con.cc_call_ref;
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     cprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", cprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		}
 		cprim.opt.len = m->release_con.cc_opt_length;
-		bcopy((char *) &m->release_con + m->release_con.cc_opt_offset, &cprim.opt.buf,
-		      cprim.opt.len);
+		bcopy((char *) &m->release_con + m->release_con.cc_opt_offset, &cprim.opt.buf, cprim.opt.len);
 		break;
 	case CC_RESET_IND:
-		printf
-		    ("<--RESET------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RESET------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RESET_IND;
 		cprim.flags = m->reset_ind.cc_flags;
 		cprim.addr.len = m->reset_ind.cc_addr_length;
-		bcopy((char *) &m->reset_ind + m->reset_ind.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->reset_ind + m->reset_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_RESET_CON:
-		printf
-		    ("<--RESET-OK---------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--RESET-OK---------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_RESET_CON;
 		cprim.flags = m->reset_con.cc_flags;
 		cprim.addr.len = m->reset_con.cc_addr_length;
-		bcopy((char *) &m->reset_con + m->reset_con.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->reset_con + m->reset_con.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_BLOCKING_IND:
-		printf
-		    ("<--BLOCK------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--BLOCK------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_BLOCKING_IND;
 		cprim.flags = m->blocking_ind.cc_flags;
 		cprim.addr.len = m->blocking_ind.cc_addr_length;
-		bcopy((char *) &m->blocking_ind + m->blocking_ind.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->blocking_ind + m->blocking_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_BLOCKING_CON:
-		printf
-		    ("<--BLOCK-OK---------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--BLOCK-OK---------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_BLOCKING_CON;
 		cprim.flags = m->blocking_con.cc_flags;
 		cprim.addr.len = m->blocking_con.cc_addr_length;
-		bcopy((char *) &m->blocking_con + m->blocking_con.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->blocking_con + m->blocking_con.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_UNBLOCKING_IND:
-		printf
-		    ("<--UNBLOCK----------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--UNBLOCK----------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_UNBLOCKING_IND;
 		cprim.flags = m->unblocking_ind.cc_flags;
 		cprim.addr.len = m->unblocking_ind.cc_addr_length;
-		bcopy((char *) &m->unblocking_ind + m->unblocking_ind.cc_addr_offset,
-		      &cprim.addr.add, cprim.addr.len);
+		bcopy((char *) &m->unblocking_ind + m->unblocking_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_UNBLOCKING_CON:
-		printf
-		    ("<--UNBLOCK-OK-------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--UNBLOCK-OK-------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_UNBLOCKING_CON;
 		cprim.flags = m->unblocking_con.cc_flags;
 		cprim.addr.len = m->unblocking_con.cc_addr_length;
-		bcopy((char *) &m->unblocking_con + m->unblocking_con.cc_addr_offset,
-		      &cprim.addr.add, cprim.addr.len);
+		bcopy((char *) &m->unblocking_con + m->unblocking_con.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_QUERY_IND:
-		printf
-		    ("<--QUERY------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--QUERY------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_QUERY_IND;
 		cprim.flags = m->query_ind.cc_flags;
 		cprim.addr.len = m->query_ind.cc_addr_length;
-		bcopy((char *) &m->query_ind + m->query_ind.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->query_ind + m->query_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_QUERY_CON:
-		printf
-		    ("<--QUERY-OK---------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--QUERY-OK---------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_QUERY_CON;
 		cprim.flags = m->query_con.cc_flags;
 		cprim.addr.len = m->query_con.cc_addr_length;
-		bcopy((char *) &m->query_con + m->query_con.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->query_con + m->query_con.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		break;
 	case CC_STOP_IND:
-		printf
-		    ("<--STOP-------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--STOP-------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_STOP_IND;
 		break;
@@ -4708,225 +3909,152 @@ iut_cpc_decode_msg(struct strbuf ctrl, struct strbuf data)
 		cprim.reason = m->maint_ind.cc_reason;
 		cprim.call_ref = m->maint_ind.cc_call_ref;
 		cprim.addr.len = m->maint_ind.cc_addr_length;
-		bcopy((char *) &m->maint_ind + m->maint_ind.cc_addr_offset, &cprim.addr.add,
-		      cprim.addr.len);
+		bcopy((char *) &m->maint_ind + m->maint_ind.cc_addr_offset, &cprim.addr.add, cprim.addr.len);
 		switch (m->maint_ind.cc_reason) {
 		case ISUP_MAINT_T5_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t5 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t5 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T13_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t13 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t13 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T15_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t15 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t15 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T17_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t17 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t17 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T19_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t19 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t19 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T21_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t21 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t21 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T23_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t23 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t23 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T25_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t25 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t25 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T26_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t26 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t26 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T27_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t27 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t27 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T28_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t28 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t28 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T36_TIMEOUT:
-			printf
-			    ("<--MAINT------------|  | (t36 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (t36 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGBA:
-			printf
-			    ("<--MAINT------------|  | (unexpected cgba)             |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (unexpected cgba)             |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGUA:
-			printf
-			    ("<--MAINT------------|  | (unexpected cgua)             |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (unexpected cgua)             |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_MESSAGE:
-			printf
-			    ("<--MAINT------------|  | (unexpected message)          |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (unexpected message)          |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEQUIPPED_CIC:
 			a = (isup_addr_t *) (((unsigned char *) m) + m->maint_ind.cc_addr_offset);
-			printf
-			    ("<--MAINT------------|  | (unequipped cic = %5ld)      |                    (%d)\n",
-			     a->cic, state);
+			printf("<--MAINT------------|  | (unequipped cic = %5ld)      |                    (%d)\n", a->cic, state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_SEGMENTATION_DISCARDED:
-			printf
-			    ("<--MAINT------------|  | (segmentation discarded)      |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (segmentation discarded)      |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNEQUIPPED:
-			printf
-			    ("<--MAINT------------|  | (user part unequipped)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (user part unequipped)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNAVAILABLE:
-			printf
-			    ("<--MAINT------------|  | (user part unavailable)       |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (user part unavailable)       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_AVAILABLE:
-			printf
-			    ("<--MAINT------------|  | (user part available)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (user part available)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_MAN_MADE_BUSY:
-			printf
-			    ("<--MAINT------------|  | (user part man made busy)     |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (user part man made busy)     |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_CONGESTED:
-			printf
-			    ("<--MAINT------------|  | (user part congested)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (user part congested)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNCONGESTED:
-			printf
-			    ("<--MAINT------------|  | (user part uncongested)       |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (user part uncongested)       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGBA:
-			printf
-			    ("<--MAINT------------|  | (missing ack in cgba)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (missing ack in cgba)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGUA:
-			printf
-			    ("<--MAINT------------|  | (missing ack in cgua)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (missing ack in cgua)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGBA:
-			printf
-			    ("<--MAINT------------|  | (abnormal ack in cgba)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (abnormal ack in cgba)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGUA:
-			printf
-			    ("<--MAINT------------|  | (abnormal ack in cgua)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (abnormal ack in cgua)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_BLA:
-			printf
-			    ("<--MAINT------------|  | (unexpected bla)              |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (unexpected bla)              |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_UBA:
-			printf
-			    ("<--MAINT------------|  | (unexpected uba)              |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (unexpected uba)              |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_UNREC_INFO:
-			printf
-			    ("<--MAINT------------|  | (unrecognized information)    |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (unrecognized information)    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_FAILURE:
-			printf
-			    ("<--MAINT------------|  | (release failure)             |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (release failure)             |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_MESSAGE_FORMAT_ERROR:
-			printf
-			    ("<--MAINT------------|  | (message format error)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (message format error)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--MAINT------------|  | (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------|  | (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			return (FAILURE);
 		}
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     cprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", cprim.call_ref);
 		break;
 	case CC_START_RESET_IND:
-		printf
-		    ("<--START-RESET------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--START-RESET------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = CPC_START_RESET_IND;
 		break;
 	default:
-		printf
-		    ("<--\?\?\?\?-------------|  |                               |                    (%d)\n",
-		     state);
+		printf("<--\?\?\?\?-------------|  |                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		return (UNKNOWN);
 	}
@@ -4946,12 +4074,11 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 	union CC_primitives *m = (union CC_primitives *) ctrl.buf;
 	struct isup_addr *a;
 	char *s;
+
 	switch (m->cc_primitive) {
 	case CC_OK_ACK:
 		if (show_acks || verbose > 1)
-			printf
-			    ("<--OK---------------+--|                               |                    (%d)\n",
-			     state);
+			printf("<--OK---------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_OK_ACK;
 		break;
@@ -5000,55 +4127,38 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		break;
 	case CC_INFO_ACK:
 		if (verbose)
-			printf
-			    ("<--INFO-------------+--|                               |                    (%d)\n",
-			     state);
+			printf("<--INFO-------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_INFO_ACK;
 		break;
 	case CC_BIND_ACK:
 		if (verbose > 1) {
-			printf
-			    ("<--BIND-------------+--|                               |                    (%d)\n",
-			     state);
+			printf("<--BIND-------------+--|                               |                    (%d)\n", state);
 			FFLUSH(stdout);
 		}
 		mprim.addr.len = m->bind_ack.cc_addr_length;
-		bcopy((char *) &m->bind_ack + m->bind_ack.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->bind_ack + m->bind_ack.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		mprim.setup_ind = m->bind_ack.cc_setup_ind;
 		if (verbose > 2) {
 			if (mprim.addr.len) {
-				printf
-				    (" addr scope =    %2s |  |                               |                    \n",
-				     scope_string(mprim.addr.add.scope));
-				printf
-				    (" addr id    = %5ld |  |                               |                    \n",
-				     mprim.addr.add.id);
-				printf
-				    (" addr cic   = %5ld |  |                               |                    \n",
-				     mprim.addr.add.cic);
+				printf(" addr scope =    %2s |  |                               |                    \n", scope_string(mprim.addr.add.scope));
+				printf(" addr id    = %5ld |  |                               |                    \n", mprim.addr.add.id);
+				printf(" addr cic   = %5ld |  |                               |                    \n", mprim.addr.add.cic);
 			}
-			printf
-			    (" setup inds = %5ld |  |                               |                    \n",
-			     mprim.setup_ind);
+			printf(" setup inds = %5ld |  |                               |                    \n", mprim.setup_ind);
 			FFLUSH(stdout);
 		}
 		ret = MGM_BIND_ACK;
 		break;
 	case CC_OPTMGMT_ACK:
 		if (verbose)
-			printf
-			    ("<--OPTMGMT----------+--|                               |                    (%d)\n",
-			     state);
+			printf("<--OPTMGMT----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_OPTMGMT_ACK;
 		break;
 	case CC_ADDR_ACK:
 		if (verbose)
-			printf
-			    ("<--ADDR-------------+--|                               |                    (%d)\n",
-			     state);
+			printf("<--ADDR-------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_ADDR_ACK;
 		break;
@@ -5057,210 +4167,143 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		mprim.user_ref = m->call_reattempt_ind.cc_user_ref;
 		switch ((mprim.reason = m->call_reattempt_ind.cc_reason)) {
 		case ISUP_REATTEMPT_DUAL_SIEZURE:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (dual siezure)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (dual siezure)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_RESET:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (reset)                       |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (reset)                       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_BLOCKING:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (blocking)                    |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (blocking)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_T24_TIMEOUT:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (t24 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (t24 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_UNEXPECTED:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (unexpected message)          |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (unexpected message)          |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_COT_FAILURE:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (continuity check failure)    |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (continuity check failure)    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_REATTEMPT_CIRCUIT_BUSY:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (circuit busy)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (circuit busy)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--CALL-REATTEMPT---+--| (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--CALL-REATTEMPT---+--| (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		}
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 		break;
 	case CC_SETUP_IND:
-		printf
-		    ("<--SETUP------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--SETUP------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_SETUP_IND;
 		mprim.user_ref = 0;
 		mprim.call_ref = m->setup_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.call_type = m->setup_ind.cc_call_type;
 		mprim.call_flags = m->setup_ind.cc_call_flags;
 		mprim.cdpn.len = m->setup_ind.cc_cdpn_length;
-		bcopy((char *) &m->setup_ind + m->setup_ind.cc_cdpn_offset, &mprim.cdpn.buf,
-		      mprim.cdpn.len);
+		bcopy((char *) &m->setup_ind + m->setup_ind.cc_cdpn_offset, &mprim.cdpn.buf, mprim.cdpn.len);
 		mprim.addr.len = m->setup_ind.cc_addr_length;
-		bcopy((char *) &m->setup_ind + m->setup_ind.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->setup_ind + m->setup_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		mprim.opt.len = m->setup_ind.cc_opt_length;
-		bcopy((char *) &m->setup_ind + m->setup_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->setup_ind + m->setup_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_MORE_INFO_IND:
-		printf
-		    ("<--MORE-INFO--------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--MORE-INFO--------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_MORE_INFO_IND;
 		mprim.user_ref = m->more_info_ind.cc_user_ref;
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 		mprim.opt.len = m->more_info_ind.cc_opt_length;
-		bcopy((char *) &m->more_info_ind + m->more_info_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->more_info_ind + m->more_info_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_INFORMATION_IND:
-		printf
-		    ("<--INFORMATION------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--INFORMATION------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_INFORMATION_IND;
 		mprim.call_ref = m->information_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.subn.len = m->information_ind.cc_subn_length;
-		bcopy((char *) &m->information_ind + m->information_ind.cc_subn_offset,
-		      &mprim.subn.buf, mprim.subn.len);
+		bcopy((char *) &m->information_ind + m->information_ind.cc_subn_offset, &mprim.subn.buf, mprim.subn.len);
 		mprim.opt.len = m->information_ind.cc_opt_length;
-		bcopy((char *) &m->information_ind + m->information_ind.cc_opt_offset,
-		      &mprim.opt.buf, mprim.opt.len);
+		bcopy((char *) &m->information_ind + m->information_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_CONT_CHECK_IND:
-		printf
-		    ("<--CONT-CHECK-------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--CONT-CHECK-------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_CONT_CHECK_IND;
 		mprim.call_ref = m->cont_check_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.addr.len = m->cont_check_ind.cc_addr_length;
-		bcopy((char *) &m->cont_check_ind + m->cont_check_ind.cc_addr_offset,
-		      &mprim.addr.add, mprim.addr.len);
+		bcopy((char *) &m->cont_check_ind + m->cont_check_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_CONT_TEST_IND:
-		printf
-		    ("<--CONT-TEST--------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--CONT-TEST--------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_CONT_TEST_IND;
 		mprim.call_ref = m->cont_test_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.addr.len = m->cont_test_ind.cc_addr_length;
-		bcopy((char *) &m->cont_test_ind + m->cont_test_ind.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->cont_test_ind + m->cont_test_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_CONT_REPORT_IND:
-		printf
-		    ("<--CONT-REPORT------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--CONT-REPORT------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_CONT_REPORT_IND;
 		mprim.call_ref = m->cont_report_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.result = m->cont_report_ind.cc_result;
 		break;
 	case CC_SETUP_CON:
-		printf
-		    ("<--SETUP-OK---------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--SETUP-OK---------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_SETUP_CON;
 		mprim.user_ref = m->setup_con.cc_user_ref;
 		mprim.call_ref = m->setup_con.cc_call_ref;
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
 		mprim.addr.len = m->setup_con.cc_addr_length;
-		bcopy((char *) &m->setup_con + m->setup_con.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->setup_con + m->setup_con.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_PROCEEDING_IND:
-		printf
-		    ("<--PROCEEDING-------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--PROCEEDING-------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_PROCEEDING_IND;
 		mprim.call_ref = m->proceeding_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.flags = m->proceeding_ind.cc_flags;
 		mprim.opt.len = m->proceeding_ind.cc_opt_length;
-		bcopy((char *) &m->proceeding_ind + m->proceeding_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->proceeding_ind + m->proceeding_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_ALERTING_IND:
-		printf
-		    ("<--ALERTING---------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--ALERTING---------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_ALERTING_IND;
 		mprim.call_ref = m->alerting_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.flags = m->alerting_ind.cc_flags;
 		mprim.opt.len = m->alerting_ind.cc_opt_length;
-		bcopy((char *) &m->alerting_ind + m->alerting_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->alerting_ind + m->alerting_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_PROGRESS_IND:
 		ret = MGM_PROGRESS_IND;
@@ -5268,228 +4311,156 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		mprim.event = m->progress_ind.cc_event;
 		mprim.flags = m->progress_ind.cc_flags;
 		mprim.opt.len = m->progress_ind.cc_opt_length;
-		bcopy((char *) &m->progress_ind + m->progress_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->progress_ind + m->progress_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		switch (m->progress_ind.cc_event & ISUP_EVNT_MASK) {
 		case ISUP_EVNT_ALERTING:
-			printf
-			    ("<--PROGRESS---------+--| (alerting)                    |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (alerting)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_PROGRESS:
-			printf
-			    ("<--PROGRESS---------+--| (progress)                    |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (progress)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_IBI:
-			printf
-			    ("<--PROGRESS---------+--| (in-band info avail)          |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (in-band info avail)          |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_CFB:
-			printf
-			    ("<--PROGRESS---------+--| (call forwarded busy)         |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (call forwarded busy)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_CFNA:
-			printf
-			    ("<--PROGRESS---------+--| (call fowarded no reply)      |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (call fowarded no reply)      |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_EVNT_CFU:
-			printf
-			    ("<--PROGRESS---------+--| (call forwarded uncond)       |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (call forwarded uncond)       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--PROGRESS---------+--| (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--PROGRESS---------+--| (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		}
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		break;
 	case CC_IBI_IND:
-		printf
-		    ("<--IBI--------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--IBI--------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_IBI_IND;
 		mprim.call_ref = m->ibi_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.flags = m->ibi_ind.cc_flags;
 		mprim.opt.len = m->ibi_ind.cc_opt_length;
-		bcopy((char *) &m->ibi_ind + m->ibi_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->ibi_ind + m->ibi_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_CONNECT_IND:
-		printf
-		    ("<--CONNECT----------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--CONNECT----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_CONNECT_IND;
 		mprim.call_ref = m->connect_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.flags = m->connect_ind.cc_flags;
 		mprim.opt.len = m->connect_ind.cc_opt_length;
-		bcopy((char *) &m->connect_ind + m->connect_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->connect_ind + m->connect_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_SETUP_COMPLETE_IND:
-		printf
-		    ("<--SETUP-COMPLETE---+--|                               |                    (%d)\n",
-		     state);
+		printf("<--SETUP-COMPLETE---+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_SETUP_COMPLETE_IND;
 		mprim.call_ref = m->setup_complete_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.opt.len = m->setup_complete_ind.cc_opt_length;
-		bcopy((char *) &m->setup_complete_ind + m->setup_complete_ind.cc_opt_offset,
-		      &mprim.opt.buf, mprim.opt.len);
+		bcopy((char *) &m->setup_complete_ind + m->setup_complete_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_FORWXFER_IND:
-		printf
-		    ("<--FORWXFER---------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--FORWXFER---------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_FORWXFER_IND;
 		mprim.call_ref = m->forwxfer_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.opt.len = m->forwxfer_ind.cc_opt_length;
-		bcopy((char *) &m->forwxfer_ind + m->forwxfer_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->forwxfer_ind + m->forwxfer_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_SUSPEND_IND:
-		printf
-		    ("<--SUSPEND----------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--SUSPEND----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_SUSPEND_IND;
 		mprim.call_ref = m->suspend_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.flags = m->suspend_ind.cc_flags;
 		mprim.opt.len = m->suspend_ind.cc_opt_length;
-		bcopy((char *) &m->suspend_ind + m->suspend_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->suspend_ind + m->suspend_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_SUSPEND_CON:
-		printf
-		    ("<--SUSPEND-OK-------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--SUSPEND-OK-------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_SUSPEND_CON;
 		mprim.call_ref = m->suspend_con.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.opt.len = m->suspend_con.cc_opt_length;
-		bcopy((char *) &m->suspend_con + m->suspend_con.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->suspend_con + m->suspend_con.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_SUSPEND_REJECT_IND:
-		printf
-		    ("<--SUSPEND-REJECT---+--|                               |                    (%d)\n",
-		     state);
+		printf("<--SUSPEND-REJECT---+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_SUSPEND_REJECT_IND;
 		mprim.call_ref = m->suspend_reject_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.cause = m->suspend_reject_ind.cc_cause;
 		mprim.opt.len = m->suspend_reject_ind.cc_opt_length;
-		bcopy((char *) &m->suspend_reject_ind + m->suspend_reject_ind.cc_opt_offset,
-		      &mprim.opt.buf, mprim.opt.len);
+		bcopy((char *) &m->suspend_reject_ind + m->suspend_reject_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_RESUME_IND:
-		printf
-		    ("<--RESUME-----------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RESUME-----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RESUME_IND;
 		mprim.call_ref = m->resume_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.flags = m->resume_ind.cc_flags;
 		mprim.opt.len = m->resume_ind.cc_opt_length;
-		bcopy((char *) &m->resume_ind + m->resume_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->resume_ind + m->resume_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_RESUME_CON:
-		printf
-		    ("<--RESUME-OK--------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RESUME-OK--------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RESUME_CON;
 		mprim.call_ref = m->resume_con.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.opt.len = m->resume_con.cc_opt_length;
-		bcopy((char *) &m->resume_con + m->resume_con.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->resume_con + m->resume_con.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_RESUME_REJECT_IND:
-		printf
-		    ("<--RESUME-REJECT----+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RESUME-REJECT----+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RESUME_REJECT_IND;
 		mprim.call_ref = m->resume_reject_ind.cc_call_ref;
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		mprim.cause = m->resume_reject_ind.cc_cause;
 		mprim.opt.len = m->resume_reject_ind.cc_opt_length;
-		bcopy((char *) &m->resume_reject_ind + m->resume_reject_ind.cc_opt_offset,
-		      &mprim.opt.buf, mprim.opt.len);
+		bcopy((char *) &m->resume_reject_ind + m->resume_reject_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_REJECT_IND:
-		printf
-		    ("<--REJECT-----------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--REJECT-----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_REJECT_IND;
 		mprim.user_ref = m->reject_ind.cc_user_ref;
 		if (verbose)
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
 		mprim.cause = m->reject_ind.cc_cause;
 		mprim.opt.len = m->reject_ind.cc_opt_length;
-		bcopy((char *) &m->reject_ind + m->reject_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->reject_ind + m->reject_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_CALL_FAILURE_IND:
 		ret = MGM_CALL_FAILURE_IND;
@@ -5498,228 +4469,158 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		mprim.cause = m->call_failure_ind.cc_cause;
 		switch (m->call_failure_ind.cc_reason) {
 		case ISUP_CALL_FAILURE_COT_FAILURE:
-			printf
-			    ("<--CALL-FAILURE-----+--| (continuity check failure)    |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (continuity check failure)    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RESET:
-			printf
-			    ("<--CALL-FAILURE-----+--| (reset)                       |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (reset)                       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_RECV_RLC:
-			printf
-			    ("<--CALL-FAILURE-----+--| (received RLC)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (received RLC)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_BLOCKING:
-			printf
-			    ("<--CALL-FAILURE-----+--| (blocking)                    |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (blocking)                    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T2_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t2 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t2 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T3_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t3 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t3 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T6_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t6 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t6 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T7_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t7 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t7 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T8_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t8 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t8 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T9_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t9 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t9 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T35_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t35 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t35 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_T38_TIMEOUT:
-			printf
-			    ("<--CALL-FAILURE-----+--| (t38 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (t38 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_CALL_FAILURE_CIRCUIT_BUSY:
-			printf
-			    ("<--CALL-FAILURE-----+--| (circuit busy)                |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (circuit busy)                |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--CALL-FAILURE-----+--| (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--CALL-FAILURE-----+--| (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		}
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		break;
 	case CC_RELEASE_IND:
-		printf
-		    ("<--RELEASE----------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RELEASE----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RELEASE_IND;
 		mprim.user_ref = m->release_ind.cc_user_ref;
 		mprim.call_ref = m->release_ind.cc_call_ref;
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
 		mprim.cause = m->release_ind.cc_cause;
 		mprim.opt.len = m->release_ind.cc_opt_length;
-		bcopy((char *) &m->release_ind + m->release_ind.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->release_ind + m->release_ind.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_RELEASE_CON:
-		printf
-		    ("<--RELEASE-OK-------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RELEASE-OK-------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RELEASE_CON;
 		mprim.user_ref = m->release_con.cc_user_ref;
 		mprim.call_ref = m->release_con.cc_call_ref;
 		if (verbose) {
-			printf
-			    ("user ref = %-4ld     |  |                               |                    \n",
-			     mprim.user_ref);
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("user ref = %-4ld     |  |                               |                    \n", mprim.user_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		}
 		mprim.opt.len = m->release_con.cc_opt_length;
-		bcopy((char *) &m->release_con + m->release_con.cc_opt_offset, &mprim.opt.buf,
-		      mprim.opt.len);
+		bcopy((char *) &m->release_con + m->release_con.cc_opt_offset, &mprim.opt.buf, mprim.opt.len);
 		break;
 	case CC_RESET_IND:
-		printf
-		    ("<--RESET------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RESET------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RESET_IND;
 		mprim.flags = m->reset_ind.cc_flags;
 		mprim.addr.len = m->reset_ind.cc_addr_length;
-		bcopy((char *) &m->reset_ind + m->reset_ind.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->reset_ind + m->reset_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_RESET_CON:
-		printf
-		    ("<--RESET-OK---------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--RESET-OK---------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_RESET_CON;
 		mprim.flags = m->reset_con.cc_flags;
 		mprim.addr.len = m->reset_con.cc_addr_length;
-		bcopy((char *) &m->reset_con + m->reset_con.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->reset_con + m->reset_con.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_BLOCKING_IND:
-		printf
-		    ("<--BLOCK------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--BLOCK------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_BLOCKING_IND;
 		mprim.flags = m->blocking_ind.cc_flags;
 		mprim.addr.len = m->blocking_ind.cc_addr_length;
-		bcopy((char *) &m->blocking_ind + m->blocking_ind.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->blocking_ind + m->blocking_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_BLOCKING_CON:
-		printf
-		    ("<--BLOCK-OK---------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--BLOCK-OK---------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_BLOCKING_CON;
 		mprim.flags = m->blocking_con.cc_flags;
 		mprim.addr.len = m->blocking_con.cc_addr_length;
-		bcopy((char *) &m->blocking_con + m->blocking_con.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->blocking_con + m->blocking_con.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_UNBLOCKING_IND:
-		printf
-		    ("<--UNBLOCK----------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--UNBLOCK----------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_UNBLOCKING_IND;
 		mprim.flags = m->unblocking_ind.cc_flags;
 		mprim.addr.len = m->unblocking_ind.cc_addr_length;
-		bcopy((char *) &m->unblocking_ind + m->unblocking_ind.cc_addr_offset,
-		      &mprim.addr.add, mprim.addr.len);
+		bcopy((char *) &m->unblocking_ind + m->unblocking_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_UNBLOCKING_CON:
-		printf
-		    ("<--UNBLOCK-OK-------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--UNBLOCK-OK-------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_UNBLOCKING_CON;
 		mprim.flags = m->unblocking_con.cc_flags;
 		mprim.addr.len = m->unblocking_con.cc_addr_length;
-		bcopy((char *) &m->unblocking_con + m->unblocking_con.cc_addr_offset,
-		      &mprim.addr.add, mprim.addr.len);
+		bcopy((char *) &m->unblocking_con + m->unblocking_con.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_QUERY_IND:
-		printf
-		    ("<--QUERY------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--QUERY------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_QUERY_IND;
 		mprim.flags = m->query_ind.cc_flags;
 		mprim.addr.len = m->query_ind.cc_addr_length;
-		bcopy((char *) &m->query_ind + m->query_ind.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->query_ind + m->query_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_QUERY_CON:
-		printf
-		    ("<--QUERY-OK---------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--QUERY-OK---------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_QUERY_CON;
 		mprim.flags = m->query_con.cc_flags;
 		mprim.addr.len = m->query_con.cc_addr_length;
-		bcopy((char *) &m->query_con + m->query_con.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->query_con + m->query_con.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		break;
 	case CC_STOP_IND:
-		printf
-		    ("<--STOP-------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--STOP-------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_STOP_IND;
 		break;
@@ -5728,225 +4629,152 @@ iut_mgm_decode_msg(struct strbuf ctrl, struct strbuf data)
 		mprim.reason = m->maint_ind.cc_reason;
 		mprim.call_ref = m->maint_ind.cc_call_ref;
 		mprim.addr.len = m->maint_ind.cc_addr_length;
-		bcopy((char *) &m->maint_ind + m->maint_ind.cc_addr_offset, &mprim.addr.add,
-		      mprim.addr.len);
+		bcopy((char *) &m->maint_ind + m->maint_ind.cc_addr_offset, &mprim.addr.add, mprim.addr.len);
 		switch (m->maint_ind.cc_reason) {
 		case ISUP_MAINT_T5_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t5 timeout)                  |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t5 timeout)                  |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T13_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t13 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t13 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T15_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t15 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t15 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T17_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t17 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t17 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T19_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t19 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t19 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T21_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t21 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t21 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T23_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t23 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t23 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T25_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t25 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t25 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T26_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t26 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t26 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T27_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t27 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t27 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T28_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t28 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t28 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_T36_TIMEOUT:
-			printf
-			    ("<--MAINT------------+--| (t36 timeout)                 |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (t36 timeout)                 |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGBA:
-			printf
-			    ("<--MAINT------------+--| (unexpected cgba)             |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (unexpected cgba)             |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_CGUA:
-			printf
-			    ("<--MAINT------------+--| (unexpected cgua)             |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (unexpected cgua)             |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_MESSAGE:
-			printf
-			    ("<--MAINT------------+--| (unexpected message)          |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (unexpected message)          |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEQUIPPED_CIC:
 			a = (isup_addr_t *) (((unsigned char *) m) + m->maint_ind.cc_addr_offset);
-			printf
-			    ("<--MAINT------------|  | (unequipped cic = %5ld)      |                    (%d)\n",
-			     a->cic, state);
+			printf("<--MAINT------------|  | (unequipped cic = %5ld)      |                    (%d)\n", a->cic, state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_SEGMENTATION_DISCARDED:
-			printf
-			    ("<--MAINT------------+--| (segmentation discarded)      |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (segmentation discarded)      |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNEQUIPPED:
-			printf
-			    ("<--MAINT------------+--| (user part unequipped)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (user part unequipped)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNAVAILABLE:
-			printf
-			    ("<--MAINT------------+--| (user part unavailable)       |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (user part unavailable)       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_AVAILABLE:
-			printf
-			    ("<--MAINT------------+--| (user part available)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (user part available)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_MAN_MADE_BUSY:
-			printf
-			    ("<--MAINT------------+--| (user part man made busy)     |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (user part man made busy)     |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_CONGESTED:
-			printf
-			    ("<--MAINT------------+--| (user part congested)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (user part congested)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_USER_PART_UNCONGESTED:
-			printf
-			    ("<--MAINT------------+--| (user part uncongested)       |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (user part uncongested)       |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGBA:
-			printf
-			    ("<--MAINT------------+--| (missing ack in cgba)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (missing ack in cgba)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_MISSING_ACK_IN_CGUA:
-			printf
-			    ("<--MAINT------------+--| (missing ack in cgua)         |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (missing ack in cgua)         |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGBA:
-			printf
-			    ("<--MAINT------------+--| (abnormal ack in cgba)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (abnormal ack in cgba)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_ABNORMAL_ACK_IN_CGUA:
-			printf
-			    ("<--MAINT------------+--| (abnormal ack in cgua)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (abnormal ack in cgua)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_BLA:
-			printf
-			    ("<--MAINT------------+--| (unexpected bla)              |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (unexpected bla)              |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_UNEXPECTED_UBA:
-			printf
-			    ("<--MAINT------------+--| (unexpected uba)              |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (unexpected uba)              |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_UNREC_INFO:
-			printf
-			    ("<--MAINT------------+--| (unrecognized information)    |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (unrecognized information)    |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_RELEASE_FAILURE:
-			printf
-			    ("<--MAINT------------+--| (release failure)             |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (release failure)             |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		case ISUP_MAINT_MESSAGE_FORMAT_ERROR:
-			printf
-			    ("<--MAINT------------+--| (message format error)        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (message format error)        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			break;
 		default:
-			printf
-			    ("<--MAINT------------+--| (\?\?\?\?)                        |                    (%d)\n",
-			     state);
+			printf("<--MAINT------------+--| (\?\?\?\?)                        |                    (%d)\n", state);
 			FFLUSH(stdout);
 			return (FAILURE);
 		}
 		if (verbose)
-			printf
-			    ("call ref = %-4ld     |  |                               |                    \n",
-			     mprim.call_ref);
+			printf("call ref = %-4ld     |  |                               |                    \n", mprim.call_ref);
 		break;
 	case CC_START_RESET_IND:
-		printf
-		    ("<--START-RESET------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--START-RESET------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		ret = MGM_START_RESET_IND;
 		break;
 	default:
-		printf
-		    ("<--\?\?\?\?-------------+--|                               |                    (%d)\n",
-		     state);
+		printf("<--\?\?\?\?-------------+--|                               |                    (%d)\n", state);
 		FFLUSH(stdout);
 		return (UNKNOWN);
 	}
@@ -5974,12 +4802,11 @@ wait_event(int wait, int source)
 			{iut_mgm_fd, POLLIN | POLLPRI, 0},
 			{iut_mnt_fd, POLLIN | POLLPRI, 0}
 		};
+
 		if (timer_timeout) {
 			timer_timeout = 0;
 			if (show_timeout || verbose) {
-				printf
-				    ("++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++(%d)\n",
-				     state);
+				printf("++++++++++++++++++++|++|+++++++++ TIMEOUT! ++++++++++++|++++++++++++++++++++(%d)\n", state);
 				FFLUSH(stdout);
 				show_timeout--;
 			}
@@ -5989,46 +4816,32 @@ wait_event(int wait, int source)
 		// printf("polling:\n");
 		// FFLUSH(stdout);
 		pfd[0].fd = pt_fd;
-		pfd[0].events =
-		    (source & PT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR
-				     | POLLHUP) : 0;
+		pfd[0].events = (source & PT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
 		pfd[0].revents = 0;
 		pfd[1].fd = iut_cpc_fd;
-		pfd[1].events =
-		    (source & CPC) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR
-				      | POLLHUP) : 0;
+		pfd[1].events = (source & CPC) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
 		pfd[1].revents = 0;
 		pfd[2].fd = iut_tst_fd;
-		pfd[2].events =
-		    (source & TST) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR
-				      | POLLHUP) : 0;
+		pfd[2].events = (source & TST) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
 		pfd[2].revents = 0;
 		pfd[3].fd = iut_mgm_fd;
-		pfd[3].events =
-		    (source & MGM) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR
-				      | POLLHUP) : 0;
+		pfd[3].events = (source & MGM) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
 		pfd[3].revents = 0;
 		pfd[4].fd = iut_mnt_fd;
-		pfd[4].events =
-		    (source & MNT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR
-				      | POLLHUP) : 0;
+		pfd[4].events = (source & MNT) ? (POLLIN | POLLPRI | POLLRDNORM | POLLRDBAND | POLLMSG | POLLERR | POLLHUP) : 0;
 		pfd[4].revents = 0;
 		switch (poll(pfd, 5, wait)) {
 		case -1:
 			if ((errno == EAGAIN || errno == EINTR))
 				break;
 			if (verbose) {
-				printf
-				    ("X-X-X-X-X-X-X-X-X-X-|-X|X-X-X-X-X- ERROR! -X-X-X-X-X-X-|-X-X-X-X-X-X-X-X-X-X(%d)\n",
-				     state);
+				printf("X-X-X-X-X-X-X-X-X-X-|-X|X-X-X-X-X- ERROR! -X-X-X-X-X-X-|-X-X-X-X-X-X-X-X-X-X(%d)\n", state);
 				FFLUSH(stdout);
 			}
 			break;
 		case 0:
 			if (verbose) {
-				printf
-				    ("- - - - - - - - - - | -|- - - - - nothing! - - - - - - | - - - - - - - - - -(%d)\n",
-				     state);
+				printf("- - - - - - - - - - | -|- - - - - nothing! - - - - - - | - - - - - - - - - -(%d)\n", state);
 				FFLUSH(stdout);
 			}
 			last_event = NO_MSG;
@@ -6042,20 +4855,19 @@ wait_event(int wait, int source)
 			// FFLUSH(stdout);
 			if (pfd[4].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
+
 				// printf("getmsg from iut_mgm:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_mnt_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
 					// FFLUSH(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event =
-						     iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event =
-						     iut_mgm_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_data(data)) != UNKNOWN)
 							return time_event(last_event);
 					}
 				}
@@ -6064,20 +4876,19 @@ wait_event(int wait, int source)
 			// FFLUSH(stdout);
 			if (pfd[3].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
+
 				// printf("getmsg from iut_mgm:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_mgm_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
 					// FFLUSH(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event =
-						     iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event =
-						     iut_mgm_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_data(data)) != UNKNOWN)
 							return time_event(last_event);
 					}
 				}
@@ -6086,56 +4897,54 @@ wait_event(int wait, int source)
 			// FFLUSH(stdout);
 			if (pfd[2].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
+
 				// printf("getmsg from iut_mgm:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_tst_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
 					// FFLUSH(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event =
-						     iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_msg(ctrl, data)) != UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event =
-						     iut_mgm_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_mgm_decode_data(data)) != UNKNOWN)
 							return time_event(last_event);
 					}
 				}
 			}
 			if (pfd[1].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, (char *)iut_ctl };
-				struct strbuf data = { BUFSIZE, 0, (char *)iut_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *) iut_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *) iut_dat };
+
 				// printf("getmsg from iut:\n");
 				// FFLUSH(stdout);
 				if (getmsg(iut_cpc_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from iut [%d,%d]:\n",ctrl.len,data.len);
 					// FFLUSH(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event =
-						     iut_cpc_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = iut_cpc_decode_msg(ctrl, data)) != UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
-						if ((last_event =
-						     iut_cpc_decode_data(data)) != UNKNOWN)
+						if ((last_event = iut_cpc_decode_data(data)) != UNKNOWN)
 							return time_event(last_event);
 					}
 				}
 			}
 			if (pfd[0].revents) {
 				int flags = 0;
-				struct strbuf ctrl = { BUFSIZE, 0, (char *)pt_ctl };
-				struct strbuf data = { BUFSIZE, 0, (char *)pt_dat };
+				struct strbuf ctrl = { BUFSIZE, 0, (char *) pt_ctl };
+				struct strbuf data = { BUFSIZE, 0, (char *) pt_dat };
+
 				// printf("getmsg from pt:\n");
 				// FFLUSH(stdout);
 				if (getmsg(pt_fd, &ctrl, &data, &flags) == 0) {
 					// printf("gotmsg from pt [%d,%d]:\n",ctrl.len,data.len);
 					// FFLUSH(stdout);
 					if (ctrl.len > 0) {
-						if ((last_event =
-						     pt_decode_msg(ctrl, data)) != UNKNOWN)
+						if ((last_event = pt_decode_msg(ctrl, data)) != UNKNOWN)
 							return time_event(last_event);
 					} else if (data.len > 0) {
 						if ((last_event = pt_decode_data(data)) != UNKNOWN)
@@ -6324,9 +5133,7 @@ test_case_1_1(void)
 	state = 0;
 	pmsg.cic = 16;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -7123,9 +5930,7 @@ test_case_1_3_2_4(void)
 		return FAILURE;
 	state = 5;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -7149,9 +5954,7 @@ test_case_1_3_2_4(void)
 	if (cpc_event() != CPC_OK_ACK)
 		return (FAILURE);
 	state = 12;
-	cprim.flags =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	cprim.flags = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
@@ -7242,9 +6045,7 @@ test_case_1_3_2_5(void)
 		return FAILURE;
 	state = 10;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -7277,9 +6078,7 @@ test_case_1_3_2_5(void)
 		return FAILURE;
 	state = 12;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 13;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -7658,9 +6457,7 @@ test_case_1_4_5(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = ISUP_NCI_CONT_CHECK_REQUIRED;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -8049,9 +6846,7 @@ test_case_2_1_1(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x19;
@@ -8077,9 +6872,7 @@ test_case_2_1_1(void)
 		return FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -8127,9 +6920,7 @@ test_case_2_1_2(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x19;
@@ -8155,9 +6946,7 @@ test_case_2_1_2(void)
 		return FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -8211,9 +7000,7 @@ test_case_2_2_1a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -8246,9 +7033,7 @@ test_case_2_2_1a(void)
 		return FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -8298,9 +7083,7 @@ test_case_2_2_1b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -8316,9 +7099,7 @@ test_case_2_2_1b(void)
 	if (cpc_event() != CPC_OK_ACK)
 		return FAILURE;
 	state = 4;
-	cprim.flags =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	cprim.flags = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
@@ -8374,9 +7155,7 @@ test_case_2_2_2a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -8421,9 +7200,7 @@ test_case_2_2_2a(void)
 		return FAILURE;
 	state = 4;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 5;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -8472,9 +7249,7 @@ test_case_2_2_2b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -8497,9 +7272,7 @@ test_case_2_2_2b(void)
 	if (cpc_event() != CPC_INFORMATION_IND)
 		return FAILURE;
 	state = 6;
-	cprim.flags =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	cprim.flags = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	cprim.opt.len = 0;
 	iut_cpc_signal(ALERTING_REQ);
 	if (cpc_event() != CPC_OK_ACK)
@@ -8556,9 +7329,7 @@ test_case_2_3_1x(ulong bci)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -8707,9 +7478,7 @@ test_case_2_3_1y(ulong bci)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -8837,9 +7606,7 @@ test_case_2_3_2x(ulong evnt)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -8872,9 +7639,7 @@ test_case_2_3_2x(ulong evnt)
 		return FAILURE;
 	state = 2;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_ORDINARY_SUBSCRIBER | ((evnt != ISUP_EVNT_PROGRESS) ? 0 :
-					    ISUP_BCI_SUBSCRIBER_FREE);
+	pmsg.bci = ISUP_BCI_ORDINARY_SUBSCRIBER | ((evnt != ISUP_EVNT_PROGRESS) ? 0 : ISUP_BCI_SUBSCRIBER_FREE);
 	send(ACM);
 	state = 3;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -8983,9 +7748,7 @@ test_case_2_3_2y(ulong evnt)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -9145,9 +7908,7 @@ test_case_2_3_3a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -9222,9 +7983,7 @@ test_case_2_3_3b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -9288,10 +8047,7 @@ test_case_2_3_4a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_NCI_ONE_SATELLITE_CCT | ISUP_FCI_INTERNATIONAL_CALL |
-	    ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN |
-	    ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_NCI_ONE_SATELLITE_CCT | ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -9374,9 +8130,7 @@ test_case_2_3_4b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = ISUP_NCI_ONE_SATELLITE_CCT;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -9449,9 +8203,7 @@ test_case_2_3_5a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -9566,9 +8318,7 @@ test_case_2_3_5b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -9672,9 +8422,7 @@ test_case_2_3_6a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -9784,9 +8532,7 @@ test_case_2_3_6b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -9953,9 +8699,7 @@ test_case_3_1a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -10019,9 +8763,7 @@ test_case_3_1b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -10072,9 +8814,7 @@ test_case_3_2a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -10150,9 +8890,7 @@ test_case_3_2b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -10213,9 +8951,7 @@ test_case_3_3a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -10296,9 +9032,7 @@ test_case_3_3b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -10369,9 +9103,7 @@ test_case_3_4a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -10458,9 +9190,7 @@ test_case_3_4b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -10530,9 +9260,7 @@ test_case_3_5a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -10627,9 +9355,7 @@ test_case_3_5b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -10715,9 +9441,7 @@ test_case_3_6a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -10815,9 +9539,7 @@ test_case_3_6b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -10906,9 +9628,7 @@ test_case_3_7a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11004,9 +9724,7 @@ test_case_3_7b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -11092,9 +9810,7 @@ test_case_3_8a(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11184,9 +9900,7 @@ test_case_3_8b(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11276,9 +9990,7 @@ test_case_4_1x(ulong cause)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11348,9 +10060,7 @@ test_case_4_1y(ulong cause)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11523,9 +10233,7 @@ test_case_5_2_1(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11595,9 +10303,7 @@ test_case_5_2_2(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11677,15 +10383,14 @@ test_case_5_2_3(void)
 {
 	int subsequent_t1_expiry = 0;
 	unsigned long t1_time = now(), t5_time = now(), rel_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
 		case 0:
 			pmsg.cic = 12;
 			pmsg.nci = 0;
-			pmsg.fci =
-			    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-			     ISUP_FCI_ORIGINATING_ACCESS_ISDN) >> 8;
+			pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN) >> 8;
 			pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 			pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
 			strncpy(pmsg.cdpn.num, "17805551212/", 24);
@@ -11752,9 +10457,7 @@ test_case_5_2_3(void)
 			switch (pt_event()) {
 			case REL:
 				rel_time = now();
-				if (check_time
-				    ("  T1  ", rel_time - t1_time, timer[t1].lo,
-				     timer[t1].hi) != SUCCESS)
+				if (check_time("  T1  ", rel_time - t1_time, timer[t1].lo, timer[t1].hi) != SUCCESS)
 					goto failure;
 				t1_time = milliseconds_2nd("  T1  ");
 				start_st(timer[t1].hi);
@@ -11777,8 +10480,7 @@ test_case_5_2_3(void)
 			break;
 		case 17:
 		      state_17:
-			if (check_time("  T5  ", now() - t5_time, timer[t5].lo, timer[t5].hi) !=
-			    SUCCESS)
+			if (check_time("  T5  ", now() - t5_time, timer[t5].lo, timer[t5].hi) != SUCCESS)
 				goto failure;
 			start_st(timer[t5].hi);
 			state = 18;
@@ -11820,9 +10522,7 @@ test_case_5_2_4(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -11921,9 +10621,7 @@ test_case_5_2_5a(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = ISUP_NCI_CONT_CHECK_REQUIRED;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -11979,9 +10677,7 @@ test_case_5_2_5b(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = ISUP_NCI_CONT_CHECK_PREVIOUS;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -12023,6 +10719,7 @@ static int
 test_case_5_2_6(void)
 {
 	unsigned long t12_time = now(), t13_time = now(), blo_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
@@ -12044,9 +10741,7 @@ test_case_5_2_6(void)
 			switch (any_event()) {
 			case BLO:
 				blo_time = now();
-				if (check_time
-				    (" T12  ", blo_time - t12_time, timer[t12].lo,
-				     timer[t12].hi) != SUCCESS) {
+				if (check_time(" T12  ", blo_time - t12_time, timer[t12].lo, timer[t12].hi) != SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -12067,8 +10762,7 @@ test_case_5_2_6(void)
 			state = 3;
 			break;
 		case 3:
-			if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) !=
-			    SUCCESS)
+			if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) != SUCCESS)
 				goto failure;
 			t13_time = milliseconds(" T13  ");
 			start_st(timer[t13].hi);
@@ -12078,9 +10772,7 @@ test_case_5_2_6(void)
 			switch (any_event()) {
 			case BLO:
 				blo_time = now();
-				if (check_time
-				    (" T13  ", now() - t13_time, timer[t13].lo,
-				     timer[t13].hi) != SUCCESS)
+				if (check_time(" T13  ", now() - t13_time, timer[t13].lo, timer[t13].hi) != SUCCESS)
 					goto failure;
 				t13_time = milliseconds(" T13  ");
 				start_st(timer[t13].hi);
@@ -12121,6 +10813,7 @@ static int
 test_case_5_2_7(void)
 {
 	unsigned long t14_time = now(), t15_time = now(), ubl_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
@@ -12160,9 +10853,7 @@ test_case_5_2_7(void)
 			switch (any_event()) {
 			case UBL:
 				ubl_time = now();
-				if (check_time
-				    (" T14  ", ubl_time - t14_time, timer[t14].lo,
-				     timer[t14].hi) != SUCCESS) {
+				if (check_time(" T14  ", ubl_time - t14_time, timer[t14].lo, timer[t14].hi) != SUCCESS) {
 					state = 5;
 					break;
 				}
@@ -12194,9 +10885,7 @@ test_case_5_2_7(void)
 			switch (any_event()) {
 			case UBL:
 				ubl_time = now();
-				if (check_time
-				    (" T15  ", ubl_time - t15_time, timer[t15].lo,
-				     timer[t15].hi) != SUCCESS)
+				if (check_time(" T15  ", ubl_time - t15_time, timer[t15].lo, timer[t15].hi) != SUCCESS)
 					goto failure;
 				t15_time = milliseconds(" T15  ");
 				start_st(timer[t15].hi);
@@ -12233,6 +10922,7 @@ static int
 test_case_5_2_8(void)
 {
 	unsigned long t16_time = now(), t17_time = now(), rsc_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
@@ -12254,9 +10944,7 @@ test_case_5_2_8(void)
 			switch (any_event()) {
 			case RSC:
 				rsc_time = now();
-				if (check_time
-				    (" T16  ", rsc_time - t16_time, timer[t16].lo,
-				     timer[t16].hi) != SUCCESS) {
+				if (check_time(" T16  ", rsc_time - t16_time, timer[t16].lo, timer[t16].hi) != SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -12286,9 +10974,7 @@ test_case_5_2_8(void)
 			switch (any_event()) {
 			case RSC:
 				rsc_time = now();
-				if (check_time
-				    (" T17  ", rsc_time - t17_time, timer[t17].lo,
-				     timer[t17].hi) != SUCCESS)
+				if (check_time(" T17  ", rsc_time - t17_time, timer[t17].lo, timer[t17].hi) != SUCCESS)
 					goto failure;
 				t17_time = milliseconds(" T17  ");
 				start_st(timer[t17].hi);
@@ -12325,6 +11011,7 @@ static int
 test_case_5_2_9(void)
 {
 	unsigned long t18_time = now(), t19_time = now(), cgb_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
@@ -12346,9 +11033,7 @@ test_case_5_2_9(void)
 			switch (any_event()) {
 			case CGB:
 				cgb_time = now();
-				if (check_time
-				    (" T18  ", cgb_time - t18_time, timer[t18].lo,
-				     timer[t18].hi) != SUCCESS) {
+				if (check_time(" T18  ", cgb_time - t18_time, timer[t18].lo, timer[t18].hi) != SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -12378,9 +11063,7 @@ test_case_5_2_9(void)
 			switch (any_event()) {
 			case CGB:
 				cgb_time = now();
-				if (check_time
-				    (" T19  ", cgb_time - t19_time, timer[t19].lo,
-				     timer[t19].hi) != SUCCESS)
+				if (check_time(" T19  ", cgb_time - t19_time, timer[t19].lo, timer[t19].hi) != SUCCESS)
 					goto failure;
 				t19_time = milliseconds(" T19  ");
 				start_st(timer[t19].hi);
@@ -12426,6 +11109,7 @@ static int
 test_case_5_2_10(void)
 {
 	unsigned long t20_time = now(), t21_time = now(), cgu_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
@@ -12466,9 +11150,7 @@ test_case_5_2_10(void)
 			switch (any_event()) {
 			case CGU:
 				cgu_time = now();
-				if (check_time
-				    (" T20  ", cgu_time - t20_time, timer[t20].lo,
-				     timer[t20].hi) != SUCCESS) {
+				if (check_time(" T20  ", cgu_time - t20_time, timer[t20].lo, timer[t20].hi) != SUCCESS) {
 					state = 5;
 					break;
 				}
@@ -12498,9 +11180,7 @@ test_case_5_2_10(void)
 			switch (any_event()) {
 			case CGU:
 				cgu_time = now();
-				if (check_time
-				    (" T21  ", cgu_time - t21_time, timer[t21].lo,
-				     timer[t21].hi) != SUCCESS)
+				if (check_time(" T21  ", cgu_time - t21_time, timer[t21].lo, timer[t21].hi) != SUCCESS)
 					goto failure;
 				t21_time = milliseconds(" T21  ");
 				start_st(timer[t21].hi);
@@ -12542,6 +11222,7 @@ static int
 test_case_5_2_11(void)
 {
 	unsigned long t22_time = now(), t23_time = now(), grs_time = now();
+
 	state = 0;
 	for (;;) {
 		switch (state) {
@@ -12563,9 +11244,7 @@ test_case_5_2_11(void)
 			switch (any_event()) {
 			case GRS:
 				grs_time = now();
-				if (check_time
-				    (" T22  ", grs_time - t22_time, timer[t22].lo,
-				     timer[t22].hi) != SUCCESS) {
+				if (check_time(" T22  ", grs_time - t22_time, timer[t22].lo, timer[t22].hi) != SUCCESS) {
 					state = 3;
 					break;
 				}
@@ -12595,9 +11274,7 @@ test_case_5_2_11(void)
 			switch (any_event()) {
 			case GRS:
 				grs_time = now();
-				if (check_time
-				    (" T23  ", grs_time - t23_time, timer[t23].lo,
-				     timer[t23].hi) != SUCCESS)
+				if (check_time(" T23  ", grs_time - t23_time, timer[t23].lo, timer[t23].hi) != SUCCESS)
 					goto failure;
 				t23_time = milliseconds(" T23  ");
 				start_st(timer[t23].hi);
@@ -12646,9 +11323,7 @@ test_case_5_3_1(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -12732,9 +11407,7 @@ test_case_5_3_2(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -12809,10 +11482,7 @@ test_case_6_1_1(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY |
-	    ISUP_NCI_CONT_CHECK_REQUIRED;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY | ISUP_NCI_CONT_CHECK_REQUIRED;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -12859,9 +11529,7 @@ test_case_6_1_1(void)
 		return FAILURE;
 	state = 7;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -12910,9 +11578,7 @@ test_case_6_1_2(void)
 	state = 0;
 	pmsg.cic = 12;
 	pmsg.nci = ISUP_NCI_CONT_CHECK_PREVIOUS;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -13000,10 +11666,7 @@ test_case_6_1_3(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY |
-	    ISUP_NCI_CONT_CHECK_REQUIRED;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY | ISUP_NCI_CONT_CHECK_REQUIRED;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13074,10 +11737,7 @@ test_case_6_1_4(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY |
-	    ISUP_NCI_CONT_CHECK_REQUIRED;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY | ISUP_NCI_CONT_CHECK_REQUIRED;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13124,9 +11784,7 @@ test_case_6_1_4(void)
 		return FAILURE;
 	state = 7;
 	pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 8;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -13174,10 +11832,7 @@ test_case_6_1_5(void)
 {
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY |
-	    ISUP_NCI_CONT_CHECK_REQUIRED;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY | ISUP_NCI_CONT_CHECK_REQUIRED;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13298,11 +11953,10 @@ static int
 test_case_6_2_1(void)
 {
 	ulong cicx = 31, cicy = 30;
+
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13336,9 +11990,7 @@ test_case_6_2_1(void)
 	state = 2;
 	cicx = pmsg.cic = imsg.cic;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -13380,9 +12032,7 @@ test_case_6_2_1(void)
 	iut_cpc_signal(COMMUNICATION);
 	state = 15;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13415,9 +12065,7 @@ test_case_6_2_1(void)
 		goto failure;
 	state = 17;
 	cicy = pmsg.cic = imsg.cic;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 18;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -13491,11 +12139,10 @@ static int
 test_case_6_2_2(void)
 {
 	ulong cic = 31;
+
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13551,9 +12198,7 @@ test_case_6_2_2(void)
 	send(RLC);
 	state = 11;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13649,11 +12294,10 @@ static int
 test_case_6_2_3(void)
 {
 	ulong cic = 31;
+
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13704,9 +12348,7 @@ test_case_6_2_3(void)
 		return FAILURE;
 	state = 9;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13787,12 +12429,10 @@ static int
 test_case_6_2_4(void)
 {
 	ulong cicx, cicy;
+
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY |
-	    ISUP_NCI_CONT_CHECK_REQUIRED;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY | ISUP_NCI_CONT_CHECK_REQUIRED;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13850,10 +12490,7 @@ test_case_6_2_4(void)
 	state = 11;
 	start_st(timer[t25].hi + 100);
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY |
-	    ISUP_NCI_CONT_CHECK_REQUIRED;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY | ISUP_NCI_CONT_CHECK_REQUIRED;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -13970,11 +12607,10 @@ static int
 test_case_6_2_5(void)
 {
 	ulong cicx = 31, cicy = 30;
+
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -14021,9 +12657,7 @@ test_case_6_2_5(void)
 	send(RLC);
 	state = 7;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -14113,14 +12747,13 @@ static int
 test_case_6_3_1(void)
 {
 	ulong cicx = 31;
+
 	iut_tg_opt.flags |= ISUP_TGF_GLARE_PRIORITY;
 	if (iut_option() != SUCCESS)
 		return INCONCLUSIVE;
 	state = 0;
 	cprim.call_type = ISUP_CALL_TYPE_SPEECH;
-	cprim.call_flags =
-	    ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	    ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
+	cprim.call_flags = ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN | ISUP_CPC_SUBSCRIBER_ORDINARY;
 	cprim.cdpn.buf[0] = 0x00;
 	cprim.cdpn.buf[1] = 0x10;
 	cprim.cdpn.buf[2] = 0x71;
@@ -14154,9 +12787,7 @@ test_case_6_3_1(void)
 	state = 2;
 	cicx = pmsg.cic = imsg.cic;
 	pmsg.nci = 0;
-	pmsg.fci =
-	    (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY |
-	     ISUP_FCI_ORIGINATING_ACCESS_ISDN)
+	pmsg.fci = (ISUP_FCI_INTERNATIONAL_CALL | ISUP_FCI_ISDN_USER_PART_ALL_THE_WAY | ISUP_FCI_ORIGINATING_ACCESS_ISDN)
 	    >> 8;
 	pmsg.cpc = (ISUP_CPC_SUBSCRIBER_ORDINARY) >> 24;
 	pmsg.tmr = ISUP_CALL_TYPE_SPEECH;
@@ -14164,9 +12795,7 @@ test_case_6_3_1(void)
 	pmsg.cdpn.len = strnlen(pmsg.cdpn.num, 24);
 	send(IAM);
 	state = 3;
-	pmsg.bci =
-	    ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER |
-	    ISUP_BCI_TERMINATING_ACCESS_ISDN;
+	pmsg.bci = ISUP_BCI_SUBSCRIBER_FREE | ISUP_BCI_ORDINARY_SUBSCRIBER | ISUP_BCI_TERMINATING_ACCESS_ISDN;
 	send(ACM);
 	state = 4;
 	if (cpc_event() != CPC_SETUP_CON)
@@ -14556,6 +13185,7 @@ static int
 test_case_8_2_3(void)
 {
 	long upt_time = now(), t4_time = now();
+
 	state = 0;
 	send(USER_PART_UNAVAILABLE);
 	state = 1;
@@ -14617,44 +13247,36 @@ static int
 pt_open(void)
 {
 	int pfd[2];
+
 	if (verbose > 1) {
-		printf
-		    ("                    .  .                            X--X---pipe()           (%d)\n",
-		     state);
+		printf("                    .  .                            X--X---pipe()           (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if ((pipe(pfd) < 0)) {
 		printf("                                              ****ERROR: pipe failed\n");
-		printf("                                              ****ERROR: %s; %s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	pt_fd = pfd[0];
 	pt_lnk_fd = pfd[1];
 	if (verbose > 1) {
-		printf
-		    ("                    .  .                            |  |<--I_SRDOPT---------(%d)\n",
-		     state);
+		printf("                    .  .                            |  |<--I_SRDOPT---------(%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(pt_fd, I_SRDOPT, RMSGD) < 0) {
 		printf("                                              ****ERROR: ioctl failed\n");
-		printf("                                              ****ERROR: %s; %s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("                    .  .                            |  |<--I_PUSH-----------(%d)\n",
-		     state);
+		printf("                    .  .                            |  |<--I_PUSH-----------(%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(pt_fd, I_PUSH, "pipemod") < 0) {
 		printf("                                              ****ERROR: push failed\n");
-		printf("                                              ****ERROR: %s; %s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -14665,37 +13287,28 @@ static int
 pt_close(void)
 {
 	if (verbose > 1) {
-		printf
-		    ("                    .  .                            |  |<--I_POP------------(%d)\n",
-		     state);
+		printf("                    .  .                            |  |<--I_POP------------(%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(pt_fd, I_POP, 0) < 0) {
 		printf("                                              ****ERROR: pop failed\n");
-		printf("                                              ****ERROR: %s; %s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("                    .  .                            X--X---close()          (%d)\n",
-		     state);
+		printf("                    .  .                            X--X---close()          (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (close(pt_fd) < 0) {
-		printf
-		    ("                                              ****ERROR: close pipe[0] failed\n");
-		printf("                                              ****ERROR: %s; %s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                                              ****ERROR: close pipe[0] failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 	if (close(pt_lnk_fd) < 0) {
-		printf
-		    ("                                              ****ERROR: close pipe[1] failed\n");
-		printf("                                              ****ERROR: %s; %s\n",
-		       __FUNCTION__, strerror(errno));
+		printf("                                              ****ERROR: close pipe[1] failed\n");
+		printf("                                              ****ERROR: %s; %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -14725,9 +13338,7 @@ static int
 iut_open(void)
 {
 	if (verbose > 1) {
-		printf
-		    ("---open()-----------X  .                            |  |                    (%d)\n",
-		     state);
+		printf("---open()-----------X  .                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if ((iut_cpc_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
@@ -14737,9 +13348,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---open()-tst-------+--X                            |  |                    (%d)\n",
-		     state);
+		printf("---open()-tst-------+--X                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if ((iut_tst_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
@@ -14749,9 +13358,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---open()-mgm-------+--X                            |  |                    (%d)\n",
-		     state);
+		printf("---open()-mgm-------+--X                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if ((iut_mgm_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
@@ -14761,9 +13368,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---open()-mnt-------+--X                            |  |                    (%d)\n",
-		     state);
+		printf("---open()-mnt-------+--X                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if ((iut_mnt_fd = open("/dev/isup", O_NONBLOCK | O_RDWR)) < 0) {
@@ -14773,9 +13378,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---I_SRDOPT-------->|  |                            |  |                    (%d)\n",
-		     state);
+		printf("---I_SRDOPT-------->|  |                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_cpc_fd, I_SRDOPT, RMSGD) < 0) {
@@ -14785,9 +13388,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---I_SRDOPT-tst-----+->|                            |  |                    (%d)\n",
-		     state);
+		printf("---I_SRDOPT-tst-----+->|                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_tst_fd, I_SRDOPT, RMSGD) < 0) {
@@ -14797,9 +13398,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---I_SRDOPT-mgm-----+->|                            |  |                    (%d)\n",
-		     state);
+		printf("---I_SRDOPT-mgm-----+->|                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_SRDOPT, RMSGD) < 0) {
@@ -14809,9 +13408,7 @@ iut_open(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---I_SRDOPT-mnt-----+->|                            |  |                    (%d)\n",
-		     state);
+		printf("---I_SRDOPT-mnt-----+->|                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mnt_fd, I_SRDOPT, RMSGD) < 0) {
@@ -14827,9 +13424,7 @@ static int
 iut_close(void)
 {
 	if (verbose > 1) {
-		printf
-		    ("---close()----------+--X                            |  |                    (%d)\n",
-		     state);
+		printf("---close()----------+--X                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (close(iut_mnt_fd) < 0) {
@@ -14839,9 +13434,7 @@ iut_close(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---close()----------+--X                            |  |                    (%d)\n",
-		     state);
+		printf("---close()----------+--X                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (close(iut_mgm_fd) < 0) {
@@ -14851,9 +13444,7 @@ iut_close(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---close()----------+--X                            |  |                    (%d)\n",
-		     state);
+		printf("---close()----------+--X                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (close(iut_tst_fd) < 0) {
@@ -14863,9 +13454,7 @@ iut_close(void)
 		return FAILURE;
 	}
 	if (verbose > 1) {
-		printf
-		    ("---close()----------X  .                            |  |                    (%d)\n",
-		     state);
+		printf("---close()----------X  .                            |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (close(iut_cpc_fd) < 0) {
@@ -14902,6 +13491,7 @@ iut_config(void)
 		struct isup_config conf;
 		struct isup_conf_ct ct;
 	} conf_ct;
+
 	conf_sp.conf.type = ISUP_OBJ_TYPE_SP;
 	conf_sp.conf.id = 1;
 	conf_sp.conf.cmd = ISUP_ADD;
@@ -14913,9 +13503,7 @@ iut_config(void)
 	ioc.ic_len = sizeof(conf_sp);
 	ioc.ic_dp = (char *) &conf_sp;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sp = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sp = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -14936,9 +13524,7 @@ iut_config(void)
 	ioc.ic_len = sizeof(conf_sr);
 	ioc.ic_dp = (char *) &conf_sr;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sr = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD sr = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -14958,9 +13544,7 @@ iut_config(void)
 	ioc.ic_len = sizeof(conf_tg);
 	ioc.ic_dp = (char *) &conf_tg;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSCONFIG--+->| (ISUP_ADD tg = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD tg = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -14980,9 +13564,7 @@ iut_config(void)
 	ioc.ic_len = sizeof(conf_cg);
 	ioc.ic_dp = (char *) &conf_cg;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSCONFIG--+->| (ISUP_ADD cg = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD cg = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15005,9 +13587,7 @@ iut_config(void)
 		conf_ct.ct.tgid = 1;
 		conf_ct.ct.cic = i;
 		if (verbose > 2) {
-			printf
-			    ("---ISUP_IOCSCONFIG--+->| (ISUP_ADD ct = %2d)         |  |                    (%d)\n",
-			     state, i);
+			printf("---ISUP_IOCSCONFIG--+->| (ISUP_ADD ct = %2d)         |  |                    (%d)\n", state, i);
 			FFLUSH(stdout);
 		}
 		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15026,6 +13606,7 @@ iut_unconfig(void)
 	int i;
 	struct isup_config conf;
 	struct strioctl ioc = { ISUP_IOCCCONFIG, 0, sizeof(conf), (char *) &conf };
+
 	for (i = 1; i < 32; i++) {
 		if (i == 16)
 			continue;
@@ -15033,9 +13614,7 @@ iut_unconfig(void)
 		conf.id = i;
 		conf.cmd = ISUP_DEL;
 		if (verbose > 2) {
-			printf
-			    ("---ISUP_IOCCCONFIG--+->| (ISUP_DEL ct = %2d)         |  |                    (%d)\n",
-			     i, state);
+			printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL ct = %2d)         |  |                    (%d)\n", i, state);
 			FFLUSH(stdout);
 		}
 		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15049,9 +13628,7 @@ iut_unconfig(void)
 	conf.id = 1;
 	conf.cmd = ISUP_DEL;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCCCONFIG--+->| (ISUP_DEL cg = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL cg = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15064,9 +13641,7 @@ iut_unconfig(void)
 	conf.id = 1;
 	conf.cmd = ISUP_DEL;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCCCONFIG--+->| (ISUP_DEL tg = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL tg = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15079,9 +13654,7 @@ iut_unconfig(void)
 	conf.id = 1;
 	conf.cmd = ISUP_DEL;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sr = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sr = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15094,9 +13667,7 @@ iut_unconfig(void)
 	conf.id = 1;
 	conf.cmd = ISUP_DEL;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sp = 1)          |  |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCCCONFIG--+->| (ISUP_DEL sp = 1)          |  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15116,10 +13687,9 @@ iut_link(void)
 		struct isup_conf_mtp mtp;
 	} conf;
 	struct strioctl ioc;
+
 	if (verbose > 1) {
-		printf
-		    ("---I_LINK-----------+->|<---------------------------X  |                    (%d)\n",
-		     state);
+		printf("---I_LINK-----------+->|<---------------------------X  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if ((pt_lnk_id = ioctl(iut_mgm_fd, I_LINK, pt_lnk_fd)) == -1) {
@@ -15141,9 +13711,7 @@ iut_link(void)
 	ioc.ic_len = sizeof(conf);
 	ioc.ic_dp = (char *) &conf;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSCONFIG--+->| ISUP_ADD (mtp = 1)            |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCSCONFIG--+->| ISUP_ADD (mtp = 1)            |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15161,6 +13729,7 @@ iut_unlink(void)
 #if 0
 	struct isup_config conf;
 	struct strioctl ioc;
+
 	conf.type = ISUP_OBJ_TYPE_MT;
 	conf.id = 1;
 	conf.cmd = ISUP_DEL;
@@ -15169,9 +13738,7 @@ iut_unlink(void)
 	ioc.ic_len = sizeof(conf);
 	ioc.ic_dp = (char *) &conf;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCCCONFIG--+->| ISUP_DEL (mtp = 1)            |                    (%d)\n",
-		     state);
+		printf("---ISUP_IOCCCONFIG--+->| ISUP_DEL (mtp = 1)            |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15182,9 +13749,7 @@ iut_unlink(void)
 	}
 #endif
 	if (verbose > 1) {
-		printf
-		    ("---I_UNLINK---------+->|<---------------------------X  |                    (%d)\n",
-		     state);
+		printf("---I_UNLINK---------+->|<---------------------------X  |                    (%d)\n", state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_UNLINK, pt_lnk_id) < 0) {
@@ -15213,6 +13778,7 @@ iut_option(void)
 		} opts;
 	} opt;
 	struct strioctl ioc;
+
 	/* circuit options */
 	opt.opts.ct_opt = iut_ct_opt;
 	ioc.ic_cmd = ISUP_IOCSOPTIONS;
@@ -15225,9 +13791,7 @@ iut_option(void)
 		opt.hdr.type = ISUP_OBJ_TYPE_CT;
 		opt.hdr.id = i;
 		if (verbose > 2) {
-			printf
-			    ("---ISUP_IOCSOPTIONS-+->| ct id = %2d                    |                    (%d)\n",
-			     i, state);
+			printf("---ISUP_IOCSOPTIONS-+->| ct id = %2d                    |                    (%d)\n", i, state);
 			FFLUSH(stdout);
 		}
 		if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15246,9 +13810,7 @@ iut_option(void)
 	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.cg_opt);
 	ioc.ic_dp = (char *) &opt;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSOPTIONS-+->| cg id = %2d                    |                    (%d)\n",
-		     1, state);
+		printf("---ISUP_IOCSOPTIONS-+->| cg id = %2d                    |                    (%d)\n", 1, state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15317,9 +13879,7 @@ iut_option(void)
 	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.tg_opt);
 	ioc.ic_dp = (char *) &opt;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSOPTIONS-+->| tg id = %2d                    |                    (%d)\n",
-		     1, state);
+		printf("---ISUP_IOCSOPTIONS-+->| tg id = %2d                    |                    (%d)\n", 1, state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15356,9 +13916,7 @@ iut_option(void)
 	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.sr_opt);
 	ioc.ic_dp = (char *) &opt;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSOPTIONS-+->| sr id = %2d                    |                    (%d)\n",
-		     1, state);
+		printf("---ISUP_IOCSOPTIONS-+->| sr id = %2d                    |                    (%d)\n", 1, state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15376,9 +13934,7 @@ iut_option(void)
 	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.sp_opt);
 	ioc.ic_dp = (char *) &opt;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSOPTIONS-+->| sp id = %2d                    |                    (%d)\n",
-		     1, state);
+		printf("---ISUP_IOCSOPTIONS-+->| sp id = %2d                    |                    (%d)\n", 1, state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15396,9 +13952,7 @@ iut_option(void)
 	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.mtp_opt);
 	ioc.ic_dp = (char *) &opt;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSOPTIONS-+->| mtp id = %2d                   |                    (%d)\n",
-		     1, state);
+		printf("---ISUP_IOCSOPTIONS-+->| mtp id = %2d                   |                    (%d)\n", 1, state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15416,9 +13970,7 @@ iut_option(void)
 	ioc.ic_len = sizeof(opt.hdr) + sizeof(opt.opts.df_opt);
 	ioc.ic_dp = (char *) &opt;
 	if (verbose > 2) {
-		printf
-		    ("---ISUP_IOCSOPTIONS-+->| df id = %2d                    |                    (%d)\n",
-		     0, state);
+		printf("---ISUP_IOCSOPTIONS-+->| df id = %2d                    |                    (%d)\n", 0, state);
 		FFLUSH(stdout);
 	}
 	if (ioctl(iut_mgm_fd, I_STR, &ioc) < 0) {
@@ -15439,9 +13991,7 @@ iut_bind(void)
 	mprim.addr.len = sizeof(mprim.addr.add);
 	mprim.bind_flags = CC_TOKEN_REQUEST | CC_TEST;
 	iut_tst_signal(BIND_REQ);
-	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) ||
-	    mprim.addr.add.scope != iut_tst_addr.scope || mprim.addr.add.id != iut_tst_addr.id ||
-	    mprim.addr.add.cic != iut_tst_addr.cic)
+	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_tst_addr.scope || mprim.addr.add.id != iut_tst_addr.id || mprim.addr.add.cic != iut_tst_addr.cic)
 		return FAILURE;
 	mprim.addr.add.scope = iut_mgm_addr.scope;
 	mprim.addr.add.id = iut_mgm_addr.id;
@@ -15449,9 +13999,7 @@ iut_bind(void)
 	mprim.addr.len = sizeof(mprim.addr.add);
 	mprim.bind_flags = CC_TOKEN_REQUEST | CC_MANAGEMENT;
 	iut_mgm_signal(BIND_REQ);
-	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) ||
-	    mprim.addr.add.scope != iut_mgm_addr.scope || mprim.addr.add.id != iut_mgm_addr.id ||
-	    mprim.addr.add.cic != iut_mgm_addr.cic)
+	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_mgm_addr.scope || mprim.addr.add.id != iut_mgm_addr.id || mprim.addr.add.cic != iut_mgm_addr.cic)
 		return FAILURE;
 	mprim.addr.add.scope = iut_mnt_addr.scope;
 	mprim.addr.add.id = iut_mnt_addr.id;
@@ -15459,9 +14007,7 @@ iut_bind(void)
 	mprim.addr.len = sizeof(mprim.addr.add);
 	mprim.bind_flags = CC_TOKEN_REQUEST | CC_MAINTENANCE;
 	iut_mnt_signal(BIND_REQ);
-	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) ||
-	    mprim.addr.add.scope != iut_mnt_addr.scope || mprim.addr.add.id != iut_mnt_addr.id ||
-	    mprim.addr.add.cic != iut_mnt_addr.cic)
+	if (any_event() != MGM_BIND_ACK || mprim.addr.len != sizeof(mprim.addr.add) || mprim.addr.add.scope != iut_mnt_addr.scope || mprim.addr.add.id != iut_mnt_addr.id || mprim.addr.add.cic != iut_mnt_addr.cic)
 		return FAILURE;
 	cprim.addr.add.scope = iut_cpc_addr.scope;
 	cprim.addr.add.id = iut_cpc_addr.id;
@@ -15469,9 +14015,7 @@ iut_bind(void)
 	cprim.addr.len = sizeof(cprim.addr.add);
 	cprim.bind_flags = CC_TOKEN_REQUEST;
 	iut_cpc_signal(BIND_REQ);
-	if (any_event() != CPC_BIND_ACK || cprim.addr.len != sizeof(cprim.addr.add) ||
-	    cprim.addr.add.scope != iut_cpc_addr.scope || cprim.addr.add.id != iut_cpc_addr.id ||
-	    cprim.addr.add.cic != iut_cpc_addr.cic)
+	if (any_event() != CPC_BIND_ACK || cprim.addr.len != sizeof(cprim.addr.add) || cprim.addr.add.scope != iut_cpc_addr.scope || cprim.addr.add.id != iut_cpc_addr.id || cprim.addr.add.cic != iut_cpc_addr.cic)
 		return FAILURE;
 #if 0
 	iut_tst_signal(ADDR_REQ);
@@ -15588,22 +14132,14 @@ struct test_case {
 	"1.2.5c.", desc_case_1_2_5c, &preamble_0, &test_case_1_2_5c, &postamble_0, 0, 0}, {
 	"1.2.6.", desc_case_1_2_6, &preamble_0, &test_case_1_2_6, &postamble_0, 0, 0}, {
 	"1.2.7.", desc_case_1_2_7, &preamble_0, &test_case_1_2_7, &postamble_0, 0, 0}, {
-	"1.3.1.1a.", desc_case_1_3_1_1a, &preamble_0, &test_case_1_3_1_1a, &postamble_0, 0, 0},
-	{
-	"1.3.1.1b.", desc_case_1_3_1_1b, &preamble_0, &test_case_1_3_1_1b, &postamble_0, 0, 0},
-	{
-	"1.3.1.1c.", desc_case_1_3_1_1c, &preamble_0, &test_case_1_3_1_1c, &postamble_0, 0, 0},
-	{
-	"1.3.1.1d.", desc_case_1_3_1_1d, &preamble_0, &test_case_1_3_1_1d, &postamble_0, 0, 0},
-	{
-	"1.3.1.1e.", desc_case_1_3_1_1e, &preamble_0, &test_case_1_3_1_1e, &postamble_0, 0, 0},
-	{
-	"1.3.1.1f.", desc_case_1_3_1_1f, &preamble_0, &test_case_1_3_1_1f, &postamble_0, 0, 0},
-	{
-	"1.3.1.2a.", desc_case_1_3_1_2a, &preamble_0, &test_case_1_3_1_2a, &postamble_0, 0, 0},
-	{
-	"1.3.1.2b.", desc_case_1_3_1_2b, &preamble_0, &test_case_1_3_1_2b, &postamble_0, 0, 0},
-	{
+	"1.3.1.1a.", desc_case_1_3_1_1a, &preamble_0, &test_case_1_3_1_1a, &postamble_0, 0, 0}, {
+	"1.3.1.1b.", desc_case_1_3_1_1b, &preamble_0, &test_case_1_3_1_1b, &postamble_0, 0, 0}, {
+	"1.3.1.1c.", desc_case_1_3_1_1c, &preamble_0, &test_case_1_3_1_1c, &postamble_0, 0, 0}, {
+	"1.3.1.1d.", desc_case_1_3_1_1d, &preamble_0, &test_case_1_3_1_1d, &postamble_0, 0, 0}, {
+	"1.3.1.1e.", desc_case_1_3_1_1e, &preamble_0, &test_case_1_3_1_1e, &postamble_0, 0, 0}, {
+	"1.3.1.1f.", desc_case_1_3_1_1f, &preamble_0, &test_case_1_3_1_1f, &postamble_0, 0, 0}, {
+	"1.3.1.2a.", desc_case_1_3_1_2a, &preamble_0, &test_case_1_3_1_2a, &postamble_0, 0, 0}, {
+	"1.3.1.2b.", desc_case_1_3_1_2b, &preamble_0, &test_case_1_3_1_2b, &postamble_0, 0, 0}, {
 	"1.3.2.1.", desc_case_1_3_2_1, &preamble_0, &test_case_1_3_2_1, &postamble_0, 0, 0}, {
 	"1.3.2.2.", desc_case_1_3_2_2, &preamble_0, &test_case_1_3_2_2, &postamble_0, 0, 0}, {
 	"1.3.2.3.", desc_case_1_3_2_3, &preamble_0, &test_case_1_3_2_3, &postamble_0, 0, 0}, {
@@ -15614,62 +14150,34 @@ struct test_case {
 	"1.4.3.", desc_case_1_4_3, &preamble_0, &test_case_1_4_3, &postamble_0, 0, 0}, {
 	"1.4.4.", desc_case_1_4_4, &preamble_0, &test_case_1_4_4, &postamble_0, 0, 0}, {
 	"1.4.5.", desc_case_1_4_5, &preamble_0, &test_case_1_4_5, &postamble_0, 0, 0}, {
-	"1.5.1.", desc_case_1_5_1, &preamble_0, &test_case_1_5_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"1.5.2.", desc_case_1_5_2, &preamble_0, &test_case_1_5_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"1.5.3.", desc_case_1_5_3, &preamble_0, &test_case_1_5_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"1.6.1.1.", desc_case_1_6_1_1, &preamble_0, &test_case_1_6_1_1, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.6.1.2.", desc_case_1_6_1_2, &preamble_0, &test_case_1_6_1_2, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.6.2.1.", desc_case_1_6_2_1, &preamble_0, &test_case_1_6_2_1, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.6.2.2.", desc_case_1_6_2_2, &preamble_0, &test_case_1_6_2_2, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.6.3.1.", desc_case_1_6_3_1, &preamble_0, &test_case_1_6_3_1, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.6.3.2.", desc_case_1_6_3_2, &preamble_0, &test_case_1_6_3_2, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.1.", desc_case_1_7_1_1, &preamble_0, &test_case_1_7_1_1, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.2.", desc_case_1_7_1_2, &preamble_0, &test_case_1_7_1_2, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.3.", desc_case_1_7_1_3, &preamble_0, &test_case_1_7_1_3, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.4.", desc_case_1_7_1_4, &preamble_0, &test_case_1_7_1_4, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.5.", desc_case_1_7_1_5, &preamble_0, &test_case_1_7_1_5, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.6.", desc_case_1_7_1_6, &preamble_0, &test_case_1_7_1_6, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.1.7.", desc_case_1_7_1_7, &preamble_0, &test_case_1_7_1_7, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.1.", desc_case_1_7_2_1, &preamble_0, &test_case_1_7_2_1, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.2.", desc_case_1_7_2_2, &preamble_0, &test_case_1_7_2_2, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.3.", desc_case_1_7_2_3, &preamble_0, &test_case_1_7_2_3, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.4.", desc_case_1_7_2_4, &preamble_0, &test_case_1_7_2_4, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.5.", desc_case_1_7_2_5, &preamble_0, &test_case_1_7_2_5, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.6.", desc_case_1_7_2_6, &preamble_0, &test_case_1_7_2_6, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.7.", desc_case_1_7_2_7, &preamble_0, &test_case_1_7_2_7, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.8.", desc_case_1_7_2_8, &preamble_0, &test_case_1_7_2_8, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.9.", desc_case_1_7_2_9, &preamble_0, &test_case_1_7_2_9, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.2.10.", desc_case_1_7_2_10, &preamble_0, &test_case_1_7_2_10, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.3.1.", desc_case_1_7_3_1, &preamble_0, &test_case_1_7_3_1, &postamble_0, 0,
-		    INCONCLUSIVE}, {
-	"1.7.3.2.", desc_case_1_7_3_2, &preamble_0, &test_case_1_7_3_2, &postamble_0, 0,
-		    INCONCLUSIVE}, {
+	"1.5.1.", desc_case_1_5_1, &preamble_0, &test_case_1_5_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.5.2.", desc_case_1_5_2, &preamble_0, &test_case_1_5_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.5.3.", desc_case_1_5_3, &preamble_0, &test_case_1_5_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.6.1.1.", desc_case_1_6_1_1, &preamble_0, &test_case_1_6_1_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.6.1.2.", desc_case_1_6_1_2, &preamble_0, &test_case_1_6_1_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.6.2.1.", desc_case_1_6_2_1, &preamble_0, &test_case_1_6_2_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.6.2.2.", desc_case_1_6_2_2, &preamble_0, &test_case_1_6_2_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.6.3.1.", desc_case_1_6_3_1, &preamble_0, &test_case_1_6_3_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.6.3.2.", desc_case_1_6_3_2, &preamble_0, &test_case_1_6_3_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.1.", desc_case_1_7_1_1, &preamble_0, &test_case_1_7_1_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.2.", desc_case_1_7_1_2, &preamble_0, &test_case_1_7_1_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.3.", desc_case_1_7_1_3, &preamble_0, &test_case_1_7_1_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.4.", desc_case_1_7_1_4, &preamble_0, &test_case_1_7_1_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.5.", desc_case_1_7_1_5, &preamble_0, &test_case_1_7_1_5, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.6.", desc_case_1_7_1_6, &preamble_0, &test_case_1_7_1_6, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.1.7.", desc_case_1_7_1_7, &preamble_0, &test_case_1_7_1_7, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.1.", desc_case_1_7_2_1, &preamble_0, &test_case_1_7_2_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.2.", desc_case_1_7_2_2, &preamble_0, &test_case_1_7_2_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.3.", desc_case_1_7_2_3, &preamble_0, &test_case_1_7_2_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.4.", desc_case_1_7_2_4, &preamble_0, &test_case_1_7_2_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.5.", desc_case_1_7_2_5, &preamble_0, &test_case_1_7_2_5, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.6.", desc_case_1_7_2_6, &preamble_0, &test_case_1_7_2_6, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.7.", desc_case_1_7_2_7, &preamble_0, &test_case_1_7_2_7, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.8.", desc_case_1_7_2_8, &preamble_0, &test_case_1_7_2_8, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.9.", desc_case_1_7_2_9, &preamble_0, &test_case_1_7_2_9, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.2.10.", desc_case_1_7_2_10, &preamble_0, &test_case_1_7_2_10, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.3.1.", desc_case_1_7_3_1, &preamble_0, &test_case_1_7_3_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"1.7.3.2.", desc_case_1_7_3_2, &preamble_0, &test_case_1_7_3_2, &postamble_0, 0, INCONCLUSIVE}, {
 	"2.1.1.", desc_case_2_1_1, &preamble_0, &test_case_2_1_1, &postamble_0, 0, 0}, {
 	"2.1.2.", desc_case_2_1_2, &preamble_0, &test_case_2_1_2, &postamble_0, 0, 0}, {
 	"2.2.1a.", desc_case_2_2_1a, &preamble_0, &test_case_2_2_1a, &postamble_0, 0, 0}, {
@@ -15698,16 +14206,11 @@ struct test_case {
 	"2.3.5b.", desc_case_2_3_5b, &preamble_0, &test_case_2_3_5b, &postamble_0, 0, 0}, {
 	"2.3.6a.", desc_case_2_3_6a, &preamble_0, &test_case_2_3_6a, &postamble_0, 0, 0}, {
 	"2.3.6b.", desc_case_2_3_6b, &preamble_0, &test_case_2_3_6b, &postamble_0, 0, 0}, {
-	"2.4.1.", desc_case_2_4_1, &preamble_0, &test_case_2_4_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"2.4.2.", desc_case_2_4_2, &preamble_0, &test_case_2_4_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"2.4.3.", desc_case_2_4_3, &preamble_0, &test_case_2_4_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"2.4.4.", desc_case_2_4_4, &preamble_0, &test_case_2_4_4, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"2.4.5.", desc_case_2_4_5, &preamble_0, &test_case_2_4_5, &postamble_0, 0, INCONCLUSIVE},
-	{
+	"2.4.1.", desc_case_2_4_1, &preamble_0, &test_case_2_4_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"2.4.2.", desc_case_2_4_2, &preamble_0, &test_case_2_4_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"2.4.3.", desc_case_2_4_3, &preamble_0, &test_case_2_4_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"2.4.4.", desc_case_2_4_4, &preamble_0, &test_case_2_4_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"2.4.5.", desc_case_2_4_5, &preamble_0, &test_case_2_4_5, &postamble_0, 0, INCONCLUSIVE}, {
 	"3.1a.", desc_case_3_1a, &preamble_0, &test_case_3_1a, &postamble_0, 0, 0}, {
 	"3.1b.", desc_case_3_1b, &preamble_0, &test_case_3_1b, &postamble_0, 0, 0}, {
 	"3.2a.", desc_case_3_2a, &preamble_0, &test_case_3_2a, &postamble_0, 0, 0}, {
@@ -15756,63 +14259,36 @@ struct test_case {
 	"6.2.4.", desc_case_6_2_4, &preamble_0, &test_case_6_2_4, &postamble_0, 0, 0}, {
 	"6.2.5.", desc_case_6_2_5, &preamble_0, &test_case_6_2_5, &postamble_0, 0, 0}, {
 	"6.3.1.", desc_case_6_3_1, &preamble_0, &test_case_6_3_1, &postamble_0, 0, 0}, {
-	"6.4.1.", desc_case_6_4_1, &preamble_0, &test_case_6_4_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.4.2.", desc_case_6_4_2, &preamble_0, &test_case_6_4_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.4.3.", desc_case_6_4_3, &preamble_0, &test_case_6_4_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.4.3.", desc_case_6_4_4, &preamble_0, &test_case_6_4_4, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.5.1.", desc_case_6_5_1, &preamble_0, &test_case_6_5_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.5.2.", desc_case_6_5_2, &preamble_0, &test_case_6_5_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.5.3.", desc_case_6_5_3, &preamble_0, &test_case_6_5_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.5.4.", desc_case_6_5_4, &preamble_0, &test_case_6_5_4, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.5.4.", desc_case_6_5_5, &preamble_0, &test_case_6_5_5, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.6.1.", desc_case_6_6_1, &preamble_0, &test_case_6_6_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.6.2.", desc_case_6_6_2, &preamble_0, &test_case_6_6_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.6.3.", desc_case_6_6_3, &preamble_0, &test_case_6_6_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"6.6.4.", desc_case_6_6_4, &preamble_0, &test_case_6_6_4, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.1.1.", desc_case_7_1_1, &preamble_0, &test_case_7_1_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.1.2.", desc_case_7_1_2, &preamble_0, &test_case_7_1_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.1.3.", desc_case_7_1_3, &preamble_0, &test_case_7_1_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.2.1.", desc_case_7_2_1, &preamble_0, &test_case_7_2_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.3.1.", desc_case_7_3_1, &preamble_0, &test_case_7_3_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.3.2.", desc_case_7_3_2, &preamble_0, &test_case_7_3_2, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.3.3.", desc_case_7_3_3, &preamble_0, &test_case_7_3_3, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.3.4.", desc_case_7_3_4, &preamble_0, &test_case_7_3_4, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.3.5.", desc_case_7_3_5, &preamble_0, &test_case_7_3_5, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"7.3.6.", desc_case_7_3_6, &preamble_0, &test_case_7_3_6, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"8.1.1.", desc_case_8_1_1, &preamble_0, &test_case_8_1_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"8.1.2.", desc_case_8_1_2, &preamble_0, &test_case_8_1_2, &postamble_0, 0, INCONCLUSIVE},
-	{
+	"6.4.1.", desc_case_6_4_1, &preamble_0, &test_case_6_4_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.4.2.", desc_case_6_4_2, &preamble_0, &test_case_6_4_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.4.3.", desc_case_6_4_3, &preamble_0, &test_case_6_4_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.4.3.", desc_case_6_4_4, &preamble_0, &test_case_6_4_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.5.1.", desc_case_6_5_1, &preamble_0, &test_case_6_5_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.5.2.", desc_case_6_5_2, &preamble_0, &test_case_6_5_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.5.3.", desc_case_6_5_3, &preamble_0, &test_case_6_5_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.5.4.", desc_case_6_5_4, &preamble_0, &test_case_6_5_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.5.4.", desc_case_6_5_5, &preamble_0, &test_case_6_5_5, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.6.1.", desc_case_6_6_1, &preamble_0, &test_case_6_6_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.6.2.", desc_case_6_6_2, &preamble_0, &test_case_6_6_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.6.3.", desc_case_6_6_3, &preamble_0, &test_case_6_6_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"6.6.4.", desc_case_6_6_4, &preamble_0, &test_case_6_6_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.1.1.", desc_case_7_1_1, &preamble_0, &test_case_7_1_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.1.2.", desc_case_7_1_2, &preamble_0, &test_case_7_1_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.1.3.", desc_case_7_1_3, &preamble_0, &test_case_7_1_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.2.1.", desc_case_7_2_1, &preamble_0, &test_case_7_2_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.3.1.", desc_case_7_3_1, &preamble_0, &test_case_7_3_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.3.2.", desc_case_7_3_2, &preamble_0, &test_case_7_3_2, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.3.3.", desc_case_7_3_3, &preamble_0, &test_case_7_3_3, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.3.4.", desc_case_7_3_4, &preamble_0, &test_case_7_3_4, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.3.5.", desc_case_7_3_5, &preamble_0, &test_case_7_3_5, &postamble_0, 0, INCONCLUSIVE}, {
+	"7.3.6.", desc_case_7_3_6, &preamble_0, &test_case_7_3_6, &postamble_0, 0, INCONCLUSIVE}, {
+	"8.1.1.", desc_case_8_1_1, &preamble_0, &test_case_8_1_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"8.1.2.", desc_case_8_1_2, &preamble_0, &test_case_8_1_2, &postamble_0, 0, INCONCLUSIVE}, {
 	"8.2.1.", desc_case_8_2_1, &preamble_0, &test_case_8_2_1, &postamble_0, 0, 0}, {
 	"8.2.2.", desc_case_8_2_2, &preamble_0, &test_case_8_2_2, &postamble_0, 0, 0}, {
 	"8.2.3.", desc_case_8_2_3, &preamble_0, &test_case_8_2_3, &postamble_0, 0, 0}, {
-	"9.1.1.", desc_case_9_1_1, &preamble_0, &test_case_9_1_1, &postamble_0, 0, INCONCLUSIVE},
-	{
-	"9.1.2.", desc_case_9_1_2, &preamble_0, &test_case_9_1_2, &postamble_0, 0, INCONCLUSIVE},
-	{
+	"9.1.1.", desc_case_9_1_1, &preamble_0, &test_case_9_1_1, &postamble_0, 0, INCONCLUSIVE}, {
+	"9.1.2.", desc_case_9_1_2, &preamble_0, &test_case_9_1_2, &postamble_0, 0, INCONCLUSIVE}, {
 	NULL,}
 };
 
@@ -15826,6 +14302,7 @@ do_tests(void)
 	int inconclusive = 0;
 	int successes = 0;
 	int failures = 0;
+
 	printf("\n\nQ.784 conformance test program for streams-isup driver.\n");
 	FFLUSH(stdout);
 	if (begin_tests() == SUCCESS) {
@@ -15837,64 +14314,48 @@ do_tests(void)
 				continue;
 			}
 			printf("\nTest Case Q.784/%s:\n%s\n", tests[i].numb, tests[i].name);
-			printf
-			    ("--------------------+--+---------Preamble--------------+--------------------\n");
+			printf("--------------------+--+---------Preamble--------------+--------------------\n");
 			FFLUSH(stdout);
 			if (tests[i].preamble() != SUCCESS) {
-				printf
-				    ("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n",
-				     state);
+				printf("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n", state);
 				FFLUSH(stdout);
 				result = INCONCLUSIVE;
 			} else {
-				printf
-				    ("--------------------|--|-----------Test----------------|--------------------\n");
+				printf("--------------------|--|-----------Test----------------|--------------------\n");
 				FFLUSH(stdout);
 				switch (tests[i].testcase()) {
 				default:
 				case INCONCLUSIVE:
-					printf
-					    ("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n",
-					     state);
+					printf("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n", state);
 					FFLUSH(stdout);
 					result = INCONCLUSIVE;
 					break;
 				case FAILURE:
-					printf
-					    ("XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXX FAILED XXXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX(%d)\n",
-					     state);
+					printf("XXXXXXXXXXXXXXXXXXXX|XX|XXXXXXXXX FAILED XXXXXXXXXXXXXXX|XXXXXXXXXXXXXXXXXXX(%d)\n", state);
 					FFLUSH(stdout);
 					result = FAILURE;
 					break;
 				case SCRIPTERROR:
-					printf
-					    ("####################|##|####### SCRIPT ERROR ###########|###################(%d)\n",
-					     state);
+					printf("####################|##|####### SCRIPT ERROR ###########|###################(%d)\n", state);
 					FFLUSH(stdout);
 					result = SCRIPTERROR;
 					break;
 				case SUCCESS:
-					printf
-					    ("********************|**|********* PASSED **************|********************(%d)\n",
-					     state);
+					printf("********************|**|********* PASSED **************|********************(%d)\n", state);
 					FFLUSH(stdout);
 					result = SUCCESS;
 					break;
 				}
 			}
-			printf
-			    ("--------------------|--|----------Postamble------------|--------------------\n");
+			printf("--------------------|--|----------Postamble------------|--------------------\n");
 			FFLUSH(stdout);
 			if (tests[i].postamble() != SUCCESS) {
-				printf
-				    ("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n",
-				     state);
+				printf("????????????????????|??|????\? INCONCLUSIVE ??????????\?|????????????????????\?(%d)\n", state);
 				FFLUSH(stdout);
 				if (result == SUCCESS)
 					result = INCONCLUSIVE;
 			}
-			printf
-			    ("--------------------+--+-------------------------------+--------------------\n");
+			printf("--------------------+--+-------------------------------+--------------------\n");
 			FFLUSH(stdout);
 			switch (result) {
 			case SUCCESS:
@@ -15926,8 +14387,7 @@ do_tests(void)
 		if (summary) {
 			printf("\n\n");
 			FFLUSH(stdout);
-			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb;
-			     i++) {
+			for (i = 0; i < (sizeof(tests) / sizeof(struct test_case)) && tests[i].numb; i++) {
 				if (tests[i].run) {
 					printf("Test Case Q.784/%-10s ", tests[i].numb);
 					FFLUSH(stdout);
@@ -15994,7 +14454,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -16025,7 +14485,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 	FFLUSH(stdout);
@@ -16090,6 +14550,7 @@ main(int argc, char **argv)
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+
 	for (t = tests; t->numb; t++) {
 		if (!t->result) {
 			t->run = 1;
@@ -16098,6 +14559,7 @@ main(int argc, char **argv)
 	}
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -16116,6 +14578,7 @@ main(int argc, char **argv)
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "f::so:t:mqvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "f::so:t:mqvhVC?");
@@ -16128,8 +14591,7 @@ main(int argc, char **argv)
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n",
-				timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", timer_scale);
 			break;
 		case 's':
 			summary = 1;
@@ -16150,8 +14612,7 @@ main(int argc, char **argv)
 					}
 				}
 			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
-					optarg);
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 				FFLUSH(stderr);
 			}
 			break;
@@ -16172,8 +14633,7 @@ main(int argc, char **argv)
 					}
 				}
 			if (!n) {
-				fprintf(stderr, "WARNING: specification `%s' matched no test\n",
-					optarg);
+				fprintf(stderr, "WARNING: specification `%s' matched no test\n", optarg);
 				FFLUSH(stderr);
 			}
 			break;

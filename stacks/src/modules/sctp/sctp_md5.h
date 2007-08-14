@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_md5.h,v 0.9.2.2 2007/06/17 01:56:20 brian Exp $
+ @(#) $Id: sctp_md5.h,v 0.9.2.3 2007/08/14 12:18:42 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:20 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_md5.h,v $
+ Revision 0.9.2.3  2007/08/14 12:18:42  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.2  2007/06/17 01:56:20  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SCTP_MD5_H__
 #define __SCTP_MD5_H__
 
-#ident "@(#) $RCSfile: sctp_md5.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sctp_md5.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 typedef struct {
 	uint32_t buf[4];
@@ -71,4 +74,3 @@ extern void MD5Update(MD5_CTX * md5, uint8_t const *buf, unsigned len);
 extern void MD5Final(uint8_t dig[16], MD5_CTX * md5);
 
 #endif				/* __SCTP_MD5_H__ */
-

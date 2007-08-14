@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:56 $
+ @(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:17:17 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/15 11:33:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl-mux.c,v $
+ Revision 0.9.2.2  2007/08/14 12:17:17  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.1  2007/01/15 11:33:56  brian
  - added new and old signalling link utilities
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:56 $"
+#ident "@(#) $RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:17:17 $"
 
-static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/01/15 11:33:56 $";
+static char const ident[] =
+    "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:17:17 $";
 
 /*
  *  This is a signalling link multiplexer: its primary purpose is to provide a single nexus for the
@@ -69,7 +73,6 @@ static char const ident[] = "$RCSfile: sl-mux.c,v $ $Name:  $($Revision: 0.9.2.1
  *  this SL-MUX driver can then attach to any defined global PPA or CLEI which results in
  *  atttachment of the upper multiplex stream to the appropriate lower multiplex stream.
  */
-
 
 /**
  * sl_w_ioctl: - process M_IOCTL message
@@ -381,7 +384,6 @@ sl_r_msg(queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (0);
 }
-
 
 static streamscall int
 sl_uwput(queue_t *q, mblk_t *mp)

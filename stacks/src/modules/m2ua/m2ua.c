@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:28 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.20  2007/08/14 12:17:58  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.19  2007/07/14 01:34:28  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:28 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:28 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -91,7 +94,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:34:28 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -399,6 +402,7 @@ typedef struct sl {
 	m2ua_stats_sl_t stats;		/* Signalling link statistics */
 	m2ua_stats_sl_t statsp;		/* Signalling link statistics periods */
 } sl_t;
+
 #define SL_PRIV(__q) ((sl_t *)(__q)->q_ptr)
 
 #define SLS_IDLE		0	/* Link idle */
@@ -432,6 +436,7 @@ typedef struct xp {
 	m2ua_stats_xp_t stats;		/* Transport statistics */
 	m2ua_stats_xp_t statsp;		/* Transport statistics periods */
 } xp_t;
+
 #define XP_PRIV(__q) ((xp_t *)(__q)->q_ptr)
 
 #define ASP_DOWN	0	/* ASP down */
@@ -451,6 +456,7 @@ typedef struct xp {
 typedef struct lm {
 	STR_DECLARATION (struct lm);	/* stream declaration */
 } lm_t;
+
 #define MGM_PRIV(__q) ((lm_t *)(__q)->q_ptr)
 
 typedef struct lk {
@@ -463,6 +469,7 @@ typedef union priv {
 	struct sl sl;
 	struct lm lm;
 } priv_t;
+
 #define PRIV(__q) ((priv_t *)(__q)->q_ptr)
 
 typedef union link {
@@ -470,6 +477,7 @@ typedef union link {
 	struct sl sl;
 	struct xp xp;
 } link_t;
+
 #define LINK(__q) ((link_t *)(__q)->q_ptr)
 
 /*
@@ -866,6 +874,7 @@ m_error(queue_t *q, sl_t * sl, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -907,6 +916,7 @@ slu_info_ack(queue_t *q, sl_t * sl, uchar *ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -937,6 +947,7 @@ slu_ok_ack(queue_t *q, sl_t * sl, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -971,6 +982,7 @@ slu_error_ack(queue_t *q, sl_t * sl, long prim, long error)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	/* 
 	   filter out queue returns */
 	switch (error) {
@@ -1030,6 +1042,7 @@ slu_enable_con(queue_t *q, sl_t * sl)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1055,6 +1068,7 @@ slu_disable_con(queue_t *q, sl_t * sl)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1081,6 +1095,7 @@ slu_optmgmt_ack(queue_t *q, sl_t * sl, ulong flags, uchar *opt_ptr, size_t opt_l
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1107,6 +1122,7 @@ slu_error_ind(queue_t *q, sl_t * sl, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1133,6 +1149,7 @@ slu_stats_ind(queue_t *q, sl_t * sl, ulong interval, mblk_t *dp)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		lmi_stats_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1162,6 +1179,7 @@ slu_event_ind(queue_t *q, sl_t * sl, ulong oid, ulong level)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		lmi_event_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1190,11 +1208,13 @@ slu_pdu_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	if (canput(sl->oq)) {
 		mblk_t *dp;
+
 		assure(!m->mp->b_cont);
 		if ((dp = ss7_dupb(q, m->mp))) {
 			ulong mpri;
 			mblk_t *mp;
 			sl_pdu_ind_t *p;
+
 			if (m->data1.ptr.c) {
 				mpri = 0;
 				dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
@@ -1237,6 +1257,7 @@ slu_link_congested_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_link_cong_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1261,6 +1282,7 @@ slu_link_congestion_ceased_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_link_cong_ceased_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1286,11 +1308,13 @@ slu_retrieved_message_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	if (canput(sl->oq)) {
 		mblk_t *dp;
+
 		assure(!m->mp->b_cont);
 		if ((dp = ss7_dupb(q, m->mp))) {
 			ulong mpri;
 			mblk_t *mp;
 			sl_retrieved_msg_ind_t *p;
+
 			if (m->data1.ptr.c) {
 				mpri = 0;
 				dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
@@ -1333,10 +1357,12 @@ slu_retrieval_complete_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	if (canput(sl->oq)) {
 		mblk_t *dp = NULL;
+
 		if ((!m->data1.ptr.c && !m->data2.ptr.c) || (dp = ss7_dupb(q, m->mp))) {
 			ulong mpri = 0;
 			mblk_t *mp;
 			sl_retrieval_comp_ind_t *p;
+
 			if (m->data1.ptr.c) {
 				mpri = 0;
 				dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
@@ -1378,6 +1404,7 @@ slu_rb_cleared_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_rb_cleared_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1404,6 +1431,7 @@ slu_bsnt_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_bsnt_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1431,6 +1459,7 @@ slu_in_service_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_in_service_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1482,6 +1511,7 @@ slu_local_processor_outage_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_loc_proc_out_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1505,6 +1535,7 @@ slu_local_processor_recovered_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_loc_proc_recovered_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1528,6 +1559,7 @@ slu_remote_processor_outage_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_rem_proc_out_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1551,6 +1583,7 @@ slu_remote_processor_recovered_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_rem_proc_recovered_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1575,6 +1608,7 @@ slu_rtb_cleared_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_rtb_cleared_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1601,6 +1635,7 @@ slu_retrieval_not_possible_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_retrieval_not_poss_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1627,6 +1662,7 @@ slu_bsnt_not_retrievable_ind(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_bsnt_not_retr_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1654,6 +1690,7 @@ slu_optmgmt_ack(queue_t *q, sl_t * sl, uchar *opt_ptr, size_t opt_len, ulong fla
 {
 	mblk_t *mp;
 	sl_optmgmt_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1683,6 +1720,7 @@ slu_notify_ind(queue_t *q, sl_t * sl, ulong oid, ulong level)
 {
 	mblk_t *mp;
 	sl_notify_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1716,6 +1754,7 @@ slp_info_req(queue_t *q, sl_t * sl)
 {
 	mblk_t *mp;
 	lmi_info_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1738,6 +1777,7 @@ slp_attach_req(queue_t *q, sl_t * sl, uchar *ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_attach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1762,6 +1802,7 @@ slp_detach_req(queue_t *q, sl_t * sl)
 {
 	mblk_t *mp;
 	lmi_detach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1784,6 +1825,7 @@ slp_enable_req(queue_t *q, sl_t * sl, uchar *rem_ptr, size_t rem_len)
 {
 	mblk_t *mp;
 	lmi_enable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1808,6 +1850,7 @@ slp_disable_req(queue_t *q, sl_t * sl)
 {
 	mblk_t *mp;
 	lmi_disable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1832,6 +1875,7 @@ slp_optmgmt_req(queue_t *q, sl_t * sl, uchar *opt_ptr, size_t opt_len, ulong fla
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		lmi_optmgmt_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1863,11 +1907,13 @@ slp_pdu_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	if (canput(sl->oq)) {
 		mblk_t *dp;
+
 		assure(!m->mp->b_cont);
 		if ((dp = ss7_dupb(q, m->mp))) {
 			ulong mpri;
 			mblk_t *mp;
 			sl_pdu_req_t *p;
+
 			if (m->data1.ptr.c) {
 				mpri = 0;
 				dp->b_rptr = dp->b_wptr = m->data1.ptr.c;
@@ -1910,6 +1956,7 @@ slp_emergency_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_emergency_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1932,6 +1979,7 @@ slp_emergency_ceases_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_emergency_ceases_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1955,6 +2003,7 @@ slp_start_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_start_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1981,6 +2030,7 @@ slp_stop_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_stop_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2007,6 +2057,7 @@ slp_retrieve_bsnt_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_retrieve_bsnt_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2033,6 +2084,7 @@ slp_retrieval_request_and_fsnc_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_retrieval_req_and_fsnc_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2060,6 +2112,7 @@ slp_clear_buffers_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_clear_buffers_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2086,6 +2139,7 @@ slp_clear_rtb_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_clear_rtb_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2112,6 +2166,7 @@ slp_continue_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_continue_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2137,6 +2192,7 @@ slp_local_processor_outage_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_local_proc_outage_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2160,6 +2216,7 @@ slp_resume_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 	if (canput(sl->oq)) {
 		mblk_t *mp;
 		sl_resume_req_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2185,6 +2242,7 @@ slp_congestion_discard_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_cong_discard_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2207,6 +2265,7 @@ slp_congestion_accept_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_cong_accept_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2229,6 +2288,7 @@ slp_no_congestion_req(queue_t *q, sl_t * sl, m2ua_msg_t * m)
 {
 	mblk_t *mp;
 	sl_no_cong_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2251,6 +2311,7 @@ slp_power_on_req(queue_t *q, sl_t * sl)
 {
 	mblk_t *mp;
 	sl_power_on_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -2282,6 +2343,7 @@ t_conn_req(queue_t *q, xp_t * xp, uchar *dst_ptr, size_t dst_len, uchar *opt_ptr
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_conn_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2318,6 +2380,7 @@ t_conn_res(queue_t *q, xp_t * xp, ulong acceptor, uchar *opt_ptr, size_t opt_len
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_conn_res *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2351,6 +2414,7 @@ t_discon_req(queue_t *q, xp_t * xp, ulong seqno, mblk_t *dp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_discon_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2379,6 +2443,7 @@ t_data_req(queue_t *q, xp_t * xp, ulong more, mblk_t *dp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_data_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2407,6 +2472,7 @@ t_exdata_req(queue_t *q, xp_t * xp, ulong more, mblk_t *dp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_exdata_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2435,6 +2501,7 @@ t_info_req(queue_t *q, xp_t * xp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_info_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2461,6 +2528,7 @@ t_bind_req(queue_t *q, xp_t * xp, uchar *add_ptr, size_t add_len, ulong conind)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_bind_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2492,6 +2560,7 @@ t_unbind_req(queue_t *q, xp_t * xp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_unbind_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2519,6 +2588,7 @@ t_unitdata_req(queue_t *q, xp_t * xp, uchar *dst_ptr, size_t dst_len, uchar *opt
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_unitdata_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2550,6 +2620,7 @@ t_optmgmt_req(queue_t *q, xp_t * xp, uchar *opt_ptr, size_t opt_len, ulong flags
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_optmgmt_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2581,6 +2652,7 @@ t_ordrel_req(queue_t *q, xp_t * xp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_ordrel_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2609,6 +2681,7 @@ t_optdata_req(queue_t *q, xp_t * xp, ulong flags, ulong sid, mblk_t *dp)
 		struct T_optdata_req *p;
 		uchar opt[2 * sizeof(struct t_opthdr) + 2 * sizeof(t_uscalar_t)];
 		size_t opt_len = (xp->type == M2UA_OBJ_TYPE_XP_SCTP) ? sizeof(opt) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2619,6 +2692,7 @@ t_optdata_req(queue_t *q, xp_t * xp, ulong flags, ulong sid, mblk_t *dp)
 			p->OPT_offset = opt_len ? sizeof(*p) : 0;
 			if (opt_len) {
 				struct t_opthdr *oh;
+
 				oh = (typeof(oh)) mp->b_wptr;
 				mp->b_wptr += sizeof(*oh);
 				oh->level = T_INET_SCTP;
@@ -2656,6 +2730,7 @@ t_addr_req(queue_t *q, xp_t * xp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_addr_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2683,6 +2758,7 @@ t_capability_req(queue_t *q, xp_t * xp)
 	if (canput(xp->oq)) {
 		mblk_t *mp;
 		struct T_capability_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2727,6 +2803,7 @@ m2ua_dec_msg(mblk_t *mp, m2ua_msg_t * m)
 		return (-EMSGSIZE);
 	for (; (uchar *) (wp + 1) <= mp->b_wptr; wp += (UA_PLEN(*wp) + 3) >> 2) {
 		struct ua_parm *parm = NULL;
+
 		switch (UA_PTAG(*wp)) {
 		case UA_TAG(UA_PARM_IID):	/* UA_CONST_PHDR(0x0001,sizeof(uint32_t)) */
 			if (UA_PLEN(*wp) >= sizeof(uint32_t))
@@ -2876,6 +2953,7 @@ m2ua_send_mgmt_err(queue_t *q, xp_t * xp, uint ecode, uchar *dia_ptr, size_t dia
 	    UA_PAD4(dia_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_MGMT_ERR;
 		mp->b_wptr += sizeof(uint32_t);
@@ -2916,6 +2994,7 @@ m2ua_send_mgmt_ntfy(queue_t *q, xp_t * xp, uint status, ulong *aspid, uint * iid
 	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_MGMT_NTFY;
 		mp->b_wptr += sizeof(uint32_t);
@@ -2933,8 +3012,7 @@ m2ua_send_mgmt_ntfy(queue_t *q, xp_t * xp, uint status, ulong *aspid, uint * iid
 		}
 		if (num_iid) {
 			uint32_t *ip = iid;
-			*(uint32_t *) mp->b_wptr =
-			    UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
 			mp->b_wptr += sizeof(uint32_t);
 			while (num_iid--) {
 				*(uint32_t *) mp->b_wptr = htonl(*ip++);
@@ -2970,6 +3048,7 @@ m2ua_send_asps_aspup_req(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, si
 	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPS_ASPUP_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3010,6 +3089,7 @@ m2ua_send_asps_aspdn_req(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, si
 	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPS_ASPDN_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3046,8 +3126,10 @@ m2ua_send_asps_hbeat_req(queue_t *q, xp_t * xp, uchar *hbt_ptr, size_t hbt_len)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + hbt_len ? UA_PHDR_SIZE + UA_PAD4(hbt_len) : 0;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPS_HBEAT_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3082,6 +3164,7 @@ m2ua_send_asps_aspup_ack(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, si
 	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPS_ASPUP_ACK;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3122,6 +3205,7 @@ m2ua_send_asps_aspdn_ack(queue_t *q, xp_t * xp, ulong *aspid, uchar *inf_ptr, si
 	    UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPS_ASPDN_ACK;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3158,8 +3242,10 @@ m2ua_send_asps_hbeat_ack(queue_t *q, xp_t * xp, uchar *hbt_ptr, size_t hbt_len)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + hbt_len ? UA_PHDR_SIZE + UA_PAD4(hbt_len) : 0;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPS_HBEAT_ACK;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3195,6 +3281,7 @@ m2ua_send_aspt_aspac_req(queue_t *q, xp_t * xp, uint tmode, uint32_t *iid, size_
 	    num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPT_ASPAC_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3206,8 +3293,7 @@ m2ua_send_aspt_aspac_req(queue_t *q, xp_t * xp, uint tmode, uint32_t *iid, size_
 		mp->b_wptr += sizeof(uint32_t);
 		if (num_iid) {
 			uint32_t *ip = iid;
-			*(uint32_t *) mp->b_wptr =
-			    UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
 			mp->b_wptr += sizeof(uint32_t);
 			while (num_iid--) {
 				*(uint32_t *) mp->b_wptr = htonl(*ip++);
@@ -3244,6 +3330,7 @@ m2ua_send_aspt_aspia_req(queue_t *q, xp_t * xp, uint32_t *iid, size_t num_iid, u
 	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPT_ASPIA_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3251,8 +3338,7 @@ m2ua_send_aspt_aspia_req(queue_t *q, xp_t * xp, uint32_t *iid, size_t num_iid, u
 		mp->b_wptr += sizeof(uint32_t);
 		if (num_iid) {
 			uint32_t *ip = iid;
-			*(uint32_t *) mp->b_wptr =
-			    UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
 			mp->b_wptr += sizeof(uint32_t);
 			while (num_iid--) {
 				*(uint32_t *) mp->b_wptr = htonl(*ip++);
@@ -3289,6 +3375,7 @@ m2ua_send_aspt_aspac_ack(queue_t *q, xp_t * xp, uint tmode, uint32_t *iid, size_
 	    num_iid * sizeof(uint32_t) : 0 + inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPT_ASPAC_ACK;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3300,8 +3387,7 @@ m2ua_send_aspt_aspac_ack(queue_t *q, xp_t * xp, uint tmode, uint32_t *iid, size_
 		mp->b_wptr += sizeof(uint32_t);
 		if (num_iid) {
 			uint32_t *ip = iid;
-			*(uint32_t *) mp->b_wptr =
-			    UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
 			mp->b_wptr += sizeof(uint32_t);
 			while (num_iid--) {
 				*(uint32_t *) mp->b_wptr = htonl(*ip++);
@@ -3338,6 +3424,7 @@ m2ua_send_aspt_aspia_ack(queue_t *q, xp_t * xp, uint32_t *iid, size_t num_iid, u
 	    inf_len ? UA_PHDR_SIZE + UA_PAD4(inf_len) : 0;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_ASPT_ASPIA_ACK;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3345,8 +3432,7 @@ m2ua_send_aspt_aspia_ack(queue_t *q, xp_t * xp, uint32_t *iid, size_t num_iid, u
 		mp->b_wptr += sizeof(uint32_t);
 		if (num_iid) {
 			uint32_t *ip = iid;
-			*(uint32_t *) mp->b_wptr =
-			    UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
+			*(uint32_t *) mp->b_wptr = UA_PHDR(UA_PARM_IID, num_iid * sizeof(uint32_t));
 			mp->b_wptr += sizeof(uint32_t);
 			while (num_iid--) {
 				*(uint32_t *) mp->b_wptr = htonl(*ip++);
@@ -3378,8 +3464,10 @@ m2ua_send_rkmm_reg_req(queue_t *q, xp_t * xp, uint id, uint sdti, uint sdli)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_LINK_KEY);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_RKMM_REG_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3418,8 +3506,10 @@ m2ua_send_rkmm_reg_rsp(queue_t *q, xp_t * xp, as_t * as, uint id, uint status)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_REG_RESULT);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_RKMM_REG_RSP;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3458,8 +3548,10 @@ m2ua_send_rkmm_dereg_req(queue_t *q, xp_t * xp, as_t * as)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_RKMM_DEREG_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3488,8 +3580,10 @@ m2ua_send_rkmm_dereg_rsp(queue_t *q, xp_t * xp, as_t * as, uint status)
 {
 	mblk_t *mp;
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(M2UA_PARM_DEREG_STATUS);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = UA_RKMM_DEREG_RSP;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3525,8 +3619,10 @@ m2ua_send_maup_data1(queue_t *q, gp_t * gp, mblk_t *bp)
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_DATA;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3554,8 +3650,10 @@ m2ua_send_maup_data2(queue_t *q, gp_t * gp, mblk_t *bp)
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_DATA;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3587,8 +3685,10 @@ m2ua_send_maup_estab_req(queue_t *q, gp_t * gp, mblk_t *bp)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_ESTAB_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3617,8 +3717,10 @@ m2ua_send_maup_estab_con(queue_t *q, gp_t * gp, mblk_t *bp)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_ESTAB_CON;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3647,8 +3749,10 @@ m2ua_send_maup_rel_req(queue_t *q, gp_t * gp, mblk_t *bp)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_REL_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3677,8 +3781,10 @@ m2ua_send_maup_rel_con(queue_t *q, gp_t * gp, mblk_t *bp)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_REL_CON;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3707,8 +3813,10 @@ m2ua_send_maup_rel_ind(queue_t *q, gp_t * gp, mblk_t *bp)
 {
 	mblk_t *mp;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_REL_IND;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3739,8 +3847,10 @@ m2ua_send_maup_state_req(queue_t *q, gp_t * gp, mblk_t *bp)
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_REQUEST);
 	union SL_primitives *p = (typeof(p)) bp->b_rptr;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_STATE_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3820,8 +3930,10 @@ m2ua_send_maup_state_con(queue_t *q, gp_t * gp, mblk_t *bp)
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_REQUEST);
 	union SL_primitives *p = (typeof(p)) bp->b_rptr;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_STATE_CON;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3866,6 +3978,7 @@ m2ua_send_maup_con(queue_t *q, gp_t * gp, m2ua_msg_t * m)
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_REQUEST);
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_STATE_CON;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3900,8 +4013,10 @@ m2ua_send_maup_state_ind(queue_t *q, gp_t * gp, mblk_t *bp)
 	static const size_t mlen =
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_STATE_EVENT);
 	union SL_primitives *p = (typeof(p)) bp->b_rptr;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_STATE_IND;
 		mp->b_wptr += sizeof(uint32_t);
@@ -3959,8 +4074,10 @@ m2ua_send_maup_retr_req(queue_t *q, gp_t * gp, mblk_t *bp)
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_ACTION) + (p->sl_primitive ==
 									       SL_RETRIEVAL_REQUEST_AND_FSNC_REQ)
 	    ? UA_SIZE(M2UA_PARM_SEQNO) : 0;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_RETR_REQ;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4015,6 +4132,7 @@ m2ua_send_maup_retr_con(queue_t *q, gp_t * gp, mblk_t *bp)
 	    UA_SIZE(M2UA_PARM_RETR_RESULT) + UA_SIZE(M2UA_PARM_SEQNO);
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_RETR_CON;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4089,8 +4207,10 @@ m2ua_send_maup_retr_ind1(queue_t *q, gp_t * gp, mblk_t *bp)
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_RETR_IND;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4120,8 +4240,10 @@ m2ua_send_maup_retr_ind2(queue_t *q, gp_t * gp, mblk_t *bp)
 	mblk_t *mp;
 	size_t dlen = msgdsize(bp->b_cont);
 	size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_PHDR_SIZE;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_RETR_IND;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4159,6 +4281,7 @@ m2ua_send_maup_retr_comp_ind(queue_t *q, gp_t * gp, mblk_t *bp)
 	    UA_SIZE(M2UA_PARM_RETR_RESULT);
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_RETR_COMP_IND;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4200,6 +4323,7 @@ m2ua_send_maup_cong_ind(queue_t *q, gp_t * gp, mblk_t *bp)
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
 		union SL_primitives *p = (typeof(p)) bp->b_rptr;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_CONG_IND;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4223,13 +4347,11 @@ m2ua_send_maup_cong_ind(queue_t *q, gp_t * gp, mblk_t *bp)
 		case SL_LINK_CONGESTION_CEASED_IND:
 			*(uint32_t *) mp->b_wptr = M2UA_PARM_CONG_STATUS;
 			mp->b_wptr += sizeof(uint32_t);
-			*(uint32_t *) mp->b_wptr =
-				mp->b_wptr += sizeof(uint32_t);
-			    htonl(p->link_cong_ceased_ind.sl_cong_status);
+			*(uint32_t *) mp->b_wptr = mp->b_wptr += sizeof(uint32_t);
+			htonl(p->link_cong_ceased_ind.sl_cong_status);
 			*(uint32_t *) mp->b_wptr = M2UA_PARM_DISC_STATUS;
 			mp->b_wptr += sizeof(uint32_t);
-			*(uint32_t *) mp->b_wptr =
-			    htonl(p->link_cong_ceased_ind.sl_disc_status);
+			*(uint32_t *) mp->b_wptr = htonl(p->link_cong_ceased_ind.sl_disc_status);
 			mp->b_wptr += sizeof(uint32_t);
 			break;
 		default:
@@ -4260,6 +4382,7 @@ m2ua_send_maup_data_ack(queue_t *q, gp_t * gp, m2ua_msg_t * m)
 	    UA_MHDR_SIZE + UA_SIZE(UA_PARM_IID) + UA_SIZE(M2UA_PARM_CORR_ID_ACK);
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		int err;
+
 		mp->b_datap->db_type = M_DATA;
 		*(uint32_t *) mp->b_wptr = M2UA_MAUP_DATA_ACK;
 		mp->b_wptr += sizeof(uint32_t);
@@ -4327,6 +4450,7 @@ spp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (spp_
 	       streamscall void (*exp_fnc) (caddr_t))
 {
 	spp_t *spp = (spp_t *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&spp->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, spp, timer, jiffies));
@@ -4355,6 +4479,7 @@ STATIC INLINE void
 spp_stop_timer(spp_t * spp, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, spp, timer, jiffies));
@@ -4363,7 +4488,8 @@ spp_stop_timer(spp_t * spp, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-spp_start_timer(spp_t * spp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
+spp_start_timer(spp_t * spp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t),
+		ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, spp, timer, val * 1000 / HZ,
 		jiffies));
@@ -4378,6 +4504,7 @@ STATIC INLINE void
 __spp_timer_stop(spp_t * spp, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -4411,6 +4538,7 @@ STATIC INLINE void
 spp_timer_stop(spp_t * spp, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&spp->lock, flags);
 	{
 		__spp_timer_stop(spp, t);
@@ -4421,6 +4549,7 @@ STATIC INLINE void
 spp_timer_start(spp_t * spp, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&spp->lock, flags);
 	{
 		__spp_timer_stop(spp, t);
@@ -4454,6 +4583,7 @@ as_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (as_t 
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	as_t *as = (as_t *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&as->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, as, timer, jiffies));
@@ -4482,6 +4612,7 @@ STATIC INLINE void
 as_stop_timer(as_t * as, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, as, timer, jiffies));
@@ -4490,7 +4621,8 @@ as_stop_timer(as_t * as, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-as_start_timer(as_t * as, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
+as_start_timer(as_t * as, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t),
+	       ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, as, timer, val * 1000 / HZ,
 		jiffies));
@@ -4503,6 +4635,7 @@ STATIC INLINE void
 __as_timer_stop(as_t * as, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -4524,6 +4657,7 @@ STATIC INLINE void
 as_timer_stop(as_t * as, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&as->lock, flags);
 	{
 		__as_timer_stop(as, t);
@@ -4534,6 +4668,7 @@ STATIC INLINE void
 as_timer_start(as_t * as, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&as->lock, flags);
 	{
 		__as_timer_stop(as, t);
@@ -4561,6 +4696,7 @@ sp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (sp_t 
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	sp_t *sp = (sp_t *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&sp->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, sp, timer, jiffies));
@@ -4589,6 +4725,7 @@ STATIC INLINE void
 sp_stop_timer(sp_t * sp, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, sp, timer, jiffies));
@@ -4597,7 +4734,8 @@ sp_stop_timer(sp_t * sp, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-sp_start_timer(sp_t * sp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
+sp_start_timer(sp_t * sp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t),
+	       ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, sp, timer, val * 1000 / HZ,
 		jiffies));
@@ -4609,6 +4747,7 @@ STATIC INLINE void
 __sp_timer_stop(sp_t * sp, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -4630,6 +4769,7 @@ STATIC INLINE void
 sp_timer_stop(sp_t * sp, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sp->lock, flags);
 	{
 		__sp_timer_stop(sp, t);
@@ -4640,6 +4780,7 @@ STATIC INLINE void
 sp_timer_start(sp_t * sp, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sp->lock, flags);
 	{
 		__sp_timer_stop(sp, t);
@@ -4667,6 +4808,7 @@ sl_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (sl_t 
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	sl_t *sl = (sl_t *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&sl->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, sl, timer, jiffies));
@@ -4695,6 +4837,7 @@ STATIC INLINE void
 sl_stop_timer(sl_t * sl, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, sl, timer, jiffies));
@@ -4703,7 +4846,8 @@ sl_stop_timer(sl_t * sl, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-sl_start_timer(sl_t * sl, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
+sl_start_timer(sl_t * sl, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t),
+	       ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, sl, timer, val * 1000 / HZ,
 		jiffies));
@@ -4715,6 +4859,7 @@ STATIC INLINE void
 __sl_timer_stop(sl_t * sl, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -4736,6 +4881,7 @@ STATIC INLINE void
 sl_timer_stop(sl_t * sl, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
@@ -4746,6 +4892,7 @@ STATIC INLINE void
 sl_timer_start(sl_t * sl, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sl->lock, flags);
 	{
 		__sl_timer_stop(sl, t);
@@ -4773,6 +4920,7 @@ xp_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (to_fnc) (xp_t 
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	xp_t *xp = (xp_t *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&xp->lock)) {
 			printd(("%s: %p: %s: timeout at %lu\n", DRV_NAME, xp, timer, jiffies));
@@ -4801,6 +4949,7 @@ STATIC INLINE void
 xp_stop_timer(xp_t * xp, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", DRV_NAME, xp, timer, jiffies));
@@ -4809,7 +4958,8 @@ xp_stop_timer(xp_t * xp, const char *timer, ulong *timeo)
 	return;
 }
 STATIC INLINE void
-xp_start_timer(xp_t * xp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t), ulong val)
+xp_start_timer(xp_t * xp, const char *timer, ulong *timeo, streamscall void (*exp_fnc) (caddr_t),
+	       ulong val)
 {
 	printd(("%s: %p: starting %s %lu ms at %lu\n", DRV_NAME, xp, timer, val * 1000 / HZ,
 		jiffies));
@@ -4821,6 +4971,7 @@ STATIC INLINE void
 __xp_timer_stop(xp_t * xp, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -4842,6 +4993,7 @@ STATIC INLINE void
 xp_timer_stop(xp_t * xp, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		__xp_timer_stop(xp, t);
@@ -4852,6 +5004,7 @@ STATIC INLINE void
 xp_timer_start(xp_t * xp, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		__xp_timer_stop(xp, t);
@@ -5108,6 +5261,7 @@ asp_as_p_recalc_state(queue_t *q, struct as *as)
 {
 	struct gp *gp;
 	ulong newstate;
+
 	for (newstate = AS_ACTIVE; newstate && as->ap.u.counts[newstate] != 0; newstate--) ;
 	switch (newstate) {
 	case AS_DOWN:
@@ -5145,6 +5299,7 @@ asp_as_p_recalc_state(queue_t *q, struct as *as)
 }
 
 STATIC INLINE int sl_u_set_state(queue_t *, sl_t *, ulong);
+
 #if 0
 STATIC int
 sgp_as_u_recalc_state(queue_t *q, struct as *as)
@@ -5153,6 +5308,7 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 	struct gp *gp;
 	struct sl *sl;
 	ulong newstate;
+
 	for (newstate = AS_ACTIVE; newstate && as->ap.u.counts[newstate] != 0; newstate--) ;
 	switch (newstate) {
 	case AS_DOWN:
@@ -5160,6 +5316,7 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 	case AS_WACK_ASPAC:
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			struct xp *xp;
+
 			switch (gp_get_state(gp)) {
 			case AS_WACK_ASPAC:
 				if (newstate == AS_WACK_ASPAC)
@@ -5198,6 +5355,7 @@ sgp_as_u_recalc_state(queue_t *q, struct as *as)
 	case AS_WACK_ASPIA:
 		for (gp = as->gp.list; gp; gp = gp->as.next) {
 			struct xp *xp;
+
 			switch (gp_get_state(gp)) {
 			case AS_WACK_ASPAC:
 				if ((xp = gp->spp.spp->xp))
@@ -5236,6 +5394,7 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 	struct gp *gp;
 	ulong oldstate = as_get_state(as), newstate;
 	ulong oldflags = as_get_flags(as), newflags = oldflags;
+
 	assure(as->ap.numb > 0);
 	ensure(oldstate <= AS_ACTIVE, return (-EFAULT));
 	for (newstate = AS_ACTIVE; newstate && as->gp.u.counts[newstate] != 0; newstate--) ;
@@ -5255,6 +5414,7 @@ asp_as_u_recalc_state(queue_t *q, struct as *as)
 	for (gp = as->gp.list; gp; gp = gp->as.next) {
 		struct xp *xp = gp->spp.spp->xp;
 		ulong state = gp_get_state(gp);
+
 		if (state == AS_DOWN)
 			continue;
 		/* 
@@ -5370,6 +5530,7 @@ sgp_as_p_recalc_state(queue_t *q, struct as *as)
 	int err;
 	struct ap *ap;
 	ulong newstate, oldstate = as_get_state(as);
+
 	assure(as->ap.numb > 0);
 	ensure(oldstate <= AS_ACTIVE, return (-EFAULT));
 	for (newstate = AS_ACTIVE; newstate && as->gp.u.counts[newstate] != 0; newstate--) ;
@@ -5400,6 +5561,7 @@ gp_u_set_state(queue_t *q, struct gp *gp, const ulong newstate)
 	int err;
 	struct as *as = gp->as.as;
 	ulong oldstate = gp_get_state(gp);
+
 	if (newstate == oldstate)
 		return (QR_DONE);
 	as->gp.u.counts[oldstate]--;
@@ -5431,6 +5593,7 @@ sl_u_set_state(queue_t *q, struct sl *sl, const ulong newstate)
 	int err;
 	struct as *as = sl->as.as;
 	ulong oldstate = sl_get_state(sl);
+
 	if (newstate == oldstate)
 		return (QR_DONE);
 	as->gp.u.counts[oldstate]--;
@@ -5458,6 +5621,7 @@ gp_p_set_state(queue_t *q, struct gp *gp, const ulong newstate)
 	struct as *as = gp->as.as;
 	ulong oldstate = gp_get_state(gp);
 	ulong oldwack = as->gp.u.c.wack_aspac + as->gp.u.c.wack_aspia, newwack;
+
 	if (oldstate == newstate)
 		return (QR_DONE);
 	as->gp.u.counts[oldstate]--;
@@ -5489,6 +5653,7 @@ sl_p_set_state(queue_t *q, struct sl *sl, const ulong newstate)
 	int err;
 	struct as *as = sl->as.as;
 	ulong oldstate = sl_get_state(sl);
+
 	if (oldstate == newstate)
 		return (QR_DONE);
 	as->gp.u.counts[oldstate]--;
@@ -5512,6 +5677,7 @@ asp_set_state(queue_t *q, struct spp *spp, const ulong newstate)
 	int err;
 	struct gp *gp;
 	ulong oldstate = spp_get_state(spp);
+
 	switch (newstate) {
 	case ASP_WACK_ASPUP:
 	case ASP_UP:
@@ -5576,6 +5742,7 @@ sgp_set_state(queue_t *q, struct spp *spp, const ulong newstate)
 	int err;
 	struct gp *gp;
 	ulong oldstate = spp_get_state(spp);
+
 	switch (newstate) {
 	case ASP_DOWN:
 		switch (oldstate) {
@@ -5755,6 +5922,7 @@ spp_find_gp(struct spp *spp, uint32_t *iids, size_t iid_len)
 {
 	int i;
 	struct gp *gp;
+
 	iid_len /= sizeof(*iids);
 	for (gp = spp->gp.list; gp; gp = gp->spp.next)
 		for (i = 0; i < iid_len; i++)
@@ -5766,6 +5934,7 @@ STATIC INLINE struct sl *
 ap_find_slu(struct ap *ap)
 {
 	struct sl *sl;
+
 	/* 
 	   return first available link */
 	for (sl = ap->u.as->sl.list; sl && sl_tst_flags(sl, ASF_ACTIVE | ASF_PENDING);
@@ -5776,6 +5945,7 @@ STATIC INLINE struct sl *
 ap_find_slu_next(struct ap *ap, struct sl *sl, const int command)
 {
 	struct as *as = ap->u.as;
+
 	switch (as->sp.sp->tmode) {
 	case UA_TMODE_OVERRIDE:
 		return (NULL);
@@ -5794,6 +5964,7 @@ STATIC INLINE struct gp *
 ap_find_asp(struct ap *ap)
 {
 	struct gp *gp;
+
 	/* 
 	   return first available link */
 	for (gp = ap->u.as->gp.list; gp && gp_tst_flags(gp, ASF_ACTIVE | ASF_PENDING);
@@ -5804,6 +5975,7 @@ STATIC INLINE struct gp *
 ap_find_asp_next(struct ap *ap, struct gp *gp, const int command)
 {
 	struct as *as = ap->u.as;
+
 	switch (as->sp.sp->tmode) {
 	case UA_TMODE_OVERRIDE:
 		return (NULL);
@@ -5822,6 +5994,7 @@ STATIC INLINE struct ap *
 as_p_find_ap(struct as *as)
 {
 	struct ap *ap;
+
 	/* 
 	   return first available sp/sg */
 	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
@@ -5832,6 +6005,7 @@ STATIC INLINE struct ap *
 as_p_find_ap_next(struct as *as, struct ap *ap, const int command)
 {
 	struct sp *sp = as->sp.sp;
+
 	switch (sp->tmode) {
 	case UA_TMODE_OVERRIDE:
 		return (NULL);
@@ -5856,6 +6030,7 @@ STATIC INLINE struct sl *
 ap_find_slp(struct ap *ap)
 {
 	struct sl *sl;
+
 	/* 
 	   return first available link */
 	for (sl = ap->p.as->sl.list; sl && sl_tst_flags(sl, ASF_ACTIVE | ASF_PENDING);
@@ -5875,6 +6050,7 @@ STATIC INLINE struct gp *
 ap_find_sgp(struct ap *ap)
 {
 	struct gp *gp;
+
 	/* 
 	   return first available link */
 	for (gp = ap->p.as->gp.list; gp && gp_tst_flags(gp, ASF_ACTIVE | ASF_PENDING);
@@ -5894,6 +6070,7 @@ STATIC INLINE struct ap *
 as_u_find_ap(struct as *as)
 {
 	struct ap *ap;
+
 	/* 
 	   return first available sg */
 	for (ap = as->ap.list; ap && as_tst_flags(ap->u.as, ASF_ACTIVE | ASF_PENDING);
@@ -6024,6 +6201,7 @@ sgp_recv_asps_aspup_req(queue_t *q, m2ua_msg_t * m)
 	struct gp *gp;
 	struct sp *sp;
 	struct spp *spp;
+
 	fixme(("Need to check ASPID\n"));
 	if (!(spp = xp->spp)) {
 		if (!(sp = xp->sp))
@@ -6054,6 +6232,7 @@ sgp_recv_asps_aspup_req(queue_t *q, m2ua_msg_t * m)
 		sp = spp->sp.sp;
 		if (m->aspid.ptr.c) {
 			struct spp *s;
+
 			if (!spp->aspid) {
 				if (!m->aspid.val)
 					goto needaspid;
@@ -6078,6 +6257,7 @@ sgp_recv_asps_aspup_req(queue_t *q, m2ua_msg_t * m)
 		for (gp = spp->gp.list; gp; gp = gp->spp.next) {
 			struct as *as = gp->as.as;
 			struct xp *xp = gp->spp.spp->xp;
+
 			if (gp_get_state(gp) != AS_DOWN)
 				continue;
 			/* 
@@ -6164,6 +6344,7 @@ sgp_recv_asps_aspdn_req(queue_t *q, m2ua_msg_t * m)
 	int err;
 	struct gp *gp;
 	struct spp *spp;
+
 	if (!(spp = xp->spp)) {
 		if (!(xp->sp))
 			goto disable;
@@ -6220,12 +6401,14 @@ STATIC int
 asp_recv_asps_hbeat_req(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	return m2ua_send_asps_hbeat_ack(q, xp, m->hinfo.ptr.c, m->hinfo.len);
 }
 STATIC int
 sgp_recv_asps_hbeat_req(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	return m2ua_send_asps_hbeat_ack(q, xp, m->hinfo.ptr.c, m->hinfo.len);
 }
 
@@ -6238,6 +6421,7 @@ asp_recv_asps_aspup_ack(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	switch (spp_get_state(spp)) {
@@ -6269,6 +6453,7 @@ asp_recv_asps_aspdn_ack(queue_t *q, m2ua_msg_t * m)
 	struct xp *xp = XP_PRIV(q);
 	int err;
 	struct spp *spp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	switch (spp_get_state(spp)) {
@@ -6307,6 +6492,7 @@ asp_recv_asps_hbeat_ack(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if ((spp = xp->spp)) {
 		spp_timer_stop(spp, tbeat);
 		spp_timer_start(spp, tidle);
@@ -6318,6 +6504,7 @@ sgp_recv_asps_hbeat_ack(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if ((spp = xp->spp)) {
 		spp_timer_stop(spp, tbeat);
 		spp_timer_start(spp, tidle);
@@ -6345,6 +6532,7 @@ sgp_recv_aspt_aspac_req(queue_t *q, m2ua_msg_t * m)
 	struct as *as;
 	struct sp *sp;
 	struct sl *sl;
+
 	if (!(spp = xp->spp)) {
 		if (!(xp->sp))
 			goto disable;
@@ -6499,6 +6687,7 @@ sgp_recv_aspt_aspia_req(queue_t *q, m2ua_msg_t * m)
 	struct gp *gp;
 	struct as *as;
 	struct sp *sp;
+
 	if (!(spp = xp->spp)) {
 		if (!(xp->sp))
 			goto disable;
@@ -6551,6 +6740,7 @@ asp_recv_aspt_aspac_ack(queue_t *q, m2ua_msg_t * m)
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
 	struct gp *gp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	if (!m->iid.ptr.w)
@@ -6598,6 +6788,7 @@ asp_recv_aspt_aspia_ack(queue_t *q, m2ua_msg_t * m)
 	int err;
 	struct spp *spp;
 	struct gp *gp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	if (!m->iid.ptr.w)
@@ -6661,6 +6852,7 @@ sgp_recv_rkmm_reg_req(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	return (-EPROTO);
@@ -6677,6 +6869,7 @@ asp_recv_rkmm_reg_rsp(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	return (-EPROTO);
@@ -6703,6 +6896,7 @@ sgp_recv_rkmm_dereg_req(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	return (-EPROTO);
@@ -6719,6 +6913,7 @@ asp_recv_rkmm_dereg_rsp(queue_t *q, m2ua_msg_t * m)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct spp *spp;
+
 	if (!(spp = xp->spp))
 		goto disable;
 	return (-EPROTO);
@@ -6749,6 +6944,7 @@ sgp_recv_maup_estab_req(queue_t *q, m2ua_msg_t * m)
 	struct sl *slp;
 	struct ap *ap;
 	struct gp *asp, *sgp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w)
@@ -6868,6 +7064,7 @@ asp_recv_maup_estab_con(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w)
@@ -6923,6 +7120,7 @@ sgp_recv_maup_rel_req(queue_t *q, m2ua_msg_t * m)
 	struct sl *slp;
 	struct ap *ap;
 	struct gp *sgp, *asp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w)
@@ -7011,6 +7209,7 @@ asp_recv_maup_rel_con(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w)
@@ -7071,6 +7270,7 @@ asp_recv_maup_rel_ind(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w)
@@ -7141,6 +7341,7 @@ sgp_recv_maup_state_req(queue_t *q, m2ua_msg_t * m)
 	struct sl *slp;
 	struct ap *ap;
 	struct gp *sgp, *asp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->status.ptr.w)
@@ -7346,6 +7547,7 @@ asp_recv_maup_state_con(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->status.ptr.w)
@@ -7434,6 +7636,7 @@ asp_recv_maup_state_ind(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->event.ptr.w)
@@ -7534,6 +7737,7 @@ sgp_recv_maup_retr_req(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slp;
 	struct gp *asp, *sgp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->action.ptr.w)
@@ -7604,6 +7808,7 @@ asp_recv_maup_retr_con(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->action.ptr.w || !m->result.ptr.w)
@@ -7721,6 +7926,7 @@ asp_recv_maup_retr_ind(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || (!m->data1.ptr.w && !m->data2.ptr.w))
@@ -7770,6 +7976,7 @@ asp_recv_maup_retr_comp_ind(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w)
@@ -7822,6 +8029,7 @@ asp_recv_maup_cong_ind(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->cong.ptr.w || !m->disc.ptr.w)
@@ -7879,6 +8087,7 @@ asp_recv_maup_data(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || (!m->data1.ptr.w && !m->data2.ptr.w))
@@ -7931,6 +8140,7 @@ sgp_recv_maup_data(queue_t *q, m2ua_msg_t * m)
 	struct sl *slp;
 	struct ap *ap;
 	struct gp *asp, *sgp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if ((!m->iid.ptr.w) || (!m->data1.ptr.w && !m->data2.ptr.w))
@@ -8016,6 +8226,7 @@ asp_recv_maup_data_ack(queue_t *q, m2ua_msg_t * m)
 	struct ap *ap;
 	struct sl *slu;
 	mblk_t *bp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if (!m->iid.ptr.w || !m->corid.ptr.w)
@@ -8055,6 +8266,7 @@ sgp_recv_maup_data_ack(queue_t *q, m2ua_msg_t * m)
 	struct sl *slp;
 	struct ap *ap;
 	struct gp *asp, *sgp;
+
 	if (!xp->spp)
 		return (QR_DISABLE);
 	if ((!m->iid.ptr.w) || !m->corid.ptr.w)
@@ -8300,6 +8512,7 @@ m2ua_recv_msg(queue_t *q, mblk_t *mp)
 	struct sp *sp;
 	struct spp *spp;
 	struct m2ua_msg msg;
+
 	if ((err = m2ua_dec_msg(mp, &msg)) >= 0) {
 		if ((spp = xp->spp)) {
 			switch (spp->type) {
@@ -8400,6 +8613,7 @@ slu_info_req(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int err;
 	lmi_info_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	switch (sl_get_i_state(sl)) {
@@ -8431,6 +8645,7 @@ slu_attach_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
 	struct m2ua_addr add;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p) + sizeof(add))
@@ -8487,6 +8702,7 @@ slu_detach_req(queue_t *q, mblk_t *mp)
 	int err;
 	struct as *as;
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (sl_get_i_state(sl) != LMI_DISABLED)
@@ -8537,6 +8753,7 @@ slu_enable_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	int err;
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	switch (sl_get_i_state(sl)) {
@@ -8665,6 +8882,7 @@ slu_disable_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	int err;
 	lmi_disable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	switch (sl_get_i_state(sl)) {
@@ -8738,6 +8956,7 @@ slu_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
+
 	return slu_error_ack(q, sl, p->sl_primitive, LMI_NOTSUPP);
 }
 #endif
@@ -8759,6 +8978,7 @@ slu_send_msg(queue_t *q, mblk_t *mp, int type, int (*pass_f) (queue_t *, sl_t *,
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slu->as.as))
@@ -8801,6 +9021,7 @@ slu_write(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (dlen < slu->info.lmi_min_sdu || dlen > slu->info.lmi_max_sdu)
@@ -8860,6 +9081,7 @@ slu_pdu_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -8926,6 +9148,7 @@ slu_emergency_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9017,6 +9240,7 @@ slu_emergency_ceases_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9110,6 +9334,7 @@ slu_start_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9250,6 +9475,7 @@ slu_stop_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9346,6 +9572,7 @@ slu_retrieve_bsnt_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9448,6 +9675,7 @@ slu_retrieval_request_and_fsnc_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9557,6 +9785,7 @@ slu_clear_buffers_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9643,6 +9872,7 @@ slu_clear_rtb_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9729,6 +9959,7 @@ slu_continue_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9815,6 +10046,7 @@ slu_local_processor_outage_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9887,6 +10119,7 @@ slu_resume_req(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *sgp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		goto discard;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -9982,6 +10215,7 @@ slu_congestion_discard_req(queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slu->as.as))
@@ -10017,6 +10251,7 @@ slu_congestion_accept_req(queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slu->as.as))
@@ -10052,6 +10287,7 @@ slu_no_congestion_req(queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slu->as.as))
@@ -10086,6 +10322,7 @@ slu_power_on_req(queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *sgp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slu) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slu->as.as))
@@ -10116,6 +10353,7 @@ slu_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 	int err;
+
 	if ((err = sl_error_ack(q, sl, SL_OPTMGMT_REQ, LMI_NOTSUPP, EOPNOTSUPP)))
 		return (err);
 	return (-EPROTO);
@@ -10132,6 +10370,7 @@ slu_notify_req(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl = SL_PRIV(q);
 	int err;
+
 	if ((err = sl_error_ack(q, sl, SL_NOTIFY_REQ, LMI_NOTSUPP, EOPNOTSUPP)))
 		return (err);
 	return (-EPROTO);
@@ -10160,6 +10399,7 @@ slp_info_ack(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	lmi_info_ack_t *p = (typeof(p)) mp->b_rptr;
 	m2ua_addr_t *add;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p) + sizeof(*add))
@@ -10182,6 +10422,7 @@ slp_ok_ack(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int err;
 	lmi_ok_ack_t *p = (typeof(p)) mp->b_wptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (sl_get_i_state(sl)) {
@@ -10218,6 +10459,7 @@ slp_error_ack(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int err;
 	lmi_error_ack_t *p = (typeof(p)) mp->b_wptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (sl_get_i_state(sl)) {
@@ -10266,6 +10508,7 @@ slp_enable_con(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int err;
 	lmi_enable_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (sl_get_i_state(sl)) {
@@ -10293,6 +10536,7 @@ slp_disable_con(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int err;
 	lmi_disable_con_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (sl_get_i_state(sl)) {
@@ -10335,6 +10579,7 @@ slp_error_ind(queue_t *q, mblk_t *mp)
 	struct sl *sl = SL_PRIV(q);
 	int err;
 	lmi_error_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	switch (sl_get_i_state(sl)) {
@@ -10422,6 +10667,7 @@ slp_read(queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *asp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10486,6 +10732,7 @@ slp_pdu_ind(queue_t *q, mblk_t *mp)
 	struct ap *ap;
 	struct gp *asp;
 	mblk_t *bp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10547,6 +10794,7 @@ slp_link_congested_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10557,6 +10805,7 @@ slp_link_congested_ind(queue_t *q, mblk_t *mp)
 			if (!sl_tst_flags(slu, ASF_OPERATION_PENDING)) {
 				if (sl_get_l_state(slu) == SLS_ESTABLISHED) {
 					mblk_t *bp;
+
 					if (!canput(slu->oq))
 						return (-EBUSY);
 					if (!(bp = ss7_dupmsg(q, mp)))
@@ -10600,6 +10849,7 @@ slp_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10610,6 +10860,7 @@ slp_congestion_ceased_ind(queue_t *q, mblk_t *mp)
 			if (!sl_tst_flags(slu, ASF_OPERATION_PENDING)) {
 				if (sl_get_l_state(slu) == SLS_ESTABLISHED) {
 					mblk_t *bp;
+
 					if (!(bp = ss7_dupmsg(q, mp)))
 						return (-ENOBUFS);
 					if (!canput(slu->oq))
@@ -10654,6 +10905,7 @@ slp_retrieved_message_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10696,6 +10948,7 @@ slp_retrieval_complete_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10736,6 +10989,7 @@ slp_rb_cleared_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10745,6 +10999,7 @@ slp_rb_cleared_ind(queue_t *q, mblk_t *mp)
 		for (slu = ap_find_slu(ap); slu; slu = ap_find_slu_next(ap, slu, 1))
 			if (sl_tst_flags(slu, ASF_FLUSH_BUFFERS)) {
 				mblk_t *bp;
+
 				if (!canput(slu->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, mp)))
@@ -10776,6 +11031,7 @@ slp_bsnt_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10785,6 +11041,7 @@ slp_bsnt_ind(queue_t *q, mblk_t *mp)
 		for (slu = ap_find_slu(ap); slu; slu = ap_find_slu_next(ap, slu, 1))
 			if (sl_tst_flags(slu, ASF_BSNT_REQUEST)) {
 				mblk_t *bp;
+
 				if (!canput(slu->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, mp)))
@@ -10820,6 +11077,7 @@ slp_in_service_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		goto discard;
 	if (!(as = slp->as.as))
@@ -10829,6 +11087,7 @@ slp_in_service_ind(queue_t *q, mblk_t *mp)
 		for (slu = ap_find_slu(ap); slu; slu = ap_find_slu_next(ap, slu, 1))
 			if (sl_get_l_state(slu) == SLS_WCON_EREQ) {
 				mblk_t *bp;
+
 				if (!canput(slu->oq))
 					goto ebusy;
 				if (!(bp = ss7_dupmsg(q, mp)))
@@ -10873,6 +11132,7 @@ slp_out_of_service_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10882,6 +11142,7 @@ slp_out_of_service_ind(queue_t *q, mblk_t *mp)
 		for (slu = ap_find_slu(ap); slu; slu = ap_find_slu_next(ap, slu, 1))
 			if ((1 << sl_get_l_state(slu)) & (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
 				mblk_t *bp;
+
 				if (!canput(slu->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, mp)))
@@ -10912,6 +11173,7 @@ slp_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10923,6 +11185,7 @@ slp_remote_processor_outage_ind(queue_t *q, mblk_t *mp)
 				if ((1 << sl_get_l_state(slu)) &
 				    (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
 					mblk_t *bp;
+
 					if (!canput(slu->oq))
 						return (-EBUSY);
 					if (!(bp = ss7_dupmsg(q, mp)))
@@ -10962,6 +11225,7 @@ slp_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -10973,6 +11237,7 @@ slp_remote_processor_recovered_ind(queue_t *q, mblk_t *mp)
 				if ((1 << sl_get_l_state(slu)) &
 				    (SLSF_WCON_EREQ | SLSF_ESTABLISHED)) {
 					mblk_t *bp;
+
 					if (!canput(slu->oq))
 						return (-EBUSY);
 					if (!(bp = ss7_dupmsg(q, mp)))
@@ -11012,6 +11277,7 @@ slp_rtb_cleared_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -11021,6 +11287,7 @@ slp_rtb_cleared_ind(queue_t *q, mblk_t *mp)
 		for (slu = ap_find_slu(ap); slu; slu = ap_find_slu_next(ap, slu, 1))
 			if (sl_tst_flags(slu, ASF_CLEAR_RTB)) {
 				mblk_t *bp;
+
 				if (!canput(slu->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, mp)))
@@ -11053,6 +11320,7 @@ slp_retrieval_not_possible_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -11092,6 +11360,7 @@ slp_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 	struct as *as;
 	struct ap *ap;
 	struct gp *asp;
+
 	if (sl_get_i_state(slp) != LMI_ENABLED)
 		return (QR_DONE);
 	if (!(as = slp->as.as))
@@ -11101,6 +11370,7 @@ slp_bsnt_not_retrievable_ind(queue_t *q, mblk_t *mp)
 		for (slu = ap_find_slu(ap); slu; slu = ap_find_slu_next(ap, slu, 1))
 			if (sl_tst_flags(slu, ASF_BSNT_REQUEST)) {
 				mblk_t *bp;
+
 				if (!canput(slu->oq))
 					return (-EBUSY);
 				if (!(bp = ss7_dupmsg(q, mp)))
@@ -11196,6 +11466,7 @@ xp_discon_ind(queue_t *q, mblk_t *mp)
 	int err;
 	struct gp *asp, *sgp;
 	struct spp *spp, *sp2;
+
 	if (!(spp = xp->spp)) {
 		if (!(xp->sp))
 			goto disable;
@@ -11290,6 +11561,7 @@ STATIC int
 xp_read(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = ss7_pullupmsg(q, mp, -1)))
 		return (err);
 	return m2ua_recv_msg(q, mp);
@@ -11305,10 +11577,12 @@ xp_data_ind(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	int err;
 	struct T_data_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (p->MORE_flag) {
 		mblk_t *rp;
+
 		for (rp = xp->nm_reassem; rp && *(ulong *) rp->b_rptr != 0; rp = rp->b_next) ;
 		if (rp) {
 			linkb(rp, mp->b_cont);
@@ -11321,6 +11595,7 @@ xp_data_ind(queue_t *q, mblk_t *mp)
 		}
 	} else {
 		mblk_t **rpp;
+
 		for (rpp = &xp->nm_reassem; *rpp && *(ulong *) (*rpp)->b_rptr != 0;
 		     rpp = &(*rpp)->b_next) ;
 		if (*rpp) {
@@ -11348,10 +11623,12 @@ xp_exdata_ind(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	int err;
 	struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (p->MORE_flag) {
 		mblk_t *rp;
+
 		for (rp = xp->ex_reassem; rp && *(ulong *) rp->b_rptr != 0; rp = rp->b_next) ;
 		if (rp) {
 			linkb(rp, mp->b_cont);
@@ -11364,6 +11641,7 @@ xp_exdata_ind(queue_t *q, mblk_t *mp)
 		}
 	} else {
 		mblk_t **rpp;
+
 		for (rpp = &xp->ex_reassem; *rpp && *(ulong *) (*rpp)->b_rptr != 0;
 		     rpp = &(*rpp)->b_next) ;
 		if (*rpp) {
@@ -11390,6 +11668,7 @@ xp_info_ack(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	struct T_info_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	xp->info = *p;
@@ -11482,6 +11761,7 @@ xp_ordrel_ind(queue_t *q, mblk_t *mp)
 	int err;
 	struct gp *asp, *sgp;
 	struct spp *spp, *sp2;
+
 	if (!(spp = xp->spp)) {
 		if (!(xp->sp))
 			goto disable;
@@ -11567,12 +11847,14 @@ xp_optdata_ind(queue_t *q, mblk_t *mp)
 	int err;
 	struct T_optdata_ind *p = (typeof(p)) mp->b_rptr;
 	ulong sid = 0;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if (p->OPT_length) {
 		uchar *op = mp->b_rptr + p->OPT_offset;
 		uchar *oe = op + p->OPT_length;
 		struct t_opthdr *oh = (struct t_opthdr *) op;
+
 		if (mp->b_wptr < oe)
 			goto efault;
 		/* 
@@ -11585,6 +11867,7 @@ xp_optdata_ind(queue_t *q, mblk_t *mp)
 	if (p->DATA_flag & T_ODF_EX) {
 		if (p->DATA_flag & T_ODF_MORE) {
 			mblk_t *rp;
+
 			for (rp = xp->ex_reassem; rp && *(ulong *) rp->b_rptr != sid;
 			     rp = rp->b_next) ;
 			if (rp) {
@@ -11598,6 +11881,7 @@ xp_optdata_ind(queue_t *q, mblk_t *mp)
 			}
 		} else {
 			mblk_t **rpp;
+
 			for (rpp = &xp->ex_reassem; *rpp && *(ulong *) (*rpp)->b_rptr != sid;
 			     rpp = &(*rpp)->b_next) ;
 			if (*rpp) {
@@ -11613,6 +11897,7 @@ xp_optdata_ind(queue_t *q, mblk_t *mp)
 	} else {
 		if (p->DATA_flag & T_ODF_MORE) {
 			mblk_t *rp;
+
 			for (rp = xp->nm_reassem; rp && *(ulong *) rp->b_rptr != sid;
 			     rp = rp->b_next) ;
 			if (rp) {
@@ -11626,6 +11911,7 @@ xp_optdata_ind(queue_t *q, mblk_t *mp)
 			}
 		} else {
 			mblk_t **rpp;
+
 			for (rpp = &xp->nm_reassem; *rpp && *(ulong *) (*rpp)->b_rptr != sid;
 			     rpp = &(*rpp)->b_next) ;
 			if (*rpp) {
@@ -11659,6 +11945,7 @@ xp_addr_ack(queue_t *q, mblk_t *mp)
 	size_t loc_len = 0;
 	uchar *rem_ptr = NULL;
 	size_t rem_len = 0;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto efault;
 	if ((loc_len = p->LOCADDR_length)) {
@@ -11715,6 +12002,7 @@ sl_iocpass(queue_t *q, mblk_t *mp)
 	struct sl *sl_u = SL_PRIV(q), *sl_p = NULL;
 	struct as *as_u, *as_p;
 	struct ap *ap;
+
 	spin_lock_irqsave(&master.lock, flags);
 	{
 		if ((as_u = sl_u->as.as))
@@ -11742,6 +12030,7 @@ sl_ackpass(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct sl *sl_p = SL_PRIV(q), *sl_u;
+
 		if (sl_p->ioc) {
 			sl_put((sl_u = xchg(&sl_p->ioc, NULL)));
 			if (sl_u->oq) {
@@ -11768,6 +12057,7 @@ sl_iocgoptions(queue_t *q, mblk_t *mp)
 		struct as *as_u, *as_p;
 		struct ap *ap;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&master.lock, flags);
 		{
 			if ((as_u = sl_u->as.as))
@@ -11798,8 +12088,10 @@ sl_ackgoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct sl *sl_p = SL_PRIV(q), *sl_u;
+
 		if (sl_p->ioc) {
 			lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 			sl_put((sl_u = xchg(&sl_p->ioc, NULL)));
 			sl_u->proto = *arg;
 			if (sl_u->oq) {
@@ -11826,6 +12118,7 @@ sl_iocsoptions(queue_t *q, mblk_t *mp)
 		struct as *as_u, *as_p;
 		struct ap *ap;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&master.lock, flags);
 		{
 			if ((as_u = sl_u->as.as))
@@ -11856,8 +12149,10 @@ sl_acksoptions(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		struct sl *sl_p = SL_PRIV(q), *sl_u;
+
 		if (sl_p->ioc) {
 			lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 			sl_put((sl_u = xchg(&sl_p->ioc, NULL)));
 			sl_u->proto = *arg;
 			if (sl_u->oq) {
@@ -11889,6 +12184,7 @@ STATIC int
 m2ua_opt_get_as(m2ua_option_t * arg, struct as *as, int size)
 {
 	m2ua_opt_conf_as_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!as)
@@ -11900,6 +12196,7 @@ STATIC int
 m2ua_opt_get_sp(m2ua_option_t * arg, struct sp *sp, int size)
 {
 	m2ua_opt_conf_sp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sp)
@@ -11911,6 +12208,7 @@ STATIC int
 m2ua_opt_get_spp(m2ua_option_t * arg, struct spp *spp, int size)
 {
 	m2ua_opt_conf_spp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!spp)
@@ -11922,6 +12220,7 @@ STATIC int
 m2ua_opt_get_sl(m2ua_option_t * arg, struct sl *sl, int size)
 {
 	m2ua_opt_conf_sl_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sl)
@@ -11933,6 +12232,7 @@ STATIC int
 m2ua_opt_get_xp(m2ua_option_t * arg, struct xp *xp, int size)
 {
 	m2ua_opt_conf_xp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!xp)
@@ -11944,6 +12244,7 @@ STATIC int
 m2ua_opt_get_df(m2ua_option_t * arg, struct df *df, int size)
 {
 	m2ua_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -11960,6 +12261,7 @@ STATIC int
 m2ua_opt_set_as(m2ua_option_t * arg, struct as *as, int size)
 {
 	m2ua_opt_conf_as_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!as)
@@ -11972,6 +12274,7 @@ STATIC int
 m2ua_opt_set_sp(m2ua_option_t * arg, struct sp *sp, int size)
 {
 	m2ua_opt_conf_sp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sp)
@@ -11984,6 +12287,7 @@ STATIC int
 m2ua_opt_set_spp(m2ua_option_t * arg, struct spp *spp, int size)
 {
 	m2ua_opt_conf_spp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!spp)
@@ -11996,6 +12300,7 @@ STATIC int
 m2ua_opt_set_sl(m2ua_option_t * arg, struct sl *sl, int size)
 {
 	m2ua_opt_conf_sl_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sl)
@@ -12008,6 +12313,7 @@ STATIC int
 m2ua_opt_set_xp(m2ua_option_t * arg, struct xp *xp, int size)
 {
 	m2ua_opt_conf_xp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!xp)
@@ -12020,6 +12326,7 @@ STATIC int
 m2ua_opt_set_df(m2ua_option_t * arg, struct df *df, int size)
 {
 	m2ua_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -12041,6 +12348,7 @@ m2ua_get_as(m2ua_config_t * arg, struct as *as, int size)
 	m2ua_conf_as_t *cha;
 	struct sl *sl;
 	m2ua_conf_sl_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!as)
@@ -12059,6 +12367,7 @@ m2ua_get_as(m2ua_config_t * arg, struct as *as, int size)
 	     sizeof(*arg) + sizeof(*cha), arg = (typeof(arg)) (cha + 1), cha =
 	     (typeof(cha)) (arg + 1)) {
 		struct as *oas = (as == ap->u.as) ? ap->p.as : ap->u.as;
+
 		arg->type = oas->type;
 		arg->id = oas->id;
 		cha->spid = oas->sp.sp ? oas->sp.sp->id : 0;
@@ -12095,6 +12404,7 @@ m2ua_get_sp(m2ua_config_t * arg, struct sp *sp, int size)
 	m2ua_conf_as_t *cha;
 	struct spp *spp;
 	m2ua_conf_spp_t *chs;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!sp)
@@ -12113,6 +12423,7 @@ m2ua_get_sp(m2ua_config_t * arg, struct sp *sp, int size)
 	     sizeof(*arg) + sizeof(*chp), arg = (typeof(arg)) (chp + 1), chp =
 	     (typeof(chp)) (arg + 1)) {
 		struct sp *osp = (sp == np->u.sp) ? np->p.sp : np->u.sp;
+
 		arg->type = osp->type;
 		arg->id = osp->id;
 		chp->spid = sp->id;
@@ -12155,6 +12466,7 @@ m2ua_get_spp(m2ua_config_t * arg, struct spp *spp, int size)
 	m2ua_conf_spp_t *cnf = (typeof(cnf)) (arg + 1);
 	struct xp *xp;
 	m2ua_conf_xp_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!spp)
@@ -12186,6 +12498,7 @@ STATIC int
 m2ua_get_sl(m2ua_config_t * arg, struct sl *sl, int size)
 {
 	m2ua_conf_sl_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!sl)
@@ -12208,6 +12521,7 @@ STATIC int
 m2ua_get_xp(m2ua_config_t * arg, struct xp *xp, int size)
 {
 	m2ua_conf_xp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!xp)
@@ -12230,6 +12544,7 @@ m2ua_get_df(m2ua_config_t * arg, struct df *df, int size)
 	m2ua_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
 	struct sp *sp;
 	m2ua_conf_sp_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!df)
@@ -12266,6 +12581,7 @@ m2ua_add_as(m2ua_config_t * arg, struct as *as, int size, int force, int test)
 {
 	struct sp *sp = NULL;
 	m2ua_conf_as_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (as || (size -= sizeof(*cnf)) < 0)
 		goto einval;
 	if (cnf->spid)
@@ -12309,6 +12625,7 @@ m2ua_add_sp(m2ua_config_t * arg, struct sp *sp, int size, int force, int test)
 {
 	struct sp *osp = NULL;
 	m2ua_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (sp || (size -= sizeof(*cnf)) < 0)
 		goto einval;
 	if (cnf->spid)
@@ -12350,6 +12667,7 @@ m2ua_add_spp(m2ua_config_t * arg, struct spp *spp, int size, int force, int test
 {
 	struct sp *sp = NULL;
 	m2ua_conf_spp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (spp || (size -= sizeof(*cnf)) < 0)
 		goto einval;
 	if (cnf->spid)
@@ -12400,6 +12718,7 @@ m2ua_add_sl(m2ua_config_t * arg, struct sl *sl, int size, int force, int test)
 {
 	struct as *as = NULL;
 	m2ua_conf_sl_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (sl || (size -= sizeof(*cnf)) < 0)
 		goto einval;
 	if (cnf->asid)
@@ -12430,6 +12749,7 @@ m2ua_add_xp(m2ua_config_t * arg, struct xp *xp, int size, int force, int test)
 	struct sp *sp = NULL;
 	struct spp *spp = NULL;
 	m2ua_conf_xp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (xp || (size -= sizeof(*cnf)) < 0)
 		goto einval;
 	if (cnf->spid)
@@ -12458,6 +12778,7 @@ STATIC int
 m2ua_add_df(m2ua_config_t * arg, struct df *df, int size, int force, int test)
 {
 	m2ua_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (df || (size -= sizeof(*cnf)) < 0)
 		goto einval;
 	goto einval;
@@ -12474,6 +12795,7 @@ m2ua_cha_as(m2ua_config_t * arg, struct as *as, int size, int force, int test)
 {
 	struct as *a;
 	m2ua_conf_as_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!as || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid && cnf->spid != as->sp.sp->id)
@@ -12500,6 +12822,7 @@ STATIC int
 m2ua_cha_sp(m2ua_config_t * arg, struct sp *sp, int size, int force, int test)
 {
 	m2ua_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid)
@@ -12520,6 +12843,7 @@ STATIC int
 m2ua_cha_spp(m2ua_config_t * arg, struct spp *spp, int size, int force, int test)
 {
 	m2ua_conf_spp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!spp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid && cnf->spid != spp->sp.sp->id)
@@ -12542,6 +12866,7 @@ m2ua_cha_sl(m2ua_config_t * arg, struct sl *sl, int size, int force, int test)
 	struct as *a;
 	struct sl *s;
 	m2ua_conf_sl_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!sl || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->asid && cnf->asid != sl->as.as->id)
@@ -12572,6 +12897,7 @@ STATIC int
 m2ua_cha_xp(m2ua_config_t * arg, struct xp *xp, int size, int force, int test)
 {
 	m2ua_conf_xp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!xp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->sppid && (!xp->spp || cnf->sppid != xp->spp->id))
@@ -12594,6 +12920,7 @@ STATIC int
 m2ua_cha_df(m2ua_config_t * arg, struct df *df, int size, int force, int test)
 {
 	m2ua_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
@@ -12787,6 +13114,7 @@ m2ua_sta_as(m2ua_statem_t * arg, struct as *as, int size)
 	ulong *p;
 	struct ap *ap;
 	struct gp *gp;
+
 	if (!as || (size -= sizeof(*sta)) < sizeof(*p))
 		return (-EINVAL);
 	arg->flags = as_get_flags(as);
@@ -12813,6 +13141,7 @@ m2ua_sta_sp(m2ua_statem_t * arg, struct sp *sp, int size)
 	m2ua_statem_sp_t *sta = (typeof(sta)) (arg + 1);
 	ulong *p;
 	struct np *np;
+
 	if (!sp || (size -= sizeof(*sta)) < sizeof(*p))
 		return (-EINVAL);
 	arg->flags = sp_get_flags(sp);
@@ -12834,6 +13163,7 @@ m2ua_sta_spp(m2ua_statem_t * arg, struct spp *spp, int size)
 	m2ua_statem_spp_t *sta = (typeof(sta)) (arg + 1);
 	ulong *p;
 	struct gp *gp;
+
 	if (!spp || (size -= sizeof(*sta)) < sizeof(*p))
 		return (-EINVAL);
 	arg->flags = spp_get_flags(spp);
@@ -12852,6 +13182,7 @@ STATIC int
 m2ua_sta_sl(m2ua_statem_t * arg, struct sl *sl, int size)
 {
 	m2ua_statem_sl_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sl || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	arg->flags = sl_get_flags(sl);
@@ -12863,6 +13194,7 @@ STATIC int
 m2ua_sta_xp(m2ua_statem_t * arg, struct xp *xp, int size)
 {
 	m2ua_statem_xp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!xp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	arg->flags = xp_get_flags(xp);
@@ -12874,6 +13206,7 @@ STATIC int
 m2ua_sta_df(m2ua_statem_t * arg, struct df *df, int size)
 {
 	m2ua_statem_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	arg->flags = 0;
@@ -13319,6 +13652,7 @@ STATIC int
 m2ua_up_blo_as(m2ua_mgmt_t * arg, struct as *as)
 {
 	gp_t *gp;
+
 	if (!as)
 		return (-EINVAL);
 	for (gp = as->gp.list; gp; gp = gp->as.next)
@@ -13329,6 +13663,7 @@ STATIC int
 m2ua_up_blo_sp(m2ua_mgmt_t * arg, struct sp *sp)
 {
 	spp_t *spp;
+
 	if (!sp)
 		return (-EINVAL);
 	for (spp = sp->spp.list; spp; spp = spp->sp.next)
@@ -13364,6 +13699,7 @@ m2ua_up_blo_df(m2ua_mgmt_t * arg, struct df *df)
 {
 	sl_t *sl;
 	spp_t *spp;
+
 	for (spp = master.spp.list; spp; spp = spp->next)
 		spp_set_flags(spp, ASF_MGMT_BLOCKED);
 	for (sl = (sl_t *) master.priv.list; sl; sl = sl->next)
@@ -13383,6 +13719,7 @@ STATIC int
 m2ua_up_ubl_as(m2ua_mgmt_t * arg, struct as *as)
 {
 	gp_t *gp;
+
 	if (!as)
 		return (-EINVAL);
 	for (gp = as->gp.list; gp; gp = gp->as.next)
@@ -13393,6 +13730,7 @@ STATIC int
 m2ua_up_ubl_sp(m2ua_mgmt_t * arg, struct sp *sp)
 {
 	spp_t *spp;
+
 	if (!sp)
 		return (-EINVAL);
 	for (spp = sp->spp.list; spp; spp = spp->sp.next)
@@ -13428,6 +13766,7 @@ m2ua_up_ubl_df(m2ua_mgmt_t * arg, struct df *df)
 {
 	sl_t *sl;
 	spp_t *spp;
+
 	for (spp = master.spp.list; spp; spp = spp->next)
 		spp_clr_flags(spp, ASF_MGMT_BLOCKED);
 	for (sl = (sl_t *) master.priv.list; sl; sl = sl->next)
@@ -13455,6 +13794,7 @@ STATIC int
 m2ua_act_blo_sp(m2ua_mgmt_t * arg, struct sp *sp)
 {
 	as_t *as;
+
 	if (!sp)
 		return (-EINVAL);
 	for (as = sp->as.list; as; as = as->sp.next)
@@ -13465,6 +13805,7 @@ STATIC int
 m2ua_act_blo_spp(m2ua_mgmt_t * arg, struct spp *spp)
 {
 	gp_t *gp;
+
 	if (!spp)
 		return (-EINVAL);
 	for (gp = spp->gp.list; gp; gp = gp->spp.next)
@@ -13489,6 +13830,7 @@ STATIC int
 m2ua_act_blo_df(m2ua_mgmt_t * arg, struct df *df)
 {
 	as_t *as;
+
 	for (as = master.as.list; as; as = as->next)
 		as_set_flags(as, ASF_MGMT_BLOCKED);
 	return (QR_DONE);
@@ -13510,6 +13852,7 @@ STATIC int
 m2ua_act_ubl_sp(m2ua_mgmt_t * arg, struct sp *sp)
 {
 	as_t *as;
+
 	if (!sp)
 		return (-EINVAL);
 	for (as = sp->as.list; as; as = as->sp.next)
@@ -13520,6 +13863,7 @@ STATIC int
 m2ua_act_ubl_spp(m2ua_mgmt_t * arg, struct spp *spp)
 {
 	gp_t *gp;
+
 	if (!spp)
 		return (-EINVAL);
 	for (gp = spp->gp.list; gp; gp = gp->spp.next)
@@ -13544,6 +13888,7 @@ STATIC int
 m2ua_act_ubl_df(m2ua_mgmt_t * arg, struct df *df)
 {
 	as_t *as;
+
 	for (as = master.as.list; as; as = as->next)
 		as_clr_flags(as, ASF_MGMT_BLOCKED);
 	return (QR_DONE);
@@ -13567,6 +13912,7 @@ m2ua_iocgoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		m2ua_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
@@ -13604,6 +13950,7 @@ m2ua_iocsoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		m2ua_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
@@ -13641,6 +13988,7 @@ m2ua_iocgconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		m2ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case M2UA_OBJ_TYPE_AS_U:
@@ -13678,6 +14026,7 @@ m2ua_iocsconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		m2ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case M2UA_ADD:
@@ -13765,6 +14114,7 @@ m2ua_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		m2ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case M2UA_ADD:
@@ -13852,6 +14202,7 @@ m2ua_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		m2ua_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case M2UA_ADD:
@@ -13942,6 +14293,7 @@ m2ua_iocgstatem(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -13989,6 +14341,7 @@ m2ua_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		m2ua_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		(void) arg;
 		return (-EOPNOTSUPP);
 	}
@@ -14009,6 +14362,7 @@ m2ua_iocgstatsp(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14059,6 +14413,7 @@ m2ua_iocsstatsp(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14108,6 +14463,7 @@ m2ua_iocgstats(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14157,6 +14513,7 @@ m2ua_ioccstats(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14206,6 +14563,7 @@ m2ua_iocgnotify(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14255,6 +14613,7 @@ m2ua_iocsnotify(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14304,6 +14663,7 @@ m2ua_ioccnotify(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		m2ua_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -14350,6 +14710,7 @@ m2ua_ioccmgmt(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		m2ua_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		switch (arg->cmd) {
 		case M2UA_MGMT_UP:
 			switch (arg->type) {
@@ -14552,6 +14913,7 @@ m2ua_ioccpass(queue_t *q, mblk_t *mp)
 		m2ua_pass_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		mblk_t *bp, *dp;
 		union link *lk;
+
 		if (!(lk = link_lookup(arg->muxid)) || !lk->str.oq)
 			return (-EINVAL);
 		if (arg->type < QPCTL && !canput(lk->str.oq))
@@ -14597,6 +14959,7 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	(void) s;
 	switch (type) {
 	case _IOC_TYPE(__SID):
@@ -14604,6 +14967,7 @@ m2ua_w_ioctl(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		union link *lk, **lkp;
 		struct linkblk *lb;
+
 		MOD_INC_USE_COUNT;	/* keep module from unloading */
 		if (!(lb = arg)) {
 			swerr();
@@ -14849,6 +15213,7 @@ slp_r_iocack(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	(void) s;
 	(void) nr;
 	(void) size;
@@ -14895,6 +15260,7 @@ STATIC int
 slp_r_iocnak(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl_p = SL_PRIV(q), *sl_u;
+
 	if ((sl_p->ioc)) {
 		sl_put((sl_u = xchg(&sl_p->ioc, NULL)));
 		if (sl_u->oq) {
@@ -14923,6 +15289,7 @@ slu_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	str_t *s = STR_PRIV(q);
 	ulong oldstate = s->i_state;
+
 	switch (*(ulong *) mp->b_rptr) {
 	case LMI_INFO_REQ:
 		printd(("%s: %p: -> LMI_INFO_REQ\n", DRV_NAME, s));
@@ -15046,6 +15413,7 @@ slp_r_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	str_t *s = STR_PRIV(q);
 	ulong oldstate = s->i_state;
+
 	switch (*(ulong *) mp->b_rptr) {
 	case LMI_INFO_ACK:
 		printd(("%s: %p: -> LMI_INFO_ACK\n", DRV_NAME, s));
@@ -15173,6 +15541,7 @@ xp_r_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	str_t *s = STR_PRIV(q);
 	ulong oldstate = s->i_state;
+
 	switch (*(ulong *) mp->b_rptr) {
 	case T_CONN_IND:
 		printd(("%s: %p: -> T_CONN_IND\n", DRV_NAME, s));
@@ -15425,6 +15794,7 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	minor_t bminor = cminor;
 	union priv *p, **pp = &master.priv.list;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		if (q->q_ptr == master.lm) {
@@ -15454,10 +15824,12 @@ m2ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *pp; pp = (union priv **) &(*pp)->str.next) {
 		major_t dmajor = (*pp)->str.u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*pp)->str.u.dev.cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -15500,6 +15872,7 @@ m2ua_close(queue_t *q, int flag, cred_t *crp)
 {
 	str_t *s = STR_PRIV(q);
 	psw_t flags;
+
 	(void) s;
 	printd(("%s: %p: closing character device %d:%d\n", DRV_NAME, s, s->u.dev.cmajor,
 		s->u.dev.cminor));
@@ -15532,6 +15905,7 @@ STATIC int
 m2ua_term_caches(void)
 {
 	int err = 0;
+
 	if (m2ua_priv_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(m2ua_priv_cachep)) {
@@ -15704,6 +16078,7 @@ STATIC struct ap *
 m2ua_alloc_ap(struct as *as_u, struct as *as_p)
 {
 	struct ap *ap;
+
 	printd(("%s: %s: ap graph as %ld:%ld\n", DRV_NAME, __FUNCTION__, as_u->id, as_p->id));
 	if ((ap = kmem_cache_alloc(m2ua_ap_cachep, GFP_ATOMIC))) {
 		bzero(ap, sizeof(*ap));
@@ -15765,6 +16140,7 @@ STATIC struct np *
 m2ua_alloc_np(struct sp *sp, struct sp *sg)
 {
 	struct np *np;
+
 	printd(("%s: %s: np graph sp %ld:%ld\n", DRV_NAME, __FUNCTION__, sp->id, sg->id));
 	if ((np = kmem_cache_alloc(m2ua_np_cachep, GFP_ATOMIC))) {
 		bzero(np, sizeof(*np));
@@ -15826,6 +16202,7 @@ STATIC struct gp *
 m2ua_alloc_gp(ulong iid, struct as *as, struct spp *spp)
 {
 	struct gp *gp;
+
 	printd(("%s: %s: gp graph as %ld spp %lu\n", DRV_NAME, __FUNCTION__, as->id, spp->id));
 	if ((gp = kmem_cache_alloc(m2ua_gp_cachep, GFP_ATOMIC))) {
 		bzero(gp, sizeof(gp));
@@ -15888,10 +16265,12 @@ STATIC union priv *
 m2ua_alloc_priv(queue_t *q, union priv **pp, dev_t *devp, cred_t *crp, minor_t bminor)
 {
 	union priv *p;
+
 	printd(("%s: %s: create priv dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
 	if ((p = kmem_cache_alloc(m2ua_priv_cachep, GFP_ATOMIC))) {
 		str_t *s = (str_t *) p, **sp = (str_t **) pp;
+
 		bzero(p, sizeof(*p));
 		priv_get(p);	/* first get */
 		s->u.dev.cmajor = getmajor(*devp);
@@ -15934,6 +16313,7 @@ m2ua_free_priv(queue_t *q)
 	union priv *p = PRIV(q);
 	struct str *s = &p->str;
 	psw_t flags;
+
 	ensure(p, return);
 	printd(("%s: %s: %p: free priv %d:%d\n", DRV_NAME, __FUNCTION__, s, s->u.dev.cmajor,
 		s->u.dev.cminor));
@@ -16012,10 +16392,12 @@ STATIC struct as *
 m2ua_alloc_as(ulong id, ulong type, struct sp *sp, uint32_t iid, m2ua_addr_t * add)
 {
 	struct as *as, **p;
+
 	printd(("%s: %s: create as->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((as = kmem_cache_alloc(m2ua_as_cachep, GFP_ATOMIC))) {
 		struct spp *spp;
 		struct np *np;
+
 		bzero(as, sizeof(*as));
 		as_get(as);	/* first get */
 		spin_lock_init(&as->lock);	/* "as-lock" */
@@ -16048,6 +16430,7 @@ m2ua_alloc_as(ulong id, ulong type, struct sp *sp, uint32_t iid, m2ua_addr_t * a
 		   generate graph nodes to all matching AS for other SPs */
 		if ((np = sp->np.list)) {
 			struct as *a2;
+
 			if (sp == np->u.sp)
 				for (; np; np = np->u.next)
 					for (a2 = np->p.sp->as.list; a2; a2 = a2->sp.next)
@@ -16081,6 +16464,7 @@ STATIC void
 m2ua_free_as(struct as *as)
 {
 	psw_t flags;
+
 	ensure(as, return);
 	printd(("%s: %s: %p free as->id = %ld\n", DRV_NAME, __FUNCTION__, as, as->id));
 	spin_lock_irqsave(&as->lock, flags);
@@ -16088,6 +16472,7 @@ m2ua_free_as(struct as *as)
 		struct sl *sl;
 		struct ap *ap;
 		struct gp *gp;
+
 		/* 
 		   unlink from sl */
 		while ((sl = as->sl.list)) {
@@ -16162,6 +16547,7 @@ STATIC ulong
 as_get_id(ulong id)
 {
 	struct as *as;
+
 	if (!id) {
 		id = 1;
 		for (as = master.as.list; as; as = as->next)
@@ -16176,6 +16562,7 @@ STATIC struct as *
 as_lookup(ulong id)
 {
 	struct as *as;
+
 	for (as = master.as.list; as && as->id != id; as = as->next) ;
 	return (as);
 }
@@ -16189,6 +16576,7 @@ STATIC struct sp *
 m2ua_alloc_sp(ulong id, ulong type, struct sp *osp, ulong cost, ulong tmode)
 {
 	struct sp *sp, **p;
+
 	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sp = kmem_cache_alloc(m2ua_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
@@ -16226,6 +16614,7 @@ STATIC void
 m2ua_free_sp(struct sp *sp)
 {
 	psw_t flags;
+
 	ensure(sp, return);
 	printd(("%s: %s: %p free sp->id = %ld\n", DRV_NAME, __FUNCTION__, sp, sp->id));
 	spin_lock_irqsave(&sp->lock, flags);
@@ -16291,6 +16680,7 @@ STATIC ulong
 sp_get_id(ulong id)
 {
 	struct sp *sp;
+
 	if (!id) {
 		id = 1;
 		for (sp = master.sp.list; sp; sp = sp->next)
@@ -16305,6 +16695,7 @@ STATIC struct sp *
 sp_lookup(ulong id)
 {
 	struct sp *sp;
+
 	for (sp = master.sp.list; sp && sp->id != id; sp = sp->next) ;
 	return (sp);
 }
@@ -16318,9 +16709,11 @@ STATIC struct spp *
 m2ua_alloc_spp(ulong id, ulong type, struct sp *sp, ulong aspid, ulong cost)
 {
 	struct spp *spp, **p;
+
 	printd(("%s: %s: create spp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((spp = kmem_cache_alloc(m2ua_spp_cachep, GFP_ATOMIC))) {
 		struct as *as;
+
 		bzero(spp, sizeof(*spp));
 		spp_get(spp);	/* first get */
 		spin_lock_init(&spp->lock);	/* "spp-lock" */
@@ -16363,12 +16756,14 @@ STATIC void
 m2ua_free_spp(struct spp *spp)
 {
 	psw_t flags;
+
 	ensure(spp, return);
 	printd(("%s: %s: %p free spp->id = %ld\n", DRV_NAME, __FUNCTION__, spp, spp->id));
 	spin_lock_irqsave(&spp->lock, flags);
 	{
 		struct xp *xp;
 		struct gp *gp;
+
 		/* 
 		   unlink from xp */
 		if ((xp = spp->xp)) {
@@ -16439,6 +16834,7 @@ STATIC ulong
 spp_get_id(ulong id)
 {
 	struct spp *spp;
+
 	if (!id) {
 		id = 1;
 		for (spp = master.spp.list; spp; spp = spp->next)
@@ -16453,6 +16849,7 @@ STATIC struct spp *
 spp_lookup(ulong id)
 {
 	struct spp *spp;
+
 	for (spp = master.spp.list; spp && spp->id != id; spp = spp->next) ;
 	return (spp);
 }
@@ -16488,6 +16885,7 @@ STATIC void
 m2ua_free_sl(struct sl *sl)
 {
 	psw_t flags;
+
 	ensure(sl, return);
 	printd(("%s: %s: %p free sl index = %lu\n", DRV_NAME, __FUNCTION__, sl, sl->u.mux.index));
 	spin_lock_irqsave(&sl->lock, flags);
@@ -16569,6 +16967,7 @@ STATIC ulong
 sl_get_id(ulong id)
 {
 	static ulong identifier = 0;
+
 	if (!id)
 		id = ++identifier;
 	return (id);
@@ -16577,6 +16976,7 @@ STATIC struct sl *
 sl_lookup(ulong id)
 {
 	struct sl *sl;
+
 	for (sl = (struct sl *) master.link.list; sl; sl = sl->next) {
 		if (sl->type != M2UA_OBJ_TYPE_SL_U && sl->type != M2UA_OBJ_TYPE_SL_P)
 			continue;
@@ -16630,11 +17030,13 @@ STATIC void
 m2ua_free_xp(struct xp *xp)
 {
 	psw_t flags;
+
 	ensure(xp, return);
 	printd(("%s: %s: %p free xp index = %lu\n", DRV_NAME, __FUNCTION__, xp, xp->u.mux.index));
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		mblk_t *b_next, *bp;
+
 		noenable(xp->iq);
 		noenable(xp->oq);
 		/* 
@@ -16728,6 +17130,7 @@ STATIC ulong
 xp_get_id(ulong id)
 {
 	static ulong identifier = 0;
+
 	if (!id)
 		id = ++identifier;
 	return (id);
@@ -16736,6 +17139,7 @@ STATIC struct xp *
 xp_lookup(ulong id)
 {
 	struct xp *xp;
+
 	for (xp = (struct xp *) master.link.list; xp; xp = xp->next) {
 		if (xp->type != M2UA_OBJ_TYPE_XP_SCTP && xp->type != M2UA_OBJ_TYPE_XP_TCP
 		    && xp->type != M2UA_OBJ_TYPE_XP_SSCOP)
@@ -16755,6 +17159,7 @@ STATIC union link *
 m2ua_alloc_link(queue_t *q, union link **lkp, ulong index, cred_t *crp)
 {
 	union link *lk;
+
 	printd(("%s: %s: create link index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((lk = kmem_cache_alloc(m2ua_link_cachep, GFP_ATOMIC))) {
 		bzero(lk, sizeof(*lk));
@@ -16789,6 +17194,7 @@ m2ua_free_link(queue_t *q)
 {
 	union link *lk = LINK(q);
 	psw_t flags;
+
 	ensure(lk, return);
 	switch (lk->str.type) {
 	case M2UA_OBJ_TYPE_SL_U:
@@ -16871,6 +17277,7 @@ STATIC union link *
 link_lookup(ulong index)
 {
 	union link *lk;
+
 	for (lk = master.link.list; lk && lk->str.u.mux.index != index;
 	     lk = (link_t *) lk->str.next) ;
 	return (lk);
@@ -16890,6 +17297,7 @@ link_lookup(ulong index)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -16898,6 +17306,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -16924,6 +17333,7 @@ STATIC int
 m2ua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&m2ua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -16933,6 +17343,7 @@ STATIC int
 m2ua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&m2ua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -16950,6 +17361,7 @@ STATIC int
 m2ua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &m2uainfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -16965,6 +17377,7 @@ STATIC int
 m2ua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -16976,6 +17389,7 @@ MODULE_STATIC void __exit
 m2uaterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (m2ua_majors[mindex]) {
 			if ((err = m2ua_unregister_strdev(m2ua_majors[mindex])))
@@ -16994,6 +17408,7 @@ MODULE_STATIC int __init
 m2uainit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = m2ua_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

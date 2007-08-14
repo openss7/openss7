@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:14:42 $
+ @(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:19:28 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:14:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n.c,v $
+ Revision 0.9.2.8  2007/08/14 12:19:28  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.7  2007/03/15 10:14:42  brian
  - test case reporting and release date
 
@@ -67,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:14:42 $"
+#ident "@(#) $RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:19:28 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:14:42 $";
+static char const ident[] = "$RCSfile: test-sctp_n.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:19:28 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -131,6 +148,7 @@ static const char *lpkgname = "OpenSS7 SCTP Driver - NPI-SCTP";
 static const char *lstdname = "XNS 5.2/NPI Rev 2";
 static const char *sstdname = "XNS/NPI";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_n";
 #else
@@ -149,12 +167,13 @@ static int server_host_specified = 0;
 
 static int verbose = 1;
 
-static int client_exec = 0; /* execute client side */
-static int server_exec = 0; /* execute server side */
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 static int PRIM_type = 0;
@@ -645,8 +664,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -3240,7 +3260,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 #endif
 
 void
-print_info(int child, N_info_ack_t *info)
+print_info(int child, N_info_ack_t * info)
 {
 	char buf[64];
 
@@ -4605,20 +4625,23 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_DATA_IND;
 			DATA_xfer_flags = p->data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->type));
-			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->data_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->data_ind), sizeof(N_qos_sel_data_sctp_t));
+			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->data_ind)))->sid;
+			// print_options(child, cbuf, sizeof(p->data_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->type));
-			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->exdata_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->exdata_ind), sizeof(N_qos_sel_data_sctp_t));
+			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->exdata_ind)))->sid;
+			// print_options(child, cbuf, sizeof(p->exdata_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->type));
-			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->datack_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->datack_ind), sizeof(N_qos_sel_data_sctp_t));
+			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->datack_ind)))->sid;
+			// print_options(child, cbuf, sizeof(p->datack_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -4942,7 +4965,7 @@ preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 
 	return (__RESULT_NOTAPPL);
@@ -5010,7 +5033,7 @@ preamble_1_idle_cons(int child)
 	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
 		goto failure;
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONIND_number = coninds;
 	BIND_flags = TOKEN_REQUEST;
 	PROTOID_buffer = prot;
@@ -5075,6 +5098,7 @@ preamble_1_idle_cons(int child)
       failure:
 	return __RESULT_FAILURE;
 }
+
 #if 0
 #define preamble_1_idle preamble_1_idle_clns
 #else
@@ -5134,6 +5158,7 @@ postamble_1_data_xfer(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_1_refuse(int child)
 {
@@ -5177,7 +5202,7 @@ preamble_1_wres_cind_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -5218,7 +5243,7 @@ preamble_2_wres_cind_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -5320,6 +5345,7 @@ preamble_2_data_xfer_conn(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 #if 0
 static int
 preamble_1_data_xfer_resp(int child)
@@ -5349,6 +5375,7 @@ static int
 preamble_1_data_xfer_list(int child)
 {
 	char buf[] = "xxxxTest Data";
+
 #if 0
 	N_qos_sel_conn_ip_t test_qos = {
 		.n_qos_type = N_QOS_SEL_CONN_IP,
@@ -5375,7 +5402,7 @@ preamble_1_data_xfer_list(int child)
 	// test_resfd = test_fd[child];
 	TOKEN_value = tok[child];
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONN_flags = 0;
 	QOS_buffer = &test_qos;
 	QOS_length = sizeof(test_qos);
@@ -5415,6 +5442,7 @@ static int
 preamble_2_data_xfer_list(int child)
 {
 	char buf[] = "xxxxTest Data";
+
 #if 0
 	N_qos_sel_conn_ip_t test_qos = {
 		.n_qos_type = N_QOS_SEL_CONN_IP,
@@ -5441,7 +5469,7 @@ preamble_2_data_xfer_list(int child)
 	// test_resfd = test_fd[child];
 	TOKEN_value = tok[child];
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONN_flags = 0;
 	QOS_buffer = &test_qos;
 	QOS_length = sizeof(test_qos);
@@ -5638,7 +5666,7 @@ int
 test_case_1_2(int child)
 {
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONIND_number = (child == 1) ? 5 : 0;
 	PROTOID_buffer = NULL;
 	PROTOID_length = 0;
@@ -5704,7 +5732,7 @@ test_case_2_1_conn(int child)
 		goto failure;
 	state++;
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONIND_number = 0;
 	PROTOID_buffer = NULL;
 	PROTOID_length = 0;
@@ -5716,7 +5744,7 @@ test_case_2_1_conn(int child)
 		goto failure;
 	state++;
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5784,7 +5812,7 @@ int
 test_case_2_2_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5862,7 +5890,7 @@ int
 test_case_3_1_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -5939,7 +5967,7 @@ test_case_3_2_conn(int child)
 	int i;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6021,7 +6049,7 @@ int
 test_case_4_1_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6138,7 +6166,7 @@ test_case_4_2_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6244,7 +6272,7 @@ int
 test_case_5_1_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6338,7 +6366,7 @@ int
 test_case_5_2_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6430,7 +6458,7 @@ int
 test_case_5_3_conn(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -6915,14 +6943,14 @@ test_case_7_1_conn(int child)
 		state++;
 		QOS_buffer = &qos_data;
 		QOS_length = sizeof(qos_data);
-		DATA_buffer = (char *)urg;
+		DATA_buffer = (char *) urg;
 		DATA_length = sizeof(urg);
 		if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS) {
 			state++;
 			test_sleep(child, 1);
 			QOS_buffer = &qos_data;
 			QOS_length = sizeof(qos_data);
-			DATA_buffer = (char *)urg;
+			DATA_buffer = (char *) urg;
 			DATA_length = sizeof(urg);
 			if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS) {
 				failure_string = "Could not send expedited data!";
@@ -6936,7 +6964,7 @@ test_case_7_1_conn(int child)
 		DATA_xfer_flags = 0;
 		QOS_buffer = NULL;
 		QOS_length = 0;
-		DATA_buffer = (char *)nrm;
+		DATA_buffer = (char *) nrm;
 		DATA_length = sizeof(nrm);
 		if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
 			state++;
@@ -6944,7 +6972,7 @@ test_case_7_1_conn(int child)
 			DATA_xfer_flags = 0;
 			QOS_buffer = NULL;
 			QOS_length = 0;
-			DATA_buffer = (char *)nrm;
+			DATA_buffer = (char *) nrm;
 			DATA_length = sizeof(nrm);
 			if (do_signal(child, __TEST_DATA_REQ) != __RESULT_SUCCESS) {
 				failure_string = "Could not send normal data!";
@@ -7274,7 +7302,7 @@ test_case_8_2_conn(int child)
 	uint32_t tsn1[10];
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = REC_CONF_OPT | EX_DATA_OPT;
 	QOS_buffer = &qos_conn;
 	QOS_length = sizeof(qos_conn);
@@ -7961,6 +7989,7 @@ test_case_9_4_list(int child)
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	return (__RESULT_FAILURE);
 }
+
 #undef TEST_PACKETS
 #undef TEST_STREAMS
 #undef TEST_TOTAL
@@ -8899,7 +8928,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -8930,7 +8959,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

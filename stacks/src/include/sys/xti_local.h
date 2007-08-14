@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: xti_local.h,v 0.9.2.4 2006/09/25 12:10:09 brian Exp $
+ @(#) $Id: xti_local.h,v 0.9.2.5 2007/08/14 12:17:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:10:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_local.h,v $
+ Revision 0.9.2.5  2007/08/14 12:17:13  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2006/09/25 12:10:09  brian
  - updated and doxygenified headers
 
@@ -58,7 +61,7 @@
 #ifndef _SYS_XTI_LOCAL_H
 #define _SYS_XTI_LOCAL_H
 
-#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_local.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -124,6 +127,7 @@ extern int _t_putmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int flags
 extern int _t_getmsg(int fd, struct strbuf *ctrl, struct strbuf *data, int *flags);
 extern int _t_rcvconnect(int fd, struct t_call *call, struct t_info *info);
 extern int _t_getinfo(int fd, struct t_info *info);
+
 /** @} */
 
 #ifdef __END_DECLS

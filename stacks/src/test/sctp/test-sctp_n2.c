@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:59 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:50 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:14:59 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 0.9.2.5  2007/08/14 12:19:50  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/03/15 10:14:59  brian
  - test case reporting and release date
 
@@ -73,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:59 $"
+#ident "@(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:50 $"
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:59 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:50 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the
@@ -137,6 +154,7 @@ static const char *lpkgname = "OpenSS7 SCTP Driver - NPI-SCTP";
 static const char *lstdname = "XNS 5.2/NPI Rev 2";
 static const char *sstdname = "XNS/NPI";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_n";
 #else
@@ -155,12 +173,13 @@ static int server_host_specified = 0;
 
 static int verbose = 1;
 
-static int client_exec = 0; /* execute client side */
-static int server_exec = 0; /* execute server side */
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 static int PRIM_type = 0;
@@ -651,8 +670,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -3246,7 +3266,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 #endif
 
 void
-print_info(int child, N_info_ack_t *info)
+print_info(int child, N_info_ack_t * info)
 {
 	char buf[64];
 
@@ -4653,20 +4673,23 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			event = __TEST_DATA_IND;
 			DATA_xfer_flags = p->data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->type));
-			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->data_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->data_ind), sizeof(N_qos_sel_data_sctp_t));
+			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->data_ind)))->sid;
+			// print_options(child, cbuf, sizeof(p->data_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->type));
-			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->exdata_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->exdata_ind), sizeof(N_qos_sel_data_sctp_t));
+			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->exdata_ind)))->sid;
+			// print_options(child, cbuf, sizeof(p->exdata_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->type));
-			sid[child] = ((N_qos_sel_data_sctp_t *)(cbuf + sizeof(p->datack_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->datack_ind), sizeof(N_qos_sel_data_sctp_t));
+			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->datack_ind)))->sid;
+			// print_options(child, cbuf, sizeof(p->datack_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -4990,7 +5013,7 @@ preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 
 	return (__RESULT_NOTAPPL);
@@ -5058,7 +5081,7 @@ preamble_1_idle_cons(int child)
 	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
 		goto failure;
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONIND_number = coninds;
 	BIND_flags = TOKEN_REQUEST;
 	PROTOID_buffer = prot;
@@ -5123,6 +5146,7 @@ preamble_1_idle_cons(int child)
       failure:
 	return __RESULT_FAILURE;
 }
+
 #if 0
 #define preamble_1_idle preamble_1_idle_clns
 #else
@@ -5182,6 +5206,7 @@ postamble_1_data_xfer(int child)
 	state = failed;
 	return (__RESULT_FAILURE);
 }
+
 int
 postamble_1_refuse(int child)
 {
@@ -5225,7 +5250,7 @@ preamble_1_wres_cind_conn(int child)
 	state++;
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -5316,6 +5341,7 @@ static int
 preamble_1_data_xfer_list(int child)
 {
 	char buf[] = "xxxxTest Data";
+
 #if 0
 	N_qos_sel_conn_ip_t test_qos = {
 		.n_qos_type = N_QOS_SEL_CONN_IP,
@@ -5342,7 +5368,7 @@ preamble_1_data_xfer_list(int child)
 	// test_resfd = test_fd[child];
 	TOKEN_value = tok[child];
 	ADDR_buffer = addrs[child];
-	ADDR_length = anums[child]*sizeof(addrs[child][0]);
+	ADDR_length = anums[child] * sizeof(addrs[child][0]);
 	CONN_flags = 0;
 	QOS_buffer = &test_qos;
 	QOS_length = sizeof(test_qos);
@@ -6220,7 +6246,7 @@ test_case_1_5_2_1(int child)
 		.protocol = QOS_UNKNOWN,
 		.priority = 0,
 		.ttl = 64,
-		.tos = N_ROUTINE|N_NOTOS,
+		.tos = N_ROUTINE | N_NOTOS,
 		.mtu = 536,
 		.saddr = QOS_UNKNOWN,
 		.daddr = QOS_UNKNOWN,
@@ -6304,7 +6330,7 @@ test_case_1_5_2_2(int child)
 		.protocol = QOS_UNKNOWN,
 		.priority = 0,
 		.ttl = 63,
-		.tos = N_ROUTINE|N_NOTOS,
+		.tos = N_ROUTINE | N_NOTOS,
 		.saddr = QOS_UNKNOWN,
 	};
 #else
@@ -6370,7 +6396,7 @@ test_case_1_5_2_3(int child)
 		.protocol = QOS_UNKNOWN,
 		.priority = 0,
 		.ttl = 64,
-		.tos = N_ROUTINE|N_NOTOS,
+		.tos = N_ROUTINE | N_NOTOS,
 		.mtu = 536,
 		.saddr = QOS_UNKNOWN,
 		.daddr = QOS_UNKNOWN,
@@ -6479,7 +6505,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_2(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -6531,7 +6557,7 @@ int
 test_case_1_6_1_3(int child)
 {
 #if 0
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -6586,7 +6612,7 @@ int
 test_case_1_6_1_4(int child)
 {
 #if 0
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -6641,7 +6667,7 @@ int
 test_case_1_6_1_5(int child)
 {
 #if 0
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -6695,7 +6721,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_6(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	return (__RESULT_NOTAPPL);
@@ -6747,7 +6773,7 @@ issued in the NS_UNBND state."
 int
 test_case_1_6_1_7(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	ADDR_buffer = &sin;
@@ -6799,7 +6825,7 @@ set."
 int
 test_case_1_6_1_8(int child)
 {
-	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, { 0x0000007f } };
+	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, {0x0000007f} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	return (__RESULT_NOTAPPL);
@@ -6851,7 +6877,7 @@ issued in the NS_UNBND state.  Default destination with specified port."
 int
 test_case_1_6_1_9(int child)
 {
-	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, TEST_PORT_NUMBER, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL };
 
 	return (__RESULT_NOTAPPL);
@@ -6996,7 +7022,7 @@ address in the NS_UNBND state."
 int
 test_case_1_6_2_2(int child)
 {
-	struct sockaddr_in sin = { AF_INET, 0, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, 0, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7090,7 +7116,7 @@ int
 test_case_1_6_2_3(int child)
 {
 	int port = htons(TEST_PORT_NUMBER);
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7182,11 +7208,11 @@ is properly issued in the NS_UNBND state."
 int
 test_case_1_6_2_4(int child)
 {
-	int port = 0; // htons(TEST_PORT_NUMBER);
+	int port = 0;			// htons(TEST_PORT_NUMBER);
 	int proto = TEST_PROTOCOL;
-	int flag = (child == 0) ? DEFAULT_DEST : ((child == 2) ? DEFAULT_LISTENER : 0) ;
+	int flag = (child == 0) ? DEFAULT_DEST : ((child == 2) ? DEFAULT_LISTENER : 0);
 	int serv = (flag == DEFAULT_LISTENER) ? N_CONS : N_CLNS;
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 
 #if 1
@@ -7281,7 +7307,7 @@ int
 test_case_1_6_2_5(int child)
 {
 	int port = htons(TEST_PORT_NUMBER);
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7369,7 +7395,7 @@ int
 test_case_1_6_3_1(int child)
 {
 	int port = htons(TEST_PORT_NUMBER);
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { TEST_PROTOCOL + child };
 
 	ADDR_buffer = &sin;
@@ -7436,7 +7462,7 @@ test_case_2_1_1(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
 	int proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 
 	ADDR_buffer = &sin;
@@ -7488,7 +7514,7 @@ int
 test_case_2_1_2(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child + 3);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -7538,7 +7564,7 @@ int
 test_case_2_1_3(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child + 3);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
 
 	TOKEN_value = 0;
 	ADDR_buffer = &sin;
@@ -7905,7 +7931,7 @@ test_case_2_3_2(int child)
 	ADDR_length = 0;
 	DATA_buffer = "Test";
 	DATA_length = strlen(DATA_buffer);
-	
+
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -7950,13 +7976,13 @@ int
 test_case_2_4_1(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
 	DATA_buffer = NULL;
 	DATA_length = 0;
-	
+
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8000,13 +8026,13 @@ int
 test_case_2_4_2(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
 	DATA_buffer = "";
 	DATA_length = strlen(DATA_buffer);
-	
+
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8050,13 +8076,13 @@ int
 test_case_2_4_3(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
 	DATA_buffer = NULL;
 	DATA_length = 0;
-	
+
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8100,13 +8126,13 @@ int
 test_case_2_4_4(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
 	DATA_buffer = "Test";
 	DATA_length = strlen(DATA_buffer);
-	
+
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8150,13 +8176,13 @@ int
 test_case_2_4_5(int child)
 {
 	int port = htons(TEST_PORT_NUMBER + child);
-	struct sockaddr_in sin = { AF_X25, port, { htonl(0x7f000000) } };
+	struct sockaddr_in sin = { AF_X25, port, {htonl(0x7f000000)} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
 	DATA_buffer = "Test";
 	DATA_length = strlen(DATA_buffer);
-	
+
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -8310,7 +8336,7 @@ test_case_3_1_1(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 	int coninds = (child == 2) ? 1 : 0;
 
@@ -8363,7 +8389,7 @@ int
 test_case_3_1_2(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child + 3);
-	struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000000) } };
+	struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000000)} };
 
 	TOKEN_value = 0;
 	ADDR_buffer = &sin;
@@ -8939,7 +8965,7 @@ test_case_3_4_5(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin) - 1;
@@ -8994,7 +9020,7 @@ test_case_3_4_6(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_X25, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_X25, port, {htonl(0x7f000001)} };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin);
@@ -9049,7 +9075,7 @@ test_case_3_4_7(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+		struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 
 		ADDR_buffer = &sin;
 		ADDR_length = sizeof(sin);
@@ -9104,7 +9130,8 @@ test_case_3_4_8(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+
 #if 0
 		np_ulong type = N_QOS_SEL_UD_IP;
 #else
@@ -9164,7 +9191,8 @@ test_case_3_4_9(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+
 #if 0
 		np_ulong type = N_QOS_SEL_CONN_IP;
 #else
@@ -9224,7 +9252,8 @@ test_case_3_4_10(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
+
 #if 0
 		N_qos_sel_conn_ip_t qos = {
 			.n_qos_type = N_QOS_SEL_CONN_IP,
@@ -9246,7 +9275,7 @@ test_case_3_4_10(int child)
 		ADDR_length = sizeof(sin);
 		CONN_flags = 0;
 		QOS_buffer = &qos;
-		QOS_length = sizeof(qos)-1;
+		QOS_length = sizeof(qos) - 1;
 		DATA_buffer = NULL;
 		DATA_length = 0;
 
@@ -9295,7 +9324,7 @@ test_case_3_4_11(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
 		char buf[] = "Test data";
 
 		ADDR_buffer = &sin;
@@ -9351,7 +9380,7 @@ test_case_3_4_12(int child)
 {
 	if (child != 2) {
 		unsigned short port = htons(TEST_PORT_NUMBER + child);
-		struct sockaddr_in sin = { AF_INET, port, { htonl(0x7f000001) } };
+		struct sockaddr_in sin = { AF_INET, port, {htonl(0x7f000001)} };
 		char buf[70000] = "Test data";
 
 		ADDR_buffer = &sin;
@@ -9407,7 +9436,7 @@ int
 test_case_3_5_1(int child)
 {
 	unsigned short port = addrs[2][0].sin_port;
-	struct sockaddr_in sin = { AF_INET, port, { addrs[2][0].sin_addr.s_addr } };
+	struct sockaddr_in sin = { AF_INET, port, {addrs[2][0].sin_addr.s_addr} };
 
 	ADDR_buffer = &sin;
 	ADDR_length = sizeof(sin);
@@ -9465,7 +9494,7 @@ int
 test_case_3_5_2(int child)
 {
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -9522,7 +9551,7 @@ test_case_3_5_3(int child)
 	char buf[] = "xxxxTest Data";
 
 	ADDR_buffer = addrs[2];
-	ADDR_length = anums[2]*sizeof(addrs[2][0]);
+	ADDR_length = anums[2] * sizeof(addrs[2][0]);
 	CONN_flags = 0;
 	QOS_buffer = NULL;
 	QOS_length = 0;
@@ -9715,7 +9744,8 @@ test_case_3_6_3(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&port, &buf[0], sizeof(port));
 		bcopy(&port, &buf[2], sizeof(port));
 
@@ -9951,7 +9981,8 @@ test_case_3_7_1(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&port, &buf[0], sizeof(port));
 		bcopy(&port, &buf[2], sizeof(port));
 
@@ -10006,7 +10037,8 @@ test_case_3_7_2(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&port, &buf[0], sizeof(port));
 		bcopy(&port, &buf[2], sizeof(port));
 
@@ -10110,7 +10142,8 @@ test_case_3_7_4(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&port, &buf[0], sizeof(port));
 		bcopy(&port, &buf[2], sizeof(port));
 
@@ -10216,6 +10249,7 @@ test_case_3_8_2(int child)
 {
 	if (child == 2) {
 		char buf[] = "xxxxTest Data";
+
 #if 0
 		N_qos_sel_conn_ip_t qos = {
 			.n_qos_type = N_QOS_SEL_CONN_IP,
@@ -10236,7 +10270,7 @@ test_case_3_8_2(int child)
 		test_resfd = test_fd[child];
 		TOKEN_value = 0;
 		ADDR_buffer = addrs[child];
-		ADDR_length = anums[child]*sizeof(addrs[child][0]);
+		ADDR_length = anums[child] * sizeof(addrs[child][0]);
 		CONN_flags = 0;
 		QOS_buffer = &qos;
 		QOS_length = sizeof(qos);
@@ -10300,7 +10334,7 @@ N_CONN_RES in the NS_WRES_CIND state (different stream)."
 int
 test_case_3_8_3(int child)
 {
-	return (__RESULT_SKIPPED); /* later */
+	return (__RESULT_SKIPPED);	/* later */
 	if (child == 2) {
 		int port = htons(TEST_PORT_NUMBER + 0);
 		struct sockaddr_in sin[3] = {
@@ -10309,6 +10343,7 @@ test_case_3_8_3(int child)
 			{AF_INET, port, {htonl(0x7f000003)}}
 		};
 		char buf[] = "xxxxTest Data";
+
 #if 0
 		N_qos_sel_conn_ip_t qos = {
 			.n_qos_type = N_QOS_SEL_CONN_IP,
@@ -10525,7 +10560,8 @@ test_case_3_9_3(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&port, &buf[0], sizeof(port));
 		bcopy(&port, &buf[2], sizeof(port));
 
@@ -10859,7 +10895,8 @@ test_case_3_10_4(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&port, &buf[0], sizeof(port));
 		bcopy(&port, &buf[2], sizeof(port));
 
@@ -10894,7 +10931,6 @@ struct test_stream test_3_10_4_conn = { &preamble_3_10_4_conn, &test_case_3_10_4
 struct test_stream test_3_10_4_resp = { &preamble_3_10_4_resp, &test_case_3_10_4_resp, &postamble_3_10_4_resp };
 struct test_stream test_3_10_4_list = { &preamble_3_10_4_list, &test_case_3_10_4_list, &postamble_3_10_4_list };
 
-
 #define test_group_3_11 "3.11. Successful data transfer in the NS_DATA_XFER state"
 #define tgrp_case_3_11_1 test_group_3
 #define sgrp_case_3_11_1 test_group_3_10
@@ -10916,7 +10952,8 @@ test_case_3_11_1(int child)
 		DATA_buffer = buf;
 		DATA_length = 14;
 
-		/* source and destination port, port number in the destination address is meaningless. */
+		/* source and destination port, port number in the destination address is
+		   meaningless. */
 		bcopy(&sport, &buf[0], sizeof(sport));
 		bcopy(&dport, &buf[2], sizeof(dport));
 
@@ -10949,8 +10986,6 @@ test_case_3_11_1(int child)
 struct test_stream test_3_11_1_conn = { &preamble_3_11_1_conn, &test_case_3_11_1_conn, &postamble_3_11_1_conn };
 struct test_stream test_3_11_1_resp = { &preamble_3_11_1_resp, &test_case_3_11_1_resp, &postamble_3_11_1_resp };
 struct test_stream test_3_11_1_list = { &preamble_3_11_1_list, &test_case_3_11_1_list, &postamble_3_11_1_list };
-
-
 
 /*
  *  -------------------------------------------------------------------------
@@ -11803,7 +11838,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -11834,7 +11869,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

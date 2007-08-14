@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $
+ @(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_ip.c,v $
+ Revision 0.9.2.10  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.9  2007/07/14 01:35:12  brian
  - make license explicit, add documentation
 
@@ -58,9 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $"
+#ident "@(#) $RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:51 $"
 
-static char const ident[] = "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $";
+static char const ident[] =
+    "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:51 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE/IP as specified in
@@ -70,7 +74,7 @@ static char const ident[] = "$RCSfile: sscop_ip.c,v $ $Name:  $($Revision: 0.9.2
 #include <sys/os7/compat.h>
 
 #define SSCOP_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/07/14 01:35:12 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop_ip.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:51 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -183,46 +187,53 @@ MODULE_STATIC struct streamtab sscop_info = {
 
 /*  N_CONN_IND		(11 - Incoming connection indication)		*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_conn_ind(uint flags, uint seq, uint32_t daddr, uint32_t saddr)
+static inline mblk_t *
+aa_conn_ind(uint flags, uint seq, uint32_t daddr, uint32_t saddr)
 {
 	return n_conn_ind(flags, seq, &daddr, sizeof(daddr), &saddr, sizeof(saddr), NULL, 0);
 }
 
 /*  N_CONN_CON		(12 - Connection established)			*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_conn_con(uint flags, uint32_t raddr)
+static inline mblk_t *
+aa_conn_con(uint flags, uint32_t raddr)
 {
 	return n_conn_con(flags, &raddr, sizeof(raddr), NULL, 0);
 }
 
 /*  N_DISCON_IND	(13 - NC disconnected)				*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_discon_ind(uint seq, uint orig, uint reason, uint32_t raddr)
+static inline mblk_t *
+aa_discon_ind(uint seq, uint orig, uint reason, uint32_t raddr)
 {
 	return n_discon_ind(seq, orig, reason, &raddr, sizeof(raddr));
 }
 
 /*  N_DATA_IND		(14 - Incoming connection-mode data indication)	*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_data_ind(uint flags, mblk_t * dp)
+static inline mblk_t *
+aa_data_ind(uint flags, mblk_t *dp)
 {
 	return n_data_ind(flags, dp);
 }
 
 /*  N_EXDATA_IND	(15 - Incoming expedited data indication)	*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_exdata_ind(mblk_t * dp)
+static inline mblk_t *
+aa_exdata_ind(mblk_t *dp)
 {
 	return n_exdata_ind(dp);
 }
 
 /*  N_INFO_ACK		(16 - Information Acknowledgement)		*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_info_ack(queue_t * q)
+static inline mblk_t *
+aa_info_ack(queue_t *q)
 {
 	sscop_t *sp = Q_SSCOP(q);
 	mblk_t *mp;
 	N_info_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p) + add_len + qos_len + qor_len, BRPI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_info_ack_t *) mp->b_wptr;
@@ -256,77 +267,88 @@ static inline mblk_t *aa_info_ack(queue_t * q)
 
 /*  N_BIND_ACK		(17 - NS User bound to network address)		*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_bind_ack(uint cons, uint token, uint32_t baddr, uint32_t protoid)
+static inline mblk_t *
+aa_bind_ack(uint cons, uint token, uint32_t baddr, uint32_t protoid)
 {
 	return n_bind_ack(cons, token, &baddr, sizeof(baddr), &protoid, sizeof(protoid));
 }
 
 /*  N_ERROR_ACK		(18 - Error Acknowledgement)			*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_error_ack(int prim, int err)
+static inline mblk_t *
+aa_error_ack(int prim, int err)
 {
 	return n_error_ack(prim, err);
 }
 
 /*  N_OK_ACK		(19 - Success Acknowledgement)			*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_ok_ack(int prim)
+static inline mblk_t *
+aa_ok_ack(int prim)
 {
 	return n_ok_ack(prim);
 }
 
 /*  N_UNITDATA_IND	(20 - Connection-less data receive indication)	*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_unitdata_ind(uint32_t daddr, uint32_t saddr, mblk_t * dp)
+static inline mblk_t *
+aa_unitdata_ind(uint32_t daddr, uint32_t saddr, mblk_t *dp)
 {
 	return n_unitdata_ind(&daddr, sizeof(daddr), &saddr, sizeof(saddr), dp);
 }
 
 /*  N_UDERROR_IND	(21 - UNITDATA Error Indication)		*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_uderror_ind(uint ecode, uint32_t daddr)
+static inline mblk_t *
+aa_uderror_ind(uint ecode, uint32_t daddr)
 {
 	return n_uderror_ind(ecode, &daddr, sizeof(daddr));
 }
 
 /*  N_DATACK_IND	(24 - Data acknowledgement indication)		*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_datack_ind(void)
+static inline mblk_t *
+aa_datack_ind(void)
 {
 	return n_datack_ind();
 }
 
 /*  N_RESET_IND		(26 - Incoing NC reset request indication)	*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_reset_ind(uint orig, uint reason)
+static inline mblk_t *
+aa_reset_ind(uint orig, uint reason)
 {
 	return n_reset_ind(orig, reason);
 }
 
 /*  N_RESET_CON		(28 - Reset processing complete)		*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_reset_con(void)
+static inline mblk_t *
+aa_reset_con(void)
 {
 	return n_reset_con();
 }
 
 /*  N_RECOVER_IND	(29 - NC Recovery indication)			*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_recover_ind(void)
+static inline mblk_t *
+aa_recover_ind(void)
 {
 	return n_recover_ind();
 }
 
 /*  N_RETRIEVE_IND	(32 - NC Retrieval indication)			*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_retrieve_ind(mblk_t * dp)
+static inline mblk_t *
+aa_retrieve_ind(mblk_t *dp)
 {
 	return n_retrieve_ind(dp);
 }
 
 /*  N_RETRIEVE_CON	(33 - NC Retrieval complete confirmation)	*/
 /*  --------------------------------------------------------------------*/
-static inline mblk_t *aa_retrieve_con(void)
+static inline mblk_t *
+aa_retrieve_con(void)
 {
 	return n_retrieve_con();
 }
@@ -342,7 +364,8 @@ static inline mblk_t *aa_retrieve_con(void)
  *  N_CONN_REQ		(0 - NC request)
  *  -------------------------------------------------------------------------
  */
-static int aa_conn_req(queue_t * q, mblk_t * mp)
+static int
+aa_conn_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -353,7 +376,8 @@ static int aa_conn_req(queue_t * q, mblk_t * mp)
  *  N_CONN_RES		(1 - Accept prevsious connection indication)
  *  -------------------------------------------------------------------------
  */
-static int aa_conn_res(queue_t * q, mblk_t * mp)
+static int
+aa_conn_res(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -364,7 +388,8 @@ static int aa_conn_res(queue_t * q, mblk_t * mp)
  *  N_DISCON_REQ	(2 - NC disconnection request)
  *  -------------------------------------------------------------------------
  */
-static int aa_discon_req(queue_t * q, mblk_t * mp)
+static int
+aa_discon_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -375,7 +400,8 @@ static int aa_discon_req(queue_t * q, mblk_t * mp)
  *  N_DATA_REQ		(3 - Connection-Mode data transfer request)
  *  -------------------------------------------------------------------------
  */
-static int aa_data_req(queue_t * q, mblk_t * mp)
+static int
+aa_data_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -386,7 +412,8 @@ static int aa_data_req(queue_t * q, mblk_t * mp)
  *  N_EXDATA_REQ	(4 - Expedited data request)
  *  -------------------------------------------------------------------------
  */
-static int aa_exdata_req(queue_t * q, mblk_t * mp)
+static int
+aa_exdata_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -397,7 +424,8 @@ static int aa_exdata_req(queue_t * q, mblk_t * mp)
  *  N_INFO_REQ		(5 - Information Request)
  *  -------------------------------------------------------------------------
  */
-static int aa_info_req(queue_t * q, mblk_t * mp)
+static int
+aa_info_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -408,7 +436,8 @@ static int aa_info_req(queue_t * q, mblk_t * mp)
  *  N_BIND_REQ		(6 - Bind a NS user to network address)
  *  -------------------------------------------------------------------------
  */
-static int aa_bind_req(queue_t * q, mblk_t * mp)
+static int
+aa_bind_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -419,7 +448,8 @@ static int aa_bind_req(queue_t * q, mblk_t * mp)
  *  N_UNBIND_REQ	(7 - Unbind NS user from network address)
  *  -------------------------------------------------------------------------
  */
-static int aa_unbind_req(queue_t * q, mblk_t * mp)
+static int
+aa_unbind_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -430,7 +460,8 @@ static int aa_unbind_req(queue_t * q, mblk_t * mp)
  *  N_UNITDATA_REQ	(8 - Connection-less data send request)
  *  -------------------------------------------------------------------------
  */
-static int aa_unitdata_req(queue_t * q, mblk_t * mp)
+static int
+aa_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -441,7 +472,8 @@ static int aa_unitdata_req(queue_t * q, mblk_t * mp)
  *  N_OPTMGMT_REQ	(9 - Options Management request)
  *  -------------------------------------------------------------------------
  */
-static int aa_optmgmt_req(queue_t * q, mblk_t * mp)
+static int
+aa_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -452,7 +484,8 @@ static int aa_optmgmt_req(queue_t * q, mblk_t * mp)
  *  N_DATACK_REQ	(23 - Data acknowledgement request)
  *  -------------------------------------------------------------------------
  */
-static int aa_datack_req(queue_t * q, mblk_t * mp)
+static int
+aa_datack_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -463,7 +496,8 @@ static int aa_datack_req(queue_t * q, mblk_t * mp)
  *  N_RESET_REQ		(25 - NC reset request)
  *  -------------------------------------------------------------------------
  */
-static int aa_reset_req(queue_t * q, mblk_t * mp)
+static int
+aa_reset_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -474,7 +508,8 @@ static int aa_reset_req(queue_t * q, mblk_t * mp)
  *  N_RESET_RES		(27 - Reset processing accepted)
  *  -------------------------------------------------------------------------
  */
-static int aa_reset_res(queue_t * q, mblk_t * mp)
+static int
+aa_reset_res(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -485,7 +520,8 @@ static int aa_reset_res(queue_t * q, mblk_t * mp)
  *  N_RECOVER_REQ	(30 - NC recovery request)
  *  -------------------------------------------------------------------------
  */
-static int aa_reset_req(queue_t * q, mblk_t * mp)
+static int
+aa_reset_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
@@ -496,14 +532,15 @@ static int aa_reset_req(queue_t * q, mblk_t * mp)
  *  N_RETRIEVE_REQ	(32 - NC retrieval request)
  *  -------------------------------------------------------------------------
  */
-static int aa_retreive_req(queue_t * q, mblk_t * mp)
+static int
+aa_retreive_req(queue_t *q, mblk_t *mp)
 {
 	(void) q;
 	(void) mp;
 	return (-EOPNOTSUPP);
 }
 
-static int (*sscop_ustr_primp[]) (queue_t * q, mblk_t * mp) = {
+static int (*sscop_ustr_primp[]) (queue_t *q, mblk_t *mp) = {
 	aa_conn_req,		/* N_CONN_REQ (0 - NC request) */
 	    aa_conn_res,	/* N_CONN_RES (1 - Accept prevsious connection indication) */
 	    aa_discon_req,	/* N_DISCON_REQ (2 - NC disconnection request) */
@@ -527,6 +564,7 @@ static int (*sscop_ustr_primp[]) (queue_t * q, mblk_t * mp) = {
 	    NULL, aa_retrieve_req	/* N_RETRIEVE_REQ (32 - NC retrieval request) */
 NULL, NULL,};
 
-static int sscop_w_proto(queue_t * q, mblk_t * mp)
+static int
+sscop_w_proto(queue_t *q, mblk_t *mp)
 {
 }

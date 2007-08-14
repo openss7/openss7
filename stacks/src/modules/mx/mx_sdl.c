@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:44 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:44 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_sdl.c,v $
+ Revision 0.9.2.17  2007/08/14 12:18:10  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.16  2007/07/14 01:34:44  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:44 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:44 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -100,7 +103,7 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:44 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -197,6 +200,7 @@ typedef struct mx {
 	uchar rem_ptr[32];		/* remote address */
 	size_t rem_len;			/* remote address length */
 } mx_t;
+
 #define MX_PRIV(__q) ((struct mx *)(__q)->q_ptr)
 
 struct mx_config mx_default = {
@@ -240,6 +244,7 @@ m_error(queue_t *q, struct mx *mx, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -288,6 +293,7 @@ mx_info_ack(queue_t *q)
 	struct MX_info_ack *p;
 	struct MX_parms_circuit *o;
 	size_t pad_len = (mx->add_len + (sizeof(ulong) - 1)) & ~(sizeof(ulong) - 1);
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + pad_len + sizeof(*o), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -332,6 +338,7 @@ mx_optmgmt_ack(queue_t *q, uchar *opt_ptr, size_t opt_len, ulong flags)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_optmgmt_ack *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -365,6 +372,7 @@ mx_ok_ack(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_ok_ack *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -411,6 +419,7 @@ mx_error_ack(queue_t *q, ulong prim, long error)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_error_ack *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -478,6 +487,7 @@ mx_enable_con(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_enable_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -513,6 +523,7 @@ mx_connect_con(queue_t *q, ulong flags, ulong slot)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_connect_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -551,6 +562,7 @@ mx_data_ind(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_data_ind *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -581,6 +593,7 @@ mx_disconnect_ind(queue_t *q, ulong flags, ulong slot)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_disconnect_ind *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -621,6 +634,7 @@ mx_disconnect_con(queue_t *q, ulong flags, ulong slot)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_disconnect_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -666,6 +680,7 @@ mx_disable_ind(queue_t *q, long cause)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_disable_ind *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -691,6 +706,7 @@ mx_disable_con(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	struct MX_disable_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -736,6 +752,7 @@ lmi_info_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	lmi_info_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -761,6 +778,7 @@ lmi_attach_req(queue_t *q, uchar *ppa_ptr, size_t ppa_len)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	lmi_attach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -791,6 +809,7 @@ lmi_detach_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	lmi_detach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -818,6 +837,7 @@ lmi_enable_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	lmi_enable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + mx->rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -848,6 +868,7 @@ lmi_disable_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	lmi_disable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -873,6 +894,7 @@ lmi_optmgmt_req(queue_t *q, uchar *opt_ptr, size_t opt_len, ulong flags)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -906,6 +928,7 @@ sdl_bits_for_transmission_req(queue_t *q, mblk_t *dp)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	sdl_bits_for_transmission_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -931,6 +954,7 @@ sdl_connect_req(queue_t *q, ulong flags)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	sdl_connect_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -956,6 +980,7 @@ sdl_disconnect_req(queue_t *q, ulong flags)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp;
 	sdl_disconnect_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1010,6 +1035,7 @@ lmi_error_ack(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	long prim, error = -EFAULT;
 	lmi_error_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (p->lmi_reason) {
@@ -1152,6 +1178,7 @@ STATIC int
 mx_read(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
+
 	if (!mp || !msgdsize(mp))
 		goto eproto;
 	switch (mx->state) {
@@ -1186,6 +1213,7 @@ sdl_received_bits_ind(queue_t *q, mblk_t *mp)
 {
 	sdl_received_bits_ind_t *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if ((err = mx_read(q, mp->b_cont)) == QR_ABSORBED)
@@ -1205,6 +1233,7 @@ sdl_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	sdl_disconnect_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state != MXS_CONNECTED && mx->state != MXS_WACK_CREQ && mx->state != MXS_WCON_CREQ)
@@ -1236,6 +1265,7 @@ STATIC int
 mx_write(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
+
 	if (!mp || !msgdsize(mp))
 		goto eproto;
 	switch (mx->state) {
@@ -1271,6 +1301,7 @@ mx_info_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_info_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state == MXS_UNUSABLE)
@@ -1294,6 +1325,7 @@ mx_optmgmt_req(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	struct MX_optmgmt_req *p = (typeof(p)) mp->b_rptr;
 	union MX_parms *o;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr > mp->b_rptr + p->mx_opt_offset + p->mx_opt_length)
@@ -1349,6 +1381,7 @@ mx_optmgmt_req(queue_t *q, mblk_t *mp)
 		goto badparmtype;
 	} else {
 		union MX_parms parms;
+
 		o = &parms;
 		/* 
 		   no options */
@@ -1406,6 +1439,7 @@ mx_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_attach_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr > mp->b_rptr + p->mx_addr_offset + p->mx_addr_length)
@@ -1429,6 +1463,7 @@ mx_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_enable_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state != MXS_ATTACHED)
@@ -1452,6 +1487,7 @@ mx_connect_req(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	struct MX_connect_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (mx->state) {
@@ -1495,6 +1531,7 @@ mx_data_req(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	struct MX_data_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eproto;
 	if (p->mx_slot != 0)
@@ -1518,6 +1555,7 @@ mx_disconnect_req(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	struct MX_disconnect_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (mx->state) {
@@ -1557,6 +1595,7 @@ mx_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_disable_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (mx->state) {
@@ -1582,6 +1621,7 @@ mx_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct MX_detach_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (mx->state) {
@@ -1624,6 +1664,7 @@ STATIC int
 mx_iocsconfig(struct mx *mx, struct mx_config *p)
 {
 	int err;
+
 	if ((err = mx_ioctconfig(mx, p)))
 		return (err);
 	mx->config = *p;
@@ -1784,13 +1825,14 @@ sdl_iocgconfig_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCGCONFIG;
-		iocp->ioc_id = (uint) (long) mx; /* XXX */
+		iocp->ioc_id = (uint) (long) mx;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_config_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1897,13 +1939,14 @@ sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCSSTATSP;
-		iocp->ioc_id = (uint) (long) mx; /* XXX */
+		iocp->ioc_id = (uint) (long) mx;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_stats_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1946,13 +1989,14 @@ sdl_iocgstats_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCGSTATS;
-		iocp->ioc_id = (uint) (long) mx; /* XXX */
+		iocp->ioc_id = (uint) (long) mx;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_stats_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1995,13 +2039,14 @@ sdl_ioccstats_req(queue_t *q)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCCSTATS;
-		iocp->ioc_id = (uint) (long) mx; /* XXX */
+		iocp->ioc_id = (uint) (long) mx;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_stats_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -2044,13 +2089,14 @@ sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCSNOTIFY;
-		iocp->ioc_id = (uint) (long) mx; /* XXX */
+		iocp->ioc_id = (uint) (long) mx;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_notify_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -2093,13 +2139,14 @@ sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
 	struct mx *mx = MX_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCCNOTIFY;
-		iocp->ioc_id = (uint) (long) mx; /* XXX */
+		iocp->ioc_id = (uint) (long) mx;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_notify_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -2151,6 +2198,7 @@ mx_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	switch (type) {
 	case MX_IOC_MAGIC:
 	{
@@ -2242,7 +2290,9 @@ mx_r_iocack(queue_t *q, mblk_t *mp)
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	if (iocp->ioc_id != (uint) (long) mx) /* XXX */
+
+	if (iocp->ioc_id != (uint) (long) mx)
+		/* XXX */
 		/* 
 		   we didn't send it */
 		return (QR_PASSALONG);
@@ -2286,7 +2336,9 @@ mx_r_iocnak(queue_t *q, mblk_t *mp)
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	if (iocp->ioc_id != (uint) (long) mx) /* XXX */
+
+	if (iocp->ioc_id != (uint) (long) mx)
+		/* XXX */
 		/* 
 		   we didn't send it */
 		return (QR_PASSALONG);
@@ -2340,6 +2392,7 @@ mx_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct mx *mx = MX_PRIV(q);
 	ulong prim;
+
 	(void) mx;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MX_INFO_REQ:
@@ -2395,6 +2448,7 @@ mx_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct mx *mx = MX_PRIV(q);
+
 	(void) mx;
 	switch (*((ulong *) mp->b_rptr)) {
 	case LMI_INFO_ACK:
@@ -2485,6 +2539,7 @@ mx_r_error(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	int err;
+
 	switch (mx->state) {
 	default:
 		/* 
@@ -2502,6 +2557,7 @@ mx_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct mx *mx = MX_PRIV(q);
 	int err;
+
 	switch (mx->state) {
 	default:
 		/* 
@@ -2584,6 +2640,7 @@ STATIC streamscall int
 mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -2593,6 +2650,7 @@ mx_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct mx *mx;
+
 		for (mx = mx_opens; mx; mx = mx->next) {
 			if (mx->u.dev.cmajor == cmajor && mx->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -2675,6 +2733,7 @@ STATIC struct mx *
 mx_alloc_priv(queue_t *q, struct mx **chp, dev_t *devp, cred_t *crp)
 {
 	struct mx *mx;
+
 	if ((mx = kmem_cache_alloc(mx_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mx private structure\n", MOD_NAME, mx));
 		bzero(mx, sizeof(*mx));
@@ -2705,6 +2764,7 @@ mx_free_priv(queue_t *q)
 {
 	struct mx *mx = MX_PRIV(q);
 	psw_t flags;
+
 	ensure(mx, return);
 	spin_lock_irqsave(&mx->lock, flags);
 	{
@@ -2755,6 +2815,7 @@ mx_put(struct mx *mx)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2779,6 +2840,7 @@ STATIC int
 mx_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&mx_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2788,6 +2850,7 @@ STATIC int
 mx_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&mx_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2805,6 +2868,7 @@ STATIC int
 mx_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&mx_sdlinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2818,6 +2882,7 @@ STATIC int
 mx_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&mx_sdlinfo)) < 0)
 		return (err);
 	return (0);
@@ -2829,6 +2894,7 @@ MODULE_STATIC int __init
 mx_sdlinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = mx_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -2848,6 +2914,7 @@ MODULE_STATIC void __exit
 mx_sdlterminate(void)
 {
 	int err;
+
 	if ((err = mx_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = mx_term_caches()))

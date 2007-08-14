@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:18:49 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.20  2007/08/14 12:18:49  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.19  2007/07/14 01:35:10  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:18:49 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:18:49 $";
 
 #include <sys/os7/compat.h>
 
@@ -90,7 +93,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/07/14 01:35:10 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:18:49 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -234,6 +237,7 @@ lmi_info_ack(sdt_t * sp)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -263,6 +267,7 @@ lmi_ok_ack(sdt_t * sp, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -297,6 +302,7 @@ lmi_error_ack(sdt_t * sp, long prim, long err)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	switch (err) {
 	case -EBUSY:
 	case -EAGAIN:
@@ -348,6 +354,7 @@ lmi_enable_con(sdt_t * sp)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	ensure(sp, return (-EFAULT));
 	ensure(sp->state == LMI_ENABLE_PENDING, return (-EFAULT));
 	if (canputnext(sp->iq)) {
@@ -376,6 +383,7 @@ lmi_disable_con(sdt_t * sp)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	ensure(sp, return (-EFAULT));
 	ensure(sp->state == LMI_DISABLE_PENDING, return (-EFAULT));
 	if (canputnext(sp->iq)) {
@@ -405,6 +413,7 @@ lmi_optmgmt_ack(sdt_t * sp, ulong flags, void *opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -433,6 +442,7 @@ lmi_error_ind(sdt_t * sp, long err)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -459,6 +469,7 @@ lmi_stats_ind(sdt_t * sp, ulong interval, ulong timestamp)
 {
 	mblk_t *mp;
 	lmi_stats_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -488,6 +499,7 @@ lmi_event_ind(sdt_t * sp, ulong oid, ulong severity, ulong timestamp)
 {
 	mblk_t *mp;
 	lmi_event_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -530,6 +542,7 @@ sdt_daedr_received_bits_ind(sdt_t * sp, ulong count, mblk_t *dp)
 {
 	mblk_t *mp;
 	sdt_daedr_received_bits_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if (canputnext(sp->iq)) {
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
@@ -558,6 +571,7 @@ sdt_daedr_correct_su_ind(sdt_t * sp, ulong count)
 {
 	mblk_t *mp;
 	sdt_daedr_correct_su_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -582,6 +596,7 @@ sdt_daedr_su_in_error_ind(sdt_t * sp)
 {
 	mblk_t *mp;
 	sdt_daedr_su_in_error_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -604,6 +619,7 @@ sdt_daedt_transmission_request_ind(sdt_t * sp)
 {
 	mblk_t *mp;
 	sdt_txc_transmission_request_ind_t *p;
+
 	ensure(sp, return (-EFAULT));
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -633,6 +649,7 @@ n_data_req(sdt_t * sp, ulong flags, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_data_req_t *p;
+
 	ensure(sp, return (-EFAULT));
 	ensure(dp, return (-EFAULT));
 	if (canputnext(sp->oq)) {
@@ -665,6 +682,7 @@ n_exdata_req(sdt_t * sp, void *qos_ptr, size_t qos_len, mblk_t *dp)
 {
 	mblk_t *mp;
 	N_exdata_req_t *p;
+
 	ensure(sp, return (-EFAULT));
 	ensure(dp, return (-EFAULT));
 	if (bcanputnext(sp->oq, 1)) {
@@ -742,6 +760,7 @@ lmi_attach_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_attach_req_t *p = (lmi_attach_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -774,6 +793,7 @@ lmi_detach_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_detach_req_t *p = (lmi_detach_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -806,6 +826,7 @@ lmi_enable_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_enable_req_t *p = (lmi_enable_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -838,6 +859,7 @@ lmi_disable_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_disable_req_t *p = (lmi_disable_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -876,6 +898,7 @@ lmi_optmgmt_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	lmi_optmgmt_req_t *p = (lmi_optmgmt_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -903,6 +926,7 @@ STATIC int
 m_error_reply(sdt_t * sp, int err)
 {
 	mblk_t *mp;
+
 	ensure(sp, return (-EFAULT));
 	switch (err) {
 	case -EBUSY:
@@ -934,6 +958,7 @@ sdt_daedt_xmit_req(sdt_t * sp, mblk_t *mp)
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	sdt_daedt_transmission_req_t *p = (sdt_daedt_transmission_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -983,6 +1008,7 @@ sdt_daedt_start_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	sdt_daedt_start_req_t *p = (sdt_daedt_start_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -1017,6 +1043,7 @@ sdt_daedr_start_req(sdt_t * sp, mblk_t *mp)
 	int err;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
 	sdt_daedr_start_req_t *p = (sdt_daedr_start_req_t *) mp->b_rptr;
+
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	do {
@@ -1103,6 +1130,7 @@ n_data_ind(sdt_t * sp, mblk_t *mp)
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
+
 	// N_data_ind_t *p = (N_data_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -1143,6 +1171,7 @@ n_exdata_ind(sdt_t * sp, mblk_t *mp)
 	int err;
 	mblk_t *dp;
 	size_t mlen = mp->b_wptr - mp->b_rptr;
+
 	// N_exdata_ind_t *p = (N_exdata_ind_t *) mp->b_rptr;
 	ensure(sp, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -1296,6 +1325,7 @@ sdt_iocgoptions(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
 	lmi_option_t *opt = (lmi_option_t *) arg;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1313,6 +1343,7 @@ sdt_iocsoptions(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
 	lmi_option_t *opt = (lmi_option_t *) arg;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1353,6 +1384,7 @@ sdt_iocgconfig(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
 	sdt_config_t *cnf = (sdt_config_t *) arg;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1370,6 +1402,7 @@ sdt_iocsconfig(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
 	sdt_config_t *cnf = (sdt_config_t *) arg;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1387,6 +1420,7 @@ dev_iocsifclock(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
 	ulong *val = (ulong *) arg;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1420,6 +1454,7 @@ dev_iocgifclock(queue_t *q, int cmd, void *arg)
 {
 	sdt_t *sp;
 	ulong *val = (ulong *) arg;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1473,6 +1508,7 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sdt_t *sp;
 	ulong oldstate;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	oldstate = sp->state;
@@ -1522,6 +1558,7 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	ulong prim;
 	sdt_t *sp;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1585,6 +1622,7 @@ sdt_w_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	sdt_t *sp;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1598,6 +1636,7 @@ sdt_r_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	sdt_t *sp;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1619,6 +1658,7 @@ STATIC int
 sdt_r_ctl(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sp;
+
 	ensure(q, return (-EFAULT));
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return (-EFAULT));
@@ -1649,6 +1689,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd);
 	int nr = _IOC_NR(cmd);
 	int size = _IOC_SIZE(cmd);
+
 	(void) nr;
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
@@ -1849,6 +1890,7 @@ STATIC streamscall int
 sdt_wput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
+
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
@@ -1915,6 +1957,7 @@ sdt_wsrv(queue_t *q)
 {
 	int rtn;
 	mblk_t *mp;
+
 	ensure(q, return (-EFAULT));
 	if (ss7_trylockq(q)) {
 		while ((mp = getq(q))) {
@@ -1987,6 +2030,7 @@ STATIC streamscall int
 sdt_rput(queue_t *q, mblk_t *mp)
 {
 	int rtn;
+
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
@@ -2054,6 +2098,7 @@ sdt_rsrv(queue_t *q)
 {
 	int rtn;
 	mblk_t *mp;
+
 	ensure(q, return (-EFAULT));
 	if (ss7_trylockq(q)) {
 		while ((mp = getq(q))) {
@@ -2157,6 +2202,7 @@ STATIC sdt_t *
 sdt_alloc_priv(queue_t *q)
 {
 	sdt_t *sp;
+
 	ensure(q, return (NULL));
 
 	if ((sp = kmem_cache_alloc(sdt_cachep, GFP_ATOMIC))) {
@@ -2173,6 +2219,7 @@ STATIC void
 sdt_free_priv(queue_t *q)
 {
 	sdt_t *sp;
+
 	ensure(q, return);
 	sp = (sdt_t *) q->q_ptr;
 	ensure(sp, return);
@@ -2228,6 +2275,7 @@ sdt_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2252,6 +2300,7 @@ STATIC int
 sdt_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&sdt_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2261,6 +2310,7 @@ STATIC int
 sdt_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sdt_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2278,6 +2328,7 @@ STATIC int
 sdt_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sdt_sctpinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2291,6 +2342,7 @@ STATIC int
 sdt_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sdt_sctpinfo)) < 0)
 		return (err);
 	return (0);
@@ -2302,6 +2354,7 @@ MODULE_STATIC int __init
 sdt_sctpinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = sdt_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -2321,6 +2374,7 @@ MODULE_STATIC void __exit
 sdt_sctpterminate(void)
 {
 	int err;
+
 	if ((err = sdt_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sdt_term_caches()))

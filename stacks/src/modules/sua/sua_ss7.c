@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/17 01:56:32 $
+ @(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:18:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:32 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:53 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sua_ss7.c,v $
+ Revision 0.9.2.8  2007/08/14 12:18:53  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/17 01:56:32 $"
+#ident "@(#) $RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:18:53 $"
 
 static char const ident[] =
-    "$RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/06/17 01:56:32 $";
+    "$RCSfile: sua_ss7.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:18:53 $";
 
 #define __NO_VERSION__
 
@@ -70,9 +76,11 @@ static char const ident[] =
  *
  *  =========================================================================
  */
-static inline ss7_error_reply(queue_t * q, mblk_t * pdu, int prim, int err)
+static inline
+ss7_error_reply(queue_t *q, mblk_t *pdu, int prim, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = sccp_error_ack(prim, err))) {
 		freemsg(pdu);
 		qreply(q, mp);
@@ -80,10 +88,12 @@ static inline ss7_error_reply(queue_t * q, mblk_t * pdu, int prim, int err)
 	}
 	return (-ENOBUFS);
 }
-static inline int ss7_uderror_reply(queue_t * q, mblk_t * pdu, int err)
+static inline int
+ss7_uderror_reply(queue_t *q, mblk_t *pdu, int err)
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p = (N_unitdata_req_t *) pdu->b_rptr;
+
 	if ((mp = sccp_uderror_ind(err,
 				   p->DEST_length ? (sccp_addr_t *) (pdu->b_rptr +
 								     p->DEST_offset) : 0,
@@ -101,7 +111,8 @@ static inline int ss7_uderror_reply(queue_t * q, mblk_t * pdu, int err)
  *  N_CONN_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_conn_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_conn_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -109,7 +120,8 @@ static int ss7_conn_req(queue_t * q, mblk_t * pdu)
  *  N_CONN_RES
  *  -------------------------------------------------------------------------
  */
-static int ss7_conn_res(queue_t * q, mblk_t * pdu)
+static int
+ss7_conn_res(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -117,7 +129,8 @@ static int ss7_conn_res(queue_t * q, mblk_t * pdu)
  *  N_DISCON_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_discon_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_discon_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -125,10 +138,12 @@ static int ss7_discon_req(queue_t * q, mblk_t * pdu)
  *  N_DATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_data_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_data_req(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_w_data(queue_t * q, mblk_t * pdu)
+static int
+ss7_w_data(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -136,7 +151,8 @@ static int ss7_w_data(queue_t * q, mblk_t * pdu)
  *  N_EXDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_exdata_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_exdata_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -144,7 +160,8 @@ static int ss7_exdata_req(queue_t * q, mblk_t * pdu)
  *  N_INFO_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_info_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_info_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -152,7 +169,8 @@ static int ss7_info_req(queue_t * q, mblk_t * pdu)
  *  N_BIND_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_bind_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_bind_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -160,7 +178,8 @@ static int ss7_bind_req(queue_t * q, mblk_t * pdu)
  *  N_UNBIND_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_unbind_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_unbind_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -168,7 +187,8 @@ static int ss7_unbind_req(queue_t * q, mblk_t * pdu)
  *  N_UNITDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_unitdata_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_unitdata_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -176,7 +196,8 @@ static int ss7_unitdata_req(queue_t * q, mblk_t * pdu)
  *  N_OPTMGMT_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_optmgmt_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_optmgmt_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -184,7 +205,8 @@ static int ss7_optmgmt_req(queue_t * q, mblk_t * pdu)
  *  N_DATACK_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_datack_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_datack_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -192,7 +214,8 @@ static int ss7_datack_req(queue_t * q, mblk_t * pdu)
  *  N_RESET_REQ
  *  -------------------------------------------------------------------------
  */
-static int ss7_reset_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_reset_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -200,7 +223,8 @@ static int ss7_reset_req(queue_t * q, mblk_t * pdu)
  *  N_RESET_RES
  *  -------------------------------------------------------------------------
  */
-static int ss7_reset_res(queue_t * q, mblk_t * pdu)
+static int
+ss7_reset_res(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -238,14 +262,17 @@ static int (*ss7_dstr_prim[]) (queue_t *, mblk_t *) = {
 	    NULL		/* N_RESET_CON 28 */
 };
 
-static int ss7_w_proto(queue_t * q, mblk_t * pdu)
+static int
+ss7_w_proto(queue_t *q, mblk_t *pdu)
 {
 	int prim = *((long *) mp->b_rptr);
+
 	if (SS7_DSTR_FIRST <= prim && prim <= SS7_DSTR_LAST && ss7_dstr_prim[prim])
 		return ((*ss7_dstr_prim[prim]) (q, mp));
 	return (-EOPNOTSUPP);
 }
-static int ss7_w_flush(queue_t * q, mblk_t * pdu)
+static int
+ss7_w_flush(queue_t *q, mblk_t *pdu)
 {
 	return ua_w_flush(q, pdu);
 }
@@ -279,10 +306,12 @@ static int (*ss7_w_ops[]) (queue_t *, mblk_t *) = {
 	    NULL		/* M_STOPI */
 };
 
-static void ss7_u_create(lp_t * lp)
+static void
+ss7_u_create(lp_t * lp)
 {
 }
-static void ss7_u_delete(lp_t * lp)
+static void
+ss7_u_delete(lp_t * lp)
 {
 }
 
@@ -305,7 +334,8 @@ struct ops sua_ss7_u_ops = {
  *  N_CONN_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_conn_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_conn_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -313,7 +343,8 @@ static int ss7_conn_ind(queue_t * q, mblk_t * pdu)
  *  N_CONN_CON
  *  -------------------------------------------------------------------------
  */
-static int ss7_conn_con(queue_t * q, mblk_t * pdu)
+static int
+ss7_conn_con(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -321,7 +352,8 @@ static int ss7_conn_con(queue_t * q, mblk_t * pdu)
  *  N_DISCON_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_discon_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_discon_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -329,10 +361,12 @@ static int ss7_discon_ind(queue_t * q, mblk_t * pdu)
  *  N_DATA_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_data_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_data_ind(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_r_data(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_data(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -340,7 +374,8 @@ static int ss7_r_data(queue_t * q, mblk_t * pdu)
  *  N_EXDATA_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_exdata_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_exdata_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -348,7 +383,8 @@ static int ss7_exdata_ind(queue_t * q, mblk_t * pdu)
  *  N_INFO_ACK
  *  -------------------------------------------------------------------------
  */
-static int ss7_info_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_info_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -356,7 +392,8 @@ static int ss7_info_ack(queue_t * q, mblk_t * pdu)
  *  N_BIND_ACK
  *  -------------------------------------------------------------------------
  */
-static int ss7_bind_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_bind_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -364,7 +401,8 @@ static int ss7_bind_ack(queue_t * q, mblk_t * pdu)
  *  N_ERROR_ACK
  *  -------------------------------------------------------------------------
  */
-static int ss7_error_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_error_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -372,7 +410,8 @@ static int ss7_error_ack(queue_t * q, mblk_t * pdu)
  *  N_OK_ACK
  *  -------------------------------------------------------------------------
  */
-static int ss7_ok_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_ok_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -380,7 +419,8 @@ static int ss7_ok_ack(queue_t * q, mblk_t * pdu)
  *  N_UNITDATA_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_unitdata_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_unitdata_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -388,7 +428,8 @@ static int ss7_unitdata_ind(queue_t * q, mblk_t * pdu)
  *  N_UDERROR_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_uderror_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_uderror_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -396,7 +437,8 @@ static int ss7_uderror_ind(queue_t * q, mblk_t * pdu)
  *  N_DATACK_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_datack_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_datack_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -404,7 +446,8 @@ static int ss7_datack_ind(queue_t * q, mblk_t * pdu)
  *  N_RESET_IND
  *  -------------------------------------------------------------------------
  */
-static int ss7_reset_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_reset_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -412,7 +455,8 @@ static int ss7_reset_ind(queue_t * q, mblk_t * pdu)
  *  N_RESET_CON
  *  -------------------------------------------------------------------------
  */
-static int ss7_conn_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_conn_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -450,16 +494,20 @@ static int (*ss7_ustr_prim[]) (queue_t *, mblk_t *) = {
 #define SS7_USTR_LAST		   N_RESET_CON
 };
 
-static int ss7_r_proto(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_proto(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_r_error(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_error(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_r_hangup(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_hangup(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_r_flush(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_flush(queue_t *q, mblk_t *pdu)
 {
 	return ua_r_flush(q, pdu);
 }
@@ -493,10 +541,12 @@ static int (*ss7_r_ops[]) (queue_t *, mblk_t *) = {
 	    NULL		/* M_STOPI */
 };
 
-static void ss7_l_create(lp_t * lp)
+static void
+ss7_l_create(lp_t * lp)
 {
 }
-static void ss7_l_delete(lp_t * lp)
+static void
+ss7_l_delete(lp_t * lp)
 {
 }
 

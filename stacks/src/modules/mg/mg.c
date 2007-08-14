@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:04 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:32 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.19  2007/08/14 12:18:04  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.18  2007/07/14 01:34:32  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:04 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:04 $";
 
 #include <sys/os7/compat.h>
 
@@ -88,7 +91,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:34:32 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:04 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -280,11 +283,13 @@ typedef struct mg {
 	struct mg_stats_mg stats;	/* media gateway statistics */
 	struct mg_notify_mg notify;	/* media gateway notificiations */
 } mg_t;
+
 #define MG_PRIV(__q) ((struct mg *)(__q)->q_ptr)
 
 STATIC struct mg *mg_alloc_priv(queue_t *, struct mg **, dev_t *, cred_t *);
 STATIC void mg_free_priv(struct mg *);
 STATIC struct mg *mg_lookup(ulong);
+
 #if 0
 STATIC ulong mg_get_id(ulong);
 #endif
@@ -409,6 +414,7 @@ typedef struct mx {
 	struct mg_stats_mx stats;	/* multiplex statistics */
 	struct mg_notify_mx notify;	/* multiplex notificiations */
 } mx_t;
+
 #define MX_PRIV(__q) ((struct mx *)(__q)->q_ptr)
 
 STATIC struct mx *mx_alloc_link(queue_t *, struct mx **, ulong, cred_t *);
@@ -460,6 +466,7 @@ STATIC inline int16_t
 pcma2pcml(uint8_t s)
 {
 	int seg, lval;
+
 	s ^= 0x55;
 	seg = (s >> 4) & 0x07;
 	lval = ((seg ? 0x084 : 0x004) | ((uint16_t) (s & 0x0f) << 3)) << (seg ? seg : 1);
@@ -471,6 +478,7 @@ pcml2pcma(int16_t s)
 	int seg, shft;
 	uint8_t aval, sign;
 	uint16_t tst, mag;
+
 	if (s < 0) {
 		mag = -s - 8;
 		sign = 0x00;
@@ -507,6 +515,7 @@ pcmu2pcma(uint8_t s)
 		0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78,
 		0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80
 	};
+
 	return ((s & 0x80) ? (0xd5 ^ (utoa[s ^ 0xff] - 1)) : (0x55 ^ (utoa[s ^ 0x7f] - 1)));
 }
 
@@ -528,6 +537,7 @@ STATIC inline int16_t
 pcmu2pcml(uint8_t s)
 {
 	int seg, lval;
+
 	s ^= 0xff;
 	seg = (s >> 4) & 0x07;
 	lval = ((0x084 | ((uint16_t) (s & 0x0f) << 3)) << seg) - (33 << 2);
@@ -539,6 +549,7 @@ pcml2pcmu(int16_t s)
 	int seg, shft;
 	uint8_t uval, sign;
 	uint16_t tst, mag;
+
 	if (s < 0) {
 		mag = -s;
 		sign = 0x00;
@@ -576,6 +587,7 @@ pcma2pcmu(uint8_t s)
 		0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77,
 		0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f
 	};
+
 	return ((s & 0x80) ? (0xff ^ atou[s ^ 0xd5]) : (0x7f ^ atou[s ^ 0x55]));
 }
 
@@ -599,6 +611,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 		mblk_t *mp;
 		size_t bytes, samples;
 		uint pad = cn->pad;
+
 		switch (og_type) {
 		default:
 			swerr();
@@ -613,6 +626,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 		case MX_ENCODING_G711_PCM_L:
 		{
 			int16_t *op;
+
 			switch (ic_type) {
 			default:
 				swerr();
@@ -634,6 +648,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 						mp = ss7_dupmsg(q, dp);
 				} else if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					int16_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -646,6 +661,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 				bytes = samples << 1;
 				if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					uint8_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -658,6 +674,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 				bytes = samples << 1;
 				if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					uint8_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -671,6 +688,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 		case MX_ENCODING_G711_PCM_A:
 		{
 			uint8_t *op;
+
 			switch (ic_type) {
 			default:
 				swerr();
@@ -687,6 +705,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 				bytes = samples;
 				if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					int16_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -704,6 +723,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 						mp = ss7_dupmsg(q, dp);
 				} else if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					uint8_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -716,6 +736,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 				bytes = samples;
 				if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					uint8_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -733,6 +754,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 		case MX_ENCODING_G711_PCM_U:
 		{
 			uint8_t *op;
+
 			switch (ic_type) {
 			default:
 				swerr();
@@ -749,6 +771,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 				bytes = samples;
 				if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					int16_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -761,6 +784,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 				bytes = samples;
 				if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					uint8_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -782,6 +806,7 @@ mg_convert_msg(queue_t *q, mblk_t *dp, struct cn *cn, ulong ic_type, ulong og_ty
 						mp = ss7_dupmsg(q, dp);
 				} else if ((mp = ss7_allocb(q, bytes, BPRI_MED))) {
 					uint8_t *ip;
+
 					mp->b_wptr += bytes;
 					ip = (typeof(ip)) dp->b_rptr;
 					op = (typeof(op)) mp->b_rptr;
@@ -819,6 +844,7 @@ mg_convert_input(queue_t *q, mblk_t *dp, struct cn *cn)
 {
 	ulong ic_type = cn->ic.ch->config.encoding;
 	ulong og_type = cn->og.ch->config.encoding;
+
 	if (cn->og.ch->og.conn + cn->og.ch->ac.conn > 1) {	/* conferencing */
 		/* 
 		   need to perform conferencing, convert and pad to 16-bit signed native */
@@ -845,10 +871,12 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 	int pad;
 	uint cons;
 	size_t samples = ch->config.samples;
+
 	if (mx->ch.conn > 1) {
 		/* 
 		   we need an MX_DATA_REQ on the front of the data */
 		struct MX_data_req *p;
+
 		if (!(mp = ss7_allocb(q, sizeof(*p), BPRI_MED)))
 			goto enobufs;
 		mp->b_datap->db_type = M_PROTO;
@@ -866,6 +894,7 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 		/* 
 		   just one connection active */
 		size_t bytes = ch->config.block_size >> 3;
+
 		for (cn = ch->og.list; cn; cn = cn->og.next)
 			if (!(cn->flags & MGF_PULL_PENDING) && (cn->flags & MGF_OG_READY))
 				break;
@@ -887,9 +916,11 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 		}
 	} else {
 		ulong og_type;
+
 		/* 
 		   need to perform conferencing of connections and actions */
 		size_t bytes = samples << 1;
+
 		ensure(dp, return (-EFAULT));
 		/* 
 		   we need a working/result buffer */
@@ -904,6 +935,7 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 			if (!(cn->flags & MGF_PULL_PENDING) && (cn->flags & MGF_OG_READY)) {
 				int16_t *ip, *op;
 				size_t count = samples;
+
 				if (!pullupmsg(cn->buf, bytes))
 					goto enobufs;
 				ip = (typeof(ip)) cn->buf->b_rptr;
@@ -929,6 +961,7 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 				{
 					int16_t *ip, *op;
 					size_t count = samples;
+
 					if (!pullupmsg(ac->buf, bytes))
 						goto enobufs;
 					ip = (typeof(ip)) ac->buf->b_rptr;
@@ -946,6 +979,7 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 				{
 					int16_t *ip, *op;
 					size_t count = samples;
+
 					if (!pullupmsg(ac->buf, -1))
 						goto enobufs;
 					ip = (typeof(ip)) (ac->buf->b_rptr + ac->pos);
@@ -982,6 +1016,7 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 			uint8_t *op = (typeof(op)) dp->b_rptr;
 			int16_t *ip = (typeof(ip)) dp->b_rptr;
 			size_t count = (dp->b_wptr - dp->b_rptr) >> 1;
+
 			dp->b_wptr = dp->b_rptr + count;
 			while (count--)
 				*op++ = pcml2pcma(*ip++);
@@ -992,6 +1027,7 @@ mg_push_frames(queue_t *q, struct mx *mx, struct ch *ch)
 			uint8_t *op = (typeof(op)) dp->b_rptr;
 			int16_t *ip = (typeof(ip)) dp->b_rptr;
 			size_t count = (dp->b_wptr - dp->b_rptr) >> 1;
+
 			dp->b_wptr = dp->b_rptr + count;
 			while (count--)
 				*op++ = pcml2pcmu(*ip++);
@@ -1032,6 +1068,7 @@ mg_wakeup_multiplex(struct mx *mx)
 {
 	while (mx->ch.ready >= mx->ch.conn && canput(mx->oq)) {
 		struct ch *ch;
+
 		for (ch = mx->ch.list; ch; ch = ch->mx.next)
 			if (!(ch->flags & MGF_PUSH_PENDING) && (ch->flags & MGF_OG_READY)) {
 				if (mg_push_frames(mx->oq, mx, ch) < 0)
@@ -1066,6 +1103,7 @@ mg_wakeup_channel(struct ch *ch)
 {
 	if (ch->og.ready >= ch->og.conn && !(ch->flags & MGF_OG_READY)) {
 		struct mx *mx = ch->mx.mx;
+
 		ch->flags |= MGF_OG_READY;
 		mx->ch.ready++;
 		mg_wakeup_multiplex(mx);
@@ -1081,6 +1119,7 @@ STATIC INLINE void
 mg_wakeup_connection(struct cn *cn)
 {
 	struct ch *ch = cn->og.ch;
+
 	if (cn->samples >= ch->config.samples && !(cn->flags & MGF_OG_READY)) {
 		cn->flags |= MGF_OG_READY;
 		ch->og.ready++;
@@ -1101,6 +1140,7 @@ STATIC int
 mg_push_connect(queue_t *q, mblk_t *mp, struct cn *cn)
 {
 	int err;
+
 	if ((err = mg_convert_input(q, mp, cn)) >= 0)
 		mg_wakeup_connection(cn);
 	return (err);
@@ -1112,6 +1152,7 @@ ch_write(queue_t *q, mblk_t *dp, struct ch *ch)
 	if (ch->ic.ready >= ch->ic.conn) {
 		int err;
 		struct cn *cn;
+
 		for (cn = ch->ic.list; cn; cn = cn->next)
 			if (!(cn->flags & MGF_PUSH_PENDING) && (cn->flags & MGF_IC_READY)) {
 				if ((err = mg_convert_input(q, dp, cn)) < 0)
@@ -1152,6 +1193,7 @@ STATIC int
 m_flush(queue_t *q, struct mg *mg, int band, int flags, int what)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | band ? FLUSHBAND : 0;
@@ -1173,6 +1215,7 @@ m_error(queue_t *q, struct mg *mg, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -1244,6 +1287,7 @@ mg_info_ack(queue_t *q)
 	struct MG_info_ack *p;
 	struct MG_channel_opt *o;
 	size_t opt_len = sizeof(*o);
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1287,6 +1331,7 @@ mg_optmgmt_ack(queue_t *q, struct mg *mg, uchar *opt_ptr, size_t opt_len, ulong 
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_optmgmt_ack *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1321,6 +1366,7 @@ mg_ok_ack(queue_t *q, struct mg *mg, long prim)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_ok_ack *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1350,6 +1396,7 @@ mg_error_ack(queue_t *q, struct mg *mg, long prim, long error)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_error_ack *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1381,6 +1428,7 @@ mg_attach_ack(queue_t *q, struct mg *mg, struct ch *ch)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_attach_ack *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1412,6 +1460,7 @@ mg_join_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_join_con *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1443,6 +1492,7 @@ mg_action_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_action_con *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1474,6 +1524,7 @@ mg_action_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, struct ac
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_action_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1505,6 +1556,7 @@ mg_conn_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_conn_con *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1538,6 +1590,7 @@ mg_data_ind(queue_t *q, struct mg *mg, ulong flags, mblk_t *dp)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_data_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1568,6 +1621,7 @@ mg_discon_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_discon_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1618,6 +1672,7 @@ mg_discon_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong fla
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_discon_con *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1673,6 +1728,7 @@ mg_leave_ind(queue_t *q, struct mg *mg, struct se *se, struct lg *lg, ulong caus
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_leave_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1709,6 +1765,7 @@ mg_leave_con(queue_t *q, struct mg *mg, struct se *se, struct lg *lg)
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_leave_con *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1743,6 +1800,7 @@ mg_notify_ind(queue_t *q, struct mg *mg, ulong event, uchar *dia_ptr, size_t dia
 	if (mg && mg->oq) {
 		mblk_t *mp;
 		struct MG_notify_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dia_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1808,6 +1866,7 @@ mx_info_req(queue_t *q, struct mx *mx)
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_info_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1836,6 +1895,7 @@ mx_attach_req(queue_t *q, struct mx *mx, uchar *add_ptr, size_t add_len, ulong f
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_attach_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = MX_ATTACH_REQ;
 			p = (typeof(p)) mp->b_wptr;
@@ -1871,6 +1931,7 @@ mx_enable_req(queue_t *q, struct mx *mx)
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_enable_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = MX_ENABLE_REQ;
 			p = (typeof(p)) mp->b_wptr;
@@ -1902,6 +1963,7 @@ mx_connect_req(queue_t *q, struct mx *mx, struct ch *ch)
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_connect_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1936,6 +1998,7 @@ mx_data_req(queue_t *q, struct mx *mx, ulong slot, mblk_t *dp)
 		if (canput(mx->oq)) {
 			mblk_t *mp;
 			struct MX_data_req *p;
+
 			if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
@@ -1971,6 +2034,7 @@ mx_disconnect_req(queue_t *q, struct mx *mx, struct ch *ch, ulong flags)
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_disconnect_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2002,6 +2066,7 @@ mx_disable_req(queue_t *q, struct mx *mx)
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_disable_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2030,6 +2095,7 @@ mx_detach_req(queue_t *q, struct mx *mx)
 	if (mx && mx->oq) {
 		mblk_t *mp;
 		struct MX_detach_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = MX_DETACH_REQ;
 			p = (typeof(p)) mp->b_wptr;
@@ -2093,6 +2159,7 @@ mx_read(queue_t *q, mblk_t *dp)
 {
 	struct mx *mx = MX_PRIV(q);
 	struct ch *ch;
+
 	if (mx->state != MGS_CONNECTED || !(mx->flags & MGF_IC_DIR) || !(ch = mx->ch.list))
 		goto discard;
 	if (!msgsize(dp))
@@ -2117,6 +2184,7 @@ mx_info_ack(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	int err;
 	struct MX_info_ack *p = (typeof(p)) mp->b_rptr;
+
 	(void) mx;
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
@@ -2142,6 +2210,7 @@ mx_ok_ack(queue_t *q, mblk_t *mp)
 	struct mx *mx = MX_PRIV(q);
 	int err;
 	struct MX_ok_ack *p = (typeof(p)) mp->b_rptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -2174,6 +2243,7 @@ mx_error_ack(queue_t *q, mblk_t *mp)
 	long error;
 	ulong prim;
 	struct MX_error_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	prim = p->mx_error_primitive;
@@ -2203,6 +2273,7 @@ mx_enable_con(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	int err;
 	struct MX_enable_con *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state != MXS_WCON_EREQ)
@@ -2211,6 +2282,7 @@ mx_enable_con(queue_t *q, mblk_t *mp)
 		if (ch->state == MGS_WCON_JREQ) {
 			if ((lg = ch->lg.lg)) {
 				struct ch *c2 = ch;
+
 				if (lg->state == MGS_WCON_JREQ) {
 					for (c2 = lg->ch.list; c2 && c2 != ch; c2 = c2->lg.next)
 						if (c2->state == MGS_WCON_JREQ)
@@ -2262,6 +2334,7 @@ mx_connect_con(queue_t *q, mblk_t *mp)
 	struct cn *cn;
 	int err;
 	struct MX_connect_con *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state != MXS_ENABLED && mx->state != MXS_WCON_DREQ)
@@ -2344,6 +2417,7 @@ mx_data_ind(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	struct MX_data_ind *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p) || !mp->b_cont || !msgsize(mp->b_cont))
 		goto emsgsize;
 	if (mx->state != MXS_ENABLED && mx->state != MXS_WCON_DREQ)
@@ -2393,6 +2467,7 @@ mx_disconnect_ind(queue_t *q, mblk_t *mp)
 	struct cn *cn;
 	int err;
 	struct MX_disconnect_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state != MXS_ENABLED && mx->state != MXS_WCON_DREQ)
@@ -2477,6 +2552,7 @@ mx_disconnect_con(queue_t *q, mblk_t *mp)
 	struct ch *ch, *c2;
 	int err;
 	struct MX_disconnect_con *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mx->state != MXS_ENABLED && mx->state != MXS_WCON_DREQ)
@@ -2546,6 +2622,7 @@ mx_disable_ind(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	int err;
 	struct MX_disable_ind *p = (typeof(p)) mp->b_rptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -2553,6 +2630,7 @@ mx_disable_ind(queue_t *q, mblk_t *mp)
 		if (ch->state != MGS_DETACHED) {
 			if ((lg = ch->lg.lg)) {
 				struct ch *c2 = ch;
+
 				if (lg->state != MGS_DETACHED) {
 					for (c2 = lg->ch.list; c2 && c2 != ch; c2 = c2->lg.next)
 						if (c2->state != MGS_DETACHED)
@@ -2598,6 +2676,7 @@ mx_disable_con(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	int err;
 	struct MX_disable_con *p = (typeof(p)) mp->b_rptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -2607,6 +2686,7 @@ mx_disable_con(queue_t *q, mblk_t *mp)
 		if (ch->state == MGS_WCON_LREQ) {
 			if ((lg = ch->lg.lg)) {
 				struct ch *c2 = ch;
+
 				if (lg->state == MGS_WCON_LREQ) {
 					for (c2 = lg->ch.list; c2 && c2 != ch; c2 = c2->lg.next)
 						if (c2->state == MGS_WCON_LREQ)
@@ -2656,6 +2736,7 @@ mg_write(queue_t *q, mblk_t *dp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct ch *ch;
+
 	if (mg->state != MGS_CONNECTED || !(mg->flags & MGF_IC_DIR) || !(ch = mg->ch.list))
 		goto discard;
 	if (!msgsize(dp))
@@ -2679,6 +2760,7 @@ mg_info_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct MG_info_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mg->state == MGS_UNINIT)
@@ -2709,6 +2791,7 @@ mg_optmgmt_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	ulong flags;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr > mp->b_rptr + p->mg_opt_offset + p->mg_opt_length)
@@ -2763,6 +2846,7 @@ mg_optmgmt_req(queue_t *q, mblk_t *mp)
 		}
 	} else {
 		union MG_options opts;
+
 		o = &opts;
 		/* 
 		   no options */
@@ -2823,6 +2907,7 @@ mg_attach_req(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	struct MG_attach_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (mg->i_state) {
@@ -2897,6 +2982,7 @@ mg_detach_req(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	struct MG_detach_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (mg->i_state) {
@@ -2949,6 +3035,7 @@ mg_join_req(queue_t *q, mblk_t *mp)
 	int waiting;
 	struct MG_join_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr > mp->b_rptr + p->mg_channel_length + p->mg_channel_offset)
@@ -3077,6 +3164,7 @@ mg_action_req(queue_t *q, mblk_t *mp)
 	struct ac *ac;
 	struct MG_action_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (!((1 << mg->i_state) && (MGSF_DETACHED | MGSF_ATTACHED)))
@@ -3143,6 +3231,7 @@ mg_abort_req(queue_t *q, mblk_t *mp)
 	struct ac *ac;
 	struct MG_abort_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (!((1 << mg->i_state) && (MGSF_DETACHED | MGSF_ATTACHED)))
@@ -3207,6 +3296,7 @@ mg_conn_req(queue_t *q, mblk_t *mp)
 	struct MG_conn_req *p = (typeof(p)) mp->b_rptr;
 	int err, single, waiting;
 	ulong flags;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->mg_topology_offset + p->mg_topology_length)
@@ -3240,6 +3330,7 @@ mg_conn_req(queue_t *q, mblk_t *mp)
 	      lg_known:
 		for (ch = lg->ch.list; ch; ch = ch->lg.next) {
 			struct mx *mx, *m2;
+
 			if (!(mx = ch->mx.mx))
 				continue;
 			switch (ch->state) {
@@ -3341,6 +3432,7 @@ mg_data_req(queue_t *q, mblk_t *mp)
 	struct ch *ch;
 	struct MG_data_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (!mp->b_cont || !msgsize(mp->b_cont))
@@ -3380,6 +3472,7 @@ mg_discon_req(queue_t *q, mblk_t *mp)
 	struct cn *cn;
 	struct MG_discon_req *p = (typeof(p)) mp->b_rptr;
 	int err, single, waiting;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->mg_topology_offset + p->mg_topology_length)
@@ -3411,6 +3504,7 @@ mg_discon_req(queue_t *q, mblk_t *mp)
 	      lg_known:
 		for (ch = lg->ch.list; ch; ch = ch->lg.next) {
 			struct mx *mx;
+
 			if (!ch->og.list && !ch->ic.list)
 				continue;
 			if (!(mx = ch->mx.mx))
@@ -3494,6 +3588,7 @@ mg_leave_req(queue_t *q, mblk_t *mp)
 	int disable, single, waiting = 0;
 	struct MG_leave_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (!((1 << mg->i_state) && (MGSF_DETACHED | MGSF_ATTACHED)))
@@ -3594,6 +3689,7 @@ mg_notify_req(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	int err;
+
 	(void) mg;
 	err = -EFAULT;
 	fixme(("Write this function\n"));
@@ -3616,6 +3712,7 @@ STATIC int
 mg_opt_get_mg(mg_option_t * arg, struct mg *mg, int size)
 {
 	mg_opt_conf_mg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!mg)
@@ -3627,6 +3724,7 @@ STATIC int
 mg_opt_get_se(mg_option_t * arg, struct se *se, int size)
 {
 	mg_opt_conf_se_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!se)
@@ -3638,6 +3736,7 @@ STATIC int
 mg_opt_get_lg(mg_option_t * arg, struct lg *lg, int size)
 {
 	mg_opt_conf_lg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!lg)
@@ -3649,6 +3748,7 @@ STATIC int
 mg_opt_get_ch(mg_option_t * arg, struct ch *ch, int size)
 {
 	mg_opt_conf_ch_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!ch)
@@ -3660,6 +3760,7 @@ STATIC int
 mg_opt_get_mx(mg_option_t * arg, struct mx *mx, int size)
 {
 	mg_opt_conf_mx_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!mx)
@@ -3671,6 +3772,7 @@ STATIC int
 mg_opt_get_df(mg_option_t * arg, struct df *df, int size)
 {
 	mg_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -3687,6 +3789,7 @@ STATIC int
 mg_opt_set_mg(mg_option_t * arg, struct mg *mg, int size)
 {
 	mg_opt_conf_mg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!mg)
@@ -3699,6 +3802,7 @@ STATIC int
 mg_opt_set_se(mg_option_t * arg, struct se *se, int size)
 {
 	mg_opt_conf_se_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!se)
@@ -3711,6 +3815,7 @@ STATIC int
 mg_opt_set_lg(mg_option_t * arg, struct lg *lg, int size)
 {
 	mg_opt_conf_lg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!lg)
@@ -3723,6 +3828,7 @@ STATIC int
 mg_opt_set_ch(mg_option_t * arg, struct ch *ch, int size)
 {
 	mg_opt_conf_ch_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!ch)
@@ -3735,6 +3841,7 @@ STATIC int
 mg_opt_set_mx(mg_option_t * arg, struct mx *mx, int size)
 {
 	mg_opt_conf_mx_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!mx)
@@ -3747,6 +3854,7 @@ STATIC int
 mg_opt_set_df(mg_option_t * arg, struct df *df, int size)
 {
 	mg_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -3766,6 +3874,7 @@ mg_get_mg(mg_config_t * arg, struct mg *mg, int size)
 	struct se *se;
 	mg_conf_mg_t *cnf = (typeof(cnf)) (arg + 1);
 	mg_conf_se_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!mg || size < sizeof(*arg))
@@ -3792,6 +3901,7 @@ mg_get_se(mg_config_t * arg, struct se *se, int size)
 	struct lg *lg;
 	mg_conf_se_t *cnf = (typeof(cnf)) (arg + 1);
 	mg_conf_lg_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!se || size < sizeof(*arg))
@@ -3819,6 +3929,7 @@ mg_get_lg(mg_config_t * arg, struct lg *lg, int size)
 	struct ch *ch;
 	mg_conf_lg_t *cnf = (typeof(cnf)) (arg + 1);
 	mg_conf_ch_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!lg || size < sizeof(*arg))
@@ -3848,6 +3959,7 @@ STATIC int
 mg_get_ch(mg_config_t * arg, struct ch *ch, int size)
 {
 	mg_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!ch || size < sizeof(*arg))
@@ -3869,6 +3981,7 @@ mg_get_mx(mg_config_t * arg, struct mx *mx, int size)
 	struct ch *ch;
 	mg_conf_mx_t *cnf = (typeof(cnf)) (arg + 1);
 	mg_conf_ch_t *chd;
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!mx || size < sizeof(*arg))
@@ -3898,6 +4011,7 @@ STATIC int
 mg_get_df(mg_config_t * arg, struct df *df, int size)
 {
 	mg_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!df || size < sizeof(*arg))
@@ -3918,6 +4032,7 @@ STATIC int
 mg_add_mg(mg_config_t * arg, struct mg *mg, int size, int force, int test)
 {
 	mg_conf_mg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (mg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -3928,6 +4043,7 @@ STATIC int
 mg_add_se(mg_config_t * arg, struct se *se, int size, int force, int test)
 {
 	mg_conf_se_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (se || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -3938,6 +4054,7 @@ STATIC int
 mg_add_lg(mg_config_t * arg, struct lg *lg, int size, int force, int test)
 {
 	mg_conf_lg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (lg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -3953,6 +4070,7 @@ mg_add_ch(mg_config_t * arg, struct ch *ch, int size, int force, int test)
 	   Channels for upper MG streams are allocated dynamically. */
 	struct mx *mx;
 	mg_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (ch || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	for (ch = master.ch.list; ch; ch = ch->next)
@@ -3978,6 +4096,7 @@ STATIC int
 mg_add_mx(mg_config_t * arg, struct mx *mx, int size, int force, int test)
 {
 	mg_conf_mx_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (mx || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	for (mx = master.mx.list; mx; mx = mx->next)
@@ -4001,6 +4120,7 @@ STATIC int
 mg_add_df(mg_config_t * arg, struct df *df, int size, int force, int test)
 {
 	mg_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	return (-EINVAL);
@@ -4014,6 +4134,7 @@ STATIC int
 mg_cha_mg(mg_config_t * arg, struct mg *mg, int size, int force, int test)
 {
 	mg_conf_mg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -4024,6 +4145,7 @@ STATIC int
 mg_cha_se(mg_config_t * arg, struct se *se, int size, int force, int test)
 {
 	mg_conf_se_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!se || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -4034,6 +4156,7 @@ STATIC int
 mg_cha_lg(mg_config_t * arg, struct lg *lg, int size, int force, int test)
 {
 	mg_conf_lg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -4044,6 +4167,7 @@ STATIC int
 mg_cha_ch(mg_config_t * arg, struct ch *ch, int size, int force, int test)
 {
 	mg_conf_ch_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -4054,6 +4178,7 @@ STATIC int
 mg_cha_mx(mg_config_t * arg, struct mx *mx, int size, int force, int test)
 {
 	mg_conf_mx_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -4064,6 +4189,7 @@ STATIC int
 mg_cha_df(mg_config_t * arg, struct df *df, int size, int force, int test)
 {
 	mg_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -4226,6 +4352,7 @@ STATIC int
 mg_statp_get_mg(mg_stats_t * arg, struct mg *mg, int size)
 {
 	mg_stats_mg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = mg->statsp;
@@ -4235,6 +4362,7 @@ STATIC int
 mg_statp_get_se(mg_stats_t * arg, struct se *se, int size)
 {
 	mg_stats_se_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!se || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = se->statsp;
@@ -4244,6 +4372,7 @@ STATIC int
 mg_statp_get_lg(mg_stats_t * arg, struct lg *lg, int size)
 {
 	mg_stats_lg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = lg->statsp;
@@ -4253,6 +4382,7 @@ STATIC int
 mg_statp_get_ch(mg_stats_t * arg, struct ch *ch, int size)
 {
 	mg_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = ch->statsp;
@@ -4262,6 +4392,7 @@ STATIC int
 mg_statp_get_mx(mg_stats_t * arg, struct mx *mx, int size)
 {
 	mg_stats_mx_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = mx->statsp;
@@ -4271,6 +4402,7 @@ STATIC int
 mg_statp_get_df(mg_stats_t * arg, struct df *df, int size)
 {
 	mg_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = df->statsp;
@@ -4285,6 +4417,7 @@ STATIC int
 mg_statp_set_mg(mg_stats_t * arg, struct mg *mg, int size)
 {
 	mg_stats_mg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	mg->statsp = *sta;
@@ -4294,6 +4427,7 @@ STATIC int
 mg_statp_set_se(mg_stats_t * arg, struct se *se, int size)
 {
 	mg_stats_se_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!se || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	se->statsp = *sta;
@@ -4303,6 +4437,7 @@ STATIC int
 mg_statp_set_lg(mg_stats_t * arg, struct lg *lg, int size)
 {
 	mg_stats_lg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	lg->statsp = *sta;
@@ -4312,6 +4447,7 @@ STATIC int
 mg_statp_set_ch(mg_stats_t * arg, struct ch *ch, int size)
 {
 	mg_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	ch->statsp = *sta;
@@ -4321,6 +4457,7 @@ STATIC int
 mg_statp_set_mx(mg_stats_t * arg, struct mx *mx, int size)
 {
 	mg_stats_mx_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	mx->statsp = *sta;
@@ -4330,6 +4467,7 @@ STATIC int
 mg_statp_set_df(mg_stats_t * arg, struct df *df, int size)
 {
 	mg_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	df->statsp = *sta;
@@ -4344,6 +4482,7 @@ STATIC int
 mg_stat_get_mg(mg_stats_t * arg, struct mg *mg, int size)
 {
 	mg_stats_mg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = mg->stats;
@@ -4353,6 +4492,7 @@ STATIC int
 mg_stat_get_se(mg_stats_t * arg, struct se *se, int size)
 {
 	mg_stats_se_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!se || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = se->stats;
@@ -4362,6 +4502,7 @@ STATIC int
 mg_stat_get_lg(mg_stats_t * arg, struct lg *lg, int size)
 {
 	mg_stats_lg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = lg->stats;
@@ -4371,6 +4512,7 @@ STATIC int
 mg_stat_get_ch(mg_stats_t * arg, struct ch *ch, int size)
 {
 	mg_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = ch->stats;
@@ -4380,6 +4522,7 @@ STATIC int
 mg_stat_get_mx(mg_stats_t * arg, struct mx *mx, int size)
 {
 	mg_stats_mx_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = mx->stats;
@@ -4389,6 +4532,7 @@ STATIC int
 mg_stat_get_df(mg_stats_t * arg, struct df *df, int size)
 {
 	mg_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = df->stats;
@@ -4404,6 +4548,7 @@ mg_stat_clr_mg(mg_stats_t * arg, struct mg *mg, int size)
 {
 	uchar *s, *d;
 	mg_stats_mg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -4416,6 +4561,7 @@ mg_stat_clr_se(mg_stats_t * arg, struct se *se, int size)
 {
 	uchar *s, *d;
 	mg_stats_se_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!se || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -4428,6 +4574,7 @@ mg_stat_clr_lg(mg_stats_t * arg, struct lg *lg, int size)
 {
 	uchar *s, *d;
 	mg_stats_lg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -4440,6 +4587,7 @@ mg_stat_clr_ch(mg_stats_t * arg, struct ch *ch, int size)
 {
 	uchar *s, *d;
 	mg_stats_ch_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -4452,6 +4600,7 @@ mg_stat_clr_mx(mg_stats_t * arg, struct mx *mx, int size)
 {
 	uchar *s, *d;
 	mg_stats_mx_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -4464,6 +4613,7 @@ mg_stat_clr_df(mg_stats_t * arg, struct df *df, int size)
 {
 	uchar *s, *d;
 	mg_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -4480,6 +4630,7 @@ STATIC int
 mg_not_get_mg(mg_notify_t * arg, struct mg *mg, int size)
 {
 	mg_notify_mg_t *not = (typeof(not)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	not->events = mg->notify.events;
@@ -4489,6 +4640,7 @@ STATIC int
 mg_not_get_se(mg_notify_t * arg, struct se *se, int size)
 {
 	mg_notify_se_t *not = (typeof(not)) (arg + 1);
+
 	if (!se || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	not->events = se->notify.events;
@@ -4498,6 +4650,7 @@ STATIC int
 mg_not_get_lg(mg_notify_t * arg, struct lg *lg, int size)
 {
 	mg_notify_lg_t *not = (typeof(not)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	not->events = lg->notify.events;
@@ -4507,6 +4660,7 @@ STATIC int
 mg_not_get_ch(mg_notify_t * arg, struct ch *ch, int size)
 {
 	mg_notify_ch_t *not = (typeof(not)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	not->events = ch->notify.events;
@@ -4516,6 +4670,7 @@ STATIC int
 mg_not_get_mx(mg_notify_t * arg, struct mx *mx, int size)
 {
 	mg_notify_mx_t *not = (typeof(not)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	not->events = mx->notify.events;
@@ -4525,6 +4680,7 @@ STATIC int
 mg_not_get_df(mg_notify_t * arg, struct df *df, int size)
 {
 	mg_notify_df_t *not = (typeof(not)) (arg + 1);
+
 	if (!df || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	not->events = df->notify.events;
@@ -4539,6 +4695,7 @@ STATIC int
 mg_not_set_mg(mg_notify_t * arg, struct mg *mg, int size)
 {
 	mg_notify_mg_t *not = (typeof(not)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	mg->notify.events |= not->events;
@@ -4548,6 +4705,7 @@ STATIC int
 mg_not_set_se(mg_notify_t * arg, struct se *se, int size)
 {
 	mg_notify_se_t *not = (typeof(not)) (arg + 1);
+
 	if (!se || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	se->notify.events |= not->events;
@@ -4557,6 +4715,7 @@ STATIC int
 mg_not_set_lg(mg_notify_t * arg, struct lg *lg, int size)
 {
 	mg_notify_lg_t *not = (typeof(not)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	lg->notify.events |= not->events;
@@ -4566,6 +4725,7 @@ STATIC int
 mg_not_set_ch(mg_notify_t * arg, struct ch *ch, int size)
 {
 	mg_notify_ch_t *not = (typeof(not)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	ch->notify.events |= not->events;
@@ -4575,6 +4735,7 @@ STATIC int
 mg_not_set_mx(mg_notify_t * arg, struct mx *mx, int size)
 {
 	mg_notify_mx_t *not = (typeof(not)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	mx->notify.events |= not->events;
@@ -4584,6 +4745,7 @@ STATIC int
 mg_not_set_df(mg_notify_t * arg, struct df *df, int size)
 {
 	mg_notify_df_t *not = (typeof(not)) (arg + 1);
+
 	if (!df || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	df->notify.events |= not->events;
@@ -4598,6 +4760,7 @@ STATIC int
 mg_not_clr_mg(mg_notify_t * arg, struct mg *mg, int size)
 {
 	mg_notify_mg_t *not = (typeof(not)) (arg + 1);
+
 	if (!mg || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	mg->notify.events &= ~not->events;
@@ -4607,6 +4770,7 @@ STATIC int
 mg_not_clr_se(mg_notify_t * arg, struct se *se, int size)
 {
 	mg_notify_se_t *not = (typeof(not)) (arg + 1);
+
 	if (!se || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	se->notify.events &= ~not->events;
@@ -4616,6 +4780,7 @@ STATIC int
 mg_not_clr_lg(mg_notify_t * arg, struct lg *lg, int size)
 {
 	mg_notify_lg_t *not = (typeof(not)) (arg + 1);
+
 	if (!lg || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	lg->notify.events &= ~not->events;
@@ -4625,6 +4790,7 @@ STATIC int
 mg_not_clr_ch(mg_notify_t * arg, struct ch *ch, int size)
 {
 	mg_notify_ch_t *not = (typeof(not)) (arg + 1);
+
 	if (!ch || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	ch->notify.events &= ~not->events;
@@ -4634,6 +4800,7 @@ STATIC int
 mg_not_clr_mx(mg_notify_t * arg, struct mx *mx, int size)
 {
 	mg_notify_mx_t *not = (typeof(not)) (arg + 1);
+
 	if (!mx || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	mx->notify.events &= ~not->events;
@@ -4643,6 +4810,7 @@ STATIC int
 mg_not_clr_df(mg_notify_t * arg, struct df *df, int size)
 {
 	mg_notify_df_t *not = (typeof(not)) (arg + 1);
+
 	if (!df || (size -= sizeof(*not)) < 0)
 		return (-EINVAL);
 	df->notify.events &= ~not->events;
@@ -4830,9 +4998,11 @@ mg_iocgoptions(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		mg_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case MG_OBJ_TYPE_MG:
@@ -4863,9 +5033,11 @@ mg_iocsoptions(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		mg_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case MG_OBJ_TYPE_MG:
@@ -4897,9 +5069,11 @@ mg_iocgconfig(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		mg_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			switch (arg->type) {
 			case MG_OBJ_TYPE_MG:
@@ -4930,9 +5104,11 @@ mg_iocsconfig(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		mg_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case MG_ADD:
@@ -4999,9 +5175,11 @@ mg_ioctconfig(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		mg_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case MG_ADD:
@@ -5068,9 +5246,11 @@ mg_ioccconfig(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		mg_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case MG_ADD:
@@ -5136,11 +5316,13 @@ mg_iocgstatem(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5183,6 +5365,7 @@ mg_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		mg_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		(void) arg;
 		return (-EOPNOTSUPP);
 	}
@@ -5199,11 +5382,13 @@ mg_iocgstatsp(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5246,11 +5431,13 @@ mg_iocsstatsp(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5293,11 +5480,13 @@ mg_iocgstats(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5340,11 +5529,13 @@ mg_ioccstats(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5387,11 +5578,13 @@ mg_iocgnotify(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5434,11 +5627,13 @@ mg_iocsnotify(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5481,11 +5676,13 @@ mg_ioccnotify(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		psw_t flags;
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		mg_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -5529,8 +5726,10 @@ mg_ioccmgmt(queue_t *q, mblk_t *mp)
 {
 	struct mg *mg = MG_PRIV(q);
 	struct se *se = mg->se.list;
+
 	if (mp->b_cont) {
 		mg_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		switch (arg->cmd) {
 		case MG_MGMT_BLOCK:
 			switch (arg->type) {
@@ -5614,6 +5813,7 @@ mg_ioccpass(queue_t *q, mblk_t *mp)
 		mg_pass_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		mblk_t *bp, *dp;
 		struct mx *mx;
+
 		for (mx = master.mx.list; mx && mx->u.mux.index != arg->muxid; mx = mx->next) ;
 		if (!mx || !mx->oq)
 			return (-EINVAL);
@@ -5660,11 +5860,13 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	switch (type) {
 	case __SID:
 	{
 		struct mx *mx;
 		struct linkblk *lb;
+
 		if (!(lb = arg)) {
 			swerr();
 			ret = -EINVAL;
@@ -5800,6 +6002,7 @@ mg_w_ioctl(queue_t *q, mblk_t *mp)
 	{
 		struct mx *mx;
 		ulong mxid;
+
 		/* 
 		   These are MX IOCTLs. They differ from normal MX IOCTLs in the fact that they
 		   have a Multiplex Identifier as a discriminator in the first long in the
@@ -5853,6 +6056,7 @@ mx_r_iocack(queue_t *q, mblk_t *mp)
 	struct iocblk *iocp = (struct iocblk *) mp->b_rptr;
 	struct mg *mg;
 	ulong mgid;
+
 	(void) iocp;
 	if (!mp->b_cont)
 		goto efault;
@@ -5890,6 +6094,7 @@ mg_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct mg *mg = MG_PRIV(q);
 	ulong prim;
+
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case MG_INFO_REQ:
 		printd(("%s: %p: -> MG_INFO_REQ\n", DRV_NAME, mg));
@@ -5956,6 +6161,7 @@ mx_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct mx *mx = MX_PRIV(q);
+
 	(void) mx;
 	switch (*((ulong *) mp->b_rptr)) {
 	case MX_INFO_ACK:
@@ -6140,6 +6346,7 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct mg *mg, **mgp = &master.mg.list;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -6157,10 +6364,12 @@ mg_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *mgp; mgp = (typeof(mgp)) & (*mgp)->next) {
 		major_t dmajor = (*mgp)->u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*mgp)->u.dev.cminor;
+
 			if (cminor < dminor) {
 				if (++cminor >= NMINORS) {
 					if (++mindex >= MG_CMAJORS || !(cmajor = mg_majors[mindex]))
@@ -6197,6 +6406,7 @@ STATIC streamscall int
 mg_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct mg *mg = MG_PRIV(q);
+
 	(void) flag;
 	(void) crp;
 	(void) mg;
@@ -6302,6 +6512,7 @@ STATIC int
 mg_term_caches(void)
 {
 	int err = 0;
+
 	if (mg_priv_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(mg_priv_cachep)) {
@@ -6369,8 +6580,8 @@ mg_term_caches(void)
 #endif
 	}
 	if (mx_priv_cachep) {
-		if (kmem_cache_destroy(mx_priv_cachep)) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
+		if (kmem_cache_destroy(mx_priv_cachep)) {
 			cmn_err(CE_WARN, "%s: did not destroy mx_priv_cachep", __FUNCTION__);
 			err = -EBUSY;
 		} else
@@ -6390,6 +6601,7 @@ STATIC struct mg *
 mg_alloc_priv(queue_t *q, struct mg **mgp, dev_t *devp, cred_t *crp)
 {
 	struct mg *mg;
+
 	if ((mg = kmem_cache_alloc(mg_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mg private structure %d:%d\n", DRV_NAME, mg,
 			getmajor(*devp), getminor(*devp)));
@@ -6424,11 +6636,13 @@ STATIC void
 mg_free_priv(struct mg *mg)
 {
 	psw_t flags;
+
 	ensure(mg, return);
 	spin_lock_irqsave(&mg->lock, flags);
 	{
 		struct ch *ch;
 		struct se *se;
+
 		ss7_unbufcall((str_t *) mg);
 		flushq(mg->oq, FLUSHALL);
 		flushq(mg->iq, FLUSHALL);
@@ -6473,15 +6687,18 @@ STATIC struct mg *
 mg_lookup(ulong id)
 {
 	struct mg *mg = NULL;
+
 	if (id)
 		for (mg = master.mg.list; mg && mg->id != id; mg = mg->next) ;
 	return (mg);
 }
+
 #if 0
 STATIC ulong
 mg_get_id(ulong id)
 {
 	static ulong sequence = 0;
+
 	if (!id)
 		for (id = ++sequence; mg_lookup(id); id = ++sequence) ;
 	return (id);
@@ -6510,6 +6727,7 @@ STATIC struct se *
 se_alloc_priv(ulong id, struct mg *mg)
 {
 	struct se *se, **sep;
+
 	if ((se = kmem_cache_alloc(se_priv_cachep, GFP_ATOMIC))) {
 		bzero(se, sizeof(*se));
 		spin_lock_init(&se->lock);	/* "se-lock" */
@@ -6543,11 +6761,13 @@ STATIC void
 se_free_priv(struct se *se)
 {
 	psw_t flags;
+
 	ensure(se, return);
 	spin_lock_irqsave(&se->lock, flags);
 	{
 		struct mg *mg;
 		struct lg *lg;
+
 		while ((lg = se->lg.list))
 			lg_free_priv(lg);
 		if ((mg = se->mg.mg)) {
@@ -6593,6 +6813,7 @@ STATIC struct se *
 se_lookup(ulong id, struct mg *mg)
 {
 	struct se *se = NULL;
+
 	if (id)
 		for (se = mg->se.list; se && se->id != id; se = se->next) ;
 	return (se);
@@ -6601,6 +6822,7 @@ STATIC ulong
 se_get_id(ulong id)
 {
 	static ulong sequence = 0;
+
 	if (!id)
 		id = ++sequence;
 	return (id);
@@ -6628,6 +6850,7 @@ STATIC struct lg *
 lg_alloc_priv(ulong id, struct se *se)
 {
 	struct lg *lg;
+
 	if ((lg = kmem_cache_alloc(lg_priv_cachep, GFP_ATOMIC))) {
 		bzero(lg, sizeof(*lg));
 		spin_lock_init(&lg->lock);	/* "lg-lock" */
@@ -6660,11 +6883,13 @@ STATIC void
 lg_free_priv(struct lg *lg)
 {
 	psw_t flags;
+
 	ensure(lg, return);
 	spin_lock_irqsave(&lg->lock, flags);
 	{
 		struct se *se;
 		struct ch *ch;
+
 		/* 
 		   unlink channels */
 		while ((ch = lg->ch.list)) {
@@ -6726,6 +6951,7 @@ STATIC struct lg *
 lg_lookup(ulong id, struct se *se)
 {
 	struct lg *lg = NULL;
+
 	if (id)
 		for (lg = se->lg.list; lg && lg->id != id; lg = lg->next) ;
 	return (lg);
@@ -6734,6 +6960,7 @@ STATIC ulong
 lg_get_id(ulong id)
 {
 	static ulong sequence = 0;
+
 	if (!id)
 		id = ++sequence;
 	return (id);
@@ -6763,6 +6990,7 @@ cn_alloc_priv(struct ch *ic, struct ch *og, ulong pad)
 	/* 
 	   Form a connection between in an incoming and outgoing leg */
 	struct cn *cn;
+
 	if ((cn = kmem_cache_alloc(cn_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated cn private structure\n", DRV_NAME, cn));
 		bzero(cn, sizeof(*cn));
@@ -6797,6 +7025,7 @@ STATIC void
 cn_free_priv(struct cn *cn)
 {
 	struct ch *ch;
+
 	ensure(cn, return);
 	/* 
 	   free buffers */
@@ -6836,6 +7065,7 @@ STATIC struct ac *
 ac_alloc_priv(ulong id, ulong type, ulong flags, ulong duration, struct ch *ch, mblk_t *dp)
 {
 	struct ac *ac;
+
 	if ((ac = kmem_cache_alloc(ac_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated ac private structure\n", DRV_NAME, ac));
 		bzero(ac, sizeof(*ac));
@@ -6866,6 +7096,7 @@ STATIC void
 ac_free_priv(struct ac *ac)
 {
 	struct ch *ch;
+
 	ensure(ac, return);
 	if ((ch = ac->ch.ch)) {
 		if (ac->buf)
@@ -6888,6 +7119,7 @@ STATIC ulong
 ac_get_id(ulong id)
 {
 	static ulong sequence = 0;
+
 	if (!id)
 		id = ++sequence;
 	return (id);
@@ -6901,6 +7133,7 @@ STATIC struct ch *
 ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 {
 	struct ch *ch;
+
 	if ((ch = kmem_cache_alloc(ch_priv_cachep, GFP_ATOMIC))) {
 		bzero(ch, sizeof(*ch));
 		spin_lock_init(&ch->lock);	/* "ch-lock" */
@@ -6914,6 +7147,7 @@ ch_alloc_priv(ulong id, struct mx *mx, ulong slot, ulong type)
 		master.ch.numb++;
 		if (mx) {
 			struct ch **chp;
+
 			for (chp = &mx->ch.list; (*chp) && (*chp)->mx_slot < slot;
 			     (*chp) = (*chp)->mx.next) ;
 			/* 
@@ -6973,6 +7207,7 @@ STATIC void
 ch_free_priv(struct ch *ch)
 {
 	psw_t flags;
+
 	ensure(ch, return);
 	spin_lock_irqsave(&ch->lock, flags);
 	{
@@ -6980,6 +7215,7 @@ ch_free_priv(struct ch *ch)
 		struct lg *lg;
 		struct cn *cn;
 		struct ac *ac;
+
 		/* 
 		   clear action list */
 		while ((ac = ch->ac.list))
@@ -7047,6 +7283,7 @@ STATIC struct ch *
 ch_lookup(ulong id)
 {
 	struct ch *ch = NULL;
+
 	if (id)
 		for (ch = master.ch.list; ch && ch->id != id; ch = ch->next) ;
 	return (ch);
@@ -7055,6 +7292,7 @@ STATIC ulong
 ch_get_id(ulong id)
 {
 	static ulong sequence = 0;
+
 	if (!id)
 		id = ++sequence;
 	return (id);
@@ -7082,6 +7320,7 @@ STATIC struct mx *
 mx_alloc_link(queue_t *q, struct mx **mxp, ulong index, cred_t *crp)
 {
 	struct mx *mx;
+
 	if ((mx = kmem_cache_alloc(mx_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated mx private structure %lu\n", DRV_NAME, mx, index));
 		bzero(mx, sizeof(*mx));
@@ -7118,10 +7357,12 @@ STATIC void
 mx_free_link(struct mx *mx)
 {
 	psw_t flags;
+
 	ensure(mx, return);
 	spin_lock_irqsave(&mx->lock, flags);
 	{
 		struct ch *ch;
+
 		ss7_unbufcall((str_t *) mx);
 		flushq(mx->oq, FLUSHALL);
 		flushq(mx->iq, FLUSHALL);
@@ -7162,6 +7403,7 @@ STATIC struct mx *
 mx_lookup(ulong id)
 {
 	struct mx *mx = NULL;
+
 	if (id)
 		for (mx = master.mx.list; mx && mx->id != id; mx = mx->next) ;
 	return (mx);
@@ -7170,6 +7412,7 @@ STATIC ulong
 mx_get_id(ulong id)
 {
 	static ulong sequence = 0;
+
 	if (!id)
 		for (id = ++sequence; mx_lookup(id); id = ++sequence) ;
 	return (id);
@@ -7210,6 +7453,7 @@ mx_put(struct mx *mx)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -7218,6 +7462,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -7244,6 +7489,7 @@ STATIC int
 mg_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&mg_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -7253,6 +7499,7 @@ STATIC int
 mg_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&mg_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -7270,6 +7517,7 @@ STATIC int
 mg_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &mginfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -7285,6 +7533,7 @@ STATIC int
 mg_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -7296,6 +7545,7 @@ MODULE_STATIC void __exit
 mgterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (mg_majors[mindex]) {
 			if ((err = mg_unregister_strdev(mg_majors[mindex])))
@@ -7314,6 +7564,7 @@ MODULE_STATIC int __init
 mginit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = mg_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

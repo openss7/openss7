@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/17 01:56:18 $
+ @(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:02 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:02 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: m3ua_lower.c,v $
+ Revision 0.9.2.10  2007/08/14 12:18:02  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/17 01:56:18 $"
+#ident "@(#) $RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:02 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/17 01:56:18 $";
+    "$RCSfile: m3ua_lower.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:02 $";
 
 #define __NO_VERSION__
 
@@ -81,27 +87,33 @@ extern int ss7_r_proto(queue_t *, mblk_t *);
  *  M_ERROR, M_HANGUP Processing
  *  -------------------------------------------------------------------------
  */
-static int uap_r_error(queue_t * q, mblk_t * mp)
+static int
+uap_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = lm_link_ind(q, mp)))
 		return (err);
 	if ((err = uap_blocked(q)))
 		return (err);
 	return (0);
 }
-static int ipc_r_error(queue_t * q, mblk_t * mp)
+static int
+ipc_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = lm_link_ind(q, mp)))
 		return (err);
 	if ((err = ipc_blocked(q)))
 		return (err);
 	return (0);
 }
-static int ss7_r_error(queue_t * q, mblk_t * mp)
+static int
+ss7_r_error(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = lm_link_ind(q, mp)))
 		return (err);
 	if ((err = ss7_blocked(q)))
@@ -113,23 +125,29 @@ static int ss7_r_error(queue_t * q, mblk_t * mp)
  *  M_CTL Processing
  *  -------------------------------------------------------------------------
  */
-static int uap_r_ctl(queue_t * q, mblk_t * mp)
+static int
+uap_r_ctl(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = lm_link_ind(q, mp)))
 		return (err);
 	return (0);
 }
-static int ipc_r_ctl(queue_t * q, mblk_t * mp)
+static int
+ipc_r_ctl(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = lm_link_ind(q, mp)))
 		return (err);
 	return (0);
 }
-static int ss7_r_ctl(queue_t * q, mblk_t * mp)
+static int
+ss7_r_ctl(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = lm_link_ind(q, mp)))
 		return (err);
 	return (0);
@@ -139,7 +157,8 @@ static int ss7_r_ctl(queue_t * q, mblk_t * mp)
  *  M_FLUSH Processing
  *  -------------------------------------------------------------------------
  */
-static int xxx_r_flush(queue_t * q, mblk_t * mp)
+static int
+xxx_r_flush(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_rptr[0] & FLUSHR) {
 		if (mp->b_rptr[0] & FLUSHBAND)
@@ -167,7 +186,8 @@ static int xxx_r_flush(queue_t * q, mblk_t * mp)
  *
  *  =========================================================================
  */
-static inline int m3ua_recover(queue_t * q, mblk_t * mp, int err)
+static inline int
+m3ua_recover(queue_t *q, mblk_t *mp, int err)
 {
 	switch (err) {
 	case -EBUSY:
@@ -180,7 +200,8 @@ static inline int m3ua_recover(queue_t * q, mblk_t * mp, int err)
 	freemsg(mp);
 	return (err);
 }
-static inline int m3ua_reservice(queue_t * q, mblk_t * mp, int err)
+static inline int
+m3ua_reservice(queue_t *q, mblk_t *mp, int err)
 {
 	if (mp->b_datap->db_type < QPCTL)
 		switch (err) {
@@ -199,7 +220,8 @@ static inline int m3ua_reservice(queue_t * q, mblk_t * mp, int err)
  *  READ PUT and SERVICE (Message from below to SUA)
  *  -------------------------------------------------------------------------
  */
-static inline int m3ua_rd(queue_t * q, mblk_t * mp)
+static inline int
+m3ua_rd(queue_t *q, mblk_t *mp)
 {
 	switch (Q_TYPE(q)) {
 	case UA_TYPE_UAP:
@@ -254,9 +276,11 @@ static inline int m3ua_rd(queue_t * q, mblk_t * mp)
 	return (-EFAULT);
 }
 
-int m3ua_l_rput(queue_t * q, mblk_t * mp)
+int
+m3ua_l_rput(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
 		return (0);
@@ -266,11 +290,14 @@ int m3ua_l_rput(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-int m3ua_l_rsrv(queue_t * q)
+int
+m3ua_l_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while ((mp = getq(q))) {
 		int err;
+
 		if (!(err = m3ua_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)

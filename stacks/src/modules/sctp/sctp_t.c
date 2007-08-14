@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/06/17 01:56:20 $
+ @(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:18:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:20 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:43 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp_t.c,v $
+ Revision 0.9.2.15  2007/08/14 12:18:43  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/06/17 01:56:20 $"
+#ident "@(#) $RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:18:43 $"
 
-static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/06/17 01:56:20 $";
+static char const ident[] =
+    "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:18:43 $";
 
 #define __NO_VERSION__
 
@@ -376,7 +383,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_BROADCAST;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = T_NO;
+		*((t_scalar_t *) *p)++ = T_NO;
 	}
 	if (!ops || ops->norte) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -384,7 +391,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_DONTROUTE;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = T_NO;
+		*((t_scalar_t *) *p)++ = T_NO;
 	}
 	if (!ops || ops->opts) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -392,7 +399,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_OPTIONS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = 0;
+		*((t_scalar_t *) *p)++ = 0;
 	}
 	if (!ops || ops->reuse) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -400,7 +407,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_REUSEADDR;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = T_NO;
+		*((t_scalar_t *) *p)++ = T_NO;
 	}
 	if (!ops || ops->tos) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -408,7 +415,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_TOS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_ip_tos;
+		*((t_scalar_t *) *p)++ = sctp_default_ip_tos;
 	}
 	if (!ops || ops->ttl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -416,7 +423,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_TTL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_ip_ttl;
+		*((t_scalar_t *) *p)++ = sctp_default_ip_ttl;
 	}
 	if (!ops || ops->nd) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -424,7 +431,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_NODELAY;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = T_YES;
+		*((t_scalar_t *) *p)++ = T_YES;
 	}
 	if (!ops || ops->cork) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -432,7 +439,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_CORK;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = T_NO;
+		*((t_scalar_t *) *p)++ = T_NO;
 	}
 	if (!ops || ops->ppi) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -440,7 +447,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PPI;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_ppi;
+		*((t_scalar_t *) *p)++ = sctp_default_ppi;
 	}
 	if (!ops || ops->sid) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -448,7 +455,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SID;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_sid;
+		*((t_scalar_t *) *p)++ = sctp_default_sid;
 	}
 	/* note ssn and tsn are per-packet */
 
@@ -458,7 +465,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RECVOPT;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = T_NO;
+		*((t_scalar_t *) *p)++ = T_NO;
 	}
 	if (!ops || ops->cklife) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -466,7 +473,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_COOKIE_LIFE;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_valid_cookie_life * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_valid_cookie_life * 1000 / HZ;
 	}
 	if (!ops || ops->sack) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -474,7 +481,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SACK_DELAY;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_max_sack_delay * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_max_sack_delay * 1000 / HZ;
 	}
 	if (!ops || ops->path) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -482,7 +489,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PATH_MAX_RETRANS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_path_max_retrans;
+		*((t_scalar_t *) *p)++ = sctp_default_path_max_retrans;
 	}
 	if (!ops || ops->assoc) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -490,7 +497,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 		oh->status = T_SUCCESS;
-		*((t_uscalar_t *) * p)++ = sctp_default_assoc_max_retrans;
+		*((t_uscalar_t *) *p)++ = sctp_default_assoc_max_retrans;
 	}
 	if (!ops || ops->init) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -498,7 +505,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAX_INIT_RETRIES;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_max_init_retries;
+		*((t_scalar_t *) *p)++ = sctp_default_max_init_retries;
 	}
 	if (!ops || ops->hbitvl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -506,7 +513,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_HEARTBEAT_ITVL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_heartbeat_itvl * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_heartbeat_itvl * 1000 / HZ;
 	}
 	if (!ops || ops->rtoinit) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -514,7 +521,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_INITIAL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_rto_initial * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_rto_initial * 1000 / HZ;
 	}
 	if (!ops || ops->rtomin) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -522,7 +529,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_MIN;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_rto_min * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_rto_min * 1000 / HZ;
 	}
 	if (!ops || ops->rtomax) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -530,7 +537,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_MAX;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_rto_max * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_rto_max * 1000 / HZ;
 	}
 	if (!ops || ops->ostr) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -538,7 +545,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_OSTREAMS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_req_ostreams;
+		*((t_scalar_t *) *p)++ = sctp_default_req_ostreams;
 	}
 	if (!ops || ops->istr) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -546,7 +553,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_ISTREAMS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_max_istreams;
+		*((t_scalar_t *) *p)++ = sctp_default_max_istreams;
 	}
 	if (!ops || ops->ckinc) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -554,7 +561,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_COOKIE_INC;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_cookie_inc * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_cookie_inc * 1000 / HZ;
 	}
 	if (!ops || ops->titvl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -562,7 +569,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_THROTTLE_ITVL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_throttle_itvl * 1000 / HZ;
+		*((t_scalar_t *) *p)++ = sctp_default_throttle_itvl * 1000 / HZ;
 	}
 	if (!ops || ops->hmac) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -570,7 +577,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAC_TYPE;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sctp_default_mac_type;
+		*((t_scalar_t *) *p)++ = sctp_default_mac_type;
 	}
 	if (!ops || ops->mseg) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -578,7 +585,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAXSEG;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = 576;
+		*((t_scalar_t *) *p)++ = 576;
 	}
 	if (!ops || ops->debug) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -586,7 +593,7 @@ sctp_build_default_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_DEBUG;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = 0;
+		*((t_scalar_t *) *p)++ = 0;
 	}
 }
 
@@ -723,7 +730,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_BROADCAST;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->ip_broadcast ? T_YES : T_NO;
+		*((t_scalar_t *) *p)++ = sp->ip_broadcast ? T_YES : T_NO;
 	}
 	if (!ops || ops->norte) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -731,7 +738,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_DONTROUTE;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->ip_dontroute ? T_YES : T_NO;
+		*((t_scalar_t *) *p)++ = sp->ip_dontroute ? T_YES : T_NO;
 	}
 	if (!ops || ops->opts) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -739,7 +746,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_OPTIONS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = 0;
+		*((t_scalar_t *) *p)++ = 0;
 	}
 	if (!ops || ops->reuse) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -747,7 +754,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_REUSEADDR;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->i_flags & TF_IP_REUSEADDR ? T_YES : T_NO;
+		*((t_scalar_t *) *p)++ = sp->i_flags & TF_IP_REUSEADDR ? T_YES : T_NO;
 	}
 	if (!ops || ops->tos) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -755,7 +762,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_TOS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->ip_tos;
+		*((t_scalar_t *) *p)++ = sp->ip_tos;
 	}
 	if (!ops || ops->ttl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -763,7 +770,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_TTL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->ip_ttl;
+		*((t_scalar_t *) *p)++ = sp->ip_ttl;
 	}
 	if (!ops || ops->nd) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -771,7 +778,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_NODELAY;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->options & SCTP_OPTION_NAGLE ? T_NO : T_YES;
+		*((t_scalar_t *) *p)++ = sp->options & SCTP_OPTION_NAGLE ? T_NO : T_YES;
 	}
 	if (!ops || ops->cork) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -779,7 +786,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_CORK;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->options & SCTP_OPTION_CORK ? T_YES : T_NO;
+		*((t_scalar_t *) *p)++ = sp->options & SCTP_OPTION_CORK ? T_YES : T_NO;
 	}
 	if (!ops || ops->ppi) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -787,7 +794,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PPI;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->ppi;
+		*((t_scalar_t *) *p)++ = sp->ppi;
 	}
 	if (!ops || ops->sid) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -795,7 +802,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SID;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->sid;
+		*((t_scalar_t *) *p)++ = sp->sid;
 	}
 	/* note ssn and tsn are per-packet */
 
@@ -805,7 +812,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RECVOPT;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->i_flags & TF_SCTP_RECVOPT ? T_YES : T_NO;
+		*((t_scalar_t *) *p)++ = sp->i_flags & TF_SCTP_RECVOPT ? T_YES : T_NO;
 	}
 	if (!ops || ops->cklife) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -813,7 +820,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_COOKIE_LIFE;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->ck_life * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->ck_life * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->sack) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -821,7 +828,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SACK_DELAY;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->max_sack * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->max_sack * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->path) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -829,7 +836,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PATH_MAX_RETRANS;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->rtx_path;
+		*((t_scalar_t *) *p)++ = sp->rtx_path;
 	}
 	if (!ops || ops->assoc) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -837,7 +844,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 		oh->status = T_SUCCESS;
-		*((t_uscalar_t *) * p)++ = sp->max_retrans;
+		*((t_uscalar_t *) *p)++ = sp->max_retrans;
 	}
 	if (!ops || ops->init) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -845,7 +852,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAX_INIT_RETRIES;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->max_inits;
+		*((t_scalar_t *) *p)++ = sp->max_inits;
 	}
 	if (!ops || ops->hbitvl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -853,7 +860,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_HEARTBEAT_ITVL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->hb_itvl * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->hb_itvl * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->rtoinit) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -861,7 +868,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_INITIAL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->rto_ini * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->rto_ini * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->rtomin) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -869,7 +876,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_MIN;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->rto_min * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->rto_min * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->rtomax) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -877,7 +884,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_MAX;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->rto_max * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->rto_max * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->ostr) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -886,9 +893,9 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->name = T_SCTP_OSTREAMS;
 		oh->status = T_SUCCESS;
 		if ((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))
-			*((t_scalar_t *) * p)++ = sp->n_ostr;
+			*((t_scalar_t *) *p)++ = sp->n_ostr;
 		else
-			*((t_scalar_t *) * p)++ = sp->req_ostr;
+			*((t_scalar_t *) *p)++ = sp->req_ostr;
 	}
 	if (!ops || ops->istr) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -897,9 +904,9 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->name = T_SCTP_ISTREAMS;
 		oh->status = T_SUCCESS;
 		if ((1 << sp->i_state) & (TSF_DATA_XFER | TSF_WIND_ORDREL | TSF_WREQ_ORDREL))
-			*((t_scalar_t *) * p)++ = sp->n_istr;
+			*((t_scalar_t *) *p)++ = sp->n_istr;
 		else
-			*((t_scalar_t *) * p)++ = sp->max_istr;
+			*((t_scalar_t *) *p)++ = sp->max_istr;
 	}
 	if (!ops || ops->ckinc) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -907,7 +914,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_COOKIE_INC;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->ck_inc * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->ck_inc * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->titvl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -915,7 +922,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_THROTTLE_ITVL;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = (sp->throttle * 1000 + HZ - 1) / HZ;
+		*((t_scalar_t *) *p)++ = (sp->throttle * 1000 + HZ - 1) / HZ;
 	}
 	if (!ops || ops->hmac) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -923,7 +930,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAC_TYPE;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->hmac;
+		*((t_scalar_t *) *p)++ = sp->hmac;
 	}
 	if (!ops || ops->mseg) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -931,7 +938,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAXSEG;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->pmtu;
+		*((t_scalar_t *) *p)++ = sp->pmtu;
 	}
 	if (!ops || ops->debug) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -939,7 +946,7 @@ sctp_build_current_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_DEBUG;
 		oh->status = T_SUCCESS;
-		*((t_scalar_t *) * p)++ = sp->options;
+		*((t_scalar_t *) *p)++ = sp->options;
 	}
 	if (!ops || ops->hb) {
 		size_t n = ops ? (ops->hb->len - hlen) / sizeof(t_sctp_hb_t) : sp->danum;
@@ -1150,7 +1157,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_BROADCAST;
 		oh->status = ops->flags & TF_IP_BROADCAST ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->bcast + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->bcast + 1));
 	}
 	if (ops->norte) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1158,7 +1165,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_DONTROUTE;
 		oh->status = ops->flags & TF_IP_DONTROUTE ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->norte + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->norte + 1));
 	}
 	if (ops->opts) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1166,7 +1173,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_OPTIONS;
 		oh->status = ops->flags & TF_IP_OPTIONS ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->opts + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->opts + 1));
 	}
 	if (ops->reuse) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1174,7 +1181,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_REUSEADDR;
 		oh->status = ops->flags & TF_IP_REUSEADDR ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->reuse + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->reuse + 1));
 	}
 	if (ops->tos) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1182,7 +1189,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_TOS;
 		oh->status = ops->flags & TF_IP_TOS ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->tos + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->tos + 1));
 	}
 	if (ops->ttl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1190,7 +1197,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_IP;
 		oh->name = T_IP_TTL;
 		oh->status = ops->flags & TF_IP_TTL ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->ttl + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->ttl + 1));
 	}
 	if (ops->nd) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1198,7 +1205,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_NODELAY;
 		oh->status = ops->flags & TF_SCTP_NODELAY ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->nd + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->nd + 1));
 	}
 	if (ops->cork) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1206,7 +1213,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_CORK;
 		oh->status = ops->flags & TF_SCTP_CORK ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->cork + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->cork + 1));
 	}
 	if (ops->ppi) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1214,7 +1221,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PPI;
 		oh->status = ops->flags & TF_SCTP_PPI ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->ppi + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->ppi + 1));
 	}
 	if (ops->sid) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1222,7 +1229,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SID;
 		oh->status = ops->flags & TF_SCTP_SID ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->sid + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->sid + 1));
 	}
 	if (ops->ssn) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1230,7 +1237,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SSN;
 		oh->status = ops->flags & TF_SCTP_SSN ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->ssn + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->ssn + 1));
 	}
 	if (ops->tsn) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1238,7 +1245,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_TSN;
 		oh->status = ops->flags & TF_SCTP_TSN ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->tsn + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->tsn + 1));
 	}
 	if (ops->ropt) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1246,7 +1253,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RECVOPT;
 		oh->status = ops->flags & TF_SCTP_RECVOPT ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->ropt + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->ropt + 1));
 	}
 	if (ops->cklife) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1254,7 +1261,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_COOKIE_LIFE;
 		oh->status = ops->flags & TF_SCTP_COOKIE_LIFE ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->cklife + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->cklife + 1));
 	}
 	if (ops->sack) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1262,7 +1269,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_SACK_DELAY;
 		oh->status = ops->flags & TF_SCTP_SACK_DELAY ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->sack + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->sack + 1));
 	}
 	if (ops->path) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1270,7 +1277,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_PATH_MAX_RETRANS;
 		oh->status = ops->flags & TF_SCTP_PATH_MAX_RETRANS ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->path + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->path + 1));
 	}
 	if (ops->assoc) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1278,7 +1285,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_ASSOC_MAX_RETRANS;
 		oh->status = ops->flags & TF_SCTP_ASSOC_MAX_RETRANS ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->assoc + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->assoc + 1));
 	}
 	if (ops->init) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1286,7 +1293,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAX_INIT_RETRIES;
 		oh->status = ops->flags & TF_SCTP_MAX_INIT_RETRIES ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->init + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->init + 1));
 	}
 	if (ops->hbitvl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1294,7 +1301,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_HEARTBEAT_ITVL;
 		oh->status = ops->flags & TF_SCTP_HEARTBEAT_ITVL ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->hbitvl + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->hbitvl + 1));
 	}
 	if (ops->rtoinit) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1302,7 +1309,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_INITIAL;
 		oh->status = ops->flags & TF_SCTP_RTO_INITIAL ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->rtoinit + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->rtoinit + 1));
 	}
 	if (ops->rtomin) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1310,7 +1317,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_MIN;
 		oh->status = ops->flags & TF_SCTP_RTO_MIN ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->rtomin + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->rtomin + 1));
 	}
 	if (ops->rtomax) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1318,7 +1325,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_RTO_MAX;
 		oh->status = ops->flags & TF_SCTP_RTO_MAX ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->rtomax + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->rtomax + 1));
 	}
 	if (ops->ostr) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1326,7 +1333,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_OSTREAMS;
 		oh->status = ops->flags & TF_SCTP_OSTREAMS ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->ostr + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->ostr + 1));
 	}
 	if (ops->istr) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1334,7 +1341,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_ISTREAMS;
 		oh->status = ops->flags & TF_SCTP_ISTREAMS ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->istr + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->istr + 1));
 	}
 	if (ops->ckinc) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1342,7 +1349,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_COOKIE_INC;
 		oh->status = ops->flags & TF_SCTP_COOKIE_INC ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->ckinc + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->ckinc + 1));
 	}
 	if (ops->titvl) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1350,7 +1357,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_THROTTLE_ITVL;
 		oh->status = ops->flags & TF_SCTP_THROTTLE_ITVL ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->titvl + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->titvl + 1));
 	}
 	if (ops->hmac) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1358,7 +1365,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAC_TYPE;
 		oh->status = ops->flags & TF_SCTP_MAC_TYPE ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->hmac + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->hmac + 1));
 	}
 	if (ops->mseg) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1366,7 +1373,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_MAXSEG;
 		oh->status = ops->flags & TF_SCTP_MAXSEG ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->mseg + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->mseg + 1));
 	}
 	if (ops->debug) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1374,7 +1381,7 @@ sctp_build_set_opts(sctp_t * sp, sctp_opts_t * ops, unsigned char **p)
 		oh->level = T_INET_SCTP;
 		oh->name = T_SCTP_DEBUG;
 		oh->status = ops->flags & TF_SCTP_DEBUG ? T_SUCCESS : T_FAILURE;
-		*((t_scalar_t *) * p)++ = *((t_scalar_t *) (ops->debug + 1));
+		*((t_scalar_t *) *p)++ = *((t_scalar_t *) (ops->debug + 1));
 	}
 	if (ops->hb) {
 		oh = ((struct t_opthdr *) *p)++;
@@ -1869,7 +1876,7 @@ sctp_check_opts(sctp_t * sp, sctp_opts_t * ops)
 	if (!ops)
 		return;
 	ops->flags = TF_SCTP_ALLOPS;
-	/*
+	/* 
 	 *  FIXME: actually check some options.
 	 */
 	fixme(("Actually check some options.\n"));
@@ -2248,7 +2255,7 @@ t_error_ack(sctp_t * sp, ulong prim, long err)
 		case TS_WACK_DREQ11:
 			sp->i_state = TS_WREQ_ORDREL;
 			break;
-			/*
+			/* 
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  send TOUTSTATE or TNOTSUPPORT or are responding to
@@ -2320,7 +2327,7 @@ t_ok_ack(sctp_t * sp, ulong prim, ulong seq, ulong tok)
 			else
 				sp->i_state = TS_IDLE;
 			break;
-			/*
+			/* 
 			 *  Note: if we are not in a WACK state we simply do
 			 *  not change state.  This occurs normally when we
 			 *  are responding to a T_OPTMGMT_REQ in other than

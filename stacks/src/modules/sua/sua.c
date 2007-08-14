@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:13 $
+ @(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua.c,v $
+ Revision 0.9.2.16  2007/08/14 12:18:52  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.15  2007/07/14 01:35:13  brian
  - make license explicit, add documentation
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:13 $"
+#ident "@(#) $RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:52 $"
 
 static char const ident[] =
-    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:13 $";
+    "$RCSfile: sua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:52 $";
 
 #include <sys/os7/compat.h>
 
@@ -234,6 +237,7 @@ static struct ua_driver sua_dinfo = {
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -242,6 +246,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the SUA driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -268,6 +273,7 @@ STATIC int
 sua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&sua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -277,6 +283,7 @@ STATIC int
 sua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&sua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -294,6 +301,7 @@ STATIC int
 sua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &suainfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -309,6 +317,7 @@ STATIC int
 sua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -320,6 +329,7 @@ MODULE_STATIC void __exit
 suaterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (sua_majors[mindex]) {
 			if ((err = sua_unregister_strdev(sua_majors[mindex])))
@@ -338,6 +348,7 @@ MODULE_STATIC int __init
 suainit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = sua_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

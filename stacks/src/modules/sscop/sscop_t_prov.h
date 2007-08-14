@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_t_prov.h,v 0.9.2.3 2007/06/17 01:56:29 brian Exp $
+ @(#) $Id: sscop_t_prov.h,v 0.9.2.4 2007/08/14 12:18:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_t_prov.h,v $
+ Revision 0.9.2.4  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.3  2007/06/17 01:56:29  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SSCOP_T_PROV_H__
 #define __SSCOP_T_PROV_H__
 
-#ident "@(#) $RCSfile: sscop_t_prov.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sscop_t_prov.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -79,12 +82,14 @@
  *  T_INFO_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_info_ack(q)
+static __inline__ mblk_t *
+t_info_ack(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
 	struct T_info_ack *p;
 	sscop_t *sp = SSCOP_PRIV(q);
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_info_ack * p) mp->b_wptr;
@@ -108,11 +113,13 @@ static __inline__ mblk_t *t_info_ack(q)
  *  T_OK_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_ok_ack(prim)
+static __inline__ mblk_t *
+t_ok_ack(prim)
 	const int prim;
 {
 	mblk_t *mp;
 	struct T_ok_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -127,12 +134,14 @@ static __inline__ mblk_t *t_ok_ack(prim)
  *  T_ERROR_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_error_ack(prim, err)
+static __inline__ mblk_t *
+t_error_ack(prim, err)
 	const int prim;
 	const int err;
 {
 	mblk_t *mp;
 	struct T_error_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -149,13 +158,15 @@ static __inline__ mblk_t *t_error_ack(prim, err)
  *  T_OPTMGMT_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_optmgmt_ack(opt_ptr, opt_len, flags)
+static __inline__ mblk_t *
+t_optmgmt_ack(opt_ptr, opt_len, flags)
 	const caddr_t opt_ptr;
 	const size_t opt_len;
 	const uint flags;
 {
 	mblk_t *mp;
 	struct T_optmgmt_ack *p;
+
 	if ((mp = allocb(sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -174,7 +185,8 @@ static __inline__ mblk_t *t_optmgmt_ack(opt_ptr, opt_len, flags)
  *  T_ADDR_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_addr_ack(q)
+static __inline__ mblk_t *
+t_addr_ack(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
@@ -230,7 +242,8 @@ static __inline__ mblk_t *t_addr_ack(q)
  *  T_BIND_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_bind_ack(q)
+static __inline__ mblk_t *
+t_bind_ack(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
@@ -260,7 +273,8 @@ static __inline__ mblk_t *t_bind_ack(q)
  *  T_CONN_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_conn_ind(ck)
+static __inline__ mblk_t *
+t_conn_ind(ck)
 	const struct sscop_cookie *ck;
 {
 	mblk_t *mp;
@@ -312,7 +326,8 @@ static __inline__ mblk_t *t_conn_ind(ck)
  *  T_CONN_CON
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_conn_con(q)
+static __inline__ mblk_t *
+t_conn_con(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
@@ -363,12 +378,14 @@ static __inline__ mblk_t *t_conn_con(q)
  *  T_DATA_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_data_ind(flag, dp)
+static __inline__ mblk_t *
+t_data_ind(flag, dp)
 	const uint flag;
 	const mblk_t *dp;
 {
 	mblk_t *mp;
 	struct T_data_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -384,12 +401,14 @@ static __inline__ mblk_t *t_data_ind(flag, dp)
  *  T_EXDATA_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_exdata_ind(flag, dp)
+static __inline__ mblk_t *
+t_exdata_ind(flag, dp)
 	const uint flag;
 	const mblk_t *dp;
 {
 	mblk_t *mp;
 	struct T_exdata_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -404,11 +423,12 @@ static __inline__ mblk_t *t_exdata_ind(flag, dp)
  *  T_UNITDATA_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_unitdata_ind(caddr_t src_ptr, size_t src_len, caddr_t opt_ptr,
-					 size_t opt_len)
+static __inline__ mblk_t *
+t_unitdata_ind(caddr_t src_ptr, size_t src_len, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	struct T_unitdata_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + src_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -430,11 +450,12 @@ static __inline__ mblk_t *t_unitdata_ind(caddr_t src_ptr, size_t src_len, caddr_
  *  T_UDERROR_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_uderror_ind(caddr_t dst_ptr, size_t dst_len,
-					caddr_t opt_ptr, size_t opt_len, int type)
+static __inline__ mblk_t *
+t_uderror_ind(caddr_t dst_ptr, size_t dst_len, caddr_t opt_ptr, size_t opt_len, int type)
 {
 	mblk_t *mp;
 	struct T_uderror_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -457,12 +478,14 @@ static __inline__ mblk_t *t_uderror_ind(caddr_t dst_ptr, size_t dst_len,
  *  T_DISCON_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_discon_ind(reason, seq)
+static __inline__ mblk_t *
+t_discon_ind(reason, seq)
 	const int reason;
 	const uint seq;
 {
 	mblk_t *mp;
 	struct T_discon_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
@@ -478,10 +501,12 @@ static __inline__ mblk_t *t_discon_ind(reason, seq)
  *  T_ORDREL_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *t_ordrel_ind(void)
+static __inline__ mblk_t *
+t_ordrel_ind(void)
 {
 	mblk_t *mp;
 	struct T_ordrel_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct T_ok_ack *) mp->b_wptr;
