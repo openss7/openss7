@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $
+ @(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 09:42:43 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 11:17:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 09:42:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcpc.c,v $
+ Revision 0.9.2.10  2007/08/14 09:42:43  brian
+ - GPLv3 header update
+
  Revision 0.9.2.9  2007/03/12 11:17:53  brian
  - rationalize sctp test programs
 
@@ -70,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $"
+#ident "@(#) $RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 09:42:43 $"
 
-static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $";
+static char const ident[] = "$RCSfile: test-tcpc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 09:42:43 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -159,38 +176,8 @@ test_tcpc(void)
 	long inp_bytes = 0, out_bytes = 0;
 	struct pollfd pfd[1] = { {0, POLLIN | POLLOUT | POLLERR | POLLHUP, 0} };
 	unsigned char my_msg[] =
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.\0"
-	    "This is a good short test message that has some 64 bytes in it.";
+	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0"
+	    "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.\0" "This is a good short test message that has some 64 bytes in it.";
 	unsigned char ur_msg[2048];
 
 	fprintf(stderr, "Opening socket\n");
@@ -198,8 +185,7 @@ test_tcpc(void)
 		perror("socket");
 		goto dead;
 	}
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
-		ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
 		goto dead;
@@ -225,10 +211,7 @@ test_tcpc(void)
 		pfd[0].events = POLLOUT | POLLIN | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf
-			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes,
-			     inp_bytes - out_bytes, inp_count ? rtt_delay / inp_count : 0);
+			printf("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld dly: %6ld\n", out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes, inp_count ? rtt_delay / inp_count : 0);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -249,8 +232,7 @@ test_tcpc(void)
 		if (pfd[0].revents & POLLIN) {
 			int rtn;
 
-			if ((rtn = recv(fd, ur_msg + inp_offset, len - inp_offset,
-					MSG_DONTWAIT)) < 0) {
+			if ((rtn = recv(fd, ur_msg + inp_offset, len - inp_offset, MSG_DONTWAIT)) < 0) {
 				if (errno == EINTR || errno == EAGAIN)
 					goto skip_pollin;
 				perror("recv");
@@ -267,16 +249,9 @@ test_tcpc(void)
 						perror("gettimeofday");
 						goto dead;
 					}
-					if (tnow.tv_sec < tv->tv_sec
-					    || (tnow.tv_sec == tv->tv_sec
-						&& tnow.tv_usec < tv->tv_usec))
-						fprintf(stderr,
-							"time: %ld.%06ld before %ld.%06ld\n",
-							tnow.tv_sec, tnow.tv_usec,
-							tv->tv_sec, tv->tv_usec);
-					rtt_delay +=
-					    (tnow.tv_sec - tv->tv_sec) * 1000000 +
-					    tnow.tv_usec - tv->tv_usec;
+					if (tnow.tv_sec < tv->tv_sec || (tnow.tv_sec == tv->tv_sec && tnow.tv_usec < tv->tv_usec))
+						fprintf(stderr, "time: %ld.%06ld before %ld.%06ld\n", tnow.tv_sec, tnow.tv_usec, tv->tv_sec, tv->tv_usec);
+					rtt_delay += (tnow.tv_sec - tv->tv_sec) * 1000000 + tnow.tv_usec - tv->tv_usec;
 					inp_count++;
 					inp_offset = 0;
 				}
@@ -295,8 +270,7 @@ test_tcpc(void)
 					goto dead;
 				}
 			}
-			if ((rtn = send(fd, my_msg + out_offset, len - out_offset,
-					MSG_DONTWAIT)) < 0) {
+			if ((rtn = send(fd, my_msg + out_offset, len - out_offset, MSG_DONTWAIT)) < 0) {
 				if (errno == EINTR || errno == EAGAIN)
 					goto skip_pollout;
 				perror("send");
@@ -339,7 +313,7 @@ splash(int argc, char *argv[])
 %1$s: TCP Performance Test Program\n\
 %2$s\n\
 \n\
-Copyright (c) 2001-2006 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -365,9 +339,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -394,9 +367,9 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2001-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }

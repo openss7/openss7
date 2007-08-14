@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sysctl.h,v 0.9.2.9 2007/06/17 01:55:25 brian Exp $
+ @(#) $Id: sysctl.h,v 0.9.2.10 2007/08/14 09:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:55:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 09:42:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sysctl.h,v $
+ Revision 0.9.2.10  2007/08/14 09:42:27  brian
+ - GPLv3 header update
+
  Revision 0.9.2.9  2007/06/17 01:55:25  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __OS7_LINUX_LINUX_SYSCTL_H__
 #define __OS7_LINUX_LINUX_SYSCTL_H__
 
-#ident "@(#) $RCSfile: sysctl.h,v $ $Name:  $($Revision: 0.9.2.9 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sysctl.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 enum {
 	__OS7_NET_SCTP_RTO_INITIAL = 200,

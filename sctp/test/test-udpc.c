@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 11:17:53 $
+ @(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 09:42:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 11:17:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 09:42:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-udpc.c,v $
+ Revision 0.9.2.9  2007/08/14 09:42:43  brian
+ - GPLv3 header update
+
  Revision 0.9.2.8  2007/03/12 11:17:53  brian
  - rationalize sctp test programs
 
@@ -81,10 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 11:17:53 $"
+#ident "@(#) $RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 09:42:43 $"
 
-static char const ident[] =
-    "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/12 11:17:53 $";
+static char const ident[] = "$RCSfile: test-udpc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 09:42:43 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -173,8 +175,7 @@ test_udpc(void)
 		goto dead;
 	}
 
-	fprintf(stderr, "Binding socket to %s:%d\n",
-		inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
@@ -191,9 +192,7 @@ test_udpc(void)
 		pfd[0].events = POLLIN | POLLOUT | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-			       inp_count, out_count, inp_count + out_count, out_count - inp_count,
-			       8 * (42 + len) * (inp_count + out_count));
+			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n", inp_count, out_count, inp_count + out_count, out_count - inp_count, 8 * (42 + len) * (inp_count + out_count));
 			inp_count = 0;
 			out_count = 0;
 			if (start_timer()) {
@@ -215,8 +214,7 @@ test_udpc(void)
 			inp_count++;
 		}
 		if (pfd[0].revents & POLLOUT) {
-			if (sendto(fd, my_msg, len, MSG_DONTWAIT | MSG_NOSIGNAL,
-				   (struct sockaddr *) &rem_addr, sizeof(rem_addr)) < 0) {
+			if (sendto(fd, my_msg, len, MSG_DONTWAIT | MSG_NOSIGNAL, (struct sockaddr *) &rem_addr, sizeof(rem_addr)) < 0) {
 				perror("sendto");
 				goto dead;
 			}
@@ -247,7 +245,7 @@ splash(int argc, char *argv[])
 %1$s: UDP Performance Test Program\n\
 %2$s\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -273,7 +271,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -303,7 +301,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }

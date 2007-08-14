@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:33:13 $
+ @(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 09:42:35 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 09:42:35 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sctp.c,v $
+ Revision 0.9.2.42  2007/08/14 09:42:35  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:33:13 $"
+#ident "@(#) $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 09:42:35 $"
 
 static char const ident[] =
-    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:33:13 $";
+    "$RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 09:42:35 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -163,9 +169,9 @@ static char const ident[] =
 #include "include/linux/hooks.h"
 #include "include/netinet/sctp.h"
 
-#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.41 $)"
+#define SCTP_DESCRIP	"SCTP/IP (RFC 2960) FOR LINUX NET4 $Name:  $($Revision: 0.9.2.42 $)"
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.41 $) $Date: 2007/07/14 01:33:13 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 09:42:35 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2077,7 +2083,8 @@ skb_add_data(struct sk_buff *skb, char *from, int copy)
 		csum = nocsum_and_copy_from_user(from, skb_put(skb, copy), copy, skb->csum, &err);
 	else
 		csum =
-		    cksum_and_copy_from_user(skb->sk, from, skb_put(skb, copy), copy, skb->csum, &err);
+		    cksum_and_copy_from_user(skb->sk, from, skb_put(skb, copy), copy, skb->csum,
+					     &err);
 	if (!err) {
 		skb->csum = csum;
 		return (0);
@@ -2142,18 +2149,18 @@ sctp_init_caches(void)
 		panic("%s: Cannot alloc sctp_bind cache.\n", __FUNCTION__);
 	if (!sctp_dest_cachep
 	    && !(sctp_dest_cachep =
-		 kmem_cache_create("sock_sctp_daddr", sizeof(struct sctp_daddr), 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL)))
+		 kmem_cache_create("sock_sctp_daddr", sizeof(struct sctp_daddr), 0,
+				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_daddr cache.\n", __FUNCTION__);
 	if (!sctp_srce_cachep
 	    && !(sctp_srce_cachep =
-		 kmem_cache_create("sock_sctp_saddr", sizeof(struct sctp_saddr), 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL)))
+		 kmem_cache_create("sock_sctp_saddr", sizeof(struct sctp_saddr), 0,
+				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_saddr cache.\n", __FUNCTION__);
 	if (!sctp_strm_cachep
 	    && !(sctp_strm_cachep =
-		 kmem_cache_create("sock_sctp_strm", sizeof(struct sctp_strm), 0, SLAB_HWCACHE_ALIGN,
-				   NULL, NULL)))
+		 kmem_cache_create("sock_sctp_strm", sizeof(struct sctp_strm), 0,
+				   SLAB_HWCACHE_ALIGN, NULL, NULL)))
 		panic("%s: Cannot alloc sctp_strm cache.\n", __FUNCTION__);
 	return;
 }
@@ -2624,8 +2631,8 @@ __sctp_daddr_free(struct sctp_daddr *sd)
 	if ((*sd->prev = sd->next))
 		sd->next->prev = sd->prev;
 	printd(("INFO: Deallocating destination address %d.%d.%d.%d for sp = %p\n",
-		 (sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
-		 (sd->daddr >> 24) & 0xff, sd->sp));
+		(sd->daddr >> 0) & 0xff, (sd->daddr >> 8) & 0xff, (sd->daddr >> 16) & 0xff,
+		(sd->daddr >> 24) & 0xff, sd->sp));
 	sd->next = NULL;
 	sd->prev = &sd->next;
 	sctp_dput(sd);
@@ -3452,7 +3459,7 @@ ___sctp_bhash_insert(sctp_t * sp, struct sctp_bind_bucket *sb)
 		sk->sport = htons(sb->port);
 	} else if (sk->state == SCTP_LISTEN) {
 		printd(("INFO: Re-adding listening socket %p to bind bucket at port = %d\n", sk,
-			 sb->port));
+			sb->port));
 	} else
 		swerr();
 	if (!sk->reuse || sk->state == SCTP_LISTEN)
@@ -3482,7 +3489,7 @@ __sctp_bhash_unhash(struct sock *sk)
 	write_lock(&bp->lock);
 	if (sp->bprev) {
 		printd(("INFO: Removing socket %p from bind bucket at port = %d, num = %d\n", sk,
-			 sp->bindb ? sp->bindb->port : -1U, sk->num));
+			sp->bindb ? sp->bindb->port : -1U, sk->num));
 		if ((*(sp->bprev) = sp->bnext))
 			sp->bnext->bprev = sp->bprev;
 		sp->bnext = NULL;
@@ -3492,7 +3499,7 @@ __sctp_bhash_unhash(struct sock *sk)
 				struct sctp_bind_bucket *sb = sp->bindb;
 
 				printd(("INFO: Deallocating bind bucket for port = %d\n",
-					 sb->port));
+					sb->port));
 				if (sb->prev) {
 					if ((*(sb->prev) = sb->next))
 						sb->next->prev = sb->prev;
@@ -4998,7 +5005,7 @@ sctp_send_msg(struct sock *sk, struct sctp_daddr *sd, struct sk_buff *skc)
 #endif				/* (defined SCTP_CONFIG_DEBUG || defined SCTP_CONFIG_TEST) &&
 				   defined SCTP_CONFIG_ERROR_GENERATOR */
 	printd(("INFO: Preparing message sk %p, hlen %u, plen %u, tlen %u\n", sk, (uint) hlen,
-		 (uint) plen, (uint) tlen));
+		(uint) plen, (uint) tlen));
 	unusual(plen == 0 || plen > 1 << 15);
 	/* IMPLEMENTATION NOTE:- We could clone these sk_buffs or dup these mblks and put them into 
 	   a fraglist, however, this would require copying the sk_buff header on each data chunk
@@ -5370,7 +5377,7 @@ sctp_bundle_sack(struct sock *sk,	/* association */
 		   take into account SWS. */
 		arwnd = (count < arwnd) ? arwnd - count : 0;
 		ptrace(("INFO: arwnd = %u, oooq = %u:%u, dupq = %u:%u, rcvq = %u:%u, expq = %u:%u\n", (uint) arwnd, (uint) bufq_size(&sp->oooq), (uint) bufq_length(&sp->oooq), (uint) bufq_size(&sp->dupq), (uint) bufq_length(&sp->dupq), (uint) bufq_size(&sp->rcvq), (uint) bufq_length(&sp->rcvq), (uint) bufq_size(&sp->expq), (uint) bufq_length(&sp->expq)));
-#endif				    /* STREAMS */
+#endif				/* STREAMS */
 		/* fill out sack message information */
 		m = (typeof(m)) b_wptr;
 		m->ch.type = SCTP_CTYPE_SACK;
@@ -6943,8 +6950,7 @@ sctp_retrans_timeout(unsigned long data)
 
 		if (cb->daddr == sd && (cb->flags & SCTPCB_FLAG_SENT)
 		    && !(cb->flags & (SCTPCB_FLAG_RETRANS
-				      | SCTPCB_FLAG_SACKED | SCTPCB_FLAG_DROPPED)))
-		{
+				      | SCTPCB_FLAG_SACKED | SCTPCB_FLAG_DROPPED))) {
 			cb->flags |= SCTPCB_FLAG_RETRANS;
 			sp->nrtxs++;
 			sk->wmem_queued += PADC(skb->len);
@@ -9076,11 +9082,12 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 		size_t clen, dlen;
 		uint flags;
 		int ord;
+
 #if 1
 		int more;
 #endif
 		if (skb->len == 0)
-			break; /* we're done */
+			break;	/* we're done */
 		if (skb->len < 0) {
 			pswerr(("Should have been caught on last iteration!\n"));
 			goto emsgsize;
@@ -9104,7 +9111,7 @@ sctp_recv_data(struct sock *sk, struct sk_buff *skb)
 			goto emsgsize;
 		dlen = clen - sizeof(*m);
 		if (dlen == 0)
-			goto baddata; /* zero length data */
+			goto baddata;	/* zero length data */
 
 #if 0
 		if ((!(m = (typeof(m)) skb_pull(skb, plen)))
@@ -12558,7 +12565,8 @@ sctp_abort(struct sock *sk, ulong origin, long reason)
  */
 STATIC int sctp_get_port(struct sock *sk, unsigned short port);
 STATIC int
-sctp_conn_req(struct sock *sk, uint16_t dport, struct sockaddr_in *dsin, size_t dnum, struct sk_buff *dp)
+sctp_conn_req(struct sock *sk, uint16_t dport, struct sockaddr_in *dsin, size_t dnum,
+	      struct sk_buff *dp)
 {
 	sctp_t *sp = SCTP_PROT(sk);
 	int err;
