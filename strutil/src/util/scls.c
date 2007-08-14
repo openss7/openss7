@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/29 11:51:16 $
+ @(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:58:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/29 11:51:16 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: scls.c,v $
+ Revision 0.9.2.18  2007/08/14 12:58:13  brian
+ - GNUv3 header updates
+
  Revision 0.9.2.17  2006/09/29 11:51:16  brian
  - libtool library tweaks in Makefile.am
  - better rpm spec handling in *.spec.in
@@ -60,10 +63,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/29 11:51:16 $"
+#ident "@(#) $RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:58:13 $"
 
 static char const ident[] =
-    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2006/09/29 11:51:16 $";
+    "$RCSfile: scls.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:58:13 $";
 
 /* 
  *  AIX Utility: scls - Produces a list of module and driver names.
@@ -98,8 +101,8 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 2, included here by reference.\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -168,22 +171,22 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version  2  of  the  License.\n\
+Foundation; version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
 You should  have received a copy of the GNU  General  Public License  along with\n\
-this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
-Cambridge, MA 02139, USA.\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -539,14 +542,18 @@ main(int argc, char *argv[])
 	if (option_reset) {
 		if (ioctl(fd, SC_IOC_RESET, list) < 0) {
 			if (debug)
-				fprintf(stderr, "%s: could not perform second SC_IOC_RESET command\n", argv[0]);
+				fprintf(stderr,
+					"%s: could not perform second SC_IOC_RESET command\n",
+					argv[0]);
 			perror(argv[0]);
 			exit(1);
 		}
 	} else {
 		if (ioctl(fd, SC_IOC_LIST, list) < 0) {
 			if (debug)
-				fprintf(stderr, "%s: could not perform second SC_IOC_LIST command\n", argv[0]);
+				fprintf(stderr,
+					"%s: could not perform second SC_IOC_LIST command\n",
+					argv[0]);
 			perror(argv[0]);
 			exit(1);
 		}

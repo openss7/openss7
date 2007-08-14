@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:36:59 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 12:58:01 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:59 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:01 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: nuls.c,v $
+ Revision 0.9.2.44  2007/08/14 12:58:01  brian
+ - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:36:59 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 12:58:01 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:36:59 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 12:58:01 $";
 
 #define _LFS_SOURCE
 
@@ -66,7 +72,7 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:36:59 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 12:58:01 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NULS_LICENSE	"GPL v2"
@@ -160,8 +166,8 @@ static struct module_info nuls_minfo = {
 	.mi_lowat = STRLOW,
 };
 
-static struct module_stat nuls_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat nuls_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat nuls_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat nuls_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int
 nuls_put(queue_t *q, mblk_t *mp)
@@ -243,7 +249,7 @@ nuls_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 
 	_ptrace(("%s: opening major %hu, minor %hu, sflag %d\n", __FUNCTION__, cmajor, cminor,
-		sflag));
+		 sflag));
 	if (q->q_ptr != NULL) {
 		_printd(("%s: stream is already open\n", __FUNCTION__));
 		return (0);	/* already open */

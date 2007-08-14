@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:56:34 $
+ @(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:58:04 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 10:56:34 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: gen.c,v $
+ Revision 0.9.2.3  2007/08/14 12:58:04  brian
+ - GNUv3 header updates
+
  Revision 0.9.2.2  2006/12/18 10:56:34  brian
  - updated headers for release
 
@@ -58,9 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:56:34 $"
+#ident "@(#) $RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:58:04 $"
 
-static char const ident[] = "$RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/12/18 10:56:34 $";
+static char const ident[] =
+    "$RCSfile: gen.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:58:04 $";
 
 /*
  *  Linux Fast-STREAMS libc replacement functions for logging
@@ -383,15 +387,18 @@ int
 __slog_setlogmask(struct __slog_info_struct *info, int mask)
 {
 	int oldmask = info->slog_mask;
+
 	if (mask)
 		info->slog_mask = mask;
 	return (oldmask);
 }
+
 int
 __slog_setlogmask(int mask)
 {
 	struct __slog_info_struct *info = NULL;
 	int ret = -1;
+
 	pthread_cleanup_push_defer_np(__slog_putinfo, &info);
 	if ((info = __slog_wrinfo()) != NULL)
 		ret = __slog_setlogmask(info, mask);
@@ -407,6 +414,7 @@ int
 __slog_vsyslog(struct __slog_info_struct *info, int pri, const char *fmt, va_list args)
 {
 	int ret = -1;
+
 	if (info->slog_fd == 0) {
 		if ((ret = open("/dev/strlog", O_NONBLOCK | O_NDELAY)) == -1) {
 			perror(__FUNCTION__);
@@ -417,7 +425,9 @@ __slog_vsyslog(struct __slog_info_struct *info, int pri, const char *fmt, va_lis
 	/* FIXME: format the message and send it to the log device */
 	return (0);
 }
-void __slog_vsyslog_r(int pri, const char *fmt, va_list args)
+
+void
+__slog_vsyslog_r(int pri, const char *fmt, va_list args)
 {
 }
 void vsyslog(int pri, const char *fmt, va_list args) __attribute___((alias("__slog_vsyslog_r")));

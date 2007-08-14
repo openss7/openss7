@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/15 10:24:02 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:58:09 $
 
  -----------------------------------------------------------------------------
 
@@ -32,8 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:24:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:58:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.24  2007/08/14 12:58:09  brian
+ - GNUv3 header updates
+
  Revision 0.9.2.23  2007/03/15 10:24:02  brian
  - test case reporting and pushed release date one day
 
@@ -137,9 +141,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/15 10:24:02 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:58:09 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/03/15 10:24:02 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:58:09 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -196,6 +200,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX 98/SUS Version 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "STREAMS";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/echo";
 static char muxname[256] = "/dev/streams/clone/mux";
@@ -437,7 +442,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -1211,7 +1216,7 @@ print_pipe(int child)
 }
 
 void
-print_open(int child, const char* name)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
 		"open()        ----->v %-30s |  |                   \n",
@@ -1750,7 +1755,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -1908,7 +1913,7 @@ test_isastream(int child)
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
 	int result;
 
 	print_poll(child, events);
@@ -2632,9 +2637,6 @@ postamble_8(int child)
 	return __RESULT_SUCCESS;
 }
 
-
-
-
 /*
  *  =========================================================================
  *
@@ -2725,7 +2727,7 @@ test_case_2_1_1(int child)
 {
 	int numb = -1;
 
-	if (test_ioctl(child, I_NREAD, (intptr_t) & numb) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_NREAD, (intptr_t) &numb) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval != 0)
@@ -2776,7 +2778,7 @@ test_case_2_1_3(int child)
 {
 	int numb = -1;
 
-	if (test_ioctl(child, I_NREAD, (intptr_t) & numb) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_NREAD, (intptr_t) &numb) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -2813,7 +2815,7 @@ test_case_2_1_4(int child)
 	if (test_putpmsg(child, &ctl, &dat, 0, MSG_HIPRI) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_NREAD, (intptr_t) & numb) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_NREAD, (intptr_t) &numb) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (numb != 16)
@@ -2851,7 +2853,7 @@ test_case_2_1_5(int child)
 	if (test_putpmsg(child, NULL, &dat, 1, MSG_BAND) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_NREAD, (intptr_t) & numb) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_NREAD, (intptr_t) &numb) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (numb != 0)
@@ -3001,6 +3003,7 @@ int
 test_case_2_2_6(int child)
 {
 	int i;
+
 	for (i = 0; i < 64; i++) {
 		if (test_ioctl(child, I_PUSH, (intptr_t) "nullmod") != __RESULT_SUCCESS)
 			return (__RESULT_FAILURE);
@@ -3809,7 +3812,7 @@ options."
 int
 test_case_2_6_1(int child)
 {
-	if (test_ioctl(child, I_SRDOPT, (RMSGD|RMSGN)) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_SRDOPT, (RMSGD | RMSGN)) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4146,7 +4149,7 @@ test_case_2_7_1(int child)
 {
 	int rdopts = -1;
 
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTNORM))
@@ -4176,7 +4179,7 @@ test_case_2_7_2(int child)
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTNORM))
@@ -4206,7 +4209,7 @@ test_case_2_7_3(int child)
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDAT)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTDAT))
@@ -4236,7 +4239,7 @@ test_case_2_7_4(int child)
 	if (test_ioctl(child, I_SRDOPT, (RNORM | RPROTDIS)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTDIS))
@@ -4266,7 +4269,7 @@ test_case_2_7_5(int child)
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RMSGD | RPROTNORM))
@@ -4296,7 +4299,7 @@ test_case_2_7_6(int child)
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDAT)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RMSGD | RPROTDAT))
@@ -4326,7 +4329,7 @@ test_case_2_7_7(int child)
 	if (test_ioctl(child, I_SRDOPT, (RMSGD | RPROTDIS)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RMSGD | RPROTDIS))
@@ -4356,7 +4359,7 @@ test_case_2_7_8(int child)
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RMSGN | RPROTNORM))
@@ -4386,7 +4389,7 @@ test_case_2_7_9(int child)
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDAT)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RMSGN | RPROTDAT))
@@ -4416,7 +4419,7 @@ test_case_2_7_10(int child)
 	if (test_ioctl(child, I_SRDOPT, (RMSGN | RPROTDIS)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RMSGN | RPROTDIS))
@@ -4466,7 +4469,7 @@ test_case_2_7_12(int child)
 {
 	int rdopts = -1;
 
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTNORM))
@@ -4494,7 +4497,7 @@ test_case_2_7_13(int child)
 {
 	int rdopts = -1;
 
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTNORM))
@@ -4522,7 +4525,7 @@ test_case_2_7_14(int child)
 {
 	int rdopts = -1;
 
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTNORM))
@@ -4549,7 +4552,7 @@ test_case_2_7_15(int child)
 {
 	int rdopts = -1;
 
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (rdopts != (RNORM | RPROTNORM))
@@ -4577,7 +4580,7 @@ test_case_2_7_16(int child)
 {
 	int rdopts = -1;
 
-	if (test_ioctl(child, I_GRDOPT, (intptr_t) & rdopts) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_GRDOPT, (intptr_t) &rdopts) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -4626,7 +4629,8 @@ ic_len less than zero, which should return EINVAL."
 int
 test_case_2_8_2(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = -1, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = -1,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4649,7 +4653,8 @@ ic_len greater than streams.strmsgsz, which should return EINVAL."
 int
 test_case_2_8_3(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 262145, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 262145,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4672,7 +4677,8 @@ ic_timout less than minus one (-1), which should return EINVAL."
 int
 test_case_2_8_4(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = -2, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = -2,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4694,7 +4700,8 @@ Checks that I_STR can be performed on a Stream."
 int
 test_case_2_8_5(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4717,7 +4724,8 @@ returned when I_STR is attempted on a Stream that has hung up."
 int
 test_case_2_8_6(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != ENXIO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4740,7 +4748,8 @@ returned when I_STR is attempted on a Stream that has a read error."
 int
 test_case_2_8_7(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4763,7 +4772,8 @@ returned when I_STR is attempted on a Stream that has a write error."
 int
 test_case_2_8_8(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4786,7 +4796,8 @@ returned when I_STR is attempted on a Stream that has an error."
 int
 test_case_2_8_9(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4810,7 +4821,8 @@ Multiplexing Driver."
 int
 test_case_2_8_10(int child)
 {
-	struct strioctl ic = { .ic_cmd = -5, .ic_timout = 0, .ic_len = 0, .ic_dp = NULL, };
+	struct strioctl ic = {.ic_cmd = -5,.ic_timout = 0,.ic_len = 0,.ic_dp = NULL, };
+
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
@@ -4834,7 +4846,7 @@ int
 test_case_2_8_11(int child)
 {
 	char buf[1024] = { 0, };
-	struct strioctl ic = { .ic_cmd = TM_IOC_IOCTL, .ic_timout = 0, .ic_len = sizeof(buf), .ic_dp = buf, };
+	struct strioctl ic = {.ic_cmd = TM_IOC_IOCTL,.ic_timout = 0,.ic_len = sizeof(buf),.ic_dp = buf, };
 	int i;
 
 	if (test_ioctl(child, I_STR, (intptr_t) &ic) != __RESULT_SUCCESS)
@@ -5602,7 +5614,7 @@ Check that SIGURG for S_RDBAND/S_BANDURG is generated."
 int
 test_case_2_9_18(int child)
 {
-	if (test_ioctl(child, I_SETSIG, S_RDBAND|S_BANDURG) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETSIG, S_RDBAND | S_BANDURG) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	last_signum = 0;
@@ -5650,7 +5662,7 @@ test_case_2_10_1(int child)
 {
 	int sigs = 0;
 
-	if (test_ioctl(child, I_GETSIG, (intptr_t) & sigs) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &sigs) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5694,10 +5706,11 @@ int
 test_case_2_10_3(int child)
 {
 	int events;
+
 	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &events) != __RESULT_SUCCESS || events != S_ALL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5720,10 +5733,11 @@ int
 test_case_2_10_4(int child)
 {
 	int events;
+
 	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &events) != __RESULT_SUCCESS || events != S_ALL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5746,10 +5760,11 @@ int
 test_case_2_10_5(int child)
 {
 	int events;
+
 	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &events) != __RESULT_SUCCESS || events != S_ALL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5772,10 +5787,11 @@ int
 test_case_2_10_6(int child)
 {
 	int events;
+
 	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &events) != __RESULT_SUCCESS || events != S_ALL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5798,10 +5814,11 @@ int
 test_case_2_10_7(int child)
 {
 	int events;
+
 	if (test_ioctl(child, I_SETSIG, S_ALL) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) != __RESULT_SUCCESS || events != S_ALL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &events) != __RESULT_SUCCESS || events != S_ALL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -5826,7 +5843,7 @@ test_case_2_10_8(int child)
 {
 	int events;
 
-	if (test_ioctl(child, I_GETSIG, (intptr_t)&events) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_GETSIG, (intptr_t) &events) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6450,7 +6467,7 @@ test_case_2_14_1(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6474,7 +6491,7 @@ test_case_2_14_2(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != ENXIO)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != ENXIO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6499,7 +6516,7 @@ test_case_2_14_3(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6524,7 +6541,7 @@ test_case_2_14_4(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != EAGAIN)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6549,7 +6566,7 @@ test_case_2_14_5(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6573,7 +6590,7 @@ test_case_2_14_6(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6596,7 +6613,7 @@ test_case_2_14_7(int child)
 {
 	struct strrecvfd recvfd;
 
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6627,7 +6644,7 @@ test_case_2_14_8(int child)
 	if (start_tt(100) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_RECVFD, (intptr_t) & recvfd) == __RESULT_SUCCESS || last_errno != EINTR)
+	if (test_ioctl(child, I_RECVFD, (intptr_t) &recvfd) == __RESULT_SUCCESS || last_errno != EINTR)
 		return (__RESULT_FAILURE);
 	state++;
 	print_signal(child, last_signum);
@@ -6657,7 +6674,7 @@ test_case_2_15_1(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6680,7 +6697,7 @@ test_case_2_15_2(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6704,7 +6721,7 @@ test_case_2_15_3(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6727,7 +6744,7 @@ test_case_2_15_4(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS || last_retval != 0)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS || last_retval != 0)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6751,7 +6768,7 @@ test_case_2_15_5(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6776,7 +6793,7 @@ test_case_2_15_6(int child)
 {
 	struct strpeek peek = { {0, 0, NULL}, {0, 0, NULL}, 0 };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -6800,13 +6817,16 @@ test_case_2_15_7(int child)
 {
 	char scbuf[24] = "";
 	char sdbuf[24] = "";
-	struct strpeek peek = { {sizeof(scbuf), -1, scbuf}, {sizeof(sdbuf), -1, sdbuf}, 0 };
+	struct strpeek peek = { {sizeof(scbuf), -1, scbuf}
+	, {sizeof(sdbuf), -1, sdbuf}
+	, 0
+	};
 	char pcbuf[16] = "012345678901234";
 	char pdbuf[12] = "09876543210";
 	struct strbuf ctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf dat = { -1, sizeof(pdbuf), pdbuf };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval != 0)
@@ -6815,7 +6835,7 @@ test_case_2_15_7(int child)
 	if (test_putmsg(child, &ctl, &dat, RS_HIPRI) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval == 0)
@@ -6857,13 +6877,16 @@ test_case_2_15_8(int child)
 {
 	char scbuf[24] = "";
 	char sdbuf[24] = "";
-	struct strpeek peek = { {sizeof(scbuf), -1, scbuf}, {sizeof(sdbuf), -1, sdbuf}, RS_HIPRI };
+	struct strpeek peek = { {sizeof(scbuf), -1, scbuf}
+	, {sizeof(sdbuf), -1, sdbuf}
+	, RS_HIPRI
+	};
 	char pcbuf[16] = "012345678901234";
 	char pdbuf[12] = "09876543210";
 	struct strbuf ctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf dat = { -1, sizeof(pdbuf), pdbuf };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval != 0)
@@ -6872,7 +6895,7 @@ test_case_2_15_8(int child)
 	if (test_putmsg(child, &ctl, &dat, RS_HIPRI) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval == 0)
@@ -6914,13 +6937,16 @@ test_case_2_15_9(int child)
 {
 	char scbuf[24] = "";
 	char sdbuf[24] = "";
-	struct strpeek peek = { {sizeof(scbuf), -1, scbuf}, {sizeof(sdbuf), -1, sdbuf}, RS_HIPRI };
+	struct strpeek peek = { {sizeof(scbuf), -1, scbuf}
+	, {sizeof(sdbuf), -1, sdbuf}
+	, RS_HIPRI
+	};
 	char pcbuf[16] = "012345678901234";
 	char pdbuf[12] = "09876543210";
 	struct strbuf ctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf dat = { -1, sizeof(pdbuf), pdbuf };
 
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval != 0)
@@ -6929,7 +6955,7 @@ test_case_2_15_9(int child)
 	if (test_putmsg(child, &ctl, &dat, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
-	if (test_ioctl(child, I_PEEK, (intptr_t) & peek) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_PEEK, (intptr_t) &peek) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (last_retval != 0)
@@ -6961,6 +6987,7 @@ test_case_2_16_1(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = -1;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -6995,6 +7022,7 @@ test_case_2_16_2_1(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7029,6 +7057,7 @@ test_case_2_16_2_2(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7134,6 +7163,7 @@ test_case_2_16_4_1(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7168,6 +7198,7 @@ test_case_2_16_4_2(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7202,6 +7233,7 @@ test_case_2_16_5_1(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7236,6 +7268,7 @@ test_case_2_16_5_2(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7270,6 +7303,7 @@ test_case_2_16_6_1(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7304,6 +7338,7 @@ test_case_2_16_6_2(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7337,6 +7372,7 @@ test_case_2_16_7(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7370,6 +7406,7 @@ test_case_2_16_8(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t) - 1;
 	fdi.ctlbuf.buf = buf;
@@ -7401,8 +7438,9 @@ is returned when fdi.offset is not aligned to a t_uscalar_t boundary."
 int
 test_case_2_16_9(int child)
 {
-	char buf[sizeof(t_uscalar_t)<<1] = { 0, };
+	char buf[sizeof(t_uscalar_t) << 1] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(buf);
 	fdi.ctlbuf.buf = buf;
@@ -7436,6 +7474,7 @@ test_case_2_16_10(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7469,6 +7508,7 @@ test_case_2_16_11(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7502,6 +7542,7 @@ test_case_2_16_12(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7535,6 +7576,7 @@ test_case_2_16_13(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7569,6 +7611,7 @@ test_case_2_16_14(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = 0;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7603,6 +7646,7 @@ test_case_2_16_15(int child)
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
 	int oldfd = test_fd[child];
+
 	test_fd[child] = -1;
 	fdi.ctlbuf.maxlen = -1;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
@@ -7640,6 +7684,7 @@ test_case_2_16_16(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = -1;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -7675,6 +7720,7 @@ test_case_2_16_17(int child)
 {
 	char buf[sizeof(t_uscalar_t)] = { 0, };
 	struct strfdinsert fdi;
+
 	fdi.ctlbuf.maxlen = -1;
 	fdi.ctlbuf.len = sizeof(t_uscalar_t);
 	fdi.ctlbuf.buf = buf;
@@ -8208,7 +8254,7 @@ test_case_2_20_1(int child)
 {
 	int wropts = -1;
 
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO))
@@ -8238,7 +8284,7 @@ test_case_2_20_2(int child)
 	if (test_ioctl(child, I_SWROPT, 0) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != 0)
@@ -8268,7 +8314,7 @@ test_case_2_20_3(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDZERO)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO))
@@ -8298,7 +8344,7 @@ test_case_2_20_4(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDPIPE))
@@ -8331,7 +8377,7 @@ test_case_2_20_5(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDHOLD))
@@ -8362,7 +8408,7 @@ test_case_2_20_6(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO | SNDPIPE))
@@ -8395,7 +8441,7 @@ test_case_2_20_7(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO | SNDHOLD))
@@ -8429,7 +8475,7 @@ test_case_2_20_8(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDPIPE | SNDHOLD))
@@ -8463,7 +8509,7 @@ test_case_2_20_9(int child)
 	if (test_ioctl(child, I_SWROPT, (SNDZERO | SNDPIPE | SNDHOLD)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO | SNDPIPE | SNDHOLD))
@@ -8513,7 +8559,7 @@ test_case_2_20_11(int child)
 {
 	int wropts = -1;
 
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO))
@@ -8540,7 +8586,7 @@ test_case_2_20_12(int child)
 {
 	int wropts = -1;
 
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO))
@@ -8567,7 +8613,7 @@ test_case_2_20_13(int child)
 {
 	int wropts = -1;
 
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO))
@@ -8594,7 +8640,7 @@ test_case_2_20_14(int child)
 {
 	int wropts = -1;
 
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (wropts != (SNDZERO))
@@ -8622,7 +8668,7 @@ test_case_2_20_15(int child)
 {
 	int wropts = -1;
 
-	if (test_ioctl(child, I_GWROPT, (intptr_t) & wropts) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_GWROPT, (intptr_t) &wropts) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9128,7 +9174,7 @@ test_case_2_24_1(int child)
 {
 	struct bandinfo bi = { 0, 0 };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9149,9 +9195,9 @@ Checks that I_FLUSHBAND with an invalid argument returns EINVAL."
 int
 test_case_2_24_2(int child)
 {
-	struct bandinfo bi = { 0, -1};
+	struct bandinfo bi = { 0, -1 };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9196,7 +9242,7 @@ test_case_2_24_4(int child)
 {
 	struct bandinfo bi = { 0, FLUSHR };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9219,7 +9265,7 @@ test_case_2_24_5(int child)
 {
 	struct bandinfo bi = { 0, FLUSHW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9242,7 +9288,7 @@ test_case_2_24_6(int child)
 {
 	struct bandinfo bi = { 0, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9265,7 +9311,7 @@ test_case_2_24_7(int child)
 {
 	struct bandinfo bi = { 1, FLUSHR };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9288,7 +9334,7 @@ test_case_2_24_8(int child)
 {
 	struct bandinfo bi = { 1, FLUSHW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9311,7 +9357,7 @@ test_case_2_24_9(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9335,7 +9381,7 @@ test_case_2_24_10(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != ENXIO)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != ENXIO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9359,7 +9405,7 @@ test_case_2_24_11(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9383,7 +9429,7 @@ test_case_2_24_12(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9407,7 +9453,7 @@ test_case_2_24_13(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9432,7 +9478,7 @@ test_case_2_24_14(int child)
 {
 	struct bandinfo bi = { 1, FLUSHRW };
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9481,6 +9527,7 @@ preamble_test_case_2_24_15(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_24_15(int child)
 {
@@ -9492,7 +9539,7 @@ test_case_2_24_15(int child)
 	int band = 0;
 	int flags = MSG_ANY;
 
-	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) & bi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FLUSHBAND, (intptr_t) &bi) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	band = 0;
@@ -9748,6 +9795,7 @@ preamble_test_case_2_25_8(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_25_8(int child)
 {
@@ -9818,7 +9866,7 @@ test_case_2_26_1(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != ENODATA)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) == __RESULT_SUCCESS || last_errno != ENODATA)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9841,7 +9889,7 @@ test_case_2_26_2(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != ENODATA)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) == __RESULT_SUCCESS || last_errno != ENODATA)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9865,7 +9913,7 @@ test_case_2_26_3(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9888,7 +9936,7 @@ test_case_2_26_4(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != ENODATA)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) == __RESULT_SUCCESS || last_errno != ENODATA)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9912,7 +9960,7 @@ test_case_2_26_5(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != EPROTO)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) == __RESULT_SUCCESS || last_errno != EPROTO)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9936,7 +9984,7 @@ test_case_2_26_6(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -9970,12 +10018,13 @@ preamble_test_case_2_26_7(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_26_7(int child)
 {
 	int band = 1;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (band != 0)
@@ -10017,12 +10066,13 @@ preamble_test_case_2_26_8(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_26_8(int child)
 {
 	int band = 1;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (band != 0)
@@ -10064,12 +10114,13 @@ preamble_test_case_2_26_9(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_26_9(int child)
 {
 	int band = 0;
 
-	if (test_ioctl(child, I_GETBAND, (intptr_t) & band) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GETBAND, (intptr_t) &band) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (band != 1)
@@ -10235,7 +10286,7 @@ test_case_2_28_1(int child)
 {
 	int cltime = 0;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10281,7 +10332,7 @@ test_case_2_28_3(int child)
 {
 	int cltime = 0;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10305,7 +10356,7 @@ test_case_2_28_4(int child)
 {
 	int cltime = 0;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10329,7 +10380,7 @@ test_case_2_28_5(int child)
 {
 	int cltime = 0;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10353,7 +10404,7 @@ test_case_2_28_6(int child)
 {
 	int cltime = 0;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10377,7 +10428,7 @@ test_case_2_28_7(int child)
 {
 	int cltime = 0;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10419,12 +10470,13 @@ preamble_test_case_2_28_8(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_28_8(int child)
 {
 	int cltime = 1000;
 
-	if (test_ioctl(child, I_SETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_SETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	last_signum = 0;
@@ -10441,6 +10493,7 @@ test_case_2_28_8(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 postamble_test_case_2_28_8(int child)
 {
@@ -10483,6 +10536,7 @@ preamble_test_case_2_28_9(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_28_9(int child)
 {
@@ -10502,6 +10556,7 @@ test_case_2_28_9(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 postamble_test_case_2_28_9(int child)
 {
@@ -10543,6 +10598,7 @@ preamble_test_case_2_28_10(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_28_10(int child)
 {
@@ -10560,6 +10616,7 @@ test_case_2_28_10(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 postamble_test_case_2_28_10(int child)
 {
@@ -10599,6 +10656,7 @@ preamble_test_case_2_28_11(int child)
 	} while (last_errno != EAGAIN);
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_2_28_11(int child)
 {
@@ -10614,6 +10672,7 @@ test_case_2_28_11(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 postamble_test_case_2_28_11(int child)
 {
@@ -10643,7 +10702,7 @@ test_case_2_29_1(int child)
 {
 	int cltime;
 
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10689,7 +10748,7 @@ test_case_2_29_3(int child)
 {
 	int cltime;
 
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10713,7 +10772,7 @@ test_case_2_29_4(int child)
 {
 	int cltime;
 
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10737,7 +10796,7 @@ test_case_2_29_5(int child)
 {
 	int cltime;
 
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10761,7 +10820,7 @@ test_case_2_29_6(int child)
 {
 	int cltime;
 
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) != __RESULT_SUCCESS || cltime != 15000)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) &cltime) != __RESULT_SUCCESS || cltime != 15000)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -10786,7 +10845,7 @@ test_case_2_29_7(int child)
 {
 	int cltime;
 
-	if (test_ioctl(child, I_GETCLTIME, (intptr_t) & cltime) == __RESULT_SUCCESS || last_errno != EINVAL)
+	if (test_ioctl(child, I_GETCLTIME, (intptr_t) &cltime) == __RESULT_SUCCESS || last_errno != EINVAL)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -11031,11 +11090,13 @@ preamble_test_case_2_30_x(int child, int band)
 	} while (last_errno != EAGAIN);
 	return (__RESULT_SUCCESS);
 }
+
 int
 preamble_test_case_2_30_10(int child)
 {
 	return preamble_test_case_2_30_x(child, 0);
 }
+
 int
 test_case_2_30_10(int child)
 {
@@ -11067,6 +11128,7 @@ preamble_test_case_2_30_11(int child)
 {
 	return preamble_test_case_2_30_x(child, 1);
 }
+
 int
 test_case_2_30_11(int child)
 {
@@ -11098,6 +11160,7 @@ preamble_test_case_2_30_12(int child)
 {
 	return preamble_test_case_2_30_x(child, 1);
 }
+
 int
 test_case_2_30_12(int child)
 {
@@ -11129,6 +11192,7 @@ preamble_test_case_2_30_13(int child)
 {
 	return preamble_test_case_2_30_x(child, 2);
 }
+
 int
 test_case_2_30_13(int child)
 {
@@ -11486,7 +11550,7 @@ test_case_2_32_1(int child)
 #else
 	int erropts = -1;
 
-	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) &erropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (erropts != (RERRNORM | WERRNORM))
@@ -11520,7 +11584,7 @@ test_case_2_32_2(int child)
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) &erropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (erropts != (RERRNORM | WERRNORM))
@@ -11554,7 +11618,7 @@ test_case_2_32_3(int child)
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNORM)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) &erropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (erropts != (RERRNONPERSIST | WERRNORM))
@@ -11588,7 +11652,7 @@ test_case_2_32_4(int child)
 	if (test_ioctl(child, I_SERROPT, (RERRNORM | WERRNONPERSIST)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) &erropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (erropts != (RERRNORM | WERRNONPERSIST))
@@ -11622,7 +11686,7 @@ test_case_2_32_5(int child)
 	if (test_ioctl(child, I_SERROPT, (RERRNONPERSIST | WERRNONPERSIST)) != __RESULT_SUCCESS)
 		return (__RESULT_INCONCLUSIVE);
 	state++;
-	if (test_ioctl(child, I_GERROPT, (intptr_t) & erropts) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_GERROPT, (intptr_t) &erropts) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
 	if (erropts != (RERRNONPERSIST | WERRNONPERSIST))
@@ -12886,7 +12950,7 @@ test_case_3_1_9(int child)
 {
 	char buf[16];
 
-	if (test_read(child, (char *)INVALID_ADDRESS, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_read(child, (char *) INVALID_ADDRESS, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -12961,6 +13025,7 @@ preamble_test_case_3_1_11_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_11_1(int child)
 {
@@ -13029,6 +13094,7 @@ preamble_test_case_3_1_11_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_11_2(int child)
 {
@@ -13096,6 +13162,7 @@ preamble_test_case_3_1_11_3(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_11_3(int child)
 {
@@ -13160,6 +13227,7 @@ preamble_test_case_3_1_12_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_12_1(int child)
 {
@@ -13221,6 +13289,7 @@ preamble_test_case_3_1_12_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_12_2(int child)
 {
@@ -13290,6 +13359,7 @@ preamble_test_case_3_1_12_3(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_12_3(int child)
 {
@@ -13354,6 +13424,7 @@ preamble_test_case_3_1_13_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_13_1(int child)
 {
@@ -13422,6 +13493,7 @@ preamble_test_case_3_1_13_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_13_2(int child)
 {
@@ -13491,6 +13563,7 @@ preamble_test_case_3_1_13_3(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_13_3(int child)
 {
@@ -13559,6 +13632,7 @@ preamble_test_case_3_1_14_1(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_14_1(int child)
 {
@@ -13608,6 +13682,7 @@ preamble_test_case_3_1_14_2(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_14_2(int child)
 {
@@ -13621,7 +13696,7 @@ test_case_3_1_14_2(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < 16; i++)
-		if (buf[i] != (char)(i + 16))
+		if (buf[i] != (char) (i + 16))
 			return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13666,6 +13741,7 @@ preamble_test_case_3_1_15(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_15(int child)
 {
@@ -13681,7 +13757,7 @@ test_case_3_1_15(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(buf); i++)
-		if (buf[i] != (char)i)
+		if (buf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -13726,6 +13802,7 @@ preamble_test_case_3_1_16(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_1_16(int child)
 {
@@ -13740,7 +13817,7 @@ test_case_3_1_16(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < 16; i++)
-		if (buf[i] != (char)(i + 16))
+		if (buf[i] != (char) (i + 16))
 			return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14007,7 +14084,7 @@ test_case_3_2_9(int child)
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);
 
-	if (test_readv(child, (struct iovec *)INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_readv(child, (struct iovec *) INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14047,7 +14124,7 @@ test_case_3_2_10(int child)
 	char buf[16];
 	struct iovec iov[1];
 
-	iov[0].iov_base = (char *)INVALID_ADDRESS;
+	iov[0].iov_base = (char *) INVALID_ADDRESS;
 	iov[0].iov_len = sizeof(buf);
 
 	if (test_readv(child, iov, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
@@ -14321,7 +14398,7 @@ test_case_3_3_9(int child)
 {
 	char buf[16] = { 0, };
 
-	if (test_write(child, (char *)INVALID_ADDRESS, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_write(child, (char *) INVALID_ADDRESS, sizeof(buf)) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14380,7 +14457,7 @@ test_case_3_3_11(int child)
 	int i;
 
 	for (i = 0; i < sizeof(buf); i++)
-		buf[i] = (char)i;
+		buf[i] = (char) i;
 	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -14397,7 +14474,7 @@ test_case_3_3_11(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(buf); i++)
-		if (dbuf[i] != (char)i)
+		if (dbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14421,7 +14498,7 @@ int
 test_case_3_3_12(int child)
 {
 	char buf[32] = { 0, };
-	
+
 	if (test_write(child, buf, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -14458,7 +14535,7 @@ int
 test_case_3_3_13(int child)
 {
 	char buf[32] = { 0, };
-	
+
 	if (test_write(child, buf, 0) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
 	state++;
@@ -14534,9 +14611,9 @@ test_case_3_3_15(int child)
 	int i;
 
 	for (i = 0; i < 4096; i++)
-		buf[i] = (char)i;
+		buf[i] = (char) i;
 	for (i = 0; i < 128; i++)
-		buf[i+4096] = (char)(128-i);
+		buf[i + 4096] = (char) (128 - i);
 
 	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -14554,7 +14631,7 @@ test_case_3_3_15(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < 4096; i++)
-		if (dbuf[i] != (char)i)
+		if (dbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	if (test_getmsg(child, NULL, &dat, &flags) != __RESULT_SUCCESS)
@@ -14567,8 +14644,8 @@ test_case_3_3_15(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < 128; i++)
-		if (dbuf[i] != (char)(128-i)) {
-			printf("Character at position %d is %d\n", i, (int)dbuf[i]);
+		if (dbuf[i] != (char) (128 - i)) {
+			printf("Character at position %d is %d\n", i, (int) dbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -14602,7 +14679,7 @@ test_case_3_3_16(int child)
 	int i;
 
 	for (i = 0; i < 4096; i++)
-		buf[i] = (char)i;
+		buf[i] = (char) i;
 
 	if (test_write(child, buf, sizeof(buf)) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -14620,7 +14697,7 @@ test_case_3_3_16(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < 4096; i++)
-		if (dbuf[i] != (char)i)
+		if (dbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	if (test_getmsg(child, NULL, &dat, &flags) == __RESULT_SUCCESS || last_errno != EAGAIN)
@@ -14893,7 +14970,7 @@ test_case_3_4_9(int child)
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);;
 
-	if (test_writev(child, (struct iovec *)INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
+	if (test_writev(child, (struct iovec *) INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
 	return (__RESULT_SUCCESS);
@@ -14919,7 +14996,7 @@ test_case_3_4_10(int child)
 	char buf[16] = { 0, };
 	struct iovec iov[1];
 
-	iov[0].iov_base = (char *)INVALID_ADDRESS;
+	iov[0].iov_base = (char *) INVALID_ADDRESS;
 	iov[0].iov_len = sizeof(buf);;
 
 	if (test_writev(child, iov, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
@@ -15360,11 +15437,11 @@ test_case_3_5_10(int child)
 
 	ctl.maxlen = 5;
 	ctl.len = -1;
-	ctl.buf = (char *)INVALID_ADDRESS;
+	ctl.buf = (char *) INVALID_ADDRESS;
 
 	dat.maxlen = 5;
 	dat.len = -1;
-	dat.buf = (char *)INVALID_ADDRESS;
+	dat.buf = (char *) INVALID_ADDRESS;
 
 	flags = 0;
 
@@ -15472,14 +15549,14 @@ test_case_3_5_12_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15565,8 +15642,8 @@ test_case_3_5_13_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15576,8 +15653,8 @@ test_case_3_5_13_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15593,8 +15670,8 @@ test_case_3_5_13_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) (i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15680,8 +15757,8 @@ test_case_3_5_14_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15691,8 +15768,8 @@ test_case_3_5_14_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15709,8 +15786,8 @@ test_case_3_5_14_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) (i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15801,14 +15878,14 @@ test_case_3_5_15_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15824,8 +15901,8 @@ test_case_3_5_15_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) (i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -15835,8 +15912,8 @@ test_case_3_5_15_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) (i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -16134,6 +16211,7 @@ preamble_test_case_3_5_21(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_5_21(int child)
 {
@@ -16535,7 +16613,6 @@ test_case_3_6_9(int child)
 	char cbuf[1];
 	char dbuf[1];
 
-
 	ctl.maxlen = 1;
 	ctl.len = -1;
 	ctl.buf = cbuf;
@@ -16576,7 +16653,6 @@ test_case_3_6_10(int child)
 	int flags;
 	char cbuf[1];
 	char dbuf[1];
-
 
 	ctl.maxlen = 1;
 	ctl.len = -1;
@@ -16619,7 +16695,6 @@ test_case_3_6_11(int child)
 	char cbuf[1];
 	char dbuf[1];
 
-
 	ctl.maxlen = 1;
 	ctl.len = -1;
 	ctl.buf = cbuf;
@@ -16661,7 +16736,6 @@ test_case_3_6_12(int child)
 	char cbuf[1];
 	char dbuf[1];
 
-
 	ctl.maxlen = 1;
 	ctl.len = -1;
 	ctl.buf = cbuf;
@@ -16702,7 +16776,6 @@ test_case_3_6_13(int child)
 	int flags;
 	char cbuf[1];
 	char dbuf[1];
-
 
 	ctl.maxlen = 1;
 	ctl.len = -1;
@@ -16756,14 +16829,13 @@ test_case_3_6_14(int child)
 	int band;
 	int flags;
 
-
 	ctl.maxlen = 5;
 	ctl.len = -1;
-	ctl.buf = (char *)INVALID_ADDRESS;
+	ctl.buf = (char *) INVALID_ADDRESS;
 
 	dat.maxlen = 5;
 	dat.len = -1;
-	dat.buf = (char *)INVALID_ADDRESS;
+	dat.buf = (char *) INVALID_ADDRESS;
 
 	band = 0;
 	flags = MSG_ANY;
@@ -16876,14 +16948,14 @@ test_case_3_6_16_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -16987,8 +17059,8 @@ test_case_3_6_17_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -16998,8 +17070,8 @@ test_case_3_6_17_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17017,8 +17089,8 @@ test_case_3_6_17_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) (i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17122,8 +17194,8 @@ test_case_3_6_18_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17133,8 +17205,8 @@ test_case_3_6_18_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17152,8 +17224,8 @@ test_case_3_6_18_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) (i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17262,14 +17334,14 @@ test_case_3_6_19_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)i) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) i) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)i) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) i) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17285,8 +17357,8 @@ test_case_3_6_19_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gcbuf); i++)
-		if ((unsigned char)gcbuf[i] != (unsigned char)(i + sizeof(gcbuf))) {
-			printf("gcbuf differs at byte %d, value %d\n", i, (int)gcbuf[i]);
+		if ((unsigned char) gcbuf[i] != (unsigned char) (i + sizeof(gcbuf))) {
+			printf("gcbuf differs at byte %d, value %d\n", i, (int) gcbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17296,8 +17368,8 @@ test_case_3_6_19_x(int child, int flags)
 	}
 	state++;
 	for (i = 0; i < sizeof(gdbuf); i++)
-		if ((unsigned char)gdbuf[i] != (unsigned char)(i + sizeof(gdbuf))) {
-			printf("gdbuf differs at byte %d, value %d\n", i, (int)gdbuf[i]);
+		if ((unsigned char) gdbuf[i] != (unsigned char) (i + sizeof(gdbuf))) {
+			printf("gdbuf differs at byte %d, value %d\n", i, (int) gdbuf[i]);
 			return (__RESULT_FAILURE);
 		}
 	state++;
@@ -17660,6 +17732,7 @@ preamble_test_case_3_6_26(int child)
 	state++;
 	return (__RESULT_SUCCESS);
 }
+
 int
 test_case_3_6_26(int child)
 {
@@ -18008,11 +18081,11 @@ test_case_3_7_8(int child)
 
 	ctl.maxlen = -1;
 	ctl.len = sizeof(cbuf);
-	ctl.buf = (char *)INVALID_ADDRESS;
+	ctl.buf = (char *) INVALID_ADDRESS;
 
 	dat.maxlen = -1;
 	dat.len = sizeof(dbuf);
-	dat.buf = (char *)INVALID_ADDRESS;
+	dat.buf = (char *) INVALID_ADDRESS;
 
 	flags = 0;
 
@@ -18193,9 +18266,9 @@ test_case_3_7_13(int child)
 	int i;
 
 	for (i = 0; i < sizeof(pcbuf); i++)
-		pcbuf[i] = (char)i;
+		pcbuf[i] = (char) i;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+		pdbuf[i] = (char) (sizeof(pdbuf) - i);
 
 	if (test_putmsg(child, &pctl, NULL, pflags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -18216,7 +18289,7 @@ test_case_3_7_13(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pcbuf); i++)
-		if (gcbuf[i] != (char)i)
+		if (gcbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
@@ -18255,9 +18328,9 @@ test_case_3_7_14(int child)
 	int i;
 
 	for (i = 0; i < sizeof(pcbuf); i++)
-		pcbuf[i] = (char)i;
+		pcbuf[i] = (char) i;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+		pdbuf[i] = (char) (sizeof(pdbuf) - i);
 
 	if (test_putmsg(child, NULL, &pdat, pflags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -18278,7 +18351,7 @@ test_case_3_7_14(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+		if (gdbuf[i] != (char) (sizeof(pdbuf) - i))
 			return (__RESULT_FAILURE);
 	state++;
 	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
@@ -18318,9 +18391,9 @@ test_case_3_7_15(int child)
 	int i;
 
 	for (i = 0; i < sizeof(pcbuf); i++)
-		pcbuf[i] = (char)i;
+		pcbuf[i] = (char) i;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+		pdbuf[i] = (char) (sizeof(pdbuf) - i);
 
 	if (test_putmsg(child, &pctl, &pdat, pflags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -18341,11 +18414,11 @@ test_case_3_7_15(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pcbuf); i++)
-		if (gcbuf[i] != (char)i)
+		if (gcbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+		if (gdbuf[i] != (char) (sizeof(pdbuf) - i))
 			return (__RESULT_FAILURE);
 	state++;
 	if (test_getmsg(child, &gctl, &gdat, &gflags) == __RESULT_SUCCESS || last_errno != EAGAIN)
@@ -18400,7 +18473,7 @@ configured size for the control part of a message."
 int
 test_case_3_7_17(int child)
 {
-	char pcbuf[(1<<12)+1] = { 0, };
+	char pcbuf[(1 << 12) + 1] = { 0, };
 	char pdbuf[32] = { 0, };
 	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
@@ -18430,7 +18503,7 @@ int
 test_case_3_7_18(int child)
 {
 	char pcbuf[32] = { 0, };
-	char pdbuf[(1<<18)+1] = { 0, };
+	char pdbuf[(1 << 18) + 1] = { 0, };
 	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
 	int pflags = RS_HIPRI;
@@ -18800,11 +18873,11 @@ test_case_3_8_8(int child)
 
 	ctl.maxlen = -1;
 	ctl.len = sizeof(cbuf);
-	ctl.buf = (char *)INVALID_ADDRESS;
+	ctl.buf = (char *) INVALID_ADDRESS;
 
 	dat.maxlen = -1;
 	dat.len = sizeof(dbuf);
-	dat.buf = (char *)INVALID_ADDRESS;
+	dat.buf = (char *) INVALID_ADDRESS;
 
 	band = 0;
 	flags = MSG_BAND;
@@ -19004,9 +19077,9 @@ test_case_3_8_13(int child)
 	int i;
 
 	for (i = 0; i < sizeof(pcbuf); i++)
-		pcbuf[i] = (char)i;
+		pcbuf[i] = (char) i;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+		pdbuf[i] = (char) (sizeof(pdbuf) - i);
 
 	if (test_putpmsg(child, &pctl, NULL, pband, pflags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -19030,7 +19103,7 @@ test_case_3_8_13(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pcbuf); i++)
-		if (gcbuf[i] != (char)i)
+		if (gcbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	gband = 0;
@@ -19073,9 +19146,9 @@ test_case_3_8_14(int child)
 	int i;
 
 	for (i = 0; i < sizeof(pcbuf); i++)
-		pcbuf[i] = (char)i;
+		pcbuf[i] = (char) i;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+		pdbuf[i] = (char) (sizeof(pdbuf) - i);
 
 	if (test_putpmsg(child, NULL, &pdat, pband, pflags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -19099,7 +19172,7 @@ test_case_3_8_14(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+		if (gdbuf[i] != (char) (sizeof(pdbuf) - i))
 			return (__RESULT_FAILURE);
 	state++;
 	gband = 0;
@@ -19143,9 +19216,9 @@ test_case_3_8_15(int child)
 	int i;
 
 	for (i = 0; i < sizeof(pcbuf); i++)
-		pcbuf[i] = (char)i;
+		pcbuf[i] = (char) i;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		pdbuf[i] = (char)(sizeof(pdbuf)-i);
+		pdbuf[i] = (char) (sizeof(pdbuf) - i);
 
 	if (test_putpmsg(child, &pctl, &pdat, pband, pflags) != __RESULT_SUCCESS)
 		return (__RESULT_FAILURE);
@@ -19169,11 +19242,11 @@ test_case_3_8_15(int child)
 		return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pcbuf); i++)
-		if (gcbuf[i] != (char)i)
+		if (gcbuf[i] != (char) i)
 			return (__RESULT_FAILURE);
 	state++;
 	for (i = 0; i < sizeof(pdbuf); i++)
-		if (gdbuf[i] != (char)(sizeof(pdbuf) - i))
+		if (gdbuf[i] != (char) (sizeof(pdbuf) - i))
 			return (__RESULT_FAILURE);
 	state++;
 	gband = 0;
@@ -19231,7 +19304,7 @@ configured size for the control part of a message."
 int
 test_case_3_8_17(int child)
 {
-	char pcbuf[(1<<12)+1] = { 0, };
+	char pcbuf[(1 << 12) + 1] = { 0, };
 	char pdbuf[32] = { 0, };
 	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
@@ -19262,7 +19335,7 @@ int
 test_case_3_8_18(int child)
 {
 	char pcbuf[32] = { 0, };
-	char pdbuf[(1<<18)+1] = { 0, };
+	char pdbuf[(1 << 18) + 1] = { 0, };
 	struct strbuf pctl = { -1, sizeof(pcbuf), pcbuf };
 	struct strbuf pdat = { -1, sizeof(pdbuf), pdbuf };
 	int pband = 0;
@@ -19455,7 +19528,7 @@ test_case_3_10_2(int child)
 	int result;
 
 	print_poll(child, 0);
-	if ((result = last_retval = poll((struct pollfd *)-1, 1, 0)) == -1) {
+	if ((result = last_retval = poll((struct pollfd *) -1, 1, 0)) == -1) {
 		print_errno(child, (last_errno = errno));
 		if (last_errno != EFAULT)
 			return (__RESULT_FAILURE);
@@ -19481,7 +19554,7 @@ Check that poll() can be peformed on a Stream."
 int
 test_case_3_10_3(int child)
 {
-	struct pollfd pfd[4097] = { { 0, }, };
+	struct pollfd pfd[4097] = { {0,}, };
 	int result;
 
 	print_poll(child, 0);
@@ -21781,7 +21854,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -21812,7 +21885,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

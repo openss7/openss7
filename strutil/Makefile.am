@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/03/13 06:17:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/14 12:57:54 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,64 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:17:27 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.25  2007/03/13 06:17:27  brian
-# - suppress errors when building 32-bit libs
-#
-# Revision 0.9.2.24  2007/03/08 06:08:58  brian
-# - modutil_DATA should not be distributed (and it reorders uninstall)
-#
-# Revision 0.9.2.23  2007/03/04 00:24:13  brian
-# - add version file creation
-#
-# Revision 0.9.2.22  2006/10/03 13:53:30  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 0.9.2.21  2006/10/01 21:30:25  brian
-# - distribute release and library version files
-#
-# Revision 0.9.2.20  2006/09/29 11:51:06  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 0.9.2.19  2006/09/27 05:15:31  brian
-# - distinguish LDADD from LDFLAGS
-#
-# Revision 0.9.2.18  2006/09/18 01:15:35  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.17  2006/08/26 09:19:48  brian
-# - better release file generation
-#
-# Revision 0.9.2.16  2006/07/01 11:59:44  brian
-# - added new KERNEL_BLDFLAGS to makefiles
-#
-# Revision 0.9.2.15  2006/03/21 13:24:43  brian
-# - included pr.am
-#
-# Revision 0.9.2.14  2006/03/20 11:54:06  brian
-# - added checks for DEVELOPMENT
-#
-# Revision 0.9.2.13  2006/03/07 12:34:23  brian
-# - tools must be built static for distcheck
-#
-# Revision 0.9.2.12  2006/03/06 11:39:08  brian
-# - updated headers
+# Last Modified $Date: 2007/08/14 12:57:54 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -802,4 +745,65 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.26  2007/08/14 12:57:54  brian
+# - GNUv3 header updates
+#
+# Revision 0.9.2.25  2007/03/13 06:17:27  brian
+# - suppress errors when building 32-bit libs
+#
+# Revision 0.9.2.24  2007/03/08 06:08:58  brian
+# - modutil_DATA should not be distributed (and it reorders uninstall)
+#
+# Revision 0.9.2.23  2007/03/04 00:24:13  brian
+# - add version file creation
+#
+# Revision 0.9.2.22  2006/10/03 13:53:30  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
+# Revision 0.9.2.21  2006/10/01 21:30:25  brian
+# - distribute release and library version files
+#
+# Revision 0.9.2.20  2006/09/29 11:51:06  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
+# Revision 0.9.2.19  2006/09/27 05:15:31  brian
+# - distinguish LDADD from LDFLAGS
+#
+# Revision 0.9.2.18  2006/09/18 01:15:35  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 0.9.2.17  2006/08/26 09:19:48  brian
+# - better release file generation
+#
+# Revision 0.9.2.16  2006/07/01 11:59:44  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
+# Revision 0.9.2.15  2006/03/21 13:24:43  brian
+# - included pr.am
+#
+# Revision 0.9.2.14  2006/03/20 11:54:06  brian
+# - added checks for DEVELOPMENT
+#
+# Revision 0.9.2.13  2006/03/07 12:34:23  brian
+# - tools must be built static for distcheck
+#
+# Revision 0.9.2.12  2006/03/06 11:39:08  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
