@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/07/14 01:36:10 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/08/14 04:27:16 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:27:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.64  2007/08/14 04:27:16  brian
+ - GPLv3 header update
+
  Revision 0.9.2.63  2007/07/14 01:36:10  brian
  - make license explicit, add documentation
 
@@ -260,10 +263,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/07/14 01:36:10 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/08/14 04:27:16 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/07/14 01:36:10 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/08/14 04:27:16 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -345,7 +348,7 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.63 $) $Date: 2007/07/14 01:36:10 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.64 $) $Date: 2007/08/14 04:27:16 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define UDP_LICENSE	"GPL v2"
@@ -8481,7 +8484,7 @@ tp_rput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_r_prim_srv(q, mp) != QR_ABSORBED) {
-		//udp_rstat.ms_acnt++;
+		// udp_rstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);
@@ -8511,7 +8514,7 @@ tp_wput(queue_t *q, mblk_t *mp)
 {
 	if (unlikely(mp->b_datap->db_type < QPCTL && (q->q_first || (q->q_flag & QSVCBUSY)))
 	    || tp_w_prim_put(q, mp) != QR_ABSORBED) {
-		//udp_wstat.ms_acnt++;
+		// udp_wstat.ms_acnt++;
 		mp->b_wptr += PRELOAD;
 		if (unlikely(putq(q, mp) == 0))
 			freemsg(mp);

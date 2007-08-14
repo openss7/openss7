@@ -3,18 +3,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.78 $) $Date: 2007/05/17 22:32:59 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.79 $) $Date: 2007/08/14 04:26:52 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/17 22:32:59 $ by $Author: brian $
+# Last Modified $Date: 2007/08/14 04:26:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -181,15 +181,15 @@ AC_DEFUN([_INET_OPTIONS], [dnl
 AC_DEFUN([_INET_CHECK_INET], [dnl
     AC_ARG_WITH([udp],
 	AS_HELP_STRING([--with-udp],
-	    [include udp version 2 driver in build.  @<:@default=yes@:>@]),
+	    [include udp release 2 driver in build.  @<:@default=yes@:>@]),
 	[with_udp="$withval"],
 	[with_udp='no'])
-    AC_MSG_CHECKING([for UDP Version 2 driver])
+    AC_MSG_CHECKING([for UDP Release 2 driver])
     if test :"$with_udp" = :yes ; then
 	inet_cv_udp_v2='yes'
 	AC_DEFINE([UDP_VERSION_2], [1], [
-	    Define for UDP Version 2.  This define is needed by test programs and other programs
-	    that need to determine if the UDP Version 2 driver is included in the build or not.])
+	    Define for UDP Release 2.  This define is needed by test programs and other programs
+	    that need to determine if the UDP Release 2 driver is included in the build or not.])
     else
 	inet_cv_udp_v2='yes'
     fi
@@ -197,15 +197,15 @@ AC_DEFUN([_INET_CHECK_INET], [dnl
     AM_CONDITIONAL([WITH_UDP], [test :"$inet_cv_udp_v2" = :yes])dnl
     AC_ARG_WITH([raw],
 	AS_HELP_STRING([--with-raw],
-	    [include raw version 2 driver in build.  @<:@default=yes@:>@]),
+	    [include raw release 2 driver in build.  @<:@default=yes@:>@]),
 	[with_raw="$withval"],
 	[with_raw='no'])
-    AC_MSG_CHECKING([for RAW Version 2 driver])
+    AC_MSG_CHECKING([for RAW Release 2 driver])
     if test :"$with_raw" = :yes ; then
 	inet_cv_raw_v2='yes'
 	AC_DEFINE([RAW_VERSION_2], [1], [
-	    Define for RAW Version 2.  This define is needed by test programs and other programs
-	    that need to determine if the RAW Version 2 driver is included in the build or not.])
+	    Define for RAW Release 2.  This define is needed by test programs and other programs
+	    that need to determine if the RAW Release 2 driver is included in the build or not.])
     else
 	inet_cv_raw_v2='yes'
     fi
@@ -213,15 +213,15 @@ AC_DEFUN([_INET_CHECK_INET], [dnl
     AM_CONDITIONAL([WITH_RAW], [test :"$inet_cv_raw_v2" = :yes])dnl
     AC_ARG_WITH([tcp],
 	AS_HELP_STRING([--with-tcp],
-	    [include tcp version 2 driver in build.  @<:@default=no@:>@]),
+	    [include tcp release 2 driver in build.  @<:@default=no@:>@]),
 	[with_tcp="$withval"],
 	[with_tcp='no'])
-    AC_MSG_CHECKING([for TCP Version 2 driver])
+    AC_MSG_CHECKING([for TCP Release 2 driver])
     if test :"$with_tcp" = :yes ; then
 	inet_cv_tcp_v2='yes'
 	AC_DEFINE([TCP_VERSION_2], [1], [
-	    Define for TCP Version 2.  This define is needed by test programs and other programs
-	    that need to determine if the TCP Version 2 driver is included in the build or not.])
+	    Define for TCP Release 2.  This define is needed by test programs and other programs
+	    that need to determine if the TCP Release 2 driver is included in the build or not.])
     else
 	inet_cv_tcp_v2='yes'
     fi
@@ -1064,8 +1064,14 @@ AC_DEFUN([_INET_], [dnl
 # =============================================================================
 
 # =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.79  2007/08/14 04:26:52  brian
+# - GPLv3 header update
+#
+# =============================================================================
 # 
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

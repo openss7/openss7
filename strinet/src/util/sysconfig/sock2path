@@ -1,5 +1,5 @@
 ##
-# @(#) $RCSfile: sock2path,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:21 $
+# @(#) $RCSfile: sock2path,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 04:28:52 $
 ## 
 ## Socket Path Configuration Database.
 ## for the Socksys driver and the socklib library.
@@ -18,20 +18,21 @@ PF_INET		SOCK_SEQPACKET	IPPROTO_SCTP	/dev/sctp
 PF_INET		SOCK_SEQPACKET	0		/dev/sctp
 # ------------- --------------- --------------- ------------------------
 
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sock2path,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/10/16 06:06:21 $
+# @(#) $RCSfile: sock2path,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 04:28:52 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
-## Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
 ## All Rights Reserved.
 ##
 ## This program is free software; you can redistribute it and/or modify it under
 ## the terms of the GNU General Public License as published by the Free Software
-## Foundation; version 2 of the License.
+## Foundation; version 3 of the License.
 ##
 ## This program is distributed in the hope that it will be useful, but WITHOUT
 ## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -39,8 +40,8 @@ PF_INET		SOCK_SEQPACKET	0		/dev/sctp
 ## details.
 ##
 ## You should have received a copy of the GNU General Public License along with
-## this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-## Ave, Cambridge, MA 02139, USA.
+## this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+## Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -65,11 +66,14 @@ PF_INET		SOCK_SEQPACKET	0		/dev/sctp
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2006/10/16 06:06:21 $ by $Author: brian $
+## Last Modified $Date: 2007/08/14 04:28:52 $ by $Author: brian $
 ##
 ## -----------------------------------------------------------------------------
 ##
 ## $Log: sock2path,v $
+## Revision 0.9.2.2  2007/08/14 04:28:52  brian
+## - GPLv3 header update
+##
 ## Revision 0.9.2.1  2006/10/16 06:06:21  brian
 ## - added config files
 ##

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $
+ @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:27:16 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:27:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tl.c,v $
+ Revision 0.9.2.4  2007/08/14 04:27:16  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/07/14 01:36:10  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $"
+#ident "@(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:27:16 $"
 
-static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $";
+static char const ident[] =
+    "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:27:16 $";
 
 /*
  *  This driver provides transport interface loopback streams TICLTS, TICOTS
@@ -105,7 +109,7 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) 
 #define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TI_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
-#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:36:10 $"
+#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:27:16 $"
 #define TI_DEVICE	"SVR 4.2 STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TI_LICENSE	"GPL v2"
@@ -310,6 +314,7 @@ static inline fastcall __hot void
 tp_release(struct tp **tpp)
 {
 	struct tp *tp;
+
 	dassert(tpp != NULL);
 	if (likely((tp = xchg(tpp, NULL)) != NULL))
 		tp_put(tp);
@@ -318,6 +323,7 @@ static inline struct tp *
 tp_alloc(void)
 {
 	struct tp *tp;
+
 	if ((tp = kmem_cache_alloc(tl_priv_cachep, GFP_ATOMIC))) {
 		bzero(tp, sizeof(*tp));
 		atomic_set(&tp->refcnt, 1);
@@ -2084,7 +2090,7 @@ tp_disconnect(struct tp *tp, const struct sockaddr_in *RES_buffer, mblk_t *SEQ_n
 		mblk_t *b;
 
 		spin_lock_irqsave(&tp->lock, flags);
-		if ((b = rmvb(tp->conq, SEQ_number)) != (mblk_t *)(-1L))
+		if ((b = rmvb(tp->conq, SEQ_number)) != (mblk_t *) (-1L))
 			tp->conq = b;
 		spin_unlock_irqrestore(&tp->lock, flags);
 		freemsg(SEQ_number);
@@ -2660,4 +2666,3 @@ te_conn_ind(queue_t *q, mblk_t *SEQ_number)
       discard:
 	return (QR_DONE);
 }
-

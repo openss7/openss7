@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/03/13 06:17:16 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/08/14 04:26:52 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,88 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 06:17:16 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.72  2007/03/13 06:17:16  brian
-# - suppress errors when building 32-bit libs
-#
-# Revision 0.9.2.71  2007/03/08 06:08:50  brian
-# - modutil_DATA should not be distributed (and it reorders uninstall)
-#
-# Revision 0.9.2.70  2007/03/04 00:23:52  brian
-# - add version file creation
-#
-# Revision 0.9.2.69  2007/01/25 20:47:26  brian
-# - hooks.h files should not be distributed
-#
-# Revision 0.9.2.68  2006/10/16 06:09:35  brian
-# - added netconfig and sock2path config files for packages
-#
-# Revision 0.9.2.67  2006/10/03 13:52:09  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 0.9.2.66  2006/10/01 21:30:20  brian
-# - distribute release and library version files
-#
-# Revision 0.9.2.65  2006/09/29 11:50:34  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 0.9.2.64  2006/09/27 05:15:17  brian
-# - distinguish LDADD from LDFLAGS
-#
-# Revision 0.9.2.63  2006/09/25 20:15:55  brian
-# - minor formatting changes
-#
-# Revision 0.9.2.62  2006/09/18 01:15:31  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.61  2006/08/26 09:18:41  brian
-# - better release file generation
-#
-# Revision 0.9.2.60  2006/07/11 12:32:00  brian
-# - added ISO and other implementations to distribution
-#
-# Revision 0.9.2.59  2006/07/01 11:59:43  brian
-# - added new KERNEL_BLDFLAGS to makefiles
-#
-# Revision 0.9.2.58  2006/04/25 06:46:58  brian
-# - added 2nd gen TCP driver
-#
-# Revision 0.9.2.57  2006/04/23 18:13:21  brian
-# - changes for compile
-#
-# Revision 0.9.2.56  2006/03/24 06:16:37  brian
-# - added next generation rawip driver
-#
-# Revision 0.9.2.55  2006/03/24 00:08:29  brian
-# - added second generation udp driver
-#
-# Revision 0.9.2.54  2006/03/21 13:24:41  brian
-# - included pr.am
-#
-# Revision 0.9.2.53  2006/03/20 11:54:04  brian
-# - added checks for DEVELOPMENT
-#
-# Revision 0.9.2.52  2006/03/07 12:34:21  brian
-# - tools must be built static for distcheck
-#
-# Revision 0.9.2.51  2006/03/06 11:38:53  brian
-# - updated headers
+# Last Modified $Date: 2007/08/14 04:26:52 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -576,4 +495,89 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.73  2007/08/14 04:26:52  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.72  2007/03/13 06:17:16  brian
+# - suppress errors when building 32-bit libs
+#
+# Revision 0.9.2.71  2007/03/08 06:08:50  brian
+# - modutil_DATA should not be distributed (and it reorders uninstall)
+#
+# Revision 0.9.2.70  2007/03/04 00:23:52  brian
+# - add version file creation
+#
+# Revision 0.9.2.69  2007/01/25 20:47:26  brian
+# - hooks.h files should not be distributed
+#
+# Revision 0.9.2.68  2006/10/16 06:09:35  brian
+# - added netconfig and sock2path config files for packages
+#
+# Revision 0.9.2.67  2006/10/03 13:52:09  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
+# Revision 0.9.2.66  2006/10/01 21:30:20  brian
+# - distribute release and library version files
+#
+# Revision 0.9.2.65  2006/09/29 11:50:34  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
+# Revision 0.9.2.64  2006/09/27 05:15:17  brian
+# - distinguish LDADD from LDFLAGS
+#
+# Revision 0.9.2.63  2006/09/25 20:15:55  brian
+# - minor formatting changes
+#
+# Revision 0.9.2.62  2006/09/18 01:15:31  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 0.9.2.61  2006/08/26 09:18:41  brian
+# - better release file generation
+#
+# Revision 0.9.2.60  2006/07/11 12:32:00  brian
+# - added ISO and other implementations to distribution
+#
+# Revision 0.9.2.59  2006/07/01 11:59:43  brian
+# - added new KERNEL_BLDFLAGS to makefiles
+#
+# Revision 0.9.2.58  2006/04/25 06:46:58  brian
+# - added 2nd gen TCP driver
+#
+# Revision 0.9.2.57  2006/04/23 18:13:21  brian
+# - changes for compile
+#
+# Revision 0.9.2.56  2006/03/24 06:16:37  brian
+# - added next generation rawip driver
+#
+# Revision 0.9.2.55  2006/03/24 00:08:29  brian
+# - added second generation udp driver
+#
+# Revision 0.9.2.54  2006/03/21 13:24:41  brian
+# - included pr.am
+#
+# Revision 0.9.2.53  2006/03/20 11:54:04  brian
+# - added checks for DEVELOPMENT
+#
+# Revision 0.9.2.52  2006/03/07 12:34:21  brian
+# - tools must be built static for distcheck
+#
+# Revision 0.9.2.51  2006/03/06 11:38:53  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
