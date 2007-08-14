@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:26 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:57:01 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:23:26 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:57:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 0.9.2.4  2007/08/14 04:57:01  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/03/15 10:23:26  brian
  - test case reporting and pushed release date one day
 
@@ -64,14 +81,14 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:26 $"
+#ident "@(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:57:01 $"
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:26 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:57:01 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,
  *  that contains the Network Selection Facility and Name-to-address Mapping
- *  functions of the TI-RPC ala Sun TIRPCSRC Version 2.8.  This program uses
+ *  functions of the TI-RPC ala Sun TIRPCSRC Release 2.8.  This program uses
  *  the fact that the library permits the network configuration file name to
  *  be redirected for the purposes of testing.
  */
@@ -134,6 +151,7 @@ static const char *lpkgname = "OpenSS7 XTI/TLI Library";
 static const char *lstdname = "XNS 5.2";
 static const char *sstdname = "XNS";
 static const char *shortname = "XNET";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/echo";
 #else
@@ -2878,7 +2896,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -4162,7 +4180,7 @@ do_signal(int child, int action)
 		ic.ic_cmd = O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4173,7 +4191,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4181,17 +4199,17 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_UNBIND:
 		ic.ic_cmd = O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETINFO:
 		ic.ic_cmd = _O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4202,7 +4220,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4210,47 +4228,47 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_UNBIND:
 		ic.ic_cmd = _O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETMYNAME:
 		ic.ic_cmd = _O_TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETPEERNAME:
 		ic.ic_cmd = _O_TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_HELLO:
 		ic.ic_cmd = _O_TI_XTI_HELLO;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_GET_STATE:
 		ic.ic_cmd = _O_TI_XTI_GET_STATE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_CLEAR_EVENT:
 		ic.ic_cmd = _O_TI_XTI_CLEAR_EVENT;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_MODE:
 		ic.ic_cmd = _O_TI_XTI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_TLI_MODE:
 		ic.ic_cmd = _O_TI_TLI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETINFO:
 		ic.ic_cmd = TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4261,7 +4279,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4269,22 +4287,22 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_UNBIND:
 		ic.ic_cmd = TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETMYNAME:
 		ic.ic_cmd = TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETPEERNAME:
 		ic.ic_cmd = TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res);
@@ -4293,7 +4311,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req);
@@ -4302,19 +4320,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4323,7 +4341,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4332,19 +4350,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SYNC:
 	{
 		union {
@@ -4355,19 +4373,19 @@ do_signal(int child, int action)
 		ic.ic_cmd = TI_SYNC;
 		ic.ic_len = sizeof(*s);
 		s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	}
 	case __TEST_TI_GETADDRS:
 		ic.ic_cmd = TI_GETADDRS;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_CAPABILITY:
 		ic.ic_cmd = TI_CAPABILITY;
 		ic.ic_len = sizeof(p->capability_ack);
 		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
 		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	default:
 		return __RESULT_SCRIPT_ERROR;
 	}
@@ -4954,7 +4972,6 @@ test_case_0_1(int child)
 struct test_stream test_0_1_conn = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
 struct test_stream test_0_1_resp = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
 struct test_stream test_0_1_list = { &preamble_0_1, &test_case_0_1, &postamble_0_1 };
-
 
 /*
  *  -------------------------------------------------------------------------
@@ -5546,7 +5563,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -5577,7 +5594,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

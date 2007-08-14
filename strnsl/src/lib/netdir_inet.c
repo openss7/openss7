@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $
+ @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 04:56:59 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:30:57 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:56:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir_inet.c,v $
+ Revision 0.9.2.2  2007/08/14 04:56:59  brian
+ - GPLv3 header update
+
  Revision 0.9.2.1  2006/09/25 12:30:57  brian
  - added files for new strnsl package
 
@@ -67,9 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $"
+#ident "@(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 04:56:59 $"
 
-static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2006/09/25 12:30:57 $";
+static char const ident[] =
+    "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 04:56:59 $";
 
 /* This file can be processed with doxygen(1). */
 
