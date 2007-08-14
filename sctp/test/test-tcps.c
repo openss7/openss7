@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $
+ @(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 09:42:43 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 11:17:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 09:42:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcps.c,v $
+ Revision 0.9.2.10  2007/08/14 09:42:43  brian
+ - GPLv3 header update
+
  Revision 0.9.2.9  2007/03/12 11:17:53  brian
  - rationalize sctp test programs
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $"
+#ident "@(#) $RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 09:42:43 $"
 
-static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/12 11:17:53 $";
+static char const ident[] = "$RCSfile: test-tcps.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 09:42:43 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -176,8 +179,7 @@ test_tcps(void)
 		goto dead1;
 	}
 
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
-		ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 
 	if (bind(lfd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
@@ -209,9 +211,7 @@ test_tcps(void)
 		pfd[0].events = (mode ? POLLOUT : POLLIN) | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf
-			    ("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n",
-			     out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
+			printf("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n", out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -253,9 +253,7 @@ test_tcps(void)
 			if (pfd[0].revents & POLLIN) {
 				int rtn;
 
-				if ((rtn =
-				     recv(fd, ur_msg + offset,
-					  sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
+				if ((rtn = recv(fd, ur_msg + offset, sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("recv");
@@ -327,7 +325,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -357,7 +355,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }

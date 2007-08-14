@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tcp-ds.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 09:33:21 $
+ @(#) $RCSfile: test-tcp-ds.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 09:42:43 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,9 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2 or later, so long as the software is
- distributed with, and only used for the testing of, OpenSS7 modules, drivers,
- and libraries.
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 09:33:21 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 09:42:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tcp-ds.c,v $
+ Revision 0.9.2.8  2007/08/14 09:42:43  brian
+ - GPLv3 header update
+
  Revision 0.9.2.7  2007/03/12 09:33:21  brian
  - boosted default test port numbers from 10000 to 18000
 
@@ -78,10 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tcp-ds.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 09:33:21 $"
+#ident "@(#) $RCSfile: test-tcp-ds.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 09:42:43 $"
 
-static char const ident[] =
-    "$RCSfile: test-tcp-ds.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/12 09:33:21 $";
+static char const ident[] = "$RCSfile: test-tcp-ds.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 09:42:43 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -171,8 +173,7 @@ test_tcps(void)
 		goto dead1;
 	}
 
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
-		ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 
 	if (bind(lfd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
@@ -204,8 +205,7 @@ test_tcps(void)
 		pfd[0].events = (mode ? POLLOUT : POLLIN) | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n", out_bytes,
-			       inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
+			printf("Bytes sent: %7ld, recv: %7ld, tot: %7ld, dif: %8ld\n", out_bytes, inp_bytes, out_bytes + inp_bytes, inp_bytes - out_bytes);
 			inp_count = 0;
 			out_count = 0;
 			inp_bytes = 0;
@@ -247,9 +247,7 @@ test_tcps(void)
 			if (pfd[0].revents & POLLIN) {
 				int rtn;
 
-				if ((rtn =
-				     recv(fd, ur_msg + offset, sizeof(ur_msg) - offset,
-					  MSG_DONTWAIT)) < 0) {
+				if ((rtn = recv(fd, ur_msg + offset, sizeof(ur_msg) - offset, MSG_DONTWAIT)) < 0) {
 					if (errno == EINTR || errno == EAGAIN)
 						continue;
 					perror("recv");
@@ -295,7 +293,7 @@ splash(int argc, char *argv[])
 %1$s: TCP Performance Test Program\n\
 %2$s\n\
 \n\
-Copyright (c) 2001-2004 OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007 OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001 Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
@@ -321,9 +319,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -350,9 +347,9 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2004  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }
