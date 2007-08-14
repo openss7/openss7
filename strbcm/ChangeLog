@@ -1,3 +1,69 @@
+2007-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: GPLv3 headers
+	* README: GPLv3 headers
+	* acinclude.m4: GPLv3 headers
+	* configure.ac: GPLv3 headers
+	* configure.nexusware: GPLv3 headers
+	* strbcm.spec.in: GPLv3 headers
+	* debian/copyright: GPLv3 headers
+	* debian/mscript_header.in: GPLv3 headers
+	* debian/mscript_postinst.in: GPLv3 headers
+	* debian/mscript_postrm.in: GPLv3 headers
+	* debian/mscript_preinst.in: GPLv3 headers
+	* debian/mscript_prerm.in: GPLv3 headers
+	* debian/rules.in: GPLv3 headers
+	* debian/strbcm-core.postinst.in: GPLv3 headers
+	* debian/strbcm-core.postrm.in: GPLv3 headers
+	* debian/strbcm-core.preinst.in: GPLv3 headers
+	* debian/strbcm-core.prerm.in: GPLv3 headers
+	* debian/strbcm-dev.postinst.in: GPLv3 headers
+	* debian/strbcm-dev.preinst.in: GPLv3 headers
+	* debian/strbcm-dev.prerm.in: GPLv3 headers
+	* debian/strbcm-devel.preinst.in: GPLv3 headers
+	* debian/strbcm-doc.postinst.in: GPLv3 headers
+	* debian/strbcm-doc.preinst.in: GPLv3 headers
+	* debian/strbcm-doc.prerm.in: GPLv3 headers
+	* debian/strbcm-init.postinst.in: GPLv3 headers
+	* debian/strbcm-init.postrm.in: GPLv3 headers
+	* debian/strbcm-init.preinst.in: GPLv3 headers
+	* debian/strbcm-init.prerm.in: GPLv3 headers
+	* debian/strbcm-lib.preinst.in: GPLv3 headers
+	* debian/strbcm-source.preinst.in: GPLv3 headers
+	* debian/strbcm-util.preinst.in: GPLv3 headers
+	* doc/Makefile.am: GPLv3 headers
+	* doc/man/Makefile.am: GPLv3 headers
+	* doc/man/strbcm.macros: GPLv3 headers
+	* doc/man/strbcm.refs: GPLv3 headers
+	* doc/manual/Makefile.am: GPLv3 headers
+	* lib32/Makefile.am: GPLv3 headers
+	* pkg/Config: GPLv3 headers
+	* src/Makefile.am: GPLv3 headers
+	* src/drivers/Config.in: GPLv3 headers
+	* src/drivers/tstdrv.c: GPLv3 headers
+	* src/drivers/tstdrv.h: GPLv3 headers
+	* src/include/Makefile.am: GPLv3 headers
+	* src/include/sys/strbcm/config.h.in: GPLv3 headers
+	* src/include/sys/strbcm/version.h.in: GPLv3 headers
+	* src/modules/Config.in: GPLv3 headers
+	* src/modules/tstmod.c: GPLv3 headers
+	* src/modules/tstmod.h: GPLv3 headers
+	* src/test/test-bcm.c: GPLv3 headers
+	* src/util/init/strbcm: GPLv3 headers
+	* src/util/init/strbcm.sh: GPLv3 headers
+	* src/util/modutils/strbcm.in: GPLv3 headers
+	* src/util/sysconfig/strbcm.conf: GPLv3 headers
+	* src/util/sysconfig/strbcm.in: GPLv3 headers
+	* tests/Makefile.am: GPLv3 headers
+	* tests/atlocal.in: GPLv3 headers
+	* tests/dummy1.m4: GPLv3 headers
+	* tests/dummy2.m4: GPLv3 headers
+	* tests/dummy3.m4: GPLv3 headers
+	* tests/dummy4.m4: GPLv3 headers
+	* tests/kernel.at: GPLv3 headers
+	* tests/local.at: GPLv3 headers
+	* tests/testsuite.at: GPLv3 headers
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strbcm.texi: GPLv3
