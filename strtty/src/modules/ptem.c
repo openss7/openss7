@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $
+ @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:04:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ptem.c,v $
+ Revision 0.9.2.7  2007/08/14 03:04:36  brian
+ - GPLv3 header update
+
  Revision 0.9.2.6  2007/07/14 01:36:53  brian
  - make license explicit, add documentation
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $"
+#ident "@(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $"
 
 static char const ident[] =
-    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $";
+    "$RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $";
 
 /*
  * PTEM - Pseudo Terminal Emulation Module.
@@ -146,7 +149,7 @@ References
 
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:53 $"
+#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $"
 #define PTEM_DEVICE		"SVR 4.2 STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL v2"
@@ -1026,16 +1029,16 @@ ptem_qclose(queue_t *q, int oflag, cred_t *crp)
  */
 
 static struct qinit ptem_rinit = {
-	.qi_putp = ptem_rput,	/* Read-side put procedure. */
-	.qi_qopen = ptem_qopen,	/* Each open. */
+	.qi_putp = ptem_rput,		/* Read-side put procedure. */
+	.qi_qopen = ptem_qopen,		/* Each open. */
 	.qi_qclose = ptem_qclose,	/* Last close. */
 	.qi_minfo = &ptem_minfo,	/* Module information. */
 	.qi_mstat = &ptem_rstat,	/* Module statistics. */
 };
 
 static struct qinit ptem_winit = {
-	.qi_putp = ptem_wput,	/* Write-side put procedure. */
-	.qi_srvp = ptem_wsrv,	/* Write-side service procedure. */
+	.qi_putp = ptem_wput,		/* Write-side put procedure. */
+	.qi_srvp = ptem_wsrv,		/* Write-side service procedure. */
 	.qi_minfo = &ptem_minfo,	/* Module information. */
 	.qi_mstat = &ptem_wstat,	/* Module statistics. */
 };
