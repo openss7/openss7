@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:22:32 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:22:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 0.9.2.8  2007/08/14 06:22:32  brian
+ - GPLv3 header update
+
  Revision 0.9.2.7  2007/07/14 01:36:45  brian
  - make license explicit, add documentation
 
@@ -73,9 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $"
+#ident "@(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:22:32 $"
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $";
+static char const ident[] =
+    "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:22:32 $";
 
 /*
  *  This is a TPI performance testing  module for SCTP that provides some specialized intput-output
@@ -95,7 +99,7 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:36:45 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:22:32 $"
 #define TPIPERF_DEVICE		"SVR 4.2 STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL v2"
@@ -152,8 +156,8 @@ static struct module_info tpiperf_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat tpiperf_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat tpiperf_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tpiperf_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tpiperf_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int tpiperf_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tpiperf_close(queue_t *, int, cred_t *);
@@ -162,7 +166,7 @@ static streamscall int tpiperf_rput(queue_t *, mblk_t *);
 static streamscall int tpiperf_rsrv(queue_t *);
 
 static struct qinit tpiperf_rinit = {
-	.qi_putp = tpiperf_rput,		/* Read put (message from below) */
+	.qi_putp = tpiperf_rput,	/* Read put (message from below) */
 	.qi_srvp = tpiperf_rsrv,
 	.qi_qopen = tpiperf_open,	/* Each open */
 	.qi_qclose = tpiperf_close,	/* Last close */
@@ -174,7 +178,7 @@ static streamscall int tpiperf_wput(queue_t *, mblk_t *);
 static streamscall int tpiperf_wsrv(queue_t *);
 
 static struct qinit tpiperf_winit = {
-	.qi_putp = tpiperf_wput,		/* Write put (message from above) */
+	.qi_putp = tpiperf_wput,	/* Write put (message from above) */
 	.qi_srvp = tpiperf_wsrv,
 	.qi_minfo = &tpiperf_minfo,	/* Information */
 	.qi_mstat = &tpiperf_wstat,	/* Statistics */
@@ -203,7 +207,7 @@ struct tpiperf {
 	uint stream;			/* current stream number */
 	uint count;			/* current message count */
 	uint bytes;			/* current byte count */
-	bcid_t bcid;		/* bufcall */
+	bcid_t bcid;			/* bufcall */
 };
 
 static kmem_cachep_t tpiperf_priv_cachep = NULL;
@@ -284,8 +288,10 @@ tpiperf_free_priv(queue_t *q)
 }
 
 static streamscall void
-tpiperf_bufcall(long arg) {
+tpiperf_bufcall(long arg)
+{
 	queue_t *q = (queue_t *) arg;
+
 	qenable(q);
 	return;
 }
@@ -471,22 +477,38 @@ tpiperf_wsrv(queue_t *q)
 							putnext(q, dp);
 							if (priv->count > priv->number) {
 								priv->mode = 0;
-								if ((dp = allocb(2 * sizeof(t_scalar_t), BPRI_MED))) {
-									dp->b_datap->db_type = M_PROTO;
-									*((t_scalar_t *)dp->b_wptr) = T_DISCON_REQ;
-									dp->b_wptr += sizeof(t_scalar_t);
-									*((t_scalar_t *)dp->b_wptr) = 0;
-									dp->b_wptr += sizeof(t_scalar_t);
+								if ((dp =
+								     allocb(2 * sizeof(t_scalar_t),
+									    BPRI_MED))) {
+									dp->b_datap->db_type =
+									    M_PROTO;
+									*((t_scalar_t *) dp->
+									  b_wptr) = T_DISCON_REQ;
+									dp->b_wptr +=
+									    sizeof(t_scalar_t);
+									*((t_scalar_t *) dp->
+									  b_wptr) = 0;
+									dp->b_wptr +=
+									    sizeof(t_scalar_t);
 									putnext(q, dp);
 								}
-								if ((dp = allocb(3 * sizeof(t_scalar_t), BPRI_MED))) {
-									dp->b_datap->db_type = M_PROTO;
-									*((t_scalar_t *)dp->b_wptr) = T_DISCON_IND;
-									dp->b_wptr += sizeof(t_scalar_t);
-									*((t_scalar_t *)dp->b_wptr) = 0;
-									dp->b_wptr += sizeof(t_scalar_t);
-									*((t_scalar_t *)dp->b_wptr) = 0;
-									dp->b_wptr += sizeof(t_scalar_t);
+								if ((dp =
+								     allocb(3 * sizeof(t_scalar_t),
+									    BPRI_MED))) {
+									dp->b_datap->db_type =
+									    M_PROTO;
+									*((t_scalar_t *) dp->
+									  b_wptr) = T_DISCON_IND;
+									dp->b_wptr +=
+									    sizeof(t_scalar_t);
+									*((t_scalar_t *) dp->
+									  b_wptr) = 0;
+									dp->b_wptr +=
+									    sizeof(t_scalar_t);
+									*((t_scalar_t *) dp->
+									  b_wptr) = 0;
+									dp->b_wptr +=
+									    sizeof(t_scalar_t);
 									put(priv->rq, dp);
 								}
 								break;
@@ -522,8 +544,11 @@ tpiperf_wsrv(queue_t *q)
 					/* start generating immediately */
 					for (;;) {
 						if (likely((bp = copyb(mp)) != NULL)) {
-							if (likely((dp = mp->b_cont) == NULL || (dp = dupmsg(dp)) != NULL)) {
-								if (likely((bp->b_cont = dp) != NULL))
+							if (likely
+							    ((dp = mp->b_cont) == NULL
+							     || (dp = dupmsg(dp)) != NULL)) {
+								if (likely
+								    ((bp->b_cont = dp) != NULL))
 									priv->bytes += msgsize(dp);
 								priv->count++;
 								if (likely(bcanput(q, bp->b_band))) {
@@ -535,15 +560,26 @@ tpiperf_wsrv(queue_t *q)
 								if (mp->b_cont) {
 									/* need bufcall */
 									if (priv->bcid)
-										unbufcall(xchg(&priv->bcid, NULL));
-									priv->bcid = bufcall(msgsize(mp->b_cont), BPRI_MED, &tpiperf_bufcall, (long) q);
+										unbufcall(xchg
+											  (&priv->
+											   bcid,
+											   NULL));
+									priv->bcid =
+									    bufcall(msgsize
+										    (mp->b_cont),
+										    BPRI_MED,
+										    &tpiperf_bufcall,
+										    (long) q);
 								}
 							}
 						} else {
 							/* need bufcall */
 							if (priv->bcid)
 								unbufcall(xchg(&priv->bcid, NULL));
-							priv->bcid = bufcall(mp->b_wptr - mp->b_rptr, BPRI_MED, &tpiperf_bufcall, (long) q);
+							priv->bcid =
+							    bufcall(mp->b_wptr - mp->b_rptr,
+								    BPRI_MED, &tpiperf_bufcall,
+								    (long) q);
 						}
 						if (unlikely(!putbq(q, bp))) {
 							swerr();

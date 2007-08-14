@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/15 10:23:34 $
+ @(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 06:22:38 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:23:34 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:22:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_nc.c,v $
+ Revision 0.9.2.10  2007/08/14 06:22:38  brian
+ - GPLv3 header update
+
  Revision 0.9.2.9  2007/03/15 10:23:34  brian
  - test case reporting and pushed release date one day
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/15 10:23:34 $"
+#ident "@(#) $RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 06:22:38 $"
 
-static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/03/15 10:23:34 $";
+static char const ident[] = "$RCSfile: test-sctp_nc.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 06:22:38 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -593,7 +596,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 2  or later,  so long as  the software is\n\
+General Public License  (GPL)  Version 3  or later,  so long as  the software is\n\
 distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
 and libraries.\n\
 \n\
@@ -623,7 +626,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }
