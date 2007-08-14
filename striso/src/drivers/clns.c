@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:00:23 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:05:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.15  2007/08/14 07:05:03  brian
+ - GNUv3 header update
+
  Revision 0.9.2.14  2007/08/12 16:00:23  brian
  - updates, still working up CONS
 
@@ -119,10 +122,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $";
 
 /*
  *  This is an X.233 CLNS driver.
@@ -213,7 +216,7 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/08/12 16:00:23 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLNS_LICENSE	"GPL v2"
@@ -289,12 +292,12 @@ MODULE_ALIAS("/dev/isis");
 /* Upper multiplex is a N provider following the NPI. */
 
 STATIC struct module_info np_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,	/* Hi water mark */
-	.mi_lowat = 1 << 10,	/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
 STATIC struct module_stat np_mstat = {
@@ -304,52 +307,52 @@ STATIC streamscall int np_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int np_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit np_rinit = {
-	.qi_putp = &ss7_oput,	/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_osrv,	/* Read service procedure */
-	.qi_qopen = &np_qopen,	/* Each open */
+	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_osrv,		/* Read service procedure */
+	.qi_qopen = &np_qopen,		/* Each open */
 	.qi_qclose = &np_qclose,	/* Last close */
-	.qi_minfo = &np_minfo,	/* Module information */
-	.qi_mstat = &np_mstat,	/* Module statistics */
+	.qi_minfo = &np_minfo,		/* Module information */
+	.qi_mstat = &np_mstat,		/* Module statistics */
 };
 
 STATIC struct qinit np_winit = {
-	.qi_putp = &ss7_iput,	/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_isrv,	/* Read service procedure */
-	.qi_minfo = &np_minfo,	/* Module information */
-	.qi_mstat = &np_mstat,	/* Module statistics */
+	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_isrv,		/* Read service procedure */
+	.qi_minfo = &np_minfo,		/* Module information */
+	.qi_mstat = &np_mstat,		/* Module statistics */
 };
 
 /* Lower multiplex is a DL user following the DLPI. */
 
 STATIC struct module_info dl_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,	/* Hi water mark */
-	.mi_lowat = 1 << 10,	/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_lowat = 1 << 10,		/* Lo water mark */
 };
 
 STATIC struct module_stat dl_mstat = {
 };
 
 STATIC struct qinit dl_rinit = {
-	.qi_putp = &ss7_iput,	/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_isrv,	/* Read service procedure */
-	.qi_minfo = &dl_minfo,	/* Module information */
-	.qi_mstat = &dl_mstat,	/* Module statistics */
+	.qi_putp = &ss7_iput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_isrv,		/* Read service procedure */
+	.qi_minfo = &dl_minfo,		/* Module information */
+	.qi_mstat = &dl_mstat,		/* Module statistics */
 };
 
 STATIC struct qinit dl_winit = {
-	.qi_putp = &ss7_oput,	/* Read put procedure (message from below) */
-	.qi_srvp = &ss7_osrv,	/* Read service procedure */
-	.qi_minfo = &dl_minfo,	/* Module information */
-	.qi_mstat = &dl_mstat,	/* Module statistics */
+	.qi_putp = &ss7_oput,		/* Read put procedure (message from below) */
+	.qi_srvp = &ss7_osrv,		/* Read service procedure */
+	.qi_minfo = &dl_minfo,		/* Module information */
+	.qi_mstat = &dl_mstat,		/* Module statistics */
 };
 
 STATIC struct streamtab np_info = {
-	.st_rdinit = &np_rinit,	/* Upper read queue */
-	.st_wrinit = &np_winit,	/* Upper write queue */
+	.st_rdinit = &np_rinit,		/* Upper read queue */
+	.st_wrinit = &np_winit,		/* Upper write queue */
 	.st_muxrinit = &dl_rinit,	/* Lower read queue */
 	.st_muxwinit = &dl_winit,	/* Lower write queue */
 };

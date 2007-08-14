@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 07:05:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:05:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 0.9.2.6  2007/08/14 07:05:15  brian
+ - GNUv3 header update
+
  Revision 0.9.2.5  2007/07/14 01:36:25  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $"
+#ident "@(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 07:05:15 $"
 
 static char const ident[] =
-    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $";
+    "$RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 07:05:15 $";
 
 /*
  *  ISO Transport over TCP (ITOT)
@@ -96,7 +99,7 @@ static char const ident[] =
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:36:25 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 07:05:15 $"
 #define ITOT_DEVICE	"SVR 4.2 STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL v2"
@@ -204,9 +207,15 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	case T_CONN_IND:
 	{
 		/* Transform into N_CONN_IND. */
-		struct prim { N_conn_ind_t prim; unsigned short family; char address[20]; } n = { { N_CONN_IND, }, };
+		struct prim {
+			N_conn_ind_t prim;
+			unsigned short family;
+			char address[20];
+		} n = { {
+		N_CONN_IND,},};
 		struct T_conn_ind *t = (typeof(t)) mp->b_rptr;
-		struct sockaddr_in *sin = (struct sockaddr_in *)((unsigned char *)t + t->SRC_offset);
+		struct sockaddr_in *sin =
+		    (struct sockaddr_in *) ((unsigned char *) t + t->SRC_offset);
 		int length = 0;
 
 		(void) sin;
@@ -243,6 +252,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		/* Transform into N_CONN_CON. */
 		N_conn_con_t n = { N_CONN_CON, };
 		struct T_conn_con *t = (typeof(t)) mp->b_rptr;
+
 		(void) n;
 		(void) t;
 	}
@@ -251,6 +261,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		/* Transform into N_DISCON_IND. */
 		N_discon_ind_t n = { N_DISCON_IND, };
 		struct T_discon_ind *t = (typeof(t)) mp->b_rptr;
+
 		(void) n;
 		(void) t;
 	}
@@ -258,60 +269,70 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	{
 		/* Transform into N_DATA_IND. */
 		N_data_ind_t n = { N_DATA_IND, };
+
 		(void) n;
 	}
 	case T_EXDATA_IND:
 	{
 		/* Transform into N_EXDATA_IND. */
 		N_exdata_ind_t n = { N_EXDATA_IND, };
+
 		(void) n;
 	}
 	case T_INFO_ACK:
 	{
 		/* Transform into N_INFO_ACK. */
 		N_info_ack_t n = { N_INFO_ACK, };
+
 		(void) n;
 	}
 	case T_BIND_ACK:
 	{
 		/* Transform into N_BIND_ACK. */
 		N_bind_ack_t n = { N_BIND_ACK, };
+
 		(void) n;
 	}
 	case T_ERROR_ACK:
 	{
 		/* Transform into N_ERROR_ACK. */
 		N_error_ack_t n = { N_ERROR_ACK, };
+
 		(void) n;
 	}
 	case T_OK_ACK:
 	{
 		/* Transform into N_OK_ACK. */
 		N_ok_ack_t n = { N_OK_ACK, };
+
 		(void) n;
 	}
 	case T_UNITDATA_IND:
 	{
 		/* Transform into N_UNITDATA_IND. */
 		N_unitdata_ind_t n = { N_UNITDATA_IND, };
+
 		(void) n;
 	}
 	case T_UDERROR_IND:
 	{
 		/* Transform into N_UDERROR_IND. */
 		N_uderror_ind_t n = { N_UDERROR_IND, };
+
 		(void) n;
 	}
 	case T_OPTMGMT_ACK:
 	{
 		/* Transform into N_OK_ACK. */
 		N_ok_ack_t n = { N_OK_ACK, };
+
 		(void) n;
 	}
 	case T_ORDREL_IND:
 	{
 		/* Transform into N_DISCON_IND. */
 		N_discon_ind_t n = { N_DISCON_IND, };
+
 		(void) n;
 	}
 	case T_OPTDATA_IND:
@@ -319,14 +340,18 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		/* Transform into N_QOSDATA_IND, N_DATA_IND or N_EXDATA_IND. */
 #ifdef N_QOSDATA_IND
 		N_qosdata_ind_t n = { N_QOSDATA_IND, };
+
 		(void) n;
 #else
 		int isnotexpedited = 0;
+
 		if (isnotexpedited) {
 			N_data_ind_t n = { N_DATA_IND, };
+
 			(void) n;
 		} else {
 			N_exdata_ind_t n = { N_EXDATA_IND, };
+
 			(void) n;
 		}
 #endif
@@ -341,6 +366,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 	{
 		/* Transform into N_INFO_ACK. */
 		N_info_ack_t n = { N_INFO_ACK, };
+
 		(void) n;
 	}
 
