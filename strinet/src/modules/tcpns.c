@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:27:26 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:27:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.5  2007/08/14 04:27:26  brian
+ - GPLv3 header update
+
  Revision 0.9.2.4  2007/07/14 01:36:15  brian
  - make license explicit, add documentation
 
@@ -64,9 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:27:26 $"
 
-static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $";
+static char const ident[] =
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:27:26 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -95,7 +99,7 @@ static char const ident[] = "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.4 
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2996 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:36:15 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:27:26 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL v2"
@@ -152,8 +156,8 @@ static struct module_info tcpns_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat tcpns_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat tcpns_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tcpns_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat tcpns_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int tcpns_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int tcpns_close(queue_t *, int, cred_t *);
