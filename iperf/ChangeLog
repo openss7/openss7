@@ -1,3 +1,75 @@
+2007-08-14  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: GPLv3 header update
+	* acinclude.m4: GPLv3 header update
+	* configure.ac: GPLv3 header update
+	* iperf.spec.in: GPLv3 header update
+	* compat/Makefile.am: GPLv3 header update
+	* compat/Thread.c: GPLv3 header update
+	* compat/delay.cpp: GPLv3 header update
+	* compat/error.c: GPLv3 header update
+	* compat/gettimeofday.c: GPLv3 header update
+	* compat/inet_ntop.c: GPLv3 header update
+	* compat/inet_pton.c: GPLv3 header update
+	* compat/signal.c: GPLv3 header update
+	* compat/snprintf.c: GPLv3 header update
+	* compat/string.c: GPLv3 header update
+	* debian/copyright: GPLv3 header update
+	* debian/mscript_header.in: GPLv3 header update
+	* debian/mscript_postinst.in: GPLv3 header update
+	* debian/mscript_postrm.in: GPLv3 header update
+	* debian/mscript_preinst.in: GPLv3 header update
+	* debian/mscript_prerm.in: GPLv3 header update
+	* debian/rules.in: GPLv3 header update
+	* doc/Makefile.am: GPLv3 header update
+	* doc/man/Makefile.am: GPLv3 header update
+	* doc/man/iperf.macros: GPLv3 header update
+	* doc/man/iperf.refs: GPLv3 header update
+	* doc/manual/Makefile.am: GPLv3 header update
+	* doc/manual/descrip.texi: GPLv3 header update
+	* include/Client.hpp: GPLv3 header update
+	* include/Condition.h: GPLv3 header update
+	* include/Extractor.h: GPLv3 header update
+	* include/List.h: GPLv3 header update
+	* include/Listener.hpp: GPLv3 header update
+	* include/Locale.h: GPLv3 header update
+	* include/Makefile.am: GPLv3 header update
+	* include/Mutex.h: GPLv3 header update
+	* include/PerfSocket.hpp: GPLv3 header update
+	* include/Reporter.h: GPLv3 header update
+	* include/Server.hpp: GPLv3 header update
+	* include/Settings.hpp: GPLv3 header update
+	* include/SocketAddr.h: GPLv3 header update
+	* include/Thread.h: GPLv3 header update
+	* include/Timestamp.hpp: GPLv3 header update
+	* include/config.win32.h: GPLv3 header update
+	* include/delay.hpp: GPLv3 header update
+	* include/gettimeofday.h: GPLv3 header update
+	* include/headers.h: GPLv3 header update
+	* include/inet_aton.h: GPLv3 header update
+	* include/report_CSV.h: GPLv3 header update
+	* include/report_default.h: GPLv3 header update
+	* include/util.h: GPLv3 header update
+	* include/version.h: GPLv3 header update
+	* src/Client.cpp: GPLv3 header update
+	* src/Extractor.c: GPLv3 header update
+	* src/Launch.cpp: GPLv3 header update
+	* src/List.cpp: GPLv3 header update
+	* src/Listener.cpp: GPLv3 header update
+	* src/Locale.c: GPLv3 header update
+	* src/Makefile.am: GPLv3 header update
+	* src/PerfSocket.cpp: GPLv3 header update
+	* src/ReportCSV.c: GPLv3 header update
+	* src/ReportDefault.c: GPLv3 header update
+	* src/Reporter.c: GPLv3 header update
+	* src/Server.cpp: GPLv3 header update
+	* src/Settings.cpp: GPLv3 header update
+	* src/SocketAddr.c: GPLv3 header update
+	* src/main.cpp: GPLv3 header update
+	* src/sockets.c: GPLv3 header update
+	* src/stdio.c: GPLv3 header update
+	* src/tcp_window_size.c: GPLv3 header update
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/iperf.texi: GPLv3
