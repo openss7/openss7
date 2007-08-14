@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/03/05 23:02:06 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 04:56:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,44 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/05 23:02:06 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 0.9.2.8  2007/03/05 23:02:06  brian
-# - checking in release changes
-#
-# Revision 0.9.2.7  2007/03/04 23:41:39  brian
-# - additional include path
-#
-# Revision 0.9.2.6  2007/03/04 23:30:23  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.5  2007/03/04 23:14:28  brian
-# - better search for modversions
-#
-# Revision 0.9.2.4  2007/03/02 10:04:31  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 0.9.2.3  2006/12/18 08:21:17  brian
-# - resolve device numbering
-#
-# Revision 0.9.2.2  2006/09/26 00:51:18  brian
-# - corrected macro file name, reordered includes
-#
-# Revision 0.9.2.1  2006/09/25 12:30:44  brian
-# - added files for new strnsl package
-#
-# Revision 0.9.2.3  2006/09/18 13:20:14  brian
-# - better directory detection
-#
-# Revision 0.9.2.2  2006/09/18 01:15:25  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.1  2006/08/23 10:03:52  brian
-# - started STREAMS Sockets package
-#
+# Last Modified $Date: 2007/08/14 04:56:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -286,6 +249,45 @@ AC_DEFUN([_XNSL_], [dnl
 ])# _XNSL_
 # =============================================================================
 
+# =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.9  2007/08/14 04:56:38  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.8  2007/03/05 23:02:06  brian
+# - checking in release changes
+#
+# Revision 0.9.2.7  2007/03/04 23:41:39  brian
+# - additional include path
+#
+# Revision 0.9.2.6  2007/03/04 23:30:23  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.5  2007/03/04 23:14:28  brian
+# - better search for modversions
+#
+# Revision 0.9.2.4  2007/03/02 10:04:31  brian
+# - updates to common build process and versions for all exported symbols
+#
+# Revision 0.9.2.3  2006/12/18 08:21:17  brian
+# - resolve device numbering
+#
+# Revision 0.9.2.2  2006/09/26 00:51:18  brian
+# - corrected macro file name, reordered includes
+#
+# Revision 0.9.2.1  2006/09/25 12:30:44  brian
+# - added files for new strnsl package
+#
+# Revision 0.9.2.3  2006/09/18 13:20:14  brian
+# - better directory detection
+#
+# Revision 0.9.2.2  2006/09/18 01:15:25  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 0.9.2.1  2006/08/23 10:03:52  brian
+# - started STREAMS Sockets package
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>

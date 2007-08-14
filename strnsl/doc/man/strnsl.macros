@@ -1,10 +1,10 @@
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strnsl.macros,v 0.9.2.2 2006/12/31 13:47:42 brian Exp $
+.\" @(#) $Id: strnsl.macros,v 0.9.2.3 2007/08/14 04:56:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -23,7 +23,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -52,7 +52,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 13:47:42 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/14 04:56:43 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strnsl.macros,v $
+.\" Revision 0.9.2.3  2007/08/14 04:56:43  brian
+.\" - GPLv3 header update
 .\"
 .\" =========================================================================
 .de ]<
@@ -385,7 +391,6 @@ All Rights Reserved.
 .hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.2 $); $Date: 2006/12/31 13:47:42 $.
 .PP
 \f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
 .br
