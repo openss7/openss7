@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_asp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $
+ @(#) $RCSfile: sua_asp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sua_asp.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:54  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_asp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $"
+#ident "@(#) $RCSfile: sua_asp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $"
 
 static char const ident[] =
-    "$RCSfile: sua_asp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
+    "$RCSfile: sua_asp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $";
 
 #define __NO_VERSION__
 
@@ -77,7 +83,8 @@ static char const ident[] =
  *  SUA_CLNS_CLDT   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_clns_cldt(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_clns_cldt(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -88,7 +95,8 @@ static int sua_recv_clns_cldt(asp_t * asp, mblk_t * msg)
  *  SUA_CLNS_CLDR   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_clns_cldr(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_clns_cldr(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -99,7 +107,8 @@ static int sua_recv_clns_cldr(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_CORE   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_core(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_core(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -110,7 +119,8 @@ static int sua_recv_cons_core(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_COAK   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_coak(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_coak(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -121,7 +131,8 @@ static int sua_recv_cons_coak(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_COREF  ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_coref(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_coref(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -132,7 +143,8 @@ static int sua_recv_cons_coref(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_RELRE  ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_relre(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_relre(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -143,7 +155,8 @@ static int sua_recv_cons_relre(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_RELCO  ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_relco(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_relco(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -154,7 +167,8 @@ static int sua_recv_cons_relco(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_RESCO  ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_resco(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_resco(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -165,7 +179,8 @@ static int sua_recv_cons_resco(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_RESRE  ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_resre(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_resre(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -176,7 +191,8 @@ static int sua_recv_cons_resre(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_CODT   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_codt(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_codt(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -187,7 +203,8 @@ static int sua_recv_cons_codt(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_CODA   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_coda(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_coda(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -198,7 +215,8 @@ static int sua_recv_cons_coda(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_COERR  ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_coerr(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_coerr(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -209,7 +227,8 @@ static int sua_recv_cons_coerr(asp_t * asp, mblk_t * msg)
  *  SUA_CONS_COIT   ( AS --> SG, SG --> AS, SP --> SP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_cons_coit(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_cons_coit(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -220,7 +239,8 @@ static int sua_recv_cons_coit(asp_t * asp, mblk_t * msg)
  *  UA_SNMM_DUNA
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_duna(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_duna(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -231,7 +251,8 @@ static int sua_recv_duna(asp_t * asp, mblk_t * msg)
  *  UA_SNMM_DAVA
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_dava(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_dava(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -242,7 +263,8 @@ static int sua_recv_dava(asp_t * asp, mblk_t * msg)
  *  UA_SNMM_DAUD
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_daud(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_daud(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -253,7 +275,8 @@ static int sua_recv_daud(asp_t * asp, mblk_t * msg)
  *  UA_SNMM_SCON
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_scon(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_scon(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -264,7 +287,8 @@ static int sua_recv_scon(asp_t * asp, mblk_t * msg)
  *  UA_SNMM_DUPU
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_dupu(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_dupu(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -275,7 +299,8 @@ static int sua_recv_dupu(asp_t * asp, mblk_t * msg)
  *  UA_SNMM_DRST
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_drst(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_drst(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -286,7 +311,8 @@ static int sua_recv_drst(asp_t * asp, mblk_t * msg)
  *  UA_RKMM_REG_RSP ( SGP --> ASP, IPSP --> IPSP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_reg_rsp(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_reg_rsp(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -297,7 +323,8 @@ static int sua_recv_reg_rsp(asp_t * asp, mblk_t * msg)
  *  UA_RKMM_DEREG_RSP ( SGP --> ASP, IPSP --> IPSP )
  *  -------------------------------------------------------------------------
  */
-static int sua_recv_dereg_rsp(asp_t * asp, mblk_t * msg)
+static int
+sua_recv_dereg_rsp(asp_t * asp, mblk_t *msg)
 {
 	(void) asp;
 	(void) msg;
@@ -365,7 +392,8 @@ static struct msg_class msg_decode[] = {
 	{NULL, 0}		/* UA_CLASS_TCHM 0xb */
 };
 
-int sua_recv_msg(asp_t * asp, mblk_t * msg)
+int
+sua_recv_msg(asp_t * asp, mblk_t *msg)
 {
 	return ua_recv_msg(q, msg, msg_decode);
 }

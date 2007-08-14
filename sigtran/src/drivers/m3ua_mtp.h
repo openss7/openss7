@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_mtp.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $Id: m3ua_mtp.h,v 0.9.2.3 2007/08/14 08:33:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_mtp.h,v $
+ Revision 0.9.2.3  2007/08/14 08:33:54  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -76,7 +79,7 @@
 #ifndef __M3UA_MTP_H__
 #define __M3UA_MTP_H__
 
-#ident "@(#) $RCSfile: m3ua_mtp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua_mtp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -89,10 +92,12 @@
  *  MTP_INFO_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_info_req(void)
+static __inline__ mblk_t *
+mtp_info_req(void)
 {
 	mblk_t *mp;
 	m3_info_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (m3_info_req_t *) mp->b_wptr;
@@ -106,12 +111,14 @@ static __inline__ mblk_t *mtp_info_req(void)
  *  MTP_BIND_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_bind_req(src_ptr, src_len)
+static __inline__ mblk_t *
+mtp_bind_req(src_ptr, src_len)
 	const caddr_t src_ptr;
 	const size_t src_len;
 {
 	mblk_t *mp;
 	mtp_bind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_bind_req_t *) mp->b_wptr;
@@ -128,10 +135,12 @@ static __inline__ mblk_t *mtp_bind_req(src_ptr, src_len)
  *  MTP_UNBIND_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_unbind_req(void)
+static __inline__ mblk_t *
+mtp_unbind_req(void)
 {
 	mblk_t *mp;
 	m3_unbind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (m3u_unbind_req_t *) mp->b_wptr;
@@ -145,12 +154,14 @@ static __inline__ mblk_t *mtp_unbind_req(void)
  *  MTP_CONN_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_conn_req(dst_ptr, dst_len)
+static __inline__ mblk_t *
+mtp_conn_req(dst_ptr, dst_len)
 	const caddr_t dst_ptr;
 	const size_t dst_len;
 {
 	mblk_t *mp;
 	mtp_conn_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_conn_req_t *) mp->b_wptr;
@@ -167,10 +178,12 @@ static __inline__ mblk_t *mtp_conn_req(dst_ptr, dst_len)
  *  MTP_DISCON_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mpt_discon_req(void)
+static __inline__ mblk_t *
+mpt_discon_req(void)
 {
 	mblk_t *mp;
 	mtp_discon_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_discon_req_t *) mp->b_wptr;
@@ -184,13 +197,15 @@ static __inline__ mblk_t *mpt_discon_req(void)
  *  MTP_OPTMGMT_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_optmgmt_req(opt_ptr, opt_len, flags)
+static __inline__ mblk_t *
+mtp_optmgmt_req(opt_ptr, opt_len, flags)
 	const caddr_t opt_ptr;
 	const size_t opt_len;
 	const uint flags;
 {
 	mblk_t *mp;
 	mtp_optmgmt_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_optmgmt_req_t *) mp->b_wptr;
@@ -209,13 +224,15 @@ static __inline__ mblk_t *mtp_optmgmt_req(opt_ptr, opt_len, flags)
  *  MTP_NOTIFY_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_notify_req(not_ptr, not_len, flags)
+static __inline__ mblk_t *
+mtp_notify_req(not_ptr, not_len, flags)
 	const caddr_t not_ptr;
 	const size_t not_len;
 	const uint flags;
 {
 	mblk_t *mp;
 	mtp_notify_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p) + not_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_notify_req_t *) mp->b_wptr;
@@ -234,7 +251,8 @@ static __inline__ mblk_t *mtp_notify_req(not_ptr, not_len, flags)
  *  MTP_TRANSFER_REQ
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_transfer_req(opc, dpc, si, sls, mp, dp)
+static __inline__ mblk_t *
+mtp_transfer_req(opc, dpc, si, sls, mp, dp)
 	const uint32_t opc;
 	const uint32_t dpc;
 	const uint si;
@@ -244,6 +262,7 @@ static __inline__ mblk_t *mtp_transfer_req(opc, dpc, si, sls, mp, dp)
 {
 	mblk_t *mp;
 	mtp_transfer_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (mtp_transfer_req_t *) mp->b_wptr;
@@ -270,12 +289,14 @@ static __inline__ mblk_t *mtp_transfer_req(opc, dpc, si, sls, mp, dp)
  *  MTP_INFO_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_info_ack(q)
+static __inline__ mblk_t *
+mtp_info_ack(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
 	mtpu_t *mu = (mtpu_t *) q->q_ptr;
 	mtp_info_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p) + mu->src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_info_ack_t *) mp->b_wptr;
@@ -298,11 +319,13 @@ static __inline__ mblk_t *mtp_info_ack(q)
  *  MTP_OK_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_ok_ack(prim)
+static __inline__ mblk_t *
+mtp_ok_ack(prim)
 	const ulong prim;
 {
 	mblk_t *mp;
 	mtp_ok_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_ok_ack_t *) mp->b_wptr;
@@ -317,12 +340,14 @@ static __inline__ mblk_t *mtp_ok_ack(prim)
  *  MTP_ERROR_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_error_ack(prim, err)
+static __inline__ mblk_t *
+mtp_error_ack(prim, err)
 	const ulong prim;
 	const long err;
 {
 	mblk_t *mp;
 	mtp_error_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (mtp_error_ack_t *) mp->b_wptr;
@@ -339,10 +364,12 @@ static __inline__ mblk_t *mtp_error_ack(prim, err)
  *  MTP_BIND_ACK
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_bind_ack(void)
+static __inline__ mblk_t *
+mtp_bind_ack(void)
 {
 	mblk_t *mp;
 	N_bind_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_bind_ack_t *) mp->b_wptr;
@@ -378,10 +405,12 @@ static __inline__ mblk_t *mtp_bind_ack(void)
  *  MTP_UDERROR_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *mtp_uderror_ind(uint ecode, uint32_t apc, uint si, uint mp)
+static __inline__ mblk_t *
+mtp_uderror_ind(uint ecode, uint32_t apc, uint si, uint mp)
 {
 	mblk_t *mp;
 	N_uderror_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_uderror_ind_t *) mp->b_wptr;

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:51 $
+ @(#) $RCSfile: tua_ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:56 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:56 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tua_ss7.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:56  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:51 $"
+#ident "@(#) $RCSfile: tua_ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:56 $"
 
 static char const ident[] =
-    "$RCSfile: tua_ss7.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:51 $";
+    "$RCSfile: tua_ss7.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:56 $";
 
 /*
  *  =========================================================================
@@ -65,119 +71,136 @@ static char const ident[] =
 /*
  *  TC_INFO_REQ		 0
  */
-static int ss7_info_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_info_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_BIND_REQ		 1
  */
-static int ss7_bind_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_bind_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_UNBIND_REQ	 2
  */
-static int ss7_unbind_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_unbind_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_SUBS_BIND_REQ	 3
  */
-static int ss7_subs_bind_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_subs_bind_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_SUBS_UNBIND_REQ	 4
  */
-static int ss7_subs_unbind_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_subs_unbind_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_OPTMGMT_REQ	 5
  */
-static int ss7_optmgmt_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_optmgmt_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_UNI_REQ		 6
  */
-static int ss7_uni_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_uni_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_BEGIN_REQ	 7
  */
-static int ss7_begin_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_begin_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_BEGIN_RES	 8
  */
-static int ss7_begin_res(queue_t * q, mblk_t * pdu)
+static int
+ss7_begin_res(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_CONT_REQ		 9
  */
-static int ss7_cont_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_cont_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_END_REQ		10
  */
-static int ss7_end_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_end_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_ABORT_REQ	11
  */
-static int ss7_abort_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_abort_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_INVOKE_REQ	26
  */
-static int ss7_invoke_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_invoke_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_RESULT_REQ	27
  */
-static int ss7_result_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_result_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_ERROR_REQ	28
  */
-static int ss7_error_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_error_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_CANCEL_REQ	29
  */
-static int ss7_cancel_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_cancel_req(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_REJECT_REQ	30
  */
-static int ss7_reject_req(queue_t * q, mblk_t * pdu)
+static int
+ss7_reject_req(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -223,14 +246,17 @@ static int (*ss7_dstr_prim[]) (queue_t *, mblk_t *) = {
 	    NULL		/* TC_REJECT_IND 36 */
 };
 
-static int ss7_w_proto(queue_t * q, mblk_t * pdu)
+static int
+ss7_w_proto(queue_t *q, mblk_t *pdu)
 {
 	int prim = *((long *) mp->b_rptr);
+
 	if (TCAP_DSTR_FIRST <= prim && prim <= TCAP_DSTR_LAST && ss7_dstr_prim[prim])
 		return ((*ss7_dstr_prim[prim]) (q, mp));
 	return (-EOPNOTSUPP);
 }
-static int ss7_w_flush(queue_t * q, mblk_t * pdu)
+static int
+ss7_w_flush(queue_t *q, mblk_t *pdu)
 {
 	return ua_w_flush(q, pdu);
 }
@@ -264,10 +290,12 @@ static int (*ss7_w_ops[]) (queue_t *, mblk_t *) = {
 	    NULL		/* M_STOPI */
 };
 
-static void ss7_u_create(lp_t * lp)
+static void
+ss7_u_create(lp_t * lp)
 {
 }
-static void ss7_u_delete(lp_t * lp)
+static void
+ss7_u_delete(lp_t * lp)
 {
 }
 
@@ -289,126 +317,144 @@ struct ops tua_ss7_u_ops = {
 /*
  *  TC_INFO_ACK		12
  */
-static int ss7_info_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_info_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_BIND_ACK		13
  */
-static int ss7_bind_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_bind_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_SUBS_BIND_ACK	14
  */
-static int ss7_subs_bind_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_subs_bind_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_OK_ACK		15
  */
-static int ss7_ok_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_ok_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_ERROR_ACK	16
  */
-static int ss7_error_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_error_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_OPTMGMT_ACK	17
  */
-static int ss7_optmgmt_ack(queue_t * q, mblk_t * pdu)
+static int
+ss7_optmgmt_ack(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_UNI_IND		18
  */
-static int ss7_uni_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_uni_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_BEGIN_IND	19
  */
-static int ss7_begin_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_begin_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_BEGIN_CON	20
  */
-static int ss7_begin_con(queue_t * q, mblk_t * pdu)
+static int
+ss7_begin_con(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_CONT_IND		21
  */
-static int ss7_cont_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_cont_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_END_IND		22
  */
-static int ss7_end_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_end_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_ABORT_IND	23
  */
-static int ss7_abort_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_abort_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_NOTICE_IND	24
  */
-static int ss7_notice_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_notice_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_INVOKE_IND	32
  */
-static int ss7_invoke_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_invoke_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_RESULT_IND	33
  */
-static int ss7_result_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_result_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_ERROR_IND	34
  */
-static int ss7_error_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_error_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_CANCEL_IND	35
  */
-static int ss7_cancel_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_cancel_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
 /*
  *  TC_REJECT_IND	36
  */
-static int ss7_reject_ind(queue_t * q, mblk_t * pdu)
+static int
+ss7_reject_ind(queue_t *q, mblk_t *pdu)
 {
 }
 
@@ -454,20 +500,25 @@ static int (*ss7_ustr_prim[]) (queue_t *, mblk_t *) = {
 #define TCAP_USTR_LAST 		   TC_REJECT_IND
 };
 
-static int ss7_r_proto(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_proto(queue_t *q, mblk_t *pdu)
 {
 	int prim = *((long *) mp->b_rptr);
+
 	if (TCAP_USTR_FIRST <= prim && prim <= TCAP_USTR_LAST && ss7_ustr_prim[prim])
 		return ((*ss7_ustr_prim[prim]) (q, mp));
 	return (-EOPNOTSUPP);
 }
-static int ss7_r_error(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_error(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_r_hangup(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_hangup(queue_t *q, mblk_t *pdu)
 {
 }
-static int ss7_r_flush(queue_t * q, mblk_t * pdu)
+static int
+ss7_r_flush(queue_t *q, mblk_t *pdu)
 {
 	return ua_r_flush(q, pdu);
 }
@@ -501,10 +552,12 @@ static int (*ss7_r_ops[]) (queue_t *, mblk_t *) = {
 	    NULL		/* M_STOPI */
 };
 
-static void ss7_l_create(lp_t * lp)
+static void
+ss7_l_create(lp_t * lp)
 {
 }
-static void ss7_l_delete(lp_t * lp)
+static void
+ss7_l_delete(lp_t * lp)
 {
 }
 

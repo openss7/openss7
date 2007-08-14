@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_ctrl.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $Id: sua_ctrl.h,v 0.9.2.3 2007/08/14 08:33:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_ctrl.h,v $
+ Revision 0.9.2.3  2007/08/14 08:33:54  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -76,7 +79,7 @@
 #ifndef __SUA_CTRL_H__
 #define __SUA_CTRL_H__
 
-#ident "@(#) $RCSfile: sua_ctrl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sua_ctrl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -85,9 +88,11 @@
  *
  *  =========================================================================
  */
-static inline mblk_t *m_error(int r_error, int w_error)
+static inline mblk_t *
+m_error(int r_error, int w_error)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr++) = r_error;
@@ -95,17 +100,21 @@ static inline mblk_t *m_error(int r_error, int w_error)
 	}
 	return (mp);
 }
-static inline mblk_t *m_hangup(void)
+static inline mblk_t *
+m_hangup(void)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(0, BPRI_HI))) {
 		mp->b_datap->db_type = M_HANGUP;
 	}
 	return (mp);
 }
-static inline mblk_t *m_flush(int flags, int band)
+static inline mblk_t *
+m_flush(int flags, int band)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(2, BPRI_HI))) {
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr++) = flags;
@@ -113,9 +122,11 @@ static inline mblk_t *m_flush(int flags, int band)
 	}
 	return (mp);
 }
-static inline int m_error_reply(queue_t * q, mblk_t * pdu, int r_error, int w_error)
+static inline int
+m_error_reply(queue_t *q, mblk_t *pdu, int r_error, int w_error)
 {
 	mblk_t *mp;
+
 	if ((mp = m_error(r_error, w_error))) {
 		qreply(q, mp);
 		return (-EPROTO);

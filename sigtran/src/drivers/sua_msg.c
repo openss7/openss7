@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $
+ @(#) $RCSfile: sua_msg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sua_msg.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:55  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $"
+#ident "@(#) $RCSfile: sua_msg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $"
 
 static char const ident[] =
-    "$RCSfile: sua_msg.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
+    "$RCSfile: sua_msg.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $";
 
 /*
  *  -------------------------------------------------------------------------
@@ -66,11 +72,13 @@ static char const ident[] =
  *  of each type and provides their length.
  */
 
-int sua_decode_parms(mblk_t * mp, sua_parms_t * sua_results)
+int
+sua_decode_parms(mblk_t *mp, sua_parms_t * sua_results)
 {
 	int len;
 	uint32_t *p = (uint32_t *) mp->b_rptr;
 	struct ua_parm *pp = NULL;
+
 	bzero(sua_results, sizeof(*sua_results));
 	p += 2;			/* skip header */
 	for (; p < (uint32_t *) mp->b_wptr && (len = UA_LENGTH(*p)) >= 4; p += (len + 3) >> 2) {
@@ -87,6 +95,7 @@ int sua_decode_parms(mblk_t * mp, sua_parms_t * sua_results)
 			if (0 <= ttag && ttag <= SUA_PARM_MAX) {
 				int offset;
 				struct sua_sparm_results *sp;
+
 				ttag += UA_PARM_MAX + 1;
 				pp = ((struct ua_parm *) (sua_results)) + ttag;
 				pp->u.wptr = p + 1;
@@ -108,9 +117,11 @@ int sua_decode_parms(mblk_t * mp, sua_parms_t * sua_results)
 				{
 					int len2;
 					struct ua_parm *p2 = p + 2;
+
 					for (; p2 < p + (len + 3) >> 2 &&
 					     (len2 = UA_LENGTH(*p2)) >= 4; p2 += (len2 + 3) >> 2) {
 						int stag = ntohl(*p2) >> 16 - SUA_SPARM_BASE;
+
 						if (0 <= stag && stag <= SUA_SPARM_MAX) {
 							stag += offset;
 							pp = ((struct ua_parm *) (sp)) + stag;

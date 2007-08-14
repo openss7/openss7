@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_asp.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $Id: sua_asp.h,v 0.9.2.3 2007/08/14 08:33:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_asp.h,v $
+ Revision 0.9.2.3  2007/08/14 08:33:54  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SUA_ASP_H__
 #define __SUA_ASP_H__
 
-#ident "@(#) $RCSfile: sua_asp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sua_asp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include "../ua/ua_asp.h"	/* UA --> UA Common Messages */
 #include "sua_msg.h"		/* SUA specific messages */
@@ -77,8 +80,8 @@
  *  There are two versions here: N-STATE and N-PCSTATE depending on whether
  *  SSN is supplied or not.
  */
-static inline mblk_t *sua_duna(uint * rcs, size_t rc_num, uint pc, uint * ssn,
-			       uint smi, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+sua_duna(uint *rcs, size_t rc_num, uint pc, uint *ssn, uint smi, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t rlen = rc_num ? UA_PHDR_SIZE + (rc_num << 2) : 0;
@@ -87,6 +90,7 @@ static inline mblk_t *sua_duna(uint * rcs, size_t rc_num, uint pc, uint * ssn,
 	size_t ilen = inf_ptr ? UA_PHDR_SIZE + inf_len : 0;
 	size_t plen = UA_PAD4(ilen) - ilen;
 	size_t mlen = UA_MHDR_SIZE + rlen + dlen + UA_PAD4(ilen);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = UA_SNMM_DUNA;
@@ -123,8 +127,8 @@ static inline mblk_t *sua_duna(uint * rcs, size_t rc_num, uint pc, uint * ssn,
  *  There are two versions here: N-STATE and N-PCSTATE depending on whether
  *  SSN is supplied or not.
  */
-static inline mblk_t *sua_dava(uint * rcs, size_t rc_num, uint pc, uint * ssn,
-			       uint smi, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+sua_dava(uint *rcs, size_t rc_num, uint pc, uint *ssn, uint smi, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t rlen = rc_num ? UA_PHDR_SIZE + (rc_num << 2) : 0;
@@ -133,6 +137,7 @@ static inline mblk_t *sua_dava(uint * rcs, size_t rc_num, uint pc, uint * ssn,
 	size_t ilen = inf_ptr ? UA_PHDR_SIZE + inf_len : 0;
 	size_t plen = UA_PAD4(ilen) - ilen;
 	size_t mlen = UA_MHDR_SIZE + rlen + dlen + UA_PAD4(ilen);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = UA_SNMM_DAVA;
@@ -169,8 +174,8 @@ static inline mblk_t *sua_dava(uint * rcs, size_t rc_num, uint pc, uint * ssn,
  *  There are two versions here: N-STATE and N-PCSTATE depending on whether
  *  SSN is supplied or not.
  */
-static inline mblk_t *sua_daud(uint * rcs, size_t rc_num, uint pc, uint * ssn,
-			       uint smi, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+sua_daud(uint *rcs, size_t rc_num, uint pc, uint *ssn, uint smi, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t rlen = rc_num ? UA_PHDR_SIZE + (rc_num << 2) : 0;
@@ -179,6 +184,7 @@ static inline mblk_t *sua_daud(uint * rcs, size_t rc_num, uint pc, uint * ssn,
 	size_t ilen = inf_ptr ? UA_PHDR_SIZE + inf_len : 0;
 	size_t plen = UA_PAD4(ilen) - ilen;
 	size_t mlen = UA_MHDR_SIZE + rlen + dlen + UA_PAD4(ilen);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = UA_SNMM_DAUD;
@@ -215,8 +221,9 @@ static inline mblk_t *sua_daud(uint * rcs, size_t rc_num, uint pc, uint * ssn,
  *  There are two versions here: N-STATE and N-PCSTATE depending on whether
  *  SSN is supplied or not.
  */
-static inline mblk_t *sua_scon(uint * rcs, size_t rc_num, uint pc, uint * ssn,
-			       uint smi, uint cong, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+sua_scon(uint *rcs, size_t rc_num, uint pc, uint *ssn,
+	 uint smi, uint cong, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t rlen = rc_num ? UA_PHDR_SIZE + (rc_num << 2) : 0;
@@ -226,6 +233,7 @@ static inline mblk_t *sua_scon(uint * rcs, size_t rc_num, uint pc, uint * ssn,
 	size_t plen = UA_PAD4(ilen) - ilen;
 	size_t mlen = UA_MHDR_SIZE + rlen + dlen + UA_SIZE(UA_PARM_CONG_LEVEL)
 	    + UA_PAD4(ilen);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = UA_SNMM_SCON;
@@ -266,8 +274,8 @@ static inline mblk_t *sua_scon(uint * rcs, size_t rc_num, uint pc, uint * ssn,
  *
  *  FIXME: straighten out N-COORD.
  */
-static inline mblk_t *sua_drst(uint * rcs, size_t rc_num, uint pc, uint * ssn,
-			       uint smi, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+sua_drst(uint *rcs, size_t rc_num, uint pc, uint *ssn, uint smi, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t rlen = rc_num ? UA_PHDR_SIZE + (rc_num << 2) : 0;
@@ -276,6 +284,7 @@ static inline mblk_t *sua_drst(uint * rcs, size_t rc_num, uint pc, uint * ssn,
 	size_t ilen = inf_ptr ? UA_PHDR_SIZE + inf_len : 0;
 	size_t plen = UA_PAD4(ilen) - ilen;
 	size_t mlen = UA_MHDR_SIZE + rlen + dlen + UA_PAD4(ilen);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = UA_SNMM_DRST;
@@ -310,7 +319,8 @@ static inline mblk_t *sua_drst(uint * rcs, size_t rc_num, uint pc, uint * ssn,
  *  UA_RKMM_REG_REQ
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_reg_req(...)
+static inline mblk_t *
+sua_reg_req(...)
 {
 }
 
@@ -318,7 +328,8 @@ static inline mblk_t *sua_reg_req(...)
  *  UA_RKMM_REG_RSP
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_reg_rsp(...)
+static inline mblk_t *
+sua_reg_rsp(...)
 {
 }
 
@@ -326,7 +337,8 @@ static inline mblk_t *sua_reg_rsp(...)
  *  UA_RKMM_DEREG_REQ
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_dereg_req(...)
+static inline mblk_t *
+sua_dereg_req(...)
 {
 }
 
@@ -334,7 +346,8 @@ static inline mblk_t *sua_dereg_req(...)
  *  UA_RKMM_DEREG_RSP
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_dereg_rsp(...)
+static inline mblk_t *
+sua_dereg_rsp(...)
 {
 }
 
@@ -343,8 +356,8 @@ static inline mblk_t *sua_dereg_rsp(...)
  *  ------------------------------------------------------------------------
  *  TODO: Need to bread out flags for SUA-08 and add a segmentation parameter.
  */
-static inline mblk_t *sua_cldt(uint rc, uint flags, sccp_addr_t * src, sccp_addr_t * dst,
-			       mblk_t * dp)
+static inline mblk_t *
+sua_cldt(uint rc, uint flags, sccp_addr_t * src, sccp_addr_t * dst, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	const size_t slen = sua_addr_len(src);
@@ -352,8 +365,10 @@ static inline mblk_t *sua_cldt(uint rc, uint flags, sccp_addr_t * src, sccp_addr
 	const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_FLAGS)
 	    + slen ? UA_PHDR_SIZE + slen : 0 + dlen ? UA_PHDR_SIZE + dlen : 0 + UA_PHDR_SIZE;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		const size_t blen = msgdsize(dp);
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CNLS_CLDT;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + blen);
@@ -380,8 +395,8 @@ static inline mblk_t *sua_cldt(uint rc, uint flags, sccp_addr_t * src, sccp_addr
  *  ------------------------------------------------------------------------
  *  TODO: Need to bread out flags for SUA-08 and add a segmentation parameter.
  */
-static inline mblk_t *sua_cldr(uint rc, uint flags, uint cause,
-			       sccp_addr_t * src, sccp_addr_t * dst, mblk_t * dp)
+static inline mblk_t *
+sua_cldr(uint rc, uint flags, uint cause, sccp_addr_t * src, sccp_addr_t * dst, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	const size_t slen = sua_addr_len(src);
@@ -392,6 +407,7 @@ static inline mblk_t *sua_cldr(uint rc, uint flags, uint cause,
 	    dp ? UA_PHDR_SIZE : 0;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		const size_t blen = msgdsize(dp);
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CLNS_CLDR;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + blen);
@@ -419,8 +435,9 @@ static inline mblk_t *sua_cldr(uint rc, uint flags, uint cause,
  *  ------------------------------------------------------------------------
  *  TODO: Need to bread out flags for SUA-08 and treat protocol class 3.
  */
-static inline mblk_t *sua_core(uint rc, uint flags, uint srn, sccp_addr_t * dst,
-			       sccp_addr_t * src, uint * credit, mblk_t * dp)
+static inline mblk_t *
+sua_core(uint rc, uint flags, uint srn, sccp_addr_t * dst,
+	 sccp_addr_t * src, uint *credit, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	const size_t slen = src ? sua_addr_len(src) : 0;
@@ -433,6 +450,7 @@ static inline mblk_t *sua_core(uint rc, uint flags, uint srn, sccp_addr_t * dst,
 	    dp ? UA_PHDR_SIZE : 0;
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		const size_t blen = dp ? msgdsize(dp) : 0;
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CORE;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + blen);
@@ -468,8 +486,8 @@ static inline mblk_t *sua_core(uint rc, uint flags, uint srn, sccp_addr_t * dst,
  *  SUA_CONS_COAK
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_coak(uint rc, uint flags, uint drn, uint srn,
-			       uint * credit, sccp_addr_t * dst, mblk_t * dp)
+static inline mblk_t *
+sua_coak(uint rc, uint flags, uint drn, uint srn, uint *credit, sccp_addr_t * dst, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	const size_t dlen = dst ? sua_addr_len(dst) : 0;
@@ -479,8 +497,10 @@ static inline mblk_t *sua_coak(uint rc, uint flags, uint drn, uint srn,
 	    + UA_SIZE(SUA_PARM_SRN)
 	    + UA_SIZE(SUA_PARM_CREDIT)
 	    + dlen ? UA_PHDR_SIZE + dlen : 0 + dp ? UA_PHDR_SIZE : 0;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		const size_t blen = dp ? msgdsize(dp) : 0;
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COAK;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + blen);
@@ -514,7 +534,8 @@ static inline mblk_t *sua_coak(uint rc, uint flags, uint drn, uint srn,
  *  SUA_CONS_COREF
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_coref(uint rc, uint drn, uint cause, sccp_addr_t * dst, mblk_t * dp)
+static inline mblk_t *
+sua_coref(uint rc, uint drn, uint cause, sccp_addr_t * dst, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	const size_t dlen = dst ? sua_addr_len(dst) : 0;
@@ -522,8 +543,10 @@ static inline mblk_t *sua_coref(uint rc, uint drn, uint cause, sccp_addr_t * dst
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_SIZE(SUA_PARM_CAUSE)
 	    + dlen ? UA_PHDR_SIZE + dlen : 0 + dp ? UA_PDHR_SIZE : 0;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		const size_t blen = dp ? msgdsize(dp) : 0;
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COREF;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + blen);
@@ -551,7 +574,8 @@ static inline mblk_t *sua_coref(uint rc, uint drn, uint cause, sccp_addr_t * dst
  *  SUA_CONS_RELRE
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_relre(uint rc, uint drn, uint srn, uint cause, uint flags, mblk_t * dp)
+static inline mblk_t *
+sua_relre(uint rc, uint drn, uint srn, uint cause, uint flags, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
@@ -560,8 +584,10 @@ static inline mblk_t *sua_relre(uint rc, uint drn, uint srn, uint cause, uint fl
 	    + UA_SIZE(SUA_PARM_CAUSE)
 	    + UA_SIZE(SUA_PARM_FLAGS)
 	    + dp ? UA_PHDR_SIZE : 0;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		const size_t blen = dp ? msgdsize(dp) : 0;
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RELRE;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + blen);
@@ -589,12 +615,14 @@ static inline mblk_t *sua_relre(uint rc, uint drn, uint srn, uint cause, uint fl
  *  SUA_CONS_RELCO
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_relco(uint rc, uint drn, uint srn)
+static inline mblk_t *
+sua_relco(uint rc, uint drn, uint srn)
 {
 	mblk_t *mp, *np;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_SIZE(SUA_PARM_SRN);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RELCO;
@@ -616,12 +644,14 @@ static inline mblk_t *sua_relco(uint rc, uint drn, uint srn)
  *  SUA_CONS_RESCO
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_resco(uint rc, uint drn, uint srn)
+static inline mblk_t *
+sua_resco(uint rc, uint drn, uint srn)
 {
 	mblk_t *mp, *np;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_SIZE(SUA_PARM_SRN);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RESCO;
@@ -643,13 +673,15 @@ static inline mblk_t *sua_resco(uint rc, uint drn, uint srn)
  *  SUA_CONS_RESRE
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_relre(uint rc, uint drn, uint srn, uint cause)
+static inline mblk_t *
+sua_relre(uint rc, uint drn, uint srn, uint cause)
 {
 	mblk_t *mp, *np;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_SIZE(SUA_PARM_SRN)
 	    + UA_SIZE(SUA_PARM_CAUSE);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RELRE;
@@ -673,13 +705,15 @@ static inline mblk_t *sua_relre(uint rc, uint drn, uint srn, uint cause)
  *  SUA_CONS_CODT
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_codt(uint rc, uint seq, uint drn, mblk_t * dp)
+static inline mblk_t *
+sua_codt(uint rc, uint seq, uint drn, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_SEQ)
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_PHDR_SIZE;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODT;
@@ -703,12 +737,14 @@ static inline mblk_t *sua_codt(uint rc, uint seq, uint drn, mblk_t * dp)
  *  SUA_CONS_CODA
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_coda(uint rc, uint drn, uint * seq, uint * credit)
+static inline mblk_t *
+sua_coda(uint rc, uint drn, uint *seq, uint *credit)
 {
 	mblk_t *mp, *np;
 	const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + seq ? UA_SIZE(SUA_PARM_SEQ) : 0 + credit ? UA_SIZE(SUA_PARM_CREDIT) : 0;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODA;
@@ -736,12 +772,14 @@ static inline mblk_t *sua_coda(uint rc, uint drn, uint * seq, uint * credit)
  *  SUA_CONS_COERR
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_coerr(uint rc, uint drn, uint cause)
+static inline mblk_t *
+sua_coerr(uint rc, uint drn, uint cause)
 {
 	mblk_t *mp, *np;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_SIZE(SUA_PARM_CAUSE);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COERR;
@@ -763,7 +801,8 @@ static inline mblk_t *sua_coerr(uint rc, uint drn, uint cause)
  *  SUA_CONS_COIT
  *  ------------------------------------------------------------------------
  */
-static inline mblk_t *sua_coit(uint rc, uint flags, uint srn, uint drn, uint seq, uint credit)
+static inline mblk_t *
+sua_coit(uint rc, uint flags, uint srn, uint drn, uint seq, uint credit)
 {
 	mblk_t *mp, *np;
 	static const size_t mlen = UA_MHDR_SIZE + UA_SIZE(UA_PARM_RC)
@@ -772,6 +811,7 @@ static inline mblk_t *sua_coit(uint rc, uint flags, uint srn, uint drn, uint seq
 	    + UA_SIZE(SUA_PARM_DRN)
 	    + UA_SIZE(SUA_PARM_SEQ)
 	    + UA_SIZE(SUA_PARM_CREDIT);
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COIT;

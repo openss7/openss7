@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ua_msg.h,v 0.9.2.3 2007/02/14 14:08:59 brian Exp $
+ @(#) $Id: ua_msg.h,v 0.9.2.4 2007/08/14 08:34:01 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/14 14:08:59 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:34:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_msg.h,v $
+ Revision 0.9.2.4  2007/08/14 08:34:01  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/02/14 14:08:59  brian
  - broad changes updating support for SS7 MTP and M3UA
 
@@ -64,7 +67,7 @@
 #ifndef __LOCAL_UA_MSG_H__
 #define __LOCAL_UA_MSG_H__
 
-#ident "@(#) $RCSfile: ua_msg.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_msg.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  This file is usable both by kernel modules and user space programs.  The

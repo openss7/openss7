@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:15:43 $
+ @(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:34:18 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:15:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:34:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2ua_as.c,v $
+ Revision 0.9.2.6  2007/08/14 08:34:18  brian
+ - GPLv3 header update
+
  Revision 0.9.2.5  2007/08/12 16:15:43  brian
  -
 
@@ -67,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:15:43 $"
+#ident "@(#) $RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:34:18 $"
 
-static char const ident[] = "$RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/12 16:15:43 $";
+static char const ident[] = "$RCSfile: test-m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:34:18 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   0
@@ -1052,8 +1069,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 #endif				/* !TEST_X400 */
 
@@ -6955,6 +6973,7 @@ static int
 do_decode_data(int child, struct strbuf *ctrl, struct strbuf *data)
 {
 	int event = __RESULT_DECODE_ERROR;
+
 #if TEST_X400 || TEST_M2PA
 	int other = (child + 1) % 2;
 #endif				/* TEST_X400 || TEST_M2PA */
@@ -8254,9 +8273,23 @@ and moves to inactive state on receiving and ASP Up Ack message."
  * ASP Up message.
  */
 
-int test_1_1_1_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_1_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_1_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_1_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_1_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_1_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_1_ptu0 = { preamble_none, test_1_1_1_ptu0, postamble_none };
 struct test_stream test_case_1_1_1_iut1 = { preamble_none, test_1_1_1_iut1, postamble_none };
@@ -8285,9 +8318,23 @@ message and moves to the active state on receiving an ASP Active Ack message."
  * ASP Active message.
  */
 
-int test_1_1_2_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_2_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_2_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_2_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_2_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_2_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_2_ptu0 = { preamble_none, test_1_1_2_ptu0, postamble_none };
 struct test_stream test_case_1_1_2_iut1 = { preamble_none, test_1_1_2_iut1, postamble_none };
@@ -8317,9 +8364,23 @@ message."
  * ASP Active message.
  */
 
-int test_1_1_3_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_3_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_3_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_3_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_3_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_3_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_3_ptu0 = { preamble_none, test_1_1_3_ptu0, postamble_none };
 struct test_stream test_case_1_1_3_iut1 = { preamble_none, test_1_1_3_iut1, postamble_none };
@@ -8350,9 +8411,23 @@ both AS, when ASP Active Ack message is received with all parameters."
  * ASP Active message.
  */
 
-int test_1_1_4_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_4_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_4_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_4_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_4_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_4_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_4_ptu0 = { preamble_none, test_1_1_4_ptu0, postamble_none };
 struct test_stream test_case_1_1_4_iut1 = { preamble_none, test_1_1_4_iut1, postamble_none };
@@ -8383,9 +8458,23 @@ message with IID as that of AS1."
  * ASP Active message.
  */
 
-int test_1_1_5_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_5_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_5_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_5_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_5_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_5_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_5_ptu0 = { preamble_none, test_1_1_5_ptu0, postamble_none };
 struct test_stream test_case_1_1_5_iut1 = { preamble_none, test_1_1_5_iut1, postamble_none };
@@ -8416,9 +8505,23 @@ received with all parameters."
  * ASP Active message.
  */
 
-int test_1_1_6_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_6_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_6_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_6_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_6_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_6_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_6_ptu0 = { preamble_none, test_1_1_6_ptu0, postamble_none };
 struct test_stream test_case_1_1_6_iut1 = { preamble_none, test_1_1_6_iut1, postamble_none };
@@ -8444,9 +8547,23 @@ performing a restart operation) from SCTP, moves the state of the ASP to down."
  * in active state.
  */
 
-int test_1_1_7_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_7_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_7_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_7_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_7_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_7_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_7_ptu0 = { preamble_none, test_1_1_7_ptu0, postamble_none };
 struct test_stream test_case_1_1_7_iut1 = { preamble_none, test_1_1_7_iut1, postamble_none };
@@ -8473,9 +8590,23 @@ the same heartbeat data provided in the Heartbeat message."
  * in active state.
  */
 
-int test_1_1_8_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_8_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_8_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_8_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_8_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_8_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_8_ptu0 = { preamble_none, test_1_1_8_ptu0, postamble_none };
 struct test_stream test_case_1_1_8_iut1 = { preamble_none, test_1_1_8_iut1, postamble_none };
@@ -8501,9 +8632,23 @@ T(ack), when it receives no ASP Up Ack."
  * in down state.
  */
 
-int test_1_1_9_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_9_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_9_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_9_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_9_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_9_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_9_ptu0 = { preamble_none, test_1_1_9_ptu0, postamble_none };
 struct test_stream test_case_1_1_9_iut1 = { preamble_none, test_1_1_9_iut1, postamble_none };
@@ -8529,9 +8674,23 @@ timer T(ack), when it receives no ASP Down Ack."
  * in inactive state.
  */
 
-int test_1_1_10_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_10_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_10_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_10_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_10_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_10_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_10_ptu0 = { preamble_none, test_1_1_10_ptu0, postamble_none };
 struct test_stream test_case_1_1_10_iut1 = { preamble_none, test_1_1_10_iut1, postamble_none };
@@ -8557,9 +8716,23 @@ timer T(ack), when it receives no ASP Active Ack."
  * in inactive state.
  */
 
-int test_1_1_11_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_11_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_11_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_11_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_11_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_11_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_11_ptu0 = { preamble_none, test_1_1_11_ptu0, postamble_none };
 struct test_stream test_case_1_1_11_iut1 = { preamble_none, test_1_1_11_iut1, postamble_none };
@@ -8585,9 +8758,23 @@ timer T(ack), when it receives no ASP Inactive Ack."
  * in active state.
  */
 
-int test_1_1_12_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_1_12_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_1_12_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_1_12_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_12_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_1_12_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_1_12_ptu0 = { preamble_none, test_1_1_12_ptu0, postamble_none };
 struct test_stream test_case_1_1_12_iut1 = { preamble_none, test_1_1_12_iut1, postamble_none };
@@ -8620,9 +8807,23 @@ remains the ASP state in Inactive."
  * in inactive state.
  */
 
-int test_1_2_1_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_2_1_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_2_1_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_2_1_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_1_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_1_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_2_1_ptu0 = { preamble_none, test_1_2_1_ptu0, postamble_none };
 struct test_stream test_case_1_2_1_iut1 = { preamble_none, test_1_2_1_iut1, postamble_none };
@@ -8648,9 +8849,23 @@ state to Inactive."
  * in active state.
  */
 
-int test_1_2_2_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_2_2_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_2_2_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_2_2_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_2_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_2_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_2_2_ptu0 = { preamble_none, test_1_2_2_ptu0, postamble_none };
 struct test_stream test_case_1_2_2_iut1 = { preamble_none, test_1_2_2_iut1, postamble_none };
@@ -8676,9 +8891,23 @@ Down Ack message without having sent an ASP Down message."
  * in inactive state.
  */
 
-int test_1_2_3_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_2_3_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_2_3_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_2_3_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_3_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_3_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_2_3_ptu0 = { preamble_none, test_1_2_3_ptu0, postamble_none };
 struct test_stream test_case_1_2_3_iut1 = { preamble_none, test_1_2_3_iut1, postamble_none };
@@ -8704,9 +8933,23 @@ Down Ack messagew without having sent and ASP Down message."
  * in active state.
  */
 
-int test_1_2_4_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_1_2_4_iut1(int child) { return (__RESULT_FAILURE); }
-int test_1_2_4_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_1_2_4_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_4_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_1_2_4_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_1_2_4_ptu0 = { preamble_none, test_1_2_4_ptu0, postamble_none };
 struct test_stream test_case_1_2_4_iut1 = { preamble_none, test_1_2_4_iut1, postamble_none };
@@ -8747,9 +8990,23 @@ result as \"Successfully Registered\"."
  * Registration Request message.
  */
 
-int test_2_1_1_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_2_1_1_iut1(int child) { return (__RESULT_FAILURE); }
-int test_2_1_1_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_2_1_1_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_1_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_1_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_2_1_1_ptu0 = { preamble_none, test_2_1_1_ptu0, postamble_none };
 struct test_stream test_case_2_1_1_iut1 = { preamble_none, test_2_1_1_iut1, postamble_none };
@@ -8780,9 +9037,23 @@ registrations with registration result as \"Successfully Registered\"."
  * Registration Request message(s).
  */
 
-int test_2_1_2_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_2_1_2_iut1(int child) { return (__RESULT_FAILURE); }
-int test_2_1_2_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_2_1_2_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_2_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_2_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_2_1_2_ptu0 = { preamble_none, test_2_1_2_ptu0, postamble_none };
 struct test_stream test_case_2_1_2_iut1 = { preamble_none, test_2_1_2_iut1, postamble_none };
@@ -8813,9 +9084,23 @@ registration each with registration result as \"Successfully Registered\"."
  * sending M-LINK_KEY_REG request primitives.
  */
 
-int test_2_1_3_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_2_1_3_iut1(int child) { return (__RESULT_FAILURE); }
-int test_2_1_3_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_2_1_3_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_3_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_3_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_2_1_3_ptu0 = { preamble_none, test_2_1_3_ptu0, postamble_none };
 struct test_stream test_case_2_1_3_iut1 = { preamble_none, test_2_1_3_iut1, postamble_none };
@@ -8845,9 +9130,23 @@ De-registered\"."
  * Deregistration Request message.
  */
 
-int test_2_1_4_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_2_1_4_iut1(int child) { return (__RESULT_FAILURE); }
-int test_2_1_4_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_2_1_4_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_4_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_4_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_2_1_4_ptu0 = { preamble_none, test_2_1_4_ptu0, postamble_none };
 struct test_stream test_case_2_1_4_iut1 = { preamble_none, test_2_1_4_iut1, postamble_none };
@@ -8879,9 +9178,23 @@ result as \"Successfully De-registered\"."
  * Deregistration Request message(s).
  */
 
-int test_2_1_5_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_2_1_5_iut1(int child) { return (__RESULT_FAILURE); }
-int test_2_1_5_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_2_1_5_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_5_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_2_1_5_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_2_1_5_ptu0 = { preamble_none, test_2_1_5_ptu0, postamble_none };
 struct test_stream test_case_2_1_5_iut1 = { preamble_none, test_2_1_5_iut1, postamble_none };
@@ -8917,9 +9230,23 @@ and accepts an Establish Confirm message in response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_1_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_1_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_1_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_1_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_1_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_1_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_1_ptu0 = { preamble_none, test_3_1_1_ptu0, postamble_none };
 struct test_stream test_case_3_1_1_iut1 = { preamble_none, test_3_1_1_iut1, postamble_none };
@@ -8944,9 +9271,23 @@ Ensure that IUT is able to send a Data message."
  * SS7 link at the SGP.
  */
 
-int test_3_1_2_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_2_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_2_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_2_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_2_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_2_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_2_ptu0 = { preamble_none, test_3_1_2_ptu0, postamble_none };
 struct test_stream test_case_3_1_2_iut1 = { preamble_none, test_3_1_2_iut1, postamble_none };
@@ -8973,9 +9314,23 @@ Acknowledge message has the same Correlation ID."
  * SS7 link at the SGP.
  */
 
-int test_3_1_3_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_3_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_3_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_3_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_3_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_3_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_3_ptu0 = { preamble_none, test_3_1_3_ptu0, postamble_none };
 struct test_stream test_case_3_1_3_iut1 = { preamble_none, test_3_1_3_iut1, postamble_none };
@@ -9001,9 +9356,23 @@ accepts a Release Confirm message in repsonse."
  * SS7 link at the SGP.
  */
 
-int test_3_1_4_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_4_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_4_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_4_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_4_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_4_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_4_ptu0 = { preamble_none, test_3_1_4_ptu0, postamble_none };
 struct test_stream test_case_3_1_4_iut1 = { preamble_none, test_3_1_4_iut1, postamble_none };
@@ -9028,9 +9397,23 @@ Ensure that the IUT accepts State Indication messages and does not respond."
  * SS7 link at the SGP.
  */
 
-int test_3_1_5_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_5_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_5_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_5_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_5_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_5_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_5_ptu0 = { preamble_none, test_3_1_5_ptu0, postamble_none };
 struct test_stream test_case_3_1_5_iut1 = { preamble_none, test_3_1_5_iut1, postamble_none };
@@ -9056,9 +9439,23 @@ Ensure that the IUT accepts Congestion indication messages with event as\n\
  * SS7 link at the SGP.
  */
 
-int test_3_1_6_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_6_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_6_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_6_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_6_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_6_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_6_ptu0 = { preamble_none, test_3_1_6_ptu0, postamble_none };
 struct test_stream test_case_3_1_6_iut1 = { preamble_none, test_3_1_6_iut1, postamble_none };
@@ -9085,9 +9482,23 @@ result as \"RESULT_SUCCESS\" in response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_7_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_7_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_7_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_7_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_7_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_7_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_7_ptu0 = { preamble_none, test_3_1_7_ptu0, postamble_none };
 struct test_stream test_case_3_1_7_iut1 = { preamble_none, test_3_1_7_iut1, postamble_none };
@@ -9115,9 +9526,23 @@ Confrim message with \"RESULT_SUCCESS\" in response."
  * action "ACTION_RTRV_BSN" have already been exchanged.
  */
 
-int test_3_1_8_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_8_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_8_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_8_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_8_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_8_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_8_ptu0 = { preamble_none, test_3_1_8_ptu0, postamble_none };
 struct test_stream test_case_3_1_8_iut1 = { preamble_none, test_3_1_8_iut1, postamble_none };
@@ -9144,9 +9569,23 @@ Retrieval Confirm message with result as \"RESULT_FAILURE\"."
  * action "ACTION_RTRV_BSN" have already been exchanged.
  */
 
-int test_3_1_9_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_9_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_9_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_9_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_9_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_9_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_9_ptu0 = { preamble_none, test_3_1_9_ptu0, postamble_none };
 struct test_stream test_case_3_1_9_iut1 = { preamble_none, test_3_1_9_iut1, postamble_none };
@@ -9173,9 +9612,23 @@ Confirm message in response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_10_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_10_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_10_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_10_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_10_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_10_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_10_ptu0 = { preamble_none, test_3_1_10_ptu0, postamble_none };
 struct test_stream test_case_3_1_10_iut1 = { preamble_none, test_3_1_10_iut1, postamble_none };
@@ -9202,9 +9655,23 @@ State Confirm message in response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_11_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_11_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_11_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_11_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_11_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_11_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_11_ptu0 = { preamble_none, test_3_1_11_ptu0, postamble_none };
 struct test_stream test_case_3_1_11_iut1 = { preamble_none, test_3_1_11_iut1, postamble_none };
@@ -9231,9 +9698,23 @@ response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_12_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_12_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_12_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_12_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_12_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_12_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_12_ptu0 = { preamble_none, test_3_1_12_ptu0, postamble_none };
 struct test_stream test_case_3_1_12_iut1 = { preamble_none, test_3_1_12_iut1, postamble_none };
@@ -9260,9 +9741,23 @@ message in response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_13_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_13_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_13_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_13_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_13_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_13_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_13_ptu0 = { preamble_none, test_3_1_13_ptu0, postamble_none };
 struct test_stream test_case_3_1_13_iut1 = { preamble_none, test_3_1_13_iut1, postamble_none };
@@ -9289,9 +9784,23 @@ in response."
  * SS7 link at the SGP.
  */
 
-int test_3_1_14_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_14_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_14_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_14_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_14_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_14_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_14_ptu0 = { preamble_none, test_3_1_14_ptu0, postamble_none };
 struct test_stream test_case_3_1_14_iut1 = { preamble_none, test_3_1_14_iut1, postamble_none };
@@ -9316,9 +9825,23 @@ Ensure that the IUT accepts a Release Indication message for a link."
  * SS7 link at the SGP.
  */
 
-int test_3_1_15_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_15_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_15_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_15_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_15_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_15_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_15_ptu0 = { preamble_none, test_3_1_15_ptu0, postamble_none };
 struct test_stream test_case_3_1_15_iut1 = { preamble_none, test_3_1_15_iut1, postamble_none };
@@ -9344,9 +9867,23 @@ of the timer, re-sends the Establish Request message."
  * SGP.
  */
 
-int test_3_1_16_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_3_1_16_iut1(int child) { return (__RESULT_FAILURE); }
-int test_3_1_16_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_3_1_16_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_16_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_3_1_16_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_3_1_16_ptu0 = { preamble_none, test_3_1_16_ptu0, postamble_none };
 struct test_stream test_case_3_1_16_iut1 = { preamble_none, test_3_1_16_iut1, postamble_none };
@@ -9388,9 +9925,23 @@ non-configured interface identifier."
  * received.
  */
 
-int test_4_1_1_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_1_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_1_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_1_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_1_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_1_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_1_ptu0 = { preamble_none, test_4_1_1_ptu0, postamble_none };
 struct test_stream test_case_4_1_1_iut1 = { preamble_none, test_4_1_1_iut1, postamble_none };
@@ -9423,9 +9974,23 @@ traffic handling mode."
  * code to identify the Interface Identifier(s).
  */
 
-int test_4_1_2_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_2_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_2_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_2_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_2_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_2_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_2_ptu0 = { preamble_none, test_4_1_2_ptu0, postamble_none };
 struct test_stream test_case_4_1_2_iut1 = { preamble_none, test_4_1_2_iut1, postamble_none };
@@ -9457,9 +10022,23 @@ non-supported (e.g. text-based) interface identifier type."
  * formatted Interface Identifier.  
  */
 
-int test_4_1_3_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_3_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_3_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_3_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_3_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_3_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_3_ptu0 = { preamble_none, test_4_1_3_ptu0, postamble_none };
 struct test_stream test_case_4_1_3_iut1 = { preamble_none, test_4_1_3_iut1, postamble_none };
@@ -9487,9 +10066,23 @@ unsupported message class."
  * with an unexpected or unsupported Message Class is received.
  */
 
-int test_4_1_4_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_4_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_4_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_4_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_4_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_4_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_4_ptu0 = { preamble_none, test_4_1_4_ptu0, postamble_none };
 struct test_stream test_case_4_1_4_iut1 = { preamble_none, test_4_1_4_iut1, postamble_none };
@@ -9518,9 +10111,23 @@ parameter value."
  * [sic] an undefined State).
  */
 
-int test_4_1_5_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_5_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_5_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_5_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_5_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_5_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_5_ptu0 = { preamble_none, test_4_1_5_ptu0, postamble_none };
 struct test_stream test_case_4_1_5_iut1 = { preamble_none, test_4_1_5_iut1, postamble_none };
@@ -9548,9 +10155,23 @@ wrong length field."
  * parameter has the wrong length field.
  */
 
-int test_4_1_6_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_6_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_6_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_6_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_6_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_6_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_6_ptu0 = { preamble_none, test_4_1_6_ptu0, postamble_none };
 struct test_stream test_case_4_1_6_iut1 = { preamble_none, test_4_1_6_iut1, postamble_none };
@@ -9577,9 +10198,23 @@ Parameter\", when it receives a message from peer with an invalid parameter."
  * contains an invalid parameter.
  */
 
-int test_4_1_7_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_7_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_7_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_7_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_7_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_7_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_7_ptu0 = { preamble_none, test_4_1_7_ptu0, postamble_none };
 struct test_stream test_case_4_1_7_iut1 = { preamble_none, test_4_1_7_iut1, postamble_none };
@@ -9607,9 +10242,23 @@ missing."
  * parameter was not included in the message.
  */
 
-int test_4_1_8_ptu0(int child) { return (__RESULT_FAILURE); }
-int test_4_1_8_iut1(int child) { return (__RESULT_FAILURE); }
-int test_4_1_8_iut2(int child) { return (__RESULT_FAILURE); }
+int
+test_4_1_8_ptu0(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_8_iut1(int child)
+{
+	return (__RESULT_FAILURE);
+}
+
+int
+test_4_1_8_iut2(int child)
+{
+	return (__RESULT_FAILURE);
+}
 
 struct test_stream test_case_4_1_8_ptu0 = { preamble_none, test_4_1_8_ptu0, postamble_none };
 struct test_stream test_case_4_1_8_iut1 = { preamble_none, test_4_1_8_iut1, postamble_none };
@@ -10399,7 +11048,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -10430,7 +11079,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
