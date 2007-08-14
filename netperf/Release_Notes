@@ -194,7 +194,7 @@ These are the Release Notes for the 2.1 revision of netperf:
 
 Things Changed in this release:
 
-*) The XTI (Version 2 of the spec) tests are now documented in the
+*) The XTI (Revision 2 of the spec) tests are now documented in the
    manual. 
 
 *) The TCP_CRR (Connect Request/Response) test is now documented in

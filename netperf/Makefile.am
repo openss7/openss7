@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/03/04 00:23:22 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/14 07:26:43 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,37 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/04 00:23:22 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.47  2007/03/04 00:23:22  brian
-# - add version file creation
-#
-# Revision 0.9.2.46  2006/12/29 05:50:47  brian
-# - changes for successful master build
-#
-# Revision 0.9.2.45  2006/10/01 21:30:14  brian
-# - distribute release and library version files
-#
-# Revision 0.9.2.44  2006/09/18 01:15:27  brian
-# - add 32bit libs, release file changes, additional packages
-#
-# Revision 0.9.2.43  2006/08/26 09:16:13  brian
-# - better release file generation
-#
-# Revision 0.9.2.42  2006/03/21 13:24:35  brian
-# - included pr.am
-#
-# Revision 0.9.2.41  2006/03/20 11:53:56  brian
-# - added checks for DEVELOPMENT
-#
-# Revision 0.9.2.40  2006/03/07 12:34:18  brian
-# - tools must be built static for distcheck
-#
-# Revision 0.9.2.39  2006/03/06 11:37:56  brian
-# - updated headers
+# Last Modified $Date: 2007/08/14 07:26:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -317,4 +287,38 @@ EXTRA_DIST			+= \
 				  debian/README.Debian \
 				  debian/TODO.Debian
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.48  2007/08/14 07:26:43  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.47  2007/03/04 00:23:22  brian
+# - add version file creation
+#
+# Revision 0.9.2.46  2006/12/29 05:50:47  brian
+# - changes for successful master build
+#
+# Revision 0.9.2.45  2006/10/01 21:30:14  brian
+# - distribute release and library version files
+#
+# Revision 0.9.2.44  2006/09/18 01:15:27  brian
+# - add 32bit libs, release file changes, additional packages
+#
+# Revision 0.9.2.43  2006/08/26 09:16:13  brian
+# - better release file generation
+#
+# Revision 0.9.2.42  2006/03/21 13:24:35  brian
+# - included pr.am
+#
+# Revision 0.9.2.41  2006/03/20 11:53:56  brian
+# - added checks for DEVELOPMENT
+#
+# Revision 0.9.2.40  2006/03/07 12:34:18  brian
+# - tools must be built static for distcheck
+#
+# Revision 0.9.2.39  2006/03/06 11:37:56  brian
+# - updated headers
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

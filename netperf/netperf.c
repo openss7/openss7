@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2006/05/23 22:43:29 $
+ @(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2007/08/14 07:26:44 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 22:43:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:26:44 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: netperf.c,v $
+ Revision 1.1.1.9  2007/08/14 07:26:44  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2006/05/23 22:43:29 $"
+#ident "@(#) $RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2007/08/14 07:26:44 $"
 
-static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.8 $) $Date: 2006/05/23 22:43:29 $";
+static char const ident[] = "$RCSfile: netperf.c,v $ $Name:  $($Revision: 1.1.1.9 $) $Date: 2007/08/14 07:26:44 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform

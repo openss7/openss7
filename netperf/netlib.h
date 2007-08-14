@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: netlib.h,v 1.1.1.6 2006/05/23 22:43:29 brian Exp $
+ @(#) $Id: netlib.h,v 1.1.1.7 2007/08/14 07:26:44 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -44,7 +45,13 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/05/23 22:43:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:26:44 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: netlib.h,v $
+ Revision 1.1.1.7  2007/08/14 07:26:44  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
@@ -57,11 +64,11 @@
 
 #define PAD_TIME 4
 /* library routine specifc defines                                      */
-#define         MAXSPECDATA     62      /* how many ints worth of data  */
-                                        /* can tests send...            */
-#define         MAXTIMES        4       /* how many times may we loop   */
-                                        /* to calibrate                 */
-#define         MAXCPUS         64      /* how many CPU's can we track */
+#define         MAXSPECDATA     62	/* how many ints worth of data */
+					/* can tests send...  */
+#define         MAXTIMES        4	/* how many times may we loop */
+					/* to calibrate */
+#define         MAXCPUS         64	/* how many CPU's can we track */
 #define         MAXMESSAGESIZE  65536
 #define         MAXALIGNMENT    16384
 #define         MAXOFFSET        4096
@@ -277,9 +284,9 @@
 #define         SCTP_CC_RESPONSE	601
 #define         SCTP_CC_RESULTS		602
 
-enum sock_buffer{
-  SEND_BUFFER,
-  RECV_BUFFER
+enum sock_buffer {
+	SEND_BUFFER,
+	RECV_BUFFER
 };
 
  /* some of the fields in these structures are going to be doubles and */
@@ -289,27 +296,27 @@ enum sock_buffer{
  /* stated goal of netperf. raj 11/95 */
 
 union netperf_request_struct {
-  struct {
-    int     request_type;
-    int     dummy;
-    int     test_specific_data[MAXSPECDATA];
-  } content;
-  double dummy;
+	struct {
+		int request_type;
+		int dummy;
+		int test_specific_data[MAXSPECDATA];
+	} content;
+	double dummy;
 };
 
 union netperf_response_struct {
-  struct {
-    int response_type;
-    int serv_errno;
-    int test_specific_data[MAXSPECDATA];
-  } content;
-  double dummy;
+	struct {
+		int response_type;
+		int serv_errno;
+		int test_specific_data[MAXSPECDATA];
+	} content;
+	double dummy;
 };
 
 struct ring_elt {
-  struct ring_elt *next;  /* next element in the ring */
-  char *buffer_base;      /* in case we have to free it at somepoint */
-  char *buffer_ptr;       /* the aligned and offset pointer */
+	struct ring_elt *next;		/* next element in the ring */
+	char *buffer_base;		/* in case we have to free it at somepoint */
+	char *buffer_ptr;		/* the aligned and offset pointer */
 };
 
 //+*+ SAF  Sorry about the hacks with errno; NT made me do it :(
@@ -352,7 +359,7 @@ struct ring_elt {
 #define perror(text) PrintWin32Error(stderr, (text))
 #define Print_errno(stream, text) PrintWin32Error((stream), (text))
 
-extern void PrintWin32Error(FILE *stream, LPSTR text);
+extern void PrintWin32Error(FILE * stream, LPSTR text);
 
 #if !defined(NT_PERF) && !defined(USE_LOOPER)
 #define NT_PERF
@@ -387,26 +394,19 @@ extern void PrintWin32Error(FILE *stream, LPSTR text);
 #ifdef HAVE_SENDFILE
 
 struct sendfile_ring_elt {
-  struct sendfile_ring_elt *next; /* next element in the ring */
-  int fildes;                     /* the file descriptor of the source
-				     file */ 
-  off_t offset;                   /* the offset from the beginning of
-				     the file for this send */
-  size_t length;                  /* the number of bytes to send -
-				     this is redundant with the
-				     send_size variable but I decided
-				     to include it anyway */
-  struct iovec *hdtrl;            /* a pointer to a header/trailer
-				     that we do not initially use and
-				     so should be set to NULL when the 
-				     ring is setup. */
-  int flags;                      /* the flags to pass to sendfile() - 
-				     presently unused and should be
-				     set to zero when the ring is
-				     setup. */
+	struct sendfile_ring_elt *next;	/* next element in the ring */
+	int fildes;			/* the file descriptor of the source file */
+	off_t offset;			/* the offset from the beginning of the file for this send */
+	size_t length;			/* the number of bytes to send - this is redundant with the
+					   send_size variable but I decided to include it anyway */
+	struct iovec *hdtrl;		/* a pointer to a header/trailer that we do not initially
+					   use and so should be set to NULL when the ring is setup. 
+					 */
+	int flags;			/* the flags to pass to sendfile() - presently unused and
+					   should be set to zero when the ring is setup. */
 };
 
-#endif /* HAVE_SENDFILE */
+#endif				/* HAVE_SENDFILE */
 
  /* the diferent codes to denote the type of CPU utilization */
  /* methods used */
@@ -431,99 +431,94 @@ struct sendfile_ring_elt {
 
 int getopt(int argc, char **argv, char *optstring);
 
-extern char *optarg;		/* returned arg to go with this option */
-extern int optind;		/* index to next argv element to process */
-extern int opterr;		/* should error messages be printed? */
-extern int optopt;		/* */
+extern char *optarg;			/* returned arg to go with this option */
+extern int optind;			/* index to next argv element to process */
+extern int opterr;			/* should error messages be printed? */
+extern int optopt;			/* */
 
-#endif /* _GETOPT_ */
+#endif				/* _GETOPT_ */
 
-extern  SOCKET     win_kludge_socket;
-#endif /* WIN32 */
+extern SOCKET win_kludge_socket;
+#endif				/* WIN32 */
 
-extern  int   proc_affinity;
-extern  union netperf_request_struct netperf_request;
-extern  union netperf_response_struct netperf_response;
+extern int proc_affinity;
+extern union netperf_request_struct netperf_request;
+extern union netperf_response_struct netperf_response;
 
-extern  char    libfmt;
+extern char libfmt;
 
-extern  int     cpu_method;
-extern  int     lib_num_loc_cpus;
-extern  SOCKET  server_sock;
-extern  int     times_up;
-extern  FILE    *where;
-extern  int     loops_per_msec;
-extern  float   lib_local_per_cpu_util[];
-  
+extern int cpu_method;
+extern int lib_num_loc_cpus;
+extern SOCKET server_sock;
+extern int times_up;
+extern FILE *where;
+extern int loops_per_msec;
+extern float lib_local_per_cpu_util[];
+
 #ifdef INTERVALS
-extern  void    start_itimer(unsigned int interval_len_msec);
+extern void start_itimer(unsigned int interval_len_msec);
 #endif
-extern  void    netlib_init(void);
-extern  void    install_signal_catchers(void);
-extern  void    establish_control(char hostname[], short int port);
-extern  void    shutdown_control(void);
-extern  void    init_stat(void);
-extern  void    send_request(void);
-extern  void    recv_response(void);
-extern  void    send_response(void);
-extern  void    recv_request(void);
-extern  void    dump_request(void);
-extern  void    start_timer(int time);
-extern  void    stop_timer(void);
-extern  void    cpu_start(int measure_cpu);
-extern  void    cpu_stop(int measure_cpu, float *elapsed);
-extern  void	calculate_confidence(int confidence_iterations,
-		     float time,
-		     double result,
-		     float loc_cpu,
-		     float rem_cpu,
-		     float loc_sd,
-		     float rem_sd);
-extern  void	retrieve_confident_values(float *elapsed_time,
-			  double *thruput,
-			  float *local_cpu_utilization,
-			  float *remote_cpu_utilization,
-			  float *local_service_demand,
-			  float *remote_service_demand);
-extern  void    display_confidence(void);
-extern  void    set_sock_buffer(int sd,
-				enum sock_buffer which,
-				int requested_size,
-				int *effective_sizep);
-extern  char   *format_units(void);
+extern void netlib_init(void);
+extern void install_signal_catchers(void);
+extern void establish_control(char hostname[], short int port);
+extern void shutdown_control(void);
+extern void init_stat(void);
+extern void send_request(void);
+extern void recv_response(void);
+extern void send_response(void);
+extern void recv_request(void);
+extern void dump_request(void);
+extern void start_timer(int time);
+extern void stop_timer(void);
+extern void cpu_start(int measure_cpu);
+extern void cpu_stop(int measure_cpu, float *elapsed);
+extern void calculate_confidence(int confidence_iterations,
+				 float time,
+				 double result,
+				 float loc_cpu, float rem_cpu, float loc_sd, float rem_sd);
+extern void retrieve_confident_values(float *elapsed_time,
+				      double *thruput,
+				      float *local_cpu_utilization,
+				      float *remote_cpu_utilization,
+				      float *local_service_demand, float *remote_service_demand);
+extern void display_confidence(void);
+extern void set_sock_buffer(int sd,
+			    enum sock_buffer which, int requested_size, int *effective_sizep);
+extern char *format_units(void);
 
-extern  double  ntohd(double net_double);
-extern  double  htond(double host_double);
-extern  void    libmain(void);
-extern  double  calc_thruput(double units_received);
-extern  float   calibrate_local_cpu(float local_cpu_rate);
-extern  float   calibrate_remote_cpu(void);
+extern double ntohd(double net_double);
+extern double htond(double host_double);
+extern void libmain(void);
+extern double calc_thruput(double units_received);
+extern float calibrate_local_cpu(float local_cpu_rate);
+extern float calibrate_remote_cpu(void);
+
 #ifndef WIN32
 // WIN32 requires that at least one of the file sets to select be non-null.
 // Since msec_sleep routine is only called by nettest_dlpi & nettest_unix, 
 // let's duck this issue.
-extern int msec_sleep( int msecs );
-#endif  // WIN32
-extern  float   calc_cpu_util(float elapsed_time);
-extern  float	calc_service_demand(double units_sent,
-			  float elapsed_time,
-			  float cpu_utilization,
-			  int num_cpus);
+extern int msec_sleep(int msecs);
+#endif				// WIN32
+extern float calc_cpu_util(float elapsed_time);
+extern float calc_service_demand(double units_sent,
+				 float elapsed_time, float cpu_utilization, int num_cpus);
 #if defined(__hpux)
-extern  void    catcher(int, siginfo_t *,void *);
+extern void catcher(int, siginfo_t *, void *);
 #else
-extern  void    catcher(int);
-#endif /* __hpux */
-extern  struct ring_elt *allocate_buffer_ring(int width, int buffer_size, int alignment, int offset);
-#ifdef HAVE_SENDFILE
-extern  struct sendfile_ring_elt *alloc_sendfile_buf_ring(int width, int buffer_size, int alignment, int offset);
+extern void catcher(int);
+#endif				/* __hpux */
+extern struct ring_elt *allocate_buffer_ring(int width, int buffer_size, int alignment, int offset);
 
-#endif /* HAVE_SENDFILE */
-extern  int     dl_accept(int fd, unsigned char *rem_addr, int rem_addr_len);
-extern  int     dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len);
-extern  int     dl_bind(int fd, int sap, int mode, char *dlsap_ptr, int *dlsap_len);
-extern  int     dl_open(char devfile[], int ppa);
-extern  char    format_cpu_method(int method);
+#ifdef HAVE_SENDFILE
+extern struct sendfile_ring_elt *alloc_sendfile_buf_ring(int width, int buffer_size, int alignment,
+							 int offset);
+
+#endif				/* HAVE_SENDFILE */
+extern int dl_accept(int fd, unsigned char *rem_addr, int rem_addr_len);
+extern int dl_connect(int fd, unsigned char *rem_addr, int rem_addr_len);
+extern int dl_bind(int fd, int sap, int mode, char *dlsap_ptr, int *dlsap_len);
+extern int dl_open(char devfile[], int ppa);
+extern char format_cpu_method(int method);
 extern unsigned int convert(char *string);
 
  /* these are all for the confidence interval stuff */
@@ -574,14 +569,14 @@ extern double confidence;
 
 #ifndef HAVE_BCOPY
 #define bcopy(s,d,h) memcpy((d),(s),(h))
-#endif /* HAVE_BCOPY */
+#endif				/* HAVE_BCOPY */
 
 #ifndef HAVE_BZERO
 #define bzero(p,h) memset((p),0,(h))
-#endif /* HAVE_BZERO */
+#endif				/* HAVE_BZERO */
 
 #ifndef HAVE_MIN
 #define min(a,b) ((a < b) ? a : b)
-#endif /* HAVE_MIN */
+#endif				/* HAVE_MIN */
 
 #endif				/* __LOCAL_NETLIB_H__ */
