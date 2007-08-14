@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/06/20 07:53:20 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 09:06:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -11,7 +11,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,34 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/20 07:53:20 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.8  2007/06/20 07:53:20  brian
-# - updates for Fedora 7 and 2.6.21
-#
-# Revision 0.9.2.7  2007/03/13 06:16:55  brian
-# - suppress errors when building 32-bit libs
-#
-# Revision 0.9.2.6  2007/03/08 06:08:27  brian
-# - modutil_DATA should not be distributed (and it reorders uninstall)
-#
-# Revision 0.9.2.5  2007/03/04 00:23:25  brian
-# - add version file creation
-#
-# Revision 0.9.2.4  2007/03/01 00:10:16  brian
-# - update to build process for 2.4 kernels
-#
-# Revision 0.9.2.3  2007/02/27 08:38:33  brian
-# - release corrections for 2.4 kernel builds
-#
-# Revision 0.9.2.2  2007/02/27 01:40:10  brian
-# - final corrections to build
-#
-# Revision 0.9.2.1  2007/02/25 12:26:05  brian
-# - added new files for release package
+# Last Modified $Date: 2007/08/14 09:06:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -815,4 +788,35 @@ MAINTAINERCLEANFILES		+= \
 				  $(top_srcdir)/scripts/missing \
 				  $(top_srcdir)/scripts/texinfo.tex
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.9  2007/08/14 09:06:31  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.8  2007/06/20 07:53:20  brian
+# - updates for Fedora 7 and 2.6.21
+#
+# Revision 0.9.2.7  2007/03/13 06:16:55  brian
+# - suppress errors when building 32-bit libs
+#
+# Revision 0.9.2.6  2007/03/08 06:08:27  brian
+# - modutil_DATA should not be distributed (and it reorders uninstall)
+#
+# Revision 0.9.2.5  2007/03/04 00:23:25  brian
+# - add version file creation
+#
+# Revision 0.9.2.4  2007/03/01 00:10:16  brian
+# - update to build process for 2.4 kernels
+#
+# Revision 0.9.2.3  2007/02/27 08:38:33  brian
+# - release corrections for 2.4 kernel builds
+#
+# Revision 0.9.2.2  2007/02/27 01:40:10  brian
+# - final corrections to build
+#
+# Revision 0.9.2.1  2007/02/25 12:26:05  brian
+# - added new files for release package
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

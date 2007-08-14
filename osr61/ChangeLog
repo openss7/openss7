@@ -1,3 +1,69 @@
+2007-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 header update
+	* Makefile.am: GPLv3 header update
+	* NEWS: GPLv3 header update
+	* README: GPLv3 header update
+	* THANKS: GPLv3 header update
+	* acinclude.m4: GPLv3 header update
+	* configure.ac: GPLv3 header update
+	* configure.nexusware: GPLv3 header update
+	* osr61.dox.in: GPLv3 header update
+	* osr61.spec.in: GPLv3 header update
+	* debian/copyright: GPLv3 header update
+	* debian/mscript_header.in: GPLv3 header update
+	* debian/mscript_postinst.in: GPLv3 header update
+	* debian/mscript_postrm.in: GPLv3 header update
+	* debian/mscript_preinst.in: GPLv3 header update
+	* debian/mscript_prerm.in: GPLv3 header update
+	* debian/osr61-core.postinst.in: GPLv3 header update
+	* debian/osr61-core.postrm.in: GPLv3 header update
+	* debian/osr61-core.preinst.in: GPLv3 header update
+	* debian/osr61-core.prerm.in: GPLv3 header update
+	* debian/osr61-dev.postinst.in: GPLv3 header update
+	* debian/osr61-dev.preinst.in: GPLv3 header update
+	* debian/osr61-dev.prerm.in: GPLv3 header update
+	* debian/osr61-devel.preinst.in: GPLv3 header update
+	* debian/osr61-doc.postinst.in: GPLv3 header update
+	* debian/osr61-doc.preinst.in: GPLv3 header update
+	* debian/osr61-doc.prerm.in: GPLv3 header update
+	* debian/osr61-init.postinst.in: GPLv3 header update
+	* debian/osr61-init.postrm.in: GPLv3 header update
+	* debian/osr61-init.preinst.in: GPLv3 header update
+	* debian/osr61-init.prerm.in: GPLv3 header update
+	* debian/osr61-lib.preinst.in: GPLv3 header update
+	* debian/osr61-source.preinst.in: GPLv3 header update
+	* debian/osr61-util.preinst.in: GPLv3 header update
+	* debian/rules.in: GPLv3 header update
+	* doc/Makefile.am: GPLv3 header update
+	* doc/man/Makefile.am: GPLv3 header update
+	* doc/man/osr61.macros: GPLv3 header update
+	* doc/man/osr61.refs: GPLv3 header update
+	* doc/manual/Makefile.am: GPLv3 header update
+	* lib32/Makefile.am: GPLv3 header update
+	* src/Makefile.am: GPLv3 header update
+	* src/drivers/Config.in: GPLv3 header update
+	* src/include/Makefile.am: GPLv3 header update
+	* src/include/sys/dlgn.h: GPLv3 header update
+	* src/include/sys/osr61/config.h.in: GPLv3 header update
+	* src/include/sys/osr61/version.h.in: GPLv3 header update
+	* src/lib/gc/gclib.h: GPLv3 header update
+	* src/test/test-osr61.c: GPLv3 header update
+	* src/util/init/osr61: GPLv3 header update
+	* src/util/init/osr61.sh: GPLv3 header update
+	* src/util/modutils/osr61.in: GPLv3 header update
+	* src/util/sysconfig/osr61: GPLv3 header update
+	* src/util/sysconfig/osr61.conf: GPLv3 header update
+	* tests/Makefile.am: GPLv3 header update
+	* tests/atlocal.in: GPLv3 header update
+	* tests/dummy1.m4: GPLv3 header update
+	* tests/dummy2.m4: GPLv3 header update
+	* tests/dummy3.m4: GPLv3 header update
+	* tests/dummy4.m4: GPLv3 header update
+	* tests/kernel.at: GPLv3 header update
+	* tests/local.at: GPLv3 header update
+	* tests/testsuite.at: GPLv3 header update
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/osr61.texi: GPLv3

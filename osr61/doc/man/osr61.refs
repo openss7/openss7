@@ -20,23 +20,25 @@
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
 %R TCI Revision 0.9.2
-%N Draft 1
+%N Draft 2
 %T Transaction Component Interface (TCI) Specification
-%D October 2004
+%D July 15, 2007
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tci.pdf
+%O Distributed with package strss7-0.9.2.
 
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
 %R TRI Revision 0.9.2
-%N Draft 1
+%N Draft 2
 %T Transaction Interface (TRI) Specification
-%D October 2004
+%D July 15, 2007
 %C Edmonton, Alberta
 %I OpenSS7\ Corporation
 %U http://www.openss7.org/docs/tri.pdf
+%O Distributed with package strss7-0.9.2.
 
 %L TPI
 %A Open\ Group
@@ -88,49 +90,99 @@
 %I Gcom, Inc.
 %D March 1999
 
+%L CDI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R CDI Revision 0.9.2
+%N Draft 2
+%T Communications Device Interface (CDI) Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/cdi.pdf
+%O Distributed with package strss7-0.9.2.
+
 %L LMI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R strss7-0.9.2
+%R LMI Revision 0.9.2
 %N Draft 2
-%T Local Management Interface Specification
+%T Local Management Interface (LMI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/lmi.pdf
+%O Distributed with package strss7-0.9.2.
 
 %L SLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R strss7-0.9.2
+%R SLI Revision 0.9.2
 %N Draft 2
-%T Signalling Link Interface Specification
+%T Signalling Link Interface (SLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sli.pdf
+%O Distributed with package strss7-0.9.2.
 
 %L SDTI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R strss7-0.9.2
+%R SDTI Revision 0.9.2
 %N Draft 2
-%T Signalling Data Terminal Interface Specification
+%T Signalling Data Terminal Interface (SDTI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdti.pdf
+%O Distributed with package strss7-0.9.2.
 
 %L SDLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R strss7-0.9.2
+%R SDLI Revision 0.9.2
 %N Draft 2
-%T Signalling Data Link Interface Specification
+%T Signalling Data Link Interface (SDLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
 %I OpenSS7 Corporation
 %U http://www.openss7.org/specs/sdli.pdf
+%O Distributed with package strss7-0.9.2.
+
+%L MTPI
+%A Brian Bidulock
+%Q OpenSS7\ Corporation
+%R MTPI Revision 0.9.2
+%N Draft 1
+%T Message Transfer Provider Interface (MTPI)  Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7\ Corporation
+%U http://www.openss7.org/specs/mtpi.pdf
+%O Distributed with package strss7-0.9.2.
+
+%L CHI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R CHI Revision 0.9.2
+%N Draft 2
+%T Channel Interface (CHI) Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/chi.pdf
+
+%L MXI
+%A Brian Bidulock
+%Q OpenSS7 Corporation
+%R MXI Revision 0.9.2
+%N Draft 2
+%T Multiplex Interface (MXI) Specification
+%D July 15, 2007
+%C Edmonton, Canada
+%I OpenSS7 Corporation
+%U http://www.openss7.org/specs/mxi.pdf
 
 %K xxx
 %A X Programmer's Group
@@ -3211,12 +3263,29 @@ Part 1: Protocol Specification
 %D 1995
 %I International Organization for Standardization
 
+%K iso8881
+%L ISO 8881
+%R ISO/IEC 8881:1989
+%A ISO/IEC
+%Q International Organization for Standardization
+%T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
+%D 1989
+%I International Organization for Standardization
+
 %K iso9542
 %L ISO/IEC 9542
 %A ISO
 %R ISO/IEC 9542 : 1988
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System to Intermediate System Routeing Exchange Protocol for use in Conjunction with the Protocol Routeing for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1988
+%I International Organization for Standardization
+
+%K iso10030
+%L ISO/IEC 10030
+%A ISO
+%R ISO/IEC 10030 : 1995
+%T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System Routeing Information Exchange Protocol for use in conjunction with ISO/IEC 8878
+%D 1995
 %I International Organization for Standardization
 
 %K iso10589
@@ -3749,6 +3818,7 @@ Part 1: Protocol Specification
 %D 2000
 %I American National Standards Institute
 
+%K iso3309
 %L ISO 3309
 %R ISO/IEC 3309:1988
 %A ISO/IEC
@@ -3757,6 +3827,7 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
+%K iso4335
 %L ISO 4335
 %R ISO/IEC 4335:1988
 %A ISO/IEC
@@ -3765,6 +3836,7 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
+%K iso8649
 %L ISO 8649
 %R ISO/IEC 8649:1988
 %A ISO/IEC
@@ -3773,6 +3845,7 @@ Part 1: Protocol Specification
 %D 1988
 %I International Organization for Standardization
 
+%K iso8650
 %L ISO 8650
 %R ISO/IEC 8650:1988
 %A ISO/IEC
@@ -4674,6 +4747,17 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1162.txt
 
+%K rfc1223
+%L RFC1223
+%R RFC 1223
+%A Joel M. Halpern
+%T OSI CLNS and LLC1 Protocols on Network Systems HYPERchannel
+%D May 1991
+%O (Status: INFORMATIONAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1223.txt
+
 %K rfc1237
 %L RFC1237
 %R RFC 1237
@@ -4735,6 +4819,17 @@ Part 1: Protocol Specification
 %Q Internet Engineering Task Force \(em Network Working Group
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc1706.txt
+
+%K rfc1768
+%L RFC1768
+%R RFC 1768
+%A Dave Marlow
+%T Host Group Extensions for CLNP Multicasting
+%D March 1995
+%O (Status: EXPERIMENTAL)
+%Q Internet Engineering Task Force \(em Network Working Group
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc1768.txt
 
 %K rfc1888
 %L RFC1888
