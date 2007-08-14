@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:21 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 0.9.2.4  2007/08/14 03:31:09  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/07/14 01:37:21  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $"
+#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $"
 
-static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $";
+static char const ident[] =
+    "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -106,7 +110,7 @@ static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) 
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:21 $"
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $"
 #define NF_DEVICE	"SVR 4.2 STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NF_LICENSE	"GPL v2"
@@ -258,5 +262,3 @@ STATIC struct nf *nf_opens = NULL;
 STATIC spinlock_t nf_lock = SPIN_LOCK_UNLOCKED;
 
 /* FIXME: much more to write here... */
-
-

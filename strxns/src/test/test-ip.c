@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:24:30 $
+ @(#) $RCSfile: test-ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 03:31:21 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:24:30 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-ip.c,v $
+ Revision 0.9.2.8  2007/08/14 03:31:21  brian
+ - GPLv3 header update
+
  Revision 0.9.2.7  2007/03/15 10:24:30  brian
  - test case reporting and pushed release date one day
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:24:30 $"
+#ident "@(#) $RCSfile: test-ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 03:31:21 $"
 
-static char const ident[] = "$RCSfile: test-ip.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:24:30 $";
+static char const ident[] = "$RCSfile: test-ip.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 03:31:21 $";
 
 /*
  *  Simple test program for NPI-IP streams.
@@ -150,6 +153,7 @@ static const char *lpkgname = "OpenSS7 XNS Driver - NPI-IP";
 static const char *lstdname = "XNS 5.2/NPI Rev 2";
 static const char *sstdname = "XNS/NPI";
 static const char *shortname = "NPI-IP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/ip";
 #else
@@ -642,8 +646,9 @@ stop_tt(void)
 struct sockaddr_in addrs[4][3];
 
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -655,7 +660,7 @@ N_qos_sel_ud_ip_t qos_data = {
 	.protocol = 132,
 	.priority = 0,
 	.ttl = 64,
-	.tos = N_ROUTINE|N_NOTOS,
+	.tos = N_ROUTINE | N_NOTOS,
 	.saddr = 0,
 };
 
@@ -664,7 +669,7 @@ N_qos_sel_conn_ip_t qos_conn = {
 	.protocol = 132,
 	.priority = 0,
 	.ttl = 64,
-	.tos = N_ROUTINE|N_NOTOS,
+	.tos = N_ROUTINE | N_NOTOS,
 	.mtu = 536,
 	.saddr = 0,
 	.daddr = 0,
@@ -675,7 +680,7 @@ N_qos_sel_info_ip_t qos_info = {
 	.protocol = 132,
 	.priority = 0,
 	.ttl = 64,
-	.tos = N_ROUTINE|N_NOTOS,
+	.tos = N_ROUTINE | N_NOTOS,
 	.mtu = 536,
 	.saddr = 0,
 	.daddr = 0,
@@ -3123,7 +3128,7 @@ print_opt_value(int child, struct t_opthdr *oh)
 void
 print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 {
-	unsigned char *qos_ptr = (unsigned char *)(cmd_buf + qos_ofs);
+	unsigned char *qos_ptr = (unsigned char *) (cmd_buf + qos_ofs);
 	union N_qos_ip_types *qos = (union N_qos_ip_types *) qos_ptr;
 	char buf[64];
 
@@ -3200,7 +3205,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 #endif
 
 void
-print_info(int child, N_info_ack_t *info)
+print_info(int child, N_info_ack_t * info)
 {
 	char buf[64];
 
@@ -4011,9 +4016,9 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_CONN_IND:
 		ctrl->len = sizeof(p->conn_ind)
-			+ (DEST_buffer ? DEST_length : 0)
-			+ (SRC_buffer ? SRC_length : 0)
-			+ (QOS_buffer ? QOS_length : 0);
+		    + (DEST_buffer ? DEST_length : 0)
+		    + (SRC_buffer ? SRC_length : 0)
+		    + (QOS_buffer ? QOS_length : 0);
 		p->conn_ind.PRIM_type = N_CONN_IND;
 		p->conn_ind.DEST_length = DEST_buffer ? DEST_length : 0;
 		p->conn_ind.DEST_offset = DEST_buffer ? sizeof(p->conn_ind) : 0;
@@ -4202,8 +4207,8 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_REQ:
 		ctrl->len = sizeof(p->bind_req)
-			+ (ADDR_buffer ? ADDR_length : 0)
-			+ (PROTOID_buffer ? PROTOID_length : 0);
+		    + (ADDR_buffer ? ADDR_length : 0)
+		    + (PROTOID_buffer ? PROTOID_length : 0);
 		p->bind_req.PRIM_type = N_BIND_REQ;
 		p->bind_req.ADDR_length = ADDR_buffer ? ADDR_length : 0;
 		p->bind_req.ADDR_offset = ADDR_buffer ? sizeof(p->bind_req) : 0;
@@ -4232,8 +4237,8 @@ do_signal(int child, int action)
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_BIND_ACK:
 		ctrl->len = sizeof(p->bind_ack)
-			+ (ADDR_buffer ? ADDR_length : 0)
-			+ (PROTOID_buffer ? PROTOID_length : 0);
+		    + (ADDR_buffer ? ADDR_length : 0)
+		    + (PROTOID_buffer ? PROTOID_length : 0);
 		p->bind_ack.PRIM_type = N_BIND_ACK;
 		p->bind_ack.ADDR_length = ADDR_buffer ? ADDR_length : 0;
 		p->bind_ack.ADDR_offset = ADDR_buffer ? sizeof(p->bind_ack) : 0;
@@ -4827,7 +4832,7 @@ preamble_1_idle_clns(int child)
 {
 	unsigned short port = htons(TEST_PORT_NUMBER + child);
 	unsigned char proto = TEST_PROTOCOL;
-	struct sockaddr_in sin = { AF_INET, port, { INADDR_ANY } };
+	struct sockaddr_in sin = { AF_INET, port, {INADDR_ANY} };
 	unsigned char prot[] = { proto };
 
 	if (preamble_1_unbnd(child) != __RESULT_SUCCESS)
@@ -5145,8 +5150,7 @@ preamble_1_data_xfer_list(int child)
 	DATA_buffer = buf;
 	DATA_length = strlen(DATA_buffer);
 
-	/* source and destination port, port number in the destination address is
-	   meaningless. */
+	/* source and destination port, port number in the destination address is meaningless. */
 	bcopy(&port, &buf[0], sizeof(port));
 	bcopy(&port, &buf[2], sizeof(port));
 
@@ -5170,6 +5174,7 @@ preamble_1_data_xfer_list(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
+
 #if 0
 static int
 preamble_1(int child)
@@ -5915,7 +5920,7 @@ test_case_1_2(int child)
 	if (last_info.NIDU_size != 65515)
 		goto failure;
 	state++;
-	if (last_info.SERV_type != (N_CLNS|N_CONS))
+	if (last_info.SERV_type != (N_CLNS | N_CONS))
 		goto failure;
 	state++;
 	if (last_info.CURRENT_state != NS_UNBND)
@@ -5941,7 +5946,6 @@ test_case_1_2(int child)
 struct test_stream test_1_2_conn = { &preamble_1_2_conn, &test_case_1_2_conn, &postamble_1_2_conn };
 struct test_stream test_1_2_resp = { &preamble_1_2_resp, &test_case_1_2_resp, &postamble_1_2_resp };
 struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &postamble_1_2_list };
-
 
 /*
  *  -------------------------------------------------------------------------
@@ -6601,7 +6605,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -6632,7 +6636,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

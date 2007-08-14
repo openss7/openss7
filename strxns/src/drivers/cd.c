@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:37:18 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:31:07 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.6  2007/08/14 03:31:07  brian
+ - GPLv3 header update
+
  Revision 0.9.2.5  2007/07/14 01:37:18  brian
  - make license explicit, add documentation
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:37:18 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:31:07 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:37:18 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:31:07 $";
 
 /*
  *  This module is a master device driver for Communications Device Streams presending the
@@ -99,7 +102,7 @@ static char const ident[] =
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CD_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:37:18 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:31:07 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS CDI OSI Communications Device Provider"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL v2"
@@ -185,12 +188,12 @@ MODULE_ALIAS("/dev/cd");
 #endif				/* MODULE */
 
 STATIC struct module_info cd_minfo = {
-	.mi_idnum = DRV_ID,	/* Module ID number */
-	.mi_idname = DRV_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size acceptd */
-	.mi_hiwat = 1 << 15,	/* Hi water mark */
-	.mi_hiwat = 1 << 10,	/* Lo water mark */
+	.mi_idnum = DRV_ID,		/* Module ID number */
+	.mi_idname = DRV_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size acceptd */
+	.mi_hiwat = 1 << 15,		/* Hi water mark */
+	.mi_hiwat = 1 << 10,		/* Lo water mark */
 };
 
 /* Upper multiplex is a CD provider following the CDI. */
@@ -199,18 +202,18 @@ STATIC streamscall int cd_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int cd_qclose(queue_t *, int, cred_t *);
 
 STATIC struct qinit cd_rinit = {
-	.qi_qopen = &cd_qopen,	/* Each open */
+	.qi_qopen = &cd_qopen,		/* Each open */
 	.qi_qclose = &cd_qclose,	/* Last close */
-	.qi_minfo = &cd_minfo,	/* Module information */
+	.qi_minfo = &cd_minfo,		/* Module information */
 };
 
 STATIC struct qinit cd_winit = {
-	.qi_minfo = &cd_minfo,	/* Module information */
+	.qi_minfo = &cd_minfo,		/* Module information */
 };
 
 STATIC struct streamtab cd_info = {
-	.st_rdinit = &cd_rinit,	/* Upper read queue */
-	.st_wrinit = &cd_winit,	/* Upper write queue */
+	.st_rdinit = &cd_rinit,		/* Upper read queue */
+	.st_wrinit = &cd_winit,		/* Upper write queue */
 };
 
 #define MAX_MINORS 16

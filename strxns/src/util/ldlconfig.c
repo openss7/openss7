@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 11:27:48 $
+ @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:31:24 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/03 11:27:48 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldlconfig.c,v $
+ Revision 0.9.2.9  2007/08/14 03:31:24  brian
+ - GPLv3 header update
+
  Revision 0.9.2.8  2006/03/03 11:27:48  brian
  - 32/64-bit compatibility
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 11:27:48 $"
+#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:31:24 $"
 
 static char const ident[] =
-    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2006/03/03 11:27:48 $";
+    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:31:24 $";
 
 /*
  *  ldlconfig: A configuration helper for ldl clients
@@ -404,7 +407,8 @@ do_info(int fd)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_info: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+		       (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_INFO_ACK:
@@ -432,8 +436,10 @@ do_info(int fd)
 			printf("\tprovider_style=%ld\n", (ulong) reply.ack.dl_provider_style);
 			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
 			printf("\tversion=%lu\n", (ulong) reply.ack.dl_version);
-			printf("\tbrdcst_addr_length=%lu\n", (ulong) reply.ack.dl_brdcst_addr_length);
-			printf("\tbrdcst_addr_offset=%lu\n", (ulong) reply.ack.dl_brdcst_addr_offset);
+			printf("\tbrdcst_addr_length=%lu\n",
+			       (ulong) reply.ack.dl_brdcst_addr_length);
+			printf("\tbrdcst_addr_offset=%lu\n",
+			       (ulong) reply.ack.dl_brdcst_addr_offset);
 			printf("\tgrowth=%lu\n", (ulong) reply.ack.dl_growth);
 			if (reply.ack.dl_addr_length && reply.ack.dl_addr_offset &&
 			    reply.ack.dl_addr_offset + reply.ack.dl_addr_length <= ctlbuf.len)
@@ -460,7 +466,8 @@ do_info(int fd)
 					printf("\t\ttrans_delay=%ld\n", (long) sel->dl_trans_delay);
 					printf("\t\tpriority=%ld\n", (long) sel->dl_priority);
 					printf("\t\tprotection=%ld\n", (long) sel->dl_protection);
-					printf("\t\tresidual_error=%ld\n", (long) sel->dl_residual_error);
+					printf("\t\tresidual_error=%ld\n",
+					       (long) sel->dl_residual_error);
 				}
 			}
 			if (reply.ack.dl_qos_range_length >= sizeof(unsigned long) &&
@@ -472,7 +479,8 @@ do_info(int fd)
 				printf("\tQOS range:\n");
 				if (range->dl_qos_type != DL_QOS_CL_RANGE1)
 					printf("\t\tUnknown type %lu, expected %lu\n",
-					       (ulong) range->dl_qos_type, (ulong) DL_QOS_CL_RANGE1);
+					       (ulong) range->dl_qos_type,
+					       (ulong) DL_QOS_CL_RANGE1);
 				else {
 					printf("\t\ttrans_delay(target, accept)=(%ld, %ld)\n",
 					       (long) range->dl_trans_delay.dl_target_value,
@@ -518,7 +526,8 @@ do_info(int fd)
 		break;
 
 	default:
-		fprintf(stderr, "do_info: Unknown reply primitive=%lu\n", (ulong) reply.ack.dl_primitive);
+		fprintf(stderr, "do_info: Unknown reply primitive=%lu\n",
+			(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -577,7 +586,8 @@ do_attach(int fd, dl_ulong ppa)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_attach: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+		       (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_OK_ACK:
@@ -595,7 +605,8 @@ do_attach(int fd, dl_ulong ppa)
 		break;
 
 	default:
-		fprintf(stderr, "do_attach: Unknown reply primitive=%lu\n", (ulong) reply.ack.dl_primitive);
+		fprintf(stderr, "do_attach: Unknown reply primitive=%lu\n",
+			(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;
@@ -654,7 +665,8 @@ do_promiscon(int fd, unsigned long level)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_promiscon: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+		       (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_OK_ACK:
@@ -740,7 +752,8 @@ do_bind(int fd, dl_ulong sap)
 		err_ack = (dl_error_ack_t *) & reply;
 		printf("do_bind: error ack:\n");
 		printf("\tprimitive=%lu, errno=%lu, unix_errno=%lu\n",
-		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno, (ulong) err_ack->dl_unix_errno);
+		       (ulong) err_ack->dl_error_primitive, (ulong) err_ack->dl_errno,
+		       (ulong) err_ack->dl_unix_errno);
 		return -1;
 
 	case DL_BIND_ACK:
@@ -765,7 +778,8 @@ do_bind(int fd, dl_ulong sap)
 		break;
 
 	default:
-		fprintf(stderr, "do_bind: Unknown reply primitive=%lu\n", (ulong) reply.ack.dl_primitive);
+		fprintf(stderr, "do_bind: Unknown reply primitive=%lu\n",
+			(ulong) reply.ack.dl_primitive);
 		return -1;
 	}
 	return 0;

@@ -1,29 +1,43 @@
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78
-dnl =========================================================================
+dnl ==========================================================================
 dnl 
-dnl @(#) $RCSfile: testsuite-np_ip.at,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/05/03 22:15:09 $
+dnl @(#) $RCSfile: testsuite-np_ip.at,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 03:31:31 $
 dnl
-dnl -------------------------------------------------------------------------
+dnl --------------------------------------------------------------------------
 dnl
 dnl Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 dnl Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 dnl
 dnl All Rights Reserved.
-dnl 
-dnl This program is free software; you can redistribute it and/or modify it
-dnl under the terms of the GNU General Public License as published by the Free
-dnl Software Foundation; version 2 of the License.
-dnl 
-dnl This program is distributed in the hope that it will be useful, but
-dnl WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-dnl or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-dnl for more details.
-dnl 
-dnl You should have received a copy of the GNU General Public License along
-dnl with this program; if not, write to the Free Software Foundation, Inc.,
-dnl 675 Mass Ave, Cambridge, MA 02139, USA.
-dnl 
-dnl -------------------------------------------------------------------------
+dnl
+dnl Unauthorized distribution or duplication is prohibited.
+dnl
+dnl This software and related documentation is protected by copyright and
+dnl distributed under licenses restricting its use, copying, distribution
+dnl and decompilation.  No part of this software or related documentation
+dnl may be reproduced in any form by any means without the prior written
+dnl authorization of the copyright holder, and licensors, if any.
+dnl
+dnl The recipient of this document, by its retention and use, warrants that
+dnl the recipient will protect this information and keep it confidential,
+dnl and will not disclose the information contained in this document
+dnl without the written permission of its owner.
+dnl
+dnl The author reserves the right to revise this software and documentation
+dnl for any reason, including but not limited to, conformity with standards
+dnl promulgated by various agencies, utilization of advances in the state
+dnl of the technical arts, or the reflection of changes in the design of any
+dnl techniques, or procedures embodied, described, or referred to herein.
+dnl The author is under no obligation to provide any feature listed herein.
+dnl
+dnl --------------------------------------------------------------------------
+dnl
+dnl As an exception to the above, this software may be distributed under the
+dnl GNU General Public License (GPL) Version 3, so long as the software is
+dnl distributed with, and only used for the testing of, OpenSS7 modules,
+dnl drivers, and libraries.
+dnl
+dnl --------------------------------------------------------------------------
 dnl
 dnl U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 dnl behalf of the U.S. Government ("Government"), the following provisions
@@ -40,74 +54,14 @@ dnl Acquisition Regulations ("FAR") (or any successor regulations) or, in the
 dnl cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 dnl (or any successor regulations).
 dnl
-dnl -------------------------------------------------------------------------
+dnl --------------------------------------------------------------------------
 dnl
-dnl Commercial licensing and support of this software is available from
-dnl OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+dnl Commercial licensing and support of this software is available from OpenSS7
+dnl Corporation at a fee.  See http://www.openss7.com/
 dnl
-dnl -------------------------------------------------------------------------
+dnl --------------------------------------------------------------------------
 dnl
-dnl Last Modified $Date: 2007/05/03 22:15:09 $ by $Author: brian $
-dnl
-dnl -------------------------------------------------------------------------
-dnl
-dnl $Log: testsuite-np_ip.at,v $
-dnl Revision 0.9.2.18  2007/05/03 22:15:09  brian
-dnl - testsuite factoring
-dnl
-dnl Revision 0.9.2.17  2007/03/12 02:24:38  brian
-dnl - updating tests
-dnl
-dnl Revision 0.9.2.16  2006/10/30 06:51:09  brian
-dnl - added ability to sync between test cases
-dnl
-dnl Revision 0.9.2.15  2006/09/18 00:49:08  brian
-dnl - updated testsuite headers
-dnl
-dnl Revision 0.9.2.14  2006/08/16 07:39:42  brian
-dnl - add brief sleep to buffer leak check
-dnl
-dnl Revision 0.9.2.13  2006/05/14 06:34:32  brian
-dnl - corrected buffer leaks
-dnl
-dnl Revision 0.9.2.12  2006/05/12 23:54:44  brian
-dnl - close to last changes from testing
-dnl
-dnl Revision 0.9.2.11  2006/05/12 09:58:04  brian
-dnl - more testing results and corrections for NPI-IP driver
-dnl
-dnl Revision 0.9.2.10  2006/05/12 01:16:23  brian
-dnl - more results from testing NPI-IP driver
-dnl
-dnl Revision 0.9.2.9  2006/05/11 22:16:47  brian
-dnl - more testing of NPI-IP driver
-dnl
-dnl Revision 0.9.2.8  2006/05/11 11:02:53  brian
-dnl - additional tests
-dnl
-dnl Revision 0.9.2.7  2006/05/11 10:59:39  brian
-dnl - more testing of NPI-IP driver
-dnl
-dnl Revision 0.9.2.6  2006/05/10 09:42:45  brian
-dnl - more testing on NPI-IP driver
-dnl
-dnl Revision 0.9.2.5  2006/05/09 22:13:04  brian
-dnl - changes from testing
-dnl
-dnl Revision 0.9.2.4  2006/05/09 09:47:58  brian
-dnl - changes from initial testing
-dnl
-dnl Revision 0.9.2.3  2006/05/09 06:48:10  brian
-dnl - changes from testing
-dnl
-dnl Revision 0.9.2.2  2006/05/08 11:26:18  brian
-dnl - post inc problem and working through test cases
-dnl
-dnl Revision 0.9.2.1  2006/05/07 22:13:00  brian
-dnl - updated for NPI-IP driver
-dnl
-dnl Revision 0.9.2.1  2006/05/06 10:22:38  brian
-dnl - added test suite for NPI-IP driver
+dnl Last Modified $Date: 2007/08/14 03:31:31 $ by $Author: brian $
 dnl
 dnl ==========================================================================
 
@@ -614,4 +568,68 @@ AT_KEYWORDS([N_UNITDATA_REQ NS_DATA_XFER EPROTO])
 AT_CHECK([test_np_ip 3.10.4], [], [ignore], [], [], [])
 AT_CLEANUP
 
+dnl ==========================================================================
+dnl
+dnl $Log: testsuite-np_ip.at,v $
+dnl Revision 0.9.2.19  2007/08/14 03:31:31  brian
+dnl - GPLv3 header update
+dnl
+dnl Revision 0.9.2.18  2007/05/03 22:15:09  brian
+dnl - testsuite factoring
+dnl
+dnl Revision 0.9.2.17  2007/03/12 02:24:38  brian
+dnl - updating tests
+dnl
+dnl Revision 0.9.2.16  2006/10/30 06:51:09  brian
+dnl - added ability to sync between test cases
+dnl
+dnl Revision 0.9.2.15  2006/09/18 00:49:08  brian
+dnl - updated testsuite headers
+dnl
+dnl Revision 0.9.2.14  2006/08/16 07:39:42  brian
+dnl - add brief sleep to buffer leak check
+dnl
+dnl Revision 0.9.2.13  2006/05/14 06:34:32  brian
+dnl - corrected buffer leaks
+dnl
+dnl Revision 0.9.2.12  2006/05/12 23:54:44  brian
+dnl - close to last changes from testing
+dnl
+dnl Revision 0.9.2.11  2006/05/12 09:58:04  brian
+dnl - more testing results and corrections for NPI-IP driver
+dnl
+dnl Revision 0.9.2.10  2006/05/12 01:16:23  brian
+dnl - more results from testing NPI-IP driver
+dnl
+dnl Revision 0.9.2.9  2006/05/11 22:16:47  brian
+dnl - more testing of NPI-IP driver
+dnl
+dnl Revision 0.9.2.8  2006/05/11 11:02:53  brian
+dnl - additional tests
+dnl
+dnl Revision 0.9.2.7  2006/05/11 10:59:39  brian
+dnl - more testing of NPI-IP driver
+dnl
+dnl Revision 0.9.2.6  2006/05/10 09:42:45  brian
+dnl - more testing on NPI-IP driver
+dnl
+dnl Revision 0.9.2.5  2006/05/09 22:13:04  brian
+dnl - changes from testing
+dnl
+dnl Revision 0.9.2.4  2006/05/09 09:47:58  brian
+dnl - changes from initial testing
+dnl
+dnl Revision 0.9.2.3  2006/05/09 06:48:10  brian
+dnl - changes from testing
+dnl
+dnl Revision 0.9.2.2  2006/05/08 11:26:18  brian
+dnl - post inc problem and working through test cases
+dnl
+dnl Revision 0.9.2.1  2006/05/07 22:13:00  brian
+dnl - updated for NPI-IP driver
+dnl
+dnl Revision 0.9.2.1  2006/05/06 10:22:38  brian
+dnl - added test suite for NPI-IP driver
+dnl
+dnl ==========================================================================
 dnl vim: ft=config sw=4 noet nocin com+=b\:dnl fo+=or tw=78

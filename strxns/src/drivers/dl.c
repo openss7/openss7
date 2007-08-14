@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 03:31:07 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.11  2007/08/14 03:31:07  brian
+ - GPLv3 header update
+
  Revision 0.9.2.10  2007/07/14 01:37:18  brian
  - make license explicit, add documentation
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 03:31:07 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 03:31:07 $";
 
 /*
  *  This multiplexing driver is a master device driver for Data Link Provider streams prsenting a
@@ -119,7 +122,7 @@ static char const ident[] =
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:37:18 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/14 03:31:07 $"
 #define DL_DEVICE	"SVR 4.2 STREAMS DLPI OSI Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL v2"
@@ -411,12 +414,12 @@ cd_alloc(void)
  *  STATE CHANGES
  */
 STATIC INLINE fastcall dl_ulong
-dl_get_state(struct dl * dl)
+dl_get_state(struct dl *dl)
 {
 	return (dl->dl_info.dl_current_state);
 }
 STATIC INLINE fastcall dl_ulong
-dl_get_statef(struct dl * dl)
+dl_get_statef(struct dl *dl)
 {
 	return (1 << dl_get_state(dl));
 }
@@ -432,7 +435,7 @@ cd_get_state(struct cd *cd)
 	return (cd->cd_info.cd_current_state);
 }
 STATIC INLINE fastcall cd_ulong
-cd_get_statef(struct cd * cd)
+cd_get_statef(struct cd *cd)
 {
 	return (1 << cd_get_state(cd));
 }

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:24 $
+ @(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:24 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_conv.c,v $
+ Revision 0.9.2.4  2007/08/14 03:31:19  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/07/14 01:37:24  brian
  - make license explicit, add documentation
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:24 $"
+#ident "@(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $"
 
-static char const ident[] = "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:24 $";
+static char const ident[] =
+    "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $";
 
 /*
  *  CDI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -77,7 +81,7 @@ static char const ident[] = "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2
 
 #define CDI_CONV_DESCRIP	"CDI ENDIAN CONVERSION (CDI-CONV) FOR LINUX FAST-STREAMS"
 #define CDI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:37:24 $"
+#define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $"
 #define CDI_CONV_DEVICE		"SVR 4.2 CDI Endian Conversion (CDI-CONV) for STREAMS"
 #define CDI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDI_CONV_LICENSE	"GPL v2"
