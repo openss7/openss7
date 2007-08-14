@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:44:06 $
+ @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/06 04:44:06 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:47:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_pmod.c,v $
+ Revision 0.9.2.4  2007/08/14 06:47:37  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/08/06 04:44:06  brian
  - rework of pipe-based emulation modules
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:44:06 $"
+#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $"
 
 static char const ident[] =
-    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:44:06 $";
+    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $";
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -87,7 +90,7 @@ static char const ident[] =
 #undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/06 04:44:06 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2380,7 +2383,7 @@ __ch_m_proto(struct ch *ch, queue_t *q, mblk_t *mp)
 #ifndef _OPTIMIZE_SPEED
 			mi_strlog(ch->oq, STRLOGDA, SL_TRACE, "-> CH_DATA_REQ");
 #endif				/* _OPTIMIZE_SPEED */
-			rtn = ch_data_req(ch, q, mp); /* FIXME: not right */
+			rtn = ch_data_req(ch, q, mp);	/* FIXME: not right */
 		} else {
 			rtn = ch_m_proto_slow(ch, q, mp, prim);
 		}
@@ -2450,7 +2453,7 @@ ch_m_sig(queue_t *q, mblk_t *mp)
 	if (likely((priv = mi_trylock(q)) != NULL)) {
 		err = __ch_m_sig(CH_PRIV(q), q, mp);
 		mi_unlock(priv);
-	} else 
+	} else
 		err = mi_timer_requeue(mp) ? -EAGAIN : 0;
 	return (err);
 }

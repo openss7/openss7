@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $
+ @(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 06:47:28 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:33 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:47:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: v401p.c,v $
+ Revision 0.9.2.11  2007/08/14 06:47:28  brian
+ - GPLv3 header update
+
  Revision 0.9.2.10  2007/07/14 01:35:33  brian
  - make license explicit, add documentation
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $"
+#ident "@(#) $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 06:47:28 $"
 
 static char const ident[] =
-    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $";
+    "$RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 06:47:28 $";
 
 /*
  *  This is a driver for the Varion V401P card.  It provides only full multi-card access (for speed)
@@ -285,7 +288,7 @@ static char const ident[] =
 
 #define MX_V400P_DESCRIP	"V40XP: MX (Multiplex) STREAMS DRIVER."
 #define MX_V400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/07/14 01:35:33 $"
+#define MX_V400P_REVISION	"OpenSS7 $RCSfile: v401p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 06:47:28 $"
 #define MX_V400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_V400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define MX_V400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -310,7 +313,8 @@ MODULE_LICENSE(MX_V400P_LICENSE);
 MODULE_ALIAS("streams-mx_v400p");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
+	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
@@ -2716,7 +2720,7 @@ vp_span_reconfig(struct vp *vp, int span)
 		if (sp->config.iftxlevel < 8) {
 			reg7a = 0x00;	/* no gain */
 			reg78 = 0x31;	/* 120 Ohm normal, transmitter on, -43dB EGL */
-			reg78 |= ((sp->config.iftxlevel & 0x1) << 5); /* LBO */
+			reg78 |= ((sp->config.iftxlevel & 0x1) << 5);	/* LBO */
 		} else {
 			/* monitoring mode */
 			reg7a = 0x00;	/* no gain */
@@ -2912,7 +2916,6 @@ vp_span_reconfig(struct vp *vp, int span)
 	}
 	return (0);
 }
-
 
 /*
  *  State Machine and Zaptel Integration.
@@ -4738,7 +4741,6 @@ vp_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 	return (irqreturn_t) (IRQ_NONE);
 }
 
-
 /*
  *  CH Primitives received from upstream.
  *  =====================================
@@ -5731,13 +5733,15 @@ mx_w_data(queue_t *q, mblk_t *mp)
 		goto overrun;
 	{
 		/* first write to transmit backing store - the problem here being that there is no
-		 * way to read transmit data from shared memory. */
+		   way to read transmit data from shared memory. */
 		for (frame = 0; frame < 1024; frame += 128) {
-			for (cbit = 1, slot = frame; (mx->c.cmask & ~(cbit - 1)) && slot < frame + 128;
+			for (cbit = 1, slot = frame;
+			     (mx->c.cmask & ~(cbit - 1)) && slot < frame + 128;
 			     slot += 4, cbit <<= 1) {
 				if (!(mx->c.cmask & cbit))
 					continue;
-				for (sbit = 1, span = slot; (mx->c.smask & ~(sbit - 1)) && span < slot + 4;
+				for (sbit = 1, span = slot;
+				     (mx->c.smask & ~(sbit - 1)) && span < slot + 4;
 				     span++, sbit <<= 1) {
 					if (!(mx->c.smask & sbit))
 						continue;
@@ -6013,7 +6017,7 @@ vp_download_fw(struct vp *vp, enum vp_board board)
 	return (0);
 }
 
-unsigned short vp_loadfw = 1;	 /* Yes, download firmware by default. */
+unsigned short vp_loadfw = 1;		/* Yes, download firmware by default. */
 
 #define VP_MAX_CARDS	8	/* No machines with more than 8 PCI slots? */
 
