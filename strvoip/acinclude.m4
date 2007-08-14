@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/03/25 19:02:32 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 08:46:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,40 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 19:02:32 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 0.9.2.10  2007/03/25 19:02:32  brian
-# - changes to support 2.6.20-1.2307.fc5 kernel
-#
-# Revision 0.9.2.9  2007/03/05 23:02:34  brian
-# - checking in release changes
-#
-# Revision 0.9.2.8  2007/03/04 23:41:50  brian
-# - additional include path
-#
-# Revision 0.9.2.7  2007/03/04 23:30:29  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.6  2007/03/04 23:14:40  brian
-# - better search for modversions
-#
-# Revision 0.9.2.5  2007/03/02 10:04:53  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 0.9.2.4  2006/12/29 05:52:03  brian
-# - changes for successful master build
-#
-# Revision 0.9.2.3  2006/12/23 13:07:26  brian
-# - manual page and other package updates for release
-#
-# Revision 0.9.2.2  2006/12/18 08:22:55  brian
-# - resolve device numbering
-#
-# Revision 0.9.2.1  2006/10/16 10:54:53  brian
-# - added new package files
+# Last Modified $Date: 2007/08/14 08:46:21 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -438,6 +405,42 @@ AC_DEFUN([_VOIP_], [dnl
 ])# _VOIP_
 # =============================================================================
 
+# =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.11  2007/08/14 08:46:21  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.10  2007/03/25 19:02:32  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
+# Revision 0.9.2.9  2007/03/05 23:02:34  brian
+# - checking in release changes
+#
+# Revision 0.9.2.8  2007/03/04 23:41:50  brian
+# - additional include path
+#
+# Revision 0.9.2.7  2007/03/04 23:30:29  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.6  2007/03/04 23:14:40  brian
+# - better search for modversions
+#
+# Revision 0.9.2.5  2007/03/02 10:04:53  brian
+# - updates to common build process and versions for all exported symbols
+#
+# Revision 0.9.2.4  2006/12/29 05:52:03  brian
+# - changes for successful master build
+#
+# Revision 0.9.2.3  2006/12/23 13:07:26  brian
+# - manual page and other package updates for release
+#
+# Revision 0.9.2.2  2006/12/18 08:22:55  brian
+# - resolve device numbering
+#
+# Revision 0.9.2.1  2006/10/16 10:54:53  brian
+# - added new package files
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
