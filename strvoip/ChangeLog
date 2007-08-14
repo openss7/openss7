@@ -1,3 +1,72 @@
+2007-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 header update
+	* Makefile.am: GPLv3 header update
+	* NEWS: GPLv3 header update
+	* README: GPLv3 header update
+	* README-cvs: GPLv3 header update
+	* THANKS: GPLv3 header update
+	* acinclude.m4: GPLv3 header update
+	* configure.ac: GPLv3 header update
+	* configure.nexusware: GPLv3 header update
+	* strvoip.dox.in: GPLv3 header update
+	* strvoip.spec.in: GPLv3 header update
+	* debian/copyright: GPLv3 header update
+	* debian/mscript_header.in: GPLv3 header update
+	* debian/mscript_postinst.in: GPLv3 header update
+	* debian/mscript_postrm.in: GPLv3 header update
+	* debian/mscript_preinst.in: GPLv3 header update
+	* debian/mscript_prerm.in: GPLv3 header update
+	* debian/rules.in: GPLv3 header update
+	* debian/strvoip-core.postinst.in: GPLv3 header update
+	* debian/strvoip-core.postrm.in: GPLv3 header update
+	* debian/strvoip-core.preinst.in: GPLv3 header update
+	* debian/strvoip-core.prerm.in: GPLv3 header update
+	* debian/strvoip-dev.postinst.in: GPLv3 header update
+	* debian/strvoip-dev.preinst.in: GPLv3 header update
+	* debian/strvoip-dev.prerm.in: GPLv3 header update
+	* debian/strvoip-devel.preinst.in: GPLv3 header update
+	* debian/strvoip-doc.postinst.in: GPLv3 header update
+	* debian/strvoip-doc.preinst.in: GPLv3 header update
+	* debian/strvoip-doc.prerm.in: GPLv3 header update
+	* debian/strvoip-init.postinst.in: GPLv3 header update
+	* debian/strvoip-init.postrm.in: GPLv3 header update
+	* debian/strvoip-init.preinst.in: GPLv3 header update
+	* debian/strvoip-init.prerm.in: GPLv3 header update
+	* debian/strvoip-lib.preinst.in: GPLv3 header update
+	* debian/strvoip-source.preinst.in: GPLv3 header update
+	* debian/strvoip-util.preinst.in: GPLv3 header update
+	* doc/Makefile.am: GPLv3 header update
+	* doc/man/Makefile.am: GPLv3 header update
+	* doc/man/strvoip.macros: GPLv3 header update
+	* doc/man/strvoip.refs: GPLv3 header update
+	* doc/manual/Makefile.am: GPLv3 header update
+	* doc/projects/Makefile.am: GPLv3 header update
+	* doc/projects/carrier/Makefile.am: GPLv3 header update
+	* doc/projects/carrier/carrier.texi: GPLv3 header update
+	* lib32/Makefile.am: GPLv3 header update
+	* src/Makefile.am: GPLv3 header update
+	* src/drivers/Config.in: GPLv3 header update
+	* src/drivers/h225.c: GPLv3 header update
+	* src/include/Makefile.am: GPLv3 header update
+	* src/include/sys/dlpi_h225.h: GPLv3 header update
+	* src/include/sys/h225_ioctl.h: GPLv3 header update
+	* src/include/sys/strvoip/config.h.in: GPLv3 header update
+	* src/include/sys/strvoip/version.h.in: GPLv3 header update
+	* src/modules/Config.in: GPLv3 header update
+	* src/modules/rtp.c: GPLv3 header update
+	* src/test/test-voip.c: GPLv3 header update
+	* src/util/init/strvoip: GPLv3 header update
+	* src/util/init/strvoip.sh: GPLv3 header update
+	* src/util/modutils/strvoip.in: GPLv3 header update
+	* src/util/sysconfig/strvoip.conf: GPLv3 header update
+	* src/util/sysconfig/strvoip.in: GPLv3 header update
+	* tests/Makefile.am: GPLv3 header update
+	* tests/atlocal.in: GPLv3 header update
+	* tests/kernel.at: GPLv3 header update
+	* tests/local.at: GPLv3 header update
+	* tests/testsuite.at: GPLv3 header update
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/manual/strvoip.texi: GPLv3
