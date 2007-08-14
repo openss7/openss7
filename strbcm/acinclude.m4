@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/25 19:00:47 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 02:46:14 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,49 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/25 19:00:47 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 0.9.2.13  2007/03/25 19:00:47  brian
-# - changes to support 2.6.20-1.2307.fc5 kernel
-#
-# Revision 0.9.2.12  2007/03/05 23:01:50  brian
-# - checking in release changes
-#
-# Revision 0.9.2.11  2007/03/04 23:41:33  brian
-# - additional include path
-#
-# Revision 0.9.2.10  2007/03/04 23:29:59  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.9  2007/03/04 23:14:22  brian
-# - better search for modversions
-#
-# Revision 0.9.2.8  2007/03/02 10:03:52  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 0.9.2.7  2006/12/18 08:28:53  brian
-# - resolve device numbering
-#
-# Revision 0.9.2.6  2006/10/12 10:20:40  brian
-# - removed redundant debug flags
-#
-# Revision 0.9.2.5  2006/09/18 13:20:08  brian
-# - better directory detection
-#
-# Revision 0.9.2.4  2006/07/25 06:38:58  brian
-# - expanded minor device numbers and optimization and locking corrections
-#
-# Revision 0.9.2.3  2006/05/08 03:12:27  brian
-# - added module id base to strconf
-#
-# Revision 0.9.2.2  2006/03/21 13:24:13  brian
-# - added problem report checks
-#
-# Revision 0.9.2.1  2006/03/08 11:42:09  brian
-# - setting up package
+# Last Modified $Date: 2007/08/14 02:46:14 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -374,6 +332,51 @@ AC_DEFUN([_BCM_], [dnl
 ])# _BCM_
 # =============================================================================
 
+# =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.14  2007/08/14 02:46:14  brian
+# - GPLv3 headers
+#
+# Revision 0.9.2.13  2007/03/25 19:00:47  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
+# Revision 0.9.2.12  2007/03/05 23:01:50  brian
+# - checking in release changes
+#
+# Revision 0.9.2.11  2007/03/04 23:41:33  brian
+# - additional include path
+#
+# Revision 0.9.2.10  2007/03/04 23:29:59  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.9  2007/03/04 23:14:22  brian
+# - better search for modversions
+#
+# Revision 0.9.2.8  2007/03/02 10:03:52  brian
+# - updates to common build process and versions for all exported symbols
+#
+# Revision 0.9.2.7  2006/12/18 08:28:53  brian
+# - resolve device numbering
+#
+# Revision 0.9.2.6  2006/10/12 10:20:40  brian
+# - removed redundant debug flags
+#
+# Revision 0.9.2.5  2006/09/18 13:20:08  brian
+# - better directory detection
+#
+# Revision 0.9.2.4  2006/07/25 06:38:58  brian
+# - expanded minor device numbers and optimization and locking corrections
+#
+# Revision 0.9.2.3  2006/05/08 03:12:27  brian
+# - added module id base to strconf
+#
+# Revision 0.9.2.2  2006/03/21 13:24:13  brian
+# - added problem report checks
+#
+# Revision 0.9.2.1  2006/03/08 11:42:09  brian
+# - setting up package
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
