@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 05:02:29 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 06:22:39 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/18 05:02:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:22:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.30  2007/08/14 06:22:39  brian
+ - GPLv3 header update
+
  Revision 0.9.2.29  2007/05/18 05:02:29  brian
  - final sctp performance rework
 
@@ -132,9 +135,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 05:02:29 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 06:22:39 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/05/18 05:02:29 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 06:22:39 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -216,6 +219,7 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_t";
 static char modname[256] = "sctp_t";
@@ -238,12 +242,13 @@ static int server_host_specified = 0;
 
 static int verbose = 1;
 
-static int client_exec = 0; /* execute client side */
-static int server_exec = 0; /* execute server side */
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 static int last_prim = 0;
@@ -720,8 +725,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -1398,28 +1404,28 @@ terrno_string(ulong terr, long uerr)
 	}
 }
 
-#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
-#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
-#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
-#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
-#define ICMP_ECHO		8	/* Echo Request			*/
-#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
-#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
-#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
-#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
-#define ICMP_INFO_REQUEST	15	/* Information Request		*/
-#define ICMP_INFO_REPLY		16	/* Information Reply		*/
-#define ICMP_ADDRESS		17	/* Address Mask Request		*/
-#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define ICMP_ECHOREPLY		0	/* Echo Reply */
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable */
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench */
+#define ICMP_REDIRECT		5	/* Redirect (change route) */
+#define ICMP_ECHO		8	/* Echo Request */
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded */
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem */
+#define ICMP_TIMESTAMP		13	/* Timestamp Request */
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply */
+#define ICMP_INFO_REQUEST	15	/* Information Request */
+#define ICMP_INFO_REPLY		16	/* Information Reply */
+#define ICMP_ADDRESS		17	/* Address Mask Request */
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply */
 #define NR_ICMP_TYPES		18
 
 /* Codes for UNREACH. */
-#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
-#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
-#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
-#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
-#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
-#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNREACH	0	/* Network Unreachable */
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable */
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable */
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable */
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set */
+#define ICMP_SR_FAILED		5	/* Source Route failed */
 #define ICMP_NET_UNKNOWN	6
 #define ICMP_HOST_UNKNOWN	7
 #define ICMP_HOST_ISOLATED	8
@@ -1433,14 +1439,14 @@ terrno_string(ulong terr, long uerr)
 #define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
 
 /* Codes for REDIRECT. */
-#define ICMP_REDIR_NET		0	/* Redirect Net			*/
-#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
-#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
-#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+#define ICMP_REDIR_NET		0	/* Redirect Net */
+#define ICMP_REDIR_HOST		1	/* Redirect Host */
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS */
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS */
 
 /* Codes for TIME_EXCEEDED. */
-#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
-#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+#define ICMP_EXC_TTL		0	/* TTL count exceeded */
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded */
 
 char *
 etype_string(t_uscalar_t etype)
@@ -4601,7 +4607,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if ((verbose && show) || verbose > 4)
-		print_tx_prim(child, prim_string(p->type));
+			print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_EXDATA_REQ:
 		ctrl->len = sizeof(p->exdata_req);
@@ -5417,18 +5423,18 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			}
 			if (p->optdata_ind.OPT_length) {
 				struct t_opthdr *oh;
-				unsigned char *op = (unsigned char *)p + p->optdata_ind.OPT_offset;
+				unsigned char *op = (unsigned char *) p + p->optdata_ind.OPT_offset;
 				int olen = p->optdata_ind.OPT_length;
 
 				for (oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0); oh; oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0)) {
 					if (oh->level == T_INET_SCTP) {
 						switch (oh->name) {
 						case T_SCTP_SID:
-							sid[child]= (*((t_scalar_t *)(oh +1))) & 0xffff;
+							sid[child] = (*((t_scalar_t *) (oh + 1))) & 0xffff;
 							opt_data.sid_val = sid[child];
 							break;
 						case T_SCTP_PPI:
-							ppi[child]= (*((t_scalar_t *)(oh +1))) & 0xffffffff;
+							ppi[child] = (*((t_scalar_t *) (oh + 1))) & 0xffffffff;
 							opt_data.ppi_val = ppi[child];
 							break;
 						}
@@ -5798,7 +5804,7 @@ preamble_1(int child)
 	state++;
 #endif
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -5918,7 +5924,7 @@ preamble_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -6118,7 +6124,7 @@ preamble_2b_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = "Hello World";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -6693,7 +6699,7 @@ struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &p
 #define tgrp_case_1_3_1 test_group_1
 #define numb_case_1_3_1 "1.3.1"
 #define name_case_1_3_1 "Request capabilities."
-#define sref_case_1_3_1 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_1 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_1 "\
 Checks that capabilities can be requested on each of three streams,\n\
 and that the returned information is appropriate for each stream."
@@ -6880,7 +6886,7 @@ struct test_stream test_1_3_1_list = { &preamble_1_3_1_list, &test_case_1_3_1_li
 #define tgrp_case_1_3_2 test_group_1
 #define numb_case_1_3_2 "1.3.2"
 #define name_case_1_3_2 "Request capabilities -- primitive in error."
-#define sref_case_1_3_2 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_2 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_2 "\
 Checks that a T_CAPABILITY_REQ primitive in error (too short) results in\n\
 failure.  The specifications do not state what to do in the event that a\n\
@@ -6932,7 +6938,7 @@ struct test_stream test_1_3_2_list = { &preamble_1_3_2_list, &test_case_1_3_2_li
 #define tgrp_case_1_3_3 test_group_1
 #define numb_case_1_3_3 "1.3.3"
 #define name_case_1_3_3 "Request capabilities -- M_PCPROTO"
-#define sref_case_1_3_3 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_3 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_3 "\
 Checks that a T_CAPABILITY_REQ sent as a M_PCPROTO is replied to with a\n\
 T_CAPABILITY_ACK as a M_PCPROTO.  The TPI specification says that a\n\
@@ -6977,7 +6983,7 @@ struct test_stream test_1_3_3_list = { &preamble_1_3_3_list, &test_case_1_3_3_li
 #define tgrp_case_1_3_4 test_group_1
 #define numb_case_1_3_4 "1.3.4"
 #define name_case_1_3_4 "Request capabilities -- M_PROTO"
-#define sref_case_1_3_4 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_4 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_4 "\
 Checks that a T_CAPABILITY_REQ sent as a M_PROTO is replied to with a\n\
 T_CAPABILITY_ACK as a M_PROTO.  The TPI specification says that a\n\
@@ -17131,7 +17137,7 @@ struct test_stream test_1_9_1_3_list = { &preamble_1_9_1_3_list, &test_case_1_9_
 #define tgrp_case_1_9_1_4 test_group_1_9_1
 #define numb_case_1_9_1_4 "1.9.1.4"
 #define name_case_1_9_1_4 "Perform options management -- T_NEGOTIATE (none)"
-#define sref_case_1_9_1_4 "TPI Version 2 Draft 2 -- T_OPTMGMT_ACK"
+#define sref_case_1_9_1_4 "TPI Revision 2 Draft 2 -- T_OPTMGMT_ACK"
 #define desc_case_1_9_1_4 "\
 Checks that all negotiated options are returned when no options are specified in\n\
 the T_OPTMGMT_REQ.  The specifications say than when T_NEGOTIATE is given and\n\
@@ -18071,7 +18077,7 @@ int
 test_case_1_10_2_conn(int child)
 {
 	test_addr = addrs[0];
-	test_alen = anums[0]*sizeof(addrs[0][0]);
+	test_alen = anums[0] * sizeof(addrs[0][0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -18107,7 +18113,7 @@ test_case_1_10_2_resp(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[0];
-	test_alen = anums[0]*sizeof(addrs[0][0]);
+	test_alen = anums[0] * sizeof(addrs[0][0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -18138,7 +18144,7 @@ test_case_1_10_2_list(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[0];
-	test_alen = anums[0]*sizeof(addrs[0][0]);
+	test_alen = anums[0] * sizeof(addrs[0][0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -18195,7 +18201,7 @@ test_case_1_10_3(int child)
 	, T_YES};
 	if (test_level == T_INET_IP) {
 		test_addr = addrs[0];
-		test_alen = anums[0]*sizeof(addrs[0][0]);
+		test_alen = anums[0] * sizeof(addrs[0][0]);
 		last_qlen = 0;
 		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 			goto failure;
@@ -18217,7 +18223,7 @@ test_case_1_10_3(int child)
 	state++;
 	if (test_level != T_INET_IP) {
 		test_addr = addrs[0];
-		test_alen = anums[0]*sizeof(addrs[0][0]);
+		test_alen = anums[0] * sizeof(addrs[0][0]);
 		last_qlen = 0;
 		if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 			goto failure;
@@ -18277,7 +18283,7 @@ struct test_stream test_1_10_3_list = { &preamble_1_10_3_list, &test_case_1_10_3
 #define tgrp_case_1_10_4 test_group_1_10
 #define numb_case_1_10_4 "1.10.4"
 #define name_case_1_10_4 "Double bind on three streams."
-#define sref_case_1_10_4 "TPI Version 2 Draft 2 T_BIND_REQ [TOUTSTATE]"
+#define sref_case_1_10_4 "TPI Revision 2 Draft 2 T_BIND_REQ [TOUTSTATE]"
 #define desc_case_1_10_4 "\
 Check that an attempt to bind three streams twice to each address results in\n\
 failure.  This is a simple test of a common interface state violation."
@@ -18286,7 +18292,7 @@ int
 test_case_1_10_4(int child)
 {
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -18333,7 +18339,7 @@ test_case_1_10_5(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -18365,7 +18371,7 @@ struct test_stream test_1_10_5_list = { &preamble_1_10_5_list, &test_case_1_10_5
 #define tgrp_case_1_10_6 test_group_1_10
 #define numb_case_1_10_6 "1.10.6"
 #define name_case_1_10_6 "Unbind from unbound on three streams."
-#define sref_case_1_10_6 "TPI Version 2 Draft 2 T_UNBIND_REQ [TOUTSTATE]"
+#define sref_case_1_10_6 "TPI Revision 2 Draft 2 T_UNBIND_REQ [TOUTSTATE]"
 #define desc_case_1_10_6 "\
 Check that an attempt to and unbind three streams, already in the unbound\n\
 state, results in failure.  This is a simple tests of a common interface\n\
@@ -18448,7 +18454,7 @@ struct test_stream test_1_10_7_list = { &preamble_1_10_7_list, &test_case_1_10_7
 #define tgrp_case_1_10_8 test_group_1_10
 #define numb_case_1_10_8 "1.10.8"
 #define name_case_1_10_8 "Bind streams with a bad address -- too short"
-#define sref_case_1_10_8 "TPI Version 2 Draft 2 T_BIND_REQ [TBADADDR]"
+#define sref_case_1_10_8 "TPI Revision 2 Draft 2 T_BIND_REQ [TBADADDR]"
 #define desc_case_1_10_8 "\
 Checks that an attempt to bind a stream with an address that is too short will\n\
 result in error TBADADDR.  The specification states that an address that is\n\
@@ -18492,7 +18498,7 @@ struct test_stream test_1_10_8_list = { &preamble_1_10_8_list, &test_case_1_10_8
 #define tgrp_case_1_10_9 test_group_1_10
 #define numb_case_1_10_9 "1.10.9"
 #define name_case_1_10_9 "Bind streams with a bad address -- too long"
-#define sref_case_1_10_9 "TPI Version 2 Draft 2 T_BIND_REQ [TBADADDR]"
+#define sref_case_1_10_9 "TPI Revision 2 Draft 2 T_BIND_REQ [TBADADDR]"
 #define desc_case_1_10_9 "\
 Checks that an attempt to bind a stream with an address that is too long will\n\
 result in error TBADADDR.  The specification states that an address that is\n\
@@ -18504,7 +18510,7 @@ int
 test_case_1_10_9(int child)
 {
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]) + 1;
+	test_alen = anums[child] * sizeof(addrs[child][0]) + 1;
 	last_qlen = 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -18536,7 +18542,7 @@ struct test_stream test_1_10_9_list = { &preamble_1_10_9_list, &test_case_1_10_9
 #define tgrp_case_1_10_10 test_group_1_10
 #define numb_case_1_10_10 "1.10.10"
 #define name_case_1_10_10 "Bind streams to unassignable address -- TNOADDR"
-#define sref_case_1_10_10 "TPI Version 2 Draft 2 T_BIND_REQ [TNOADDR]"
+#define sref_case_1_10_10 "TPI Revision 2 Draft 2 T_BIND_REQ [TNOADDR]"
 #define desc_case_1_10_10 "\
 Checks that an attempt to bind to an unassignable address results in failure\n\
 with error TNOADDR.  There are two ways of specifying an unassignable address\n\
@@ -18620,7 +18626,7 @@ struct test_stream test_1_10_10_list = { &preamble_1_10_10_list, &test_case_1_10
 #define tgrp_case_1_10_11 test_group_1_10
 #define numb_case_1_10_11 "1.10.11"
 #define name_case_1_10_11 "Bind streams with non-zero CONNIND_number"
-#define sref_case_1_10_11 "TPI Version 2 Draft 2 T_BIND_REQ [CONNIND_number]"
+#define sref_case_1_10_11 "TPI Revision 2 Draft 2 T_BIND_REQ [CONNIND_number]"
 #define desc_case_1_10_11 "\
 Checks that an attempt to bind to wildcard and non-wildcard addresses and with a\n\
 non-zero CONNINND_number results in failure for T_COTS or T_COTS_ORD service,\n\
@@ -22961,7 +22967,7 @@ test_case_3_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23055,7 +23061,7 @@ test_case_3_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23183,7 +23189,7 @@ test_case_3_3_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23321,7 +23327,7 @@ test_case_3_4_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23463,7 +23469,7 @@ test_case_3_5_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23614,7 +23620,7 @@ test_case_3_6_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23636,7 +23642,7 @@ test_case_3_6_conn(int child)
 	}
 	state++;
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -23653,7 +23659,7 @@ test_case_3_6_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23771,7 +23777,7 @@ struct test_stream test_3_6_resp = { &preamble_3_6_resp, &test_case_3_6_resp, &p
 struct test_stream test_3_6_list = { &preamble_3_6_list, &test_case_3_6_list, &postamble_3_6_list };
 
 #define test_group_4 "Connection and disconnection -- successful"
-#define sref_case_4_1 "TPI Version 2 Draft 2 -- Appendix A -- Connection Acceptance"
+#define sref_case_4_1 "TPI Revision 2 Draft 2 -- Appendix A -- Connection Acceptance"
 
 /*
  *  Accept a connection.
@@ -23790,7 +23796,7 @@ test_case_4_1_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23883,7 +23889,7 @@ test_case_4_1_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -23977,7 +23983,7 @@ test_case_4_1_3_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24018,7 +24024,7 @@ test_case_4_1_3_resp(int child)
 	test_msleep(child, LONG_WAIT);
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24146,7 +24152,7 @@ test_case_4_1_4_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24278,7 +24284,7 @@ test_case_4_1_5_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24377,7 +24383,7 @@ test_case_4_1_6_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24414,7 +24420,7 @@ test_case_4_1_6_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24569,7 +24575,7 @@ preamble_4_1_7(int child)
 	test_msleep(child, SHORT_WAIT);
 	state++;
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -24656,7 +24662,7 @@ test_case_4_1_7_conn_part(int child)
 	test_msleep(child, LONG_WAIT);
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24855,7 +24861,7 @@ test_case_4_1_8_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -24959,7 +24965,7 @@ test_case_4_1_9_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -25062,7 +25068,7 @@ test_case_4_2_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = "Connection Data!";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -25071,8 +25077,7 @@ test_case_4_2_1_conn(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_TCP:
-		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS
-		    || last_t_errno != TBADDATA)
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TBADDATA)
 			goto failure;
 		state++;
 		break;
@@ -25169,7 +25174,7 @@ test_case_4_2_1_list(int child)
 		break;
 	}
 	return (__RESULT_SUCCESS);
-failure:
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -25208,7 +25213,7 @@ int
 test_case_4_2_2_conn(int child)
 {
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -25311,7 +25316,7 @@ test_case_4_3_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -25432,7 +25437,7 @@ test_case_4_3_conn_readonly(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -25447,7 +25452,6 @@ test_case_4_3_conn_readonly(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-
 
 int
 test_case_4_3_resp_readonly(int child)
@@ -29412,7 +29416,7 @@ test_case_5_5_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = anums[1]*sizeof(addrs[1][0]);
+	test_alen = anums[1] * sizeof(addrs[1][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -29500,7 +29504,7 @@ test_case_5_5_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = anums[1]*sizeof(addrs[1][0]);
+	test_alen = anums[1] * sizeof(addrs[1][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -29588,7 +29592,7 @@ test_case_5_5_3_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[1];
-	test_alen = anums[1]*sizeof(addrs[1][0]);
+	test_alen = anums[1] * sizeof(addrs[1][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -32585,7 +32589,7 @@ test_case_11_3(int child, long prim)
 			break;
 		case T_CONN_REQ:
 			test_addr = addrs[2];
-			test_alen = anums[2]*sizeof(addrs[2][0]);
+			test_alen = anums[2] * sizeof(addrs[2][0]);
 			test_data = "Hello World";
 			test_opts = &opt_conn;
 			test_olen = sizeof(opt_conn);
@@ -32685,7 +32689,7 @@ test_case_11_3(int child, long prim)
 			break;
 		case T_UNITDATA_REQ:
 			test_addr = addrs[(child + 1) % 3];
-			test_alen = anums[(child + 1) % 3]*sizeof(addrs[(child + 1) % 3][0]);
+			test_alen = anums[(child + 1) % 3] * sizeof(addrs[(child + 1) % 3][0]);
 			test_data = "Unit test data.";
 			if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 				goto failure;
@@ -32728,7 +32732,7 @@ test_case_11_3(int child, long prim)
 			break;
 		case T_UNITDATA_REQ:
 			test_addr = addrs[(child + 1) % 3];
-			test_alen = anums[(child + 1) % 3]*sizeof(addrs[(child + 1) % 3][0]);
+			test_alen = anums[(child + 1) % 3] * sizeof(addrs[(child + 1) % 3][0]);
 			test_data = "Unit test data.";
 			if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 				goto failure;
@@ -33069,7 +33073,7 @@ struct test_stream test_11_3_13_list = { &preamble_0, &test_case_11_3_13, &posta
 
 #define tgrp_case_11_3_14 test_group_11_3
 #define numb_case_11_3_14 "11.3.14"
-#define sref_case_11_3_14 "TPI Version 2 Draft 2 -- Chapter 1 -- Receipt of Unknown Primitives"
+#define sref_case_11_3_14 "TPI Revision 2 Draft 2 -- Chapter 1 -- Receipt of Unknown Primitives"
 #define name_case_11_3_14 "Primitive in error -- unsupported primitive type -- UNKNOWN"
 #define desc_case_11_3_14 "\
 Checks than an unsupported primitive returns an error.  The TPI specification\n\
@@ -33088,7 +33092,7 @@ struct test_stream test_11_3_14_resp = { &preamble_0, &test_case_11_3_14, &posta
 struct test_stream test_11_3_14_list = { &preamble_0, &test_case_11_3_14, &postamble_0 };
 
 #define test_group_12 "Flushing"
-#define sref_case_12 "TPI Version 2 Draft 2 -- Chapter 1 -- Rules for Flushing Queues"
+#define sref_case_12 "TPI Revision 2 Draft 2 -- Chapter 1 -- Rules for Flushing Queues"
 
 #define tgrp_case_12_1 test_group_12
 #define numb_case_12_1 "12.1"
@@ -33133,7 +33137,7 @@ test_case_12_1_conn(int child)
 		test_opts = NULL;
 		test_olen = 0;
 		test_addr = addrs[2];
-		test_alen = anums[2]*sizeof(addrs[2][0]);
+		test_alen = anums[2] * sizeof(addrs[2][0]);
 		if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
 			goto failure;
 	}
@@ -33767,7 +33771,7 @@ struct test_stream test_12_3_3_resp = { &preamble_12_3_3_resp, &test_case_12_3_3
 struct test_stream test_12_3_3_list = { &preamble_12_3_3_list, &test_case_12_3_3_list, &postamble_12_3_3_list };
 
 #define test_group_13 "Fatal and non-fatal errors."
-#define sref_case_13 "TPI Version 2 Draft 2 -- Chapter 2"
+#define sref_case_13 "TPI Revision 2 Draft 2 -- Chapter 2"
 
 int
 preamble_ts_unbnd_cots(int child)
@@ -33930,7 +33934,7 @@ preamble_ts_wcon_creq_conn(int child)
 	state++;
 	test_data = NULL;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -34004,7 +34008,7 @@ postamble_ts_wcon_creq_conn(int child)
 int
 preamble_ts_wres_cind_conn(int child)
 {
-	switch(test_level) {
+	switch (test_level) {
 	case T_INET_TCP:
 	default:
 		return preamble_13_connection(child);
@@ -34024,7 +34028,7 @@ preamble_ts_wres_cind_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -34402,8 +34406,9 @@ test_case_13_2_2(int child)
 	test_addr = addrs[child];
 	test_alen = sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
-	addrs[child][0].sin_addr.s_addr = htonl(0x7fffffff);	/* 127.255.255.255 is a broadcast address */
-	addrs[child][0].sin_port = htons(3);			/* reserved port */
+	addrs[child][0].sin_addr.s_addr = htonl(0x7fffffff);	/* 127.255.255.255 is a broadcast
+								   address */
+	addrs[child][0].sin_port = htons(3);	/* reserved port */
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
@@ -34457,7 +34462,7 @@ test_case_13_2_3(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	last_qlen = 5;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -34486,7 +34491,7 @@ test_case_13_2_3_list(int child)
 		goto notapplicable;
 	state++;
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -34537,7 +34542,7 @@ int
 test_case_13_2_4(int child)
 {
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]) - 1;
+	test_alen = anums[child] * sizeof(addrs[child][0]) - 1;
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -34600,7 +34605,7 @@ test_case_13_2_5(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	addrs[child][0].sin_addr.s_addr = 0x3f00003f;	/* pick some non-local address */
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
@@ -34651,7 +34656,7 @@ int
 test_case_13_2_6(int child)
 {
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -35182,7 +35187,7 @@ test_case_13_4_4_conn(int child)
 {
 	test_data = NULL;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]) - 1;
+	test_alen = anums[2] * sizeof(addrs[2][0]) - 1;
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -35238,7 +35243,7 @@ test_case_13_4_5_conn(int child)
 {
 	test_data = "";
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -35301,7 +35306,7 @@ test_case_13_4_6_conn(int child)
 	, 0x0};
 	test_data = NULL;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_opts = &options;
 	test_olen = sizeof(options);
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -35366,7 +35371,7 @@ test_case_13_4_7_conn(int child)
 	state++;
 	test_data = NULL;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -35424,7 +35429,7 @@ test_case_13_4_8(int child)
 {
 	test_data = NULL;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -38883,7 +38888,7 @@ test_case_13_14_1(int child)
 {
 	test_data = "Some data.";
 	test_addr = addrs[(child + 1) % 3];
-	test_alen = anums[(child + 1) % 3]*sizeof(addrs[(child + 1) % 3][0]);
+	test_alen = anums[(child + 1) % 3] * sizeof(addrs[(child + 1) % 3][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
@@ -38945,7 +38950,7 @@ test_case_13_14_2(int child)
 {
 	test_data = "";
 	test_addr = addrs[(child + 1) % 3];
-	test_alen = anums[(child + 1) % 3]*sizeof(addrs[(child + 1) % 3][0]);
+	test_alen = anums[(child + 1) % 3] * sizeof(addrs[(child + 1) % 3][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
@@ -38979,7 +38984,7 @@ struct test_stream test_13_14_2_resp = { &preamble_13_14_2_resp, &test_case_13_1
 struct test_stream test_13_14_2_list = { &preamble_13_14_2_list, &test_case_13_14_2_list, &postamble_13_14_2_list };
 
 #define test_group_14 "Allowable states."
-#define sref_case_14 "TPI Version 2 Draft 2 -- Chapter 2"
+#define sref_case_14 "TPI Revision 2 Draft 2 -- Chapter 2"
 
 #define tgrp_case_14_1_1 test_group_14
 #define numb_case_14_1_1 "14.1.1"
@@ -39253,7 +39258,7 @@ int
 test_case_14_2(int child)
 {
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -39556,7 +39561,7 @@ test_case_14_4_1_conn(int child)
 {
 	test_data = NULL;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_CONN_REQ) != __RESULT_SUCCESS)
@@ -41004,7 +41009,7 @@ test_case_14_14(int child)
 	state++;
 	test_data = "Some data.";
 	test_addr = addrs[(child + 1) % 3];
-	test_alen = anums[(child + 1) % 3]*sizeof(addrs[(child + 1) % 3][0]);
+	test_alen = anums[(child + 1) % 3] * sizeof(addrs[(child + 1) % 3][0]);
 	test_opts = NULL;
 	test_olen = 0;
 	if (do_signal(child, __TEST_UNITDATA_REQ) != __RESULT_SUCCESS)
@@ -43010,7 +43015,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -43041,7 +43046,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

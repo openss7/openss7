@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: xti_sctp.h,v 0.9.2.5 2006/10/19 12:48:31 brian Exp $
+ @(#) $Id: xti_sctp.h,v 0.9.2.6 2007/08/14 06:22:29 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/19 12:48:31 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:22:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xti_sctp.h,v $
+ Revision 0.9.2.6  2007/08/14 06:22:29  brian
+ - GPLv3 header update
+
  Revision 0.9.2.5  2006/10/19 12:48:31  brian
  - corrections to ETSI SACK frequency
 
@@ -82,7 +85,7 @@
 #ifndef _SYS_XTI_SCTP_H
 #define _SYS_XTI_SCTP_H
 
-#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: xti_sctp.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define T_INET_SCTP	132	/* SCTP level (same as protocol number) */
 
@@ -131,7 +134,6 @@
 #define T_SCTP_STATUS			37
 #define T_SCTP_DEBUG			38
 #define T_SCTP_SACK_FREQUENCY		39
-
 
 #define T_SCTP_HMAC_NONE	0
 #define T_SCTP_HMAC_SHA1	1

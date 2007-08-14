@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:33 $
+ @(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 06:22:22 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/10 22:32:33 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:22:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rmux.c,v $
+ Revision 0.9.2.3  2007/08/14 06:22:22  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/02/10 22:32:33  brian
  - working up sigtran drivers
 
@@ -58,9 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:33 $"
+#ident "@(#) $RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 06:22:22 $"
 
-static char const ident[] = "$RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/02/10 22:32:33 $";
+static char const ident[] =
+    "$RCSfile: rmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 06:22:22 $";
 
 /*
  *  RMUX is a remote multiplexing driver using SCTP.  Its purpose is to make remote STREAMS devices
@@ -235,7 +239,6 @@ static int
 r_open_res(struct rmux *rm, queue_t *q, mblk_t *mp)
 {
 }
-
 
 static int
 r_send_open_con(struct rmux *rm, queue_t *q, mblk_t *mp)
