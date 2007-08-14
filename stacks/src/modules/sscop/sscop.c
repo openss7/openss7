@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop.c,v $
+ Revision 0.9.2.16  2007/08/14 12:18:50  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.15  2007/07/14 01:35:11  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $"
+#ident "@(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $"
 
 static char const ident[] =
-    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $";
+    "$RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $";
 
 /*
  *  This driver provides the functionality of SSCOP-MCE over a connectionless
@@ -95,7 +98,7 @@ static char const ident[] =
 //#include "sscop_input.h"
 
 #define SSCOP_DESCRIP	"SSCOPMCE/IP STREAMS DRIVER."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:35:11 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:50 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -368,6 +371,7 @@ MODULE_STATIC struct streamtab sscopinfo = {
 struct AA_info_req {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_INFO_ACK
  */
@@ -394,6 +398,7 @@ struct AA_info_ack {
 	ulong PROTOID_offset;		/* offset of bound protocol ids */
 	ulong NPI_version;		/* version # of npi that is supported */
 };
+
 /*
  *  AA_BIND_REQ
  */
@@ -406,6 +411,7 @@ struct AA_bind_req {
 	ulong PROTOID_length;		/* length of bound protocol ids */
 	ulong PROTOID_offset;		/* offset of bound protocol ids */
 };
+
 /*
  *  AA_BIND_ACK
  */
@@ -418,12 +424,14 @@ struct AA_bind_ack {
 	ulong PROTOID_length;		/* length of bound protocol ids */
 	ulong PROTOID_offset;		/* offset of bound protocol ids */
 };
+
 /*
  *  AA_UNBIND_REQ
  */
 struct AA_unbind_req {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_OPTMGMT_REQ
  */
@@ -433,6 +441,7 @@ struct AA_optmgmt_req {
 	ulong QOS_offset;
 	ulong OPTMGMT_flags;
 };
+
 /*
  *  AA_ERROR_ACK
  */
@@ -442,6 +451,7 @@ struct AA_error_ack {
 	ulong NPI_error;		/* NPI error code */
 	ulong UNIX_error;		/* UNIX error code */
 };
+
 /*
  *  AA_OK_ACK
  */
@@ -449,6 +459,7 @@ struct AA_ok_ack {
 	np_ulong PRIM_type;		/* always N_OK_ACK */
 	np_ulong CORRECT_prim;		/* primitive being acknowledged */
 };
+
 /*
  *  AA_ESTABLISH_REQ (M_PROTO, 0 or more M_DATA)
  */
@@ -460,6 +471,7 @@ struct AA_establish_req {
 	ulong QOS_length;
 	ulong QOS_offset;
 };
+
 /*
  *  AA_ESTABLISH_IND (M_PROTO, 0 or more M_DATA)
  */
@@ -474,6 +486,7 @@ struct AA_establish_ind {
 	ulong QOS_length;
 	ulong QOS_offset;
 };
+
 /*
  *  AA_ESTABLISH_RES (M_PROTO, 0 or more M_DATA)
  */
@@ -487,6 +500,7 @@ struct AA_establish_res {
 	ulong QOS_length;
 	ulong QOS_offset;
 };
+
 /*
  *  AA_ESTABLISH_CON (M_PROTO, 0 or more M_DATA)
  */
@@ -498,6 +512,7 @@ struct AA_establish_con {
 	ulong QOS_length;
 	ulong QOS_offset;
 };
+
 /*
  *  AA_RELEASE_REQ (M_PROTO, 0 or more M_DATA)
  */
@@ -508,6 +523,7 @@ struct AA_release_req {
 	ulong RES_offset;
 	ulong SEQ_number;
 };
+
 /*
  *  AA_RELEASE_IND (M_PROTO, 0 or more M_DATA)
  */
@@ -518,6 +534,7 @@ struct AA_release_ind {
 	ulong RES_offset;
 	ulong SEQ_number;
 };
+
 /*
  *  AA_DATA_REQ (M_PROTO, 1 or more M_DATA )
  */
@@ -525,6 +542,7 @@ struct AA_data_req {
 	ulong PRIM_type;
 	ulong DATA_xfer_flags;		/* OOS */
 };
+
 /*
  *  AA_DATA_IND (M_PROTO, 1 or more M_DATA)
  */
@@ -533,12 +551,14 @@ struct AA_data_ind {
 	ulong DATA_xfer_flags;		/* OOS */
 	ulong PDU_sequence;		/* SN *//* in addition to NPI */
 };
+
 /*
  *  AA_DATACK_REQ (M_PROTO)
  */
 struct AA_datack_req {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_DATACK_IND (M_PROTO) (not used)
  */
@@ -546,6 +566,7 @@ struct AA_datack_ind {
 	ulong PRIM_type;
 	ulong PDU_sequence;		/* SN *//* in addition to NPI */
 };
+
 /*
  *  AA_RESYNC_REQ (M_PROTO, 0 or more M_DATA)
  */
@@ -553,6 +574,7 @@ struct AA_resync_req {
 	ulong PRIM_type;
 	ulong RESET_reason;		/* not used */
 };
+
 /*
  *  AA_RESYNC_IND (M_PROTO, 0 or more M_DATA)
  */
@@ -561,30 +583,35 @@ struct AA_resync_ind {
 	ulong RESET_orig;
 	ulong RESET_reason;
 };
+
 /*
  *  AA_RESYNC_RES (M_PROTO)
  */
 struct AA_resync_res {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_RESYNC_CON (M_PROTO)
  */
 struct AA_resync_con {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_RECOVER_IND (M_PROTO)	(not in NPI)
  */
 struct AA_recover_ind {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_RECOVER_RES (M_PROTO)	(not in NPI)
  */
 struct AA_recover_res {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_UNITDATA_REQ (M_PROTO, 0 or more M_DATA)
  */
@@ -594,6 +621,7 @@ struct AA_unitdata_req {
 	ulong DEST_offset;
 	ulong RESERVED_field[2];
 };
+
 /*
  *  AA_UNITDATA_IND (M_PROTO, 0 or more M_DATA)
  */
@@ -605,6 +633,7 @@ struct AA_unitdata_ind {
 	ulong SRC_offset;
 	ulong RESERVED_field;
 };
+
 /*
  *  AA_RETRIEVE_REQ (M_PROTO)	(not in NPI)
  */
@@ -612,12 +641,14 @@ struct AA_retieve_req {
 	ulong PRIM_type;
 	ulong RETRIEVE_sequence;
 };
+
 /*
  *  AA_RETRIEVE_IND (M_PROTO, 0 or more M_DATA)	(not in NPI)
  */
 struct AA_retrieve_ind {
 	ulong PRIM_type;
 };
+
 /*
  *  AA_RETRIEVE_COMPLETE_IND (M_PROTO)	(not in NPI)
  */
@@ -636,6 +667,7 @@ struct MAA_error_ind {
 	ulong ERROR_type;
 	ulong ERROR_count;		/* not in NPI */
 };
+
 /*
  *  MAA_UNITDATA_REQ (M_PROTO, 0 or more M_DATA)
  */
@@ -670,6 +702,7 @@ aa_info_ack(queue_t *q)
 	mblk_t *mp;
 	struct AA_info_ack *p;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	if ((mp = allocb(sizeof(*p) + add_len + qos_len + rng_len + pro_len, BPRI_MED))) {
 		mp->b - datap->db_type = M_PCPROTO;
 		p = (struct AA_info_ack *) mp->b_wptr;
@@ -716,6 +749,7 @@ aa_bind_ack()
 {
 	mblk_t *mp;
 	struct AA_bind_req *p;
+
 	if ((mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct AA_bind_req *) mp->b_wptr;
@@ -744,6 +778,7 @@ aa_error_ack(ulong prim, long err)
 {
 	mblk_t *mp;
 	struct AA_error_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct AA_error_ack *) mp->b_wptr;
@@ -765,6 +800,7 @@ aa_ok_ack(ulong prim)
 {
 	mblk_t *mp;
 	struct AA_ok_ack *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (struct AA_ok_ack *) mp->b_wptr;
@@ -793,6 +829,7 @@ aa_establish_ind(dst_ptr, dst_len, src_ptr, src_len, seq, flags, qos_ptr, qos_le
 {
 	mblk_t *mp;
 	struct AA_establish_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len + qos + len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_establish_ind *) mp->b_wptr;
@@ -832,6 +869,7 @@ aa_establish_con(res_ptr, res_len, flags, qos_ptr, qos_len, db)
 {
 	mblk_t *mp;
 	struct AA_establish_con *p;
+
 	if ((mp = allocb(sizeof(*p) + res_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_establish_con *) mp->b_wptr;
@@ -865,6 +903,7 @@ aa_release_ind(orig, res_ptr, res_len, seq, db)
 {
 	mblk_t *mp;
 	struct AA_release_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_release_ind *) mp->b_wptr;
@@ -893,6 +932,7 @@ aa_data_ind(flags, seqno, db)
 {
 	mblk_t *mp;
 	struct AA_data_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_data_ind *) mp->b_wptr;
@@ -915,6 +955,7 @@ aa_datack_ind(seqno, db)
 {
 	mblk_t *mp;
 	struct AA_datack_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_datack_ind *) mp->b_wptr;
@@ -937,6 +978,7 @@ aa_resync_ind(orig, reason, db)
 {
 	mblk_t *mp;
 	struct AA_resync_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_resync_ind *) mp->b_wptr;
@@ -959,6 +1001,7 @@ aa_resync_ind(orig, reason, db)
 {
 	mblk_t *mp;
 	struct AA_resync_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_resync_ind *) mp->b_wptr;
@@ -978,6 +1021,7 @@ aa_recover_ind(void)
 {
 	mblk_t *mp;
 	struct AA_recover_ind *p;
+
 	if ((mp = allocb(sizoef(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_recover_ind *) mp->b_wptr;
@@ -1001,6 +1045,7 @@ aa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db)
 {
 	mblk_t *mp;
 	struct AA_unitdata_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_unitdata_ind *) mp->b_wptr;
@@ -1029,6 +1074,7 @@ aa_retrieve_ind(db)
 {
 	mblk_t *mp;
 	struct AA_retrieve_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_retrieve_ind *) mp->b_wptr;
@@ -1048,6 +1094,7 @@ aa_retrieve_complete_ind(void)
 {
 	mblk_t *mp;
 	struct AA_retrieve_complete_ind *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct AA_retrieve_complete_ind *) mp->b_wptr;
@@ -1070,6 +1117,7 @@ maa_error_ind(dst_ptr, dst_len, code, count)
 {
 	mblk_t *mp;
 	struct MAA_error_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct MAA_error_ind *) mp->b_wptr;
@@ -1098,6 +1146,7 @@ maa_unitdata_ind(dst_ptr, dst_len, src_ptr, src_len, db)
 {
 	mblk_t *mp;
 	struct MAA_unitdata_ind *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (struct MAA_unitdata_ind *) mp->b_wptr;
@@ -1128,6 +1177,7 @@ n_info_req(void)
 {
 	mblk_t *mp;
 	N_info_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_info_req_t *) mp->b_wptr;
@@ -1147,6 +1197,7 @@ n_bind_req(add_ptr, add_len, cons, flags, pro_ptr, pro_len)
 {
 	mblk_t *mp;
 	N_bind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_bind_req_t *) mp->b_wptr;
@@ -1170,6 +1221,7 @@ n_unbind_req(void)
 {
 	mblk_t *mp;
 	N_unbind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unbind_req_t *) mp->b_wptr;
@@ -1186,6 +1238,7 @@ n_optmgmt_req(qos_ptr, qos_len, flags)
 {
 	mblk_t *mp;
 	N_optmgmt_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_optmgmt_req_t *) mp->b_wptr;
@@ -1208,6 +1261,7 @@ n_conn_req(dst_ptr, dst_len, flags, qos_ptr, qos_len)
 {
 	mblk_t *mp;
 	N_conn_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_conn_req_t *) mp->b_wptr;
@@ -1230,6 +1284,7 @@ n_data_req(uint flags, mblk_t *db)
 {
 	mblk_t *mp;
 	N_data_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_data_req_t *) mp->b_wptr;
@@ -1248,6 +1303,7 @@ n_discon_req(reason, res_ptr, res_len, seq)
 	uint seq;
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_discon_req_t *) mp->b_wptr;
@@ -1268,6 +1324,7 @@ n_unitdata_req(dst_ptr, dst_len)
 	size_t dst_len;
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_unitdata_req_t *) mp->b_wptr;
@@ -1296,6 +1353,7 @@ STATIC __inline__ int
 s_send_msg(queue_t *q, mblk_t *mp)
 {
 	mblk_t *pp;
+
 	if ((pp = n_data_req(0))) {
 		pp->b_cont = mp;
 		putnext(q, pp);
@@ -1315,6 +1373,7 @@ s_send_bgn(queue_t *q, uint n_sq, uint n_mr, mblk_t *db)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_BGN) << 24;
+
 	if ((mp = allocb(12, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1337,6 +1396,7 @@ s_send_bgak(queue_t *q, uint n_mr, mblk_t *db)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_BGAK) << 24;
+
 	if ((mp = allocb(12, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1359,6 +1419,7 @@ s_send_bgrej(queue_t *q, mblk_t *db)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_BGREJ) << 24;
+
 	if ((mp = allocb(12, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1381,6 +1442,7 @@ s_send_end(queue_t *q, uint s, mblk_t *db)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	uint32_t ptype = (((plen << 2) | ((s & 1)) << 4) | SSCOP_END) << 24;
+
 	if ((mp = allocb(12, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1402,6 +1464,7 @@ s_send_endak(queue_t *q)
 {
 	mblk_t *mp;
 	const uint32_t ptype = SSCOP_ENDAK << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = 0;
@@ -1421,6 +1484,7 @@ s_send_rs(queue_t *q, uint n_w, uint n_sq, uint n_s, mblk_t *db)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_RS) << 24;
+
 	if ((mp = allocb(12, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1442,6 +1506,7 @@ s_send_rsak(queue_t *q, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_RSAK) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = 0;
@@ -1460,6 +1525,7 @@ s_send_er(queue_t *q, uint n_sq, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_ER) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = htonl(n_sq & 0xff);
@@ -1478,6 +1544,7 @@ s_send_erak(queue_t *q, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_ERAK) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = 0;
@@ -1497,6 +1564,7 @@ s_send_sd(queue_t *q, uint n_s, mblk_t *db)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_SD) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1517,6 +1585,7 @@ s_send_poll(queue_t *q, uint n_ps, uint n_s)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_POLL) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = htonl(n_ps & 0xffffff);
@@ -1535,8 +1604,10 @@ s_send_stat(queue_t *q, uint n_r, uint n_mr, uint n_ps)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_STAT) << 24;
+
 	if ((mp = allocb(12 + 4 * lnum, BPRI_MED))) {
 		int i;
+
 		mp->b_datap->db_type = M_DATA;
 		for (i = 0; i < lnum; i++)
 			*((uint32_t *) mp->b_wptr)++ = htonl(sp->le[i] & 0xffffff);
@@ -1557,6 +1628,7 @@ s_send_ustat(queue_t *q, uint n_r, uint n_mr)
 {
 	mblk_t *mp;
 	const uint32_t ptype = (SSCOP_USTAT) << 24;
+
 	if ((mp = allocb(16, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = htonl(sp->le[0] & 0xffffff);
@@ -1578,6 +1650,7 @@ s_send_ud(queue_t *q, mblk_t *mp)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_UD) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1598,6 +1671,7 @@ s_send_md(queue_t *q, mblk_t *mp)
 	mblk_t *mp;
 	size_t plen = 4 - ((db ? msgdsize(db) : 0) & 0x3);
 	const uint32_t ptype = ((plen << 6) | SSCOP_MD) << 24;
+
 	if ((mp = allocb(8, BPRI_MED))) {
 		mp->b_datap->db_type = M_DATA;
 		mp->b_rptr += plen;
@@ -1623,6 +1697,7 @@ aa_idle_msg(queue_t *q, mblk_t *mp)
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint prim = (ntohl(*(((uint32_t *) mp->b_wptr) - 1) >> 24)) & 0xf;
 	uint cause;
+
 	switch (prim) {
 	case SSCOP_BGN:
 	case SSCOP_ENDAK:
@@ -1679,6 +1754,7 @@ aa_idle_sig(queue_t *q, mblk_t *mp)
 	mblk_t *bp;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint sig = ((union AA_signals *) mp->b_rptr)->signal;
+
 	switch (sig) {
 	case AA_ESTABLISH_REQ:
 		/* clear transmitter */
@@ -1709,6 +1785,7 @@ aa_outcon_msg(queue_t *q, mblk_t *mp)
 	mblk_t *bp;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint prim = (ntohl(*(((uint32_t *) mp->b_wptr) - 1) >> 24)) & 0xf;
+
 	switch (prim) {
 	case SSCOP_BGN:
 		/* 
@@ -1766,6 +1843,7 @@ aa_outcon_sig(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint sig = ((union AA_signals *) mp->b_rptr)->signal;
+
 	switch (sig) {
 	case AA_RELEASE_REQ:
 		if ((err = s_send_end(q)))
@@ -1787,6 +1865,7 @@ aa_incon_msg(queue_t *q, mblk_t *mp)
 	mblk_t *bp, *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint prim = (ntohl(*(((uint32_t *) mp->b_wptr) - 1) >> 24)) & 0xf;
+
 	switch (prim) {
 	case SSCOP_BGAK:
 		freemsg(mp);
@@ -1794,6 +1873,7 @@ aa_incon_msg(queue_t *q, mblk_t *mp)
 	return case SSCOP_BGREJ:
 	{
 		sscop_t *cp;
+
 		if (!(bp = maa_error_ind(A_CAUSE_D, 0)))
 			return (-ENOBUFS);
 		/* 
@@ -1818,6 +1898,7 @@ aa_incon_msg(queue_t *q, mblk_t *mp)
 	case SSCOP_END:
 	{
 		sscop_t *cp;
+
 		/* 
 		 *  FIXME:  Find incoming connection indication to which the
 		 *  BGREJ applies.
@@ -1901,6 +1982,7 @@ aa_incon_sig(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint sig = ((union AA_signals *) mp->b_rptr)->signal;
+
 	switch (sig) {
 	case AA_ESTABLISH_RES:
 		/* clear transmitter */
@@ -1915,6 +1997,7 @@ aa_incon_sig(queue_t *q, mblk_t *mp)
 	case AA_RELEASE_REQ:
 	{
 		sscop_t *cp;
+
 		/* 
 		 *  FIXME:  Find incoming connection indication to thwich the
 		 *  AA_RELEASE_REQ applies (use seq number).
@@ -1947,6 +2030,7 @@ aa_outdis_msg(queue_t *q, mblk_t *mp)
 	mblk_t *bp, *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint prim = (ntohl(*(((uint32_t *) mp->b_wptr) - 1) >> 24)) & 0xf;
+
 	switch (prim) {
 	case SSCOP_BGN:
 		/* 
@@ -1988,6 +2072,7 @@ aa_outdis_sig(queue_t *q, mblk_t *mp)
 	mblk_t *bp, *ap;
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	const uint sig = ((union AA_signals *) mp->b_rptr)->signal;
+
 	switch (sig) {
 	case AA_ESTABLISH_REQ:
 		if ((err = s_send_bgn()))
@@ -2021,6 +2106,7 @@ n_info_ack(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_info_ack_t *p = (N_info_ack_t *) mp->b_rptr;
+
 	sp->nsdu_size = p->NSDU_size;
 	sp->ensdu_size = p->ENSDU_size;
 	sp->cdata_size = p->CDATA_size;
@@ -2045,6 +2131,7 @@ n_bind_ack(q, mp)
 	size_t add_len;
 	caddr_t pro_ptr;
 	size_t pro_len;
+
 	add_len = p->ADDR_length;
 	add_ptr = p->ADDR_offset + mp->b_rptr;
 	pro_len = p->PROTOID_length;
@@ -2062,6 +2149,7 @@ n_error_ack(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_error_ack_t *p = (N_error_ack_t *) mp->b_rptr;
+
 	switch (sp->n_state) {
 		/* 
 		 *  FIXME
@@ -2078,6 +2166,7 @@ n_ok_ack(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_ok_ack_t *p = (N_ok_ack_t *) mp->b_rptr;
+
 	switch (sp->n_state) {
 		/* 
 		 *  FIXME
@@ -2094,6 +2183,7 @@ n_conn_con(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_conn_con_t *p = (N_conn_con_t *) mp->b_rptr;
+
 	if (sp->n_state == NS_WCON_CREQ) {
 		sp->n_state = NS_DATA_XFER;
 		freemsg(mp);
@@ -2108,6 +2198,7 @@ n_discon_ind(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_discon_ind_t *p = (N_discon_ind_t *) mp->b_rptr;
+
 	if (sp->n_state == NS_DATA_XFER) {
 		sp->n_state = NS_IDLE;
 		/* 
@@ -2130,6 +2221,7 @@ n_unitdata_ind(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_unitdata_ind_t *p = (N_unitdata_ind_t *) mp->b_rptr;
+
 	if (sp->n_state == NS_IDLE) {
 	}
 	return -EPROTO;
@@ -2141,6 +2233,7 @@ n_uderror_ind(q, mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
 	N_uderror_ind_t *p = (N_uderror_ind_t *) q->q_ptr;
+
 	if (sp->n_state == NS_IDLE) {
 	}
 	return -EPROTO;
@@ -2189,6 +2282,7 @@ STATIC int
 aa_info_req(queue_t *q, mblk_t *mp)
 {
 	mblk_t *ap;
+
 	(void) mp;
 	if (!(ap = aa_info_ack(q)))
 		return (-EAGAIN);
@@ -2423,6 +2517,7 @@ sscop_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd);
 	int nr = _IOC_NR(cmd);
 	int size = _IOC_SIZE(cmd);
+
 	switch (type) {
 	case __SID:
 		switch (cmd) {
@@ -2507,6 +2602,7 @@ STATIC inline void
 sscop_r_error(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = (sscop_t *) q->q_ptr;
+
 	sp->a_state = AA_UNUSABLE;
 	if (q->q_next) {
 		putnext(q, mp);
@@ -2596,6 +2692,7 @@ sscop_rsrv(q)
 {
 	mblk_t *mp;
 	int err = -EOPNOTSUPP;
+
 	while ((mp = getq(q))) {
 		if (mp->b_datap->db_type < QPCTL && !canputnext(q)) {
 			putbq(q, mp);
@@ -2655,6 +2752,7 @@ STATIC sscop_t *
 sscop_alloc_priv(queue_t *q)
 {
 	sscop_t *sp;
+
 	if ((sscop = kmem_cache_alloc(sscop_cachep))) {
 		bzero(sscop, sizeof(*sp));
 		RD(q)->q_ptr = WR(q)->q_ptr = sp;
@@ -2729,6 +2827,7 @@ sscop_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2753,6 +2852,7 @@ STATIC int
 aa_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&aa_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2762,6 +2862,7 @@ STATIC int
 aa_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&aa_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2779,6 +2880,7 @@ STATIC int
 aa_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sscopinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2792,6 +2894,7 @@ STATIC int
 aa_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sscopinfo)) < 0)
 		return (err);
 	return (0);
@@ -2803,6 +2906,7 @@ MODULE_STATIC int __init
 sscopinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = aa_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -2822,6 +2926,7 @@ MODULE_STATIC void __exit
 sscopterminate(void)
 {
 	int err;
+
 	if ((err = aa_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = aa_term_caches()))

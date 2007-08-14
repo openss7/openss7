@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tcap_ioctl.h,v 0.9.2.6 2007/08/03 13:35:01 brian Exp $
+ @(#) $Id: tcap_ioctl.h,v 0.9.2.7 2007/08/14 12:17:11 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap_ioctl.h,v $
+ Revision 0.9.2.7  2007/08/14 12:17:11  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.6  2007/08/03 13:35:01  brian
  - manual updates, put ss7 modules in public release
 
@@ -61,7 +64,7 @@
 #ifndef __SSCP_IOCTL_H__
 #define __SSCP_IOCTL_H__
 
-#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tcap_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -485,7 +488,7 @@ typedef struct tcap_stats_te {
 	uint s_gp_unrec_comp;		/* Q.752/A.5 a) CP PE (rej tx): gp unrec comp */
 	uint s_gp_mistyped_comp;	/* Q.752/A.5 b) CP PE (rej tx): gp mistyped comp */
 	uint s_gp_bad_struct_comp;	/* Q.752/A.5 c) CP PE (rej tx): gp bad struct comp */
-	uint s_gp_unrec_invk_id;		/* Q.752/A.5 d) CP PE (rej tx): iv unrec invk id */
+	uint s_gp_unrec_invk_id;	/* Q.752/A.5 d) CP PE (rej tx): iv unrec invk id */
 	uint s_rr_unrec_comp;		/* Q.752/A.5 e) CP PE (rej tx): rr unrec comp */
 	uint s_rr_unexp;		/* Q.752/A.5 f) CP PE (rej tx): rr RR unexp */
 	uint s_re_unrec_invk_id;	/* Q.752/A.5 g) CP PE (rej tx): re unrec invk id */

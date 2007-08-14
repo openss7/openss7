@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:51 $
+ @(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:02:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_mod.c,v $
+ Revision 0.9.2.2  2007/08/14 12:18:23  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.1  2007/08/03 13:02:51  brian
  - added documentation and minimal modules
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:51 $"
+#ident "@(#) $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $"
 
-static char const ident[] = "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:51 $";
+static char const ident[] =
+    "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $";
 
 /*
  * This is SCCP-MOD.  It is a simplified Signalling Connection Control Part (SCCPI) module for SCCP
@@ -97,7 +101,7 @@ static char const ident[] = "$RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2
 #include <ss7/mtpi_ioctl.h>
 
 #define SC_DESCRIP	"SS7/SCCP (SCCP Minimal Module) STREAMS MODULE."
-#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/03 13:02:51 $"
+#define SC_REVISION	"OpenSS7 $RCSfile: sccp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:23 $"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SC_DEVICE	"Provides OpenSS7 SCCP module."
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2136,7 +2140,8 @@ mtp_info_req(struct mt *mt, queue_t *q, mblk_t *msg)
  * @msg: message to free upon success
  */
 static inline fastcall int
-mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *msg, mtp_ulong flags, size_t opt_len, caddr_t opt_ptr)
+mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *msg, mtp_ulong flags, size_t opt_len,
+		caddr_t opt_ptr)
 {
 	struct MTP_optmgmt_req *p;
 	mblk_t *mp;
@@ -2166,7 +2171,8 @@ mtp_optmgmt_req(struct mt *mt, queue_t *q, mblk_t *msg, mtp_ulong flags, size_t 
  * @msg: message to free upon success
  */
 static inline fastcall int
-mtp_transfer_req(struct mt *mt, queue_t *q, mblk_t *msg, struct mtp_addr *add, mtp_ulong prior, mtp_ulong sls, mblk_t *dp)
+mtp_transfer_req(struct mt *mt, queue_t *q, mblk_t *msg, struct mtp_addr *add, mtp_ulong prior,
+		 mtp_ulong sls, mblk_t *dp)
 {
 	struct MTP_transfer_req *p;
 	mblk_t *mp;
@@ -2272,9 +2278,11 @@ sccp_send_cr(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *dp)
 			DB_TYPE(mp) = M_DATA;
 			*mp->b_wptr++ = SCCP_MT_CR;
 			*mp->b_wptr++ = sc->slr >> 16;
-			*mp->b_wptr++ = sc->slr >>  8;
-			*mp->b_wptr++ = sc->slr >>  0;
-			*mp->b_wptr++ = sc->cqos.protocol_class | ((sc->cqos.protocol_class < 2) ?  sc->cqos.return_error : 0);
+			*mp->b_wptr++ = sc->slr >> 8;
+			*mp->b_wptr++ = sc->slr >> 0;
+			*mp->b_wptr++ =
+			    sc->cqos.protocol_class | ((sc->cqos.protocol_class < 2) ? sc->cqos.
+						       return_error : 0);
 			p = mp->b_wptr;
 			mp->b_wptr += 2;
 			*p = mp->b_wptr - p;
@@ -2288,7 +2296,7 @@ sccp_send_cr(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *dp)
 			*mp->b_wptr |= (sc->dst.ri & 0x01) << 6;
 			*mp->b_wptr |= (sc->dst.ni & 0x01) << 7;
 			mp->b_wptr++;
-			switch(sc->proto.pvar & SS7_PVAR_MASK) {
+			switch (sc->proto.pvar & SS7_PVAR_MASK) {
 			case SS7_PVAR_JTTC:
 				goto skip_ni;
 			case SS7_PVAR_ANSI:
@@ -2297,9 +2305,6 @@ sccp_send_cr(struct sc *sc, queue_t *q, mblk_t *msg, mblk_t *dp)
 				}
 			default:
 			}
-
-
-
 
 		}
 		return (-ENOBUFS);
@@ -3096,7 +3101,7 @@ mtp_other_ind(struct mt *mt, queue_t *q, mblk_t *mp)
 
 	if (!MBLKIN(mp, 0, sizeof(*p)))
 		goto efault;
-	mi_strlog(q, 0, SL_ERROR | SL_TRACE, "invalid primitive on read queue %u", (uint) *p);
+	mi_strlog(q, 0, SL_ERROR | SL_TRACE, "invalid primitive on read queue %u", (uint) * p);
 	freemsg(mp);
 	return (0);
       efault:
@@ -3175,22 +3180,22 @@ sc_setconfig(struct sc *sc, struct sccp_config *arg)
 		df.config = arg->config[0].df;
 		break;
 	case SCCP_OBJ_TYPE_NA:
-		//sc->na.config = arg->config[0].na;
+		// sc->na.config = arg->config[0].na;
 		break;
 	case SCCP_OBJ_TYPE_SS:
-		//sc->ss.config = arg->config[0].ss;
+		// sc->ss.config = arg->config[0].ss;
 		break;
 	case SCCP_OBJ_TYPE_RS:
-		//sc->rs.config = arg->config[0].rs;
+		// sc->rs.config = arg->config[0].rs;
 		break;
 	case SCCP_OBJ_TYPE_SR:
-		//sc->sr.config = arg->config[0].sr;
+		// sc->sr.config = arg->config[0].sr;
 		break;
 	case SCCP_OBJ_TYPE_SP:
-		//sc->sp.config = arg->config[0].sp;
+		// sc->sp.config = arg->config[0].sp;
 		break;
 	case SCCP_OBJ_TYPE_MT:
-		//sc->mt->config = arg->config[0].mt;
+		// sc->mt->config = arg->config[0].mt;
 		break;
 	case SCCP_OBJ_TYPE_SC:
 	case SCCP_OBJ_TYPE_CP:

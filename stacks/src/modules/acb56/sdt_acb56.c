@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:52 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:18 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdt_acb56.c,v $
+ Revision 0.9.2.17  2007/08/14 12:17:18  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -78,7 +84,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:33:52 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -253,6 +259,7 @@ m_error(queue_t *q, int err)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -276,6 +283,7 @@ m_hangup(queue_t *q, int err)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_HANGUP;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -300,6 +308,7 @@ lmi_info_ack(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -331,6 +340,7 @@ lmi_ok_ack(queue_t *q, long prim)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -365,6 +375,7 @@ lmi_error_ack(queue_t *q, long prim, ulong reason, ulong errno)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -407,6 +418,7 @@ lmi_enable_con(queue_t *q)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -432,6 +444,7 @@ lmi_disable_con(queue_t *q)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -457,6 +470,7 @@ lmi_optmgmt_ack(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -482,6 +496,7 @@ lmi_error_ind(queue_t *q, ulong errno, ulong reason)
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -505,9 +520,11 @@ STATIC INLINE int
 lmi_stats_ind(queue_t *q, ulong interval)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (canputnext(sdt->oq)) {
 		mblk_t *mp;
 		lmi_stats_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -533,9 +550,11 @@ STATIC INLINE int
 lmi_event_ind(queue_t *q, ulong oid, ulong level)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (canputnext(sdt->oq)) {
 		mblk_t *mp;
 		lmi_event_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -565,6 +584,7 @@ sdt_rc_signal_unit_ind(queue_t *q, sdt_t * sdt, mblk_t *dp, ulong count)
 		if (canputnext(sdt->oq)) {
 			mblk_t *mp;
 			sdt_rc_signal_unit_ind_t *p;
+
 			if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = ((typeof(p)) mp->b_wptr)++;
@@ -596,6 +616,7 @@ sdt_rc_congestion_accept_ind(queue_t *q, sdt_t * sdt)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_accept_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -617,6 +638,7 @@ sdt_rc_congestion_discard_ind(queue_t *q, sdt_t * sdt)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_discard_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -638,6 +660,7 @@ sdt_rc_no_congestion_ind(queue_t *q, sdt_t * sdt)
 {
 	mblk_t *mp;
 	sdt_rc_no_congestion_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -660,6 +683,7 @@ sdt_iac_correct_su_ind(queue_t *q, sdt_t * sdt)
 	if (canputnext(sdt->oq)) {
 		mblk_t *mp;
 		sdt_iac_correct_su_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = ((typeof(p)) mp->b_wptr)++;
@@ -684,6 +708,7 @@ sdt_iac_abort_proving_ind(queue_t *q, sdt_t * sdt)
 {
 	mblk_t *mp;
 	sdt_iac_abort_proving_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -705,6 +730,7 @@ sdt_lsc_link_failure_ind(queue_t *q, sdt_t * sdt)
 {
 	mblk_t *mp;
 	sdt_lsc_link_failure_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -726,6 +752,7 @@ sdt_txc_transmission_request_ind(queue_t *q, sdt_t * sdt)
 {
 	mblk_t *mp;
 	sdt_txc_transmission_request_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -774,6 +801,7 @@ sdt_do_timeout(caddr_t data, const char *timer, ulong *timeo, int (*to_fnc) (ct_
 	       void (*exp_fnc) (caddr_t))
 {
 	sdt_t *sdt = (sdt_t *) data;
+
 	if (xchg(timeo, 0)) {
 		if (lis_spin_trylock(&sdt->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", MOD_NAME, sdt, timer, jiffies));
@@ -802,6 +830,7 @@ STATIC INLINE void
 sdt_stop_timer(sdt_t * sdt, const char *timer, ulong *timeo)
 {
 	ulong to;
+
 	if ((to = xchg(timeo, 0))) {
 		untimeout(to);
 		printd(("%s: %p: stopping %s at %lu\n", MOD_NAME, sdt, timer, jiffies));
@@ -824,6 +853,7 @@ STATIC INLINE void
 __sdt_timer_stop(sdt_t * sdt, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -850,6 +880,7 @@ STATIC INLINE void
 sdt_timer_stop(sdt_t * sdt, const uint t)
 {
 	psw_t flags;
+
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
 		__sdt_timer_stop(sdt, t);
@@ -860,6 +891,7 @@ STATIC INLINE void
 sdt_timer_start(sdt_t * sdt, const uint t)
 {
 	psw_t flags;
+
 	lis_spin_lock_irqsave(&sdt->lock, flags);
 	{
 		__sdt_timer_stop(sdt, t);
@@ -973,6 +1005,7 @@ STATIC INLINE void
 sdt_daedt_start(queue_t *q, sdt_t * sdt)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	sdt->sdt.statem.daedt_state = SDT_STATE_IN_SERVICE;
 	sdt->sdl.statem.tx_state = SDL_STATE_IN_SERVICE;
 	sdt->sdl.config.ifflags |= (SDL_IF_UP | SDL_IF_TX_RUNNING);
@@ -1073,6 +1106,7 @@ STATIC INLINE void
 sdt_daedr_su_in_error(queue_t *q, sdt_t * sdt)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		/* 
 		   cancel compression */
@@ -1096,6 +1130,7 @@ sdt_daedr_received_bits(sdt_t * sdt, mblk_t *mp)
 		printd(("%s: %p: SDT_DAEDR_RECEIVED_BITS [%d]<-\n", MOD_NAME, sdt, msgdsize(mp)));
 		if (mp) {
 			int lmax, li, sif;
+
 			len = msgdsize(mp);
 			if (len > max_len || min_len > len) {
 				if (len > max_len)
@@ -1136,6 +1171,7 @@ sdt_daedr_received_bits(sdt_t * sdt, mblk_t *mp)
 				if (sdt->sdt.rx_repeat) {
 #if 0
 					mblk_t *cp;
+
 					if ((cp = dupb(sdt->sdt.rx_cmp))) {
 						if (sdt_rc_signal_unit_ind
 						    (NULL, sdt, cp, sdt->sdt.rx_repeat)
@@ -1174,17 +1210,20 @@ sdt_daedt_transmission_request(queue_t *q)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	mblk_t *mp = NULL;
+
 	if (sdt->sdt.statem.daedt_state != SDT_STATE_IDLE) {
 		if ((mp = bufq_dequeue(&sdt->sdt.tb))) {
 			int len = msgdsize(mp);
 			int hlen = (sdt->option.popt & SS7_POPT_XSN) ? 6 : 3;
 			int mlen = hlen + 2;
+
 			if (!sdt->sdt.tb.q_count)
 				qenable(sdt->iq);	/* back-enable */
 			if (mlen < hlen)
 				goto dont_repeat;
 			if (mlen == hlen + 1 || mlen == hlen + 2) {
 				int li, sio;
+
 				if (sdt->option.popt & SS7_POPT_XSN) {
 					li = ((mp->b_rptr[5] << 8) | mp->b_rptr[4]) & 0x1ff;
 					sio = mp->b_rptr[6];
@@ -1209,6 +1248,7 @@ sdt_daedt_transmission_request(queue_t *q)
 			if (len <= mlen
 			    && (sdt->sdt.tx_cmp || (sdt->sdt.tx_cmp = allocb(mlen, BPRI_HI)))) {
 				mblk_t *cp = sdt->sdt.tx_cmp;
+
 				cp->b_rptr = cp->b_datap->db_base;
 				bcopy(mp->b_rptr, cp->b_rptr, len);
 				cp->b_wptr = cp->b_rptr + len;
@@ -1270,10 +1310,12 @@ STATIC int
 sdt_tx_wakeup(queue_t *q)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->sdt.statem.daedt_state != SDT_STATE_IDLE) {
 		mblk_t *mp, *dp;
 		long tdiff;
 		int size;
+
 		while (canputnext(sdt->iq)) {
 			switch (sdt->sdl.config.ifclock) {
 			case SDL_CLOCK_TICK:
@@ -1361,6 +1403,7 @@ sdt_t8_timeout(sdt_t * sdt)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	int err;
+
 	if (sdt->sdt.statem.eim_state == SDT_STATE_MONITORING) {
 		sdt_timer_start(sdt, t8);
 		if (sdt->sdt.statem.su_received) {
@@ -1409,6 +1452,7 @@ STATIC int
 lmi_info_req(queue_t *q, mblk_t *mp)
 {
 	lmi_info_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	return lmi_info_ack(q, NULL, 0);
@@ -1429,6 +1473,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->state == LMI_UNUSABLE)
@@ -1475,6 +1520,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->state == LMI_UNUSABLE)
@@ -1519,6 +1565,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->state == LMI_UNUSABLE)
@@ -1579,6 +1626,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	lmi_disable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->state == LMI_UNUSABLE)
@@ -1613,6 +1661,7 @@ STATIC int
 lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	goto eopnotsupp;
@@ -1639,6 +1688,7 @@ STATIC int
 sdt_send_data(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	// printd(("%s: %p: Queuing SDT data\n", MOD_NAME, sdt));
@@ -1658,6 +1708,7 @@ STATIC int
 sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	// printd(("%s: %p: Queuing SDT data\n", MOD_NAME, sdt));
@@ -1673,6 +1724,7 @@ STATIC int
 sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_daedt_start(q, sdt);
@@ -1687,6 +1739,7 @@ STATIC int
 sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_daedr_start(q, sdt);
@@ -1701,6 +1754,7 @@ STATIC int
 sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_aerm_start(q, sdt);
@@ -1715,6 +1769,7 @@ STATIC int
 sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_aerm_stop(q, sdt);
@@ -1729,6 +1784,7 @@ STATIC int
 sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_aerm_set_ti_to_tin(q, sdt);
@@ -1743,6 +1799,7 @@ STATIC int
 sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_aerm_set_ti_to_tie(q, sdt);
@@ -1757,6 +1814,7 @@ STATIC int
 sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_suerm_start(q, sdt);
@@ -1771,6 +1829,7 @@ STATIC int
 sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	if (sdt->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
 	sdt_suerm_stop(q, sdt);
@@ -1881,6 +1940,7 @@ acb56_tx_setup_next_frame(sdt_t * sdt)
 		sdt->dev.tx_msg = bufq_dequeue(&sdt->dev.tinputq);
 	} else {
 		int len = msgdsize(sdt->dev.tx_msg);
+
 		if (len > 5 || (len > 3 && sdt->dev.tx_msg->b_rptr[3] == LSSU_SIB)) {
 			/* 
 			   its an MSU or SIB, make FISU out of it */
@@ -1915,6 +1975,7 @@ static inline void
 acb56_sync_hunt(sdt_t * sdt)
 {
 	int actrl = sdt->dev.iobase + 1;
+
 	if (sdt->dev.rx_octet_mode && !sdt->dev.rr0 & 0x10) {
 		sdt->dev.rx_octet_mode = 0;	/* we synced */
 		outb(0x0f, actrl);
@@ -2029,6 +2090,7 @@ static inline void
 acb56_rx_setup_next_frame(sdt_t * sdt)
 {
 	int len = sdt->dev.rx_buf - sdt->dev.rx_msg->b_rptr;
+
 	sdt->dev.rx_buf = sdt->dev.rx_msg->b_rptr;
 	sdt->sdt.stats.rx_sus++;
 	if (len == 3)
@@ -2054,6 +2116,7 @@ acb56_end_of_frame(sdt_t * sdt)
 		mblk_t *mp = sdt->dev.rx_msg, *mc = sdt->dev.cp_msg;
 		unsigned int len = (unsigned int) (sdt->dev.rx_buf - mp->b_rptr);
 		unsigned char li = mp->b_rptr[2] & 0x3f;
+
 		if (len < 3)
 			return acb56_short_error(sdt);
 		if (len > sdt->sdt.config.m + 4)
@@ -2063,6 +2126,7 @@ acb56_end_of_frame(sdt_t * sdt)
 		mp->b_wptr = mp->b_rptr + len;
 		if (len < 6) {
 			int clen = mc->b_wptr - mc->b_rptr;
+
 			if (len == clen && !memcmp(mc->b_rptr, mp->b_rptr, len)) {
 				sdt->stats.compressed_sus++;
 				acb56_rx_setup_next_frame(sdt);
@@ -2088,6 +2152,7 @@ static inline void
 acb56_frame_overflow_check(sdt_t * sdt)
 {
 	int actrl = sdt->dev.iobase + 1;
+
 	/* 
 	   check for frame overflow */
 	if (sdt->dev.rx_buf > sdt->dev.rx_max) {
@@ -2149,6 +2214,7 @@ acb56_isr_cha_rx_char_avail(sdt_t * sdt)
 {
 	register int adata = sdt->dev.iobase;
 	register int i = 0;
+
 	if (sdt->dev.rx_buf) {
 		/* 
 		   collect bytes */
@@ -2167,6 +2233,7 @@ acb56_isr_cha_rx_sp_cond(sdt_t * sdt)
 	register int adata = sdt->dev.iobase;
 	register int actrl = sdt->dev.iobase + 1;
 	register int i = 0;
+
 	sdt->stats.cha_rx_sp_cond++;
 	/* 
 	   collect bytes */
@@ -2251,6 +2318,7 @@ acb56_isr(int irq, void *dev_id, struct pt_regs *regs)
 	unsigned char rr3;
 	register int i;
 	register int actrl = ((sdt_t *) dev_id)->dev.iobase + 1;
+
 	for (i = 0, outb(0x03, actrl), rr3 = inb(actrl); i < 4 && rr3;
 	     i++, outb(0x03, actrl), rr3 = inb(actrl)) {
 		outb(0x02, actrl + 2);
@@ -2297,6 +2365,7 @@ static void
 dummy_isr(int irq, void *dev_id, struct pt_regs *regs)
 {
 	volatile int *p;
+
 	(void) irq;
 	(void) dev_id;
 	(void) regs;
@@ -2320,6 +2389,7 @@ acb56_attach(sdt_t * sdt)
 {
 	int iobase, _irq, actrl, _dma_rx, _dma_tx, i, err;
 	unsigned long time, cookie;
+
 	board = sdt->u.dev.cminor - 1;
 	if ((iobase = io[board]) == -1)
 		iobase = ports[board];
@@ -2429,6 +2499,7 @@ acb56_open(lmi_t * lmi)
 	sdt_t *sdt = (sdt_t *) lmi;
 	int err = 0;
 	unsigned long flags;
+
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
 		MOD_INC_USE_COUNT;
@@ -2474,6 +2545,7 @@ acb56_close(lmi_t * lmi)
 {
 	sdt_t *sdt = (sdt_t *) lmi;
 	unsigned long flags;
+
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
 		free_irq(sdt->dev.irq, sdt);
@@ -2498,6 +2570,7 @@ acb56_info(lmi_t * lmi, void **ppap, int *lenp)
 {
 	sdt_t *sdt = (sdt_t *) lmi;
 	unsigned long flags;
+
 	(void) dev;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -2518,6 +2591,7 @@ acb56_attach(lmi_t * lmi, void *ppa, int len)
 {
 	sdt_t *sdt = (sdt_t *) lmi;
 	unsigned long flags;
+
 	(void) dev;
 	(void) ppa;
 	(void) len;
@@ -2538,6 +2612,7 @@ acb56_detach(lmi_t * lmi)
 {
 	sdt_t *sdt = (sdt_t *) lmi;
 	unsigned long flags;
+
 	(void) dev;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -2561,6 +2636,7 @@ acb56_enable(lmi_t * lmi)
 	sdt_t *sdt = (sdt_t *) lmi;
 	int i, actrl;
 	unsigned long flags;
+
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
 		actrl = sdt->dev.iobase + 1;
@@ -2729,6 +2805,7 @@ acb56_disable(lmi_t * lmi)
 	sdt_t *sdt = (sdt_t *) lmi;
 	int actrl = sdt->dev.iobase + 1;
 	unsigned long flags;
+
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
 		sdt->sdl.config.ifflags &= ~SDL_IF_TX_RUNNING;
@@ -2980,6 +3057,7 @@ static void
 acb56_tx_start(struct dev *dev)
 {
 	sdt_t *sdt = (sdt_t *) dev;
+
 	sdt->sdl.config.ifflags |= SDL_IF_TX_RUNNING;
 }
 
@@ -2987,6 +3065,7 @@ static void
 acb56_rx_start(struct dev *dev)
 {
 	sdt_t *sdt = (sdt_t *) dev;
+
 	sdt->sdl.config.ifflags |= SDL_IF_RX_RUNNING;
 }
 
@@ -3089,6 +3168,7 @@ lmi_iocgoptions(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->option;
@@ -3107,6 +3187,7 @@ lmi_iocsoptions(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->option = *arg;
@@ -3124,6 +3205,7 @@ lmi_iocgconfig(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			arg->version = sdt->version;
@@ -3142,6 +3224,7 @@ lmi_iocsconfig(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->version = arg->version;
@@ -3159,6 +3242,7 @@ lmi_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		sdt_t *sdt = SDT_PRIV(q);
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return lmi_test_config(sdt, arg);
 	}
 	rare();
@@ -3170,6 +3254,7 @@ lmi_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		sdt_t *sdt = SDT_PRIV(q);
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return lmi_commit_config(sdt, arg);
 	}
 	rare();
@@ -3182,6 +3267,7 @@ lmi_iocgstatem(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			arg->state = sdt->state;
@@ -3200,6 +3286,7 @@ lmi_ioccmreset(queue_t *q, mblk_t *mp)
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->state = LMI_UNUSABLE;
@@ -3218,6 +3305,7 @@ lmi_iocgstatsp(queue_t *q, mblk_t *mp)
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdt.statsp;
@@ -3236,6 +3324,7 @@ lmi_iocsstatsp(queue_t *q, mblk_t *mp)
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdt.statsp = *arg;
@@ -3254,6 +3343,7 @@ lmi_iocgstats(queue_t *q, mblk_t *mp)
 		lmi_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3270,6 +3360,7 @@ lmi_ioccstats(queue_t *q, mblk_t *mp)
 	sdt_t *sdt = SDT_PRIV(q);
 	psw_t flags;
 	int ret = 0;
+
 	(void) mp;
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -3286,6 +3377,7 @@ lmi_iocgnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3304,6 +3396,7 @@ lmi_iocsnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3322,6 +3415,7 @@ lmi_ioccnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3345,6 +3439,7 @@ sdt_test_config(sdt_t * sdt, sdt_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags;
+
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	do {
 		if (!arg->t8)
@@ -3381,6 +3476,7 @@ STATIC int
 sdt_commit_config(sdt_t * sdt, sdt_config_t * arg)
 {
 	psw_t flags;
+
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
 		sdt_test_config(sdt, arg);
@@ -3396,6 +3492,7 @@ sdt_iocgoptions(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->option;
@@ -3413,6 +3510,7 @@ sdt_iocsoptions(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->option = *arg;
@@ -3430,6 +3528,7 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdt.config;
@@ -3447,6 +3546,7 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdt.config = *arg;
@@ -3463,6 +3563,7 @@ sdt_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		sdt_t *sdt = SDT_PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_test_config(sdt, arg);
 	}
 	rare();
@@ -3474,6 +3575,7 @@ sdt_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		sdt_t *sdt = SDT_PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_commit_config(sdt, arg);
 	}
 	rare();
@@ -3486,6 +3588,7 @@ sdt_iocgstatem(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdt.statem;
@@ -3500,6 +3603,7 @@ STATIC int
 sdt_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	(void) sdt;
 	(void) mp;
 	fixme(("%s: Master reset\n", MOD_NAME));
@@ -3512,6 +3616,7 @@ sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdt.statsp;
@@ -3529,6 +3634,7 @@ sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdt.statsp = *arg;
@@ -3546,6 +3652,7 @@ sdt_iocgstats(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdt.stats;
@@ -3561,6 +3668,7 @@ sdt_ioccstats(queue_t *q, mblk_t *mp)
 {
 	psw_t flags;
 	sdt_t *sdt = SDT_PRIV(q);
+
 	(void) mp;
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -3576,6 +3684,7 @@ sdt_iocgnotify(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdt.notify;
@@ -3593,6 +3702,7 @@ sdt_iocsnotify(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdt.notify = *arg;
@@ -3610,6 +3720,7 @@ sdt_ioccnotify(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdt.notify.events &= ~arg->events;
@@ -3626,6 +3737,7 @@ sdt_ioccabort(queue_t *q, mblk_t *mp)
 	sdt_t *sdt = SDT_PRIV(q);
 	psw_t flags;
 	int ret = 0;
+
 	(void) mp;
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -3654,6 +3766,7 @@ STATIC void
 sdl_commit_config(sdt_t * sdt, sdl_config_t * arg)
 {
 	long tdiff;
+
 	sdt->sdl.config = *arg;
 	switch (sdt->sdl.config.ifclock) {
 	case SDL_CLOCK_TICK:
@@ -3682,6 +3795,7 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->option;
@@ -3699,6 +3813,7 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->option = *arg;
@@ -3716,6 +3831,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdl.config;
@@ -3734,6 +3850,7 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			if (!(ret = sdl_test_config(sdt, arg)))
@@ -3753,6 +3870,7 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			ret = sdl_test_config(sdt, arg);
@@ -3770,6 +3888,7 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdl_commit_config(sdt, arg);
@@ -3787,6 +3906,7 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdl.statem;
@@ -3802,6 +3922,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) sdt;
 	(void) arg;
 	fixme(("%s: FIXME: Support master reset\n", MOD_NAME));
@@ -3814,6 +3935,7 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdl.statsp;
@@ -3831,6 +3953,7 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		fixme(("%s: FIXME: check these settings\n", MOD_NAME));
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
@@ -3849,6 +3972,7 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdl.stats;
@@ -3864,6 +3988,7 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -3879,6 +4004,7 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			*arg = sdt->sdl.notify;
@@ -3896,6 +4022,7 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdl.notify.events |= arg->events;
@@ -3913,6 +4040,7 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 		sdt_t *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		lis_spin_lock_irqsave(&sdt->lock, &flags);
 		{
 			sdt->sdl.notify.events &= ~arg->events;
@@ -3928,6 +4056,7 @@ sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -3941,6 +4070,7 @@ sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -3971,6 +4101,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
+
 	switch (type) {
 	case __SID:
 	{
@@ -4212,6 +4343,7 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sdt_t *sdt = SDT_PRIV(q);
 	ulong oldstate = sdt->state;
+
 	/* 
 	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SDT_DAEDT_TRANSMISSION_REQ) {
@@ -4297,6 +4429,7 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	sdt_t *sdt = SDT_PRIV(q);
 	ulong oldstate = sdt->t.state;
+
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == T_UNITDATA_IND) {
@@ -4387,6 +4520,7 @@ STATIC int
 sdt_w_data(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	(void) sdt;
 	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, sdt, msgdsize(mp)));
 	return sdt_send_data(q, mp);
@@ -4395,6 +4529,7 @@ STATIC int
 sdt_r_data(queue_t *q, mblk_t *mp)
 {
 	sdt_t *sdt = SDT_PRIV(q);
+
 	(void) sdt;
 	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, sdt, msgdsize(mp)));
 	return sdt_recv_data(q, mp);
@@ -4524,6 +4659,7 @@ STATIC sdt_t *
 sdt_alloc_priv(queue_t *q, sdt_t ** sdtp, major_t cmajor, minor_t cminor)
 {
 	sdt_t *sdt;
+
 	if ((sdt = kmem_cache_alloc(sdt_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", MOD_NAME));
 		bzero(sdt, sizeof(*sdt));
@@ -4611,6 +4747,7 @@ sdt_free_priv(queue_t *q)
 {
 	sdt_t *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	ensure(sdt, return);
 	lis_spin_lock_irqsave(&sdt->lock, &flags);
 	{
@@ -4669,6 +4806,7 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct sdt *sdt;
+
 		/* test for multiple push */
 		for (sdt = sdt_list; sdt; sdt = sdt->next) {
 			if (sdt->cmajor == cmajor && sdt->cminor == cminor) {
@@ -4714,6 +4852,7 @@ sdt_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 MODULE_PARM(modid, "h");
 MODULE_PARM_DESC(modid, "Module ID for the SDT-ACB56 module. (0 for allocation.)");
 
@@ -4734,6 +4873,7 @@ STATIC int
 sdt_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&sdt_fmod, modid)) < 0)
 		return (err);
 	return (0);
@@ -4743,6 +4883,7 @@ STATIC int
 sdt_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sdt_fmod, modid)) < 0)
 		return (err);
 	return (0);
@@ -4760,6 +4901,7 @@ STATIC int
 sdt_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sdt_acb56info, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -4773,6 +4915,7 @@ STATIC int
 sdt_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sdt_acb56info)) < 0)
 		return (err);
 	return (0);
@@ -4784,6 +4927,7 @@ MODULE_STATIC int __init
 sdt_acb56init(void)
 {
 	int err;
+
 #ifdef MODULE
 	cmn_err(CE_NOTE, SDT_ACB56_BANNER);	/* banner message */
 #else
@@ -4807,6 +4951,7 @@ MODULE_STATIC void __exit
 sdt_acb56terminate(void)
 {
 	int err;
+
 	if ((err = sdt_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sdt_term_caches()))

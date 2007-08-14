@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.25  2007/08/14 12:18:14  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.24  2007/08/12 16:20:14  brian
  - new PPA handling
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -122,7 +125,7 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 16:20:14 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2046,7 +2049,7 @@ n_discon_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong orig, np_long reas
  * @dp: user data
  */
 static int
-n_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data_sccp_t *qos,
+n_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data_sccp_t * qos,
 	   mblk_t *dp)
 {
 	if (likely(canputnext(sc->oq))) {
@@ -2087,7 +2090,7 @@ n_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data
  * @dp: user data
  */
 static int
-n_exdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data_sccp_t *qos,
+n_exdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, N_qos_sel_data_sccp_t * qos,
 	     mblk_t *dp)
 {
 	if (likely(bcanputnext(sc->oq, 1))) {
@@ -3141,7 +3144,7 @@ t_exdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong more, mblk_t *dp)
  */
 static int
 t_optdata_ind(struct sc *sc, queue_t *q, mblk_t *msg, t_uscalar_t exp, t_uscalar_t more,
-	      N_qos_sel_data_sccp_t *qos, mblk_t *dp)
+	      N_qos_sel_data_sccp_t * qos, mblk_t *dp)
 {
 	uchar b_band = exp ? 1 : 0;
 
@@ -7773,7 +7776,7 @@ sr_timer_start(struct sr *sr, const uint t)
  *  These interface functions adapt between user interface events requested by the state machine and
  *  the particular style of interface that is supported by the particular SCCP user stream.  Not all
  *  events are supported by all interface styles.  The most complete interface style is the SCCPI
- *  which is the NPI Version 2 interface with the extended N-primitives described in Q.711 and
+ *  which is the NPI Release 2 interface with the extended N-primitives described in Q.711 and
  *  T1.112.1.
  */
 
@@ -7821,7 +7824,7 @@ sccp_conn_con(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong flags, struct scc
 
 static int
 sccp_data_ind(struct sc *sc, queue_t *q, mblk_t *msg, np_ulong exp, np_ulong more,
-	      N_qos_sel_data_sccp_t *qos, mblk_t *dp)
+	      N_qos_sel_data_sccp_t * qos, mblk_t *dp)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
@@ -7989,7 +7992,8 @@ sccp_notice_ind(struct sc *sc, queue_t *q, np_ulong cause, struct sccp_addr *dst
 
 #if 0
 static int
-sccp_inform_ind(struct sc *sc, queue_t *q, mblk_t *msg, N_qos_sel_infr_sccp_t * qos, np_ulong reason)
+sccp_inform_ind(struct sc *sc, queue_t *q, mblk_t *msg, N_qos_sel_infr_sccp_t * qos,
+		np_ulong reason)
 {
 	switch (sc->i_style) {
 	case SCCP_STYLE_SCCPI:
@@ -20323,18 +20327,19 @@ sccp_alloc_priv(queue_t *q, struct sc **scp, dev_t *devp, cred_t *crp, minor_t b
 		*scp = sccp_get(sc);
 		/* set defaults */
 		sc->info.PRIM_type = N_INFO_ACK;
-		sc->info.NSDU_size = T_INFINITE; /* unlimited */
-		sc->info.ENSDU_size = T_INFINITE; /* unlimited */
-		sc->info.CDATA_size = T_INFINITE; /* unlimited  XXX */
-		sc->info.DDATA_size = T_INFINITE; /* unlimited  XXX */
+		sc->info.NSDU_size = T_INFINITE;	/* unlimited */
+		sc->info.ENSDU_size = T_INFINITE;	/* unlimited */
+		sc->info.CDATA_size = T_INFINITE;	/* unlimited XXX */
+		sc->info.DDATA_size = T_INFINITE;	/* unlimited XXX */
 		sc->info.ADDR_size = sizeof(sc->src) + sizeof(sc->saddr);
 		sc->info.ADDR_length = sizeof(sc->src) + sizeof(sc->saddr);
 		sc->info.QOS_length = sizeof(sc->iqos);
 		sc->info.QOS_offset = sc->info.ADDR_offset + sc->info.ADDR_length;
 		sc->info.QOS_range_length = sizeof(sc->iqor);
 		sc->info.QOS_range_offset = sc->info.QOS_offset + sc->info.QOS_length;
-		sc->info.OPTIONS_flags = (REC_CONF_OPT | EX_DATA_OPT | DEFAULT_RC_SEL) & ~DEFAULT_RC_SEL;
-		sc->info.NIDU_size = T_INFINITE; /* unlimited */
+		sc->info.OPTIONS_flags =
+		    (REC_CONF_OPT | EX_DATA_OPT | DEFAULT_RC_SEL) & ~DEFAULT_RC_SEL;
+		sc->info.NIDU_size = T_INFINITE;	/* unlimited */
 		sc->info.SERV_type = N_CONS | N_CLNS;
 		sc->info.PROVIDER_type = N_SUBNET;
 		sc->info.NODU_size = 254;
@@ -20518,6 +20523,7 @@ na_lookup(uint id)
 		for (na = master.na.list; na && na->id != id; na = na->next) ;
 	return (na);
 }
+
 static uint
 na_get_id(uint id)
 {
@@ -20755,6 +20761,7 @@ ss_lookup(uint id)
 		for (ss = master.ss.list; ss && ss->id != id; ss = ss->next) ;
 	return (ss);
 }
+
 static uint
 ss_get_id(uint id)
 {
@@ -20884,6 +20891,7 @@ rs_lookup(uint id)
 		for (rs = master.rs.list; rs && rs->id != id; rs = rs->next) ;
 	return (rs);
 }
+
 static uint
 rs_get_id(uint id)
 {
@@ -21023,6 +21031,7 @@ sr_lookup(uint id)
 	for (sr = master.sr.list; sr && sr->id != id; sr = sr->next) ;
 	return (sr);
 }
+
 static uint
 sr_get_id(uint id)
 {
@@ -21159,6 +21168,7 @@ sp_lookup(uint id)
 	for (sp = master.sp.list; sp && sp->id != id; sp = sp->next) ;
 	return (sp);
 }
+
 static uint
 sp_get_id(uint id)
 {
@@ -21338,6 +21348,7 @@ mtp_lookup(uint id)
 	for (mt = master.mt.list; mt && mt->id != id; mt = mt->next) ;
 	return (mt);
 }
+
 static uint
 mtp_get_id(uint id)
 {

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:34:45 $
+ @(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:18:13 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp.c,v $
+ Revision 0.9.2.5  2007/08/14 12:18:13  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/07/14 01:34:45  brian
  - make license explicit, add documentation
 
@@ -64,9 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:34:45 $"
+#ident "@(#) $RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:18:13 $"
 
-static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:34:45 $";
+static char const ident[] =
+    "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:18:13 $";
 
 /*
  *  This driver provides the functionality of an RTP (Realtime Transport
@@ -110,7 +114,7 @@ static char const ident[] = "$RCSfile: rtp.c,v $ $Name:  $($Revision: 0.9.2.4 $)
 #define RTP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RTP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define RTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/07/14 01:34:45 $"
+#define RTP_REVISION	"OpenSS7 $RCSfile: rtp.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:18:13 $"
 #define RTP_DEVICE	"SVR 4.2 STREAMS RTP Driver"
 #define RTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RTP_LICENSE	"GPL v2"
@@ -689,7 +693,7 @@ n_unitdata_req(queue_t *q, struct sockaddr_in *dst, struct sockaddr_in *src, mbl
 			mp->b_wptr += sizeof(*p);
 			sin = (struct sockaddr_in *) mp->b_wptr;
 			sin->sin_family = dst->sin_family;
-			sin->sin_port = IPPROTO_UDP; /* NPI IP port number is protocol */
+			sin->sin_port = IPPROTO_UDP;	/* NPI IP port number is protocol */
 			sin->sin_addr.s_addr = dst->sin_addr.s_addr;
 			mp->b_wptr += sizeof(*sin);
 
@@ -724,7 +728,7 @@ n_unbind_req(queue_t *q)
 
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
-		p = (N_unbind_req_t *)mp->b_wptr;
+		p = (N_unbind_req_t *) mp->b_wptr;
 		p->PRIM_type = N_UNBIND_REQ;
 		mp->b_wptr += sizeof(*p);
 		npi_set_state(NIP_PRIV(q), NS_WACK_UREQ);
@@ -747,8 +751,9 @@ n_return_msg(queue_t *q, mblk_t *mp)
 		qreply(q, mp);
 		return (QR_ABSORBED);
 	}
-	return (QR_DONE); /* discard if flow controlled */
+	return (QR_DONE);	/* discard if flow controlled */
 }
+
 /*
  *  MX-primitives from above
  */
@@ -852,6 +857,7 @@ STATIC INLINE fastcall int
 mx_other_req(queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * rtp_w_data: - process M_DATA on write queue
  * @q: active queue in pari (write queue)
@@ -1144,6 +1150,7 @@ STATIC INLINE fastcall int
 n_other_ind(queue_t *q, mblk_t *mp)
 {
 }
+
 /**
  * nip_r_data: - process M_DATA on read queue
  * @q: active queue in pari (read queue)

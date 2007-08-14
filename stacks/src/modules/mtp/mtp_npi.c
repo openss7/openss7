@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:26 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:26 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_npi.c,v $
+ Revision 0.9.2.24  2007/08/14 12:18:06  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.23  2007/08/03 13:35:26  brian
  - manual updates, put ss7 modules in public release
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:26 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:26 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -117,7 +120,7 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/03 13:35:26 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -247,7 +250,7 @@ static inline fastcall size_t
 n_opts_size(union N_qos_mtp *qos)
 {
 	if (qos) {
-		switch(qos->n_qos_type) {
+		switch (qos->n_qos_type) {
 		case N_QOS_SEL_DATA_MTP:
 			return (sizeof(qos->n_qos_data));
 		case N_QOS_SEL_CONN_MTP:
@@ -1376,7 +1379,7 @@ mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, union N_qos_mtp *opt, 
 				oh->len = sizeof(*oh) + sizeof(t_scalar_t);
 				oh->status = T_SUCCESS;
 				mp->b_wptr += sizeof(*oh);
-				*(t_scalar_t *)mp->b_wptr = opt->n_qos_info.sls;
+				*(t_scalar_t *) mp->b_wptr = opt->n_qos_info.sls;
 				mp->b_wptr += sizeof(t_scalar_t);
 				oh = (typeof(oh)) mp->b_wptr;
 				oh->level = T_SS7_MTP;
@@ -1384,7 +1387,7 @@ mtp_optmgmt_req(struct mtp *mtp, queue_t *q, mblk_t *msg, union N_qos_mtp *opt, 
 				oh->len = sizeof(*oh) + sizeof(t_scalar_t);
 				oh->status = T_SUCCESS;
 				mp->b_wptr += sizeof(*oh);
-				*(t_scalar_t *)mp->b_wptr = opt->n_qos_info.mp;
+				*(t_scalar_t *) mp->b_wptr = opt->n_qos_info.mp;
 				mp->b_wptr += sizeof(t_scalar_t);
 			}
 			freemsg(msg);
@@ -1475,7 +1478,7 @@ n_data(struct mtp *mtp, queue_t *q, mblk_t *mp)
 		goto baddata;
 	return mtp_transfer_req(mtp, q, mp, &mtp->dst, mtp->options.mp, mtp->options.sls, mp);
       baddata:
-	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong)dlen);
+	mi_strlog(q, 0, SL_TRACE, "bad data size %lu", (ulong) dlen);
 	goto error;
       outstate:
 	mi_strlog(q, 0, SL_TRACE, "would place i/f out of state");
@@ -1862,6 +1865,7 @@ n_unitdata_req(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	const N_unitdata_req_t *p = (typeof(p)) mp->b_rptr;
 	size_t dlen = mp->b_cont ? msgdsize(mp->b_cont) : 0;
 	struct mtp_addr dst;
+
 #if 0
 	struct mtp_opts opts = { 0L, NULL, };
 #endif
@@ -2453,7 +2457,8 @@ mtp_pause_ind(struct mtp *mtp, queue_t *q, mblk_t *mp)
 	case N_CONS:
 		if (mtp_not_state(mtp, (NSF_DATA_XFER | NSF_WCON_RREQ)))
 			goto outstate;
-		return n_discon_ind(mtp, q, mp, N_PROVIDER, N_MTP_DEST_PROHIBITED, 0, NULL, mp->b_cont);
+		return n_discon_ind(mtp, q, mp, N_PROVIDER, N_MTP_DEST_PROHIBITED, 0, NULL,
+				    mp->b_cont);
 	case N_CLNS:
 		if (mtp_not_state(mtp, NSF_IDLE))
 			goto outstate;

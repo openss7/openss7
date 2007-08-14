@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:05 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:17:40 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 0.9.2.6  2007/08/14 12:17:40  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.5  2007/07/14 01:34:05  brian
  - make license explicit, add documentation
 
@@ -110,9 +113,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:05 $"
+#ident "@(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:17:40 $"
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:05 $";
+static char const ident[] =
+    "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:17:40 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -191,7 +195,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:34:05 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 12:17:40 $"
 #define TCP_DEVICE	"SVR 4.2 STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL v2"
@@ -277,8 +281,8 @@ STATIC struct module_info tpi_minfo = {
 	.mi_lowat = STRLOW,		/* Lo water mark */
 };
 
-STATIC struct module_stat tpi_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat tpi_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tpi_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat tpi_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 STATIC streamscall int tpi_qopen(queue_t *, dev_t *, int, int, cred_t *);
 STATIC streamscall int tpi_qclose(queue_t *, int, cred_t *);
@@ -760,12 +764,13 @@ t_opts_build(const struct tpi *t, mblk_t *mp, unsigned char *op, size_t olen)
 		if (oh == NULL)
 			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 		oh->level = T_INET_TCP;
 		oh->name = T_TCP_MAXSEG;
 		oh->status = T_SUCCESS;
 		// *((t_uscalar_t *) T_OPT_DATA(oh)) = th->maxseg; /* FIXME */
-		/* FIXME: have to find maxseg option in TCP options portion of
-		 * TCP header and then extract it */
+		/* FIXME: have to find maxseg option in TCP options portion of TCP header and then
+		   extract it */
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	assure(oh == NULL);
@@ -866,12 +871,13 @@ t_errs_build(const struct tpi *t, mblk_t *mp, unsigned char *op, size_t olen, in
 		if (oh == NULL)
 			goto efault;
 		oh->len = _T_LENGTH_SIZEOF(t_uscalar_t);
+
 		oh->level = T_INET_TCP;
 		oh->name = T_TCP_MAXSEG;
 		oh->status = T_SUCCESS;
 		// *((t_uscalar_t *) T_OPT_DATA(oh)) = th->maxseg; /* FIXME */
-		/* FIXME: have to find maxseg option in options portion of TCP
-		 * header and extract it. */
+		/* FIXME: have to find maxseg option in options portion of TCP header and extract
+		   it. */
 		oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0);
 	}
 	assure(oh == NULL);
@@ -1735,8 +1741,7 @@ t_size_negotiate_options(const struct tpi *t, const unsigned char *ip, size_t il
 				if (ih->name != T_ALLOPT)
 					continue;
 			case T_TCP_MAXSEG:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(t->options.tcp.maxseg))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.tcp.maxseg))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.tcp.maxseg);
 				if (ih->name != T_ALLOPT)
@@ -1749,8 +1754,7 @@ t_size_negotiate_options(const struct tpi *t, const unsigned char *ip, size_t il
 				if (ih->name != T_ALLOPT)
 					continue;
 			case T_TCP_CORK:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(t->options.tcp.cork))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.tcp.cork))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.tcp.cork);
 				if (ih->name != T_ALLOPT)
@@ -1777,8 +1781,7 @@ t_size_negotiate_options(const struct tpi *t, const unsigned char *ip, size_t il
 				if (ih->name != T_ALLOPT)
 					continue;
 			case T_TCP_SYNCNT:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(t->options.tcp.syncnt))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.tcp.syncnt))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.tcp.syncnt);
 				if (ih->name != T_ALLOPT)
@@ -1805,8 +1808,7 @@ t_size_negotiate_options(const struct tpi *t, const unsigned char *ip, size_t il
 				if (ih->name != T_ALLOPT)
 					continue;
 			case T_TCP_INFO:
-				if (ih->name != T_ALLOPT
-				    && optlen != sizeof(t->options.tcp.info))
+				if (ih->name != T_ALLOPT && optlen != sizeof(t->options.tcp.info))
 					goto einval;
 				olen += _T_SPACE_SIZEOF(t->options.tcp.info);
 				if (ih->name != T_ALLOPT)
@@ -1878,7 +1880,7 @@ t_overall_result(uint * overall, uint result)
  * Perform the actions required of T_DEFAULT placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_default_options(const struct tpi * t, const unsigned char *ip, size_t ilen,
+t_build_default_options(const struct tpi *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -2208,7 +2210,7 @@ t_build_default_options(const struct tpi * t, const unsigned char *ip, size_t il
  * Perform the actions required of T_CURRENT placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_current_options(const struct tpi * t, const unsigned char *ip, size_t ilen,
+t_build_current_options(const struct tpi *t, const unsigned char *ip, size_t ilen,
 			unsigned char *op, size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -2567,7 +2569,7 @@ t_build_current_options(const struct tpi * t, const unsigned char *ip, size_t il
  * Perform the actions required of T_CHECK placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_check_options(const struct tpi * t, const unsigned char *ip, size_t ilen, unsigned char *op,
+t_build_check_options(const struct tpi *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 		      size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -3165,7 +3167,7 @@ t_build_check_options(const struct tpi * t, const unsigned char *ip, size_t ilen
  * Perform the actions required of T_NEGOTIATE placing the output in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_negotiate_options(struct tpi * t, const unsigned char *ip, size_t ilen, unsigned char *op,
+t_build_negotiate_options(struct tpi *t, const unsigned char *ip, size_t ilen, unsigned char *op,
 			  size_t *olen)
 {
 	t_scalar_t overall = T_SUCCESS;
@@ -3874,7 +3876,7 @@ t_build_negotiate_options(struct tpi * t, const unsigned char *ip, size_t ilen, 
  * in the provided buffer.
  */
 STATIC t_scalar_t
-t_build_options(struct tpi * t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
+t_build_options(struct tpi *t, unsigned char *ip, size_t ilen, unsigned char *op, size_t *olen,
 		t_scalar_t flag)
 {
 	switch (flag) {
@@ -4056,6 +4058,7 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 		ip->next->err_handler(skb, info);
 	return (0);
 }
+
 #ifdef CONFIG_SMP
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 #else				/* CONFIG_SMP */
@@ -6884,8 +6887,10 @@ tpi_init_hashes(void)
 		rwlock_init(&tpi_bhash[i].lock);
 	for (i = 0; i < tpi_chash_size; i++)
 		rwlock_init(&tpi_chash[i].lock);
-	printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME, (long) tpi_bhash_size));
-	printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME, (long) tpi_chash_size));
+	printd(("%s: INFO: bind hash table configured size = %ld\n", DRV_NAME,
+		(long) tpi_bhash_size));
+	printd(("%s: INFO: conn hash table configured size = %ld\n", DRV_NAME,
+		(long) tpi_chash_size));
 }
 
 STATIC void

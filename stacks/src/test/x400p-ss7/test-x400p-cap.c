@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/31 21:04:53 $
+ @(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:20:12 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/31 21:04:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:20:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p-cap.c,v $
+ Revision 0.9.2.7  2007/08/14 12:20:12  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.6  2006/10/31 21:04:53  brian
  - changes for 32-bit compatibility and remove HZ dependency
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/31 21:04:53 $"
+#ident "@(#) $RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:20:12 $"
 
-static char const ident[] = "$RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2006/10/31 21:04:53 $";
+static char const ident[] = "$RCSfile: test-x400p-cap.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:20:12 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -234,6 +237,7 @@ milliseconds(char *t, int d)
 {
 	long ret;
 	struct timeval now;
+
 	printf("                                     |\n");
 	printf("                                     | %s %d ms\n", t, d * 10);
 	printf("                                     |\n");
@@ -257,6 +261,7 @@ check_time(const char *t, long beg, long lo, long hi, long tol)
 {
 	long i;
 	struct timeval now;
+
 	if (gettimeofday(&now, NULL)) {
 		printf("    ****ERROR: couldn't get time!\n");
 		printf("               %s: %s\n", __FUNCTION__, strerror(errno));
@@ -266,8 +271,7 @@ check_time(const char *t, long beg, long lo, long hi, long tol)
 	i = (now.tv_sec - test_start) * 1000;
 	i += (now.tv_usec + 500L) / 1000;
 	i -= beg;
-	printf("                 check time:       %4s (%ld <= %ld <= %ld)\n", t, lo - tol, i,
-	       hi + tol);
+	printf("                 check time:       %4s (%ld <= %ld <= %ld)\n", t, lo - tol, i, hi + tol);
 	FFLUSH(stdout);
 	if (lo - tol <= i && i <= hi + tol)
 		return SUCCESS;
@@ -290,6 +294,7 @@ timer_sethandler(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = timer_handler;
 	act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_restorer = NULL;
@@ -312,6 +317,7 @@ start_tt(long duration)
 		{0, 0},
 		{duration / 1000, (duration % 1000) * 1000}
 	};
+
 	if (timer_sethandler())
 		return FAILURE;
 	if (setitimer(ITIMER_REAL, &setting, NULL))
@@ -325,6 +331,7 @@ stop_tt(void)
 {
 	sigset_t mask;
 	struct sigaction act;
+
 	act.sa_handler = SIG_DFL;
 	act.sa_flags = 0;
 	act.sa_restorer = NULL;
@@ -583,9 +590,10 @@ send(int msg)
 	char *label = NULL;
 	char cbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
-	struct strbuf data = { sizeof(*pt_buf), 0, (char *)pt_buf };
+	struct strbuf data = { sizeof(*pt_buf), 0, (char *) pt_buf };
 	struct strioctl ioc;
 	union SDT_primitives *p = (union SDT_primitives *) cbuf;
+
 	if (msg != oldmsg || oldpsb != (((pt_bib | pt_bsn) << 8) | (pt_fib | pt_fsn))) {
 		oldmsg = msg;
 		oldpsb = ((pt_bib | pt_bsn) << 8) | (pt_fib | pt_fsn);
@@ -612,38 +620,31 @@ send(int msg)
 		switch (msg) {
 		case SIO:
 			if (!cntmsg)
-				printf("    SIO  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIO  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIN:
 			if (!cntmsg)
-				printf("    SIN  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIN  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIE:
 			if (!cntmsg)
-				printf("    SIE  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIE  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIOS:
 			if (!cntmsg)
-				printf("    SIOS (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIOS (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIPO:
 			if (!cntmsg)
-				printf("    SIPO (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIPO (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIB:
 			if (!cntmsg)
-				printf("    SIB  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIB  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIX:
 			if (!cntmsg)
-				printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		}
 		FFLUSH(stdout);
@@ -664,38 +665,31 @@ send(int msg)
 		switch (msg) {
 		case SIO2:
 			if (!cntmsg)
-				printf("    SIO  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIO  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIN2:
 			if (!cntmsg)
-				printf("    SIN  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIN  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIE2:
 			if (!cntmsg)
-				printf("    SIE  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIE  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIOS2:
 			if (!cntmsg)
-				printf("    SIOS (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIOS (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIPO2:
 			if (!cntmsg)
-				printf("    SIPO (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIPO (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIB2:
 			if (!cntmsg)
-				printf("    SIB  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    SIB  (%02x/%02x)[2]-------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		case SIX2:
 			if (!cntmsg)
-				printf("    LSSU (%02x/%02x)[2](corrupt)----->\n", pt_bib | pt_bsn,
-				       pt_fib | pt_fsn);
+				printf("    LSSU (%02x/%02x)[2](corrupt)----->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			break;
 		}
 		FFLUSH(stdout);
@@ -723,8 +717,7 @@ send(int msg)
 		return SUCCESS;
 	case FISU:
 		if (!cntmsg) {
-			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    FISU (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 	case FISU_S:
@@ -735,8 +728,7 @@ send(int msg)
 		break;
 	case FISU_BAD_FIB:
 		if (!cntmsg) {
-			printf("    FISU (%02x/%02x) (bad fib)------->\n", pt_bib | pt_bsn,
-			       (pt_fib | pt_fsn) ^ 0x80);
+			printf("    FISU (%02x/%02x) (bad fib)------->\n", pt_bib | pt_bsn, (pt_fib | pt_fsn) ^ 0x80);
 			FFLUSH(stdout);
 		}
 		pt_buf[0] = pt_bib | pt_bsn;
@@ -746,8 +738,7 @@ send(int msg)
 		break;
 	case LSSU_CORRUPT:
 		if (!cntmsg) {
-			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    LSSU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 	case LSSU_CORRUPT_S:
@@ -759,8 +750,7 @@ send(int msg)
 		break;
 	case FISU_CORRUPT:
 		if (!cntmsg) {
-			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    FISU (%02x/%02x) (corrupt)------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 	case FISU_CORRUPT_S:
@@ -779,8 +769,7 @@ send(int msg)
 		memset(&pt_buf[3], 'B', msu_len);
 		len = msu_len + 3;
 		if (!cntmsg) {
-			printf("    MSU  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) ---------------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		break;
@@ -802,8 +791,7 @@ send(int msg)
 		memset(&pt_buf[3], 'A', 280);
 		len = 283;
 		if (!cntmsg) {
-			printf("    MSU  (%02x/%02x) (too long)------>\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) (too long)------>\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		break;
@@ -811,13 +799,13 @@ send(int msg)
 		msu_len = 256;
 		pt_fsn = (pt_fsn + 1) & 0x7f;
 		if (!cntmsg) {
-			printf("    MSU  (%02x/%02x) (7 ones)-------->\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) (7 ones)-------->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		pt_fsn = (pt_fsn - 1) & 0x7f;
 		{
 			struct strioctl ctl;
+
 			ctl.ic_cmd = SDT_IOCCABORT;
 			ctl.ic_timout = 0;
 			ctl.ic_len = 0;
@@ -833,8 +821,7 @@ send(int msg)
 		pt_buf[1] = pt_fib | pt_fsn;
 		len = 2;
 		if (!cntmsg) {
-			printf("    MSU  (%02x/%02x) (too short)----->\n", pt_bib | pt_bsn,
-			       pt_fib | pt_fsn);
+			printf("    MSU  (%02x/%02x) (too short)----->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 			FFLUSH(stdout);
 		}
 		break;
@@ -865,15 +852,13 @@ send(int msg)
 		}
 		return SUCCESS;
 	case FISU_FISU_1FLAG:
-		printf("    FISU (%02x/%02x) ---FISU-F-FISU-->\n", pt_bib | pt_bsn,
-		       pt_fib | pt_fsn);
+		printf("    FISU (%02x/%02x) ---FISU-F-FISU-->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		send(FISU_S);
 		send(FISU_S);
 		return SUCCESS;
 	case FISU_FISU_2FLAG:
-		printf("    FISU (%02x/%02x) --FISU-F-F-FISU->\n", pt_bib | pt_bsn,
-		       pt_fib | pt_fsn);
+		printf("    FISU (%02x/%02x) --FISU-F-F-FISU->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		pt_flags = SDT_FLAGS_TWO;
 		if (pt_config() != SUCCESS)
@@ -885,15 +870,13 @@ send(int msg)
 			return INCONCLUSIVE;
 		return SUCCESS;
 	case MSU_MSU_1FLAG:
-		printf("    MSU  (%02x/%02x) ----MSU-F-MSU--->\n", pt_bib | pt_bsn,
-		       pt_fib | pt_fsn);
+		printf("    MSU  (%02x/%02x) ----MSU-F-MSU--->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		send(MSU_S);
 		send(MSU_S);
 		return SUCCESS;
 	case MSU_MSU_2FLAG:
-		printf("    MSU  (%02x/%02x) ---MSU-F-F-MSU-->\n", pt_bib | pt_bsn,
-		       pt_fib | pt_fsn);
+		printf("    MSU  (%02x/%02x) ---MSU-F-F-MSU-->\n", pt_bib | pt_bsn, pt_fib | pt_fsn);
 		FFLUSH(stdout);
 		pt_flags = SDT_FLAGS_TWO;
 		if (pt_config() != SUCCESS)
@@ -951,7 +934,7 @@ send(int msg)
 		ctrl.buf = cbuf;
 		data.maxlen = BUFSIZE;
 		data.len = len;
-		data.buf = (char *)pt_buf;
+		data.buf = (char *) pt_buf;
 		p->daedt_transmission_req.sdt_primitive = SDT_DAEDT_TRANSMISSION_REQ;
 		if (putmsg(pt_fd, NULL, &data, 0) < 0) {
 			if (errno != EAGAIN && errno != EINTR) {
@@ -978,6 +961,7 @@ signal(int action)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union SL_primitives *p = (union SL_primitives *) cbuf;
+
 	ctrl.maxlen = BUFSIZE;
 	ctrl.buf = cbuf;
 	if (action != oldact) {
@@ -1058,8 +1042,7 @@ signal(int action)
 	      signal_iut_putmsg:
 		if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 			printf("                                   ****ERROR: putmsg failed!\n");
-			printf("                                              %s: %s\n",
-			       __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 			return FAILURE;
 		}
 		return SUCCESS;
@@ -1091,8 +1074,7 @@ signal(int action)
 		data.len = msu_len;
 		if ((ret = putmsg(iut_fd, NULL, &data, 0)) < 0) {
 			printf("                                   ****ERROR: putmsg failed!\n");
-			printf("                                              %s: %s\n",
-			       __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 			return FAILURE;
 		}
 		return SUCCESS;
@@ -1112,6 +1094,7 @@ static int
 pt_decode_data(void)
 {
 	int ret;
+
 	// printf("pt decode data:\n"); FFLUSH(stdout);
 	// FFLUSH(stdout);
 	iut_bib = pt_buf[0] & 0x80;
@@ -1179,11 +1162,11 @@ pt_decode_data(void)
 	}
 	if (!cntret) {
 		char *label = NULL;
+
 		switch (ret) {
 		case FISU:
 			if (show_fisus) {
-				printf("                 <---------------- FISU (%02x/%02x)\n",
-				       iut_bib | iut_bsn, iut_fib | iut_fsn);
+				printf("                 <---------------- FISU (%02x/%02x)\n", iut_bib | iut_bsn, iut_fib | iut_fsn);
 				FFLUSH(stdout);
 			}
 			break;
@@ -1207,30 +1190,25 @@ pt_decode_data(void)
 		      show_lssu:
 			switch (iut_li) {
 			case 1:
-				printf("                 <---------------- %s (%02x/%02x)\n", label,
-				       iut_bib | iut_bsn, iut_fib | iut_fsn);
+				printf("                 <---------------- %s (%02x/%02x)\n", label, iut_bib | iut_bsn, iut_fib | iut_fsn);
 				break;
 			case 2:
-				printf("                 <---------------- %s (%02x/%02x)[%d]\n",
-				       label, iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
+				printf("                 <---------------- %s (%02x/%02x)[%d]\n", label, iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
 				break;
 			}
 			FFLUSH(stdout);
 			break;
 		case SIX:
-			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n",
-			       iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
+			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n", iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
 			FFLUSH(stdout);
 			break;
 		case SIX2:
-			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n",
-			       iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
+			printf("                 <-------(corrupt) LSSU (%02x/%02x)[%d]\n", iut_bib | iut_bsn, iut_fib | iut_fsn, iut_li);
 			FFLUSH(stdout);
 			break;
 		case MSU:
 			if (show_msus) {
-				printf("                 <---------------- MSU  (%02x/%02x)[%d]\n",
-				       iut_bib | iut_bsn, iut_fib | iut_fsn, iut_len - 3);
+				printf("                 <---------------- MSU  (%02x/%02x)[%d]\n", iut_bib | iut_bsn, iut_fib | iut_fsn, iut_len - 3);
 				FFLUSH(stdout);
 			}
 			break;
@@ -1245,6 +1223,7 @@ static int
 pt_decode_msg(unsigned char *buf)
 {
 	union SDT_primitives *p = (union SDT_primitives *) buf;
+
 	// printf("pt decode msg:\n"); FFLUSH(stdout);
 	// FFLUSH(stdout);
 	switch (p->sdt_primitive) {
@@ -1323,6 +1302,7 @@ iut_decode_msg(unsigned char *buf)
 {
 	char *reason;
 	union SL_primitives *p = (union SL_primitives *) buf;
+
 	if (p->sl_primitive != oldprm) {
 		oldprm = p->sl_primitive;
 		cntprm = 0;
@@ -1468,11 +1448,13 @@ static int
 wait_event(int wait)
 {
 	int ret = SUCCESS;
+
 	while (1) {
 		struct pollfd pfd[] = {
 			{pt_fd, POLLIN | POLLPRI, 0},
 			{iut_fd, POLLIN | POLLPRI, 0}
 		};
+
 		if (timer_timeout) {
 			timer_timeout = 0;
 			if (show_timeout) {
@@ -1509,8 +1491,7 @@ wait_event(int wait)
 					// FFLUSH(stdout);
 					if (data.len > 0)
 						iut_len = data.len;	/* iut_len??? */
-					if (ctrl.len > 0
-					    && (ret = pt_decode_msg(ctrl.buf)) != UNKNOWN)
+					if (ctrl.len > 0 && (ret = pt_decode_msg(ctrl.buf)) != UNKNOWN)
 						return ret;
 					if (data.len > 0 && (ret = pt_decode_data()) != UNKNOWN)
 						return ret;
@@ -1528,8 +1509,7 @@ wait_event(int wait)
 					// FFLUSH(stdout);
 					if (data.len > 0)
 						iut_len = data.len;
-					if (ctrl.len > 0
-					    && (ret = iut_decode_msg(ctrl.buf)) != UNKNOWN)
+					if (ctrl.len > 0 && (ret = iut_decode_msg(ctrl.buf)) != UNKNOWN)
 						return ret;
 					if (data.len > 0 && (ret = iut_decode_data()) != UNKNOWN)
 						return ret;
@@ -1553,6 +1533,7 @@ static int
 check_snibs(unsigned char bsnib, unsigned char fsnib)
 {
 	int ret = FAILURE;
+
 	if ((iut_bib | iut_bsn) == bsnib && (iut_fib | iut_fsn) == fsnib)
 		ret = SUCCESS;
 	printf("                 check b/f sn/ib:  ---> (%02x/%02x)\n", bsnib, fsnib);
@@ -1566,6 +1547,7 @@ test_1_1a(void)
 {
 	for (;;) {
 		int i;
+
 		for (i = 0; i < 100; i++) {
 			send(SIOS);
 		}
@@ -1652,8 +1634,7 @@ test_1_2(void)
 				send(SIOS);
 				break;
 			case SIOS:
-				return check_time("T2  ", beg_time, timer[t2].lo, timer[t2].hi,
-						  100);
+				return check_time("T2  ", beg_time, timer[t2].lo, timer[t2].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -1721,8 +1702,7 @@ test_1_3(void)
 			case OUT_OF_SERVICE:
 				break;
 			case SIOS:
-				return check_time("T3  ", beg_time, timer[t3].lo, timer[t3].hi,
-						  100);
+				return check_time("T3  ", beg_time, timer[t3].lo, timer[t3].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -1797,8 +1777,7 @@ test_1_4(void)
 			case OUT_OF_SERVICE:
 				break;
 			case SIOS:
-				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi,
-						  100);
+				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -2069,8 +2048,7 @@ test_1_7(void)
 				send(SIN);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -2990,8 +2968,7 @@ test_1_16(void)
 			case OUT_OF_SERVICE:
 				break;
 			case SIOS:
-				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi,
-						  100);
+				return check_time("T1  ", beg_time, timer[t1].lo, timer[t1].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -3042,8 +3019,7 @@ test_1_17(void)
 				break;
 			case SIN:
 				send(SIN);
-				beg_time =
-				    milliseconds("T3+T4(Pn)", iutconf.sl.t3 + iutconf.sl.t4n);
+				beg_time = milliseconds("T3+T4(Pn)", iutconf.sl.t3 + iutconf.sl.t4n);
 				state = 3;
 				break;
 			default:
@@ -3056,8 +3032,7 @@ test_1_17(void)
 				send(SIN);
 				break;
 			case FISU:
-				return check_time("T3,4", beg_time, timer[t4n].lo,
-						  timer[t3].hi + timer[t4n].hi, 200);
+				return check_time("T3,4", beg_time, timer[t4n].lo, timer[t3].hi + timer[t4n].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3122,8 +3097,7 @@ test_1_18(void)
 				send(SIN);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4n].lo, timer[t4n].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3187,8 +3161,7 @@ test_1_19(void)
 				send(SIE);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3265,8 +3238,7 @@ test_1_20(void)
 				send(SIN);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3330,8 +3302,7 @@ test_1_21(void)
 				send(SIE);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3395,8 +3366,7 @@ test_1_22(void)
 				send(SIE);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3474,8 +3444,7 @@ test_1_23(void)
 				send(SIN);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -3539,8 +3508,7 @@ test_1_24(void)
 				send(SIE);
 				break;
 			case FISU:
-				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi,
-						  200);
+				return check_time("T4  ", beg_time, timer[t4e].lo, timer[t4e].hi, 200);
 			default:
 				return FAILURE;
 			}
@@ -5710,6 +5678,7 @@ static int
 test_5_1(void)
 {
 	unsigned char old_bsn = 0x7f;
+
 	for (;;) {
 		switch (state) {
 		case 0:
@@ -5935,6 +5904,7 @@ test_6_1(void)
 			case NO_MSG:
 				if (tries < 8192) {
 					int i;
+
 					if (tries) {
 						send(FISU_CORRUPT_S);
 						for (i = 0; i < count; i++)
@@ -5979,6 +5949,7 @@ test_6_2(void)
 			case NO_MSG:
 				if (tries < 8192) {
 					int i;
+
 					if (tries) {
 						send(FISU_CORRUPT_S);
 						for (i = 0; i < count; i++)
@@ -6644,6 +6615,7 @@ test_8_3(void)
 	for (;;) {
 		int i;
 		int n = iutconf.sl.N1;
+
 		stop_tt();
 		switch (state) {
 		case 0:
@@ -7309,8 +7281,7 @@ test_8_12(void)
 			case OUT_OF_SERVICE:
 				break;
 			case SIOS:
-				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi,
-						  100);
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -7426,6 +7397,7 @@ static int
 test_9_2(void)
 {
 	int fsn_lo = 0, fsn_hi = 0, fsn_ex = 0;
+
 	for (;;) {
 		switch (state) {
 		case 0:
@@ -7541,6 +7513,7 @@ test_9_3(void)
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
 	int n = iutconf.sl.N1;
+
 	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
 	if (msu_len < 3)
 		return INCONCLUSIVE;
@@ -7626,6 +7599,7 @@ test_9_4(void)
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
 	int n = iutconf.sl.N1 - 1;
+
 	msu_len = iutconf.sl.N2 / (iutconf.sl.N1 - 1) - h + 1;
 	n = iutconf.sl.N2 / (msu_len + h) + 1;
 	if (msu_len > iutconf.sdt.m)
@@ -7710,6 +7684,7 @@ test_9_5(void)
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
 	int n = iutconf.sl.N1;
+
 	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
 	if (msu_len < 3) {
 		n = iutconf.sl.N1 - 1;
@@ -7802,6 +7777,7 @@ test_9_6(void)
 	int i;
 	int h = (iutconf.opt.popt & SS7_POPT_HSL) ? 6 : 3;
 	int n = iutconf.sl.N1;
+
 	msu_len = iutconf.sl.N2 / iutconf.sl.N1 - h - 1;
 	if (msu_len < 3) {
 		n = iutconf.sl.N1 - 1;
@@ -8099,8 +8075,7 @@ test_9_11(void)
 			case OUT_OF_SERVICE:
 				break;
 			case SIOS:
-				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi,
-						  100);
+				return check_time("T7  ", beg_time, timer[t7].lo, timer[t7].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -8235,6 +8210,7 @@ static int
 test_10_2(void)
 {
 	int n = (iutconf.sl.t6 - iutconf.sl.t7) / iutconf.sl.t5;
+
 	for (;;) {
 		switch (state) {
 		case 0:
@@ -8315,6 +8291,7 @@ static int
 test_10_3(void)
 {
 	int n = (iutconf.sl.t6 + 20) / iutconf.sl.t5 + 20;
+
 	for (;;) {
 		switch (state) {
 		case 0:
@@ -8357,8 +8334,7 @@ test_10_3(void)
 			case SIOS:
 				if (count > 1)
 					send(COUNT);
-				return check_time("T6  ", beg_time, timer[t6].lo, timer[t6].hi,
-						  100);
+				return check_time("T6  ", beg_time, timer[t6].lo, timer[t6].hi, 100);
 			default:
 				return FAILURE;
 			}
@@ -8428,6 +8404,7 @@ pt_attach(void)
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
 	ppa_t ppa;
+
 	ppa = (PT_TEST_SLOT << 12) | (PT_TEST_SPAN << 8) | (PT_TEST_CHAN << 0);
 	// printf(" :attach\n");
 	// FFLUSH(stdout);
@@ -8470,6 +8447,7 @@ pt_detach(void)
 	char cbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	// printf(" :detach\n");
 	// FFLUSH(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8493,6 +8471,7 @@ pt_enable(void)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	// printf(" :enable\n");
 	// FFLUSH(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8537,6 +8516,7 @@ pt_stats(void)
 {
 	struct strioctl ctl;
 	sdt_stats_t stats;
+
 	printf("    :stats sdt\n");
 	FFLUSH(stdout);
 	ctl.ic_cmd = SDT_IOCGSTATS;
@@ -8586,6 +8566,7 @@ pt_disable(void)
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
 	struct strbuf ctrl = { sizeof(*cbuf), sizeof(p->disable_req), cbuf };
+
 	// printf(" :disable\n");
 	// FFLUSH(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8693,8 +8674,10 @@ pt_power_on(void)
 {
 	int ret;
 	char cbuf[BUFSIZE];
+
 	// char dbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
+
 	// struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union SDT_primitives *d = (union SDT_primitives *) cbuf;
 
@@ -8761,8 +8744,7 @@ iut_open(void)
 	// FFLUSH(stdout);
 	if ((iut_fd = open(IUT_SL_DEVICE, O_NONBLOCK | O_RDWR)) < 0) {
 		printf("                                   ****ERROR: open failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8770,8 +8752,7 @@ iut_open(void)
 	// FFLUSH(stdout);
 	if (ioctl(iut_fd, I_SRDOPT, RMSGD) < 0) {
 		printf("                                   ****ERROR: ioctl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8780,8 +8761,7 @@ iut_open(void)
 	FFLUSH(stdout);
 	if (ioctl(iut_fd, I_PUSH, "sdt") < 0) {
 		printf("                                   ****ERROR: push sdt failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8789,8 +8769,7 @@ iut_open(void)
 	FFLUSH(stdout);
 	if (ioctl(iut_fd, I_PUSH, "sl") < 0) {
 		printf("                                   ****ERROR: push sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8807,8 +8786,7 @@ iut_close(void)
 	// FFLUSH(stdout);
 	if (close(iut_fd) < 0) {
 		printf("                                   ****ERROR: close failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8827,6 +8805,7 @@ iut_attach(void)
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
 	ppa_t ppa;
+
 	ppa = (IUT_TEST_SLOT << 12) | (IUT_TEST_SPAN << 8) | (IUT_TEST_CHAN << 0);
 	// printf(" :attach\n");
 	// FFLUSH(stdout);
@@ -8837,8 +8816,7 @@ iut_attach(void)
 	bcopy(&ppa, p->attach_req.lmi_ppa, sizeof(ppa_t));
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8852,10 +8830,8 @@ iut_attach(void)
 		data.buf = dbuf;
 		if ((ret = getmsg(iut_fd, &ctrl, &data, &flags)) < 0) {
 			if (errno != EAGAIN && errno != EINTR) {
-				printf
-				    ("                                   ****ERROR: getmsg failed\n");
-				printf("                                              %s: %s\n",
-				       __FUNCTION__, strerror(errno));
+				printf("                                   ****ERROR: getmsg failed\n");
+				printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 				FFLUSH(stdout);
 				return FAILURE;
 			}
@@ -8864,8 +8840,7 @@ iut_attach(void)
 		if (p->lmi_primitive != LMI_OK_ACK) {
 			printf("                                   ****ERROR: getmsg failed\n");
 			FFLUSH(stdout);
-			printf("                                              %s: %s\n",
-			       __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 			iut_showmsg(&ctrl, &data);
 		} else
 			return SUCCESS;
@@ -8882,6 +8857,7 @@ iut_detach(void)
 	char cbuf[BUFSIZE];
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	// printf(" :detach\n");
 	// FFLUSH(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8890,8 +8866,7 @@ iut_detach(void)
 	p->detach_req.lmi_primitive = LMI_DETACH_REQ;
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8909,6 +8884,7 @@ iut_enable(void)
 	struct strbuf ctrl = { sizeof(*cbuf), 0, cbuf };
 	struct strbuf data = { sizeof(*dbuf), 0, dbuf };
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
+
 	// printf(" :enable\n");
 	// FFLUSH(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8919,8 +8895,7 @@ iut_enable(void)
 	if ((ret = putmsg(iut_fd, &ctrl, NULL, RS_HIPRI)) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
 		FFLUSH(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		return FAILURE;
 	}
 	for (;;) {
@@ -8933,10 +8908,8 @@ iut_enable(void)
 		data.buf = dbuf;
 		if ((ret = getmsg(iut_fd, &ctrl, &data, &flags)) < 0) {
 			if (errno != EAGAIN && errno != EINTR) {
-				printf
-				    ("                                   ****ERROR: getmsg failed\n");
-				printf("                                              %s: %s\n",
-				       __FUNCTION__, strerror(errno));
+				printf("                                   ****ERROR: getmsg failed\n");
+				printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 				FFLUSH(stdout);
 				return FAILURE;
 			}
@@ -8945,8 +8918,7 @@ iut_enable(void)
 		if (p->lmi_primitive != LMI_ENABLE_CON && p->lmi_primitive != LMI_OK_ACK) {
 			printf("                                   ****ERROR: getmsg failed\n");
 			FFLUSH(stdout);
-			printf("                                              %s: %s\n",
-			       __FUNCTION__, strerror(errno));
+			printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 			iut_showmsg(&ctrl, &data);
 		} else
 			return SUCCESS;
@@ -8962,6 +8934,7 @@ iut_disable(void)
 	char cbuf[BUFSIZE];
 	union LMI_primitives *p = (union LMI_primitives *) cbuf;
 	struct strbuf ctrl = { sizeof(*cbuf), sizeof(p->disable_req), cbuf };
+
 	// printf(" :disable\n");
 	// FFLUSH(stdout);
 	ctrl.maxlen = BUFSIZE;
@@ -8971,8 +8944,7 @@ iut_disable(void)
 	ctrl.len = LMI_DISABLE_REQ_SIZE;
 	if (putmsg(iut_fd, &ctrl, NULL, RS_HIPRI) < 0) {
 		printf("                                   ****ERROR: putmsg failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -8988,6 +8960,7 @@ iut_config(void)
 #if 0
 	return SUCCESS;
 	struct strioctl ctl;
+
 	// printf(" :config\n");
 	// FFLUSH(stdout);
 	// printf(" :options sdl\n");
@@ -9001,8 +8974,7 @@ iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 	      option_sdl_failed:
 		printf("                                   ****ERROR: options sdl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -9026,8 +8998,7 @@ iut_config(void)
 	      option_sdt_failed:
 		printf("                                   ****ERROR: options sdt failed\n");
 		FFLUSH(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		return FAILURE;
 	}
 	ctl.ic_cmd = SDT_IOCGOPTIONS;
@@ -9049,8 +9020,7 @@ iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 	      option_sl_failed:
 		printf("                                   ****ERROR: options sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -9100,17 +9070,12 @@ iut_config(void)
 		// config_sdl_failed:
 		printf("                                   ****ERROR: config sdl failed\n");
 		FFLUSH(stdout);
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		return FAILURE;
 	}
 	/* go with defaults */
 #if 0
-	if (iutconf.sdl.iftype != SDL_TYPE_DS0 || iutconf.sdl.ifrate != 64000
-	    || iutconf.sdl.ifgtype != SDL_GTYPE_NONE || iutconf.sdl.ifgrate != 1544000
-	    || iutconf.sdl.ifmode != SDL_MODE_PEER || iutconf.sdl.ifgmode != SDL_GMODE_NONE
-	    || iutconf.sdl.ifgcrc != SDL_GCRC_CRC4 || iutconf.sdl.ifcoding != SDL_CODING_B8ZS
-	    || iutconf.sdl.ifframing != SDL_FRAMING_ESF)
+	if (iutconf.sdl.iftype != SDL_TYPE_DS0 || iutconf.sdl.ifrate != 64000 || iutconf.sdl.ifgtype != SDL_GTYPE_NONE || iutconf.sdl.ifgrate != 1544000 || iutconf.sdl.ifmode != SDL_MODE_PEER || iutconf.sdl.ifgmode != SDL_GMODE_NONE || iutconf.sdl.ifgcrc != SDL_GCRC_CRC4 || iutconf.sdl.ifcoding != SDL_CODING_B8ZS || iutconf.sdl.ifframing != SDL_FRAMING_ESF)
 		goto config_sdl_failed;
 #endif
 	// printf(" :config sdt\n");
@@ -9142,16 +9107,12 @@ iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 		// config_sdt_failed:
 		printf("                                   ****ERROR: config sdt failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
 #if 0
-	if (iutconf.sdt.t8 != 100 || iutconf.sdt.Tin != 4 || iutconf.sdt.Tie != 1
-	    || iutconf.sdt.T != 64 || iutconf.sdt.D != 256 || iutconf.sdt.Te != 577169
-	    || iutconf.sdt.De != 9308000 || iutconf.sdt.Ue != 144292000 || iutconf.sdt.N != 16
-	    || iutconf.sdt.m != 272 || iutconf.sdt.b != 8 || iutconf.sdt.f != iut_flags)
+	if (iutconf.sdt.t8 != 100 || iutconf.sdt.Tin != 4 || iutconf.sdt.Tie != 1 || iutconf.sdt.T != 64 || iutconf.sdt.D != 256 || iutconf.sdt.Te != 577169 || iutconf.sdt.De != 9308000 || iutconf.sdt.Ue != 144292000 || iutconf.sdt.N != 16 || iutconf.sdt.m != 272 || iutconf.sdt.b != 8 || iutconf.sdt.f != iut_flags)
 		goto config_sdt_failed;
 #endif
 	// printf(" :config sl\n");
@@ -9162,10 +9123,10 @@ iut_config(void)
 	iutconf.sl.t2h = 100 * 1000;	/* milliseconds */
 	iutconf.sl.t3 = 1 * 1000;	/* milliseconds */
 	iutconf.sl.t4n = 8 * 1000;	/* milliseconds */
-	iutconf.sl.t4e = 500;		/* milliseconds */
-	iutconf.sl.t5 = 100;		/* milliseconds */
+	iutconf.sl.t4e = 500;	/* milliseconds */
+	iutconf.sl.t5 = 100;	/* milliseconds */
 	iutconf.sl.t6 = 4 * 1000;	/* milliseconds */
-	iutconf.sl.t7 = iut_t7;		/* milliseconds */
+	iutconf.sl.t7 = iut_t7;	/* milliseconds */
 	iutconf.sl.rb_abate = 3;	/* messages */
 	iutconf.sl.rb_accept = 6;	/* messages */
 	iutconf.sl.rb_discard = 9;	/* messages */
@@ -9188,8 +9149,7 @@ iut_config(void)
 	if (ioctl(iut_fd, I_STR, &ctl) < 0) {
 	      config_sl_failed:
 		printf("                                   ****ERROR: config sl failed\n");
-		printf("                                              %s: %s\n", __FUNCTION__,
-		       strerror(errno));
+		printf("                                              %s: %s\n", __FUNCTION__, strerror(errno));
 		FFLUSH(stdout);
 		return FAILURE;
 	}
@@ -9199,17 +9159,7 @@ iut_config(void)
 	ctl.ic_dp = (char *) &iutconf.sl;
 	if (ioctl(iut_fd, I_STR, &ctl) < 0)
 		goto config_sl_failed;
-	if (iutconf.sl.t1 != 45 * 1000 || iutconf.sl.t2 != 5 * 1000 || iutconf.sl.t2l != 20 * 1000
-	    || iutconf.sl.t2h != 100 * 1000 || iutconf.sl.t3 != 1 * 1000 || iutconf.sl.t4n != 8 * 1000
-	    || iutconf.sl.t4e != 500 || iutconf.sl.t5 != 100
-	    || iutconf.sl.t6 != 4 * 1000 || iutconf.sl.t7 != iut_t7 || iutconf.sl.rb_abate != 3
-	    || iutconf.sl.rb_accept != 6 || iutconf.sl.rb_discard != 9
-	    || iutconf.sl.tb_abate_1 != 128 * 272 || iutconf.sl.tb_onset_1 != 256 * 272
-	    || iutconf.sl.tb_discd_1 != 384 * 272 || iutconf.sl.tb_abate_2 != 512 * 272
-	    || iutconf.sl.tb_onset_2 != 640 * 272 || iutconf.sl.tb_discd_2 != 768 * 272
-	    || iutconf.sl.tb_abate_3 != 896 * 272 || iutconf.sl.tb_onset_3 != 1024 * 272
-	    || iutconf.sl.tb_discd_3 != 1152 * 272 || iutconf.sl.N1 != 127 || iutconf.sl.N2 != 8192
-	    || iutconf.sl.M != 5)
+	if (iutconf.sl.t1 != 45 * 1000 || iutconf.sl.t2 != 5 * 1000 || iutconf.sl.t2l != 20 * 1000 || iutconf.sl.t2h != 100 * 1000 || iutconf.sl.t3 != 1 * 1000 || iutconf.sl.t4n != 8 * 1000 || iutconf.sl.t4e != 500 || iutconf.sl.t5 != 100 || iutconf.sl.t6 != 4 * 1000 || iutconf.sl.t7 != iut_t7 || iutconf.sl.rb_abate != 3 || iutconf.sl.rb_accept != 6 || iutconf.sl.rb_discard != 9 || iutconf.sl.tb_abate_1 != 128 * 272 || iutconf.sl.tb_onset_1 != 256 * 272 || iutconf.sl.tb_discd_1 != 384 * 272 || iutconf.sl.tb_abate_2 != 512 * 272 || iutconf.sl.tb_onset_2 != 640 * 272 || iutconf.sl.tb_discd_2 != 768 * 272 || iutconf.sl.tb_abate_3 != 896 * 272 || iutconf.sl.tb_onset_3 != 1024 * 272 || iutconf.sl.tb_discd_3 != 1152 * 272 || iutconf.sl.N1 != 127 || iutconf.sl.N2 != 8192 || iutconf.sl.M != 5)
 		goto config_sl_failed;
 #endif
 	return SUCCESS;
@@ -9239,6 +9189,7 @@ link_power_off(void)
 {
 #if 0
 	int ret = SUCCESS;
+
 	show_msus = 1;
 	show_fisus = 1;
 	show_timeout = 0;
@@ -9268,6 +9219,7 @@ link_out_of_service(void)
 {
 #if 0
 	int ret = SUCCESS;
+
 	show_msus = 1;
 	show_fisus = 1;
 	show_timeout = 0;
@@ -9299,6 +9251,7 @@ link_in_service(void)
 {
 #if 0
 	int ret = SUCCESS;
+
 	show_msus = 1;
 	show_fisus = 1;
 	show_timeout = 0;
@@ -9427,13 +9380,11 @@ typedef struct test_case {
 
 static test_case_t test_suite[] = {
 	{test_1_1a, link_power_off,
-	 "Q.781/Test 1.1(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Initialization (Power-up)\n"}
+	 "Q.781/Test 1.1(a)\n" "Link State Control - Expected signal units/orders\n" "Initialization (Power-up)\n"}
 #if 0
 	,
 	{test_1_1b, link_out_of_service,
-	 "Q.781/Test 1.1(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Initialization (Power-up)\n"}
+	 "Q.781/Test 1.1(b)\n" "Link State Control - Expected signal units/orders\n" "Initialization (Power-up)\n"}
 	,
 	{test_1_2, link_out_of_service,
 	 "Q.781/Test 1.2\n" "Link State Control - Expected signal units/orders\n" "Timer T2\n"}
@@ -9442,196 +9393,148 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 1.3\n" "Link State Control - Expected signal units/orders\n" "Timer T3\n"}
 	,
 	{test_1_4, link_out_of_service,
-	 "Q.781/Test 1.4\n" "Link State Control - Expected signal units/orders\n"
-	 "Timer T1 & Timer T4 (Normal)\n"}
+	 "Q.781/Test 1.4\n" "Link State Control - Expected signal units/orders\n" "Timer T1 & Timer T4 (Normal)\n"}
 	,
 	{test_1_5a, link_out_of_service,
-	 "Q.781/Test 1.5(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment procedure\n"}
+	 "Q.781/Test 1.5(a)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment procedure\n"}
 	,
 	{test_1_5b, link_out_of_service,
-	 "Q.781/Test 1.5(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment procedure\n"}
+	 "Q.781/Test 1.5(b)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment procedure\n"}
 	,
 	{test_1_6, link_out_of_service,
-	 "Q.781/Test 1.6\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment procedure - correct procedure (MSU)\n"}
+	 "Q.781/Test 1.6\n" "Link State Control - Expected signal units/orders\n" "Normal alignment procedure - correct procedure (MSU)\n"}
 	,
 	{test_1_7, link_out_of_service,
-	 "Q.781/Test 1.7\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received during normal proving period\n"}
+	 "Q.781/Test 1.7\n" "Link State Control - Expected signal units/orders\n" "SIO received during normal proving period\n"}
 	,
 	{test_1_8a, link_out_of_service,
-	 "Q.781/Test 1.8(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment with PO set (FISU)\n"}
+	 "Q.781/Test 1.8(a)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (FISU)\n"}
 	,
 	{test_1_8b, link_out_of_service,
-	 "Q.781/Test 1.8(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment with PO set (FISU)\n"}
+	 "Q.781/Test 1.8(b)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (FISU)\n"}
 	,
 	{test_1_9a, link_out_of_service,
-	 "Q.781/Test 1.9(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment with PO set (MSU)\n"}
+	 "Q.781/Test 1.9(a)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (MSU)\n"}
 	,
 	{test_1_9b, link_out_of_service,
-	 "Q.781/Test 1.9(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment with PO set (MSU)\n"}
+	 "Q.781/Test 1.9(b)\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set (MSU)\n"}
 	,
 	{test_1_10, link_out_of_service,
-	 "Q.781/Test 1.10\n" "Link State Control - Expected signal units/orders\n"
-	 "Normal alignment with PO set and cleared\n"}
+	 "Q.781/Test 1.10\n" "Link State Control - Expected signal units/orders\n" "Normal alignment with PO set and cleared\n"}
 	,
 	{test_1_11, link_out_of_service,
-	 "Q.781/Test 1.11\n" "Link State Control - Expected signal units/orders\n"
-	 "Set RPO when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.11\n" "Link State Control - Expected signal units/orders\n" "Set RPO when \"Aligned not ready\"\n"}
 	,
 	{test_1_12a, link_out_of_service,
-	 "Q.781/Test 1.12(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "SIOS received when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.12(a)\n" "Link State Control - Expected signal units/orders\n" "SIOS received when \"Aligned not ready\"\n"}
 	,
 	{test_1_12b, link_out_of_service,
-	 "Q.781/Test 1.12(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "SIOS received when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.12(b)\n" "Link State Control - Expected signal units/orders\n" "SIOS received when \"Aligned not ready\"\n"}
 	,
 	{test_1_13, link_out_of_service,
-	 "Q.781/Test 1.13\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received when \"Aligned not ready\"\n"}
+	 "Q.781/Test 1.13\n" "Link State Control - Expected signal units/orders\n" "SIO received when \"Aligned not ready\"\n"}
 	,
 	{test_1_14, link_out_of_service,
-	 "Q.781/Test 1.14\n" "Link State Control - Expected signal units/orders\n"
-	 "Set and clear LPO when \"Initial alignment\"\n"}
+	 "Q.781/Test 1.14\n" "Link State Control - Expected signal units/orders\n" "Set and clear LPO when \"Initial alignment\"\n"}
 	,
 	{test_1_15, link_out_of_service,
-	 "Q.781/Test 1.15\n" "Link State Control - Expected signal units/orders\n"
-	 "Set and clear LPO when \"Aligned ready\"\n"}
+	 "Q.781/Test 1.15\n" "Link State Control - Expected signal units/orders\n" "Set and clear LPO when \"Aligned ready\"\n"}
 	,
 	{test_1_16, link_out_of_service,
-	 "Q.781/Test 1.16\n" "Link State Control - Expected signal units/orders\n"
-	 "Timer T1 in \"Aligned not ready\" state\n"}
+	 "Q.781/Test 1.16\n" "Link State Control - Expected signal units/orders\n" "Timer T1 in \"Aligned not ready\" state\n"}
 	,
 	{test_1_17, link_out_of_service,
-	 "Q.781/Test 1.17\n" "Link State Control - Expected signal units/orders\n"
-	 "No SIO sent during normal proving period\n"}
+	 "Q.781/Test 1.17\n" "Link State Control - Expected signal units/orders\n" "No SIO sent during normal proving period\n"}
 	,
 	{test_1_18, link_out_of_service,
-	 "Q.781/Test 1.18\n" "Link State Control - Expected signal units/orders\n"
-	 "Set and cease emergency prior to \"start alignment\"\n"}
+	 "Q.781/Test 1.18\n" "Link State Control - Expected signal units/orders\n" "Set and cease emergency prior to \"start alignment\"\n"}
 	,
 	{test_1_19, link_out_of_service,
-	 "Q.781/Test 1.19\n" "Link State Control - Expected signal units/orders\n"
-	 "Set emergency while in \"not aligned state\"\n"}
+	 "Q.781/Test 1.19\n" "Link State Control - Expected signal units/orders\n" "Set emergency while in \"not aligned state\"\n"}
 	,
 	{test_1_20, link_out_of_service,
-	 "Q.781/Test 1.20\n" "Link State Control - Expected signal units/orders\n"
-	 "Set emergency when \"aligned\"\n"}
+	 "Q.781/Test 1.20\n" "Link State Control - Expected signal units/orders\n" "Set emergency when \"aligned\"\n"}
 	,
 	{test_1_21, link_out_of_service,
-	 "Q.781/Test 1.21\n" "Link State Control - Expected signal units/orders\n"
-	 "Both ends set emergency.\n"}
+	 "Q.781/Test 1.21\n" "Link State Control - Expected signal units/orders\n" "Both ends set emergency.\n"}
 	,
 	{test_1_22, link_out_of_service,
-	 "Q.781/Test 1.22\n" "Link State Control - Expected signal units/orders\n"
-	 "Individual end sets emergency\n"}
+	 "Q.781/Test 1.22\n" "Link State Control - Expected signal units/orders\n" "Individual end sets emergency\n"}
 	,
 	{test_1_23, link_out_of_service,
-	 "Q.781/Test 1.23\n" "Link State Control - Expected signal units/orders\n"
-	 "Set emergency during normal proving\n"}
+	 "Q.781/Test 1.23\n" "Link State Control - Expected signal units/orders\n" "Set emergency during normal proving\n"}
 	,
 	{test_1_24, link_out_of_service,
-	 "Q.781/Test 1.24\n" "Link State Control - Expected signal units/orders\n"
-	 "No SIO send during emergency alignment\n"}
+	 "Q.781/Test 1.24\n" "Link State Control - Expected signal units/orders\n" "No SIO send during emergency alignment\n"}
 	,
 	{test_1_25, link_out_of_service,
-	 "Q.781/Test 1.25\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation duing intial alignment\n"}
+	 "Q.781/Test 1.25\n" "Link State Control - Expected signal units/orders\n" "Deactivation duing intial alignment\n"}
 	,
 	{test_1_26, link_out_of_service,
-	 "Q.781/Test 1.26\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during aligned state\n"}
+	 "Q.781/Test 1.26\n" "Link State Control - Expected signal units/orders\n" "Deactivation during aligned state\n"}
 	,
 	{test_1_27, link_out_of_service,
-	 "Q.781/Test 1.27\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during aligned not ready\n"}
+	 "Q.781/Test 1.27\n" "Link State Control - Expected signal units/orders\n" "Deactivation during aligned not ready\n"}
 	,
 	{test_1_28, link_in_service_basic,
-	 "Q.781/Test 1.28\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received during link in service\n"}
+	 "Q.781/Test 1.28\n" "Link State Control - Expected signal units/orders\n" "SIO received during link in service\n"}
 	,
 	{test_1_29a, link_in_service_basic,
-	 "Q.781/Test 1.29(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received during link in service\n"}
+	 "Q.781/Test 1.29(a)\n" "Link State Control - Expected signal units/orders\n" "SIO received during link in service\n"}
 	,
 	{test_1_29b, link_in_service_basic,
-	 "Q.781/Test 1.29(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received during link in service\n"}
+	 "Q.781/Test 1.29(b)\n" "Link State Control - Expected signal units/orders\n" "SIO received during link in service\n"}
 	,
 	{test_1_30a, link_in_service_basic,
-	 "Q.781/Test 1.30(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during LPO\n"}
+	 "Q.781/Test 1.30(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during LPO\n"}
 	,
 	{test_1_30b, link_in_service_basic,
-	 "Q.781/Test 1.30(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during LPO\n"}
+	 "Q.781/Test 1.30(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during LPO\n"}
 	,
 	{test_1_31a, link_in_service_basic,
-	 "Q.781/Test 1.31(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during RPO\n"}
+	 "Q.781/Test 1.31(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during RPO\n"}
 	,
 	{test_1_31b, link_in_service_basic,
-	 "Q.781/Test 1.31(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during RPO\n"}
+	 "Q.781/Test 1.31(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during RPO\n"}
 	,
 	{test_1_32a, link_out_of_service,
-	 "Q.781/Test 1.32(a)\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during the proving period\n"}
+	 "Q.781/Test 1.32(a)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during the proving period\n"}
 	,
 	{test_1_32b, link_out_of_service,
-	 "Q.781/Test 1.32(b)\n" "Link State Control - Expected signal units/orders\n"
-	 "Deactivation during the proving period\n"}
+	 "Q.781/Test 1.32(b)\n" "Link State Control - Expected signal units/orders\n" "Deactivation during the proving period\n"}
 	,
 	{test_1_33, link_out_of_service,
-	 "Q.781/Test 1.33\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received instead of FISUs\n"}
+	 "Q.781/Test 1.33\n" "Link State Control - Expected signal units/orders\n" "SIO received instead of FISUs\n"}
 	,
 	{test_1_34, link_out_of_service,
-	 "Q.781/Test 1.34\n" "Link State Control - Expected signal units/orders\n"
-	 "SIO received instead of FISUs\n"}
+	 "Q.781/Test 1.34\n" "Link State Control - Expected signal units/orders\n" "SIO received instead of FISUs\n"}
 	,
 	{test_1_35, link_out_of_service,
-	 "Q.781/Test 1.35\n" "Link State Control - Expected signal units/orders\n"
-	 "SIPO received instead of FISUs\n"}
+	 "Q.781/Test 1.35\n" "Link State Control - Expected signal units/orders\n" "SIPO received instead of FISUs\n"}
 	,
 	{test_2_1, link_out_of_service,
-	 "Q.781/Test 2.1\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Out of service\" state\n"}
+	 "Q.781/Test 2.1\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Out of service\" state\n"}
 	,
 	{test_2_2, link_out_of_service,
-	 "Q.781/Test 2.2\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Not Aligned\" state\n"}
+	 "Q.781/Test 2.2\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Not Aligned\" state\n"}
 	,
 	{test_2_3, link_out_of_service,
-	 "Q.781/Test 2.3\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Aligned\" state\n"}
+	 "Q.781/Test 2.3\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Aligned\" state\n"}
 	,
 	{test_2_4, link_out_of_service,
-	 "Q.781/Test 2.4\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Proving\" state\n"}
+	 "Q.781/Test 2.4\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Proving\" state\n"}
 	,
 	{test_2_5, link_out_of_service,
-	 "Q.781/Test 2.5\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Aligned Ready\" state\n"}
+	 "Q.781/Test 2.5\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Aligned Ready\" state\n"}
 	,
 	{test_2_6, link_out_of_service,
-	 "Q.781/Test 2.6\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Aligned Not Ready\" state\n"}
+	 "Q.781/Test 2.6\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Aligned Not Ready\" state\n"}
 	,
 	{test_2_7, link_in_service_basic,
-	 "Q.781/Test 2.7\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"In Service\" state\n"}
+	 "Q.781/Test 2.7\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"In Service\" state\n"}
 	,
 	{test_2_8, link_in_service_basic,
-	 "Q.781/Test 2.8\n" "Link State Control - Unexpected signal units/orders\n"
-	 "Unexpected signal units/orders in \"Processor Outage\" state\n"}
+	 "Q.781/Test 2.8\n" "Link State Control - Unexpected signal units/orders\n" "Unexpected signal units/orders in \"Processor Outage\" state\n"}
 	,
 	{test_3_1, link_out_of_service,
 	 "Q.781/Test 3.1\n" "Transmission Failure\n" "Link aligned ready (Break Tx path)\n"}
@@ -9643,8 +9546,7 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 3.3\n" "Transmission Failure\n" "Link aligned not ready (Break Tx path)\n"}
 	,
 	{test_3_4, link_out_of_service,
-	 "Q.781/Test 3.4\n" "Transmission Failure\n"
-	 "Link aligned not ready (Corrupt FIBs - Basic)\n"}
+	 "Q.781/Test 3.4\n" "Transmission Failure\n" "Link aligned not ready (Corrupt FIBs - Basic)\n"}
 	,
 	{test_3_5, link_in_service_basic,
 	 "Q.781/Test 3.5\n" "Transmission Failure\n" "Link in service (Break Tx path)\n"}
@@ -9656,8 +9558,7 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 3.7\n" "Transmission Failure\n" "Link in processor outage (Break Tx path)\n"}
 	,
 	{test_3_8, link_in_service_basic,
-	 "Q.781/Test 3.8\n" "Transmission Failure\n"
-	 "Link in processor outage (Corrupt FIBs - Basic)\n"}
+	 "Q.781/Test 3.8\n" "Transmission Failure\n" "Link in processor outage (Corrupt FIBs - Basic)\n"}
 	,
 	{test_4_1, link_in_service_basic,
 	 "Q.781/Test 4.1\n" "Processor Outage Control\n" "Set and clear LPO while link in service\n"}
@@ -9666,36 +9567,28 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 4.2\n" "Processor Outage Control\n" "RPO during LPO\n"}
 	,
 	{test_4_3, link_in_service_basic,
-	 "Q.781/Test 4.3\n" "Processor Outage Control\n"
-	 "Clear LPO when \"Both processor outage\"\n"}
+	 "Q.781/Test 4.3\n" "Processor Outage Control\n" "Clear LPO when \"Both processor outage\"\n"}
 	,
 	{test_5_1, link_in_service_basic,
-	 "Q.781/Test 5.1\n" "SU delimitation, alignment, error detection and correction\n"
-	 "More than 7 ones between MSU opening and closing flags\n"}
+	 "Q.781/Test 5.1\n" "SU delimitation, alignment, error detection and correction\n" "More than 7 ones between MSU opening and closing flags\n"}
 	,
 	{test_5_2, link_in_service_basic,
-	 "Q.781/Test 5.2\n" "SU delimitation, alignment, error detection and correction\n"
-	 "Greater than maximum signal unit length\n"}
+	 "Q.781/Test 5.2\n" "SU delimitation, alignment, error detection and correction\n" "Greater than maximum signal unit length\n"}
 	,
 	{test_5_3, link_in_service_basic,
-	 "Q.781/Test 5.3\n" "SU delimitation, alignment, error detection and correction\n"
-	 "Below minimum signal unit length\n"}
+	 "Q.781/Test 5.3\n" "SU delimitation, alignment, error detection and correction\n" "Below minimum signal unit length\n"}
 	,
 	{test_5_4a, link_in_service_basic,
-	 "Q.781/Test 5.4(a)\n" "SU delimitation, alignment, error detection and correction\n"
-	 "Reception of single and multiple flags between FISUs\n"}
+	 "Q.781/Test 5.4(a)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between FISUs\n"}
 	,
 	{test_5_4b, link_in_service_basic,
-	 "Q.781/Test 5.4(b)\n" "SU delimitation, alignment, error detection and correction\n"
-	 "Reception of single and multiple flags between FISUs\n"}
+	 "Q.781/Test 5.4(b)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between FISUs\n"}
 	,
 	{test_5_5a, link_in_service_basic,
-	 "Q.781/Test 5.5(a)\n" "SU delimitation, alignment, error detection and correction\n"
-	 "Reception of single and multiple flags between MSUs\n"}
+	 "Q.781/Test 5.5(a)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between MSUs\n"}
 	,
 	{test_5_5b, link_in_service_basic,
-	 "Q.781/Test 5.5(b)\n" "SU delimitation, alignment, error detection and correction\n"
-	 "Reception of single and multiple flags between MSUs\n"}
+	 "Q.781/Test 5.5(b)\n" "SU delimitation, alignment, error detection and correction\n" "Reception of single and multiple flags between MSUs\n"}
 	,
 	{test_6_1, link_in_service_basic,
 	 "Q.781/Test 6.1\n" "SUERM check\n" "Error rate of 1 in 256 - Link remains in service\n"}
@@ -9722,84 +9615,67 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 7.4\n" "AERM check\n" "Error rate at the emergency threshold\n"}
 	,
 	{test_8_1, link_in_service_basic,
-	 "Q.781/Test 8.1\n" "Transmission and reception control (Basic)\n"
-	 "MSU transmission and reception\n"}
+	 "Q.781/Test 8.1\n" "Transmission and reception control (Basic)\n" "MSU transmission and reception\n"}
 	,
 	{test_8_2, link_in_service_basic,
-	 "Q.781/Test 8.2\n" "Transmission and reception control (Basic)\n"
-	 "Negative acknowledgement of an MSU\n"}
+	 "Q.781/Test 8.2\n" "Transmission and reception control (Basic)\n" "Negative acknowledgement of an MSU\n"}
 	,
 	{test_8_3, link_in_service_basic_long_ack,
 	 "Q.781/Test 8.3\n" "Transmission and reception control (Basic)\n" "Check RTB full\n"}
 	,
 	{test_8_4, link_in_service_basic,
-	 "Q.781/Test 8.4\n" "Transmission and reception control (Basic)\n"
-	 "Single MSU with erroneous FIB\n"}
+	 "Q.781/Test 8.4\n" "Transmission and reception control (Basic)\n" "Single MSU with erroneous FIB\n"}
 	,
 	{test_8_5, link_in_service_basic,
 	 "Q.781/Test 8.5\n" "Transmission and reception control (Basic)\n" "Duplicated FSN\n"}
 	,
 	{test_8_6, link_in_service_basic,
-	 "Q.781/Test 8.6\n" "Transmission and reception control (Basic)\n"
-	 "Erroneous retransmission - Single MSU\n"}
+	 "Q.781/Test 8.6\n" "Transmission and reception control (Basic)\n" "Erroneous retransmission - Single MSU\n"}
 	,
 	{test_8_7, link_in_service_basic,
-	 "Q.781/Test 8.7\n" "Transmission and reception control (Basic)\n"
-	 "Erroneous retransmission - Multiple FISUs\n"}
+	 "Q.781/Test 8.7\n" "Transmission and reception control (Basic)\n" "Erroneous retransmission - Multiple FISUs\n"}
 	,
 	{test_8_8, link_in_service_basic,
-	 "Q.781/Test 8.8\n" "Transmission and reception control (Basic)\n"
-	 "Single FISU with corrupt FIB\n"}
+	 "Q.781/Test 8.8\n" "Transmission and reception control (Basic)\n" "Single FISU with corrupt FIB\n"}
 	,
 	{test_8_9, link_in_service_basic,
-	 "Q.781/Test 8.9\n" "Transmission and reception control (Basic)\n"
-	 "Single FISU prior to RPO being set\n"}
+	 "Q.781/Test 8.9\n" "Transmission and reception control (Basic)\n" "Single FISU prior to RPO being set\n"}
 	,
 	{test_8_10, link_in_service_basic,
-	 "Q.781/Test 8.10\n" "Transmission and reception control (Basic)\n"
-	 "Abnormal BSN - single MSU\n"}
+	 "Q.781/Test 8.10\n" "Transmission and reception control (Basic)\n" "Abnormal BSN - single MSU\n"}
 	,
 	{test_8_11, link_in_service_basic,
-	 "Q.781/Test 8.11\n" "Transmission and reception control (Basic)\n"
-	 "Abnormal BSN - two consecutive FISUs\n"}
+	 "Q.781/Test 8.11\n" "Transmission and reception control (Basic)\n" "Abnormal BSN - two consecutive FISUs\n"}
 	,
 	{test_8_12, link_in_service_basic,
-	 "Q.781/Test 8.12\n" "Transmission and reception control (Basic)\n"
-	 "Excessive delay of acknowledgement\n"}
+	 "Q.781/Test 8.12\n" "Transmission and reception control (Basic)\n" "Excessive delay of acknowledgement\n"}
 	,
 	{test_8_13, link_in_service_basic,
 	 "Q.781/Test 8.13\n" "Transmission and reception control (Basic)\n" "Level 3 Stop command\n"}
 	,
 	{test_9_1, link_in_service_pcr,
-	 "Q.781/Test 9.1\n" "Transmission and reception control (PCR)\n"
-	 "MSU transmission and reception\n"}
+	 "Q.781/Test 9.1\n" "Transmission and reception control (PCR)\n" "MSU transmission and reception\n"}
 	,
 	{test_9_2, link_in_service_pcr,
 	 "Q.781/Test 9.2\n" "Transmission and reception control (PCR)\n" "Priority control\n"}
 	,
 	{test_9_3, link_in_service_pcr_long_ack,
-	 "Q.781/Test 9.3\n" "Transmission and reception control (PCR)\n"
-	 "Forced retransmission with the value N1\n"}
+	 "Q.781/Test 9.3\n" "Transmission and reception control (PCR)\n" "Forced retransmission with the value N1\n"}
 	,
 	{test_9_4, link_in_service_pcr_long_ack,
-	 "Q.781/Test 9.4\n" "Transmission and reception control (PCR)\n"
-	 "Forced retransmission with the value N2\n"}
+	 "Q.781/Test 9.4\n" "Transmission and reception control (PCR)\n" "Forced retransmission with the value N2\n"}
 	,
 	{test_9_5, link_in_service_pcr_long_ack,
-	 "Q.781/Test 9.5\n" "Transmission and reception control (PCR)\n"
-	 "Forced retransmission cancel\n"}
+	 "Q.781/Test 9.5\n" "Transmission and reception control (PCR)\n" "Forced retransmission cancel\n"}
 	,
 	{test_9_6, link_in_service_pcr_long_ack,
-	 "Q.781/Test 9.6\n" "Transmission and reception control (PCR)\n"
-	 "Reception of forced retransmission\n"}
+	 "Q.781/Test 9.6\n" "Transmission and reception control (PCR)\n" "Reception of forced retransmission\n"}
 	,
 	{test_9_7, link_in_service_pcr,
-	 "Q.781/Test 9.7\n" "Transmission and reception control (PCR)\n"
-	 "MSU transmission while RPO set\n"}
+	 "Q.781/Test 9.7\n" "Transmission and reception control (PCR)\n" "MSU transmission while RPO set\n"}
 	,
 	{test_9_8, link_in_service_pcr,
-	 "Q.781/Test 9.8\n" "Transmission and reception control (PCR)\n"
-	 "Abnormal BSN - Single MSU\n"}
+	 "Q.781/Test 9.8\n" "Transmission and reception control (PCR)\n" "Abnormal BSN - Single MSU\n"}
 	,
 	{test_9_9, link_in_service_pcr,
 	 "Q.781/Test 9.9\n" "Transmission and reception control (PCR)\n" "Abnormal BSN - Two MSUs\n"}
@@ -9808,12 +9684,10 @@ static test_case_t test_suite[] = {
 	 "Q.781/Test 9.10\n" "Transmission and reception control (PCR)\n" "Unexpected FSN\n"}
 	,
 	{test_9_11, link_in_service_pcr,
-	 "Q.781/Test 9.11\n" "Transmission and reception control (PCR)\n"
-	 "Excessive delay of acknowledgement\n"}
+	 "Q.781/Test 9.11\n" "Transmission and reception control (PCR)\n" "Excessive delay of acknowledgement\n"}
 	,
 	{test_9_12, link_in_service_pcr,
-	 "Q.781/Test 9.12\n" "Transmission and reception control (PCR)\n"
-	 "FISU with FSN expected for MSU\n"}
+	 "Q.781/Test 9.12\n" "Transmission and reception control (PCR)\n" "FISU with FSN expected for MSU\n"}
 	,
 	{test_9_13, link_in_service_pcr,
 	 "Q.781/Test 9.13\n" "Transmission and reception control (PCR)\n" "Level 3 Stop command\n"}
@@ -9833,6 +9707,7 @@ static int
 run_test(test_case_t * tcase)
 {
 	int ret = 0;
+
 	printf(tcase->title);
 	fflush(stdout);
 	state = 0;
@@ -9895,6 +9770,7 @@ const char *
 lmi_strreason(unsigned int reason)
 {
 	const char *r;
+
 	switch (reason) {
 	default:
 	case LMI_UNSPEC:
@@ -10026,6 +9902,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 		case LMI_INFO_ACK:
 		{
 			int ppalen = ctrl->len - sizeof(p->info_ack);
+
 			printf("LMI_INFO_ACK:\n");
 			printf("Version = 0x%08lx\n", p->info_ack.lmi_version);
 			printf("State = %lu\n", p->info_ack.lmi_state);
@@ -10089,6 +9966,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			{
 				int i;
 				char *c = data->buf;
+
 				printf("SL_PDU_IND:\n");
 				printf("  Data: ");
 				for (i = 0; i < data->len; i++, c++)
@@ -10110,10 +9988,8 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			{
 				printf("SL_LINK_CONGESTION_CEASED_IND:\n");
 				printf("  timestamp = %lu\n", l->link_cong_ceased_ind.sl_timestamp);
-				printf("  cong stat = %lu\n",
-				       l->link_cong_ceased_ind.sl_cong_status);
-				printf("  disc stat = %lu\n",
-				       l->link_cong_ceased_ind.sl_disc_status);
+				printf("  cong stat = %lu\n", l->link_cong_ceased_ind.sl_cong_status);
+				printf("  disc stat = %lu\n", l->link_cong_ceased_ind.sl_disc_status);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -10121,6 +9997,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			{
 				int i;
 				char *c = data->buf;
+
 				printf("SL_RETRIEVED_MESSAGE_IND:\n");
 				printf("  Data: ");
 				for (i = 0; i < data->len; i++, c++)
@@ -10166,8 +10043,7 @@ iut_showmsg(struct strbuf *ctrl, struct strbuf *data)
 			case SL_REMOTE_PROCESSOR_RECOVERED_IND:
 			{
 				printf("SL_REMOTE_PROCESSOR_RECOVERED_IND:\n");
-				printf("  timestamp = %lu\n",
-				       l->rem_proc_recovered_ind.sl_timestamp);
+				printf("  timestamp = %lu\n", l->rem_proc_recovered_ind.sl_timestamp);
 				FFLUSH(stdout);
 			}
 				return (l->sl_primitive);
@@ -10217,9 +10093,7 @@ do_tests(void)
 		switch (ret) {
 		case FAILURE:
 			failed++;
-			printf
-			    ("******** FAILURE(%d:%d) - test case failed in state %d with event %s.\n",
-			     state, event, state, show_event(event));
+			printf("******** FAILURE(%d:%d) - test case failed in state %d with event %s.\n", state, event, state, show_event(event));
 			break;
 		case SUCCESS:
 			passed++;
@@ -10227,16 +10101,12 @@ do_tests(void)
 			break;
 		case INCONCLUSIVE:
 			inconc++;
-			printf
-			    ("******** INCONCLUSIVE(%d:%d) - test case inconclusive in state %d with event %s.\n",
-			     state, event, state, show_event(event));
+			printf("******** INCONCLUSIVE(%d:%d) - test case inconclusive in state %d with event %s.\n", state, event, state, show_event(event));
 			break;
 		case SCRIPTERROR:
 		default:
 			errored++;
-			printf
-			    ("******** ERROR(%d:%d) - test case completed in error in state %d with event %s.\n",
-			     state, event, state, show_event(event));
+			printf("******** ERROR(%d:%d) - test case completed in error in state %d with event %s.\n", state, event, state, show_event(event));
 			break;
 		}
 		printf("********\n\n");
@@ -10298,7 +10168,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -10327,7 +10197,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }
@@ -10379,6 +10249,7 @@ main(int argc, char *argv[])
 {
 	for (;;) {
 		int c, val;
+
 #if defined _GNU_SOURCE
 		int option_index = 0;
 		/* *INDENT-OFF* */
@@ -10392,6 +10263,7 @@ main(int argc, char *argv[])
 			{ 0, }
 		};
 		/* *INDENT-ON* */
+
 		c = getopt_long(argc, argv, "qvhVC?", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "qvhVC?");

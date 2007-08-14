@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: voip.texi,v 0.9.2.14 2007/06/26 18:15:55 brian Exp $
+% @(#) $Id: voip.texi,v 0.9.2.15 2007/08/14 12:16:56 brian Exp $
 %
 % =========================================================================
 %
@@ -54,11 +54,14 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/06/26 18:15:55 $ by $Author: brian $
+% Last Modified $Date: 2007/08/14 12:16:56 $ by $Author: brian $
 %
 % =========================================================================
 %
 % $Log: voip.texi,v $
+% Revision 0.9.2.15  2007/08/14 12:16:56  brian
+% - GPLv3 header updates
+%
 % Revision 0.9.2.14  2007/06/26 18:15:55  brian
 % - added new documentation
 %
@@ -257,7 +260,7 @@ The @uref{http://www.openss7.org/, OpenSS7 Project} is an open source software p
 developed many protocol components within the SS7, SIGTRAN, ISDN and VoIP protocol stacks.
 Intellectual property rights for the OpenSS7 Project are held by @uref{http://www.openss7.com/,
 OpenSS7 Corporation}.  All OpenSS7 Project software is eventually licensed under the GNU Public
-License Version 2.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
+License.  OpenSS7 Corporation also provide commercial licensing of OpenSS7 Project
 software under terms less restrictive than the GPL.
 
 @subsubheading The OpenSS7 VoIP Switch
@@ -419,6 +422,9 @@ Project} website for a current version.
 @smallexample
 
 $Log: voip.texi,v $
+Revision 0.9.2.15  2007/08/14 12:16:56  brian
+- GPLv3 header updates
+
 Revision 0.9.2.14  2007/06/26 18:15:55  brian
 - added new documentation
 
@@ -1615,8 +1621,8 @@ application using the Transaction Component Interface (TCI).
 
 The TCAP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including operation classes 1 through 5.  The TCAP driver provides a specialized TR and TC
-interface to its users and accepts an X/Open NPI Version 2.0 interface from beneath.  In addition, a
-TPI Version 2.0 user interface supporting an X/Open XNS 5.2 mOSI XTI library interface is provided.
+interface to its users and accepts an X/Open NPI Revision 2.0 interface from beneath.  In addition, a
+TPI Revision 2.0 user interface supporting an X/Open XNS 5.2 mOSI XTI library interface is provided.
 
 The TCAP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
 The primary scale limiting characteristic of the TCAP driver is the number of simultaneous open
@@ -1678,9 +1684,9 @@ the TCAP driver to form a complete SS7 stack in support of call transactions.
 
 The SCCP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including both connectionless and connection-oriented protocol classes 0 through 3.  The
-SCCP driver provides an extended NPI Version 2.0 interface to its users and accepts an NPI Version
+SCCP driver provides an extended NPI Revision 2.0 interface to its users and accepts an NPI Version
 2.0 (Connectionless) MTP interface from beneath or a specialized OpenSS7 MTPI interface.  In
-addition, a TPI Version 2.0 user interface supporting an X/Open XNS 5.2 XTI library interface is
+addition, a TPI Revision 2.0 user interface supporting an X/Open XNS 5.2 XTI library interface is
 provided.
 
 The SCCP driver also provide GTT streams for servicing Global Title Translations requests.  These
@@ -1697,8 +1703,8 @@ stream.  In addition, it is possible to use an ISO/OSI connectionless Network Se
 provide the network services to SCCP.
 
 The OpenSS7 SCCP component has message encoding and decoding for ITU-T/ETSI and ANSI SCCP.
-Interfaces provided to SCCP users include an XTI/OSI capable TPI Version 2.0 interface, an NPI
-Version 2.0 interface, and an SCCP-specific interface.
+Interfaces provided to SCCP users include an XTI/OSI capable TPI Revision 2.0 interface, an NPI
+Revision 2.0 interface, and an SCCP-specific interface.
 
 The OpenSS7 SCCP module supports all Protocol Classes.
 
@@ -1771,7 +1777,7 @@ support of transaction services.}
 
 The MTP driver supports all CCITT/ITU-T versions (Blue Book forward), ETSI and ANSI versions (1992
 forward), including full transfer function.  The MTP driver provides a specialized MTP interface to
-its users, in addition to an NPI Version 2.0 connectionless interface.  A TPI Version 2.0
+its users, in addition to an NPI Revision 2.0 connectionless interface.  A TPI Revision 2.0
 (connectionless) user interface support X/Open XNS 5.2 XTI library functions is also provided.
 
 The MTP driver is a @dfn{STREAMS} driver that runs in the Linux kernel for maximum performance.
@@ -1812,7 +1818,7 @@ forward), including Q.703 and
 @cindex Q.703 Annex B
 Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
 The SL module provides a specialized SL interface to its users, in addition to an NCR Comten CDI
-Version 2.0 Style 2 connectionless interface.
+Revision 2.0 Style 2 connectionless interface.
 
 The SL module is a @dfn{STREAMS} module that runs in the Linux kernel for maximum performance.
 
@@ -1843,7 +1849,7 @@ forward), including Q.703 and
 @cindex Q.703 Annex B
 Q.703 Annex B (HSL) operation.  TTC JQ.703 (1994) is also supported.
 The SDT module provides a specialized SDT interface to its users, in addition to an NCR Comten CDI
-Version 2.0 Style 2 connectionless interface.
+Revision 2.0 Style 2 connectionless interface.
 
 The Signalling Data Terminal (SDT) module is responsible for providing SDT services to its users.
 
@@ -2277,7 +2283,7 @@ OpenSS7 stack components such as SIP, H.323, MGCP, H.248 and TALI.
 
 OpenSS7 has two implementations (@dfn{STREAMS} and Linux Sockets) that provide support for this new
 transport protocol and provide transport for SIGTRAN and other protocols.  The @dfn{STREAMS} SCTP
-implementation provides an NPI Version 2.0 and TPI Version 2.0 interface to its users.  Also
+implementation provides an NPI Revision 2.0 and TPI Revision 2.0 interface to its users.  Also
 supported is an X/Open XNS 5.2 XTI library.  The Linux Native SCTP implementation provides a Sockets
 interface.
 
@@ -2370,7 +2376,7 @@ and other facilities commonly used by protocol modules.
 @figure{osimap,21,SS7 to ISO/OSI Mapping}
 
 Each OpenSS7 protocol module provides standardized X/Open ISO/OSI interfaces as well as more SS7
-specialized interfaces.  Many of the OpenSS7 protocols modules provide TPI Version 2.0 interfaces
+specialized interfaces.  Many of the OpenSS7 protocols modules provide TPI Revision 2.0 interfaces
 with support for the OpenSS7 XTI/TLI Library.
 
 @figuresized{stack,22,STREAMS SS7/SIGTRAN Stack Architecture,3in}

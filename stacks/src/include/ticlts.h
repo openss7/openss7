@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ticlts.h,v 0.9.2.4 2007/06/17 01:56:07 brian Exp $
+ @(#) $Id: ticlts.h,v 0.9.2.5 2007/08/14 12:17:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:07 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ticlts.h,v $
+ Revision 0.9.2.5  2007/08/14 12:17:08  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/06/17 01:56:07  brian
  - updates for release, remove any later language
 
@@ -70,7 +73,7 @@
 #ifndef _TICLTS_H
 #define _TICLTS_H
 
-#ident "@(#) $RCSfile: ticlts.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ticlts.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 /* *INDENT-OFF* */

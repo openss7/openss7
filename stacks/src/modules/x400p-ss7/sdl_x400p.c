@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:22 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_x400p.c,v $
+ Revision 0.9.2.21  2007/08/14 12:19:00  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.20  2007/07/14 01:35:22  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:22 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:22 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -108,7 +111,7 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/07/14 01:35:22 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -226,6 +229,7 @@ typedef struct xp {
 	sdl_stats_t stamp;		/* SDT statistics timestamps */
 	sdl_stats_t statsp;		/* SDT statistics periods */
 } xp_t;
+
 #define XP_PRIV(__q) ((struct xp *)(__q)->q_ptr)
 
 STATIC struct xp *xp_alloc_priv(queue_t *, struct xp **, dev_t *, cred_t *);
@@ -408,6 +412,7 @@ STATIC int
 m_error(queue_t *q, struct xp *xp, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = err < 0 ? -err : err;
@@ -430,6 +435,7 @@ sdl_received_bits_ind(queue_t *q, struct xp *xp, mblk_t *dp)
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
 		sdl_received_bits_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -455,6 +461,7 @@ sdl_disconnect_ind(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
 	sdl_disconnect_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -476,6 +483,7 @@ lmi_info_ack(queue_t *q, struct xp *xp, caddr_t ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -505,6 +513,7 @@ lmi_ok_ack(queue_t *q, struct xp *xp, ulong state, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -528,6 +537,7 @@ lmi_error_ack(queue_t *q, struct xp *xp, ulong state, long prim, ulong errno, ul
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -553,6 +563,7 @@ lmi_enable_con(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -575,8 +586,10 @@ lmi_disable_con(queue_t *q, struct xp *xp)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		struct xp *xp = XP_PRIV(q);
+
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
@@ -598,6 +611,7 @@ lmi_optmgmt_ack(queue_t *q, struct xp *xp, ulong flags, caddr_t opt_ptr, size_t 
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -622,6 +636,7 @@ lmi_error_ind(queue_t *q, struct xp *xp, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -647,6 +662,7 @@ lmi_stats_ind(queue_t *q, struct xp *xp, ulong interval)
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
 		lmi_stats_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -674,6 +690,7 @@ lmi_event_ind(queue_t *q, struct xp *xp, ulong oid, ulong level)
 	if (canputnext(xp->oq)) {
 		mblk_t *mp;
 		lmi_event_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -722,6 +739,7 @@ STATIC int
 sdl_connect_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	if (xp->i_state != LMI_ENABLED)
 		return m_error(q, xp, EPROTO);
 	xp->config.ifflags |= (SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
@@ -736,6 +754,7 @@ STATIC int
 sdl_disconnect_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	if (xp->i_state != LMI_ENABLED)
 		return m_error(q, xp, EPROTO);
 	xp->config.ifflags &= ~(SDL_IF_TX_RUNNING | SDL_IF_RX_RUNNING);
@@ -751,6 +770,7 @@ lmi_info_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	uint16_t ppa = (xp->chan & 0xff) | ((xp->span & 0x0f) << 8) | ((xp->card & 0x0f) << 12);
+
 	return lmi_info_ack(q, xp, (caddr_t) &ppa, sizeof(ppa));
 }
 
@@ -767,6 +787,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	uint16_t ppa;
 	struct xp *xp = XP_PRIV(q);
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
+
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
 		ptrace(("X400P-SS7: ERROR: primitive too small = %d bytes\n",
 			mp->b_wptr - mp->b_rptr));
@@ -866,6 +887,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		}
 	} else {
 		int c;
+
 		/* entire span indicated */
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
@@ -921,6 +943,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	return (QR_DONE);
 	{
 		int errno, reason;
+
 	      enomem:
 		errno = ENOMEM;
 		reason = LMI_SYSERR;
@@ -961,6 +984,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int err;
+
 	/* validate detach */
 	if (xp->i_state != LMI_DISABLED)
 		return lmi_error_ack(q, xp, xp->i_state, LMI_DETACH_REQ, 0, LMI_OUTSTATE);
@@ -980,6 +1004,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 		}
 	} else {
 		int c;
+
 		/* detaching from entire span */
 		switch (xp->sp->config.ifgtype) {
 		case SDL_GTYPE_E1:
@@ -1022,6 +1047,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	struct xp *xp = XP_PRIV(q);
 	struct cd *cd;
 	struct sp *sp;
+
 	/* validate enable */
 	if (xp->i_state != LMI_DISABLED) {
 		ptrace(("X400P-SS7: ERROR: out of state: state = %ld\n", xp->i_state));
@@ -1050,6 +1076,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		int base = span << 8;
 		uint8_t ccr1 = 0, tcr1 = 0;
 		unsigned long timeout;
+
 		switch (cd->config.ifgtype) {
 		case SDL_GTYPE_E1:
 		{
@@ -1131,6 +1158,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		{
 			int byte, val, c;
 			unsigned short mask = 0;
+
 			printd(("T400P-SS7: performing enable on T1 span %d\n", span));
 			spin_lock_irq(&cd->lock);
 			// cd->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -1237,6 +1265,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	int err;
+
 	/* validate disable */
 	if (xp->i_state != LMI_ENABLED)
 		goto lmi_outstate;
@@ -1456,6 +1485,7 @@ sdl_test_config(struct xp *xp, sdl_config_t * arg)
 	}
 	if (xp->cd) {
 		int src;
+
 		for (src = 0; src < SDL_SYNCS; src++)
 			if (arg->ifsyncsrc[src] < 0 || arg->ifsyncsrc[src] > 4) {
 				trace();
@@ -1468,6 +1498,7 @@ STATIC void
 sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 {
 	int chan_reconfig = 0, span_reconfig = 0, card_reconfig = 0;
+
 	if (xp) {
 		if (xp->config.iftype != arg->iftype) {
 			xp->config.iftype = arg->iftype;
@@ -1521,6 +1552,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 	}
 	if (xp->cd) {
 		int src;
+
 		for (src = 0; src < SDL_SYNCS; src++) {
 			if (xp->cd->config.ifsyncsrc[src] != arg->ifsyncsrc[src]) {
 				xp->cd->config.ifsyncsrc[src] = arg->ifsyncsrc[src];
@@ -1550,6 +1582,7 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		lmi_option_t *arg = (lmi_option_t *) mp->b_cont->b_rptr;
+
 		*arg = xp->option;
 		return (0);
 	}
@@ -1567,6 +1600,7 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		xp->option = *arg;
 		return (0);
 	}
@@ -1585,6 +1619,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		struct xp *xp = XP_PRIV(q);
 		struct sp *sp;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		bzero(arg, sizeof(*arg));
 		if (xp) {
 			arg->ifflags = xp->config.ifflags;
@@ -1594,6 +1629,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		}
 		if ((sp = xp->sp)) {
 			struct cd *cd;
+
 			arg->ifgtype = sp->config.ifgtype;
 			arg->ifgrate = sp->config.ifgrate;
 			arg->ifgcrc = sp->config.ifgcrc;
@@ -1605,6 +1641,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 			arg->iftxlevel = sp->config.iftxlevel;
 			if ((cd = xp->cd) || (cd = sp->cd)) {
 				int src;
+
 				for (src = 0; src < SDL_SYNCS; src++)
 					arg->ifsyncsrc[src] = cd->config.ifsyncsrc[src];
 				arg->ifsync = cd->config.ifsync;
@@ -1627,6 +1664,7 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		int ret;
 		struct xp *xp = XP_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((ret = sdl_test_config(xp, arg)))
 			return (ret);
 		sdl_commit_config(xp, arg);
@@ -1646,6 +1684,7 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdl_test_config(xp, arg);
 	}
 	rare();
@@ -1662,6 +1701,7 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		sdl_commit_config(xp, arg);
 		return (0);
 	}
@@ -1679,6 +1719,7 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		*arg = xp->statem;
 		return (0);
 	}
@@ -1695,6 +1736,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) xp;
 	(void) arg;
 	fixme(("FIXME: Support master reset\n"));
@@ -1711,6 +1753,7 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		*arg = xp->statsp;
 		return (0);
 	}
@@ -1728,6 +1771,7 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		fixme(("FIXME: check these settings\n"));
 		xp->statsp = *arg;
 		return (0);
@@ -1746,6 +1790,7 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		*arg = xp->stats;
 		return (0);
 	}
@@ -1761,6 +1806,7 @@ STATIC int
 sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	(void) mp;
 	bzero(&xp->stats, sizeof(xp->stats));
 	return (0);
@@ -1776,6 +1822,7 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		*arg = xp->notify;
 		return (0);
 	}
@@ -1793,6 +1840,7 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		xp->notify.events |= arg->events;
 		return (0);
 	}
@@ -1810,6 +1858,7 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct xp *xp = XP_PRIV(q);
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		xp->notify.events &= ~arg->events;
 		return (0);
 	}
@@ -1825,6 +1874,7 @@ STATIC int
 sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	(void) mp;
 	xp->config.ifflags &= ~SDL_IF_TX_RUNNING;
 	return (0);
@@ -1838,6 +1888,7 @@ STATIC int
 sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	(void) mp;
 	xp->config.ifflags |= SDL_IF_TX_RUNNING;
 	return (0);
@@ -1855,8 +1906,10 @@ xp_rx_chan_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_RX_RUNNING) {
 		mblk_t *mp;
+
 		if (canput(xp->oq) && (mp = allocb(8, BPRI_MED))) {
 			uchar *offset;
+
 			for (offset = xp->rx_base; offset < 1024 + xp->rx_base; offset += 128) {
 				*mp->b_wptr++ = *offset;
 			}
@@ -1874,6 +1927,7 @@ xp_tx_chan_block(struct xp *xp)
 	if (xp->config.ifflags & SDL_IF_TX_RUNNING) {
 		mblk_t *mp;
 		uchar *offset;
+
 		if ((mp = (mblk_t *) xchg(&xp->tx_msg, NULL))) {
 			for (offset = xp->tx_base; offset < 1024 + xp->tx_base; offset += 128) {
 				if (mp->b_rptr < mp->b_wptr)
@@ -1898,9 +1952,11 @@ xp_rx_t1_span_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_RX_RUNNING) {
 		mblk_t *mp;
+
 		if (canput(xp->oq) && (mp = allocb(8 * 24, BPRI_MED))) {
 			int chan;
 			uchar *offset;
+
 			for (offset = xp->rx_base; offset < 1024 + xp->rx_base; offset += 128) {
 				for (chan = 0; chan < 24; chan++) {
 					*mp->b_wptr++ = *(offset + xp_t1_chan_map[chan]);
@@ -1921,6 +1977,7 @@ xp_tx_t1_span_block(struct xp *xp)
 		mblk_t *mp;
 		int chan;
 		uchar *offset;
+
 		if ((mp = (mblk_t *) xchg(&xp->tx_msg, NULL))) {
 			for (offset = xp->tx_base; offset < 1024 + xp->tx_base; offset += 128) {
 				for (chan = 0; chan < 24; chan++) {
@@ -1948,9 +2005,11 @@ xp_rx_e1_span_block(struct xp *xp)
 {
 	if (xp->config.ifflags & SDL_IF_RX_RUNNING) {
 		mblk_t *mp;
+
 		if (canput(xp->oq) && (mp = allocb(8 * 31, BPRI_MED))) {
 			int chan;
 			uchar *offset;
+
 			for (offset = xp->rx_base; offset < 1024 + xp->rx_base; offset += 128) {
 				for (chan = 0; chan < 31; chan++) {
 					*mp->b_wptr++ = *(offset + xp_e1_chan_map[chan]);
@@ -1971,6 +2030,7 @@ xp_tx_e1_span_block(struct xp *xp)
 		mblk_t *mp;
 		int chan;
 		uchar *offset;
+
 		if ((mp = (mblk_t *) xchg(&xp->tx_msg, NULL))) {
 			for (offset = xp->tx_base; offset < 1024 + xp->tx_base; offset += 128) {
 				for (chan = 0; chan < 31; chan++) {
@@ -2018,17 +2078,21 @@ xp_e1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
 	int span;
+
 	/* address transmit and receive first */
 	for (span = 0; span < 4; span++) {
 		struct sp *sp;
+
 		if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
 			struct xp *xp;
 			int base = span << 8;
+
 			switch (sp->config.iftype) {
 			case SDL_TYPE_DS0:
 			case SDL_TYPE_DS0A:
 			{
 				int chan;
+
 				/* one chan at a time, 8 frames */
 				for (chan = 0; chan < 31; chan++) {
 					if ((xp = sp->slots[xp_e1_chan_map[chan]])) {
@@ -2057,6 +2121,7 @@ xp_e1_card_tasklet(unsigned long data)
 			/* process status span 1 frame 400/512, span 2 frame 408/512, ... */
 			if ((((cd->frame >> 3) & 0x3f) - 51) == span) {
 				int status, alarms = 0, leds = 0;
+
 				cd->xlb[base + 0x06] = 0xff;
 				status = cd->xlb[base + 0x06];
 				if (status & 0x09)
@@ -2100,6 +2165,7 @@ xp_e1_card_tasklet(unsigned long data)
 	}
 	if (cd->eval_syncsrc) {
 		int src, syncsrc = 0;
+
 		for (src = 0; src < SDL_SYNCS; src++) {
 			if (cd->config.ifsyncsrc[src] && cd->spans[syncsrc - 1]
 			    && !(cd->spans[syncsrc - 1]->config.ifclock == SDL_CLOCK_LOOP)
@@ -2119,17 +2185,21 @@ xp_t1_card_tasklet(unsigned long data)
 {
 	struct cd *cd = (struct cd *) data;
 	int span;
+
 	/* address transmit and receive first */
 	for (span = 0; span < 4; span++) {
 		struct sp *sp;
+
 		if ((sp = cd->spans[span]) && (sp->config.ifflags & SDL_IF_UP)) {
 			struct xp *xp;
 			int base = span << 8;
+
 			switch (sp->config.iftype) {
 			case SDL_TYPE_DS0:
 			case SDL_TYPE_DS0A:
 			{
 				int chan;
+
 				/* one chan at a time, 8 frames */
 				for (chan = 0; chan < 24; chan++) {
 					if ((xp = sp->slots[xp_t1_chan_map[chan]])) {
@@ -2158,6 +2228,7 @@ xp_t1_card_tasklet(unsigned long data)
 			/* process status span 1 frame 400/512, span 2 frame 408/512, ... */
 			if ((((cd->frame >> 3) & 0x3f) - 51) == span) {
 				int status, alarms = 0, leds = 0;
+
 				sp->config.ifrxlevel = cd->xlb[base + RIR2] >> 6;
 				cd->xlb[base + 0x20] = 0xff;
 				status = cd->xlb[base + 0x20];
@@ -2202,6 +2273,7 @@ xp_t1_card_tasklet(unsigned long data)
 	}
 	if (cd->eval_syncsrc) {
 		int src, syncsrc = 0;
+
 		for (src = 0; src < SDL_SYNCS; src++) {
 			if (cd->config.ifsyncsrc[src] && cd->spans[syncsrc - 1]
 			    && !(cd->spans[syncsrc - 1]->config.ifclock == SDL_CLOCK_LOOP)
@@ -2220,10 +2292,12 @@ STATIC irqreturn_t
 xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
+
 	/* active interrupt (otherwise spurious or shared) */
 	if (cd->xlb[STAREG] & INTACTIVE) {
 		int word;
 		volatile uint32_t *xll, *wbuf, *rbuf;
+
 		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK | E1DIV);
 		/* write/read burst */
 		for (xll = cd->xll, wbuf = cd->wbuf, rbuf = cd->rbuf, word = 0; word < 256; word++) {
@@ -2233,18 +2307,21 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA | E1DIV);
 		tasklet_hi_schedule(&cd->tasklet);
-		return (irqreturn_t)(IRQ_HANDLED);
+		return (irqreturn_t) (IRQ_HANDLED);
 	}
-	return (irqreturn_t)(IRQ_NONE);
+	return (irqreturn_t) (IRQ_NONE);
 }
+
 STATIC irqreturn_t
-xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+xp_t1_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 {
 	struct cd *cd = (struct cd *) dev_id;
+
 	/* active interrupt (otherwise spurious or shared) */
 	if (cd->xlb[STAREG] & INTACTIVE) {
 		int word;
 		volatile uint32_t *xll, *wbuf, *rbuf;
+
 		cd->xlb[CTLREG] = (INTENA | OUTBIT | INTACK);
 		/* write/read burst */
 		for (xll = cd->xll, wbuf = cd->wbuf, rbuf = cd->rbuf, word = 0; word < 256; word++) {
@@ -2254,9 +2331,9 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		cd->frame += 8;
 		cd->xlb[CTLREG] = (INTENA);
 		tasklet_hi_schedule(&cd->tasklet);
-		return (irqreturn_t)(IRQ_HANDLED);
+		return (irqreturn_t) (IRQ_HANDLED);
 	}
-	return (irqreturn_t)(IRQ_NONE);
+	return (irqreturn_t) (IRQ_NONE);
 }
 
 /*
@@ -2279,6 +2356,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+
 	(void) nr;
 	switch (type) {
 	case __SID:
@@ -2390,6 +2468,7 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct xp *xp = XP_PRIV(q);
 	ulong oldstate = xp->i_state;
+
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case SDL_BITS_FOR_TRANSMISSION_REQ:
 		rtn = sdl_bits_for_transmission_req(q, mp);
@@ -2436,6 +2515,7 @@ STATIC int
 xp_w_data(queue_t *q, mblk_t *mp)
 {
 	struct xp *xp = XP_PRIV(q);
+
 	if (xp->tx_msg) {
 		/* wait for tx-block to remove */
 		return (-EBUSY);
@@ -2512,6 +2592,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct xp *xp, **xpp = &xp_list;
+
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
@@ -2526,16 +2607,18 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	if (!cminor)
 		sflag = CLONEOPEN;
 	if (sflag == CLONEOPEN) {
-		printd(("%s: Clone open in effect on major %d\n", DRV_NAME, (int)cmajor));
+		printd(("%s: Clone open in effect on major %d\n", DRV_NAME, (int) cmajor));
 		cminor = 1;
 	}
 	spin_lock_irqsave(&xp_lock, flags);
 	for (; *xpp; xpp = &(*xpp)->next) {
 		major_t dmajor = (*xpp)->u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*xpp)->u.dev.cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -2556,7 +2639,8 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		MOD_DEC_USE_COUNT;
 		return (ENXIO);
 	}
-	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, (ushort)cmajor, (ushort)cminor));
+	printd(("%s: opened character device %hu:%hu\n", DRV_NAME, (ushort) cmajor,
+		(ushort) cminor));
 	*devp = makedevice(cmajor, cminor);
 	if (!(xp = xp_alloc_priv(q, xpp, devp, crp))) {
 		ptrace(("%s: ERROR: no memory\n", DRV_NAME));
@@ -2572,11 +2656,12 @@ xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = XP_PRIV(q);
 	psw_t flags;
+
 	(void) flag;
 	(void) crp;
 	(void) xp;
-	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, (ushort)xp->u.dev.cmajor,
-		(ushort)xp->u.dev.cminor));
+	printd(("%s: closing character device %hu:%hu\n", DRV_NAME, (ushort) xp->u.dev.cmajor,
+		(ushort) xp->u.dev.cminor));
 	spin_lock_irqsave(&xp_lock, flags);
 	xp_free_priv(xp);
 	spin_unlock_irqrestore(&xp_lock, flags);
@@ -2647,6 +2732,7 @@ STATIC int
 xp_term_caches(void)
 {
 	int err = 0;
+
 	if (xp_xbuf_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_xbuf_cachep)) {
@@ -2702,6 +2788,7 @@ STATIC struct xp *
 xp_alloc_priv(queue_t *q, struct xp **xpp, dev_t *devp, cred_t *crp)
 {
 	struct xp *xp;
+
 	if ((xp = kmem_cache_alloc(xp_priv_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated device private structure\n"));
 		bzero(xp, sizeof(*xp));
@@ -2747,15 +2834,18 @@ STATIC void
 xp_free_priv(struct xp *xp)
 {
 	psw_t flags = 0;
+
 	ensure(xp, return);
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		struct sp *sp;
+
 		ss7_unbufcall((str_t *) xp);
 		if (xp->cd)
 			cd_put(xchg(&xp->cd, NULL));
 		if ((sp = xp->sp)) {
 			int slot;
+
 			for (slot = 0; slot < 32; slot++)
 				if (sp->slots[slot] == xp)
 					xp_put(xchg(&sp->slots[slot], NULL));
@@ -2808,6 +2898,7 @@ STATIC struct sp *
 xp_alloc_sp(struct cd *cd, uint8_t span)
 {
 	struct sp *sp;
+
 	if ((sp = kmem_cache_alloc(xp_span_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated span private structure\n"));
 		bzero(sp, sizeof(*sp));
@@ -2846,9 +2937,11 @@ STATIC void
 xp_free_sp(struct sp *sp)
 {
 	struct cd *cd;
+
 	ensure(sp, return);
 	if ((cd = sp->cd)) {
 		int slot;
+
 		/* remove card linkage */
 		sp_put(xchg(&cd->spans[sp->span], NULL));
 		cd_put(xchg(&sp->cd, NULL));
@@ -2857,6 +2950,7 @@ xp_free_sp(struct sp *sp)
 		/* remove channel linkage */
 		for (slot = 0; slot < 32; slot++) {
 			struct xp *xp;
+
 			if ((xp = sp->slots[slot])) {
 				sp_put(xchg(&xp->sp, NULL));
 				cd_put(xchg(&xp->cd, NULL));
@@ -2891,9 +2985,11 @@ STATIC struct cd *
 xp_alloc_cd(void)
 {
 	struct cd *cd;
+
 	if ((cd = kmem_cache_alloc(xp_card_cachep, GFP_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
+
 		printd(("X400P-SS7: allocated card private structure\n"));
 		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("X400P-SS7: could not allocate write buffer\n"));
@@ -2924,13 +3020,16 @@ STATIC void
 xp_free_cd(struct cd *cd)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		int span;
+
 		ensure(cd, return);
 		/* remove any remaining spans */
 		for (span = 0; span < 4; span++) {
 			struct sp *sp;
+
 			if ((sp = cd->spans[span]))
 				xp_free_sp(sp);
 		}
@@ -2983,6 +3082,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	int byte, span;
 	struct cd *cd;
+
 	if (!dev || !id) {
 		ptrace(("X400P-SS7: ERROR: Device or id is null!\n"));
 		return (-ENXIO);
@@ -3055,6 +3155,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		uint8_t *f = (uint8_t *) x400pfw;
 		volatile unsigned long *data;
 		unsigned long timeout;
+
 		data = (volatile unsigned long *) &cd->plx[GPIOC];
 		*data |= GPIO_WRITE;
 		*data &= ~GPIO_PROGRAM;
@@ -3100,6 +3201,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cd->xlb[LEDREG] = 0xff;
 	if (cd->xlb[0x00f] & 0x80) {
 		int word;
+
 		printd(("E400P-SS7: E400P-SS7 Quad E1 Card\n"));
 		for (word = 0; word < 256; word++) {
 			cd->xll[word] = 0xffffffff;
@@ -3126,6 +3228,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		cd->config.iftxlevel = 0;
 	} else {
 		int word;
+
 		printd(("T400P-SS7: T400P-SS7 Quad T1 Card\n"));
 		for (word = 0; word < 256; word++) {
 			cd->xll[word] = 0x7f7f7f7f;
@@ -3184,6 +3287,7 @@ xp_remove(struct pci_dev *dev)
 	struct cd *cd = pci_get_drvdata(dev);
 	struct sp *sp;
 	int i;
+
 	ensure(cd, return);
 	/* disable interrupts */
 	if (cd->plx_length) {
@@ -3312,6 +3416,7 @@ xp_pci_cleanup(void)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -3320,6 +3425,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the X400-SDL driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -3346,6 +3452,7 @@ STATIC int
 xp_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&xp_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -3355,6 +3462,7 @@ STATIC int
 xp_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&xp_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -3372,6 +3480,7 @@ STATIC int
 xp_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &sdl_x400pinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -3387,6 +3496,7 @@ STATIC int
 xp_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -3398,6 +3508,7 @@ MODULE_STATIC void __exit
 sdl_x400pterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (xp_majors[mindex]) {
 			if ((err = xp_unregister_strdev(xp_majors[mindex])))
@@ -3418,6 +3529,7 @@ MODULE_STATIC int __init
 sdl_x400pinit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = xp_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

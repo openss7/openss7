@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:09 $
+ @(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:17:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/03/04 13:00:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lm.c,v $
+ Revision 0.9.2.10  2007/08/14 12:17:54  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.9  2006/03/04 13:00:09  brian
  - FC4 x86_64 gcc 4.0.4 2.6.15 changes
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:09 $"
+#ident "@(#) $RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:17:54 $"
 
 static char const ident[] =
-    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2006/03/04 13:00:09 $";
+    "$RCSfile: lm.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:17:54 $";
 
 #define __NO_VERSION__
 
@@ -90,9 +93,11 @@ static char const ident[] =
  *  -----------------------------------------------------------------------
  */
 
-static inline mblk_t *lmi_reuseb(mblk_t * mp, size_t room)
+static inline mblk_t *
+lmi_reuseb(mblk_t *mp, size_t room)
 {
 	mblk_t *m2;
+
 	if (mp && mp->b_datap->db_ref < 2 && mp->b_datap->db_lim - mp->b_datap->db_base >= room) {
 		mp->b_rptr = mp->b_datap->db_base;
 		mp->b_wptr = mp->b_rptr + room;
@@ -123,10 +128,12 @@ static inline mblk_t *lmi_reuseb(mblk_t * mp, size_t room)
 
 /* Upstream Primitives */
 
-static inline int lmi_error_ind(lmi_t * lmi, mblk_t ** mpp, int err)
+static inline int
+lmi_error_ind(lmi_t * lmi, mblk_t **mpp, int err)
 {
 	if ((*mpp = lmi_reuseb(*mpp, LMI_ERROR_IND_SIZE))) {
 		lmi_error_ind_t *p = (lmi_error_ind_t *) (*mpp)->b_rptr;
+
 		(*mpp)->b_datap->db_type = M_PCPROTO;
 		p->lmi_primitive = LMI_ERROR_IND;
 		p->lmi_state = lmi->state;
@@ -138,10 +145,12 @@ static inline int lmi_error_ind(lmi_t * lmi, mblk_t ** mpp, int err)
 	return (0);
 }
 
-static inline int lmi_error_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
+static inline int
+lmi_error_ack(lmi_t * lmi, mblk_t **mpp, int prim, int err)
 {
 	if ((*mpp = lmi_reuseb(*mpp, LMI_ERROR_ACK_SIZE))) {
 		lmi_error_ack_t *p = (lmi_error_ack_t *) (*mpp)->b_rptr;
+
 		p->lmi_primitive = LMI_ERROR_ACK;
 		p->lmi_state = lmi->state;
 		p->lmi_error_primitive = prim;
@@ -153,12 +162,14 @@ static inline int lmi_error_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
 	return (0);
 }
 
-static inline int lmi_ok_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
+static inline int
+lmi_ok_ack(lmi_t * lmi, mblk_t **mpp, int prim, int err)
 {
 	if (err)
 		return lmi_error_ack(lmi, mpp, prim, err);
 	if ((*mpp = lmi_reuseb(*mpp, LMI_OK_ACK_SIZE))) {
 		lmi_ok_ack_t *p = (lmi_ok_ack_t *) (*mpp)->b_rptr;
+
 		p->lmi_primitive = LMI_OK_ACK;
 		p->lmi_state = lmi->state;
 		p->lmi_correct_primitive = prim;
@@ -168,12 +179,14 @@ static inline int lmi_ok_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
 	return (0);
 }
 
-static inline int lmi_info_ack(lmi_t * lmi, mblk_t ** mpp, int prim, void *ppa, int len, int err)
+static inline int
+lmi_info_ack(lmi_t * lmi, mblk_t **mpp, int prim, void *ppa, int len, int err)
 {
 	if (err)
 		return lmi_error_ack(lmi, mpp, prim, err);
 	if ((*mpp = lmi_reuseb(*mpp, LMI_INFO_ACK_SIZE + len))) {
 		lmi_info_ack_t *p = (lmi_info_ack_t *) (*mpp)->b_rptr;
+
 		p->lmi_primitive = LMI_INFO_ACK;
 		p->lmi_version = 0x00070200;
 		p->lmi_state = lmi->state;
@@ -192,12 +205,14 @@ static inline int lmi_info_ack(lmi_t * lmi, mblk_t ** mpp, int prim, void *ppa, 
 	return (0);
 }
 
-static inline int lmi_enable_con(lmi_t * lmi, mblk_t ** mpp, int err)
+static inline int
+lmi_enable_con(lmi_t * lmi, mblk_t **mpp, int err)
 {
 	if (err)
 		return lmi_error_ind(lmi, mpp, err);
 	if ((*mpp = lmi_reuseb(*mpp, LMI_ENABLE_CON_SIZE))) {
 		lmi_enable_con_t *p = (lmi_enable_con_t *) (*mpp)->b_rptr;
+
 		p->lmi_primitive = LMI_ENABLE_CON;
 		p->lmi_state = lmi->state;
 		qreply(lmi->wq, *mpp);
@@ -205,9 +220,11 @@ static inline int lmi_enable_con(lmi_t * lmi, mblk_t ** mpp, int err)
 	return (0);
 }
 
-static inline int lmi_enable_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
+static inline int
+lmi_enable_ack(lmi_t * lmi, mblk_t **mpp, int prim, int err)
 {
 	int ret;
+
 	if (err)
 		return lmi_error_ack(lmi, mpp, prim, err);
 	if (!(ret = lmi_ok_ack(lmi, mpp, prim, 0)))
@@ -215,12 +232,14 @@ static inline int lmi_enable_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
 	return (ret);
 }
 
-static inline int lmi_disable_con(lmi_t * lmi, mblk_t ** mpp, int err)
+static inline int
+lmi_disable_con(lmi_t * lmi, mblk_t **mpp, int err)
 {
 	if (err)
 		return lmi_error_ind(lmi, mpp, err);
 	if ((*mpp = lmi_reuseb(*mpp, LMI_DISABLE_CON_SIZE))) {
 		lmi_disable_con_t *p = (lmi_disable_con_t *) (*mpp)->b_rptr;
+
 		p->lmi_primitive = LMI_DISABLE_CON;
 		p->lmi_state = lmi->state;
 		qreply(lmi->wq, *mpp);
@@ -228,9 +247,11 @@ static inline int lmi_disable_con(lmi_t * lmi, mblk_t ** mpp, int err)
 	return (0);
 }
 
-static inline int lmi_disable_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
+static inline int
+lmi_disable_ack(lmi_t * lmi, mblk_t **mpp, int prim, int err)
 {
 	int ret;
+
 	if (err)
 		return lmi_error_ack(lmi, mpp, prim, err);
 	if (!(ret = lmi_ok_ack(lmi, mpp, prim, 0)))
@@ -240,19 +261,23 @@ static inline int lmi_disable_ack(lmi_t * lmi, mblk_t ** mpp, int prim, int err)
 
 /* Downstream Primitives */
 
-int lmi_info(lmi_t * lmi, void **ppap, int *lenp)
+int
+lmi_info(lmi_t * lmi, void **ppap, int *lenp)
 {
 	int err;
 	lmi_driver_t *drv = lmi->driver;
+
 	if (drv && (err = drv->ops.lmi.info(lmi->device, ppap, lenp)))
 		return (err);
 	return (0);
 }
 
-int lmi_attach(lmi_t * lmi, void *ppa, int len)
+int
+lmi_attach(lmi_t * lmi, void *ppa, int len)
 {
 	int err;
 	lmi_driver_t *drv = lmi->driver;
+
 	if (lmi->state != LMI_UNATTACHED)
 		return (EINVAL | LMI_OUTSTATE);
 	if (drv && (err = drv->ops.lmi.attach(lmi->device, ppa, len)))
@@ -261,10 +286,12 @@ int lmi_attach(lmi_t * lmi, void *ppa, int len)
 	return (0);
 }
 
-int lmi_detach(lmi_t * lmi)
+int
+lmi_detach(lmi_t * lmi)
 {
 	int err;
 	lmi_driver_t *drv = lmi->driver;
+
 	if (lmi->state != LMI_DISABLED)
 		return (EINVAL | LMI_OUTSTATE);
 	if (drv && (err = drv->ops.lmi.detach(lmi->device)))
@@ -273,10 +300,12 @@ int lmi_detach(lmi_t * lmi)
 	return (0);
 }
 
-int lmi_enable(lmi_t * lmi)
+int
+lmi_enable(lmi_t * lmi)
 {
 	int err;
 	lmi_driver_t *drv = lmi->driver;
+
 	if (lmi->state != LMI_DISABLED)
 		return (EINVAL | LMI_OUTSTATE);
 	if (drv && (err = drv->ops.lmi.enable(lmi->device)))
@@ -285,10 +314,12 @@ int lmi_enable(lmi_t * lmi)
 	return (0);
 }
 
-int lmi_disable(lmi_t * lmi)
+int
+lmi_disable(lmi_t * lmi)
 {
 	int err;
 	lmi_driver_t *drv = lmi->driver;
+
 	if (lmi->state != LMI_ENABLED)
 		return (EINVAL | LMI_OUTSTATE);
 	if (drv && (err = drv->ops.lmi.disable(lmi->device)))
@@ -297,33 +328,40 @@ int lmi_disable(lmi_t * lmi)
 	return (0);
 }
 
-static int lmi_info_req(lmi_t * lmi, mblk_t * mp)
+static int
+lmi_info_req(lmi_t * lmi, mblk_t *mp)
 {
 	static void *ppa = NULL;
 	static int len = 0;
 	int err = lmi_info(lmi, &ppa, &len);
+
 	return lmi_info_ack(lmi, &mp, *((int *) mp->b_rptr), ppa, len, err);
 }
 
-static int lmi_attach_req(lmi_t * lmi, mblk_t * mp)
+static int
+lmi_attach_req(lmi_t * lmi, mblk_t *mp)
 {
 	union LMI_primitives *p = (union LMI_primitives *) mp->b_rptr;
+
 	return lmi_ok_ack(lmi, &mp, *((int *) mp->b_rptr),
 			  lmi_attach(lmi, p->attach_req.lmi_ppa,
 				     mp->b_wptr - mp->b_rptr - LMI_ATTACH_REQ_SIZE));
 }
 
-static int lmi_detach_req(lmi_t * lmi, mblk_t * mp)
+static int
+lmi_detach_req(lmi_t * lmi, mblk_t *mp)
 {
 	return lmi_ok_ack(lmi, &mp, *((int *) mp->b_rptr), lmi_detach(lmi));
 }
 
-static int lmi_enable_req(lmi_t * lmi, mblk_t * mp)
+static int
+lmi_enable_req(lmi_t * lmi, mblk_t *mp)
 {
 	return lmi_enable_ack(lmi, &mp, *((int *) mp->b_rptr), lmi_enable(lmi));
 }
 
-static int lmi_disable_req(lmi_t * lmi, mblk_t * mp)
+static int
+lmi_disable_req(lmi_t * lmi, mblk_t *mp)
 {
 	return lmi_disable_ack(lmi, &mp, *((int *) mp->b_rptr), lmi_disable(lmi));
 }
@@ -344,7 +382,8 @@ int (*lmi_lmi_ops[5]) (lmi_t *, mblk_t *) = {
  *  =======================================================================
  */
 
-lmi_t *lmi_drv_attach(dev_t dev, lmi_driver_t * list, size_t size)
+lmi_t *
+lmi_drv_attach(dev_t dev, lmi_driver_t * list, size_t size)
 {
 	lmi_driver_t *drv;
 	lmi_ops_t *ops;
@@ -393,7 +432,8 @@ lmi_t *lmi_drv_attach(dev_t dev, lmi_driver_t * list, size_t size)
 	return lmi;
 }
 
-int lmi_drv_close(lmi_t * lmi, lmi_ulong * tids, int ntids, lmi_ulong * bids, int nbids)
+int
+lmi_drv_close(lmi_t * lmi, lmi_ulong * tids, int ntids, lmi_ulong * bids, int nbids)
 {
 	int i;
 	lmi_t **lmip;
@@ -434,9 +474,11 @@ int lmi_drv_close(lmi_t * lmi, lmi_ulong * tids, int ntids, lmi_ulong * bids, in
 	return (0);
 }
 
-int lmi_drv_open(lmi_t * lmi)
+int
+lmi_drv_open(lmi_t * lmi)
 {
 	int err;
+
 	if (!lmi || !lmi->driver)
 		return ENXIO;
 	if ((err = lmi->driver->ops.dev.open(lmi->device))) {
@@ -455,7 +497,7 @@ int lmi_drv_open(lmi_t * lmi)
  */
 
 int
-lmi_mux_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp, lmi_driver_t * list,
+lmi_mux_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp, lmi_driver_t * list,
 	     size_t size)
 {
 	lmi_t *lmi = NULL;
@@ -557,7 +599,7 @@ lmi_mux_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp, lmi_d
 }
 
 int
-lmi_mux_close(queue_t * q, int flag, cred_t * crp, lmi_ulong * tids, int ntids, lmi_ulong * bids,
+lmi_mux_close(queue_t *q, int flag, cred_t *crp, lmi_ulong * tids, int ntids, lmi_ulong * bids,
 	      int nbids)
 {
 	int i;
@@ -606,8 +648,9 @@ lmi_mux_close(queue_t * q, int flag, cred_t * crp, lmi_ulong * tids, int ntids, 
  *  =======================================================================
  */
 
-int lmi_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp, lmi_driver_t * list,
-	     size_t size)
+int
+lmi_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp, lmi_driver_t * list,
+	 size_t size)
 {
 	lmi_t *lmi = NULL;
 
@@ -702,8 +745,9 @@ int lmi_open(queue_t * q, dev_t * devp, int flag, int sflag, cred_t * crp, lmi_d
 	return (0);
 }
 
-int lmi_close(queue_t * q, int flag, cred_t * crp, lmi_ulong * tids, int ntids, lmi_ulong * bids,
-	      int nbids)
+int
+lmi_close(queue_t *q, int flag, cred_t *crp, lmi_ulong * tids, int ntids, lmi_ulong * bids,
+	  int nbids)
 {
 	int i;
 	lmi_t **lmip = NULL, *lmi = (lmi_t *) q->q_ptr;
@@ -751,7 +795,8 @@ int lmi_close(queue_t * q, int flag, cred_t * crp, lmi_ulong * tids, int ntids, 
  *  =======================================================================
  */
 
-int lmi_register_driver(list, cmajor, strtab, nminor, name, ops, dcalls, ucalls)
+int
+lmi_register_driver(list, cmajor, strtab, nminor, name, ops, dcalls, ucalls)
 	lmi_driver_t **list;
 	major_t cmajor;
 	struct streamtab *strtab;
@@ -797,7 +842,8 @@ int lmi_register_driver(list, cmajor, strtab, nminor, name, ops, dcalls, ucalls)
 	return (ret);
 }
 
-int lmi_unregister_driver(lmi_driver_t ** list, major_t cmajor)
+int
+lmi_unregister_driver(lmi_driver_t ** list, major_t cmajor)
 {
 	int ret;
 	lmi_driver_t **drvp, *drv;

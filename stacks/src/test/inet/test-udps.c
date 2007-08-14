@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:17:56 $
+ @(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:35 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/12 11:17:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-udps.c,v $
+ Revision 0.9.2.7  2007/08/14 12:19:35  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.6  2007/03/12 11:17:56  brian
  - rationalize sctp test programs
 
@@ -75,9 +78,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:17:56 $"
+#ident "@(#) $RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:35 $"
 
-static char const ident[] = "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/03/12 11:17:56 $";
+static char const ident[] = "$RCSfile: test-udps.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:35 $";
 
 #include <stdio.h>
 #include <errno.h>
@@ -164,8 +167,7 @@ test_udps(void)
 		goto dead;
 	}
 
-	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr),
-		ntohs(loc_addr.sin_port));
+	fprintf(stderr, "Binding socket to %s:%d\n", inet_ntoa(loc_addr.sin_addr), ntohs(loc_addr.sin_port));
 
 	if (bind(fd, (struct sockaddr *) &loc_addr, sizeof(loc_addr)) < 0) {
 		perror("bind");
@@ -182,9 +184,7 @@ test_udps(void)
 		pfd[0].events = POLLIN | POLLERR | POLLHUP;
 		pfd[0].revents = 0;
 		if (timer_timeout) {
-			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n",
-			       inp_count, out_count, inp_count + out_count, out_count - inp_count,
-			       8 * (42 + len) * (inp_count + out_count));
+			printf("Msgs sent: %5ld, recv: %5ld, tot: %5ld, dif: %5ld, tput: %10ld\n", inp_count, out_count, inp_count + out_count, out_count - inp_count, 8 * (42 + len) * (inp_count + out_count));
 			inp_count = 0;
 			out_count = 0;
 			if (start_timer()) {
@@ -200,8 +200,7 @@ test_udps(void)
 		}
 
 		if (pfd[0].revents & POLLIN) {
-			if ((len =
-			     recvfrom(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT, NULL, NULL)) < 0) {
+			if ((len = recvfrom(fd, ur_msg, sizeof(ur_msg), MSG_DONTWAIT, NULL, NULL)) < 0) {
 				perror("recvfrom");
 				goto dead;
 			}
@@ -217,9 +216,7 @@ test_udps(void)
 					goto dead;
 				}
 				if (pfd[0].revents & POLLOUT) {
-					if (sendto(fd, ur_msg, len, MSG_DONTWAIT | MSG_NOSIGNAL,
-						   (struct sockaddr *) &rem_addr,
-						   sizeof(rem_addr)) < 0) {
+					if (sendto(fd, ur_msg, len, MSG_DONTWAIT | MSG_NOSIGNAL, (struct sockaddr *) &rem_addr, sizeof(rem_addr)) < 0) {
 						perror("sendto");
 						goto dead;
 					}
@@ -283,7 +280,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -313,7 +310,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 ", argv[0], ident);
 }

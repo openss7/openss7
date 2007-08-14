@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n.c,v $
+ Revision 0.9.2.17  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.16  2007/07/14 01:35:12  brian
  - make license explicit, add documentation
 
@@ -70,15 +73,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $"
+#ident "@(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $";
+    "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:35:12 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -254,6 +257,7 @@ n_info_req(void)
 {
 	mblk_t *mp;
 	N_info_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_info_req_t *) mp->b_wptr;
@@ -275,6 +279,7 @@ n_optmgmt_req(caddr_t qos_ptr, size_t qos_len, uint flags)
 {
 	mblk_t *mp;
 	N_optmgmt_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_optmgmt_req_t *) mp->b_wptr;
@@ -301,6 +306,7 @@ n_bind_req(caddr_t add_ptr, size_t add_len, int cons, uint flags, caddr_t pro_pt
 {
 	mblk_t *mp;
 	N_bind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + add_len + pro_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_bind_req_t *) mp->b_wptr;
@@ -330,6 +336,7 @@ n_unbind_req(void)
 {
 	mblk_t *mp;
 	N_unbind_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unbind_req_t *) mp->b_wptr;
@@ -348,6 +355,7 @@ n_conn_req(caddr_t dst_ptr, size_t dst_len, uint flags, caddr_t qos_ptr, size_t 
 {
 	mblk_t *mp;
 	N_conn_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_conn_req_t *) mp->b_wptr;
@@ -375,6 +383,7 @@ n_conn_res(queue_t *q, caddr_t res_ptr, size_t res_len, uint flags, caddr_t qos_
 {
 	mblk_t *mp;
 	N_conn_res_t *p;
+
 	if ((mp = allocb(sizeof(*p) + res_len + qos_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_conn_res_t *) mp->b_wptr;
@@ -403,6 +412,7 @@ n_data_req(uint flags)
 {
 	mblk_t *mp;
 	N_data_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_data_req_t *) mp->b_wptr;
@@ -422,6 +432,7 @@ n_datack_req(void)
 {
 	mblk_t *mp;
 	N_datack_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_datack_req_t *) mp->b_wptr;
@@ -440,6 +451,7 @@ n_exdata_req(void)
 {
 	mblk_t *mp;
 	N_exdata_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_exdata_req_t *) mp->b_wptr;
@@ -458,6 +470,7 @@ n_reset_req(int reason)
 {
 	mblk_t *mp;
 	N_reset_req_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_reset_req_t *) mp->b_wptr;
@@ -477,6 +490,7 @@ n_reset_con(void)
 {
 	mblk_t *mp;
 	N_reset_con_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_reset_con_t *) mp->b_wptr;
@@ -495,6 +509,7 @@ n_discon_req(int reason, caddr_t res_ptr, size_t res_len, uint seq)
 {
 	mblk_t *mp;
 	N_discon_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_discon_req_t *) mp->b_wptr;
@@ -519,6 +534,7 @@ n_unitdata_req(caddr_t dst_ptr, size_t dst_len)
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_unitdata_req_t *) mp->b_wptr;
@@ -658,6 +674,7 @@ STATIC int
 n_info_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
+
 	(void) pdu;
 	if (!(mp = n_info_ack(q)))
 		return (-ENOBUFS);
@@ -740,6 +757,7 @@ t_bind_req(queue_t *q, mblk_t *pdu)
 		/* See if we need to assign a port number */
 		if (!(sp->bport = htons(bport)) && !(sp->cons = cons)) {
 			static u16 sscop_port_rover = 0;
+
 			/* 
 			 *  This stream can only be used for outgoing connections, so
 			 *  if it is assigned a zero port number we choose an unused
@@ -843,6 +861,7 @@ t_bind_req(queue_t *q, mblk_t *pdu)
 	sp->bport = 0;
 	{
 		struct sscop_baddr *sb;
+
 		while ((sb = sp->baddr)) {
 			sb->baddr = sb->next;
 			kmem_free_cache(sscop_badd_cachep, sb);
@@ -1002,6 +1021,7 @@ t_conn_req(queue_t *q, mblk_t *pdu)
 	bzero(&sp->l, sizeof(sp->l));
 	{
 		struct sscop_daddr *sd, sd_next = sp->daddrs;
+
 		while ((sd = sd_next)) {
 			sd_next = sd->next;
 			kfree(sd);
@@ -1063,6 +1083,7 @@ t_conn_res(queue_t *q, mblk_t *pdu)
 
 			struct t_opthdr *oh;
 			caddr_t op;
+
 			for (op = opt_ptr, oh = (struct t_opthdr *) op;
 			     op < opt_ptr + opt_len;
 			     op += PADC(oh->length), oh = (struct t_opthdr *) op) {
@@ -1399,6 +1420,7 @@ t_discon_req(queue_t *q, mblk_t *pdu)
 
 	if (sp->n_state == NS_WRES_CIND) {
 		mblk_t *mp;
+
 		for (mp = sp->connect_queue.q_head; mp; mp->next) {
 			struct sscop_rcb *cb = SSCOP_RCB(mp);
 
@@ -1674,6 +1696,7 @@ sscop_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd);
 	int nr = _IOC_NR(cmd);
 	int size = _IOC_SIZE(cmd);
+
 	switch (type) {
 	case __SID:
 		switch (cmd) {
@@ -1683,6 +1706,7 @@ sscop_w_ioctl(queue_t *q, mblk_t *mp)
 		case I_PUNLINK:
 		{
 			struct linkblk *lp = (struct linkblk *) arg;
+
 			(void) lp;
 		}
 		default:
@@ -1760,6 +1784,7 @@ STATIC INLINE void
 sscop_r_error(queue_t *q, mblk_t *mp)
 {
 	sscop_t *sp = SSCOP_PRIV(q);
+
 	sp->zapped = 1;
 	if (q->q_next) {
 		putnext(q, mp);
@@ -1925,6 +1950,7 @@ sscop_wput(queue_t *q, mblk_t *mp)
 {
 	mblk_t *mp;
 	int err = -EOPNOTSUPP;
+
 	if (q->q_count && mp->b_datap->db_type < QPCTL) {
 		putq(q, mp);
 		/* 
@@ -2075,6 +2101,7 @@ STATIC void
 sscop_free_priv(queue_t *q)
 {
 	sscop_t *m2 = SSCOP_PRIV(q);
+
 	kmem_cache_free(sscop_cachep, sscop);
 	return;
 }
@@ -2173,6 +2200,7 @@ sscop_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2197,6 +2225,7 @@ STATIC int
 sscop_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&sscop_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2206,6 +2235,7 @@ STATIC int
 sscop_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sscop_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2223,6 +2253,7 @@ STATIC int
 sscop_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sscop_npiinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2236,6 +2267,7 @@ STATIC int
 sscop_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sscop_npiinfo)) < 0)
 		return (err);
 	return (0);
@@ -2247,6 +2279,7 @@ MODULE_STATIC int __init
 sscop_npiinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = sscop_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -2266,6 +2299,7 @@ MODULE_STATIC void __exit
 sscop_npiterminate(void)
 {
 	int err;
+
 	if ((err = sscop_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sscop_term_caches()))

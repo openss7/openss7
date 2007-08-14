@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lm.h,v 0.9.2.4 2007/06/17 01:56:16 brian Exp $
+ @(#) $Id: lm.h,v 0.9.2.5 2007/08/14 12:17:54 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:16 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lm.h,v $
+ Revision 0.9.2.5  2007/08/14 12:17:54  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/06/17 01:56:16  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __LMI_LM_H__
 #define __LMI_LM_H__
 
-#ident "@(#) $RCSfile: lm.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lm.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 struct lmi;
 
@@ -115,9 +118,11 @@ typedef struct lmi {
 #define lmi_init_lock(__lmi) spin_lock_init(&(__lmi)->lock)
 #define lmi_locked(__lmi) ((__lmi)->user)
 
-static inline int lmi_trylock(lmi_t * lmi)
+static inline int
+lmi_trylock(lmi_t * lmi)
 {
 	spinlock_t *lock = &lmi->lock;
+
 	spin_lock(lock);
 	if (lmi->user && lmi->user != current) {
 		spin_unlock(lock);
@@ -129,9 +134,11 @@ static inline int lmi_trylock(lmi_t * lmi)
 	return (0);
 }
 
-static inline void lmi_unlock(lmi_t * lmi)
+static inline void
+lmi_unlock(lmi_t * lmi)
 {
 	spinlock_t *lock = &lmi->lock;
+
 	spin_lock(lock);
 	if (lmi->nest && lmi->user == current) {
 		if (!--lmi->nest)
@@ -156,14 +163,14 @@ extern lmi_t *lmi_drv_attach(dev_t, lmi_driver_t *, size_t);
 extern int lmi_drv_open(lmi_t * lmi);
 extern int lmi_drv_close(lmi_t * lmi, lmi_ulong * tids, int ntids, lmi_ulong * bids, int nbids);
 
-extern int lmi_mux_open(queue_t * q, dev_t * devp, int flag, int sflag,
-			cred_t * crp, lmi_driver_t * list, size_t size);
-extern int lmi_mux_close(queue_t * q, int flag, cred_t * crp,
+extern int lmi_mux_open(queue_t *q, dev_t *devp, int flag, int sflag,
+			cred_t *crp, lmi_driver_t * list, size_t size);
+extern int lmi_mux_close(queue_t *q, int flag, cred_t *crp,
 			 lmi_ulong * tids, int ntids, lmi_ulong * bids, int nbids);
 
-extern int lmi_open(queue_t * q, dev_t * devp, int flag, int sflag,
-		    cred_t * crp, lmi_driver_t * list, size_t size);
-extern int lmi_close(queue_t * q, int flag, cred_t * crp,
+extern int lmi_open(queue_t *q, dev_t *devp, int flag, int sflag,
+		    cred_t *crp, lmi_driver_t * list, size_t size);
+extern int lmi_close(queue_t *q, int flag, cred_t *crp,
 		     lmi_ulong * tids, int ntids, lmi_ulong * bids, int nbids);
 
 extern int lmi_register_driver(lmi_driver_t ** list, major_t cmajor,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:34:51 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:24 $
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 0.9.2.27  2007/08/14 12:18:24  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.26  2007/07/14 01:34:51  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:34:51 $"
+#ident "@(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:24 $"
 
 static char const ident[] =
-    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:34:51 $";
+    "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:24 $";
 
 #define _LFS_SOURCE
 #define _SVR4_SOURCE
@@ -94,7 +97,7 @@ static char const ident[] =
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/07/14 01:34:51 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/14 12:18:24 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -450,7 +453,7 @@ struct sctp_daddr {
 	size_t cwnd;			/* congestion window */
 	size_t ssthresh;		/* slow start threshold */
 	uint timers;			/* deferred timer flags */
-	volatile toid_t timer_heartbeat;/* heartbeat timer (for acks) */
+	volatile toid_t timer_heartbeat;	/* heartbeat timer (for acks) */
 	volatile toid_t timer_retrans;	/* retrans (RTO) timer */
 	volatile toid_t timer_idle;	/* idle timer */
 	ulong when;			/* last time transmitting */
@@ -2626,18 +2629,18 @@ sctp_dupmsg(struct sctp *sp, mblk_t *bp)
  * that runs like a put() procedure.
  */
 STATIC inline fastcall void
-sp_timeout(struct sctp *sp, void fastcall (*fcn)(struct sctp *), uint bit)
+sp_timeout(struct sctp *sp, void fastcall(*fcn) (struct sctp *), uint bit)
 {
 	if (sctp_trylock_timer(sp, NULL, bit)) {
-		(*fcn)(sp);
+		(*fcn) (sp);
 		sctp_unlockq(sp);
 	}
 }
 STATIC inline fastcall void
-sd_timeout(struct sctp_daddr *sd, void fastcall (*fcn)(struct sctp_daddr *), uint bit)
+sd_timeout(struct sctp_daddr *sd, void fastcall(*fcn) (struct sctp_daddr *), uint bit)
 {
 	if (sctp_trylock_timer(sd->sp, sd, bit)) {
-		(*fcn)(sd);
+		(*fcn) (sd);
 		sctp_unlockq(sd->sp);
 	}
 }
@@ -2660,7 +2663,7 @@ sctp_timeout_pending(volatile toid_t *tidp)
 }
 
 STATIC inline toid_t
-sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn) (void *), clock_t ticks)
 {
 	toid_t tid_new, tid_old;
 
@@ -2671,7 +2674,8 @@ sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *)
 	return (tid_new);
 }
 STATIC inline toid_t
-sd_timer(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sd_timer(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn) (void *),
+	 clock_t ticks)
 {
 	toid_t tid_new, tid_old;
 
@@ -2788,12 +2792,14 @@ sd_timer_idle(struct sctp_daddr *sd, clock_t ticks)
 }
 
 STATIC inline toid_t
-sp_timer_cond(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sp_timer_cond(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn) (void *),
+	      clock_t ticks)
 {
 	return (*tidp ? 0 : sp_timer(sp, tidp, fcn, ticks));
 }
 STATIC inline toid_t
-sd_timer_cond(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sd_timer_cond(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn) (void *),
+	      clock_t ticks)
 {
 	return (*tidp ? 0 : sd_timer(sd, tidp, fcn, ticks));
 }
@@ -2904,7 +2910,7 @@ sp_timer_cancel(struct sctp *sp, volatile toid_t *tidp)
 {
 	toid_t tid;
 
-	if ((tid = xchg(tidp, (toid_t)0)) != (toid_t) 0)
+	if ((tid = xchg(tidp, (toid_t) 0)) != (toid_t) 0)
 		quntimeout(sp->rq, tid);
 	return (tid);
 }
@@ -9398,7 +9404,7 @@ sctp_deliver_data(struct sctp *sp)
 						continue;
 				}
 			}
-			if ((db = sctp_dupb(sp, mp, 0))) { /* must be a dup, not a copy */
+			if ((db = sctp_dupb(sp, mp, 0))) {	/* must be a dup, not a copy */
 				pl_t pl;
 
 				pl = bufq_lock(&sp->oooq);
@@ -26632,7 +26638,7 @@ t_optdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
 /*
  *  T_ADDR_ACK      27 - address acknowledgement
  *  -----------------------------------------------------------------
- *  Version 2 uses socket addresses instead of the Version 1 sctp_addr_t.
+ *  Release 2 uses socket addresses instead of the Version 1 sctp_addr_t.
  */
 STATIC int
 t_addr_ack(struct sctp *sp)
@@ -29137,12 +29143,12 @@ sctp_v4_rcv(struct sk_buff *skb)
 			goto bad_chunk_len;
 	}
 #ifdef COPY_INSTEAD_OF_ESBALLOC
-	/* There seems to be some problem with skbuff corruption, so we will
-	 * try this: allocate a full STREAMS message block and copy the data
-	 * into the STREAMS message block and free the SKBUFF. */
+	/* There seems to be some problem with skbuff corruption, so we will try this: allocate a
+	   full STREAMS message block and copy the data into the STREAMS message block and free the 
+	   SKBUFF. */
 	{
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
-		
+
 		if (!(mp = allocb(plen, BPRI_MED)))
 			goto no_buffers;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);

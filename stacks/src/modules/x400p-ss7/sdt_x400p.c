@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:22 $
+ @(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:19:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_x400p.c,v $
+ Revision 0.9.2.24  2007/08/14 12:19:00  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.23  2007/07/14 01:35:22  brian
  - make license explicit, add documentation
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:22 $"
+#ident "@(#) $RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:19:00 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:22 $";
+    "$RCSfile: sdt_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:19:00 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) kernel module which
@@ -116,7 +119,7 @@ static char const ident[] =
 
 #define SDT_X400P_DESCRIP	"E/T400P-SS7: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
 #define SDT_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:22 $"
+#define SDT_X400P_REVISION	"OpenSS7 $RCSfile: sdt_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:19:00 $"
 #define SDT_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDT_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -277,6 +280,7 @@ typedef struct xp {
 		sdl_stats_t statsp;	/* SDL statistics periods */
 	} sdl;
 } xp_t;
+
 #define PRIV(__q) ((xp_t *)(__q)->q_ptr)
 
 /*
@@ -291,6 +295,7 @@ xp_trylockq(queue_t *q)
 {
 	int res;
 	xp_t *xp = PRIV(q);
+
 	if (!(res = spin_trylock(&xp->qlock))) {
 		if (q == xp->rq)
 			xp->rwait = q;
@@ -303,6 +308,7 @@ static inline void
 xp_unlockq(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	spin_unlock(&xp->qlock);
 	if (xp->rwait)
 		qenable(xchg(&xp->rwait, NULL));
@@ -573,6 +579,7 @@ STATIC int
 xp_term_caches(void)
 {
 	int err = 0;
+
 	if (xp_xbuf_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(xp_xbuf_cachep)) {
@@ -628,6 +635,7 @@ STATIC xp_t *
 xp_alloc_priv(queue_t *q, xp_t ** xpp, major_t cmajor, minor_t cminor)
 {
 	xp_t *xp;
+
 	if ((xp = kmem_cache_alloc(xp_priv_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated device private structure\n"));
 		bzero(xp, sizeof(*xp));
@@ -678,9 +686,11 @@ xp_free_priv(queue_t *q)
 	xp_t *xp = PRIV(q);
 	xp_span_t *sp;
 	psw_t flags = 0;
+
 	ensure(xp, return);
 	if ((sp = xp->sp)) {
 		int slot;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			for (slot = 0; slot < 32; slot++) {
@@ -728,6 +738,7 @@ STATIC xp_span_t *
 xp_alloc_span(xp_card_t * cp, uint8_t span)
 {
 	xp_span_t *sp;
+
 	if ((sp = kmem_cache_alloc(xp_span_cachep, GFP_ATOMIC))) {
 		printd(("X400P-SS7: allocated span private structure\n"));
 		bzero(sp, sizeof(*sp));
@@ -767,9 +778,11 @@ xp_free_span(xp_span_t * sp)
 {
 	xp_t *xp;
 	xp_card_t *cp;
+
 	ensure(sp, return);
 	if ((cp = sp->cp)) {
 		int slot;
+
 		/* remove card linkage */
 		cp->spans[sp->span] = NULL;
 		sp->refcnt--;
@@ -806,9 +819,11 @@ STATIC xp_card_t *
 xp_alloc_card(void)
 {
 	xp_card_t *cp;
+
 	if ((cp = kmem_cache_alloc(xp_card_cachep, GFP_ATOMIC))) {
 		uint32_t *wbuf;
 		uint32_t *rbuf;
+
 		printd(("X400P-SS7: allocated card private structure\n"));
 		if (!(wbuf = kmem_cache_alloc(xp_xbuf_cachep, GFP_ATOMIC))) {
 			ptrace(("X400P-SS7: could not allocate write buffer\n"));
@@ -841,10 +856,12 @@ STATIC void
 xp_free_card(xp_card_t * cp)
 {
 	int span;
+
 	ensure(cp, return);
 	/* remove any remaining spans */
 	for (span = 0; span < 4; span++) {
 		xp_span_t *sp;
+
 		if ((sp = cp->spans[span]))
 			xp_free_span(sp);
 	}
@@ -882,8 +899,10 @@ STATIC streamscall void
 xp_bufsrv(long data)
 {
 	queue_t *q = (queue_t *) data;
+
 	if (q) {
 		xp_t *xp = PRIV(q);
+
 		if (q == xp->rq)
 			if (xp->rbid)
 				xp->rbid = 0;
@@ -902,10 +921,12 @@ STATIC mblk_t *
 xp_allocb(queue_t *q, size_t size, int prior)
 {
 	mblk_t *mp;
+
 	if ((mp = allocb(size, prior)))
 		return (mp);
 	else {
 		xp_t *xp = PRIV(q);
+
 		if (q == xp->rq) {
 			if (!xp->rbid)
 				xp->rbid = bufcall(size, prior, &xp_bufsrv, (long) q);
@@ -930,10 +951,12 @@ STATIC mblk_t *
 xp_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frtn)
 {
 	mblk_t *mp;
+
 	if ((mp = esballoc(base, size, prior, frtn)))
 		return (mp);
 	else {
 		xp_t *xp = PRIV(q);
+
 		if (q == xp->rq) {
 			if (!xp->rbid)
 				xp->rbid = esbbcall(prior, &xp_bufsrv, (long) q);
@@ -972,6 +995,7 @@ STATIC INLINE mblk_t *
 xp_fast_allocb(void)
 {
 	mblk_t *mp;
+
 	spin_lock(&xp_bufpool_lock);
 	if ((mp = xp_bufpool)) {
 		xp_bufpool = mp->b_cont;
@@ -997,6 +1021,7 @@ STATIC INLINE void
 xp_fast_freemsg(mblk_t *mp)
 {
 	mblk_t *bp, *bp_next = mp;
+
 	while ((bp = bp_next)) {
 		bp_next = bp->b_cont;
 		if (bp->b_datap->db_ref == 1) {
@@ -1021,6 +1046,7 @@ xp_fast_dupb(mblk_t *mp)
 {
 	int len;
 	mblk_t *dp = NULL;
+
 	if (mp && (len = mp->b_wptr - mp->b_rptr) > 0 && (dp = xp_fast_allocb())) {
 		bcopy(mp->b_rptr, dp->b_wptr, len);
 		dp->b_wptr += len;
@@ -1036,10 +1062,12 @@ STATIC int
 xp_bufpool_init(void)
 {
 	unsigned long flags;
+
 	spin_lock_init(&xp_bufpool_lock);
 	spin_lock_irqsave(&xp_bufpool_lock, flags);
 	{
 		int n = 256;		/* two for each channel */
+
 		while (n-- > 0)
 			xp_fast_freemsg(allocb(FASTBUF, BPRI_LO));
 	}
@@ -1050,9 +1078,11 @@ STATIC int
 xp_bufpool_term(void)
 {
 	unsigned long flags;
+
 	spin_lock_irqsave(&xp_bufpool_lock, flags);
 	{
 		mblk_t *bp, *bp_next = xp_bufpool;
+
 		while ((bp = bp_next)) {
 			bp_next = bp->b_cont;
 			freeb(bp);
@@ -1078,6 +1108,7 @@ STATIC int
 m_error(queue_t *q, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = xp_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*mp->b_wptr++ = err < 0 ? -err : err;
@@ -1107,6 +1138,7 @@ sdt_rc_signal_unit_ind(queue_t *q, mblk_t *dp, ulong count)
 			if (count > 1) {
 				mblk_t *mp;
 				sdt_rc_signal_unit_ind_t *p;
+
 				if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 					mp->b_datap->db_type = M_PROTO;
 					p = (typeof(p)) mp->b_wptr;
@@ -1139,6 +1171,7 @@ sdt_rc_congestion_accept_ind(queue_t *q)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_accept_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1160,6 +1193,7 @@ sdt_rc_congestion_discard_ind(queue_t *q)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_discard_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1181,6 +1215,7 @@ sdt_rc_no_congestion_ind(queue_t *q)
 {
 	mblk_t *mp;
 	sdt_rc_no_congestion_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1203,6 +1238,7 @@ sdt_iac_correct_su_ind(queue_t *q)
 	if (canputnext(q)) {
 		mblk_t *mp;
 		sdt_iac_correct_su_ind_t *p;
+
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1227,6 +1263,7 @@ sdt_iac_abort_proving_ind(queue_t *q)
 {
 	mblk_t *mp;
 	sdt_iac_abort_proving_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1248,6 +1285,7 @@ sdt_lsc_link_failure_ind(queue_t *q)
 {
 	mblk_t *mp;
 	sdt_lsc_link_failure_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1269,6 +1307,7 @@ sdt_txc_transmission_request_ind(queue_t *q)
 {
 	mblk_t *mp;
 	sdt_txc_transmission_request_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1291,6 +1330,7 @@ lmi_info_ack(queue_t *q, caddr_t ppa_ptr, size_t ppa_len)
 	xp_t *xp = PRIV(q);
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1321,6 +1361,7 @@ lmi_ok_ack(queue_t *q, ulong state, long prim)
 	xp_t *xp = PRIV(q);
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1345,6 +1386,7 @@ lmi_error_ack(queue_t *q, ulong state, long prim, ulong errno, ulong reason)
 	xp_t *xp = PRIV(q);
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1370,8 +1412,10 @@ lmi_enable_con(queue_t *q)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		xp_t *xp = PRIV(q);
+
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
@@ -1393,8 +1437,10 @@ lmi_disable_con(queue_t *q)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		xp_t *xp = PRIV(q);
+
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
@@ -1416,6 +1462,7 @@ lmi_optmgmt_ack(queue_t *q, ulong flags, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1441,6 +1488,7 @@ lmi_error_ind(queue_t *q, ulong errno, ulong reason)
 	xp_t *xp = PRIV(q);
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1466,6 +1514,7 @@ lmi_stats_ind(queue_t *q, ulong interval)
 	if (canputnext(q)) {
 		mblk_t *mp;
 		lmi_stats_ind_t *p;
+
 		if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1493,6 +1542,7 @@ lmi_event_ind(queue_t *q, ulong oid, ulong level)
 	if (canputnext(q)) {
 		mblk_t *mp;
 		lmi_event_ind_t *p;
+
 		if ((mp = xp_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1524,6 +1574,7 @@ sdt_aerm_su_in_error(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
 	int err;
+
 	if (xp->sdt.statem.aerm_state == SDT_STATE_MONITORING) {
 		xp->sdt.statem.Ca++;
 		if (xp->sdt.statem.Ca == xp->sdt.statem.Ti) {
@@ -1543,6 +1594,7 @@ sdt_aerm_correct_su(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
 	int err;
+
 	if (xp->sdt.statem.aerm_state == SDT_STATE_IDLE) {
 		if (xp->sdt.statem.aborted_proving) {
 			if ((err = sdt_iac_correct_su_ind(q)))
@@ -1557,6 +1609,7 @@ STATIC INLINE int
 sdt_suerm_start(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	xp->sdt.statem.Cs = 0;
 	xp->sdt.statem.Ns = 0;
 	xp->sdt.statem.suerm_state = SDT_STATE_IN_SERVICE;
@@ -1567,6 +1620,7 @@ STATIC INLINE void
 sdt_suerm_stop(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	xp->sdt.statem.suerm_state = SDT_STATE_IDLE;
 }
 
@@ -1575,6 +1629,7 @@ sdt_suerm_su_in_error(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
 	int err;
+
 	if (xp->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		xp->sdt.statem.Cs++;
 		if (xp->sdt.statem.Cs >= xp->sdt.config.T) {
@@ -1599,6 +1654,7 @@ STATIC INLINE void
 sdt_eim_su_in_error(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	if (xp->sdt.statem.eim_state == SDT_STATE_MONITORING)
 		xp->sdt.statem.interval_error = 1;
 }
@@ -1607,6 +1663,7 @@ STATIC INLINE void
 sdt_suerm_correct_su(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	if (xp->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		xp->sdt.statem.Ns++;
 		if (xp->sdt.statem.Ns >= xp->sdt.config.D) {
@@ -1621,6 +1678,7 @@ STATIC INLINE void
 sdt_eim_correct_su(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	if (xp->sdt.statem.eim_state == SDT_STATE_MONITORING)
 		xp->sdt.statem.su_received = 1;
 }
@@ -1631,6 +1689,7 @@ STATIC INLINE void
 sdt_timer_stop_t8(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	if (xp->sdt.timers.t8)
 		untimeout(xchg(&xp->sdt.timers.t8, 0));
 }
@@ -1639,6 +1698,7 @@ STATIC INLINE void
 sdt_timer_start_t8(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	sdt_timer_stop_t8(q);
 	xp->sdt.timers.t8 = timeout((timo_fcn_t *) sdt_t8_timeout, (caddr_t) xp, xp->sdt.config.t8);
 }
@@ -1649,6 +1709,7 @@ sdt_t8_timeout_ind(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
 	int err;
+
 	if (xp->sdt.statem.eim_state == SDT_STATE_MONITORING) {
 		sdt_timer_start_t8(q);
 		if (xp->sdt.statem.su_received) {
@@ -1677,6 +1738,7 @@ sdt_t8_timeout(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
 	mblk_t *mp;
+
 	if (!spin_is_locked(&xp->qlock)) {
 		if ((mp = allocb(sizeof(ulong), BPRI_HI))) {
 			mp->b_datap->db_type = M_PCRSE;
@@ -1694,6 +1756,7 @@ STATIC INLINE int
 sdt_eim_start(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	xp->sdt.statem.Ce = 0;
 	xp->sdt.statem.interval_error = 0;
 	xp->sdt.statem.su_received = 0;
@@ -1706,6 +1769,7 @@ STATIC INLINE void
 sdt_eim_stop(queue_t *q)
 {
 	xp_t *xp = PRIV(q);
+
 	xp->sdt.statem.eim_state = SDT_STATE_IDLE;
 	sdt_timer_stop_t8(q);
 }
@@ -1715,6 +1779,7 @@ sdt_daedr_correct_su(queue_t *q, int count)
 {
 	int err;
 	int num;
+
 	for (num = 0; num < count; num++) {
 		sdt_eim_correct_su(q);
 		sdt_suerm_correct_su(q);
@@ -1728,6 +1793,7 @@ STATIC INLINE int
 sdt_daedr_su_in_error(queue_t *q)
 {
 	int err;
+
 	sdt_eim_su_in_error(q);
 	if ((err = sdt_suerm_su_in_error(q)))
 		return (err);
@@ -1740,6 +1806,7 @@ STATIC INLINE int
 sdt_daedr_received_bits(queue_t *q, mblk_t *mp, int count)
 {
 	int err;
+
 	if ((err = sdt_rc_signal_unit_ind(q, mp, count)) != QR_ABSORBED)
 		return (err);
 	if ((err = sdt_daedr_correct_su(q, count)))
@@ -1771,9 +1838,10 @@ sdt_daedt_transmission_request(queue_t *q)
 #define SDT_RX_TABLE_LENGTH	(2* SDT_RX_STATES * 256)
 
 typedef struct tx_entry {
-	uint bit_string:10 __attribute__ ((packed));		/* the output string */
-	uint bit_length:4 __attribute__ ((packed));		/* length in excess of 8 bits of output string */
-	uint state:3 __attribute__ ((packed));			/* new state */
+	uint bit_string:10 __attribute__ ((packed));	/* the output string */
+	uint bit_length:4 __attribute__ ((packed));	/* length in excess of 8 bits of output
+							   string */
+	uint state:3 __attribute__ ((packed));	/* new state */
 } tx_entry_t;
 
 typedef struct rx_entry {
@@ -1818,6 +1886,7 @@ STATIC INLINE void
 printb(uint8_t byte)
 {
 	uint8_t mask = 0x80;
+
 	while (mask) {
 		if (mask & byte)
 			printd(("1"));
@@ -1829,6 +1898,7 @@ STATIC INLINE void
 printbs(uint str, uint len)
 {
 	uint mask = (1 << len);
+
 	while (mask >>= 1) {
 		if (mask & str)
 			printd(("1"));
@@ -1879,6 +1949,7 @@ sdt_tx_repeat(xp_path_t * tx, mblk_t *mp, int xsn)
 {
 	mblk_t *dp;
 	size_t len;
+
 	len = msgdsize(mp);	/* how big is it? */
 	if (!(dp = tx->cmp) && !(dp = tx->cmp = xp_fast_allocb()))
 		return;
@@ -1935,6 +2006,7 @@ STATIC mblk_t *
 xp_tx_getq(queue_t *q, xp_path_t * tx, int xsn)
 {
 	mblk_t *mp = NULL;
+
 	if (!spin_is_locked(&PRIV(q)->qlock)) {
 		for (mp = q->q_first; mp && mp->b_datap->db_type != M_DATA; mp = mp->b_next) ;
 		if (mp) {
@@ -1956,6 +2028,7 @@ STATIC INLINE void
 xp_tx_bitstuff(xp_path_t * tx, unsigned char byte)
 {
 	tx_entry_t *t = tx_index(tx->state, byte);
+
 	tx->state = t->state;
 	tx->residue |= t->bit_string << tx->rbits;
 	tx->rbits += t->bit_length + 8;
@@ -1981,6 +2054,7 @@ xp_tx_block(xp_t * xp, unsigned char *bp, unsigned char *be, sdt_stats_t * stats
 	register xp_path_t *tx = &xp->tx;
 	int xsn = xp->option.popt & SS7_POPT_XSN;
 	int chan = 0, bits = (type == SDL_TYPE_DS0A) ? 7 : 8;
+
 	if (tx->mode == TX_MODE_IDLE || tx->mode == TX_MODE_FLAG) {
 		if (!tx->nxt) {
 		      next_message:
@@ -2059,6 +2133,7 @@ xp_tx_block(xp_t * xp, unsigned char *bp, unsigned char *be, sdt_stats_t * stats
 			if (tx->nxt->b_rptr < tx->nxt->b_wptr || (tx->nxt = tx->nxt->b_cont)) {
 				/* continuing in message */
 				uint byte = *tx->nxt->b_rptr++;
+
 				tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
 				xp_tx_bitstuff(tx, byte);
 				stats->tx_bytes++;
@@ -2110,14 +2185,17 @@ STATIC INLINE void
 xp_rx_compress(queue_t *q, xp_path_t * rx, int hlen, sdt_stats_t * stats)
 {
 	mblk_t *mp;
+
 	if ((mp = rx->msg)) {
 		mblk_t *cp;
 		int len = msgdsize(mp);
 		int max = hlen + 2;	/* size of 2-byte lssu */
+
 		if ((cp = rx->cmp)) {
 			if (len <= max) {
 				if (len == msgdsize(cp)) {
 					int pos;
+
 					for (pos = 0; pos < len; pos++)
 						if (cp->b_rptr[pos] != mp->b_rptr[pos])
 							goto nomatch;
@@ -2187,6 +2265,7 @@ xp_rx_block(xp_t * xp, unsigned char *bp, unsigned char *be, sdt_stats_t * stats
 	register xp_path_t *rx = &xp->rx;
 	int xsn = xp->option.popt & SS7_POPT_XSN;
 	int M, mlen, hlen, N = xp->sdt.config.N;
+
 	if (!xsn) {
 		hlen = 3;
 		mlen = 0x3f;
@@ -2197,6 +2276,7 @@ xp_rx_block(xp_t * xp, unsigned char *bp, unsigned char *be, sdt_stats_t * stats
 	M = xp->sdt.config.m + 1 + hlen;
 	for (; bp < be; bp += 128) {
 		rx_entry_t *r;
+
 	      next_channel:
 		switch (type) {
 		default:
@@ -2256,6 +2336,7 @@ xp_rx_block(xp_t * xp, unsigned char *bp, unsigned char *be, sdt_stats_t * stats
 					if (rx->bcc == (rx->residue & 0xffff)) {
 						if (rx->bytes >= hlen) {
 							uint len, li;
+
 							xp_rx_linkb(rx);
 							if (!xsn)
 								li = rx->msg->b_rptr[2] & mlen;
@@ -2378,6 +2459,7 @@ STATIC bc_entry_t
 bc_table_value(int bit_string, int bit_length)
 {
 	int pos;
+
 	for (pos = 0; pos < bit_length; pos++) {
 		if (bit_string & 0x1)
 			bit_string = (bit_string >> 1) ^ 0x8408;
@@ -2397,6 +2479,7 @@ tx_table_valueN(int state, uint8_t byte, int len)
 {
 	tx_entry_t result = { 0, };
 	int bit_mask = 1;
+
 	result.state = state;
 	result.bit_length = 0;
 	while (len--) {
@@ -2432,6 +2515,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 {
 	rx_entry_t result = { 0, };
 	int bit_mask = 1;
+
 	result.state = state;
 	while (len--) {
 		switch (result.state) {
@@ -2660,6 +2744,7 @@ STATIC void
 tx_table_generate(void)
 {
 	int j, k;
+
 	for (j = 0; j < SDT_TX_STATES; j++)
 		for (k = 0; k < 256; k++)
 			*tx_index(j, k) = tx_table_value(j, k);
@@ -2677,6 +2762,7 @@ STATIC void
 rx_table_generate7(void)
 {
 	int j, k;
+
 	for (j = 0; j < SDT_RX_STATES; j++)
 		for (k = 0; k < 256; k++)
 			*rx_index7(j, k) = rx_table_value7(j, k);
@@ -2685,6 +2771,7 @@ STATIC void
 rx_table_generate8(void)
 {
 	int j, k;
+
 	for (j = 0; j < SDT_RX_STATES; j++)
 		for (k = 0; k < 256; k++)
 			*rx_index8(j, k) = rx_table_value8(j, k);
@@ -2702,6 +2789,7 @@ STATIC void
 bc_table_generate(void)
 {
 	int pos = 0, bit_string, bit_length = 8, bit_mask = 0x100;
+
 	do {
 		for (bit_string = 0; bit_string < bit_mask; bit_string++, pos++)
 			bc_table[pos] = bc_table_value(bit_string, bit_length);
@@ -2717,6 +2805,7 @@ STATIC int
 xp_init_tables(void)
 {
 	size_t length;
+
 	length = SDT_CRC_TABLE_LENGTH * sizeof(bc_entry_t);
 	for (bc_order = 0; PAGE_SIZE << bc_order < length; bc_order++) ;
 	if (!(bc_table = (bc_entry_t *) __get_free_pages(GFP_KERNEL, bc_order))) {
@@ -2782,6 +2871,7 @@ xp_send_data(queue_t *q, mblk_t *mp)
 	xp_t *xp = PRIV(q);
 	int ret;
 	psw_t flags = 0;
+
 	if (xp->state != LMI_ENABLED)
 		return (-EPROTO);
 	spin_lock_irqsave(&xp->lock, flags);
@@ -2806,6 +2896,7 @@ STATIC int
 sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 {
 	mblk_t *dp;
+
 	if ((dp = mp->b_cont) && dp->b_datap->db_type == M_DATA)
 		return (QR_STRIP);
 	return (-EPROTO);
@@ -2820,6 +2911,7 @@ sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2849,6 +2941,7 @@ sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2877,6 +2970,7 @@ sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2899,6 +2993,7 @@ sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2920,6 +3015,7 @@ sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2941,6 +3037,7 @@ sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2963,6 +3060,7 @@ sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
 	int ret;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -2986,6 +3084,7 @@ sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	if (xp->state != LMI_ENABLED)
 		return m_error(q, EPROTO);
@@ -3006,12 +3105,14 @@ STATIC int
 lmi_info_req(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
+
 	switch (xp->state) {
 	case LMI_ENABLED:
 	case LMI_DISABLED:
 	{
 		xp_span_t *sp;
 		xp_card_t *cp;
+
 		if ((sp = xp->sp) && (cp = sp->cp)) {
 			uint16_t ppa =
 			    (xp->
@@ -3037,6 +3138,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	uint16_t ppa;
 	xp_t *xp = PRIV(q);
 	lmi_attach_req_t *p = ((typeof(p)) mp->b_rptr);
+
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
 		ptrace(("X400P-SS7: ERROR: primitive too small = %d bytes\n",
 			mp->b_wptr - mp->b_rptr));
@@ -3179,6 +3281,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 		}
 	} else {
 		int c;
+
 		/* entire span indicated */
 		switch (cp->ifgtype) {
 		case SDL_GTYPE_E1:
@@ -3288,6 +3391,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	swerr();
 	{
 		int errno, reason;
+
 	      efault:
 		errno = EFAULT;
 		reason = LMI_SYSERR;
@@ -3321,6 +3425,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 	xp_card_t *cp;
 	int err, slot;
 	psw_t flags = 0;
+
 	/* validate detach */
 	if (xp->state != LMI_DISABLED)
 		return lmi_error_ack(q, xp->state, LMI_DETACH_REQ, 0, LMI_OUTSTATE);
@@ -3359,6 +3464,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	xp_t *xp = PRIV(q);
 	xp_card_t *cp;
 	xp_span_t *sp;
+
 	/* validate enable */
 	if (xp->state != LMI_DISABLED) {
 		ptrace(("X400P-SS7: ERROR: out of state: state = %d\n", xp->state));
@@ -3421,10 +3527,12 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 		int base = span << 8;
 		uint8_t ccr1 = 0, tcr1 = 0;
 		unsigned long timeout;
+
 		switch (cp->ifgtype) {
 		case SDL_GTYPE_E1:
 		{
 			psw_t flags = 0;
+
 			printd(("E400P-SS7: performing enable on E1 span %d\n", span));
 			spin_lock_irqsave(&cp->lock, flags);
 			// cp->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -3504,6 +3612,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			int byte, val, c;
 			unsigned short mask = 0;
 			psw_t flags = 0;
+
 			printd(("T400P-SS7: performing enable on T1 span %d\n", span));
 			spin_lock_irqsave(&cp->lock, flags);
 			// cp->xlb[SYNREG] = SYNCSELF; /* NO, NO, NO */
@@ -3564,6 +3673,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 			/* establish which channels are clear channel */
 			for (c = 0; c < 24; c++) {
 				int slot = xp_t1_chan_map[c];
+
 				byte = c >> 3;
 				if (!cp->spans[span]->slots[slot]
 				    || cp->spans[span]->slots[slot]->sdl.config.iftype !=
@@ -3594,6 +3704,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 	xp_t *xp = PRIV(q);
 	int err;
 	psw_t flags = 0;
+
 	/* validate disable */
 	if (xp->state != LMI_ENABLED)
 		goto lmi_outstate;
@@ -3670,6 +3781,7 @@ sdt_test_config(xp_t * xp, sdt_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags = 0;
+
 	spin_lock_irqsave(&xp->lock, flags);
 	do {
 		if (!arg->t8)
@@ -3706,6 +3818,7 @@ STATIC int
 sdt_commit_config(xp_t * xp, sdt_config_t * arg)
 {
 	psw_t flags = 0;
+
 	spin_lock_irqsave(&xp->lock, flags);
 	{
 		sdt_test_config(xp, arg);
@@ -3722,6 +3835,7 @@ sdt_iocgoptions(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->option;
@@ -3739,6 +3853,7 @@ sdt_iocsoptions(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->option = *arg;
@@ -3756,6 +3871,7 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdt.config;
@@ -3773,6 +3889,7 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->sdt.config = *arg;
@@ -3789,6 +3906,7 @@ sdt_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_test_config(xp, arg);
 	}
 	rare();
@@ -3800,6 +3918,7 @@ sdt_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_commit_config(xp, arg);
 	}
 	rare();
@@ -3812,6 +3931,7 @@ sdt_iocgstatem(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdt.statem;
@@ -3826,6 +3946,7 @@ STATIC int
 sdt_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
+
 	(void) xp;
 	(void) mp;
 	fixme(("Master reset\n"));
@@ -3838,6 +3959,7 @@ sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdt.statsp;
@@ -3855,6 +3977,7 @@ sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->sdt.statsp = *arg;
@@ -3872,6 +3995,7 @@ sdt_iocgstats(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdt.stats;
@@ -3887,6 +4011,7 @@ sdt_ioccstats(queue_t *q, mblk_t *mp)
 {
 	psw_t flags = 0;
 	xp_t *xp = PRIV(q);
+
 	(void) mp;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
@@ -3902,6 +4027,7 @@ sdt_iocgnotify(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdt.notify;
@@ -3919,6 +4045,7 @@ sdt_iocsnotify(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->sdt.notify = *arg;
@@ -3936,6 +4063,7 @@ sdt_ioccnotify(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->sdt.notify.events &= ~arg->events;
@@ -3959,6 +4087,7 @@ sdl_test_config(xp_t * xp, sdl_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags = 0;
+
 	if (!xp)
 		return (-EFAULT);
 	spin_lock_irqsave(&xp->lock, flags);
@@ -4184,6 +4313,7 @@ sdl_test_config(xp_t * xp, sdl_config_t * arg)
 				break;
 			if (xp->sp->cp) {
 				int src;
+
 				for (src = 0; src < SDL_SYNCS; src++)
 					if (arg->ifsyncsrc[src] < 0 || arg->ifsyncsrc[src] > 4) {
 						trace();
@@ -4219,6 +4349,7 @@ sdl_commit_config(xp_t * xp, sdl_config_t * arg)
 	xp_span_t *sp = NULL;
 	xp_card_t *cp = NULL;
 	psw_t flags = 0;
+
 	if (!xp)
 		return;
 	spin_lock_irqsave(&xp->lock, flags);
@@ -4251,6 +4382,7 @@ sdl_commit_config(xp_t * xp, sdl_config_t * arg)
 		}
 		if ((sp = xp->sp)) {
 			int slot;
+
 			if (sp->ifgcrc != arg->ifgcrc) {
 				for (slot = 0; slot < 32; slot++)
 					if (sp->slots[slot])
@@ -4298,6 +4430,7 @@ sdl_commit_config(xp_t * xp, sdl_config_t * arg)
 			}
 			if ((cp = sp->cp)) {
 				int src, span, slot;
+
 				for (src = 0; src < SDL_SYNCS; src++) {
 					if (cp->ifsyncsrc[src] != arg->ifsyncsrc[src]) {
 						for (span = 0; span < 4; span++)
@@ -4347,6 +4480,7 @@ sdl_commit_config(xp_t * xp, sdl_config_t * arg)
 			int base = span << 8;
 			uint8_t ccr1 = 0, tcr1 = 0;
 			unsigned long timeout;
+
 			if (cp) {
 				switch (cp->ifgtype) {
 				case SDL_GTYPE_E1:
@@ -4428,6 +4562,7 @@ sdl_commit_config(xp_t * xp, sdl_config_t * arg)
 				{
 					int byte, val, c;
 					unsigned short mask = 0;
+
 					printd(("T400P-SS7: performing reconfiguration of T1 span %d\n", span));
 					/* Tell ISR to re-evaluate the sync source */
 					cp->eval_syncsrc = 1;
@@ -4528,6 +4663,7 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		lmi_option_t *arg = (lmi_option_t *) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->option;
@@ -4550,6 +4686,7 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->option = *arg;
@@ -4573,6 +4710,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		xp_span_t *sp;
 		psw_t flags = 0;
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		bzero(arg, sizeof(*arg));
 		spin_lock_irqsave(&xp->lock, flags);
 		{
@@ -4582,6 +4720,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 			arg->ifmode = xp->sdl.config.ifmode;
 			if ((sp = xp->sp)) {
 				xp_card_t *cp;
+
 				arg->ifgtype = sp->ifgtype;
 				arg->ifgrate = sp->ifgrate;
 				arg->ifgmode = sp->ifgmode;
@@ -4594,6 +4733,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 				arg->iftxlevel = sp->iftxlevel;
 				if ((cp = sp->cp)) {
 					int src;
+
 					for (src = 0; src < SDL_SYNCS; src++)
 						arg->ifsyncsrc[src] = cp->ifsyncsrc[src];
 					arg->ifsync = cp->ifsync;
@@ -4618,6 +4758,7 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		int ret;
 		xp_t *xp = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((ret = sdl_test_config(xp, arg)))
 			return (ret);
 		sdl_commit_config(xp, arg);
@@ -4637,6 +4778,7 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdl_test_config(xp, arg);
 	}
 	rare();
@@ -4653,6 +4795,7 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		xp_t *xp = PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		sdl_commit_config(xp, arg);
 		return (0);
 	}
@@ -4671,6 +4814,7 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdl.statem;
@@ -4691,6 +4835,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) xp;
 	(void) arg;
 	fixme(("FIXME: Support master reset\n"));
@@ -4708,6 +4853,7 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdl.statsp;
@@ -4730,6 +4876,7 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		fixme(("FIXME: check these settings\n"));
 		spin_lock_irqsave(&xp->lock, flags);
 		{
@@ -4753,6 +4900,7 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdl.stats;
@@ -4773,6 +4921,7 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
@@ -4793,6 +4942,7 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			*arg = xp->sdl.notify;
@@ -4815,6 +4965,7 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->sdl.notify.events |= arg->events;
@@ -4837,6 +4988,7 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 		xp_t *xp = PRIV(q);
 		psw_t flags = 0;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&xp->lock, flags);
 		{
 			xp->sdl.notify.events &= ~arg->events;
@@ -4857,6 +5009,7 @@ sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
@@ -4875,6 +5028,7 @@ sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	xp_t *xp = PRIV(q);
 	psw_t flags = 0;
+
 	(void) mp;
 	spin_lock_irqsave(&xp->lock, flags);
 	{
@@ -4913,12 +5067,15 @@ xp_e1c_process(xp_span_t * sp, unsigned char *wspan, unsigned char *rspan, unsig
 	       unsigned char *rend)
 {
 	int slot;
+
 	/* one slot at a time, 8 frames */
 	for (slot = 1; slot < 32; slot++) {
 		xp_t *xp;
+
 		if ((xp = sp->slots[slot]) && (xp->sdl.config.ifflags & SDL_IF_UP)) {
 			size_t coff = slot << 2;
 			sdt_stats_t *stats = &xp->sdt.stats;
+
 			if (xp->sdl.config.iftype != SDL_TYPE_DS0A) {
 				if (xp->sdl.config.ifflags & SDL_IF_TX_RUNNING) {
 					xp_ds0_tx_block(xp, wspan + coff, wend, stats);
@@ -4944,9 +5101,11 @@ xp_e1_process(xp_span_t * sp, unsigned char *wspan, unsigned char *rspan, unsign
 	      unsigned char *rend)
 {
 	xp_t *xp;
+
 	/* entire span, one frame at a time */
 	if ((xp = sp->slots[1])) {
 		sdt_stats_t *stats = &xp->sdt.stats;
+
 		if (xp->sdl.config.ifflags & SDL_IF_TX_RUNNING) {
 			xp_e1_tx_block(xp, wspan, wend, stats);
 			xp->sdl.stats.tx_octets += 8 * 31;
@@ -4967,6 +5126,7 @@ STATIC void
 xp_e1_card_tasklet(unsigned long data)
 {
 	struct xp_card *cp = (struct xp_card *) data;
+
 	if (cp->uebno != cp->lebno) {
 		size_t boff = cp->uebno << 10;
 		unsigned char *wbeg = (unsigned char *) cp->wbuf + boff;
@@ -4974,10 +5134,13 @@ xp_e1_card_tasklet(unsigned long data)
 		unsigned char *rbeg = (unsigned char *) cp->rbuf + boff;
 		unsigned char *rend = rbeg + 1024;
 		int span;
+
 		for (span = 0; span < 4; span++) {
 			struct xp_span *sp;
+
 			if ((sp = cp->spans[span]) && (sp->ifflags & SDL_IF_UP)) {
 				int soff = span_to_byte(span);
+
 				if (sp->iftype == SDL_TYPE_E1)
 					xp_e1_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 				else
@@ -5000,13 +5163,16 @@ xp_t1c_process(xp_span_t * sp, unsigned char *wspan, unsigned char *rspan, unsig
 	       unsigned char *rend)
 {
 	int slot;
+
 	/* one slot at a time, 8 frames */
 	for (slot = 1; slot < 32; slot++) {
 		if (slot & 0x3) {
 			xp_t *xp;
+
 			if ((xp = sp->slots[slot]) && (xp->sdl.config.ifflags & SDL_IF_UP)) {
 				size_t coff = slot << 2;
 				sdt_stats_t *stats = &xp->sdt.stats;
+
 				if (xp->sdl.config.iftype != SDL_TYPE_DS0A) {
 					if (xp->sdl.config.ifflags & SDL_IF_TX_RUNNING) {
 						xp_ds0_tx_block(xp, wspan + coff, wend, stats);
@@ -5042,9 +5208,11 @@ xp_t1_process(xp_span_t * sp, unsigned char *wspan, unsigned char *rspan, unsign
 	      unsigned char *rend)
 {
 	xp_t *xp;
+
 	/* entire span, one frame at a time */
 	if ((xp = sp->slots[1])) {
 		sdt_stats_t *stats = &xp->sdt.stats;
+
 		if (xp->sdl.config.ifflags & SDL_IF_TX_RUNNING) {
 			xp_t1_tx_block(xp, wspan, wend, stats);
 			xp->sdl.stats.tx_octets += 8 * 24;
@@ -5065,6 +5233,7 @@ STATIC void
 xp_t1_card_tasklet(unsigned long data)
 {
 	struct xp_card *cp = (struct xp_card *) data;
+
 	if (cp->uebno != cp->lebno) {
 		size_t boff = cp->uebno << 10;
 		unsigned char *wbeg = (unsigned char *) cp->wbuf + boff;
@@ -5072,10 +5241,13 @@ xp_t1_card_tasklet(unsigned long data)
 		unsigned char *rbeg = (unsigned char *) cp->rbuf + boff;
 		unsigned char *rend = rbeg + 1024;
 		int span;
+
 		for (span = 0; span < 4; span++) {
 			struct xp_span *sp;
+
 			if ((sp = cp->spans[span]) && (sp->ifflags & SDL_IF_UP)) {
 				int soff = span_to_byte(span);
+
 				if (sp->iftype == SDL_TYPE_T1)
 					xp_t1_process(sp, wbeg + soff, rbeg + soff, wend, rend);
 				else
@@ -5099,16 +5271,19 @@ STATIC void
 xp_overflow(xp_card_t * cp)
 {
 	int span;
+
 	printd(("%s: card %d elastic buffer overrun!\n", __FUNCTION__, cp->card));
 	for (span = 0; span < 4; span++) {
 		xp_t *xp;
 		xp_span_t *sp;
+
 		if ((sp = cp->spans[span]) && sp->ifflags & SDL_IF_UP) {
 			switch (sp->iftype) {
 			case SDL_TYPE_DS0:
 			case SDL_TYPE_DS0A:
 			{
 				int slot;
+
 				for (slot = 1; slot < 32; slot++) {
 					if ((xp = sp->slots[slot])) {
 						if (xp->sdl.config.ifflags & SDL_IF_TX_RUNNING) {
@@ -5150,6 +5325,7 @@ xp_overflow(xp_card_t * cp)
 			default:
 			{
 				static unsigned long throttle = 0;
+
 				if (throttle + 10 <= jiffies)
 					break;
 				throttle = jiffies;
@@ -5169,10 +5345,12 @@ STATIC irqreturn_t
 xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 {
 	struct xp_card *cp = (struct xp_card *) dev_id;
+
 	/* active interrupt (otherwise spurious or shared) */
 	if (cp->xlb[STAREG] & INTACTIVE) {
 		xp_span_t *sp;
 		int span, lebno;
+
 		cp->xlb[CTLREG] = (INTENA | OUTBIT | INTACK | E1DIV);
 		if ((lebno = (cp->lebno + 1) & (X400P_EBUFNO - 1)) != cp->uebno) {
 			/* write/read burst */
@@ -5181,6 +5359,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			uint32_t *wbuf = cp->wbuf + offset;
 			uint32_t *rbuf = cp->rbuf + offset;
 			volatile uint32_t *xll = cp->xll;
+
 			for (word = 0; word < 256; word += 32)
 				for (slot = word + 1; slot < word + 32; slot++)
 					xll[slot] = wbuf[slot];
@@ -5194,6 +5373,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		for (span = 0; span < 4; span++) {
 			if ((sp = cp->spans[span]) && (sp->ifflags & SDL_IF_UP)) {
 				int base = span << 8;
+
 				if (sp->recovertime && !--sp->recovertime) {
 					printd(("%s: alarm recovery complete\n", __FUNCTION__));
 					sp->ifalarms &= ~SDL_ALARM_REC;
@@ -5208,6 +5388,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		    && (sp->ifflags & SDL_IF_UP)) {
 			int status, alarms = 0, leds = 0, all_leds;
 			int base = span << 8;
+
 			cp->xlb[base + 0x06] = 0xff;
 			status = cp->xlb[base + 0x06];
 			if (status & 0x09)
@@ -5250,6 +5431,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			for (span = 0; span < 4; span++)
 				if ((sp = cp->spans[span]) && (sp->ifflags & SDL_IF_UP)) {
 					int base = span << 8;
+
 					// printd(("%s: accumulating bipolar violations\n",
 					// __FUNCTION__));
 					sp->ifbpv +=
@@ -5258,6 +5440,7 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		if (xchg((int *) &cp->eval_syncsrc, 0)) {
 			int src, syncsrc = 0;
+
 			for (src = 0; src < SDL_SYNCS; src++) {
 				if (cp->ifsyncsrc[src] && cp->spans[syncsrc - 1]
 				    && (cp->spans[syncsrc - 1]->ifflags & SDL_IF_UP)
@@ -5275,9 +5458,9 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		cp->frame += 8;
 		cp->xlb[CTLREG] = (INTENA | E1DIV);
-		return (irqreturn_t)(IRQ_HANDLED);
+		return (irqreturn_t) (IRQ_HANDLED);
 	}
-	return (irqreturn_t)(IRQ_NONE);
+	return (irqreturn_t) (IRQ_NONE);
 }
 
 /*
@@ -5285,13 +5468,15 @@ xp_e1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
  *  -----------------------------------
  */
 STATIC irqreturn_t
-xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
+xp_t1_interrupt(int irq, void *dev_id, struct pt_regs * regs)
 {
 	struct xp_card *cp = (struct xp_card *) dev_id;
+
 	/* active interrupt (otherwise spurious or shared) */
 	if (cp->xlb[STAREG] & INTACTIVE) {
 		xp_span_t *sp;
 		int span, lebno;
+
 		cp->xlb[CTLREG] = (INTENA | OUTBIT | INTACK);
 		if ((lebno = (cp->lebno + 1) & (X400P_EBUFNO - 1)) != cp->uebno) {
 			/* write/read burst */
@@ -5300,6 +5485,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			uint32_t *wbuf = cp->wbuf + offset;
 			uint32_t *rbuf = cp->rbuf + offset;
 			volatile uint32_t *xll = cp->xll;
+
 			for (word = 0; word < 256; word += 32)
 				for (slot = word + 1; slot < word + 32; slot++)
 					if (slot & 0x3)
@@ -5315,6 +5501,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		for (span = 0; span < 4; span++) {
 			if ((sp = cp->spans[span]) && (sp->ifflags & SDL_IF_UP)) {
 				int base = span << 8;
+
 				if (sp->recovertime && !--sp->recovertime) {
 					/* alarm recovery complete */
 					sp->ifalarms &= ~SDL_ALARM_REC;
@@ -5329,6 +5516,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		    && (sp->ifflags & SDL_IF_UP)) {
 			int status, alarms = 0, leds = 0, all_leds;
 			int base = span << 8;
+
 			sp->ifrxlevel = cp->xlb[base + RIR2] >> 6;
 			cp->xlb[base + 0x20] = 0xff;
 			status = cp->xlb[base + 0x20];
@@ -5390,6 +5578,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			for (span = 0; span < 4; span++)
 				if ((sp = cp->spans[span]) && (sp->ifflags & SDL_IF_UP)) {
 					int base = span << 8;
+
 					// printd(("%s: accumulating bipolar violations\n",
 					// __FUNCTION__));
 					sp->ifbpv +=
@@ -5398,6 +5587,7 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		if (xchg((int *) &cp->eval_syncsrc, 0)) {
 			int src, syncsrc = 0;
+
 			for (src = 0; src < SDL_SYNCS; src++) {
 				if (cp->ifsyncsrc[src] && cp->spans[syncsrc - 1]
 				    && (cp->spans[syncsrc - 1]->ifflags & SDL_IF_UP)
@@ -5415,9 +5605,9 @@ xp_t1_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		}
 		cp->frame += 8;
 		cp->xlb[CTLREG] = (INTENA);
-		return (irqreturn_t)(IRQ_HANDLED);
+		return (irqreturn_t) (IRQ_HANDLED);
 	}
-	return (irqreturn_t)(IRQ_NONE);
+	return (irqreturn_t) (IRQ_NONE);
 }
 
 /*
@@ -5440,6 +5630,7 @@ xp_w_ioctl(queue_t *q, mblk_t *mp)
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+
 	(void) nr;
 	switch (type) {
 	case __SID:
@@ -5613,6 +5804,7 @@ xp_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	xp_t *xp = PRIV(q);
 	ulong oldstate = xp->state;
+
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case SDT_DAEDT_TRANSMISSION_REQ:
 		rtn = sdt_daedt_transmission_req(q, mp);
@@ -5687,6 +5879,7 @@ STATIC int
 xp_r_pcrse(queue_t *q, mblk_t *mp)
 {
 	int rtn;
+
 	switch (*(ulong *) mp->b_rptr) {
 	case SDT_T8_TIMEOUT:
 		rtn = sdt_t8_timeout_ind(q);
@@ -5762,6 +5955,7 @@ STATIC INLINE char *
 mname(mblk_t *mp)
 {
 	char *ret;
+
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
 		ret = "M_DATA";
@@ -5857,6 +6051,7 @@ STATIC INLINE int
 xp_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
+
 	if (mp->b_datap->db_type < QPCTL) {
 		// printd(("%s: putting %s on queue\n", q->q_qinfo->qi_minfo->mi_idname,
 		// mname(mp)));
@@ -5937,9 +6132,11 @@ STATIC INLINE int
 xp_srvq(queue_t *q, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
+
 	ensure(q, return (-EFAULT));
 	if (xp_trylockq(q)) {
 		mblk_t *mp;
+
 		while ((mp = getq(q))) {
 			// printd(("%s: processing queued %s\n", q->q_qinfo->qi_minfo->mi_idname,
 			// mname(mp)));
@@ -6068,6 +6265,7 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct xp *xp, **xpp = &xp_list;
+
 	(void) crp;
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
@@ -6088,10 +6286,12 @@ xp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&xp_lock, flags);
 	for (; *xpp; xpp = &(*xpp)->next) {
 		major_t dmajor = (*xpp)->cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*xpp)->cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -6128,6 +6328,7 @@ xp_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct xp *xp = PRIV(q);
 	psw_t flags;
+
 	(void) flag;
 	(void) crp;
 	(void) xp;
@@ -6158,6 +6359,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	int byte, span;
 	struct xp_card *cp;
+
 	if (!dev || !id) {
 		ptrace(("X400P-SS7: ERROR: Device or id is null!\n"));
 		return (-ENXIO);
@@ -6230,6 +6432,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		uint8_t *f = (uint8_t *) x400pfw;
 		volatile unsigned long *data;
 		unsigned long timeout;
+
 		data = (volatile unsigned long *) &cp->plx[GPIOC];
 		*data |= GPIO_WRITE;
 		*data &= ~GPIO_PROGRAM;
@@ -6275,6 +6478,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	cp->xlb[LEDREG] = 0xff;
 	if (cp->xlb[0x00f] & 0x80) {
 		int word;
+
 		printd(("E400P-SS7: E400P-SS7 Quad E1 Card\n"));
 #if 0
 		cp->wbuf = cp->xll;
@@ -6308,6 +6512,7 @@ xp_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		tasklet_init(&cp->tasklet, &xp_e1_card_tasklet, (unsigned long) cp);
 	} else {
 		int word;
+
 		printd(("T400P-SS7: T400P-SS7 Quad T1 Card\n"));
 #if 0
 		cp->wbuf = cp->xll;
@@ -6372,6 +6577,7 @@ STATIC void __devexit
 xp_remove(struct pci_dev *dev)
 {
 	struct xp_card *cp = pci_get_drvdata(dev);
+
 	ensure(cp, return);
 	cp->plx[INTCSR] = 0;	/* disable interrupts */
 	cp->xlb[SYNREG] = 0;
@@ -6467,6 +6673,7 @@ xp_pci_cleanup(void)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -6475,6 +6682,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the X400-SDL driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -6501,6 +6709,7 @@ STATIC int
 xp_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&xp_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -6510,6 +6719,7 @@ STATIC int
 xp_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&xp_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -6527,6 +6737,7 @@ STATIC int
 xp_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &sdt_x400pinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -6542,6 +6753,7 @@ STATIC int
 xp_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -6553,6 +6765,7 @@ MODULE_STATIC void __exit
 sdt_x400pterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (xp_majors[mindex]) {
 			if ((err = xp_unregister_strdev(xp_majors[mindex])))
@@ -6577,6 +6790,7 @@ MODULE_STATIC int __init
 sdt_x400pinit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = xp_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

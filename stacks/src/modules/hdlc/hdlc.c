@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:34 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.18  2007/08/14 12:17:34  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.17  2007/07/14 01:34:00  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:34 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:34 $";
 
 /*
  *  This is an HDLC (High-Level Data Link Control) module which
@@ -99,7 +102,7 @@ static char const ident[] =
 #include <ss7/hdlc_ioctl.h>
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/07/14 01:34:00 $"
+#define HDLC_REVISION	"LfS $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:34 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -308,6 +311,7 @@ hdlc_free_priv(queue_t *q)
 {
 	struct cd *cd = PRIV(q);
 	psw_t flags;
+
 	ensure(cd, return);
 	spin_lock_irqsave(&cd->lock, flags);
 	{
@@ -340,6 +344,7 @@ STATIC struct cd *
 hdlc_alloc_priv(queue_t *q, struct cd **hpp, dev_t *devp, cred_t *crp)
 {
 	struct cd *cd;
+
 	if ((cd = kmem_cache_alloc(hdlc_priv_cachep, GFP_ATOMIC))) {
 		printd(("cd: allocated module private structure\n"));
 		bzero(cd, sizeof(*cd));
@@ -459,6 +464,7 @@ STATIC INLINE ulong
 cd_set_state(struct cd *cd, ulong newstate)
 {
 	ulong oldstate = cd->i_state;
+
 	(void) oldstate;
 	cd->info.cd.cd_state = cd->i_state = newstate;
 	printd(("%s: %p: %s <- %s\n", MOD_NAME, cd, cd_state_name(newstate),
@@ -519,6 +525,7 @@ STATIC INLINE ulong
 ch_set_state(struct cd *cd, ulong newstate)
 {
 	ulong oldstate = cd->state;
+
 	(void) oldstate;
 	cd->info.ch.ch_state = cd->state = newstate;
 	printd(("%s: %p: %s <- %s\n", MOD_NAME, cd, ch_state_name(newstate),
@@ -549,6 +556,7 @@ m_error(queue_t *q, int err)
 {
 	struct cd *cd = PRIV(q);
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -572,6 +580,7 @@ m_hangup(queue_t *q, int err)
 {
 	struct cd *cd = PRIV(q);
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_HANGUP;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -595,6 +604,7 @@ cd_info_ack(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_info_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -617,6 +627,7 @@ cd_ok_ack(queue_t *q, struct cd *cd, ulong prim)
 {
 	mblk_t *mp;
 	cd_ok_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -670,6 +681,7 @@ cd_error_ack(queue_t *q, struct cd *cd, ulong prim, ulong error, ulong reason)
 {
 	mblk_t *mp;
 	cd_error_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -700,6 +712,7 @@ cd_enable_con(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_enable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -723,6 +736,7 @@ cd_disable_con(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_disable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -746,6 +760,7 @@ cd_error_ind(queue_t *q, struct cd *cd, ulong error, ulong reason, ulong state, 
 {
 	mblk_t *mp;
 	cd_error_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -772,6 +787,7 @@ cd_uintdata_ack(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	cd_unitdata_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		mp->b_band = 2;
@@ -796,6 +812,7 @@ cd_unitdata_ind(queue_t *q, struct cd *cd, mblk_t *dp)
 {
 	mblk_t *mp;
 	cd_unitdata_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -826,6 +843,7 @@ cd_bad_frame_ind(queue_t *q, struct cd *cd, ulong error, mblk_t *dp)
 {
 	mblk_t *mp;
 	cd_bad_frame_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -851,6 +869,7 @@ cd_modem_sig_ind(queue_t *q, struct cd *cd, ulong sigs)
 {
 	mblk_t *mp;
 	cd_modem_sig_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		mp->b_band = 1;
@@ -883,6 +902,7 @@ ch_info_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	struct CH_info_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -905,6 +925,7 @@ ch_optmgmt_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	struct CH_optmgmt_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -927,6 +948,7 @@ ch_attach_req(queue_t *q, struct cd *cd, size_t add_len, caddr_t add_ptr, ulong 
 {
 	mblk_t *mp;
 	struct CH_attach_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -957,6 +979,7 @@ ch_enable_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	struct CH_enable_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -980,6 +1003,7 @@ ch_connect_req(queue_t *q, struct cd *cd, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_connect_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1005,6 +1029,7 @@ ch_data_req(queue_t *q, struct cd *cd, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct CH_data_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1029,6 +1054,7 @@ ch_disconnect_req(queue_t *q, struct cd *cd, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_disconnect_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1054,6 +1080,7 @@ ch_disable_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	struct CH_disable_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1077,6 +1104,7 @@ ch_detach_req(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp;
 	struct CH_detach_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1117,9 +1145,10 @@ ch_detach_req(queue_t *q, struct cd *cd)
 #define HDLC_RX_TABLE_LENGTH	(2* HDLC_RX_STATES * 256)
 
 typedef struct tx_entry {
-	uint bit_string:10 __attribute__ ((packed));		/* the output string */
-	uint bit_length:4 __attribute__ ((packed));		/* length in excess of 8 bits of output string */
-	uint state:3 __attribute__ ((packed));			/* new state */
+	uint bit_string:10 __attribute__ ((packed));	/* the output string */
+	uint bit_length:4 __attribute__ ((packed));	/* length in excess of 8 bits of output
+							   string */
+	uint state:3 __attribute__ ((packed));	/* new state */
 } tx_entry_t;
 
 typedef struct rx_entry {
@@ -1169,6 +1198,7 @@ cd_rev(uchar byte)
 {
 	int i;
 	uchar output = 0;
+
 	for (i = 0; i < 8; i++) {
 		output <<= 1;
 		if (byte & 0x01)
@@ -1187,6 +1217,7 @@ STATIC INLINE mblk_t *
 cd_tx_buffer(queue_t *q, struct cd *cd)
 {
 	mblk_t *mp, *dp = NULL;
+
 	for (mp = cd->iq->q_first; mp; mp = mp->b_next) {
 		switch (mp->b_datap->db_type) {
 		case M_DATA:
@@ -1217,6 +1248,7 @@ STATIC INLINE void
 cd_tx_bitstuff(struct hdlc_path *tx, unsigned char byte)
 {
 	tx_entry_t *t = tx_index8(tx->state, byte);
+
 	tx->state = t->state;
 	tx->residue |= t->bit_string << tx->rbits;
 	tx->rbits += t->bit_length + 8;
@@ -1243,6 +1275,7 @@ cd_tx_block(queue_t *q, struct cd *cd)
 	int bits = cd->parm.cp_sample_size;
 	int blks = (cd->parm.cp_block_size + 7) >> 3;
 	int mask = (1 << bits) - 1;
+
 	if (!(bp = ss7_allocb(q, blks, BPRI_MED)))
 		goto enobufs;	/* bufcall will bring us back */
 	if (tx->mode == TX_MODE_IDLE || tx->mode == TX_MODE_FLAG) {
@@ -1312,6 +1345,7 @@ cd_tx_block(queue_t *q, struct cd *cd)
 				/* 
 				   continuing in message */
 				uint byte = *(tx->nxt->b_rptr)++;
+
 				tx->bcc = (tx->bcc >> 8) ^ bc_table[(tx->bcc ^ byte) & 0x00ff];
 				cd_tx_bitstuff(tx, byte);
 				stats->tx_bytes++;
@@ -1375,12 +1409,15 @@ cd_rx_block(queue_t *q, struct cd *cd, mblk_t *dp)
 	struct hdlc_path *rx = &cd->rx;
 	struct hdlc_stats *stats = &cd->stats;
 	int bits = cd->parm.cp_sample_size;
+
 #if 0
 	int N = (cd->info.cd.cd_min_sdu + 5) << 1;
 #endif
 	int err = 0;
+
 	while (dp->b_rptr < dp->b_wptr) {
 		rx_entry_t *r;
+
 		if (bits == 8)
 			r = rx_index8(rx->state, cd_rev(*dp->b_rptr++));
 		else
@@ -1542,6 +1579,7 @@ STATIC bc_entry_t
 bc_table_value(int bit_string, int bit_length)
 {
 	int pos;
+
 	for (pos = 0; pos < bit_length; pos++) {
 		if (bit_string & 0x1)
 			bit_string = (bit_string >> 1) ^ 0x8408;
@@ -1561,6 +1599,7 @@ tx_table_valueN(int state, uint8_t byte, int len)
 {
 	tx_entry_t result = { 0, };
 	int bit_mask = 1;
+
 	result.state = state;
 	result.bit_length = 0;
 	while (len--) {
@@ -1596,6 +1635,7 @@ rx_table_valueN(int state, uint8_t byte, int len)
 {
 	rx_entry_t result = { 0, };
 	int bit_mask = 1;
+
 	result.state = state;
 	while (len--) {
 		switch (result.state) {
@@ -1825,6 +1865,7 @@ STATIC void
 tx_table_generate(void)
 {
 	int j, k;
+
 	for (j = 0; j < HDLC_TX_STATES; j++)
 		for (k = 0; k < 256; k++)
 			*tx_index8(j, k) = tx_table_value(j, k);
@@ -1843,6 +1884,7 @@ STATIC void
 rx_table_generate7(void)
 {
 	int j, k;
+
 	for (j = 0; j < HDLC_RX_STATES; j++)
 		for (k = 0; k < 256; k++)
 			*rx_index7(j, k) = rx_table_value7(j, k);
@@ -1851,6 +1893,7 @@ STATIC void
 rx_table_generate8(void)
 {
 	int j, k;
+
 	for (j = 0; j < HDLC_RX_STATES; j++)
 		for (k = 0; k < 256; k++)
 			*rx_index8(j, k) = rx_table_value8(j, k);
@@ -1868,6 +1911,7 @@ STATIC void
 bc_table_generate(void)
 {
 	int pos = 0, bit_string, bit_length = 8, bit_mask = 0x100;
+
 	do {
 		for (bit_string = 0; bit_string < bit_mask; bit_string++, pos++)
 			bc_table[pos] = bc_table_value(bit_string, bit_length);
@@ -1900,6 +1944,7 @@ STATIC int
 hdlc_init_tables(void)
 {
 	size_t length;
+
 	if (!bc_table) {
 		length = HDLC_CRC_TABLE_LENGTH * sizeof(bc_entry_t);
 		for (bc_order = 0; PAGE_SIZE << bc_order < length; bc_order++) ;
@@ -1956,6 +2001,7 @@ STATIC void
 cd_wakeup(queue_t *q)
 {
 	struct cd *cd = PRIV(q);
+
 	if (!cd_tst_state(cd, CDF_ENABLED | CDF_OUTPUT_ACTIVE | CDF_READ_ACTIVE))
 		return;
 	if (ch_get_state(cd) != CHS_CONNECTED)
@@ -1979,6 +2025,7 @@ STATIC int
 cd_write(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
+
 	if (!cd_tst_state(cd, CDF_ENABLED | CDF_OUTPUT_ACTIVE | CDF_READ_ACTIVE))
 		goto discard;
 	if (ch_get_state(cd) != CHS_CONNECTED)
@@ -1999,6 +2046,7 @@ cd_info_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_info_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	return cd_info_ack(q, cd);
@@ -2015,6 +2063,7 @@ cd_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_attach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_UNATTACHED)
@@ -2042,6 +2091,7 @@ cd_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_detach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_DISABLED)
@@ -2064,6 +2114,7 @@ cd_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_enable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_DISABLED)
@@ -2086,6 +2137,7 @@ cd_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_disable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_ENABLED)
@@ -2108,6 +2160,7 @@ cd_allow_input_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_allow_input_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	switch (cd_get_state(cd)) {
@@ -2135,6 +2188,7 @@ cd_read_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_read_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_ENABLED)
@@ -2158,6 +2212,7 @@ cd_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_unitdata_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (p->cd_addr_type != CD_IMPLICIT)
@@ -2188,6 +2243,7 @@ cd_write_read_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_write_read_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_ENABLED)
@@ -2208,6 +2264,7 @@ cd_halt_input_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_halt_input_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_INPUT_ALLOWED)
@@ -2228,6 +2285,7 @@ cd_abort_output_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_abort_output_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	if (cd_get_state(cd) != CD_OUTPUT_ACTIVE)
@@ -2247,8 +2305,10 @@ STATIC int
 cd_mux_name_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
+
 #if 0
 	cd_mux_name_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	return cd_error_ack(q, cd, p->cd_primitive, CD_NOTSUPP, 0);
@@ -2267,6 +2327,7 @@ cd_modem_sig_req(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_modem_sig_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 #if 0
@@ -2287,6 +2348,7 @@ cd_modem_sig_poll(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	cd_modem_sig_poll_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 #if 0
@@ -2314,6 +2376,7 @@ STATIC int
 ch_read(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
+
 	if (!cd_tst_state(cd, CDF_INPUT_ALLOWED | CDF_READ_ACTIVE))
 		goto discard;
 	if (ch_get_state(cd) != CHS_CONNECTED)
@@ -2334,6 +2397,7 @@ ch_info_ack(queue_t *q, mblk_t *mp)
 	struct CH_info_ack *p = (typeof(p)) mp->b_rptr;
 	ulong cp_type;
 	ulong oldstate = ch_get_state(cd);
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	cd->info.ch = *p;
@@ -2400,6 +2464,7 @@ ch_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_optmgmt_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	return (QR_DONE);
@@ -2417,6 +2482,7 @@ ch_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_ok_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	switch (ch_get_state(cd)) {
@@ -2456,6 +2522,7 @@ ch_error_ack(queue_t *q, mblk_t *mp)
 	struct cd *cd = PRIV(q);
 	struct CH_error_ack *p = (typeof(p)) mp->b_rptr;
 	ulong error = CD_EVENT, reason = 0;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	switch (p->ch_error_type) {
@@ -2518,6 +2585,7 @@ ch_enable_con(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_enable_con *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (ch_get_state(cd) != CHS_WCON_EREQ)
@@ -2539,6 +2607,7 @@ ch_connect_con(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_connect_con *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (ch_get_state(cd) != CHS_WCON_CREQ)
@@ -2559,6 +2628,7 @@ ch_data_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_data_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (!mp->b_cont)
@@ -2578,6 +2648,7 @@ ch_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_disconnect_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (ch_get_state(cd) != CHS_CONNECTED)
@@ -2598,6 +2669,7 @@ ch_disconnect_con(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_disconnect_con *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (ch_get_state(cd) != CHS_WCON_DREQ)
@@ -2619,6 +2691,7 @@ ch_disable_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_disable_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (ch_get_state(cd) != CHS_ENABLED)
@@ -2640,6 +2713,7 @@ ch_disable_con(queue_t *q, mblk_t *mp)
 	struct cd *cd = PRIV(q);
 	struct CH_disable_con *p = (typeof(p)) mp->b_rptr;
 	int rtn;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	if (ch_get_state(cd) != CHS_WCON_RREQ)
@@ -2673,6 +2747,7 @@ ch_event_ind(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
 	struct CH_event_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eio;
 	switch (p->ch_event) {
@@ -2765,6 +2840,7 @@ lmi_iocgoptions(queue_t *q, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->option;
@@ -2783,6 +2859,7 @@ lmi_iocsoptions(queue_t *q, mblk_t *mp)
 		int ret = 0;
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->option = *arg;
@@ -2800,6 +2877,7 @@ lmi_iocgconfig(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			arg->version = cd->i_version;
@@ -2818,6 +2896,7 @@ lmi_iocsconfig(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->i_version = arg->version;
@@ -2835,6 +2914,7 @@ lmi_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct cd *cd = PRIV(q);
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return lmi_test_config(cd, arg);
 	}
 	rare();
@@ -2846,6 +2926,7 @@ lmi_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct cd *cd = PRIV(q);
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return lmi_commit_config(cd, arg);
 	}
 	rare();
@@ -2858,6 +2939,7 @@ lmi_iocgstatem(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			arg->state = cd->state;
@@ -2876,6 +2958,7 @@ lmi_ioccmreset(queue_t *q, mblk_t *mp)
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->state = LMI_UNUSABLE;
@@ -2894,6 +2977,7 @@ lmi_iocgstatsp(queue_t *q, mblk_t *mp)
 		hdlc_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->statsp;
@@ -2912,6 +2996,7 @@ lmi_iocsstatsp(queue_t *q, mblk_t *mp)
 		hdlc_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->statsp = *arg;
@@ -2930,6 +3015,7 @@ lmi_iocgstats(queue_t *q, mblk_t *mp)
 		lmi_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -2946,6 +3032,7 @@ lmi_ioccstats(queue_t *q, mblk_t *mp)
 	struct cd *cd = PRIV(q);
 	int ret = 0;
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&cd->lock, flags);
 	{
@@ -2962,6 +3049,7 @@ lmi_iocgnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -2980,6 +3068,7 @@ lmi_iocsnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -2998,6 +3087,7 @@ lmi_ioccnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		int ret = 0;
 		psw_t flags;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3021,6 +3111,7 @@ cd_test_config(struct cd *cd, hdlc_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags;
+
 	spin_lock_irqsave(&cd->lock, flags);
 	do {
 #if 0
@@ -3059,6 +3150,7 @@ STATIC int
 cd_commit_config(struct cd *cd, hdlc_config_t * arg)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&cd->lock, flags);
 	{
 		cd_test_config(cd, arg);
@@ -3074,6 +3166,7 @@ cd_iocgoptions(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->option;
@@ -3091,6 +3184,7 @@ cd_iocsoptions(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->option = *arg;
@@ -3108,6 +3202,7 @@ cd_iocgconfig(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->config;
@@ -3125,6 +3220,7 @@ cd_iocsconfig(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->config = *arg;
@@ -3141,6 +3237,7 @@ cd_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct cd *cd = PRIV(q);
 		hdlc_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return cd_test_config(cd, arg);
 	}
 	rare();
@@ -3152,6 +3249,7 @@ cd_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct cd *cd = PRIV(q);
 		hdlc_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return cd_commit_config(cd, arg);
 	}
 	rare();
@@ -3164,6 +3262,7 @@ cd_iocgstatem(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->statem;
@@ -3178,6 +3277,7 @@ STATIC int
 cd_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
+
 	(void) cd;
 	(void) mp;
 	fixme(("%s: Master reset\n", MOD_NAME));
@@ -3190,6 +3290,7 @@ cd_iocgstatsp(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->statsp;
@@ -3207,6 +3308,7 @@ cd_iocsstatsp(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->statsp = *arg;
@@ -3224,6 +3326,7 @@ cd_iocgstats(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->stats;
@@ -3239,6 +3342,7 @@ cd_ioccstats(queue_t *q, mblk_t *mp)
 {
 	psw_t flags;
 	struct cd *cd = PRIV(q);
+
 	(void) mp;
 	spin_lock_irqsave(&cd->lock, flags);
 	{
@@ -3254,6 +3358,7 @@ cd_iocgnotify(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			*arg = cd->notify;
@@ -3271,6 +3376,7 @@ cd_iocsnotify(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->notify = *arg;
@@ -3288,6 +3394,7 @@ cd_ioccnotify(queue_t *q, mblk_t *mp)
 		struct cd *cd = PRIV(q);
 		psw_t flags;
 		hdlc_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&cd->lock, flags);
 		{
 			cd->notify.events &= ~arg->events;
@@ -3304,6 +3411,7 @@ cd_ioccmgmt(queue_t *q, mblk_t *mp)
 	struct cd *cd = PRIV(q);
 	int ret = 0;
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&cd->lock, flags);
 	{
@@ -3333,6 +3441,7 @@ cd_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
+
 	switch (type) {
 	case __SID:
 	{
@@ -3510,6 +3619,7 @@ cd_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	ulong prim;
 	struct cd *cd = PRIV(q);
+
 	cd->i_oldstate = cd_get_state(cd);
 	if ((prim = *(ulong *) mp->b_rptr) == CD_UNITDATA_REQ) {
 		printd(("%s: %p: -> CD_UNITDATA_REQ [%d]\n", MOD_NAME, cd, msgdsize(mp->b_cont)));
@@ -3595,6 +3705,7 @@ cd_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct cd *cd = PRIV(q);
 	ulong oldstate = ch_get_state(cd);
+
 	/* 
 	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == CH_DATA_IND) {
@@ -3675,6 +3786,7 @@ STATIC INLINE int
 cd_w_data(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
+
 	(void) cd;
 	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, cd, msgdsize(mp)));
 	return cd_write(q, mp);
@@ -3683,6 +3795,7 @@ STATIC INLINE int
 cd_r_data(queue_t *q, mblk_t *mp)
 {
 	struct cd *cd = PRIV(q);
+
 	(void) cd;
 	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, cd, msgdsize(mp)));
 	return ch_read(q, mp);
@@ -3758,6 +3871,7 @@ cd_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct cd *cd;
+
 		/* test for multiple push */
 		for (cd = cd_list; cd; cd = cd->next) {
 			if (cd->u.dev.cmajor == cmajor && cd->u.dev.cminor == cminor) {
@@ -3806,6 +3920,7 @@ cd_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -3830,6 +3945,7 @@ STATIC int
 hdlc_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&hdlc_fmod)) < 0)
 		return (err);
 	return (0);
@@ -3839,6 +3955,7 @@ STATIC int
 hdlc_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&hdlc_fmod)) < 0)
 		return (err);
 	return (0);
@@ -3856,6 +3973,7 @@ STATIC int
 hdlc_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&hdlcinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -3869,6 +3987,7 @@ STATIC int
 hdlc_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&hdlcinfo)) < 0)
 		return (err);
 	return (0);
@@ -3880,6 +3999,7 @@ MODULE_STATIC int __init
 hdlcinit(void)
 {
 	int err;
+
 #ifdef MODULE
 	cmn_err(CE_NOTE, HDLC_BANNER);	/* banner message */
 #else
@@ -3907,6 +4027,7 @@ MODULE_STATIC void __exit
 hdlcterminate(void)
 {
 	int err;
+
 	if ((err = hdlc_free_tables()))
 		cmn_err(CE_WARN, "%s: could not free tables", MOD_NAME);
 	if ((err = hdlc_unregister_strmod()))

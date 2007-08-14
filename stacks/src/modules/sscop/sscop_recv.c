@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:29 $
+ @(#) $RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sscop_recv.c,v $
+ Revision 0.9.2.4  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:29 $"
+#ident "@(#) $RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:51 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:29 $";
+    "$RCSfile: sscop_recv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:51 $";
 
 /*
  *  =========================================================================
@@ -65,7 +71,8 @@ static char const ident[] =
  *  RECV BGN.indication N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_bgn(q, pdu)
+static int
+sscop_recv_bgn(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -77,7 +84,8 @@ static int sscop_recv_bgn(q, pdu)
  *  RECV BGAK.indication N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_bgak(q, pdu)
+static int
+sscop_recv_bgak(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -89,7 +97,8 @@ static int sscop_recv_bgak(q, pdu)
  *  RECV BGREJ.indication SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_bgrej(q, pdu)
+static int
+sscop_recv_bgrej(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -101,7 +110,8 @@ static int sscop_recv_bgrej(q, pdu)
  *  RECV END.indication [src] SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_end(q, pdu)
+static int
+sscop_recv_end(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -113,7 +123,8 @@ static int sscop_recv_end(q, pdu)
  *  RECV ENDAK.indication ()
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_endak(q, pdu)
+static int
+sscop_recv_endak(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -125,7 +136,8 @@ static int sscop_recv_endak(q, pdu)
  *  RECV RS.indication N(W), N(SQ), N(S), SSCOP-UU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_rs(q, pdu)
+static int
+sscop_recv_rs(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -137,7 +149,8 @@ static int sscop_recv_rs(q, pdu)
  *  RECV RSAK.indication N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_rsak(q, pdu)
+static int
+sscop_recv_rsak(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -149,7 +162,8 @@ static int sscop_recv_rsak(q, pdu)
  *  RECV ER.indication N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_er(q, pdu)
+static int
+sscop_recv_er(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -161,7 +175,8 @@ static int sscop_recv_er(q, pdu)
  *  RECV ERAK.indication N(W), N(SQ), N(S)
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_erak(q, pdu)
+static int
+sscop_recv_erak(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -173,7 +188,8 @@ static int sscop_recv_erak(q, pdu)
  *  RECV SD.indication N(S), OOS, MU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_sd(q, pdu)
+static int
+sscop_recv_sd(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -185,7 +201,8 @@ static int sscop_recv_sd(q, pdu)
  *  RECV POLL.indication N(S), N(PS), N(SQ)
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_poll(q, pdu)
+static int
+sscop_recv_poll(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -197,7 +214,8 @@ static int sscop_recv_poll(q, pdu)
  *  RECV STAT.indicaiton N(R), N(MR), N(PS), N(SQ), N(SS), [list]
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_stat(q, pdu)
+static int
+sscop_recv_stat(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -209,7 +227,8 @@ static int sscop_recv_stat(q, pdu)
  *  RECV USTAT.indication N(R), N(MR), N(PS), N(SQ), N(SS), [list]
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_ustat(q, pdu)
+static int
+sscop_recv_ustat(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -221,7 +240,8 @@ static int sscop_recv_ustat(q, pdu)
  *  RECV UD.indication MU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_ud(q, pdu)
+static int
+sscop_recv_ud(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -233,7 +253,8 @@ static int sscop_recv_ud(q, pdu)
  *  RECV MD.indication MU
  *  -------------------------------------------------------------------------
  */
-static int sscop_recv_md(q, pdu)
+static int
+sscop_recv_md(q, pdu)
 	const queue_t *q;
 	const mblk_t *pdu;
 {
@@ -264,7 +285,8 @@ static int (*sscop_pdu[]) (const queue_t *, const mblk_t *) = {
  *  -------------------------------------------------------------------------
  *
  */
-int sscop_recv_msg(q, mp)
+int
+sscop_recv_msg(q, mp)
 	const queue_t *q;
 	const mblk_t *mp;
 {

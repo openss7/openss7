@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:22 $
+ @(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:01 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_v400p.c,v $
+ Revision 0.9.2.7  2007/08/14 12:19:01  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.6  2007/07/14 01:35:22  brian
  - make license explicit, add documentation
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:22 $"
+#ident "@(#) $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:01 $"
 
 static char const ident[] =
-    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:22 $";
+    "$RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:01 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -127,7 +130,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"E/T400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:22 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_v400p.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:01 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -333,7 +336,7 @@ typedef struct cd {
 	ulong irq;			/* card irq */
 	ulong iobase;			/* card iobase */
 	struct tasklet_struct tasklet;	/* card tasklet */
-	irqreturn_t (*isr)(int, void *, struct pt_regs *); /* interrupt service routine */
+	 irqreturn_t(*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
 	sdl_config_t config;		/* card configuration */
 } cd_t;
 
@@ -1713,7 +1716,8 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 1,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0},
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
 };
 STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifname = NULL,
@@ -1735,7 +1739,8 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0},
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
 };
 STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifname = NULL,

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/17 01:56:22 $
+ @(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:44 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,13 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:44 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: cdi.c,v $
+ Revision 0.9.2.10  2007/08/14 12:18:44  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/17 01:56:22 $"
+#ident "@(#) $RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:44 $"
 
-static char const ident[] = "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/06/17 01:56:22 $";
+static char const ident[] =
+    "$RCSfile: cdi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:44 $";
 
 #define __NO_VERSION__
 
@@ -143,6 +150,7 @@ STATIC INLINE mblk_t *
 cd_allocb(mblk_t *bp, int len, int prio, int *rtn)
 {
 	mblk_t *mp;
+
 	if (bp) {
 		if (bp->db_datap->db_lim - bp->b_rptr > len) {
 			bp->db_datap->db_type = M_DATA;
@@ -186,6 +194,7 @@ cd_info_ack(queue_t *q, mblk_t *mp, ulong max_sdu, ulong min_sdu, ulong ppa_styl
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_info_ack_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -214,6 +223,7 @@ cd_ok_ack(queue_t *q, mblk_t *mp, int prim)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_ok_ack_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -235,6 +245,7 @@ cd_error_ack(queue_t *q, mblk_t *mp, int prim, int errno, int exp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_error_ack_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -258,6 +269,7 @@ cd_enable_con(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_enable_con_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -278,6 +290,7 @@ cd_disable_con(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_disable_con_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -298,6 +311,7 @@ cd_error_ind(queue_t *q, mblk_t *mp, int errno, int exp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_error_ind_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -320,6 +334,7 @@ cd_unitdata_ack(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_unitdata_ack_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -340,6 +355,7 @@ cd_unitdata_ind(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	cd_unitdata_ind_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -380,6 +396,7 @@ lmi_info_req(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	lmi_info_req_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -399,6 +416,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	lmi_attach_req_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -418,6 +436,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	lmi_detach_req_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -437,6 +456,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	lmi_enable_req_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -456,6 +476,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	lmi_disable_req_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -475,6 +496,7 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CDI_PRIV(q);
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
+
 	if ((mp = cd_allocb(mp, sizeof(*p), BPRI_MED, &err))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = ((typeof(p)) mp->b_wptr)++;
@@ -507,6 +529,7 @@ STATIC INLINE int
 cd_attach_req(queue_t *q, mblk_t *mp)
 {
 	ulong ppa = ((cd_attach_req_t *) mp->b_rptr)->cd_ppa;
+
 	return lmi_attach_req(q, mp, ppa);
 }
 
@@ -535,6 +558,7 @@ STATIC INLINE int
 cd_disable_req(queue_t *q, mblk_t *mp)
 {
 	ulong disposal = ((cd_disable_req_t *) mp->b_rptr)->cd_disposal;
+
 	return lmi_disable_req(q, mp);
 }
 
@@ -666,6 +690,7 @@ STATIC INLINE int
 lmi_info_ack(queue_t *q, mblk_t *mp)
 {
 	lmi_info_ack_t *p = ((typeof(p)) mp->b_rptr);
+
 	return cd_info_ack(q, mp, p->lmi_max_sdu, p->lmi_min_sdu, p->lmi_ppa_style);
 }
 
@@ -679,6 +704,7 @@ lmi_ok_ack(queue_t *q, mblk_t *mp)
 	cdi_t *cd = CD_PRIV(q);
 	lmi_ok_ack_t *p = ((typeof(p)) mp->b_rptr);
 	int oldstate = cd->i_state;
+
 	cd->i_state = xlat_state(p->lmi_state);
 	if ((err = cd_ok_ack(q, mp, xlat_prim(p->lmi_correct_primitive))) < 0)
 		cd->i_state = oldstate;
@@ -693,6 +719,7 @@ lmi_error_ack(queue_t *q, mblk_t *mp)
 {
 	int prim;
 	lmi_error_ack_t *p = ((typeof(p)) mp->b_rptr);
+
 	switch (p->lmi_error_primitive) {
 	case LMI_INFO_REQ:
 		prim = CD_INFO_REQ;
@@ -923,6 +950,7 @@ cdi_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	cdi_t *cd = CD_PRIV(q);
 	ulong oldstate = cd->i_state;
+
 	switch (*((ulong *) mp->b_rptr)) {
 	case CD_INFO_REQ:
 		rtn = cd_info_req(q, mp);
@@ -1071,6 +1099,7 @@ STATIC INLINE int
 cdi_putq(queue_t *q, mblk_t *mp, int (*proc) (queue_t *, mblk_t *))
 {
 	int rtn = 0;
+
 	ensure(q, return (-EFAULT));
 	ensure(mp, return (-EFAULT));
 	cdi_spinlock(q);

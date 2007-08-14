@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:19 $
+ @(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:20:07 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:20:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:20:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sl-pmod.c,v $
+ Revision 0.9.2.2  2007/08/14 12:20:07  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.1  2007/08/12 15:20:19  brian
  - added new files
 
@@ -78,9 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:19 $"
+#ident "@(#) $RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:20:07 $"
 
-static char const ident[] = "$RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/12 15:20:19 $";
+static char const ident[] = "$RCSfile: test-sl-pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:20:07 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -216,6 +219,7 @@ static const char *lpkgname = "SS7 MTP Level 2";
 static const char *lstdname = "Q.703/ANSI T1.111.3/JQ.703";
 static const char *sstdname = "Q.781";
 static const char *shortname = "MTP2";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/ch";
 #else
@@ -243,6 +247,7 @@ static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
 static int show_fisus = 1;
+
 #if TEST_X400
 static int show_msus = 1;
 #endif
@@ -643,8 +648,8 @@ struct test_config {
 		    .t2h = 100 * 1000,	/* t2h - timer t2h duration (milliseconds) */
 		    .t3 = 1 * 1000,	/* t3 - timer t3 duration (milliseconds) */
 		    .t4n = 8 * 1000,	/* t4n - timer t4n duration (milliseconds) */
-		    .t4e = 500,		/* t4e - timer t4e duration (milliseconds) */
-		    .t5 = 125,		/* t5 - timer t5 duration (milliseconds) */
+		    .t4e = 500,	/* t4e - timer t4e duration (milliseconds) */
+		    .t5 = 125,	/* t5 - timer t5 duration (milliseconds) */
 		    .t6 = 4 * 1000,	/* t6 - timer t6 duration (milliseconds) */
 		    .t7 = 2 * 1000,	/* t7 - timer t7 duration (milliseconds) */
 		    .rb_abate = 3,	/* rb_abate - RB cong abatement (#msgs) */
@@ -665,7 +670,7 @@ struct test_config {
 } /* sl */ };
 
 struct test_config *config = &iutconf;
-struct test_stats  *stats = &iutstat;
+struct test_stats *stats = &iutstat;
 
 /*
  *  -------------------------------------------------------------------------
@@ -1066,7 +1071,7 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -2268,8 +2273,9 @@ print_sdt_stats(int child, sdt_stats_t * s)
 	if (s->carrier_lost)
 		print_string_val(child, "carrier_lost", s->carrier_lost);
 }
+
 void
-print_sl_stats(int child, sl_stats_t *s)
+print_sl_stats(int child, sl_stats_t * s)
 {
 	if (s->sl_dur_in_service)
 		print_string_val(child, "sl_dur_in_service", s->sl_dur_in_service);
@@ -4460,7 +4466,7 @@ print_options(int child, const char *cmd_buf, size_t qos_ofs, size_t qos_len)
 
 #if TEST_M2PA
 void
-print_info(int child, N_info_ack_t *info)
+print_info(int child, N_info_ack_t * info)
 {
 	char buf[64];
 
@@ -5446,7 +5452,7 @@ union primitives {
 	union SL_primitives sl;
 #if TEST_M2PA
 	union N_primitives npi;
-#endif				/* TEST_M2PA */
+#endif					/* TEST_M2PA */
 };
 
 static int
@@ -7279,19 +7285,22 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			DATA_xfer_flags = p->npi.data_ind.DATA_xfer_flags;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.data_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->npi.data_ind), sizeof(N_qos_sel_data_sctp_t));
+			// print_options(child, cbuf, sizeof(p->npi.data_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_EXDATA_IND:
 			event = __TEST_EXDATA_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.exdata_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->npi.exdata_ind), sizeof(N_qos_sel_data_sctp_t));
+			// print_options(child, cbuf, sizeof(p->npi.exdata_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_DATACK_IND:
 			event = __TEST_DATACK_IND;
 			print_rx_prim(child, prim_string(p->npi.type));
 			sid[child] = ((N_qos_sel_data_sctp_t *) (cbuf + sizeof(p->npi.datack_ind)))->sid;
-			//print_options(child, cbuf, sizeof(p->npi.datack_ind), sizeof(N_qos_sel_data_sctp_t));
+			// print_options(child, cbuf, sizeof(p->npi.datack_ind),
+			// sizeof(N_qos_sel_data_sctp_t));
 			break;
 		case N_INFO_ACK:
 			event = __TEST_INFO_ACK;
@@ -8071,7 +8080,7 @@ static int
 postamble_stats(int child)
 {
 	int failed = 0;
-	
+
 	if (child != CHILD_PTU) {
 		state++;
 		if (do_signal(child, __TEST_SL_STATS))
@@ -8790,7 +8799,6 @@ struct test_stream test_case_0_2_7_iut = { preamble_link_power_on, test_0_2_7_iu
 
 #define test_case_0_2_7 { &test_case_0_2_7_ptu, &test_case_0_2_7_iut, NULL }
 
-
 /*
  *  -------------------------------------------------------------------------
  *
@@ -9457,7 +9465,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -9488,7 +9496,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
@@ -9607,6 +9615,7 @@ main(int argc, char *argv[])
 	int range = 0;
 	struct test_case *t;
 	int tests_to_run = 0;
+
 #if TEST_M2PA
 	char *hostc = "127.0.0.1,127.0.0.2,127.0.0.3";
 	char *hosts = "127.0.0.1,127.0.0.2,127.0.0.3";

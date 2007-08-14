@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:29 $
+ @(#) $RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:51 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sscop_t_user.c,v $
+ Revision 0.9.2.4  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:29 $"
+#ident "@(#) $RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:51 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:29 $";
+    "$RCSfile: sscop_t_user.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:51 $";
 
 /*
  *  =========================================================================
@@ -65,9 +71,11 @@ static char const ident[] =
  *  T_INFO_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_info_req(queue_t * q, mblk_t * pdu)
+static int
+t_info_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
+
 	(void) pdu;
 	if (!(mp = t_info_ack(q)))
 		return (-ENOBUFS);
@@ -80,9 +88,11 @@ static int t_info_req(queue_t * q, mblk_t * pdu)
  *  T_ADDR_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_addr_req(queue_t * q, mblk_t * pdu)
+static int
+t_addr_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
+
 	(void) pdu;
 	if (!(mp = t_addr_ack(q)))
 		return (-ENOBUFS);
@@ -95,7 +105,8 @@ static int t_addr_req(queue_t * q, mblk_t * pdu)
  *  T_OPTMGMT_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_optmgmt_req(queue_t * q, mblk_t * pdu)
+static int
+t_optmgmt_req(queue_t *q, mblk_t *pdu)
 {
 	int err;
 	mblk_t *mp;
@@ -108,11 +119,13 @@ static int t_optmgmt_req(queue_t * q, mblk_t * pdu)
 		const caddr_t opt_ptr = p->OPT_offset + pdu->b_rptr;
 		const size_t opt_len = p->OPT_length;
 		const uint flags = p->MGMT_flags;
+
 		switch (flags) {
 		case T_NEGOTIATE:
 		{
 			caddr_t req = opt_ptr;
 			struct t_opthdr *reqoh;
+
 			for (req = opt_ptr; req <= opt_ptr + opt_len - sizeof(*reqoh);
 			     req = req + reqoh->len) {
 				reqoh = (struct t_opthdr *) req;
@@ -128,6 +141,7 @@ static int t_optmgmt_req(queue_t * q, mblk_t * pdu)
 		{
 			caddr_t req = opt_ptr;
 			struct t_opthdr *reqoh;
+
 			for (req = opt_ptr; req <= opt_ptr + opt_len - sizeof(*reqoh);
 			     req = req + reqoh->len) {
 				reqoh = (struct t_opthdr *) req;
@@ -142,6 +156,7 @@ static int t_optmgmt_req(queue_t * q, mblk_t * pdu)
 		{
 			caddr_t req = opt_ptr;
 			struct t_opthdr *reqoh;
+
 			for (req = opt_ptr; req <= opt_ptr + opt_len - sizeof(*reqoh);
 			     req = req + reqoh->len) {
 				reqoh = (struct t_opthdr *) req;
@@ -158,6 +173,7 @@ static int t_optmgmt_req(queue_t * q, mblk_t * pdu)
 		{
 			caddr_t req = opt_ptr;
 			struct t_opthdr *reqoh;
+
 			for (req = opt_ptr; req <= opt_ptr + opt_len - sizeof(*reqoh);
 			     req = req + reqoh->len) {
 				reqoh = (struct t_opthdr *) req;
@@ -186,7 +202,8 @@ static int t_optmgmt_req(queue_t * q, mblk_t * pdu)
  *  T_BIND_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_bind_req(queue_t * q, mblk_t * pdu)
+static int
+t_bind_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -234,6 +251,7 @@ static int t_bind_req(queue_t * q, mblk_t * pdu)
 		/* See if we need to assign a port number */
 		if (!(sp->bport = htons(bport)) && !(sp->cons = cons)) {
 			static u16 sscop_port_rover = 0;
+
 			/* 
 			 *  This stream can only be used for outgoing connections, so
 			 *  if it is assigned a zero port number we choose an unused
@@ -249,7 +267,7 @@ static int t_bind_req(queue_t * q, mblk_t * pdu)
 				if (bport > high || bport < low)
 					bport = low;
 				bbp = &sscop_bind_hash[bport & 0xff];
-				for (bb = *bbp; bb && bb->port != bport; bb = bb->next);
+				for (bb = *bbp; bb && bb->port != bport; bb = bb->next) ;
 				if (!bb || !bb->bound)
 					break;
 			}
@@ -260,7 +278,7 @@ static int t_bind_req(queue_t * q, mblk_t * pdu)
 			sscop_port_rover = bport;
 		} else {
 			bbp = &sscop_bind_hash[bport & 0xff];
-			for (bb = *bbp; bb && sp->bport != bport; bb = bb->next);
+			for (bb = *bbp; bb && sp->bport != bport; bb = bb->next) ;
 		}
 		/* If we have an existing bind bucket, check for conflicts */
 		if (bb && bb->cons && cons) {
@@ -344,7 +362,8 @@ static int t_bind_req(queue_t * q, mblk_t * pdu)
  *  T_UNBIND_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_unbind_req(queue_t * q, mblk_t * pdu)
+static int
+t_unbind_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -390,7 +409,8 @@ static int t_unbind_req(queue_t * q, mblk_t * pdu)
  *  T_CONN_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_conn_req(queue_t * q, mblk_t * pdu)
+static int
+t_conn_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -525,7 +545,8 @@ static int t_conn_req(queue_t * q, mblk_t * pdu)
  *  T_CONN_RES
  *  -------------------------------------------------------------------------
  */
-static int t_conn_res(queue_t * q, mblk_t * pdu)
+static int
+t_conn_res(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -577,6 +598,7 @@ static int t_conn_res(queue_t * q, mblk_t * pdu)
 
 			struct t_opthdr *oh;
 			caddr_t op;
+
 			for (op = opt_ptr, oh = (struct t_opthdr *) op;
 			     op < opt_ptr + opt_len;
 			     op += PADC(oh->len), oh = (struct t_opthdr *) op) {
@@ -717,7 +739,8 @@ static int t_conn_res(queue_t * q, mblk_t * pdu)
  *  T_DATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_data_req(queue_t * q, mblk_t * pdu)
+static int
+t_data_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -756,7 +779,8 @@ static int t_data_req(queue_t * q, mblk_t * pdu)
  *  T_EXDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_exdata_req(queue_t * q, mblk_t * pdu)
+static int
+t_exdata_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -792,7 +816,8 @@ static int t_exdata_req(queue_t * q, mblk_t * pdu)
  *  T_OPTDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_optdata_req(queue_t * q, mblk_t * pdu)
+static int
+t_optdata_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -881,7 +906,8 @@ static int t_optdata_req(queue_t * q, mblk_t * pdu)
  *  T_UNITDATA_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_unitdata_req(queue_t * q, mblk_t * pdu)
+static int
+t_unitdata_req(queue_t *q, mblk_t *pdu)
 {
 	freemsg(pdu);
 	qreply(q, t_error_ack(T_UNIDATA_REQ, TNOTSUPPORT));
@@ -892,7 +918,8 @@ static int t_unitdata_req(queue_t * q, mblk_t * pdu)
  *  T_DISCON_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_discon_req(queue_t * q, mblk_t * pdu)
+static int
+t_discon_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	sscop_t *sp = SSCOP_PRIV(q);
@@ -901,6 +928,7 @@ static int t_discon_req(queue_t * q, mblk_t * pdu)
 
 	if (sp->t_state == TS_WRES_CIND) {
 		mblk_t *mp;
+
 		for (mp = bufq_peek(&sp->connect_queue); mp; mp->next) {
 			struct sscop_rcb *cb = SSCOP_RCB(mp);
 
@@ -986,7 +1014,8 @@ static int t_discon_req(queue_t * q, mblk_t * pdu)
  *  T_ORDREL_REQ
  *  -------------------------------------------------------------------------
  */
-static int t_ordrel_req(queue_t * q, mblk_t * pdu)
+static int
+t_ordrel_req(queue_t *q, mblk_t *pdu)
 {
 	sscop_t *sp = SSCOP_PRIV(q);
 	struct T_ordrel_req *p = (struct T_ordrel_req *) pdu->b_rptr;
@@ -1043,7 +1072,8 @@ static int (*t_prim[]) (queue_t *, mblk_t *) = {
 	    NULL		/* T_ADDR_ACK 27 */
 };
 
-static __inline__ int sscop_t_proto(queue_t * q, mblk_t * mp)
+static __inline__ int
+sscop_t_proto(queue_t *q, mblk_t *mp)
 {
 	int prim = ((union T_primitives *) (mp->b_rptr))->type;
 	if (0 <= prim && prim < sizeof(t_prim) / sizeof(void *))
@@ -1052,12 +1082,14 @@ static __inline__ int sscop_t_proto(queue_t * q, mblk_t * mp)
 	return (-EOPNOTSUPP);
 }
 
-int sscop_w_proto(queue_t * q, mblk_t * mp)
+int
+sscop_w_proto(queue_t *q, mblk_t *mp)
 {
 	return sscop_t_proto(q, mp);
 }
 
-int sscop_w_pcproto(queue_t * q, mblk_t * mp)
+int
+sscop_w_pcproto(queue_t *q, mblk_t *mp)
 {
 	return sscop_t_proto(q, mp);
 }

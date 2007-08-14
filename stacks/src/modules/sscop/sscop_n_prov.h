@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sscop_n_prov.h,v 0.9.2.3 2007/06/17 01:56:28 brian Exp $
+ @(#) $Id: sscop_n_prov.h,v 0.9.2.4 2007/08/14 12:18:51 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n_prov.h,v $
+ Revision 0.9.2.4  2007/08/14 12:18:51  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.3  2007/06/17 01:56:28  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SSCOP_N_PROV_H__
 #define __SSCOP_N_PROV_H__
 
-#ident "@(#) $RCSfile: sscop_n_prov.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sscop_n_prov.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -79,7 +82,8 @@
  *  N_INFO_ACK
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_info_ack(q)
+static inline mblk_t *
+n_info_ack(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
@@ -90,6 +94,7 @@ static inline mblk_t *n_info_ack(q)
 	static const size_t add_len = 0;	/* TODO */
 	static const size_t qos_len = sizeof(*qos);
 	static const size_t rng_len = sizeof(*rng);
+
 	if ((mp = allocb(sizeof(*p) + add_len + qos_len + rng_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_info_ack_t *) mp->b_wptr;
@@ -161,11 +166,13 @@ static inline mblk_t *n_info_ack(q)
  *  N_OK_ACK
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_ok_ack(prim)
+static inline mblk_t *
+n_ok_ack(prim)
 	const int prim;
 {
 	mblk_t *mp;
 	N_ok_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_ok_ack_t *) mp->b_wptr;
@@ -180,12 +187,14 @@ static inline mblk_t *n_ok_ack(prim)
  *  N_ERROR_ACK
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_error_ack(prim, err)
+static inline mblk_t *
+n_error_ack(prim, err)
 	const int prim;
 	const int err;
 {
 	mblk_t *mp;
 	N_error_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_error_ack_t *) mp->b_wptr;
@@ -202,7 +211,8 @@ static inline mblk_t *n_error_ack(prim, err)
  *  N_BIND_ACK
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_bind_ack(q)
+static inline mblk_t *
+n_bind_ack(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
@@ -233,7 +243,8 @@ static inline mblk_t *n_bind_ack(q)
  *  N_CONN_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_conn_ind(ck)
+static inline mblk_t *
+n_conn_ind(ck)
 	const struct sscop_cookie *ck;
 {
 	mblk_t *mp;
@@ -293,7 +304,8 @@ static inline mblk_t *n_conn_ind(ck)
  *  N_CONN_CON
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_conn_con(q)
+static inline mblk_t *
+n_conn_con(q)
 	const queue_t *q;
 {
 	mblk_t *mp;
@@ -342,12 +354,14 @@ static inline mblk_t *n_conn_con(q)
  *  N_DATA_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_data_ind(flags, dp)
+static inline mblk_t *
+n_data_ind(flags, dp)
 	const uint flags;
 	const mblk_t *dp;
 {
 	mblk_t *mp;
 	N_data_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_data_ind_t *) mp->b_wptr;
@@ -362,10 +376,12 @@ static inline mblk_t *n_data_ind(flags, dp)
 /*
  *  N_DATACK_IND
  */
-static inline mblk_t *n_datack_ind(void)
+static inline mblk_t *
+n_datack_ind(void)
 {
 	mblk_t *mp;
 	N_datack_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_datack_ind_t *) mp->b_wptr;
@@ -379,11 +395,13 @@ static inline mblk_t *n_datack_ind(void)
  *  N_EXDATA_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_exdata_ind(dp)
+static inline mblk_t *
+n_exdata_ind(dp)
 	const mblk_t *dp;
 {
 	mblk_t *mp;
 	N_exdata_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_exdata_ind_t *) mp->b_wptr;
@@ -398,11 +416,12 @@ static inline mblk_t *n_exdata_ind(dp)
  *  N_UNITDATA_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_unitdata_ind(caddr_t dst_ptr, size_t dst_len, caddr_t src_ptr,
-				     size_t src_len)
+static inline mblk_t *
+n_unitdata_ind(caddr_t dst_ptr, size_t dst_len, caddr_t src_ptr, size_t src_len)
 {
 	mblk_t *mp;
 	N_unitdata_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len + src_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_unitdata_ind_t *) mp->b_wptr;
@@ -425,10 +444,12 @@ static inline mblk_t *n_unitdata_ind(caddr_t dst_ptr, size_t dst_len, caddr_t sr
  *  N_UDERROR_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_uderror_ind(caddr_t dst_ptr, size_t dst_len, int type)
+static inline mblk_t *
+n_uderror_ind(caddr_t dst_ptr, size_t dst_len, int type)
 {
 	mblk_t *mp;
 	N_uderror_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p) + dst_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (N_uderror_ind_t *) mp->b_wptr;
@@ -448,12 +469,14 @@ static inline mblk_t *n_uderror_ind(caddr_t dst_ptr, size_t dst_len, int type)
  *  N_RESET_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_reset_ind(orig, reason)
+static inline mblk_t *
+n_reset_ind(orig, reason)
 	const uint orig;
 	const int reason;
 {
 	mblk_t *mp;
 	N_reset_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_reset_ind_t *) mp->b_wptr;
@@ -469,10 +492,12 @@ static inline mblk_t *n_reset_ind(orig, reason)
  *  N_RESET_CON
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_reset_con(void)
+static inline mblk_t *
+n_reset_con(void)
 {
 	mblk_t *mp;
 	N_reset_con_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_reset_con_t *) mp->b_wptr;
@@ -486,7 +511,8 @@ static inline mblk_t *n_reset_con(void)
  *  N_DISCON_IND
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *n_discon_ind(orig, reason, seq)
+static inline mblk_t *
+n_discon_ind(orig, reason, seq)
 	const uint orig;
 	const int reason;
 	const uint seq;
@@ -494,6 +520,7 @@ static inline mblk_t *n_discon_ind(orig, reason, seq)
 	mblk_t *mp;
 	N_discon_ind_t *p;
 	static const size_t res_len = 0;	/* TODO */
+
 	if ((mp = allocb(sizeof(*p) + res_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (N_discon_ind_t *) mp->b_wptr;

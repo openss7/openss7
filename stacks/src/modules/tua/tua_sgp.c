@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_sgp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:36 $
+ @(#) $RCSfile: tua_sgp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:59 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,27 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:59 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tua_sgp.c,v $
+ Revision 0.9.2.4  2007/08/14 12:18:59  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_sgp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:36 $"
+#ident "@(#) $RCSfile: tua_sgp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:59 $"
 
 static char const ident[] =
-    "$RCSfile: tua_sgp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:56:36 $";
+    "$RCSfile: tua_sgp.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:18:59 $";
 
 /*
  *  UA_RKMM_REG_REQ	0x1
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_reg_req(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_reg_req(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -69,7 +76,8 @@ static int tua_recv_reg_req(sgp_t * sgp, mblk_t * msg)
  *  UA_RKMM_REG_RSP	0x2
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_reg_rsp(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_reg_rsp(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -80,7 +88,8 @@ static int tua_recv_reg_rsp(sgp_t * sgp, mblk_t * msg)
  *  UA_RKMM_DEREG_REQ	0x3
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_dereg_req(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_dereg_req(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -91,7 +100,8 @@ static int tua_recv_dereg_req(sgp_t * sgp, mblk_t * msg)
  *  UA_RKMM_DEREG_RSP	0x4
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_dereg_rsp(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_dereg_rsp(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -102,7 +112,8 @@ static int tua_recv_dereg_rsp(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_UNI	0x0
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_uni(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_uni(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -113,7 +124,8 @@ static int tua_recv_uni(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_BEG	0x1
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_beg(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_beg(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -124,7 +136,8 @@ static int tua_recv_beg(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_CON	0x2
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_con(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_con(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -135,7 +148,8 @@ static int tua_recv_con(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_END	0x3
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_end(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_end(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -146,7 +160,8 @@ static int tua_recv_end(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_U_ABT	0x4
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_u_abt(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_u_abt(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -157,7 +172,8 @@ static int tua_recv_u_abt(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_P_ABT	0x5
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_p_abt(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_p_abt(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -168,7 +184,8 @@ static int tua_recv_p_abt(sgp_t * sgp, mblk_t * msg)
  *  TUA_TDHM_NOT	0x6
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_not(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_not(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -179,7 +196,8 @@ static int tua_recv_not(sgp_t * sgp, mblk_t * msg)
  *  TUA_TCHM_IVK	0x0
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_ivk(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_ivk(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -190,7 +208,8 @@ static int tua_recv_ivk(sgp_t * sgp, mblk_t * msg)
  *  TUA_TCHM_RES	0x1
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_res(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_res(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -201,7 +220,8 @@ static int tua_recv_res(sgp_t * sgp, mblk_t * msg)
  *  TUA_TCHM_U_ERR	0x2
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_u_err(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_u_err(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -212,7 +232,8 @@ static int tua_recv_u_err(sgp_t * sgp, mblk_t * msg)
  *  TUA_TCHM_REJ	0x3
  *  -------------------------------------------------------------------------
  */
-static int tua_recv_rej(sgp_t * sgp, mblk_t * msg)
+static int
+tua_recv_rej(sgp_t * sgp, mblk_t *msg)
 {
 	(void) q;
 	(void) msg;
@@ -264,7 +285,8 @@ static struct msg_class msg_decode[] = {
 	{tua_tchm TUA_TCHM}	/* UA_CLASS_TCHM 0xb */
 };
 
-int tua_recv_msg(sgp_t * sgp, mblk_t * msg)
+int
+tua_recv_msg(sgp_t * sgp, mblk_t *msg)
 {
 	return ua_recv_msg(q, msg, msg_decode);
 }

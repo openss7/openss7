@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:20:41 $
+ @(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:20:06 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:20:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-q781.c,v $
+ Revision 0.9.2.10  2007/08/14 12:20:06  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.9  2007/08/12 16:20:41  brian
  - new PPA handling
 
@@ -84,9 +87,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:20:41 $"
+#ident "@(#) $RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:20:06 $"
 
-static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:20:41 $";
+static char const ident[] = "$RCSfile: test-q781.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:20:06 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -10124,9 +10127,8 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License  (GPL)  Version 3  or later,  so long as  the software is\n\
-distributed with,  and only used for the testing of,  OpenSS7 modules,  drivers,\n\
-and libraries.\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
+with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:58 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:49 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:14:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 0.9.2.5  2007/08/14 12:19:49  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/03/15 10:14:58  brian
  - test case reporting and release date
 
@@ -97,9 +114,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:58 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:49 $"
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/15 10:14:58 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:49 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -181,6 +198,7 @@ static const char *lpkgname = "OpenSS7 SCTP Driver";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/sctp_t";
 #else
@@ -200,12 +218,13 @@ static int server_host_specified = 0;
 
 static int verbose = 1;
 
-static int client_exec = 0; /* execute client side */
-static int server_exec = 0; /* execute server side */
+static int client_exec = 0;		/* execute client side */
+static int server_exec = 0;		/* execute server side */
 
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 static int last_prim = 0;
@@ -239,7 +258,7 @@ int test_fd[3] = { 0, 0, 0 };
 #define TEST_DURATION	20000
 #define INFINITE_WAIT	-1
 
-static int test_duration = TEST_DURATION; /* wait on other side */
+static int test_duration = TEST_DURATION;	/* wait on other side */
 
 ulong seq[10] = { 0, };
 ulong tok[10] = { 0, };
@@ -510,7 +529,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -549,7 +568,7 @@ start_tt(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (duration == (long)INFINITE_WAIT)
+	if (duration == (long) INFINITE_WAIT)
 		return __RESULT_SUCCESS;
 	if (start_signals())
 		return __RESULT_FAILURE;
@@ -626,8 +645,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -1304,28 +1324,28 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 	}
 }
 
-#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
-#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
-#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
-#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
-#define ICMP_ECHO		8	/* Echo Request			*/
-#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
-#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
-#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
-#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
-#define ICMP_INFO_REQUEST	15	/* Information Request		*/
-#define ICMP_INFO_REPLY		16	/* Information Reply		*/
-#define ICMP_ADDRESS		17	/* Address Mask Request		*/
-#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define ICMP_ECHOREPLY		0	/* Echo Reply */
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable */
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench */
+#define ICMP_REDIRECT		5	/* Redirect (change route) */
+#define ICMP_ECHO		8	/* Echo Request */
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded */
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem */
+#define ICMP_TIMESTAMP		13	/* Timestamp Request */
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply */
+#define ICMP_INFO_REQUEST	15	/* Information Request */
+#define ICMP_INFO_REPLY		16	/* Information Reply */
+#define ICMP_ADDRESS		17	/* Address Mask Request */
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply */
 #define NR_ICMP_TYPES		18
 
 /* Codes for UNREACH. */
-#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
-#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
-#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
-#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
-#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
-#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNREACH	0	/* Network Unreachable */
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable */
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable */
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable */
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set */
+#define ICMP_SR_FAILED		5	/* Source Route failed */
 #define ICMP_NET_UNKNOWN	6
 #define ICMP_HOST_UNKNOWN	7
 #define ICMP_HOST_ISOLATED	8
@@ -1339,14 +1359,14 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 #define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
 
 /* Codes for REDIRECT. */
-#define ICMP_REDIR_NET		0	/* Redirect Net			*/
-#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
-#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
-#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+#define ICMP_REDIR_NET		0	/* Redirect Net */
+#define ICMP_REDIR_HOST		1	/* Redirect Host */
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS */
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS */
 
 /* Codes for TIME_EXCEEDED. */
-#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
-#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+#define ICMP_EXC_TTL		0	/* TTL count exceeded */
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded */
 
 char *
 etype_string(t_uscalar_t etype)
@@ -3637,7 +3657,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -3923,7 +3943,7 @@ test_isastream(int child)
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
 	int result;
 
 	print_poll(child, events);
@@ -4071,13 +4091,11 @@ stream_start(int child, int index)
 			inet_aton(addr_strings[i], &addrs[child].addr[i]);
 #else				/* SCTP_VERSION_2 */
 			addrs[child][i].sin_family = AF_INET;
-			if ((child == 0 && !client_port_specified) ||
-			    ((child == 1 || child == 2) && !server_port_specified))
+			if ((child == 0 && !client_port_specified) || ((child == 1 || child == 2) && !server_port_specified))
 				addrs[child][i].sin_port = htons(ports[child] + offset);
 			else
 				addrs[child][i].sin_port = htons(ports[child]);
-			if ((child == 0 && !client_host_specified) ||
-			    ((child == 1 || child == 2) && !server_host_specified))
+			if ((child == 0 && !client_host_specified) || ((child == 1 || child == 2) && !server_host_specified))
 				inet_aton(addr_strings[i], &addrs[child][i].sin_addr);
 #endif				/* SCTP_VERSION_2 */
 		}
@@ -4409,7 +4427,7 @@ do_signal(int child, int action)
 		test_pflags = MSG_BAND;
 		test_pband = 0;
 		if ((verbose && show) || verbose > 4)
-		print_tx_prim(child, prim_string(p->type));
+			print_tx_prim(child, prim_string(p->type));
 		return test_putpmsg(child, ctrl, data, test_pband, test_pflags);
 	case __TEST_EXDATA_REQ:
 		ctrl->len = sizeof(p->exdata_req);
@@ -4798,7 +4816,7 @@ do_signal(int child, int action)
 		ic.ic_cmd = O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4809,7 +4827,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4817,17 +4835,17 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_UNBIND:
 		ic.ic_cmd = O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETINFO:
 		ic.ic_cmd = _O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4838,7 +4856,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4846,47 +4864,47 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_UNBIND:
 		ic.ic_cmd = _O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETMYNAME:
 		ic.ic_cmd = _O_TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETPEERNAME:
 		ic.ic_cmd = _O_TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_HELLO:
 		ic.ic_cmd = _O_TI_XTI_HELLO;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_GET_STATE:
 		ic.ic_cmd = _O_TI_XTI_GET_STATE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_CLEAR_EVENT:
 		ic.ic_cmd = _O_TI_XTI_CLEAR_EVENT;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_MODE:
 		ic.ic_cmd = _O_TI_XTI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_TLI_MODE:
 		ic.ic_cmd = _O_TI_TLI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETINFO:
 		ic.ic_cmd = TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4897,7 +4915,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4905,22 +4923,22 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_UNBIND:
 		ic.ic_cmd = TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETMYNAME:
 		ic.ic_cmd = TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETPEERNAME:
 		ic.ic_cmd = TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res);
@@ -4929,7 +4947,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req);
@@ -4938,19 +4956,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4959,7 +4977,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4968,19 +4986,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SYNC:
 	{
 		union {
@@ -4991,19 +5009,19 @@ do_signal(int child, int action)
 		ic.ic_cmd = TI_SYNC;
 		ic.ic_len = sizeof(*s);
 		s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	}
 	case __TEST_TI_GETADDRS:
 		ic.ic_cmd = TI_GETADDRS;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_CAPABILITY:
 		ic.ic_cmd = TI_CAPABILITY;
 		ic.ic_len = sizeof(p->capability_ack);
 		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
 		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	default:
 		return __RESULT_SCRIPT_ERROR;
 	}
@@ -5229,18 +5247,18 @@ do_decode_ctrl(int child, struct strbuf *ctrl, struct strbuf *data)
 			}
 			if (p->optdata_ind.OPT_length) {
 				struct t_opthdr *oh;
-				unsigned char *op = (unsigned char *)p + p->optdata_ind.OPT_offset;
+				unsigned char *op = (unsigned char *) p + p->optdata_ind.OPT_offset;
 				int olen = p->optdata_ind.OPT_length;
 
 				for (oh = _T_OPT_FIRSTHDR_OFS(op, olen, 0); oh; oh = _T_OPT_NEXTHDR_OFS(op, olen, oh, 0)) {
 					if (oh->level == T_INET_SCTP) {
 						switch (oh->name) {
 						case T_SCTP_SID:
-							sid[child]= (*((t_scalar_t *)(oh +1))) & 0xffff;
+							sid[child] = (*((t_scalar_t *) (oh + 1))) & 0xffff;
 							opt_data.sid_val = sid[child];
 							break;
 						case T_SCTP_PPI:
-							ppi[child]= (*((t_scalar_t *)(oh +1))) & 0xffffffff;
+							ppi[child] = (*((t_scalar_t *) (oh + 1))) & 0xffffffff;
 							opt_data.ppi_val = ppi[child];
 							break;
 						}
@@ -5510,7 +5528,7 @@ preamble_1(int child)
 	state++;
 #endif
 	test_addr = addrs[child];
-	test_alen = anums[child]*sizeof(addrs[child][0]);
+	test_alen = anums[child] * sizeof(addrs[child][0]);
 	last_qlen = (child == 2) ? 5 : 0;
 	if (do_signal(child, __TEST_BIND_REQ) != __RESULT_SUCCESS)
 		goto failure;
@@ -5632,7 +5650,7 @@ preamble_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -5832,7 +5850,7 @@ preamble_2b_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = "Hello World";
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -6184,7 +6202,7 @@ Checks that the test case guard timer will fire and bring down the children."
 int
 test_case_0_1(int child)
 {
-	test_msleep(child, TEST_DURATION<<1);
+	test_msleep(child, TEST_DURATION << 1);
 	return (__RESULT_SUCCESS);
 }
 
@@ -6422,27 +6440,27 @@ test_case_1_3_resp(int child)
 	test_msleep(child, LONGER_WAIT);
 	state++;
 	for (;;) {
-	for (i = 0; i < 10; i++) {
-		switch (wait_event(child, INFINITE_WAIT)) {
-		case __TEST_NRM_OPTDATA_IND:
-		case __TEST_EXP_OPTDATA_IND:
-			state++;
-			continue;
-		default:
-			goto done;
+		for (i = 0; i < 10; i++) {
+			switch (wait_event(child, INFINITE_WAIT)) {
+			case __TEST_NRM_OPTDATA_IND:
+			case __TEST_EXP_OPTDATA_IND:
+				state++;
+				continue;
+			default:
+				goto done;
+			}
 		}
-	}
-	for (i = 0; i < 10; i++) {
-		opt_data.sid_val = 0;
-		test_data = "Hello There.";
-		DATA_flag = 0;
-		test_opts = &opt_data;
-		test_olen = sizeof(opt_data);
-		if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS) {
-			failure_string = "could not send";
-			goto failure;
+		for (i = 0; i < 10; i++) {
+			opt_data.sid_val = 0;
+			test_data = "Hello There.";
+			DATA_flag = 0;
+			test_opts = &opt_data;
+			test_olen = sizeof(opt_data);
+			if (do_signal(child, __TEST_OPTDATA_REQ) != __RESULT_SUCCESS) {
+				failure_string = "could not send";
+				goto failure;
+			}
 		}
-	}
 	}
       done:
 	return (__RESULT_SUCCESS);
@@ -6935,7 +6953,7 @@ test_case_2_3_conn(int child)
 		.ic_cmd = 3,
 		.ic_timout = -1,
 		.ic_len = sizeof(args),
-		.ic_dp = (char *)args,
+		.ic_dp = (char *) args,
 	};
 
 	if (test_ioctl(child, I_STR, (intptr_t) &sio) != __RESULT_SUCCESS)
@@ -6951,14 +6969,14 @@ test_case_2_3_conn(int child)
 		goto failure;
 	state++;
 
-	switch(wait_event(child, INFINITE_WAIT)) {
-		case __TEST_DISCON_IND:
-			break;
-		case __TEST_ORDREL_IND:
-			do_signal(child, __TEST_ORDREL_REQ);
-			break;
-		default:
-			goto failure;
+	switch (wait_event(child, INFINITE_WAIT)) {
+	case __TEST_DISCON_IND:
+		break;
+	case __TEST_ORDREL_IND:
+		do_signal(child, __TEST_ORDREL_REQ);
+		break;
+	default:
+		goto failure;
 	}
 	state++;
 
@@ -7054,7 +7072,7 @@ struct test_stream test_2_3_list = { &preamble_2_3_list, &test_case_2_3_list, &p
  */
 
 #define test_group_4 "Connection and disconnection -- successful"
-#define sref_case_4_1 "TPI Version 2 Draft 2 -- Appendix A -- Connection Acceptance"
+#define sref_case_4_1 "TPI Revision 2 Draft 2 -- Appendix A -- Connection Acceptance"
 
 /*
  *  Accept a connection.
@@ -7073,7 +7091,7 @@ test_case_4_1_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -7158,7 +7176,7 @@ test_case_4_1_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -7767,7 +7785,7 @@ test_case_5_5_1_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -7860,7 +7878,7 @@ test_case_5_5_2_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -7953,7 +7971,7 @@ test_case_5_5_3_conn(int child)
 		goto failure;
 	state++;
 	test_addr = addrs[2];
-	test_alen = anums[2]*sizeof(addrs[2][0]);
+	test_alen = anums[2] * sizeof(addrs[2][0]);
 	test_data = NULL;
 	test_opts = &opt_conn;
 	test_olen = sizeof(opt_conn);
@@ -7986,7 +8004,7 @@ test_case_5_5_3_resp(int child)
 		if (last_event == __TEST_ORDREL_IND) {
 			test_data = NULL;
 			do_signal(child, __TEST_ORDREL_REQ);
-		} else 
+		} else
 			goto failure;
 	}
 	state++;
@@ -8216,7 +8234,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 1;
-	//test_data = "AAA";
+	// test_data = "AAA";
 	test_data = "Hello There 1-1/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8225,7 +8243,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 2;
-	//test_data = "AAA";
+	// test_data = "AAA";
 	test_data = "Hello There 2-1/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8234,14 +8252,14 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 0;
-	//test_data = "AAA";
+	// test_data = "AAA";
 	test_data = "Hello There 0-U1/2.";
 	MORE_flag = 1;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	opt_data.sid_val = 3;
-	//test_data = "AAA";
+	// test_data = "AAA";
 	test_data = "Hello There 3-1/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8250,14 +8268,14 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 0;
-	//test_data = "AAAAAAA";
+	// test_data = "AAAAAAA";
 	test_data = "Hello There 0-U2/2.";
 	MORE_flag = 0;
 	if (do_signal(child, __TEST_EXDATA_REQ) != __RESULT_SUCCESS)
 		goto failure;
 	state++;
 	opt_data.sid_val = 0;
-	//test_data = "AAAAAAAAAAA";
+	// test_data = "AAAAAAAAAAA";
 	test_data = "Hello There 0-2/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8266,7 +8284,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 1;
-	//test_data = "A";
+	// test_data = "A";
 	test_data = "Hello There 1-2/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8275,7 +8293,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 2;
-	//test_data = "A";
+	// test_data = "A";
 	test_data = "Hello There 2-2/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8284,7 +8302,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 3;
-	//test_data = "A";
+	// test_data = "A";
 	test_data = "Hello There 3-2/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8293,7 +8311,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 0;
-	//test_data = "AA";
+	// test_data = "AA";
 	test_data = "Hello There 0-3/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8302,7 +8320,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 1;
-	//test_data = "AA";
+	// test_data = "AA";
 	test_data = "Hello There 1-3/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8311,7 +8329,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 2;
-	//test_data = "AA";
+	// test_data = "AA";
 	test_data = "Hello There 2-3/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8320,7 +8338,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 3;
-	//test_data = "AA";
+	// test_data = "AA";
 	test_data = "Hello There 3-3/4.";
 	DATA_flag = T_MORE;
 	test_opts = &opt_data;
@@ -8329,7 +8347,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 0;
-	//test_data = "AAAAAAAAAAAAA";
+	// test_data = "AAAAAAAAAAAAA";
 	test_data = "Hello There 0-4/4.";
 	DATA_flag = 0;
 	test_opts = &opt_data;
@@ -8338,7 +8356,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 1;
-	//test_data = "AAAAAAAAAAAAA";
+	// test_data = "AAAAAAAAAAAAA";
 	test_data = "Hello There 1-4/4.";
 	DATA_flag = 0;
 	test_opts = &opt_data;
@@ -8347,7 +8365,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 2;
-	//test_data = "AAAAAAAAAAAAA";
+	// test_data = "AAAAAAAAAAAAA";
 	test_data = "Hello There 2-4/4.";
 	DATA_flag = 0;
 	test_opts = &opt_data;
@@ -8356,7 +8374,7 @@ test_case_6_3_conn(int child)
 		goto failure;
 	state++;
 	opt_data.sid_val = 3;
-	//test_data = "AAAAAAAAAAAAA";
+	// test_data = "AAAAAAAAAAAAA";
 	test_data = "Hello There 3-4/4.";
 	DATA_flag = 0;
 	test_opts = &opt_data;
@@ -10609,7 +10627,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -10640,7 +10658,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
@@ -10885,7 +10903,7 @@ main(int argc, char *argv[])
 				timer_scale = atoi(optarg);
 			else
 				timer_scale = 50;
-			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long)timer_scale);
+			fprintf(stderr, "WARNING: timers are scaled by a factor of %ld\n", (long) timer_scale);
 			break;
 		case 's':
 			summary = 1;

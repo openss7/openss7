@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:47 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:08 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:47 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdt_tpi.c,v $
+ Revision 0.9.2.24  2007/08/14 12:18:47  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $"
+#ident "@(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:47 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $";
+    "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:47 $";
 
 /*
  *  This is an SDT (Signalling Data Terminal) module which can be pushed over
@@ -88,7 +94,7 @@ static char const ident[] =
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/07/14 01:35:08 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:47 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL v2"
@@ -220,6 +226,7 @@ typedef struct sdt {
 		struct sockaddr rem;	/* transport remote address */
 	} t;
 } sdt_t;
+
 #define SDT_PRIV(__q) ((struct sdt *)(__q)->q_ptr)
 
 struct sdt *sdt_opens = NULL;
@@ -292,6 +299,7 @@ STATIC INLINE int
 m_error(queue_t *q, struct sdt *sdt, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_ERROR;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -315,6 +323,7 @@ STATIC INLINE int
 m_hangup(queue_t *q, struct sdt *sdt, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_HANGUP;
 		*(mp->b_wptr)++ = err < 0 ? -err : err;
@@ -338,6 +347,7 @@ lmi_info_ack(queue_t *q, struct sdt *sdt, caddr_t ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_info_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -369,6 +379,7 @@ lmi_ok_ack(queue_t *q, struct sdt *sdt, long prim)
 {
 	mblk_t *mp;
 	lmi_ok_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -403,6 +414,7 @@ lmi_error_ack(queue_t *q, struct sdt *sdt, long prim, ulong reason, ulong errno)
 {
 	mblk_t *mp;
 	lmi_error_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -445,6 +457,7 @@ lmi_enable_con(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	lmi_enable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -470,6 +483,7 @@ lmi_disable_con(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	lmi_disable_con_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -496,6 +510,7 @@ lmi_optmgmt_ack(queue_t *q, struct sdt *sdt, ulong flags, caddr_t opt_ptr, size_
 {
 	mblk_t *mp;
 	lmi_optmgmt_ack_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -521,6 +536,7 @@ lmi_error_ind(queue_t *q, struct sdt *sdt, ulong errno, ulong reason)
 {
 	mblk_t *mp;
 	lmi_error_ind_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -547,6 +563,7 @@ lmi_stats_ind(queue_t *q, struct sdt *sdt, ulong interval)
 	if (canputnext(sdt->oq)) {
 		mblk_t *mp;
 		lmi_stats_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -575,6 +592,7 @@ lmi_event_ind(queue_t *q, struct sdt *sdt, ulong oid, ulong level)
 	if (canputnext(sdt->oq)) {
 		mblk_t *mp;
 		lmi_event_ind_t *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -609,6 +627,7 @@ sdt_rc_signal_unit_ind(queue_t *q, struct sdt *sdt, mblk_t *dp, ulong count)
 			if (count > 1) {
 				mblk_t *mp;
 				sdt_rc_signal_unit_ind_t *p;
+
 				if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 					mp->b_datap->db_type = M_PROTO;
 					p = (typeof(p)) mp->b_wptr;
@@ -643,6 +662,7 @@ sdt_rc_congestion_accept_ind(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_accept_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -665,6 +685,7 @@ sdt_rc_congestion_discard_ind(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	sdt_rc_congestion_discard_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -687,6 +708,7 @@ sdt_rc_no_congestion_ind(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	sdt_rc_no_congestion_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -711,6 +733,7 @@ sdt_iac_correct_su_ind(queue_t *q, struct sdt *sdt)
 	if (canputnext(sdt->oq)) {
 		mblk_t *mp;
 		sdt_iac_correct_su_ind_t *p;
+
 		if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -736,6 +759,7 @@ sdt_iac_abort_proving_ind(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	sdt_iac_abort_proving_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -758,6 +782,7 @@ sdt_lsc_link_failure_ind(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	sdt_lsc_link_failure_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -781,6 +806,7 @@ sdt_txc_transmission_request_ind(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	sdt_txc_transmission_request_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -816,6 +842,7 @@ t_conn_req(queue_t *q, struct sdt *sdt)
 	size_t dst_len = sdt->t.add_size, opt_len = 0;
 	mblk_t *mp, *dp = NULL;
 	struct T_conn_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -853,13 +880,15 @@ t_conn_res(queue_t *q, struct sdt *sdt, long seq)
 	size_t opt_len = 0;
 	mblk_t *mp, *dp = NULL;
 	struct T_conn_res *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->PRIM_type = T_CONN_RES;
-		p->ACCEPTOR_id = (t_uscalar_t) (long) RD(sdt->iq->q_next);	/* accept on indicating
-									   queue */
+		p->ACCEPTOR_id = (t_uscalar_t) (long) RD(sdt->iq->q_next);	/* accept on
+										   indicating queue 
+										 */
 		p->OPT_length = opt_len;
 		p->OPT_offset = opt_len ? sizeof(*p) : 0;
 		p->SEQ_number = seq;
@@ -888,6 +917,7 @@ t_discon_req(queue_t *q, struct sdt *sdt, ulong seq)
 {
 	mblk_t *mp, *dp = NULL;
 	struct T_discon_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -933,12 +963,14 @@ STATIC INLINE mblk_t *
 t_data_req(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp = NULL;
+
 	if (canputnext(sdt->iq)) {
 		struct T_data_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p)) mp->b_wptr;
-		mp->b_wptr += sizeof(*p);
+			p = (typeof(p)) mp->b_wptr;
+			mp->b_wptr += sizeof(*p);
 			p->PRIM_type = T_DATA_REQ;
 			p->MORE_flag = 0;
 		}
@@ -957,8 +989,10 @@ STATIC INLINE mblk_t *
 t_exdata_req(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp = NULL;
+
 	if (bcanputnext(sdt->iq, 1)) {
 		struct T_exdata_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = 1;
@@ -987,6 +1021,7 @@ t_info_req(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	struct T_info_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1014,6 +1049,7 @@ t_bind_req(queue_t *q, struct sdt *sdt)
 {
 	caddr_t add_ptr = (caddr_t) &sdt->t.loc;
 	size_t add_len = sdt->t.add_size;
+
 #if 0
 	ulong conind = ((sdt->t.serv_type == T_COTS || sdt->t.serv_type == T_COTS_ORD)
 			&& (sdt->sdl.ifmode == SDL_MODE_SERVER)) ? 1 : 0;
@@ -1024,6 +1060,7 @@ t_bind_req(queue_t *q, struct sdt *sdt)
 #endif
 	mblk_t *mp;
 	struct T_bind_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1055,6 +1092,7 @@ t_unbind_req(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	struct T_unbind_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1080,10 +1118,12 @@ STATIC INLINE mblk_t *
 t_unitdata_req(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp = NULL;
+
 	if (canputnext(sdt->iq)) {
 		caddr_t dst_ptr = (caddr_t) &sdt->t.rem, opt_ptr = NULL;
 		size_t dst_len = sdt->t.add_size, opt_len = 0;
 		struct T_unitdata_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + dst_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1115,6 +1155,7 @@ t_optmgmt_req(queue_t *q, struct sdt *sdt, caddr_t opt_ptr, size_t opt_len, ulon
 	if (canputnext(sdt->iq)) {
 		mblk_t *mp;
 		struct T_optmgmt_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1149,6 +1190,7 @@ t_ordrel_req(queue_t *q, struct sdt *sdt)
 	if (canputnext(sdt->iq)) {
 		mblk_t *mp;
 		struct T_ordrel_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -1182,6 +1224,7 @@ t_optdata_req(queue_t *q, struct sdt *sdt, mblk_t *dp)
 		int flags = 0;
 		mblk_t *mp;
 		struct T_optdata_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			mp->b_band = (flags & T_ODF_EX) ? 1 : 0;
@@ -1216,6 +1259,7 @@ t_addr_req(queue_t *q, struct sdt *sdt)
 {
 	mblk_t *mp;
 	struct T_addr_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -1287,6 +1331,7 @@ STATIC INLINE void
 __sdt_timer_stop(struct sdt *s, const uint t)
 {
 	int single = 1;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -1314,6 +1359,7 @@ STATIC INLINE void
 sdt_timer_stop(struct sdt *s, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&s->lock, flags);
 	{
 		__sdt_timer_stop(s, t);
@@ -1324,6 +1370,7 @@ STATIC INLINE void
 sdt_timer_start(struct sdt *s, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&s->lock, flags);
 	{
 		__sdt_timer_stop(s, t);
@@ -1452,6 +1499,7 @@ STATIC INLINE int
 sdt_aerm_su_in_error(queue_t *q, struct sdt *sdt)
 {
 	int err;
+
 	if (sdt->sdt.statem.aerm_state == SDT_STATE_MONITORING) {
 		sdt->sdt.statem.Ca++;
 		if (sdt->sdt.statem.Ca == sdt->sdt.statem.Ti) {
@@ -1470,6 +1518,7 @@ STATIC INLINE int
 sdt_aerm_correct_su(queue_t *q, struct sdt *sdt)
 {
 	int err;
+
 	if (sdt->sdt.statem.aerm_state == SDT_STATE_IDLE) {
 		if (sdt->sdt.statem.aborted_proving) {
 			if ((err = sdt_iac_correct_su(q, sdt)))
@@ -1484,6 +1533,7 @@ STATIC INLINE int
 sdt_suerm_su_in_error(queue_t *q, struct sdt *sdt)
 {
 	int err;
+
 	if (sdt->sdt.statem.suerm_state == SDT_STATE_IN_SERVICE) {
 		sdt->sdt.statem.Cs++;
 		if (sdt->sdt.statem.Cs >= sdt->sdt.config.T) {
@@ -1548,6 +1598,7 @@ STATIC INLINE int
 sdt_daedr_su_in_error(queue_t *q, struct sdt *sdt)
 {
 	int err;
+
 	if (sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		/* 
 		   cancel compression */
@@ -1588,6 +1639,7 @@ STATIC INLINE int
 sdt_daedr_received_bits(queue_t *q, struct sdt *sdt, mblk_t *mp)
 {
 	int err, i, len, mlen, min_len, max_len, lmax, li, sif, xsn;
+
 	if (sdt->sdt.statem.daedr_state == SDT_STATE_IDLE)
 		goto discard;
 	xsn = sdt->option.popt & SS7_POPT_XSN;
@@ -1714,6 +1766,7 @@ sdt_tx_wakeup(queue_t *q)
 	struct sdt *sdt = SDT_PRIV(q);
 	mblk_t *mp;
 	int err;
+
 	if (sdt->sdt.statem.daedt_state == SDT_STATE_IDLE)
 		goto discard;
 	if (sdt->sdl.config.ifclock == SDL_CLOCK_NONE)
@@ -1783,6 +1836,7 @@ sdt_t8_timeout(struct sdt *sdt)
 {
 	queue_t *q = NULL;
 	int err;
+
 	if (sdt->sdt.statem.eim_state == SDT_STATE_MONITORING) {
 		sdt_timer_start(sdt, t8);
 		if (sdt->sdt.statem.su_received) {
@@ -1833,6 +1887,7 @@ lmi_info_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_info_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	return lmi_info_ack(q, sdt, NULL, 0);
@@ -1853,6 +1908,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_attach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->i_state == LMI_UNUSABLE)
@@ -1900,6 +1956,7 @@ lmi_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_detach_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->i_state == LMI_UNUSABLE)
@@ -1945,6 +2002,7 @@ lmi_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_enable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->i_state == LMI_UNUSABLE)
@@ -2006,6 +2064,7 @@ lmi_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_disable_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (sdt->i_state == LMI_UNUSABLE)
@@ -2042,6 +2101,7 @@ lmi_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	lmi_optmgmt_req_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	goto eopnotsupp;
@@ -2068,6 +2128,7 @@ STATIC int
 sdt_send_data(queue_t *q, mblk_t *dp, int norepeat)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state != LMI_ENABLED)
 		goto discard;
 	if (sdt->sdt.statem.daedt_state == SDT_STATE_IDLE)
@@ -2080,6 +2141,7 @@ sdt_send_data(queue_t *q, mblk_t *dp, int norepeat)
 		int hlen = (sdt->option.popt & SS7_POPT_XSN) ? 6 : 3;
 		int mlen = hlen + 2;
 		int li, sio;
+
 		switch (sdt->sdl.config.ifclock) {
 		case SDL_CLOCK_TICK:
 		case SDL_CLOCK_SHAPER:
@@ -2184,6 +2246,7 @@ STATIC int
 sdt_daedt_transmission_req(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if ((err = sdt_send_data(q, mp->b_cont, 0)) == QR_ABSORBED)
 		return (QR_TRIMMED);
 	return (err);
@@ -2197,6 +2260,7 @@ STATIC int
 sdt_daedt_start_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_daedt_start(q, sdt);
 	return (QR_DONE);
@@ -2210,6 +2274,7 @@ STATIC int
 sdt_daedr_start_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_daedr_start(q, sdt);
 	return (QR_DONE);
@@ -2223,6 +2288,7 @@ STATIC int
 sdt_aerm_start_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_aerm_start(q, sdt);
 	return (QR_DONE);
@@ -2236,6 +2302,7 @@ STATIC int
 sdt_aerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_aerm_stop(q, sdt);
 	return (QR_DONE);
@@ -2249,6 +2316,7 @@ STATIC int
 sdt_aerm_set_ti_to_tin_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_aerm_set_ti_to_tin(q, sdt);
 	return (QR_DONE);
@@ -2262,6 +2330,7 @@ STATIC int
 sdt_aerm_set_ti_to_tie_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_aerm_set_ti_to_tie(q, sdt);
 	return (QR_DONE);
@@ -2275,6 +2344,7 @@ STATIC int
 sdt_suerm_start_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_suerm_start(q, sdt);
 	return (QR_DONE);
@@ -2288,6 +2358,7 @@ STATIC int
 sdt_suerm_stop_req(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED)
 		sdt_suerm_stop(q, sdt);
 	return (QR_DONE);
@@ -2304,6 +2375,7 @@ STATIC int
 sdt_recv_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	return sdt_daedr_received_bits(q, sdt, mp);
 }
 
@@ -2316,6 +2388,7 @@ t_conn_ind(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	struct T_conn_ind *p = (typeof(p)) mp->b_rptr;
+
 	assure(sdt->t.state == TS_IDLE);
 	sdt->t.state = TS_WRES_CIND;
 	if ((sdt->i_state != LMI_UNUSABLE) && (sdt->i_style == LMI_STYLE2)
@@ -2338,6 +2411,7 @@ STATIC int
 t_conn_con(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state != LMI_UNUSABLE) {
 		assure(sdt->t.state == TS_WCON_CREQ);
 		sdt->t.state = TS_DATA_XFER;
@@ -2357,6 +2431,7 @@ t_discon_ind(queue_t *q, mblk_t *mp)
 	int err;
 	struct sdt *sdt = SDT_PRIV(q);
 	struct T_discon_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (sdt->i_state != LMI_UNUSABLE) {
 		if (sdt->t.state != TS_DATA_XFER) {
 			sdt->t.state = TS_IDLE;
@@ -2398,6 +2473,7 @@ t_data_ind_slow(queue_t *q, struct sdt *sdt, mblk_t *mp, int more)
 	mblk_t *newp = NULL, *dp = mp->b_cont;
 	struct T_data_ind *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	seldom();
 	/* 
 	 *  We have a chained M_DATA blocks: pull them up.
@@ -2417,6 +2493,7 @@ t_data_ind_slow(queue_t *q, struct sdt *sdt, mblk_t *mp, int more)
 			sdt->rbuf = dp;
 	} else {
 		int err;
+
 		if (sdt->rbuf) {
 			linkb(sdt->rbuf, dp);
 			dp = xchg(&sdt->rbuf, NULL);
@@ -2433,11 +2510,14 @@ STATIC int
 t_data_ind(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED && sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		mblk_t *dp = mp->b_cont;
 		struct T_data_ind *p = (typeof(p)) mp->b_rptr;
+
 		if (!p->MORE_flag && !dp->b_cont) {
 			int err;
+
 			if ((err = sdt_recv_data(q, dp)) != QR_ABSORBED)
 				return (err);
 			return (QR_TRIMMED);	/* absorbed data */
@@ -2466,6 +2546,7 @@ t_exdata_ind_slow(queue_t *q, struct sdt *sdt, mblk_t *mp, int more)
 	mblk_t *newp = NULL, *dp = mp->b_cont;
 	struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	seldom();
 	/* 
 	   We have a chaned M_DATA blocks: pull them up. */
@@ -2484,6 +2565,7 @@ t_exdata_ind_slow(queue_t *q, struct sdt *sdt, mblk_t *mp, int more)
 			sdt->xbuf = dp;
 	} else {
 		int err;
+
 		if (sdt->xbuf) {
 			linkb(sdt->xbuf, dp);
 			dp = xchg(&sdt->xbuf, NULL);
@@ -2500,11 +2582,14 @@ STATIC int
 t_exdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED && sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		mblk_t *dp = mp->b_cont;
 		struct T_exdata_ind *p = (typeof(p)) mp->b_rptr;
+
 		if (!p->MORE_flag && !dp->b_cont) {
 			int err;
+
 			if ((err = sdt_recv_data(q, dp)) != QR_ABSORBED)
 				return (err);
 			return (QR_TRIMMED);	/* absorbed data */
@@ -2529,6 +2614,7 @@ t_info_ack(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	struct T_info_ack *p = ((typeof(p)) mp->b_rptr);
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		sdt->t.pdu_size = p->TSDU_size;
 		if (p->TIDU_size && p->TIDU_size < p->TSDU_size)
@@ -2590,6 +2676,7 @@ STATIC int
 t_bind_ack(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state != LMI_UNUSABLE) {
 		assure(sdt->t.state == TS_WACK_BREQ);
 		sdt->t.state = TS_IDLE;
@@ -2607,8 +2694,10 @@ STATIC int
 t_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct T_error_ack *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		struct sdt *sdt = SDT_PRIV(q);
+
 		switch (sdt->t.state) {
 		case TS_WACK_OPTREQ:
 			assure(p->ERROR_prim == T_OPTMGMT_REQ);
@@ -2705,6 +2794,7 @@ t_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	struct T_ok_ack *p = (typeof(p)) mp->b_rptr;
+
 	if ((mp->b_wptr - mp->b_rptr) >= sizeof(*p)) {
 		switch (sdt->t.state) {
 		case TS_WACK_UREQ:
@@ -2774,16 +2864,20 @@ STATIC int
 t_unitdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED && sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		mblk_t *dp = mp->b_cont;
+
 #if 0
 		struct T_unitdata_ind *p = (typeof(p)) mp->b_rptr;
+
 		/* 
 		   check source of packet */
 		if (p->SRC_length
 		    && !memcmp(mp->b_rptr + p->SRC_offset, &sdt->t.rem, p->SRC_length)) {
 #endif
 			int err;
+
 			if ((err = sdt_recv_data(q, dp)) == QR_ABSORBED)
 				return (QR_TRIMMED);
 			return (err);
@@ -2806,6 +2900,7 @@ STATIC int
 t_uderror_ind(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	return sdt_daedr_su_in_error(q, sdt);
 }
 
@@ -2830,6 +2925,7 @@ t_ordrel_ind(queue_t *q, mblk_t *mp)
 {
 	int err;
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state != LMI_UNUSABLE) {
 		if (sdt->t.state == TS_WIND_ORDREL) {
 			sdt->t.state = TS_IDLE;
@@ -2860,11 +2956,14 @@ STATIC int
 t_optdata_ind(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	if (sdt->i_state == LMI_ENABLED && sdt->sdt.statem.daedr_state != SDT_STATE_IDLE) {
 		mblk_t *dp = mp->b_cont;
 		struct T_optdata_ind *p = (typeof(p)) mp->b_rptr;
+
 		if (!(p->DATA_flag & T_ODF_MORE) && !dp->b_cont) {
 			int err;
+
 			if ((err = sdt_recv_data(q, dp)) == QR_ABSORBED)
 				return (QR_TRIMMED);	/* absorbed data */
 			return (err);
@@ -2921,6 +3020,7 @@ lmi_iocgoptions(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->option;
@@ -2939,6 +3039,7 @@ lmi_iocsoptions(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = 0;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->option = *arg;
@@ -2956,6 +3057,7 @@ lmi_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			arg->version = sdt->i_version;
@@ -2974,6 +3076,7 @@ lmi_iocsconfig(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->i_version = arg->version;
@@ -2991,6 +3094,7 @@ lmi_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct sdt *sdt = SDT_PRIV(q);
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return lmi_test_config(sdt, arg);
 	}
 	rare();
@@ -3002,6 +3106,7 @@ lmi_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct sdt *sdt = SDT_PRIV(q);
 		lmi_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return lmi_commit_config(sdt, arg);
 	}
 	rare();
@@ -3014,6 +3119,7 @@ lmi_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			arg->state = sdt->i_state;
@@ -3032,6 +3138,7 @@ lmi_ioccmreset(queue_t *q, mblk_t *mp)
 		lmi_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->i_state = LMI_UNUSABLE;
@@ -3050,6 +3157,7 @@ lmi_iocgstatsp(queue_t *q, mblk_t *mp)
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdt.statsp;
@@ -3068,6 +3176,7 @@ lmi_iocsstatsp(queue_t *q, mblk_t *mp)
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdt.statsp = *arg;
@@ -3086,6 +3195,7 @@ lmi_iocgstats(queue_t *q, mblk_t *mp)
 		lmi_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3102,6 +3212,7 @@ lmi_ioccstats(queue_t *q, mblk_t *mp)
 	struct sdt *sdt = SDT_PRIV(q);
 	psw_t flags;
 	int ret;
+
 	(void) mp;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -3118,6 +3229,7 @@ lmi_iocgnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3136,6 +3248,7 @@ lmi_iocsnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3154,6 +3267,7 @@ lmi_ioccnotify(queue_t *q, mblk_t *mp)
 		lmi_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			ret = -EOPNOTSUPP;
@@ -3177,6 +3291,7 @@ sdt_test_config(struct sdt *sdt, sdt_config_t * arg)
 {
 	int ret = 0;
 	psw_t flags;
+
 	spin_lock_irqsave(&sdt->lock, flags);
 	do {
 		if (!arg->t8)
@@ -3213,6 +3328,7 @@ STATIC int
 sdt_commit_config(struct sdt *sdt, sdt_config_t * arg)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
 		sdt_test_config(sdt, arg);
@@ -3228,6 +3344,7 @@ sdt_iocgoptions(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->option;
@@ -3245,6 +3362,7 @@ sdt_iocsoptions(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->option = *arg;
@@ -3262,6 +3380,7 @@ sdt_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdt.config;
@@ -3279,6 +3398,7 @@ sdt_iocsconfig(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdt.config = *arg;
@@ -3295,6 +3415,7 @@ sdt_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct sdt *sdt = SDT_PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_test_config(sdt, arg);
 	}
 	rare();
@@ -3306,6 +3427,7 @@ sdt_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		struct sdt *sdt = SDT_PRIV(q);
 		sdt_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		return sdt_commit_config(sdt, arg);
 	}
 	rare();
@@ -3318,6 +3440,7 @@ sdt_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdt.statem;
@@ -3332,6 +3455,7 @@ STATIC int
 sdt_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	(void) sdt;
 	(void) mp;
 	fixme(("%s: Master reset\n", MOD_NAME));
@@ -3344,6 +3468,7 @@ sdt_iocgstatsp(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdt.statsp;
@@ -3361,6 +3486,7 @@ sdt_iocsstatsp(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdt.statsp = *arg;
@@ -3378,6 +3504,7 @@ sdt_iocgstats(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdt.stats;
@@ -3393,6 +3520,7 @@ sdt_ioccstats(queue_t *q, mblk_t *mp)
 {
 	psw_t flags;
 	struct sdt *sdt = SDT_PRIV(q);
+
 	(void) mp;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -3408,6 +3536,7 @@ sdt_iocgnotify(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdt.notify;
@@ -3425,6 +3554,7 @@ sdt_iocsnotify(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdt.notify = *arg;
@@ -3442,6 +3572,7 @@ sdt_ioccnotify(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdt_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdt.notify.events &= ~arg->events;
@@ -3458,6 +3589,7 @@ sdt_ioccabort(queue_t *q, mblk_t *mp)
 	struct sdt *sdt = SDT_PRIV(q);
 	psw_t flags;
 	int ret = 0;
+
 	(void) mp;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -3486,6 +3618,7 @@ STATIC void
 sdl_commit_config(struct sdt *sdt, sdl_config_t * arg)
 {
 	long tdiff;
+
 	sdt->sdl.config = *arg;
 	switch (sdt->sdl.config.ifclock) {
 	case SDL_CLOCK_TICK:
@@ -3514,6 +3647,7 @@ sdl_iocgoptions(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->option;
@@ -3531,6 +3665,7 @@ sdl_iocsoptions(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->option = *arg;
@@ -3548,6 +3683,7 @@ sdl_iocgconfig(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdl.config;
@@ -3566,6 +3702,7 @@ sdl_iocsconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			if (!(ret = sdl_test_config(sdt, arg)))
@@ -3585,6 +3722,7 @@ sdl_ioctconfig(queue_t *q, mblk_t *mp)
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
 		int ret = 0;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			ret = sdl_test_config(sdt, arg);
@@ -3602,6 +3740,7 @@ sdl_ioccconfig(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		sdl_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		psw_t flags;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdl_commit_config(sdt, arg);
@@ -3619,6 +3758,7 @@ sdl_iocgstatem(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdl.statem;
@@ -3634,6 +3774,7 @@ sdl_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
+
 	(void) sdt;
 	(void) arg;
 	fixme(("%s: FIXME: Support master reset\n", MOD_NAME));
@@ -3646,6 +3787,7 @@ sdl_iocgstatsp(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdl.statsp;
@@ -3663,6 +3805,7 @@ sdl_iocsstatsp(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		lmi_sta_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		fixme(("%s: FIXME: check these settings\n", MOD_NAME));
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
@@ -3681,6 +3824,7 @@ sdl_iocgstats(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdl.stats;
@@ -3696,6 +3840,7 @@ sdl_ioccstats(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -3711,6 +3856,7 @@ sdl_iocgnotify(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			*arg = sdt->sdl.notify;
@@ -3728,6 +3874,7 @@ sdl_iocsnotify(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdl.notify.events |= arg->events;
@@ -3745,6 +3892,7 @@ sdl_ioccnotify(queue_t *q, mblk_t *mp)
 		struct sdt *sdt = SDT_PRIV(q);
 		psw_t flags;
 		sdl_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&sdt->lock, flags);
 		{
 			sdt->sdl.notify.events &= ~arg->events;
@@ -3760,6 +3908,7 @@ sdl_ioccdisctx(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -3773,6 +3922,7 @@ sdl_ioccconntx(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	(void) mp;
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -3803,6 +3953,7 @@ sdt_w_ioctl(queue_t *q, mblk_t *mp)
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
+
 	switch (type) {
 	case __SID:
 	{
@@ -4044,6 +4195,7 @@ sdt_w_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct sdt *sdt = SDT_PRIV(q);
 	ulong oldstate = sdt->i_state;
+
 	/* 
 	   Fast Path */
 	if ((prim = *(ulong *) mp->b_rptr) == SDT_DAEDT_TRANSMISSION_REQ) {
@@ -4129,6 +4281,7 @@ sdt_r_proto(queue_t *q, mblk_t *mp)
 	ulong prim;
 	struct sdt *sdt = SDT_PRIV(q);
 	ulong oldstate = sdt->t.state;
+
 	/* 
 	   Fast Path */
 	if ((prim = *((ulong *) mp->b_rptr)) == T_UNITDATA_IND) {
@@ -4219,6 +4372,7 @@ STATIC int
 sdt_w_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	(void) sdt;
 	printd(("%s: %p: -> M_DATA [%d]\n", MOD_NAME, sdt, msgdsize(mp)));
 	return sdt_send_data(q, mp, 0);
@@ -4227,6 +4381,7 @@ STATIC int
 sdt_r_data(queue_t *q, mblk_t *mp)
 {
 	struct sdt *sdt = SDT_PRIV(q);
+
 	(void) sdt;
 	printd(("%s: %p: M_DATA [%d] <-\n", MOD_NAME, sdt, msgdsize(mp)));
 	return sdt_recv_data(q, mp);
@@ -4291,6 +4446,7 @@ STATIC streamscall int
 sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 {
 	int err;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading in our face */
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -4300,6 +4456,7 @@ sdt_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct sdt *sdt;
+
 		/* 
 		   test for multiple push */
 		for (sdt = sdt_opens; sdt; sdt = sdt->next) {
@@ -4377,6 +4534,7 @@ STATIC struct sdt *
 sdt_alloc_priv(queue_t *q, struct sdt **sdtp, dev_t *devp, cred_t *crp)
 {
 	struct sdt *sdt;
+
 	if ((sdt = kmem_cache_alloc(sdt_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: allocated module private structure\n", MOD_NAME));
 		bzero(sdt, sizeof(*sdt));
@@ -4429,6 +4587,7 @@ sdt_free_priv(queue_t *q)
 {
 	struct sdt *sdt = SDT_PRIV(q);
 	psw_t flags;
+
 	ensure(sdt, return);
 	spin_lock_irqsave(&sdt->lock, flags);
 	{
@@ -4488,6 +4647,7 @@ sdt_put(struct sdt *sdt)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -4512,6 +4672,7 @@ STATIC int
 sdt_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&sdt_fmod)) < 0)
 		return (err);
 	return (0);
@@ -4521,6 +4682,7 @@ STATIC int
 sdt_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sdt_fmod)) < 0)
 		return (err);
 	return (0);
@@ -4538,6 +4700,7 @@ STATIC int
 sdt_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&sdt_tpiinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -4551,6 +4714,7 @@ STATIC int
 sdt_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&sdt_tpiinfo)) < 0)
 		return (err);
 	return (0);
@@ -4562,6 +4726,7 @@ MODULE_STATIC int __init
 sdt_tpiinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = sdt_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -4581,6 +4746,7 @@ MODULE_STATIC void __exit
 sdt_tpiterminate(void)
 {
 	int err;
+
 	if ((err = sdt_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sdt_term_caches()))

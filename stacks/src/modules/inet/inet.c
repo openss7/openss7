@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:02 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/14 12:17:34 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:34 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: inet.c,v $
+ Revision 0.9.2.26  2007/08/14 12:17:34  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:02 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/14 12:17:34 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:02 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/14 12:17:34 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -540,7 +546,7 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/07/14 01:34:02 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/14 12:17:34 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL v2"
@@ -13532,7 +13538,7 @@ t_addr_ack(queue_t *q, mblk_t *msg, struct sockaddr *loc, struct sockaddr *rem)
 /*
  *  T_CAPABILITY_ACK    ?? - Protocol Capability Ack
  *  -------------------------------------------------------------------------
- *  Note that TPI Version 2 Draft 2 says that if the T_CAPABILITY_REQ is sent as
+ *  Note that TPI Revision 2 Draft 2 says that if the T_CAPABILITY_REQ is sent as
  *  a M_PCPROTO then the the T_CAPABILITY_ACK must be sent as an M_PCPROTO and
  *  that if the T_CAPABILITY_REQ was sent as a M_PROTO, then the
  *  T_CAPABILITY_ACK must also be sent as a M_PROTO.
@@ -13935,7 +13941,7 @@ ss_putctl(ss_t *ss, queue_t *q, int type, void streamscall (*func) (long), struc
 		p->state = sk->sk_state;	/* capture current state */
 		mp->b_wptr += sizeof(*p);
 #if 0
-		putq(q, mp); /* must succeed because band is zero */
+		putq(q, mp);	/* must succeed because band is zero */
 #else
 		put(q, mp);
 #endif
@@ -14005,7 +14011,7 @@ _ss_sock_write_space(long data)
 #if 1
 				ss_putctl(ss, ss->wq, M_READ, &_ss_sock_write_space, sk);
 #else
-				qenable(ss->wq); /* this is NOT enough */
+				qenable(ss->wq);	/* this is NOT enough */
 #endif
 			} else
 				assure(ss);
@@ -15509,7 +15515,7 @@ ss_r_read(queue_t *q, mblk_t *mp)
 	ss_event_t *p = (typeof(p)) mp->b_rptr;
 	int rtn;
 
-	mp->b_datap->db_type = M_CTL; /* in case it needs to be placed back */
+	mp->b_datap->db_type = M_CTL;	/* in case it needs to be placed back */
 	if (unlikely(!ss_trylockq(q)))
 		goto eagain;
 	if (!ss->sock)

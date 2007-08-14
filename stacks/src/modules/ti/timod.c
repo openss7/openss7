@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:18 $
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:57 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:18:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: timod.c,v $
+ Revision 0.9.2.19  2007/08/14 12:18:57  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.18  2007/07/14 01:35:18  brian
  - make license explicit, add documentation
 
@@ -67,13 +70,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:18 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:57 $"
 
 static char const ident[] =
-    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:18 $";
+    "$RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:57 $";
 
 /*
- *  This is TIMOD an XTI library interface module for TPI Version 2 transport
+ *  This is TIMOD an XTI library interface module for TPI Release 2 transport
  *  service providers supporting the T_ADDR_REQ primitive.
  *
  *  This module is suitable for supporting both Ole Husgaard's XTI library as
@@ -100,7 +103,7 @@ static char const ident[] =
 
 #define TIMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:18 $"
+#define TIMOD_REVISION	"OpenSS7 $RCSfile: timod.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:18:57 $"
 #define TIMOD_DEVICE	"SVR 4.2 STREAMS XTI Library Module for TLI Devices (TIMOD)"
 #define TIMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TIMOD_LICENSE	"GPL v2"
@@ -157,8 +160,8 @@ static struct module_info timod_minfo = {
 	.mi_lowat = 0,			/* Lo water mark */
 };
 
-static struct module_stat timod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-static struct module_stat timod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat timod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+static struct module_stat timod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 static streamscall int timod_open(queue_t *, dev_t *, int, int, cred_t *);
 static streamscall int timod_close(queue_t *, int, cred_t *);

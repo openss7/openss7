@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:21 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.19  2007/08/14 12:19:00  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.18  2007/07/14 01:35:21  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $";
 
 #include <sys/os7/compat.h>
 
@@ -89,7 +92,7 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/07/14 01:35:21 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -184,6 +187,7 @@ typedef struct ch {
 	uchar rem_ptr[32];		/* remote address */
 	size_t rem_len;			/* remote address length */
 } ch_t;
+
 #define CH_PRIV(__q) ((struct ch *)(__q)->q_ptr)
 
 struct ch_config ch_default = {
@@ -227,6 +231,7 @@ m_error(queue_t *q, struct ch *ch, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -274,6 +279,7 @@ ch_info_ack(queue_t *q, struct ch *ch)
 	struct CH_info_ack *p;
 	struct CH_parms_circuit *o;
 	size_t pad_len = (ch->add_len + (sizeof(ulong) - 1)) & ~(sizeof(ulong) - 1);
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + pad_len + sizeof(*o), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -317,6 +323,7 @@ ch_optmgmt_ack(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len, ulong 
 {
 	mblk_t *mp;
 	struct CH_optmgmt_ack *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -349,6 +356,7 @@ ch_ok_ack(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_ok_ack *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -394,6 +402,7 @@ ch_error_ack(queue_t *q, struct ch *ch, ulong prim, long error)
 {
 	mblk_t *mp;
 	struct CH_error_ack *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -459,6 +468,7 @@ ch_enable_con(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_enable_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -493,6 +503,7 @@ ch_connect_con(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_connect_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -529,6 +540,7 @@ ch_data_ind(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_data_ind *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -557,6 +569,7 @@ ch_disconnect_ind(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_disconnect_ind *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -595,6 +608,7 @@ ch_disconnect_con(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	struct CH_disconnect_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -638,6 +652,7 @@ ch_disable_ind(queue_t *q, struct ch *ch, long cause)
 {
 	mblk_t *mp;
 	struct CH_disable_ind *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -662,6 +677,7 @@ ch_disable_con(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	struct CH_disable_con *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -706,6 +722,7 @@ lmi_info_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_info_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -730,6 +747,7 @@ lmi_attach_req(queue_t *q, struct ch *ch, uchar *ppa_ptr, size_t ppa_len)
 {
 	mblk_t *mp;
 	lmi_attach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ppa_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -759,6 +777,7 @@ lmi_detach_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_detach_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -785,6 +804,7 @@ lmi_enable_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_enable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + ch->rem_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -814,6 +834,7 @@ lmi_disable_req(queue_t *q, struct ch *ch)
 {
 	mblk_t *mp;
 	lmi_disable_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -838,6 +859,7 @@ lmi_optmgmt_req(queue_t *q, struct ch *ch, uchar *opt_ptr, size_t opt_len, ulong
 {
 	mblk_t *mp;
 	lmi_optmgmt_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -870,6 +892,7 @@ sdl_bits_for_transmission_req(queue_t *q, struct ch *ch, mblk_t *dp)
 {
 	mblk_t *mp;
 	sdl_bits_for_transmission_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -894,6 +917,7 @@ sdl_connect_req(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	sdl_connect_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -918,6 +942,7 @@ sdl_disconnect_req(queue_t *q, struct ch *ch, ulong flags)
 {
 	mblk_t *mp;
 	sdl_disconnect_req_t *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -959,6 +984,7 @@ STATIC int
 lmi_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
+
 	return ch_ok_ack(q, ch);
 }
 
@@ -972,6 +998,7 @@ lmi_error_ack(queue_t *q, mblk_t *mp)
 	struct ch *ch = CH_PRIV(q);
 	long prim, error = -EFAULT;
 	lmi_error_ack_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (p->lmi_reason) {
@@ -1035,6 +1062,7 @@ STATIC int
 lmi_enable_con(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
+
 	return ch_enable_con(q, ch);
 }
 
@@ -1046,6 +1074,7 @@ STATIC int
 lmi_disable_con(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
+
 	return ch_disable_con(q, ch);
 }
 
@@ -1111,6 +1140,7 @@ STATIC int
 ch_read(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
+
 	if (!mp || !msgdsize(mp))
 		goto eproto;
 	switch (ch->i_state) {
@@ -1145,6 +1175,7 @@ sdl_received_bits_ind(queue_t *q, mblk_t *mp)
 {
 	sdl_received_bits_ind_t *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if ((err = ch_read(q, mp->b_cont)) == QR_ABSORBED)
@@ -1164,6 +1195,7 @@ sdl_disconnect_ind(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	sdl_disconnect_ind_t *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (ch->i_state != CHS_CONNECTED && ch->i_state != CHS_WACK_CREQ
@@ -1196,6 +1228,7 @@ STATIC int
 ch_write(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
+
 	if (!mp || !msgdsize(mp))
 		goto eproto;
 	switch (ch->i_state) {
@@ -1231,6 +1264,7 @@ ch_info_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_info_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (ch->i_state == CHS_UNUSABLE)
@@ -1254,6 +1288,7 @@ ch_optmgmt_req(queue_t *q, mblk_t *mp)
 	struct ch *ch = CH_PRIV(q);
 	struct CH_optmgmt_req *p = (typeof(p)) mp->b_rptr;
 	union CH_parms *o;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr > mp->b_rptr + p->ch_opt_offset + p->ch_opt_length)
@@ -1306,6 +1341,7 @@ ch_optmgmt_req(queue_t *q, mblk_t *mp)
 		goto badparmtype;
 	} else {
 		union CH_parms parms;
+
 		o = &parms;
 		/* no options */
 		switch (p->ch_mgmt_flags) {
@@ -1362,6 +1398,7 @@ ch_attach_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_attach_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr > mp->b_rptr + p->ch_addr_offset + p->ch_addr_length)
@@ -1385,6 +1422,7 @@ ch_enable_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_enable_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (ch->i_state != CHS_ATTACHED)
@@ -1408,6 +1446,7 @@ ch_connect_req(queue_t *q, mblk_t *mp)
 	struct ch *ch = CH_PRIV(q);
 	struct CH_connect_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (ch->i_state) {
@@ -1444,6 +1483,7 @@ ch_data_req(queue_t *q, mblk_t *mp)
 	struct ch *ch = CH_PRIV(q);
 	struct CH_data_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto eproto;
 	if ((err = ch_write(q, mp->b_cont)) == QR_ABSORBED)
@@ -1465,6 +1505,7 @@ ch_disconnect_req(queue_t *q, mblk_t *mp)
 	struct ch *ch = CH_PRIV(q);
 	struct CH_disconnect_req *p = (typeof(p)) mp->b_rptr;
 	int err;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (ch->i_state) {
@@ -1498,6 +1539,7 @@ ch_disable_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_disable_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (ch->i_state) {
@@ -1523,6 +1565,7 @@ ch_detach_req(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	struct CH_detach_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr > mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (ch->i_state) {
@@ -1565,6 +1608,7 @@ STATIC int
 ch_iocsconfig(struct ch *ch, struct ch_config *p)
 {
 	int err;
+
 	if ((err = ch_ioctconfig(ch, p)))
 		return (err);
 	ch->config = *p;
@@ -1725,13 +1769,14 @@ sdl_iocgconfig_req(queue_t *q)
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCGCONFIG;
-		iocp->ioc_id = (uint) (long) ch; /* XXX */
+		iocp->ioc_id = (uint) (long) ch;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_config_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1837,13 +1882,14 @@ sdl_iocsstatsp_req(queue_t *q, sdl_stats_t * p)
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCSSTATSP;
-		iocp->ioc_id = (uint) (long) ch; /* XXX */
+		iocp->ioc_id = (uint) (long) ch;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_stats_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1885,13 +1931,14 @@ sdl_iocgstats_req(queue_t *q)
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCGSTATS;
-		iocp->ioc_id = (uint) (long) ch; /* XXX */
+		iocp->ioc_id = (uint) (long) ch;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_stats_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1933,13 +1980,14 @@ sdl_ioccstats_req(queue_t *q)
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCCSTATS;
-		iocp->ioc_id = (uint) (long) ch; /* XXX */
+		iocp->ioc_id = (uint) (long) ch;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_stats_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -1981,13 +2029,14 @@ sdl_iocsnotify_req(queue_t *q, sdl_notify_t * p)
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCSNOTIFY;
-		iocp->ioc_id = (uint) (long) ch; /* XXX */
+		iocp->ioc_id = (uint) (long) ch;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_notify_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -2029,13 +2078,14 @@ sdl_ioccnotify_req(queue_t *q, sdl_notify_t * p)
 	struct ch *ch = CH_PRIV(q);
 	mblk_t *mp, *dp;
 	struct iocblk *iocp;
+
 	if ((mp = ss7_allocb(q, sizeof(*iocp), BPRI_MED))) {
 		mp->b_datap->db_type = M_IOCTL;
 		bzero(mp->b_wptr, sizeof(*iocp));
 		iocp = (typeof(iocp)) mp->b_wptr;
 		mp->b_wptr += sizeof(*iocp);
 		iocp->ioc_cmd = SDL_IOCCNOTIFY;
-		iocp->ioc_id = (uint) (long) ch; /* XXX */
+		iocp->ioc_id = (uint) (long) ch;	/* XXX */
 		iocp->ioc_count = sizeof(sdl_notify_t);
 		iocp->ioc_error = 0;
 		iocp->ioc_rval = 0;
@@ -2086,6 +2136,7 @@ ch_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	switch (type) {
 	case CH_IOC_MAGIC:
 	{
@@ -2175,7 +2226,9 @@ ch_r_iocack(queue_t *q, mblk_t *mp)
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	if (iocp->ioc_id != (uint) (long) ch) /* XXX */
+
+	if (iocp->ioc_id != (uint) (long) ch)
+		/* XXX */
 		/* we didn't send it */
 		return (QR_PASSALONG);
 	switch (type) {
@@ -2218,7 +2271,9 @@ ch_r_iocnak(queue_t *q, mblk_t *mp)
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
-	if (iocp->ioc_id != (uint) (long) ch) /* XXX */
+
+	if (iocp->ioc_id != (uint) (long) ch)
+		/* XXX */
 		/* we didn't send it */
 		return (QR_PASSALONG);
 	switch (type) {
@@ -2271,6 +2326,7 @@ ch_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct ch *ch = CH_PRIV(q);
 	ulong prim;
+
 	(void) ch;
 	switch ((prim = *(ulong *) mp->b_rptr)) {
 	case CH_INFO_REQ:
@@ -2326,6 +2382,7 @@ ch_r_proto(queue_t *q, mblk_t *mp)
 {
 	int rtn;
 	struct ch *ch = CH_PRIV(q);
+
 	(void) ch;
 	switch (*((ulong *) mp->b_rptr)) {
 	case LMI_INFO_ACK:
@@ -2414,6 +2471,7 @@ ch_r_error(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	int err;
+
 	switch (ch->i_state) {
 	default:
 		/* warn user before we error out the stream */
@@ -2429,6 +2487,7 @@ ch_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct ch *ch = CH_PRIV(q);
 	int err;
+
 	switch (ch->i_state) {
 	default:
 		/* warn user before we error out the stream */
@@ -2515,6 +2574,7 @@ ch_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct ch *ch;
+
 		for (ch = ch_opens; ch; ch = ch->next) {
 			if (ch->u.dev.cmajor == cmajor && ch->u.dev.cminor == cminor) {
 				MOD_DEC_USE_COUNT;
@@ -2593,6 +2653,7 @@ STATIC struct ch *
 ch_alloc_priv(queue_t *q, struct ch **chp, dev_t *devp, cred_t *crp)
 {
 	struct ch *ch;
+
 	if ((ch = kmem_cache_alloc(ch_priv_cachep, GFP_ATOMIC))) {
 		printd(("%s: %p: allocated ch private structure\n", MOD_NAME, ch));
 		bzero(ch, sizeof(*ch));
@@ -2626,6 +2687,7 @@ ch_free_priv(queue_t *q)
 {
 	struct ch *ch = CH_PRIV(q);
 	psw_t flags = 0;
+
 	ensure(ch, return);
 	spin_lock_irqsave(&ch->lock, flags);
 	{
@@ -2677,6 +2739,7 @@ ch_put(struct ch *ch)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2701,6 +2764,7 @@ STATIC int
 ch_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&ch_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2710,6 +2774,7 @@ STATIC int
 ch_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&ch_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2727,6 +2792,7 @@ STATIC int
 ch_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&ch_sdlinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2740,6 +2806,7 @@ STATIC int
 ch_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&ch_sdlinfo)) < 0)
 		return (err);
 	return (0);
@@ -2751,6 +2818,7 @@ MODULE_STATIC int __init
 ch_sdlinit(void)
 {
 	int err;
+
 	cmn_err(CE_NOTE, MOD_BANNER);	/* banner message */
 	if ((err = ch_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", MOD_NAME, err);
@@ -2770,6 +2838,7 @@ MODULE_STATIC void __exit
 ch_sdlterminate(void)
 {
 	int err;
+
 	if ((err = ch_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = ch_term_caches()))

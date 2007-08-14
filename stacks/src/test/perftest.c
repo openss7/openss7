@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/03 22:18:31 $
+ @(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:05 $
 
  -----------------------------------------------------------------------------
 
@@ -32,8 +32,9 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -58,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/03 22:18:31 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: perftest.c,v $
+ Revision 0.9.2.7  2007/08/14 12:19:05  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.6  2007/05/03 22:18:31  brian
  - updated perftest program and docuemntation
 
@@ -77,10 +81,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/03 22:18:31 $"
+#ident "@(#) $RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:05 $"
 
-static char const ident[] =
-    "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/03 22:18:31 $";
+static char const ident[] = "$RCSfile: perftest.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:05 $";
 
 /*
  *  These are benchmark performance tests on a pipe for testing LiS
@@ -242,9 +245,7 @@ test_sync(int fds[])
 
 				tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 				tavg_tput = (3 * tavg_tput + thrput) / 4;
-				fprintf(stdout,
-					"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
-					fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
+				fprintf(stdout, "%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n", fds[1], msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax);
 				fflush(stdout);
 			}
 			{
@@ -254,9 +255,7 @@ test_sync(int fds[])
 
 				ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 				ravg_tput = (3 * ravg_tput + thrput) / 4;
-				fprintf(stdout,
-					"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n",
-					fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
+				fprintf(stdout, "%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld\n", fds[0], msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax);
 				fflush(stdout);
 			}
 			tbyttot -= rbyttot;
@@ -303,8 +302,7 @@ test_sync(int fds[])
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { rmsize, 0, my_msg };
 
-				while (!timer_timeout
-				       && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
+				while (!timer_timeout && (ret = getmsg(fds[0], &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
 					rbyttot += dbuf.len;
 					if (rbytcnt < 0)
@@ -350,8 +348,7 @@ test_sync(int fds[])
 			} else {
 				struct strbuf dbuf = { 0, tmsize, my_msg };
 
-				while (!timer_timeout
-				       && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
+				while (!timer_timeout && (ret = putmsg(fds[1], NULL, &dbuf, 0)) != -1) {
 					tbytcnt += tmsize;
 					tbyttot += tmsize;
 					if (tbytcnt < 0)
@@ -421,9 +418,7 @@ read_child(int fd)
 
 			ravg_msgs = (3 * ravg_msgs + msgcnt) / 4;
 			ravg_tput = (3 * ravg_tput + thrput) / 4;
-			fprintf(stdout,
-				"%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
-				fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
+			fprintf(stdout, "%d Msgs read: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n", fd, msgcnt, ravg_msgs, thrput, ravg_tput, avgsiz, rbytmin, rbytmax, errcnt, reintr, rerestart);
 			fflush(stdout);
 			rbytcnt = 0;
 			rmsgcnt = 0;
@@ -460,7 +455,7 @@ read_child(int fd)
 			rerestart++;
 			continue;
 		}
-		if (pfd.revents & (POLLIN|POLLRDNORM)) {
+		if (pfd.revents & (POLLIN | POLLRDNORM)) {
 			int ret = 0;
 
 			if (readwrite) {
@@ -479,8 +474,7 @@ read_child(int fd)
 				struct strbuf cbuf = { -1, 0, my_msg };
 				struct strbuf dbuf = { rmsize, 0, my_msg };
 
-				while (!timer_timeout
-				       && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
+				while (!timer_timeout && (ret = getmsg(fd, &cbuf, &dbuf, &flags)) != -1) {
 					rbytcnt += dbuf.len;
 					if (rbytcnt < 0)
 						goto dead;
@@ -505,11 +499,11 @@ read_child(int fd)
 					goto dead;
 				}
 			}
-			pfd.revents &= ~(POLLIN|POLLRDNORM);
+			pfd.revents &= ~(POLLIN | POLLRDNORM);
 		}
 		if (pfd.revents & POLLHUP)
 			goto done;
-		if (pfd.revents & (POLLERR|POLLNVAL|POLLMSG))
+		if (pfd.revents & (POLLERR | POLLNVAL | POLLMSG))
 			goto dead;
 	}
       dead:
@@ -555,9 +549,7 @@ write_child(int fd)
 
 			tavg_msgs = (3 * tavg_msgs + msgcnt) / 4;
 			tavg_tput = (3 * tavg_tput + thrput) / 4;
-			fprintf(stdout,
-				"%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n",
-				fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);
+			fprintf(stdout, "%d Msgs sent: %10lld (%10lld), throughput: %10lld (%10lld), size (%4lld) %4lld-%4lld %6lld %6lld %6lld\n", fd, msgcnt, tavg_msgs, thrput, tavg_tput, avgsiz, tbytmin, tbytmax, errcnt, teintr, terestart);
 			fflush(stdout);
 			tbytcnt = 0;
 			tmsgcnt = 0;
@@ -594,7 +586,7 @@ write_child(int fd)
 			terestart++;
 			continue;
 		}
-		if (pfd.revents & (POLLOUT|POLLWRNORM)) {
+		if (pfd.revents & (POLLOUT | POLLWRNORM)) {
 			int ret = 0;
 
 			if (readwrite) {
@@ -636,11 +628,11 @@ write_child(int fd)
 					goto dead;
 				}
 			}
-			pfd.revents &= ~(POLLOUT|POLLWRNORM);
+			pfd.revents &= ~(POLLOUT | POLLWRNORM);
 		}
 		if (pfd.revents & POLLHUP)
 			goto done;
-		if (pfd.revents & (POLLERR|POLLNVAL|POLLMSG))
+		if (pfd.revents & (POLLERR | POLLNVAL | POLLMSG))
 			goto dead;
 	}
       dead:
@@ -933,8 +925,7 @@ do_tests(void)
 		int i;
 
 		if (verbose > 1) {
-			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname,
-				fds[0]);
+			fprintf(stderr, "Pushing %d instances of %s on %d\n", push, modname, fds[0]);
 		}
 		for (i = 0; i < push; i++) {
 			if (ioctl(fds[1], I_PUSH, modname) < 0) {
@@ -1003,7 +994,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -1035,7 +1026,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\
@@ -1156,8 +1147,7 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?W:", long_options,
-				&option_index);
+		c = getopt_long(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?W:", long_options, &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "MwRSFm:Hafp:bs:rt:i:qvhV?");
 #endif				/* defined _GNU_SOURCE */

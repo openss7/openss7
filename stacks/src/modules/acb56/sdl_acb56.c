@@ -1,18 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:52 $
+ @(#) $Id: sdl_acb56.c,v 0.9.2.7 2007/08/14 12:17:18 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2004  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -20,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -46,13 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:52 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:18 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sdl_acb56.c,v $
+ Revision 0.9.2.7  2007/08/14 12:17:18  brian
+ - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:52 $"
+#ident "@(#) $RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:17:18 $"
 
-static char const ident[] = "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:52 $";
+static char const ident[] =
+    "$RCSfile: sdl_acb56.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:17:18 $";
 
 /*
  *  This is an implementation of the Signalling Data Link for the SeaLevel
@@ -296,6 +302,7 @@ acb56_tx_setup_next_frame(acb56_t * p)
 		p->tx_msg = bufq_dequeue(&p->tinputq);
 	} else {
 		int len = msgdsize(p->tx_msg);
+
 		if (len > 5 || (len > 3 && p->tx_msg->b_rptr[3] == LSSU_SIB)) {	/* its an MSU or
 										   SIB, make FISU
 										   out of it */
@@ -329,6 +336,7 @@ static inline void
 acb56_sync_hunt(acb56_t * p)
 {
 	int actrl = p->dev.iface.iobase + 1;
+
 	if (p->rx_octet_mode && !p->rr0 & 0x10) {
 		p->rx_octet_mode = 0;	/* we synced */
 		outb(0x0f, actrl);
@@ -437,6 +445,7 @@ static inline void
 acb56_rx_setup_next_frame(acb56_t * p)
 {
 	int len = p->rx_buf - p->rx_msg->b_rptr;
+
 	p->rx_buf = p->rx_msg->b_rptr;
 	p->dev.module->stats.rx_sus++;
 	if (len == 3)
@@ -462,6 +471,7 @@ acb56_end_of_frame(acb56_t * p)
 		mblk_t *mp = p->rx_msg, *mc = p->cp_msg;
 		unsigned int len = (unsigned int) (p->rx_buf - mp->b_rptr);
 		unsigned char li = mp->b_rptr[2] & 0x3f;
+
 		if (len < 3)
 			return acb56_short_error(p);
 		if (len > p->dev.module->config.m + 4)
@@ -471,6 +481,7 @@ acb56_end_of_frame(acb56_t * p)
 		mp->b_wptr = mp->b_rptr + len;
 		if (len < 6) {
 			int clen = mc->b_wptr - mc->b_rptr;
+
 			if (len == clen && !memcmp(mc->b_rptr, mp->b_rptr, len)) {
 				p->stats.compressed_sus++;
 				acb56_rx_setup_next_frame(p);
@@ -498,13 +509,12 @@ static inline void
 acb56_frame_overflow_check(acb56_t * p)
 {
 	int actrl = p->dev.iface.iobase + 1;
-	/*
-	   check for frame overflow 
-	 */
+
+	/* 
+	   check for frame overflow */
 	if (p->rx_buf > p->rx_max) {
-		/*
-		   FIGURE 11/Q.703 (sheet 1 of 2) "m+7 octets without flags" 
-		 */
+		/* 
+		   FIGURE 11/Q.703 (sheet 1 of 2) "m+7 octets without flags" */
 		if (!p->rx_octet_mode && p->dev.iface.ifclock != DEV_CLOCK_DPLL) {	/* can't
 											   octet
 											   count on 
@@ -562,10 +572,10 @@ acb56_isr_cha_rx_char_avail(acb56_t * p)
 {
 	register int adata = p->dev.iface.iobase;
 	register int i = 0;
+
 	if (p->rx_buf) {
-		/*
-		   collect bytes 
-		 */
+		/* 
+		   collect bytes */
 		for (i = 0; i < 4; i++)
 			*(p->rx_buf++) = inb(adata);
 		acb56_frame_overflow_check(p);
@@ -581,10 +591,10 @@ acb56_isr_cha_rx_sp_cond(acb56_t * p)
 	register int adata = p->dev.iface.iobase;
 	register int actrl = p->dev.iface.iobase + 1;
 	register int i = 0;
+
 	p->stats.cha_rx_sp_cond++;
-	/*
-	   collect bytes 
-	 */
+	/* 
+	   collect bytes */
 	outb(0x00, actrl);
 	for (i = 0; i < 4 && (inb(actrl) & 0x01); i++) {
 		*(p->rx_buf++) = inb(adata);
@@ -592,9 +602,8 @@ acb56_isr_cha_rx_sp_cond(acb56_t * p)
 		outb(0x00, actrl);
 	}
 	acb56_frame_overflow_check(p);
-	/*
-	   check for special conditions 
-	 */
+	/* 
+	   check for special conditions */
 	outb(0x07, actrl);
 	if (inb(actrl) & 0x40) {
 		outb(0x01, actrl);
@@ -660,13 +669,13 @@ acb56_isr(int irq, void *dev_id, struct pt_regs *regs)
 	unsigned char rr3;
 	register int i;
 	register int actrl = ((acb56_t *) dev_id)->dev.iface.iobase + 1;
+
 	for (i = 0, outb(0x03, actrl), rr3 = inb(actrl); i < 4 && rr3;
 	     i++, outb(0x03, actrl), rr3 = inb(actrl)) {
 		outb(0x02, actrl + 2);
 		(*vector_map[inb(actrl + 2) >> 1]) (dev_id);
-		/*
-		   reset highest interrupt under service 
-		 */
+		/* 
+		   reset highest interrupt under service */
 		outb(0x00, actrl);
 		outb(0x38, actrl);
 	}
@@ -723,6 +732,7 @@ static void
 dummy_isr(int irq, void *dev_id, struct pt_regs *regs)
 {
 	volatile int *p;
+
 	(void) irq;
 	(void) dev_id;
 	(void) regs;
@@ -772,9 +782,8 @@ acb56_devatt(dev_t dev)
 	outb(0x0f, actrl);
 	if (inb(actrl) & 0x01)
 		return NULL;	/* probably an 8530 */
-	/*
-	   check assigned irq 
-	 */
+	/* 
+	   check assigned irq */
 	if ((_irq = irq[board]) != -1) {
 		if ((err = request_irq(_irq, dummy_isr, SA_SHIRQ, "acb56_dummy", NULL)))
 			return NULL;
@@ -794,9 +803,8 @@ acb56_devatt(dev_t dev)
 		outb(irqprobe[i], actrl);
 		i++;
 	}
-	/*
-	   fill tx fifo to get an interrupt 
-	 */
+	/* 
+	   fill tx fifo to get an interrupt */
 	outb(0x55, iobase);
 	outb(0x55, iobase);
 	outb(0x55, iobase);
@@ -820,9 +828,8 @@ acb56_devatt(dev_t dev)
 		return NULL;
       acb_probe_dma:
 	free_irq(_irq, NULL);
-	/*
-	   check for dma 
-	 */
+	/* 
+	   check for dma */
 	if ((_dma_rx = dma_rx[board]) && _dma_rx != -1 && !(request_dma(_dma_rx, "acb56_probe")))
 		free_dma(_dma_rx);
 	else
@@ -874,25 +881,22 @@ acb56_open(lmi_t * lmi)
 
 	spin_lock_irqsave(&dev->iflock, flags);
 	MOD_INC_USE_COUNT;
-	/*
-	   get io region 
-	 */
+	/* 
+	   get io region */
 	if ((err = check_region(dev->iobase, 8))) {
 		MOD_DEC_USE_COUNT;
 		spin_unlock_irqrestore(&dev->iflock, flags);
 		return err;
 	}
 	request_region(dev->iobase, 8, "acb56");
-	/*
-	   get dma channels 
-	 */
+	/* 
+	   get dma channels */
 	if (dev->dma_rx && request_dma(dev->dma_rx, "acb56"))
 		dev->dma_rx = 0;
 	if (dev->dma_tx && request_dma(dev->dma_tx, "acb56"))
 		dev->dma_tx = 0;
-	/*
-	   get interrupt 
-	 */
+	/* 
+	   get interrupt */
 	if ((err = request_irq(dev->irq, acb56_isr, SA_SHIRQ, "acb56", p))) {
 		if (dev->dma_rx)
 			free_dma(dev->dma_rx);
@@ -964,6 +968,7 @@ acb56_attach(lmi_t * lmi, void *ppa, int len)
 	acb56_t *p = (acb56_t *) lmi;
 	dev_device_t *dev = &p->dev.iface;
 	unsigned long flags;
+
 	(void) dev;
 	(void) ppa;
 	(void) len;
@@ -983,6 +988,7 @@ acb56_detach(lmi_t * lmi)
 	acb56_t *p = (acb56_t *) lmi;
 	dev_device_t *dev = &p->dev.iface;
 	unsigned long flags;
+
 	(void) dev;
 	spin_lock_irqsave(&dev->iflock, flags);
 	spin_unlock_irqrestore(&dev->iflock, flags);
@@ -1011,23 +1017,20 @@ acb56_enable(lmi_t * lmi)
 	actrl = dev->iobase + 1;
 	for (i = 0; i < 16; i++)
 		p->regs[i] = 0;	/* register images */
-	/*
-	   setup chip 
-	 */
+	/* 
+	   setup chip */
 	for (i = 0; i < sizeof(preset);) {
 		outb(preset[i], actrl);
 		i++;
 		outb(p->regs[i >> 1] = preset[i], actrl);
 		i++;
 	}
-	/*
-	   setup interface and clock modes 
-	 */
+	/* 
+	   setup interface and clock modes */
 	outb(0x0b, actrl);
 	outb(p->regs[0x0b] = mode_clock[mode_map[dev->ifmode]][clock_map[dev->ifclock]], actrl);
-	/*
-	   setup baud rate generator 
-	 */
+	/* 
+	   setup baud rate generator */
 	if (dev->ifmode == DEV_MODE_DTE) {
 		outb(0x0c, actrl);
 		outb(p->regs[0xc] = 0xca, actrl);
@@ -1044,9 +1047,8 @@ acb56_enable(lmi_t * lmi)
 		outb(0x0d, actrl);
 		outb(p->regs[0xd] = 0x00, actrl);
 	}
-	/*
-	   special DPLL modes 
-	 */
+	/* 
+	   special DPLL modes */
 	if (dev->ifclock == DEV_CLOCK_DPLL) {
 		outb(0x0e, actrl);
 		outb(0x60, actrl);
@@ -1064,9 +1066,8 @@ acb56_enable(lmi_t * lmi)
 	}
 	outb(0x0e, actrl);
 	outb(p->regs[0x0e] = 0x02, actrl);
-	/*
-	   setup loopback and echo modes 
-	 */
+	/* 
+	   setup loopback and echo modes */
 	switch (dev->ifmode) {
 	case DEV_MODE_LOC_LB:
 		outb(0x0e, actrl);
@@ -1081,9 +1082,8 @@ acb56_enable(lmi_t * lmi)
 		outb(p->regs[0x0e] |= 0x18, actrl);
 		break;
 	}
-	/*
-	   set up dma registers 
-	 */
+	/* 
+	   set up dma registers */
 	if (dev->dma_rx || dev->dma_tx) {
 		outb(0x0e, actrl);
 		outb(p->regs[0x0e] |= 0x04, actrl);
@@ -1111,16 +1111,14 @@ acb56_enable(lmi_t * lmi)
 		outb(p->regs[0x01] |= 0x13, actrl);
 		outb(0x00, actrl + 3);
 	}
-	/*
-	   disable status fifo 
-	 */
+	/* 
+	   disable status fifo */
 	outb(0x0f, actrl);
 	outb(0xfc, actrl);
 	outb(0x09, actrl);
 	outb(0x02, actrl);
-	/*
-	   reset and enable transmitters and receivers 
-	 */
+	/* 
+	   reset and enable transmitters and receivers */
 	outb(0x0E, actrl);
 	outb(p->regs[0x0e] |= 0x01, actrl);
 	outb(0x03, actrl);
@@ -1167,15 +1165,13 @@ acb56_enable(lmi_t * lmi)
 	*(p->tx_msg->b_wptr)++ = 0x01;	/* Initial SIOS */
 	*(p->tx_msg->b_wptr)++ = 0x00;	/* Initial SIOS */
 
-	/*
-	   enable master interrupt bit 
-	 */
+	/* 
+	   enable master interrupt bit */
 	outb(0x09, actrl);
 	outb(p->regs[0x09] |= 0x08, actrl);
 
-	/*
-	   we're running! phew! 
-	 */
+	/* 
+	   we're running! phew! */
 	spin_unlock_irqrestore(&dev->iflock, flags);
 	return (0);
 }
@@ -1294,9 +1290,8 @@ acb56_ioctl(lmi_t * sdl, int cmd, void *arg)
 		switch (cmd) {
 		case DEV_IOCCIFRESET:
 			break;
-			/*
-			   gets 
-			 */
+			/* 
+			   gets */
 		case DEV_IOCGIFFLAGS:
 			*(dev_ulong *) arg = dev->ifflags;
 			return (0);
@@ -1321,9 +1316,8 @@ acb56_ioctl(lmi_t * sdl, int cmd, void *arg)
 		case DEV_IOCGIFLEADS:
 			*(dev_ulong *) arg = dev->ifleads;
 			return (0);
-			/*
-			   sets 
-			 */
+			/* 
+			   sets */
 		case DEV_IOCSIFFLAGS:
 			if (sdl->state == LMI_ENABLED)
 				return EBUSY;
@@ -1390,9 +1384,8 @@ acb56_ioctl(lmi_t * sdl, int cmd, void *arg)
 			return (0);
 		case DEV_IOCSIFLEADS:
 		case DEV_IOCCIFLEADS:
-			/*
-			   FIXME: control the leads 
-			 */
+			/* 
+			   FIXME: control the leads */
 			if (uarg)
 				return EINVAL;
 			return (0);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: slsi.h,v 0.9.2.4 2007/06/17 01:56:02 brian Exp $
+ @(#) $Id: slsi.h,v 0.9.2.5 2007/08/14 12:17:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:56:02 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slsi.h,v $
+ Revision 0.9.2.5  2007/08/14 12:17:10  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.4  2007/06/17 01:56:02  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_SLSI_H__
 #define __SS7_SLSI_H__
 
-#ident "@(#) $RCSfile: slsi.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: slsi.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -278,6 +281,7 @@ typedef struct {
 	ls_ulong signal;		/* Traffic Management Signal */
 	ls_mtph_t mh;			/* mtp header */
 } ls_signal_up_t;
+
 /*
  *  Signalling Link Test Control Messages (SLTC), M_PROTO
  *
@@ -294,6 +298,7 @@ typedef struct {
 	ls_uchar tli;			/* test length indicator */
 	ls_uchar tmsx[15];		/* test pattern */
 } ls_signal_sltc_t;
+
 /*
  *  Changeback Messages (CBM), M_PROTO
  *
@@ -307,6 +312,7 @@ typedef struct {
 	ls_ulong slc;			/* signalling link code (ANSI) */
 	ls_ulong cbc;			/* changeback code */
 } ls_signal_cbm_t;
+
 /*
  *  Changeover Messages (COM), M_PROTO
  *
@@ -320,6 +326,7 @@ typedef struct {
 	ls_ulong slc;			/* signalling link code (ANSI) */
 	ls_ulong fsnc;			/* FSNC */
 } ls_signal_com_t;
+
 /*
  *  Signalling Link Messages (SLM), M_PROTO
  *
@@ -343,6 +350,7 @@ typedef struct {
 	ls_mtpm_t mh;			/* mtp management header */
 	ls_ulong slc;			/* signalling link code (ANSI) */
 } ls_signal_slm_t;
+
 /*
  *  Traffic Flow Control Messages (TFC), M_PROTO
  *
@@ -355,6 +363,7 @@ typedef struct {
 	ls_ulong dest;			/* destination sp or cluster */
 	ls_ulong stat;			/* congestion status */
 } ls_signal_tfc_t;
+
 /*
  *  Traffic Management Messages (TFM), M_PROTO
  *
@@ -375,6 +384,7 @@ typedef struct {
 	ls_mtpm_t mh;			/* mtp management header */
 	ls_ulong dest;			/* concerned sp or cluster */
 } ls_signal_tfm_t;
+
 /*
  *  User-Part Flow Control Messages (UFC), M_PROTO
  *
@@ -389,6 +399,7 @@ typedef struct {
 	ls_ulong dest;			/* destination sp */
 	ls_ulong upi;			/* user part indicator */
 } ls_signal_ufc_t;
+
 /*
  *  Data Link Connection Messages (DLC), M_PROTO
  *
@@ -401,6 +412,7 @@ typedef struct {
 	ls_ulong slc;			/* signalling link code (ANSI) */
 	ls_ulong sdli;			/* signalling data link indicator */
 } ls_signal_dlc_t;
+
 /*
  *  Management messages without parameters (SIG), M_PROTO
  *

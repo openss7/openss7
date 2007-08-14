@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $
+ @(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:17:22 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_daed.c,v $
+ Revision 0.9.2.16  2007/08/14 12:17:22  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.15  2007/07/14 01:33:53  brian
  - make license explicit, add documentation
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $"
+#ident "@(#) $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:17:22 $"
 
 static char const ident[] =
-    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $";
+    "$RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:17:22 $";
 
 #include <sys/os7/compat.h>
 
@@ -86,7 +89,7 @@ static char const ident[] =
 
 #define CD_DAED_DESCRIP		"Q.703/T1.111.3 DAED: (Delimination Alignment and Error Detection) STREAMS MODULE."
 #define CD_DAED_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/07/14 01:33:53 $"
+#define CD_DAED_REVISION	"OpenSS7 $RCSfile: cd_daed.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:17:22 $"
 #define CD_DAED_DEVICE		"SVR 4.2 STREAMS CDI DAED Module for SS7 Channel Devices (DAED)."
 #define CD_DAED_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CD_DAED_LICENSE		"GPL v2"
@@ -202,6 +205,7 @@ daed_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		int cmajor = getmajor(*devp);
 		int cminor = getminor(*devp);
 		struct str *str;
+
 		/* test for multiple push */
 		for (str = daed_list; str; str = str->next) {
 			if (str->u.dev.cmajor == cmajor && str->u.dev.cminor == cminor) {
@@ -241,6 +245,7 @@ daed_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -265,6 +270,7 @@ STATIC int
 daed_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&daed_fmod)) < 0)
 		return (err);
 	return (0);
@@ -274,6 +280,7 @@ STATIC int
 daed_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&daed_fmod)) < 0)
 		return (err);
 	return (0);
@@ -291,6 +298,7 @@ STATIC int
 daed_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&cd_daedinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -304,6 +312,7 @@ STATIC int
 daed_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&cd_daedinfo)) < 0)
 		return (err);
 	return (0);
@@ -315,6 +324,7 @@ MODULE_STATIC int __init
 cd_daedinit(void)
 {
 	int err;
+
 #ifdef MODULE
 	cmn_err(CE_NOTE, CD_DAED_BANNER);	/* banner message */
 #else
@@ -338,6 +348,7 @@ MODULE_STATIC void __exit
 cd_daedterminate(void)
 {
 	int err;
+
 	if ((err = daed_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = daed_term_caches()))

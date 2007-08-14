@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:26 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:57 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:34:26 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 0.9.2.17  2007/08/14 12:17:57  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.16  2007/07/14 01:34:26  brian
  - make license explicit, add documentation
 
@@ -70,9 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:26 $"
+#ident "@(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:57 $"
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/07/14 01:34:26 $";
+static char const ident[] =
+    "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:57 $";
 
 /*
  *  This is a M2TP/SCTP driver.  This simulates one or more SS7 links using an
@@ -95,7 +99,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.16 
 #include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -221,6 +225,7 @@ sdt_info_ack(m2tp_t * mt)
 {
 	mblk_t *mp;
 	sdt_info_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p)), BPRI_HI)) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (sdt_info_ack_t *) mp->b_wptr;
@@ -236,6 +241,7 @@ sdt_ok_ack(m2tp_t * mt)
 {
 	mblk_t *mp;
 	sdt_ok_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p)), BPRI_HI)) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (sdt_ok_ack_t *) mp->b_wptr;
@@ -253,6 +259,7 @@ sdt_error_ack(m2tp_t * mt)
 {
 	mblk_t *mp;
 	sdt_error_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p)), BPRI_HI)) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (sdt_error_ack_t *) mp->b_wptr;
@@ -272,6 +279,7 @@ sdt_optmgmt_ack(m2tp_t * mt, caddr_t opt_ptr, size_t opt_len)
 {
 	mblk_t *mp;
 	sdt_optmgmt_ack_t *p;
+
 	if ((mp = allocb(sizeof(*p) + opt_len), BPRI_HI)) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (sdt_optmgmt_ack_t *) mp->b_wptr;
@@ -576,6 +584,7 @@ m2tp_send_data(m2tp_t * mt, mblk_t *dp)
 {
 	mblk_t *mp;
 	struct T_data_req *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (T_ata_req_t *) mp->b_wptr;
@@ -712,6 +721,7 @@ static int
 sdt_daedt_transmission_req(m2tp_t * mt, mblk_t *mp)
 {
 	mblk_t *dp;
+
 	if ((dp = mp)->b_datap->db_type != M_DATA) {
 		dp = mp->b_cont;
 		freeb(mp);
@@ -972,9 +982,8 @@ sdt_aerm_stop_req(m2tp_t * mt, mblk_t *mp)
 static int
 sdt_aerm_set_ti_to_tin_req(m2tp_t * mt, mblk_t *mp)
 {
-	/*
-	   we don't change proving parameters in the middle of proving 
-	 */
+	/* 
+	   we don't change proving parameters in the middle of proving */
 	m2->flags &= ~M2TP_EMERGENCY;
 	freemsg(mp);
 	return (0);
@@ -992,9 +1001,8 @@ sdt_aerm_set_ti_to_tin_req(m2tp_t * mt, mblk_t *mp)
 static int
 sdt_aerm_set_ti_to_tie_req(m2tp_t * mt, mblk_t *mp)
 {
-	/*
-	   we don't change proving parameters in the middle of proving 
-	 */
+	/* 
+	   we don't change proving parameters in the middle of proving */
 	m2->flags |= M2TP_EMERGENCY;
 	freemsg(mp);
 	return (0);
@@ -1071,6 +1079,7 @@ static int
 t_info_ack(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_info_ack *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1088,6 +1097,7 @@ static int
 t_bind_ack(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_bind_ack *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1107,6 +1117,7 @@ static int
 t_optmgmt_ack(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_optmgmt_ack *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1124,6 +1135,7 @@ static int
 t_addr_ack(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_addr_ack *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1140,6 +1152,7 @@ static int
 t_ok_ack(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_ok_ack *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1156,6 +1169,7 @@ static int
 t_error_ack(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_error_ack *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1177,6 +1191,7 @@ static int
 t_conn_ind(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_conn_ind *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1195,14 +1210,14 @@ t_conn_con(m2tp_t * mt, mblk_t *mp)
 	if (mt->t_state == TS_WCON_CREQ) {
 		struct T_conn_con *p = (struct T_conn_con *) mp->b_wptr;
 
-		/*
+		/* 
 		 *  TODO: check for 2 streams inbound only.
 		 */
 		switch (mt->state) {
 		case M2TP_AIP:
 			mt->state = M2TP_INS_LOCAL;
 			mt->t_state = TS_DATA_XFER;
-			/*
+			/* 
 			 *  TODO: Get SRTT report.
 			 */
 			if (mp->b_cont)
@@ -1241,6 +1256,7 @@ static int
 t_data_ind(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_data_ind *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1257,6 +1273,7 @@ static int
 t_exdata_ind(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_exdata_ind *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1273,6 +1290,7 @@ static int
 t_optdata_ind(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_optdata_ind *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1293,9 +1311,8 @@ t_optdata_con(m2tp_t * mt, mblk_t *mp)
 	mblk_t *dp = (mblk_t *) p->TOKEN_value;
 	mblk_t *bp = mt->txq.q_head;
 
-	/*
-	   little check just to be sure that it is in the bufq 
-	 */
+	/* 
+	   little check just to be sure that it is in the bufq */
 	for (; bp && bp != dp; bp = bp->next) ;
 	if (bp != dp)
 		return (-EPROTO);
@@ -1374,6 +1391,7 @@ static int
 t_unitdata_ind(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_unitdata_ind *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1388,6 +1406,7 @@ static int
 t_uderror_ind(m2tp_t * mt, mblk_t *mp)
 {
 	struct T_uderror_ind *p;
+
 	ptrace(("Unexpected primitive received from T-Provider\n"));
 	(void) mt;
 	(void) mp;
@@ -1421,12 +1440,14 @@ static inline int
 m2tp_w_data(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	return m2tp_send_data(mt, mp);
 }
 static inline int
 m2tp_r_data(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	return m2tp_recv_data(mt, mp);
 }
 
@@ -1444,6 +1465,7 @@ static inline int
 m2tp_w_proto(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	switch ((mt->dprim = ((union M2TP_primitives *) (mp->b_rptr))->type)) {
 	case LMI_INFO_REQ:
 		return sdt_info_req(mt, mp);
@@ -1482,6 +1504,7 @@ static inline int
 m2tp_r_proto(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	switch ((mt->uprim = ((union T_primitives *) (mp->b_rptr))->type)) {
 	case T_DATA_IND:
 		return t_data_ind(mt, mp);
@@ -1519,6 +1542,7 @@ static inline int
 m2tp_w_pcproto(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	switch ((mt->dprim = ((union M2TP_primitives *) (mp->b_rptr))->type)) {
 	case SDT_INFO_REQ:
 		return sdt_info_req(mt, mp);
@@ -1550,6 +1574,7 @@ static inline int
 m2tp_r_pcproto(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	switch ((mt->uprim = ((union T_primitives *) (mp->b_rptr))->type)) {
 	case T_INFO_ACK:
 		return t_info_ack(mt, mp);
@@ -1563,9 +1588,8 @@ m2tp_r_pcproto(queue_t *q, mblk_t *mp)
 		return t_error_ack(mt, mp);
 	case T_ADDR_ACK:
 		return t_addr_ack(mt, mp);
-		/*
-		   new primitives for M2TP support 
-		 */
+		/* 
+		   new primitives for M2TP support */
 	case T_OPTDATA_CON:
 		return t_optdata_con(mt, mp);
 	}
@@ -1586,6 +1610,7 @@ static inline int
 m2tp_w_ctl(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	switch (((union M2TP_controls *) (mp->b_wptr))->type) {
 	case M2TP_CTL_XXXX:
 		return m2tp_ctl_xxxx(mt, mp);
@@ -1596,6 +1621,7 @@ static inline int
 m2tp_r_ctl(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	switch (((union M2TP_controls *) (mp->b_wptr))->type) {
 	case T_CTL_XXXX:
 		return t_ctl_xxxx(mt, mp);
@@ -1614,6 +1640,7 @@ static inline int
 m2tp_do_ioctl(m2tp_t * mt, int cmd, void *arg)
 {
 	int nr = _IOC_NR(cmd);
+
 	(void) nr;
 
 	if (_IOC_TYPE(cmd) == M2TP_IOC_MAGIC)
@@ -1718,6 +1745,7 @@ static inline void
 m2tp_r_error(queue_t *q, mblk_t *mp)
 {
 	m2tp_t *mt = (m2tp_t *) q->q_ptr;
+
 	m2tp->state = M2TP_STATE_MERROR;
 	if (q->q_next) {
 		putnext(q, mp);
@@ -1751,7 +1779,7 @@ m2tp_rput(queue_t *q, mblk_t *mp)
 
 	if (mp->b_datap->db_type < QPCTL && q->q_count) {
 		putq(q, mp);
-		/*
+		/* 
 		 *  NOTE:- after placing messages on the queue here, I should
 		 *  check if placing the message on the queue crosses a band
 		 *  threshold for congestion accept and congestion discard.
@@ -1851,7 +1879,7 @@ m2tp_rsrv(queue_t *q)
 		}
 		freemsg(mp);
 	      rsrv_continue:
-		/*
+		/* 
 		 *  NOTE:-  I have removed and processed a message from the
 		 *  receive queue, so I should check for receive congestion
 		 *  abatement.  If receive congestion has abated below the
@@ -1883,9 +1911,10 @@ m2tp_wput(queue_t *q, mblk_t *mp)
 {
 	mblk_t *mp;
 	int err = -EOPNOTSUPP;
+
 	if (q->q_count && mp->b_datap->db_type < QPCTL) {
 		putq(q, mp);
-		/*
+		/* 
 		 *  NOTE:- after placing messages on the queue here, I should
 		 *  check for transmit congestion.  I should check if placing
 		 *  the message on the queue crosses a band threshold for
@@ -1989,7 +2018,7 @@ m2tp_wsrv(queue_t *q)
 		}
 		freemsg(mp);
 	      wsrv_continue:
-		/*
+		/* 
 		 *  NOTE:-   I have removed a message from the queue, so I
 		 *  should check for band congestion abatement for the data
 		 *  band to see if transmit congestion has abated.  If it has,
@@ -2033,6 +2062,7 @@ static void
 m2tp_free_priv(queue_t *q)
 {
 	m2tp_t *m2tp = (m2tp_t *) q->q_ptr;
+
 	kmem_cache_free(m2tp_cachep, m2tp);
 	return;
 }
@@ -2041,9 +2071,8 @@ static void
 m2tp_init_priv(void)
 {
 	if (!(m2tp_cachep = kmem_find_general_cachep(sizeof(m2tp_t)))) {
-		/*
-		   allocate a new cachep 
-		 */
+		/* 
+		   allocate a new cachep */
 	}
 	return;
 }
@@ -2068,6 +2097,7 @@ m2tp_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 		major_t cmajor = getmajor(*devp);
 		minor_t cminor = getminor(*devp);
 		struct m2tp *m2tp;
+
 		/* test for multiple push */
 		for (m2tp = m2tp_list; m2tp; m2tp = m2tp->next) {
 			if (m2tp->u.dev.cmajor == cmajor && m2tp->u.dev.cminor == cminor) {
@@ -2122,6 +2152,7 @@ m2tp_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = MOD_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -2146,6 +2177,7 @@ STATIC int
 sl_register_strmod(void)
 {
 	int err;
+
 	if ((err = register_strmod(&sl_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2155,6 +2187,7 @@ STATIC int
 sl_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = unregister_strmod(&sl_fmod)) < 0)
 		return (err);
 	return (0);
@@ -2172,6 +2205,7 @@ STATIC int
 sl_register_strmod(void)
 {
 	int err;
+
 	if ((err = lis_register_strmod(&m2tpinfo, MOD_NAME)) == LIS_NULL_MID)
 		return (-EIO);
 	if ((err = lis_register_module_qlock_option(err, LIS_QLOCK_NONE)) < 0) {
@@ -2185,6 +2219,7 @@ STATIC int
 sl_unregister_strmod(void)
 {
 	int err;
+
 	if ((err = lis_unregister_strmod(&m2tpinfo)) < 0)
 		return (err);
 	return (0);
@@ -2196,6 +2231,7 @@ MODULE_STATIC int __init
 m2tpinit(void)
 {
 	int err;
+
 #ifdef MODULE
 	cmn_err(CE_NOTE, M2TP_BANNER);	/* banner message */
 #else
@@ -2219,6 +2255,7 @@ MODULE_STATIC void __exit
 m2tpterminate(void)
 {
 	int err;
+
 	if ((err = sl_unregister_strmod()))
 		cmn_err(CE_WARN, "%s: could not unregister module", MOD_NAME);
 	if ((err = sl_term_caches()))

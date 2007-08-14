@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/15 10:14:38 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:19:22 $
 
  -----------------------------------------------------------------------------
 
@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:14:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:19:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 0.9.2.14  2007/08/14 12:19:22  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.13  2007/03/15 10:14:38  brian
  - test case reporting and release date
 
@@ -103,9 +120,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/15 10:14:38 $"
+#ident "@(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:19:22 $"
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/03/15 10:14:38 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:19:22 $";
 
 /*
  *  Simple test program for INET streams.
@@ -185,6 +202,7 @@ static const char *lpkgname = "OpenSS7 INET Driver - UDP";
 static const char *lstdname = "XNS 5.2/TPI Rev 2";
 static const char *sstdname = "XNS/TPI";
 static const char *shortname = "INET/UDP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/inet/udp";
 #else
@@ -203,6 +221,7 @@ static int verbose = 1;
 static int show_msg = 0;
 static int show_acks = 0;
 static int show_timeout = 0;
+
 //static int show_data = 1;
 
 static int last_prim = 0;
@@ -630,7 +649,7 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -1303,28 +1322,28 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 	}
 }
 
-#define ICMP_ECHOREPLY		0	/* Echo Reply			*/
-#define ICMP_DEST_UNREACH	3	/* Destination Unreachable	*/
-#define ICMP_SOURCE_QUENCH	4	/* Source Quench		*/
-#define ICMP_REDIRECT		5	/* Redirect (change route)	*/
-#define ICMP_ECHO		8	/* Echo Request			*/
-#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded		*/
-#define ICMP_PARAMETERPROB	12	/* Parameter Problem		*/
-#define ICMP_TIMESTAMP		13	/* Timestamp Request		*/
-#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply		*/
-#define ICMP_INFO_REQUEST	15	/* Information Request		*/
-#define ICMP_INFO_REPLY		16	/* Information Reply		*/
-#define ICMP_ADDRESS		17	/* Address Mask Request		*/
-#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply		*/
+#define ICMP_ECHOREPLY		0	/* Echo Reply */
+#define ICMP_DEST_UNREACH	3	/* Destination Unreachable */
+#define ICMP_SOURCE_QUENCH	4	/* Source Quench */
+#define ICMP_REDIRECT		5	/* Redirect (change route) */
+#define ICMP_ECHO		8	/* Echo Request */
+#define ICMP_TIME_EXCEEDED	11	/* Time Exceeded */
+#define ICMP_PARAMETERPROB	12	/* Parameter Problem */
+#define ICMP_TIMESTAMP		13	/* Timestamp Request */
+#define ICMP_TIMESTAMPREPLY	14	/* Timestamp Reply */
+#define ICMP_INFO_REQUEST	15	/* Information Request */
+#define ICMP_INFO_REPLY		16	/* Information Reply */
+#define ICMP_ADDRESS		17	/* Address Mask Request */
+#define ICMP_ADDRESSREPLY	18	/* Address Mask Reply */
 #define NR_ICMP_TYPES		18
 
 /* Codes for UNREACH. */
-#define ICMP_NET_UNREACH	0	/* Network Unreachable		*/
-#define ICMP_HOST_UNREACH	1	/* Host Unreachable		*/
-#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable		*/
-#define ICMP_PORT_UNREACH	3	/* Port Unreachable		*/
-#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set	*/
-#define ICMP_SR_FAILED		5	/* Source Route failed		*/
+#define ICMP_NET_UNREACH	0	/* Network Unreachable */
+#define ICMP_HOST_UNREACH	1	/* Host Unreachable */
+#define ICMP_PROT_UNREACH	2	/* Protocol Unreachable */
+#define ICMP_PORT_UNREACH	3	/* Port Unreachable */
+#define ICMP_FRAG_NEEDED	4	/* Fragmentation Needed/DF set */
+#define ICMP_SR_FAILED		5	/* Source Route failed */
 #define ICMP_NET_UNKNOWN	6
 #define ICMP_HOST_UNKNOWN	7
 #define ICMP_HOST_ISOLATED	8
@@ -1338,14 +1357,14 @@ terrno_string(t_uscalar_t terr, t_scalar_t uerr)
 #define NR_ICMP_UNREACH		15	/* instead of hardcoding immediate value */
 
 /* Codes for REDIRECT. */
-#define ICMP_REDIR_NET		0	/* Redirect Net			*/
-#define ICMP_REDIR_HOST		1	/* Redirect Host		*/
-#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS		*/
-#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS	*/
+#define ICMP_REDIR_NET		0	/* Redirect Net */
+#define ICMP_REDIR_HOST		1	/* Redirect Host */
+#define ICMP_REDIR_NETTOS	2	/* Redirect Net for TOS */
+#define ICMP_REDIR_HOSTTOS	3	/* Redirect Host for TOS */
 
 /* Codes for TIME_EXCEEDED. */
-#define ICMP_EXC_TTL		0	/* TTL count exceeded		*/
-#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded	*/
+#define ICMP_EXC_TTL		0	/* TTL count exceeded */
+#define ICMP_EXC_FRAGTIME	1	/* Fragment Reass time exceeded */
 
 char *
 etype_string(t_uscalar_t etype)
@@ -4723,7 +4742,7 @@ do_signal(int child, int action)
 		ic.ic_cmd = O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_OPTMGMT:
 		ic.ic_cmd = O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4734,7 +4753,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_BIND:
 		ic.ic_cmd = O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4742,17 +4761,17 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_O_TI_UNBIND:
 		ic.ic_cmd = O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETINFO:
 		ic.ic_cmd = _O_TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_OPTMGMT:
 		ic.ic_cmd = _O_TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4763,7 +4782,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_BIND:
 		ic.ic_cmd = _O_TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4771,47 +4790,47 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_UNBIND:
 		ic.ic_cmd = _O_TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETMYNAME:
 		ic.ic_cmd = _O_TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_GETPEERNAME:
 		ic.ic_cmd = _O_TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_HELLO:
 		ic.ic_cmd = _O_TI_XTI_HELLO;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_GET_STATE:
 		ic.ic_cmd = _O_TI_XTI_GET_STATE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_CLEAR_EVENT:
 		ic.ic_cmd = _O_TI_XTI_CLEAR_EVENT;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_XTI_MODE:
 		ic.ic_cmd = _O_TI_XTI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST__O_TI_TLI_MODE:
 		ic.ic_cmd = _O_TI_TLI_MODE;
 		ic.ic_len = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETINFO:
 		ic.ic_cmd = TI_GETINFO;
 		ic.ic_len = sizeof(p->info_ack);
 		p->info_req.PRIM_type = T_INFO_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_OPTMGMT:
 		ic.ic_cmd = TI_OPTMGMT;
 		ic.ic_len = sizeof(p->optmgmt_ack)
@@ -4822,7 +4841,7 @@ do_signal(int child, int action)
 		p->optmgmt_req.MGMT_flags = test_mgmtflags;
 		if (test_opts)
 			bcopy(test_opts, ctrl->buf + p->optmgmt_req.OPT_offset, p->optmgmt_req.OPT_length);
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_BIND:
 		ic.ic_cmd = TI_BIND;
 		ic.ic_len = sizeof(p->bind_ack);
@@ -4830,22 +4849,22 @@ do_signal(int child, int action)
 		p->bind_req.ADDR_length = 0;
 		p->bind_req.ADDR_offset = 0;
 		p->bind_req.CONIND_number = last_qlen;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_UNBIND:
 		ic.ic_cmd = TI_UNBIND;
 		ic.ic_len = sizeof(p->ok_ack);
 		p->unbind_req.PRIM_type = T_UNBIND_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETMYNAME:
 		ic.ic_cmd = TI_GETMYNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_GETPEERNAME:
 		ic.ic_cmd = TI_GETPEERNAME;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res);
@@ -4854,7 +4873,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req);
@@ -4863,19 +4882,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req);
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->conn_res) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4884,7 +4903,7 @@ do_signal(int child, int action)
 		p->conn_res.OPT_length = 0;
 		p->conn_res.OPT_offset = 0;
 		p->conn_res.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->conn_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
@@ -4893,19 +4912,19 @@ do_signal(int child, int action)
 		p->conn_req.DEST_offset = 0;
 		p->conn_req.OPT_length = 0;
 		p->conn_req.OPT_offset = 0;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETMYNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETMYNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SETPEERNAME_DISC_DATA:
 		ic.ic_cmd = TI_SETPEERNAME;
 		ic.ic_len = sizeof(p->discon_req) + sprintf(cbuf + sizeof(p->conn_res), "IO control test data.");
 		p->discon_req.PRIM_type = T_DISCON_REQ;
 		p->discon_req.SEQ_number = last_sequence;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_SYNC:
 	{
 		union {
@@ -4916,19 +4935,19 @@ do_signal(int child, int action)
 		ic.ic_cmd = TI_SYNC;
 		ic.ic_len = sizeof(*s);
 		s->req.tsr_flags = TSRF_INFO_REQ | TSRF_IS_EXP_IN_RCVBUF | TSRF_QLEN_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	}
 	case __TEST_TI_GETADDRS:
 		ic.ic_cmd = TI_GETADDRS;
 		ic.ic_len = sizeof(p->addr_ack);
 		p->addr_req.PRIM_type = T_ADDR_REQ;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	case __TEST_TI_CAPABILITY:
 		ic.ic_cmd = TI_CAPABILITY;
 		ic.ic_len = sizeof(p->capability_ack);
 		p->capability_req.PRIM_type = T_CAPABILITY_REQ;
 		p->capability_req.CAP_bits1 = TC1_INFO | TC1_ACCEPTOR_ID;
-		return test_ti_ioctl(child, I_STR, (intptr_t) & ic);
+		return test_ti_ioctl(child, I_STR, (intptr_t) &ic);
 	default:
 		return __RESULT_SCRIPT_ERROR;
 	}
@@ -6426,7 +6445,7 @@ struct test_stream test_1_2_list = { &preamble_1_2_list, &test_case_1_2_list, &p
 #define tgrp_case_1_3_1 test_group_1
 #define numb_case_1_3_1 "1.3.1"
 #define name_case_1_3_1 "Request capabilities."
-#define sref_case_1_3_1 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_1 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_1 "\
 Checks that capabilities can be requested on each of three streams,\n\
 and that the returned information is appropriate for each stream."
@@ -6613,7 +6632,7 @@ struct test_stream test_1_3_1_list = { &preamble_1_3_1_list, &test_case_1_3_1_li
 #define tgrp_case_1_3_2 test_group_1
 #define numb_case_1_3_2 "1.3.2"
 #define name_case_1_3_2 "Request capabilities -- primitive in error."
-#define sref_case_1_3_2 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_2 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_2 "\
 Checks that a T_CAPABILITY_REQ primitive in error (too short) results in\n\
 failure.  The specifications do not state what to do in the event that a\n\
@@ -6665,7 +6684,7 @@ struct test_stream test_1_3_2_list = { &preamble_1_3_2_list, &test_case_1_3_2_li
 #define tgrp_case_1_3_3 test_group_1
 #define numb_case_1_3_3 "1.3.3"
 #define name_case_1_3_3 "Request capabilities -- M_PCPROTO"
-#define sref_case_1_3_3 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_3 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_3 "\
 Checks that a T_CAPABILITY_REQ sent as a M_PCPROTO is replied to with a\n\
 T_CAPABILITY_ACK as a M_PCPROTO.  The TPI specification says that a\n\
@@ -6710,7 +6729,7 @@ struct test_stream test_1_3_3_list = { &preamble_1_3_3_list, &test_case_1_3_3_li
 #define tgrp_case_1_3_4 test_group_1
 #define numb_case_1_3_4 "1.3.4"
 #define name_case_1_3_4 "Request capabilities -- M_PROTO"
-#define sref_case_1_3_4 "TPI Version 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
+#define sref_case_1_3_4 "TPI Revision 2 Draft 2 -- Chapter 6 -- T_CAPABILITY_REQ"
 #define desc_case_1_3_4 "\
 Checks that a T_CAPABILITY_REQ sent as a M_PROTO is replied to with a\n\
 T_CAPABILITY_ACK as a M_PROTO.  The TPI specification says that a\n\
@@ -16854,7 +16873,7 @@ struct test_stream test_1_9_1_3_list = { &preamble_1_9_1_3_list, &test_case_1_9_
 #define tgrp_case_1_9_1_4 test_group_1_9_1
 #define numb_case_1_9_1_4 "1.9.1.4"
 #define name_case_1_9_1_4 "Perform options management -- T_NEGOTIATE (none)"
-#define sref_case_1_9_1_4 "TPI Version 2 Draft 2 -- T_OPTMGMT_ACK"
+#define sref_case_1_9_1_4 "TPI Revision 2 Draft 2 -- T_OPTMGMT_ACK"
 #define desc_case_1_9_1_4 "\
 Checks that all negotiated options are returned when no options are specified in\n\
 the T_OPTMGMT_REQ.  The specifications say than when T_NEGOTIATE is given and\n\
@@ -18000,7 +18019,7 @@ struct test_stream test_1_10_3_list = { &preamble_1_10_3_list, &test_case_1_10_3
 #define tgrp_case_1_10_4 test_group_1_10
 #define numb_case_1_10_4 "1.10.4"
 #define name_case_1_10_4 "Double bind on three streams."
-#define sref_case_1_10_4 "TPI Version 2 Draft 2 T_BIND_REQ [TOUTSTATE]"
+#define sref_case_1_10_4 "TPI Revision 2 Draft 2 T_BIND_REQ [TOUTSTATE]"
 #define desc_case_1_10_4 "\
 Check that an attempt to bind three streams twice to each address results in\n\
 failure.  This is a simple test of a common interface state violation."
@@ -18088,7 +18107,7 @@ struct test_stream test_1_10_5_list = { &preamble_1_10_5_list, &test_case_1_10_5
 #define tgrp_case_1_10_6 test_group_1_10
 #define numb_case_1_10_6 "1.10.6"
 #define name_case_1_10_6 "Unbind from unbound on three streams."
-#define sref_case_1_10_6 "TPI Version 2 Draft 2 T_UNBIND_REQ [TOUTSTATE]"
+#define sref_case_1_10_6 "TPI Revision 2 Draft 2 T_UNBIND_REQ [TOUTSTATE]"
 #define desc_case_1_10_6 "\
 Check that an attempt to and unbind three streams, already in the unbound\n\
 state, results in failure.  This is a simple tests of a common interface\n\
@@ -18171,7 +18190,7 @@ struct test_stream test_1_10_7_list = { &preamble_1_10_7_list, &test_case_1_10_7
 #define tgrp_case_1_10_8 test_group_1_10
 #define numb_case_1_10_8 "1.10.8"
 #define name_case_1_10_8 "Bind streams with a bad address -- too short"
-#define sref_case_1_10_8 "TPI Version 2 Draft 2 T_BIND_REQ [TBADADDR]"
+#define sref_case_1_10_8 "TPI Revision 2 Draft 2 T_BIND_REQ [TBADADDR]"
 #define desc_case_1_10_8 "\
 Checks that an attempt to bind a stream with an address that is too short will\n\
 result in error TBADADDR.  The specification states that an address that is\n\
@@ -18215,7 +18234,7 @@ struct test_stream test_1_10_8_list = { &preamble_1_10_8_list, &test_case_1_10_8
 #define tgrp_case_1_10_9 test_group_1_10
 #define numb_case_1_10_9 "1.10.9"
 #define name_case_1_10_9 "Bind streams with a bad address -- too long"
-#define sref_case_1_10_9 "TPI Version 2 Draft 2 T_BIND_REQ [TBADADDR]"
+#define sref_case_1_10_9 "TPI Revision 2 Draft 2 T_BIND_REQ [TBADADDR]"
 #define desc_case_1_10_9 "\
 Checks that an attempt to bind a stream with an address that is too long will\n\
 result in error TBADADDR.  The specification states that an address that is\n\
@@ -18259,7 +18278,7 @@ struct test_stream test_1_10_9_list = { &preamble_1_10_9_list, &test_case_1_10_9
 #define tgrp_case_1_10_10 test_group_1_10
 #define numb_case_1_10_10 "1.10.10"
 #define name_case_1_10_10 "Bind streams to unassignable address -- TNOADDR"
-#define sref_case_1_10_10 "TPI Version 2 Draft 2 T_BIND_REQ [TNOADDR]"
+#define sref_case_1_10_10 "TPI Revision 2 Draft 2 T_BIND_REQ [TNOADDR]"
 #define desc_case_1_10_10 "\
 Checks that an attempt to bind to an unassignable address results in failure\n\
 with error TNOADDR.  There are two ways of specifying an unassignable address\n\
@@ -18343,7 +18362,7 @@ struct test_stream test_1_10_10_list = { &preamble_1_10_10_list, &test_case_1_10
 #define tgrp_case_1_10_11 test_group_1_10
 #define numb_case_1_10_11 "1.10.11"
 #define name_case_1_10_11 "Bind streams with non-zero CONNIND_number"
-#define sref_case_1_10_11 "TPI Version 2 Draft 2 T_BIND_REQ [CONNIND_number]"
+#define sref_case_1_10_11 "TPI Revision 2 Draft 2 T_BIND_REQ [CONNIND_number]"
 #define desc_case_1_10_11 "\
 Checks that an attempt to bind to wildcard and non-wildcard addresses and with a\n\
 non-zero CONNINND_number results in failure for T_COTS or T_COTS_ORD service,\n\
@@ -23484,7 +23503,7 @@ struct test_stream test_3_6_resp = { &preamble_3_6_resp, &test_case_3_6_resp, &p
 struct test_stream test_3_6_list = { &preamble_3_6_list, &test_case_3_6_list, &postamble_3_6_list };
 
 #define test_group_4 "Connection and disconnection -- successful"
-#define sref_case_4_1 "TPI Version 2 Draft 2 -- Appendix A -- Connection Acceptance"
+#define sref_case_4_1 "TPI Revision 2 Draft 2 -- Appendix A -- Connection Acceptance"
 
 /*
  *  Accept a connection.
@@ -24784,8 +24803,7 @@ test_case_4_2_1_conn(int child)
 	state++;
 	switch (test_level) {
 	case T_INET_TCP:
-		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS
-		    || last_t_errno != TBADDATA)
+		if (expect(child, NORMAL_WAIT, __TEST_ERROR_ACK) != __RESULT_SUCCESS || last_t_errno != TBADDATA)
 			goto failure;
 		state++;
 		break;
@@ -24888,7 +24906,7 @@ test_case_4_2_1_list(int child)
 		break;
 	}
 	return (__RESULT_SUCCESS);
-failure:
+      failure:
 	return (__RESULT_FAILURE);
 }
 
@@ -25166,7 +25184,6 @@ test_case_4_3_conn_readonly(int child)
       failure:
 	return (__RESULT_FAILURE);
 }
-
 
 int
 test_case_4_3_resp_readonly(int child)
@@ -32766,7 +32783,7 @@ struct test_stream test_11_3_13_list = { &preamble_0, &test_case_11_3_13, &posta
 
 #define tgrp_case_11_3_14 test_group_11_3
 #define numb_case_11_3_14 "11.3.14"
-#define sref_case_11_3_14 "TPI Version 2 Draft 2 -- Chapter 1 -- Receipt of Unknown Primitives"
+#define sref_case_11_3_14 "TPI Revision 2 Draft 2 -- Chapter 1 -- Receipt of Unknown Primitives"
 #define name_case_11_3_14 "Primitive in error -- unsupported primitive type -- UNKNOWN"
 #define desc_case_11_3_14 "\
 Checks than an unsupported primitive returns an error.  The TPI specification\n\
@@ -32785,7 +32802,7 @@ struct test_stream test_11_3_14_resp = { &preamble_0, &test_case_11_3_14, &posta
 struct test_stream test_11_3_14_list = { &preamble_0, &test_case_11_3_14, &postamble_0 };
 
 #define test_group_12 "Flushing"
-#define sref_case_12 "TPI Version 2 Draft 2 -- Chapter 1 -- Rules for Flushing Queues"
+#define sref_case_12 "TPI Revision 2 Draft 2 -- Chapter 1 -- Rules for Flushing Queues"
 
 #define tgrp_case_12_1 test_group_12
 #define numb_case_12_1 "12.1"
@@ -33464,7 +33481,7 @@ struct test_stream test_12_3_3_resp = { &preamble_12_3_3_resp, &test_case_12_3_3
 struct test_stream test_12_3_3_list = { &preamble_12_3_3_list, &test_case_12_3_3_list, &postamble_12_3_3_list };
 
 #define test_group_13 "Fatal and non-fatal errors."
-#define sref_case_13 "TPI Version 2 Draft 2 -- Chapter 2"
+#define sref_case_13 "TPI Revision 2 Draft 2 -- Chapter 2"
 
 int
 preamble_ts_unbnd_cots(int child)
@@ -33701,7 +33718,7 @@ postamble_ts_wcon_creq_conn(int child)
 int
 preamble_ts_wres_cind_conn(int child)
 {
-	switch(test_level) {
+	switch (test_level) {
 	case T_INET_TCP:
 	default:
 		return preamble_13_connection(child);
@@ -38675,7 +38692,7 @@ struct test_stream test_13_14_2_resp = { &preamble_13_14_2_resp, &test_case_13_1
 struct test_stream test_13_14_2_list = { &preamble_13_14_2_list, &test_case_13_14_2_list, &postamble_13_14_2_list };
 
 #define test_group_14 "Allowable states."
-#define sref_case_14 "TPI Version 2 Draft 2 -- Chapter 2"
+#define sref_case_14 "TPI Revision 2 Draft 2 -- Chapter 2"
 
 #define tgrp_case_14_1_1 test_group_14
 #define numb_case_14_1_1 "14.1.1"
@@ -42706,7 +42723,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -42737,7 +42754,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/03 13:35:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 12:17:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.21  2007/08/14 12:17:47  brian
+ - GPLv3 header updates
+
  Revision 0.9.2.20  2007/08/03 13:35:05  brian
  - manual updates, put ss7 modules in public release
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -109,7 +112,7 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/03 13:35:05 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -289,6 +292,7 @@ typedef struct cc {
 	ulong mci;			/* message compatabilty */
 	ulong pci;			/* parameter compatabilty */
 } cc_t;
+
 #define CC_PRIV(__q) ((struct cc *)(__q)->q_ptr)
 
 /*
@@ -425,6 +429,7 @@ typedef struct mtp {
 	isup_stats_mtp_t stats;		/* message transfer part statistics */
 	isup_stats_mtp_t statsp;	/* message transfer part statistics periods */
 } mtp_t;
+
 #define MTP_PRIV(__q) ((struct mtp *)(__q)->q_ptr)
 
 typedef struct df {
@@ -801,6 +806,7 @@ STATIC INLINE void
 cs_set_state(struct cc *cc, const long newstate)
 {
 	long oldstate = cs_get_state(cc);
+
 	(void) oldstate;
 	printd(("%s: %p: %d:%d cc-state %s <- %s\n", DRV_NAME, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor, cc_state_name(newstate), cc_state_name(oldstate)));
@@ -810,6 +816,7 @@ STATIC INLINE void
 ct_set_state(struct ct *ct, const long newstate)
 {
 	long oldstate = ct_get_state(ct);
+
 	(void) oldstate;
 	printd(("%s: %p: ct %2ld ct-state %s <- %s\n", DRV_NAME, ct, ct->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
@@ -819,6 +826,7 @@ STATIC INLINE void
 cg_set_state(struct cg *cg, const long newstate)
 {
 	long oldstate = cg_get_state(cg);
+
 	(void) oldstate;
 	printd(("%s: %p: cg %2ld cg-state %s <- %s\n", DRV_NAME, cg, cg->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
@@ -830,6 +838,7 @@ cc_get_uref(struct ct *ct, struct cc *cc, ulong uref)
 {
 	if (!ct->uref) {
 		struct ct *c2;
+
 		for (c2 = cc->conn.cpc; c2 && c2->uref != uref; c2 = c2->cpc.next) ;
 		if (c2)
 			return (0);
@@ -855,6 +864,7 @@ STATIC INLINE struct ct *
 cc_find_cpc_uref(struct cc *cc, ulong uref)
 {
 	struct ct *ct = NULL;
+
 	if (uref)
 		for (ct = cc->conn.cpc; ct && ct->uref != uref; ct = ct->cpc.next) ;
 	if (ct && ct->cpc.cc != cc) {
@@ -868,6 +878,7 @@ STATIC INLINE ulong
 cc_get_cref(struct ct *ct, struct cc *cc)
 {
 	static ulong reference = 0;
+
 	if (ct_get_m_state(ct) == CMS_IDLE && ct_get_i_state(ct) == CCS_IDLE
 	    && ct_get_t_state(ct) == CKS_IDLE) {
 		assure(!ct->cref);
@@ -885,6 +896,7 @@ STATIC INLINE struct ct *
 cc_find_cpc_cref(struct cc *cc, ulong cref)
 {
 	struct ct *ct = NULL;
+
 	if (cref)
 		for (ct = cc->conn.cpc; ct && ct->cref != cref; ct = ct->cpc.next) ;
 	if (ct && ct->cpc.cc != cc) {
@@ -897,6 +909,7 @@ STATIC INLINE struct ct *
 cc_find_tst_cref(struct cc *cc, ulong cref)
 {
 	struct ct *ct = NULL;
+
 	if (cref)
 		for (ct = cc->conn.tst; ct && ct->cref != cref; ct = ct->tst.next) ;
 	if (ct && ct->tst.cc != cc) {
@@ -909,6 +922,7 @@ STATIC INLINE struct cc *
 cc_find_tok(struct cc *cc, ulong tok)
 {
 	struct cc *ac = cc;
+
 	if (tok)
 		for (ac = master.cc.list; ac && (ulong) ac->oq != tok; ac = ac->next) ;
 	return (ac);
@@ -931,6 +945,7 @@ cg_set_m_state(struct cg *cg, struct cc *cc, const long newstate)
 {
 	if (cg && cc) {
 		long oldstate = cg_get_m_state(cg);
+
 		printd(("%s: %p: cg %2ld cc %d:%d g-state %s <- %s\n", DRV_NAME, cg, cg->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -962,6 +977,7 @@ ct_set_m_state(struct ct *ct, struct cc *cc, const long newstate)
 {
 	if (ct && cc) {
 		long oldstate = ct_get_m_state(ct);
+
 		printd(("%s: %p: ct %2ld cc %d:%d m-state %s <- %s\n", DRV_NAME, ct, ct->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cm_state_name(newstate),
 			cm_state_name(oldstate)));
@@ -997,6 +1013,7 @@ ct_set_t_state(struct ct *ct, struct cc *cc, const long newstate)
 {
 	if (ct && cc) {
 		long oldstate = ct_get_t_state(ct);
+
 		printd(("%s: %p: ct %2ld cc %d:%d t-state %s <- %s\n", DRV_NAME, ct, ct->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, ck_state_name(newstate),
 			ck_state_name(oldstate)));
@@ -1032,6 +1049,7 @@ ct_set_i_state(struct ct *ct, struct cc *cc, const long newstate)
 {
 	if (ct && cc) {
 		long oldstate = ct_get_i_state(ct);
+
 		printd(("%s: %p: ct %2ld cc %d:%d i-state %s <- %s\n", DRV_NAME, ct, ct->id,
 			cc->u.dev.cmajor, cc->u.dev.cminor, cc_state_name(newstate),
 			cc_state_name(oldstate)));
@@ -1097,6 +1115,7 @@ __ct_set_c_state(struct ct *ct, const long newstate)
 {
 	struct ct **ctp;
 	long oldstate = ct_get_c_state(ct);
+
 	printd(("%s: %p: ct %2ld c-state %s <- %s\n", DRV_NAME, ct, ct->id,
 		cp_state_name(newstate), cp_state_name(oldstate)));
 	if (oldstate == CTS_IDLE) {
@@ -1161,6 +1180,7 @@ ct_set(struct ct *ct, const ulong flags)
 {
 	int i;
 	ulong newflags = (ct->flags & flags) ^ flags;
+
 	ct->flags |= flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1174,6 +1194,7 @@ ct_clr(struct ct *ct, const ulong flags)
 {
 	int i;
 	ulong newflags = (~ct->flags & flags) ^ flags;
+
 	ct->flags &= ~flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1193,6 +1214,7 @@ cg_set(struct cg *cg, const ulong flags)
 {
 	int i;
 	ulong newflags = (cg->flags & flags) ^ flags;
+
 	cg->flags |= flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
 		if (newflags & (0x1UL << i))
@@ -1205,6 +1227,7 @@ cg_clr(struct cg *cg, const ulong flags)
 {
 	int i;
 	ulong newflags = (~cg->flags & flags) ^ flags;
+
 	cg->flags &= ~flags;
 	newflags = cg->flags ^ flags;
 	for (i = 0; i < sizeof(newflags) << 3; i++)
@@ -1241,8 +1264,10 @@ STATIC struct ct *
 isup_find_cct(struct cc *cc, uchar *add_ptr, size_t add_len)
 {
 	struct ct *ct = NULL;
+
 	if (add_len) {
 		struct isup_addr *a;
+
 		if (add_len >= sizeof(*a)) {
 			a = (typeof(a)) (add_ptr);
 			switch (a->scope) {
@@ -1255,6 +1280,7 @@ isup_find_cct(struct cc *cc, uchar *add_ptr, size_t add_len)
 			case ISUP_SCOPE_CG:
 			{
 				struct cg *cg = NULL;
+
 				if (a->id)
 					cg = cg_lookup(a->id);
 				else if (cc->bind.type == ISUP_BIND_CG)
@@ -1267,6 +1293,7 @@ isup_find_cct(struct cc *cc, uchar *add_ptr, size_t add_len)
 			case ISUP_SCOPE_TG:
 			{
 				struct tg *tg = NULL;
+
 				if (a->id)
 					tg = tg_lookup(a->id);
 				else if (cc->bind.type == ISUP_BIND_TG)
@@ -1279,6 +1306,7 @@ isup_find_cct(struct cc *cc, uchar *add_ptr, size_t add_len)
 			case ISUP_SCOPE_SR:
 			{
 				struct sr *sr = NULL;
+
 				if (a->id)
 					sr = sr_lookup(a->id);
 				else if (cc->bind.type == ISUP_BIND_SR)
@@ -1303,14 +1331,17 @@ STATIC struct cg *
 isup_find_grp(struct cc *cc, uchar *add_ptr, size_t add_len)
 {
 	struct cg *cg = NULL;
+
 	if (add_len) {
 		struct isup_addr *a;
+
 		if (add_len >= sizeof(*a)) {
 			a = (typeof(a)) (add_ptr);
 			switch (a->scope) {
 			case ISUP_SCOPE_CT:
 			{
 				struct ct *ct = NULL;
+
 				if (a->id)
 					ct = ct_lookup(a->id);
 				else if (cc->bind.type == ISUP_BIND_CT)
@@ -1328,6 +1359,7 @@ isup_find_grp(struct cc *cc, uchar *add_ptr, size_t add_len)
 			case ISUP_SCOPE_SR:
 			{
 				struct sr *sr = NULL;
+
 				if (a->id)
 					sr = sr_lookup(a->id);
 				else if (cc->bind.type == ISUP_BIND_SR)
@@ -1923,6 +1955,7 @@ STATIC int
 m_flush(queue_t *q, queue_t *pq, int band, int flags)
 {
 	mblk_t *mp;
+
 	if ((mp = ss7_allocb(q, 2, BPRI_MED))) {
 		mp->b_datap->db_type = M_FLUSH;
 		*(mp->b_wptr)++ = flags | (band ? FLUSHBAND : 0);
@@ -1943,6 +1976,7 @@ m_error(queue_t *q, struct cc *cc, int error)
 {
 	mblk_t *mp;
 	int hangup = 0;
+
 	if (error < 0)
 		error = -error;
 	switch (error) {
@@ -1986,6 +2020,7 @@ cc_ok_ack(queue_t *q, struct cc *cc, struct ct *ct, long prim)
 {
 	mblk_t *mp;
 	struct CC_ok_ack *p;
+
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2012,6 +2047,7 @@ cc_error_ack(queue_t *q, struct cc *cc, struct ct *ct, long prim, long error)
 {
 	mblk_t *mp;
 	struct CC_error_ack *p;
+
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2040,6 +2076,7 @@ cc_info_ack(queue_t *q, struct cc *cc)
 {
 	mblk_t *mp;
 	struct CC_info_ack *p;
+
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2065,6 +2102,7 @@ cc_bind_ack(queue_t *q, struct cc *cc, uchar *add_ptr, size_t add_len, ulong set
 {
 	mblk_t *mp;
 	struct CC_bind_ack *p;
+
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2096,6 +2134,7 @@ cc_optmgmt_ack(queue_t *q, struct cc *cc, uchar *opt_ptr, size_t opt_len, ulong 
 {
 	mblk_t *mp;
 	struct CC_optmgmt_ack *p;
+
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2128,6 +2167,7 @@ cc_addr_ack(queue_t *q, struct cc *cc, uchar *bind_ptr, size_t bind_len, ulong c
 {
 	mblk_t *mp;
 	struct CC_addr_ack *p;
+
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p) + bind_len + conn_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
@@ -2176,6 +2216,7 @@ cc_call_reattempt_ind(queue_t *q, struct cc *cc, struct ct *ct, ulong reason)
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_call_reattempt_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2210,6 +2251,7 @@ cc_setup_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 		size_t cdpn_len = (m->msg.iam.cdpn.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
 		size_t opt_len = (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + cdpn_len + opt_len + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2264,6 +2306,7 @@ cc_more_info_ind(queue_t *q, struct cc *cc, struct ct *ct)
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_more_info_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2292,6 +2335,7 @@ STATIC INLINE int
 cc_information_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
@@ -2299,6 +2343,7 @@ cc_information_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_information_ind *p;
 		size_t subn_len = (m->msg.sam.subn.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
 		size_t opt_len = (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + subn_len + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2337,11 +2382,13 @@ STATIC INLINE int
 cc_info_timeout_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_info_timeout_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2375,6 +2422,7 @@ cc_cont_check_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 		struct CC_cont_check_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2414,6 +2462,7 @@ cc_cont_test_ind(queue_t *q, struct cc *cc, struct ct *ct)
 		struct CC_cont_test_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2452,6 +2501,7 @@ cc_cont_report_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_cont_report_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2491,6 +2541,7 @@ STATIC INLINE int
 cc_setup_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
@@ -2498,6 +2549,7 @@ cc_setup_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_setup_con *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2533,12 +2585,14 @@ STATIC INLINE int
 cc_proceeding_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_proceeding_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2589,12 +2643,14 @@ STATIC INLINE int
 cc_alerting_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_alerting_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2645,12 +2701,14 @@ STATIC INLINE int
 cc_progress_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_progress_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2703,12 +2761,14 @@ STATIC INLINE int
 cc_ibi_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_ibi_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2759,12 +2819,14 @@ STATIC INLINE int
 cc_connect_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_connect_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2815,11 +2877,13 @@ STATIC INLINE int
 cc_setup_complete_ind(queue_t *q, struct ct *ct)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_setup_complete_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2848,12 +2912,14 @@ STATIC INLINE int
 cc_forwxfer_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_forwxfer_ind *p;
 		size_t opt_len = (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2886,12 +2952,14 @@ STATIC INLINE int
 cc_suspend_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_suspend_ind *p;
 		size_t opt_len = (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2925,12 +2993,14 @@ STATIC INLINE int
 cc_resume_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cpc.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
 		mblk_t *mp;
 		struct CC_resume_ind *p;
 		size_t opt_len = (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2963,11 +3033,13 @@ STATIC INLINE int
 cc_call_failure_ind(queue_t *q, struct cc *cc, struct ct *ct, ulong reason, ulong cause)
 {
 	int err;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (!(err = m_flush(q, cc->oq, 0, FLUSHR | FLUSHW))) {
 		mblk_t *mp;
 		struct CC_call_failure_ind *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -2995,12 +3067,14 @@ STATIC INLINE int
 cc_release_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (!(err = m_flush(q, cc->oq, 0, FLUSHR))) {
 		mblk_t *mp;
 		struct CC_release_ind *p;
 		size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PCPROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3036,6 +3110,7 @@ cc_release_con(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 	mblk_t *mp;
 	struct CC_release_con *p;
 	size_t opt_len = m ? (m->opt.len + (sizeof(ulong) - 1)) & (sizeof(ulong) - 1) : 0;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
@@ -3076,6 +3151,7 @@ cc_reset_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 		struct CC_reset_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3115,6 +3191,7 @@ STATIC INLINE int
 cc_reset_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = (m->mt == ISUP_MT_GRA) ? ct->cg.cg->gmg.cc : ct->mgm.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
@@ -3122,6 +3199,7 @@ cc_reset_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_reset_con *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3169,6 +3247,7 @@ cc_blocking_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 		struct CC_blocking_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3210,6 +3289,7 @@ STATIC INLINE int
 cc_blocking_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = (m->mt == ISUP_MT_CGBA) ? ct->cg.cg->gmg.cc : ct->mgm.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
@@ -3217,6 +3297,7 @@ cc_blocking_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_blocking_con *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3267,6 +3348,7 @@ cc_unblocking_ind(queue_t *q, struct cc *cc, struct ct *ct, isup_msg_t * m)
 		struct CC_unblocking_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3326,6 +3408,7 @@ STATIC INLINE int
 cc_unblocking_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = (m->mt == ISUP_MT_CGUA) ? ct->cg.cg->gmg.cc : ct->mgm.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
@@ -3333,6 +3416,7 @@ cc_unblocking_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_unblocking_con *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3375,6 +3459,7 @@ STATIC INLINE int
 cc_query_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc;
+
 	if (!(cc = ct->bind.mgm) && !(cc = ct->cg.cg->bind.mgm) && !(cc = ct->tg.tg->bind.mgm)
 	    && !(cc = ct->sr.sr->bind.mgm) && !(cc = ct->sp.sp->bind.mgm)
 	    && !(cc = master.bind.mgm)) {
@@ -3392,6 +3477,7 @@ cc_query_ind(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_query_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3425,6 +3511,7 @@ STATIC INLINE int
 cc_query_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	struct cc *cc = ct->cg.cg->gmg.cc;
+
 	ensure(cc, return (QR_DONE));
 	ensure(cc->oq, return (QR_DONE));
 	if (canput(cc->oq)) {
@@ -3432,6 +3519,7 @@ cc_query_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 		struct CC_query_con *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3464,6 +3552,7 @@ STATIC INLINE int
 cc_maint_ind(queue_t *q, struct ct *ct, ulong reason)
 {
 	struct cc *cc;
+
 	if (!(cc = ct->bind.mnt) && !(cc = ct->cg.cg->bind.mnt) && !(cc = ct->tg.tg->bind.mnt)
 	    && !(cc = ct->sr.sr->bind.mnt) && !(cc = ct->sp.sp->bind.mnt)
 	    && !(cc = master.bind.mnt)) {
@@ -3480,6 +3569,7 @@ cc_maint_ind(queue_t *q, struct ct *ct, ulong reason)
 		struct CC_maint_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3508,6 +3598,7 @@ STATIC INLINE int
 cc_cg_maint_ind(queue_t *q, struct cg *cg, ulong cic, ulong reason)
 {
 	struct cc *cc;
+
 	ensure(cg, return (QR_DONE));
 	ensure(cg->sr.sr, return (QR_DONE));
 	ensure(cg->sp.sp, return (QR_DONE));
@@ -3526,6 +3617,7 @@ cc_cg_maint_ind(queue_t *q, struct cg *cg, ulong cic, ulong reason)
 		struct CC_maint_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3554,6 +3646,7 @@ STATIC INLINE int
 cc_if_maint_ind(queue_t *q, struct sr *sr, ulong cic, ulong reason)
 {
 	struct cc *cc;
+
 	if (!(cc = sr->bind.mnt) && !(cc = sr->sp.sp->bind.mnt) && !(cc = master.bind.mnt)) {
 		/* 
 		   Note: if nobody is listening, these indications should be logged. */
@@ -3567,6 +3660,7 @@ cc_if_maint_ind(queue_t *q, struct sr *sr, ulong cic, ulong reason)
 		struct CC_maint_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3595,6 +3689,7 @@ STATIC INLINE int
 cc_sr_maint_ind(queue_t *q, struct sr *sr, ulong reason)
 {
 	struct cc *cc;
+
 	if (!(cc = sr->bind.mnt) && !(cc = sr->sp.sp->bind.mnt) && !(cc = master.bind.mnt)) {
 		/* 
 		   Note: if nobody is listening, these indications should be logged. */
@@ -3609,6 +3704,7 @@ cc_sr_maint_ind(queue_t *q, struct sr *sr, ulong reason)
 		struct CC_maint_ind *p;
 		struct isup_addr *a;
 		size_t add_len = sizeof(*a);
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3651,6 +3747,7 @@ mtp_bind_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
 	mblk_t *mp;
 	struct MTP_bind_req *p;
 	size_t add_len = add ? sizeof(*add) : 0;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -3680,6 +3777,7 @@ mtp_unbind_req(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
 	struct MTP_unbind_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -3703,6 +3801,7 @@ mtp_conn_req(queue_t *q, struct mtp *mtp, ulong flags, mtp_addr_t * add)
 	mblk_t *mp;
 	struct MTP_conn_req *p;
 	size_t add_len = add ? sizeof(*add) : 0;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -3733,6 +3832,7 @@ mtp_discon_req(queue_t *q, struct mtp *mtp)
 	if (canput(mtp->oq)) {
 		mblk_t *mp;
 		struct MTP_discon_req *p;
+
 		if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -3758,6 +3858,7 @@ mtp_addr_req(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
 	struct MTP_addr_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -3780,6 +3881,7 @@ mtp_info_req(queue_t *q, struct mtp *mtp)
 {
 	mblk_t *mp;
 	struct MTP_info_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -3802,6 +3904,7 @@ mtp_optmgmt_req(queue_t *q, struct mtp *mtp, ulong flags, uchar *opt_ptr, size_t
 {
 	mblk_t *mp;
 	struct MTP_optmgmt_req *p;
+
 	if ((mp = ss7_allocb(q, sizeof(*p) + opt_len, BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;
@@ -3833,6 +3936,7 @@ mtp_transfer_req(queue_t *q, struct mtp *mtp, mtp_addr_t * add, ulong prior, ulo
 		mblk_t *mp;
 		struct MTP_transfer_req *p;
 		size_t add_len = add ? sizeof(*add) : 0;
+
 		if ((mp = ss7_allocb(q, sizeof(*p) + add_len, BPRI_MED))) {
 			mp->b_datap->db_type = M_PROTO;
 			p = (typeof(p)) mp->b_wptr;
@@ -4080,6 +4184,7 @@ isup_st_in_cdpn(uchar *p, size_t l)
 {
 	uint digs, i;
 	uchar c, d;
+
 	digs = ((l - 2) << 1) - ((*p & 0x80) >> 7);
 	for (i = 0; i < digs; i++) {
 		c = p[(i >> 1) + 2];
@@ -4170,6 +4275,7 @@ isup_st_in_subn(uchar *p, size_t l)
 {
 	uint digs, i;
 	uchar c, d;
+
 	digs = ((l - 1) << 1) - ((*p & 0x80) >> 7);
 	for (i = 0; i < digs; i++) {
 		c = p[(i >> 1) + 1];
@@ -4532,6 +4638,7 @@ unpack_bci(uint pvar, uchar *p, uchar *e, ulong *bci)
 	if (p < e) {
 		ulong x = (*(p)++ & 0xff);
 		ulong y = (*(p)++ & 0xff);
+
 		*bci = x | (y << 8);
 		return (2);
 	}
@@ -7002,6 +7109,7 @@ isup_check_opt(uchar *p, size_t len)
 {
 	uchar ptype = 0;
 	uchar *pp = p, *ep, *e = p + len;
+
 	if (!len)
 		return (0);
 	for (pp = p, ep = pp + pp[1] + 2; pp < e && (ptype = *pp); pp = ep, ep = pp + pp[1] + 2) ;
@@ -7014,6 +7122,7 @@ isup_dec_opt(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int err = 0;
 	uchar ptype;
 	uchar *pp = p, *ep = e;
+
 	if (e - p < 3) {
 		trace();
 		return (-EMSGSIZE);
@@ -7346,11 +7455,13 @@ STATIC int
 isup_send_msg(queue_t *q, struct sr *sr, uchar mt, ulong prio, ulong sls, mblk_t *dp)
 {
 	struct mtp *mtp;
+
 	if ((mtp = sr->mtp) || (mtp = sr->sp.sp->mtp)) {
 		if (canput(mtp->oq)) {
 			mblk_t *mp;
 			struct MTP_transfer_req *p;
 			size_t hlen = sizeof(*p) + sizeof(sr->add);
+
 			if ((mp = ss7_allocb(q, hlen, BPRI_MED))) {
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
@@ -7390,13 +7501,16 @@ isup_send_cpy(queue_t *q, struct ct *ct, uchar mt, ulong prio, ulong sls, mblk_t
 	struct mtp *mtp;
 	struct sr *sr = ct->sr.sr;
 	struct sp *sp = ct->sp.sp;
+
 	if ((mtp = sr->mtp) || (mtp = sp->mtp)) {
 		if (canput(mtp->oq)) {
 			mblk_t *mp;
 			struct MTP_transfer_req *p;
 			size_t hlen = sizeof(*p) + sizeof(sr->add);
+
 			if ((mp = ss7_allocb(q, hlen, BPRI_MED))) {
 				mblk_t *bp;
+
 				mp->b_datap->db_type = M_PROTO;
 				p = (typeof(p)) mp->b_wptr;
 				mp->b_wptr += sizeof(*p);
@@ -7462,8 +7576,10 @@ isup_send_iam(queue_t *q, struct ct *ct, ulong type, ulong flags, uchar *usi_ptr
 								   cdpn_len) + 1 + size_opt(pvar,
 											    opt_len)
 	    + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_IAM);
@@ -7512,8 +7628,10 @@ isup_send_sam(queue_t *q, struct ct *ct, uchar *subn_ptr, size_t subn_len, uchar
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_SAM) + size_subn(pvar, subn_len)
 	    + 1 + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_SAM);
@@ -7548,8 +7666,10 @@ isup_send_inr(queue_t *q, struct ct *ct, ulong inri, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_INR) + size_inri(pvar)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_INR);
@@ -7582,8 +7702,10 @@ isup_send_inf(queue_t *q, struct ct *ct, ulong infi, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_INF) + size_infi(pvar)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_INF);
@@ -7615,8 +7737,10 @@ isup_send_cot(queue_t *q, struct ct *ct, ulong coti)
 	uint cic = ct->cic;
 	uint pvar = ct->tg.tg->proto.pvar;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_COT) + size_coti(pvar);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_COT);
@@ -7641,8 +7765,10 @@ isup_send_acm(queue_t *q, struct ct *ct, ulong bci, uchar *opt_ptr, size_t opt_l
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_ACM) + size_bci(pvar, bci)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_ACM);
@@ -7675,8 +7801,10 @@ isup_send_con(queue_t *q, struct ct *ct, ulong bci, uchar *opt_ptr, size_t opt_l
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CON) + size_bci(pvar, bci)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CON);
@@ -7711,6 +7839,7 @@ isup_send_fot(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FOT) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FOT);
@@ -7744,6 +7873,7 @@ isup_send_anm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_ANM) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_ANM);
@@ -7777,9 +7907,11 @@ isup_send_rel(queue_t *q, struct ct *ct, ulong causv, uchar *opt_ptr, size_t opt
 	size_t caus_len = 2;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_REL)
 	    + size_caus(pvar, caus_len) + 1 + size_opt(pvar, opt_len) + 1;
+
 	caus_ptr[1] |= causv;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		if ((dp = ss7_dupmsg(q, mp))) {
 			pack_cic(pvar, pp, cic);
@@ -7821,8 +7953,10 @@ isup_send_sus(queue_t *q, struct ct *ct, ulong sris, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_SUS) + size_sris(pvar)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_SUS);
@@ -7855,8 +7989,10 @@ isup_send_res(queue_t *q, struct ct *ct, ulong sris, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_RES) + size_sris(pvar)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_RES);
@@ -7893,6 +8029,7 @@ isup_send_rlc(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 								    1 : 0);
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_RLC);
@@ -7925,8 +8062,10 @@ isup_send_ccr(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CCR);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CCR);
@@ -7949,8 +8088,10 @@ isup_send_rsc(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_RSC);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_RSC);
@@ -7973,8 +8114,10 @@ isup_send_blo(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_BLO);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_BLO);
@@ -7997,8 +8140,10 @@ isup_send_ubl(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_UBL);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_UBL);
@@ -8021,8 +8166,10 @@ isup_send_bla(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_BLA);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_BLA);
@@ -8045,8 +8192,10 @@ isup_send_uba(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_UBA);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_UBA);
@@ -8069,8 +8218,10 @@ isup_send_grs(queue_t *q, struct ct *ct, uchar *rs_ptr, size_t rs_len)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_GRS) + size_rs(pvar, rs_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_GRS);
@@ -8098,6 +8249,7 @@ isup_send_cgb(queue_t *q, struct ct *ct, ulong cgi, uchar *rs_ptr, size_t rs_len
 	uint pvar;
 	uint cic;
 	size_t mlen;
+
 	ensure(ct, return (-EFAULT));
 	pvar = ct->tg.tg->proto.pvar;
 	cic = ct->cic;
@@ -8105,6 +8257,7 @@ isup_send_cgb(queue_t *q, struct ct *ct, ulong cgi, uchar *rs_ptr, size_t rs_len
 	    + size_cgi(pvar, cgi) + size_rs(pvar, rs_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CGB);
@@ -8134,8 +8287,10 @@ isup_send_cgu(queue_t *q, struct ct *ct, ulong cgi, uchar *rs_ptr, size_t rs_len
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CGU)
 	    + size_cgi(pvar, cgi) + size_rs(pvar, rs_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CGU);
@@ -8165,8 +8320,10 @@ isup_send_cgba(queue_t *q, struct ct *ct, ulong cgi, uchar *rs_ptr, size_t rs_le
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CGBA)
 	    + size_cgi(pvar, cgi) + size_rs(pvar, rs_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CGBA);
@@ -8196,8 +8353,10 @@ isup_send_cgua(queue_t *q, struct ct *ct, ulong cgi, uchar *rs_ptr, size_t rs_le
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CGUA)
 	    + size_cgi(pvar, cgi) + size_rs(pvar, rs_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CGUA);
@@ -8227,8 +8386,10 @@ isup_send_cmr(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_l
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CMR)
 	    + size_cmi(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CMR);
@@ -8261,8 +8422,10 @@ isup_send_cmc(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_l
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CMC)
 	    + size_cmi(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CMC);
@@ -8295,8 +8458,10 @@ isup_send_cmrj(queue_t *q, struct ct *ct, ulong cmi, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CMRJ)
 	    + size_cmi(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CMRJ);
@@ -8329,8 +8494,10 @@ isup_send_far(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FAR)
 	    + size_faci(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FAR);
@@ -8363,8 +8530,10 @@ isup_send_faa(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FAA)
 	    + size_faci(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FAA);
@@ -8398,8 +8567,10 @@ isup_send_frj(queue_t *q, struct ct *ct, ulong faci, uchar *caus_ptr, size_t cau
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FRJ) + size_faci(pvar)
 	    + size_caus(pvar, opt_len) + 1 + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FRJ);
@@ -8435,8 +8606,10 @@ isup_send_fad(queue_t *q, struct ct *ct, ulong faci, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FAD)
 	    + size_faci(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FAD);
@@ -8469,8 +8642,10 @@ isup_send_fai(queue_t *q, struct ct *ct, ulong faci, ulong faii, uchar *opt_ptr,
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FAI) + size_faci(pvar)
 	    + size_faii(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FAI);
@@ -8503,8 +8678,10 @@ isup_send_lpa(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_LPA);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_LPA);
@@ -8530,6 +8707,7 @@ isup_send_drs(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_DRS) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_DRS);
@@ -8560,8 +8738,10 @@ isup_send_pam(queue_t *q, struct ct *ct, uchar *msg_ptr, size_t msg_len)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_DRS) + msg_len;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_DRS);
@@ -8586,8 +8766,10 @@ isup_send_gra(queue_t *q, struct ct *ct, uchar *rs_ptr, size_t rs_len)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_GRA) + size_rs(pvar, rs_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_GRA);
@@ -8615,8 +8797,10 @@ isup_send_cqm(queue_t *q, struct ct *ct, uchar *rs_ptr, size_t rs_len)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CQM) + size_rs(pvar, rs_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CQM);
@@ -8649,8 +8833,10 @@ isup_send_cqr(queue_t *q, struct ct *ct, uchar *rs_ptr, size_t rs_len, uchar *cs
 	    size_csi(pvar,
 		     csi_len)
 	    + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CQR);
@@ -8684,8 +8870,10 @@ isup_send_cpg(queue_t *q, struct ct *ct, ulong evnt, uchar *opt_ptr, size_t opt_
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CPG) + size_evnt(pvar)
 	    + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CPG);
@@ -8719,8 +8907,10 @@ isup_send_usr(queue_t *q, struct ct *ct, uchar *uui_ptr, size_t uui_len, uchar *
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_USR)
 	    + size_uui(pvar, uui_len) + 1 + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_USR);
@@ -8753,8 +8943,10 @@ isup_send_ucic(queue_t *q, struct sr *sr, ulong cic)
 	mblk_t *mp;
 	uint pvar = sr->proto.pvar;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_UCIC);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_UCIC);
@@ -8779,8 +8971,10 @@ isup_send_cfn(queue_t *q, struct ct *ct, uchar *caus_ptr, size_t caus_len, uchar
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CFN)
 	    + size_caus(pvar, caus_len) + 1 + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CFN);
@@ -8814,8 +9008,10 @@ isup_send_olm(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_OLM);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_OLM);
@@ -8841,6 +9037,7 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CRG);
+
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_SING:
 		mlen += size_icci(pvar, icci_len);
@@ -8856,6 +9053,7 @@ isup_send_crg(queue_t *q, struct ct *ct, uchar *icci_ptr, size_t icci_len, uchar
 	}
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CRG);
@@ -8901,6 +9099,7 @@ isup_send_nrm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_NRM) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_NRM);
@@ -8934,6 +9133,7 @@ isup_send_fac(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_FAC) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_FAC);
@@ -8967,6 +9167,7 @@ isup_send_upt(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_UPT) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_UPT);
@@ -9000,6 +9201,7 @@ isup_send_upa(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_UPA) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_UPA);
@@ -9033,6 +9235,7 @@ isup_send_idr(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_IDR) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_IDR);
@@ -9066,6 +9269,7 @@ isup_send_irs(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_IRS) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_IRS);
@@ -9099,6 +9303,7 @@ isup_send_sgm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_SGM) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_SGM);
@@ -9129,8 +9334,10 @@ isup_send_cra(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CRA);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CRA);
@@ -9153,8 +9360,10 @@ isup_send_crm(queue_t *q, struct ct *ct, ulong nci)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CRM) + size_nci(pvar, nci);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CRM);
@@ -9180,8 +9389,10 @@ isup_send_cvr(queue_t *q, struct ct *ct, ulong cvri, ulong cgvi, ulong cgci, uch
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CVR) + size_cvri(pvar)
 	    + size_cgci(pvar) + size_opt(pvar, opt_len) + 1;
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CVR);
@@ -9214,8 +9425,10 @@ isup_send_cvt(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CVT);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CVT);
@@ -9241,6 +9454,7 @@ isup_send_exm(queue_t *q, struct ct *ct, uchar *opt_ptr, size_t opt_len)
 	    size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_EXM) + size_opt(pvar, opt_len) + 1;
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar *p, **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_EXM);
@@ -9273,8 +9487,10 @@ isup_send_non(queue_t *q, struct ct *ct, ulong ton)
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_NON)
 	    + size_ton(pvar, ton);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_NON);
@@ -9299,8 +9515,10 @@ isup_send_llm(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_LLM);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_LLM);
@@ -9324,8 +9542,10 @@ isup_send_cak(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_CAK);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_CAK);
@@ -9350,8 +9570,10 @@ isup_send_tcm(queue_t *q, struct ct *ct, ulong cri)
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_TCM)
 	    + size_cri(pvar, cri);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_TCM);
@@ -9376,8 +9598,10 @@ isup_send_mcp(queue_t *q, struct ct *ct)
 	uint pvar = ct->tg.tg->proto.pvar;
 	uint cic = ct->cic;
 	size_t mlen = size_cic(pvar, cic) + size_mt(pvar, ISUP_MT_MCP);
+
 	if ((mp = ss7_allocb(q, mlen, BPRI_MED))) {
 		uchar **pp = &mp->b_wptr;
+
 		mp->b_datap->db_type = M_DATA;
 		pack_cic(pvar, pp, cic);
 		pack_mt(pvar, pp, ISUP_MT_MCP);
@@ -9539,10 +9763,11 @@ STATIC isup_opt_conf_sr_t ansi_sr_config_defaults = {
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-ct_do_timeout(caddr_t data, const char *timer, cc_ulong *timeo, int (to_fnc) (struct ct *),
+ct_do_timeout(caddr_t data, const char *timer, cc_ulong * timeo, int (to_fnc) (struct ct *),
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct ct *ct = (struct ct *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&ct->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, ct, timer, jiffies));
@@ -9845,6 +10070,7 @@ __ct_timer_stop(struct ct *ct, const uint t)
 {
 	int single = 1;
 	ulong to;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -10207,6 +10433,7 @@ STATIC INLINE void
 ct_timer_stop(struct ct *ct, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&ct->lock, flags);
 	{
 		__ct_timer_stop(ct, t);
@@ -10219,6 +10446,7 @@ ct_timer_start(struct ct *ct, const uint t)
 {
 	psw_t flags;
 	struct tg *tg = ct->tg.tg;
+
 	ensure(tg, return);
 	spin_lock_irqsave(&ct->lock, flags);
 	{
@@ -10442,10 +10670,11 @@ ct_timer_start(struct ct *ct, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-cg_do_timeout(caddr_t data, const char *timer, cc_ulong *timeo, int (to_fnc) (struct cg *),
+cg_do_timeout(caddr_t data, const char *timer, cc_ulong * timeo, int (to_fnc) (struct cg *),
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct cg *cg = (struct cg *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&cg->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, cg, timer, jiffies));
@@ -10572,6 +10801,7 @@ __cg_timer_stop(struct cg *cg, const uint t)
 {
 	int single = 1;
 	ulong to;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -10704,6 +10934,7 @@ STATIC INLINE void
 cg_timer_stop(struct cg *cg, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&cg->lock, flags);
 	{
 		__cg_timer_stop(cg, t);
@@ -10716,6 +10947,7 @@ cg_timer_start(struct cg *cg, const uint t)
 {
 	psw_t flags;
 	struct sr *sr = cg->sr.sr;
+
 	spin_lock_irqsave(&cg->lock, flags);
 	{
 		__cg_timer_stop(cg, t);
@@ -10808,10 +11040,11 @@ cg_timer_start(struct cg *cg, const uint t)
  *  -------------------------------------------------------------------------
  */
 STATIC INLINE void
-sr_do_timeout(caddr_t data, const char *timer, cc_ulong *timeo, int (to_fnc) (struct sr *),
+sr_do_timeout(caddr_t data, const char *timer, cc_ulong * timeo, int (to_fnc) (struct sr *),
 	      streamscall void (*exp_fnc) (caddr_t))
 {
 	struct sr *sr = (struct sr *) data;
+
 	if (xchg(timeo, 0)) {
 		if (spin_trylock(&sr->lock)) {
 			printd(("%s: %p: %s timeout at %lu\n", DRV_NAME, sr, timer, jiffies));
@@ -10865,6 +11098,7 @@ __sr_timer_stop(struct sr *sr, const uint t)
 {
 	int single = 1;
 	ulong to;
+
 	switch (t) {
 	case tall:
 		single = 0;
@@ -10901,6 +11135,7 @@ STATIC INLINE void
 sr_timer_stop(struct sr *sr, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sr->lock, flags);
 	{
 		__sr_timer_stop(sr, t);
@@ -10912,6 +11147,7 @@ STATIC INLINE void
 sr_timer_start(struct sr *sr, const uint t)
 {
 	psw_t flags;
+
 	spin_lock_irqsave(&sr->lock, flags);
 	{
 		__sr_timer_stop(sr, t);
@@ -10959,6 +11195,7 @@ static int
 ct_block(queue_t *q, struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
@@ -11000,6 +11237,7 @@ static int
 ct_unblock(queue_t *q, struct ct *ct)
 {
 	int err;
+
 	ct_set(ct, CCTF_LOC_M_UNBLOCK_PENDING);
 	ct_timer_start(ct, t14);
 	ct_timer_start(ct, t15);
@@ -11012,6 +11250,7 @@ static int
 ct_reset(queue_t *q, struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
 		break;
@@ -11093,6 +11332,7 @@ cg_m_block(queue_t *q, struct cg *cg)
 	int err;
 	struct ct *ct;
 	int o, i, j;
+
 	cg->cic = cg->ct.list->cic;	/* reset base cic */
 	for (i = 0; i < RS_MAX_RANGE; i++)
 		cg->rs_ptr[i] = 0;
@@ -11153,6 +11393,7 @@ cg_h_block(queue_t *q, struct cg *cg)
 	int err;
 	struct ct *ct;
 	int o, i, j;
+
 	cg->cic = cg->ct.list->cic;	/* reset base cic */
 	for (i = 0; i < RS_MAX_RANGE; i++)
 		cg->rs_ptr[i] = 0;
@@ -11246,6 +11487,7 @@ cg_unblock(queue_t *q, struct cg *cg, ulong cgi)
 	int err;
 	struct ct *ct;
 	int o, i, j;
+
 	cg->cic = cg->ct.list->cic;	/* reset base cic */
 	for (i = 0; i < RS_MAX_RANGE; i++)
 		cg->rs_ptr[i] = 0;
@@ -11277,6 +11519,7 @@ cg_reset(queue_t *q, struct cg *cg)
 {
 	int err;
 	struct ct *ct;
+
 	cg->cic = cg->ct.list->cic;	/* reset base cic */
 	cg->rs_ptr[0] = 0;
 	for (ct = cg->ct.list; ct; ct = ct->cg.next) {
@@ -11352,6 +11595,7 @@ cg_query(queue_t *q, struct cg *cg)
 	int err;
 	struct ct *ct;
 	int o;
+
 	cg->cic = cg->ct.list->cic;	/* reset base cic */
 	cg->rs_ptr[0] = 0;
 	for (ct = cg->ct.list; ct; ct = ct->cg.next) {
@@ -11400,6 +11644,7 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct cc *cc, *ck;
+
 	printd(("%s; %p: IAM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
@@ -11478,6 +11723,7 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 			if (ct_tst(ct, CCTF_REM_M_BLOCKED)
 			    && !(ct_tst(ct, CCTF_REM_M_UNBLOCK_PENDING))) {
 				struct cc *cm;
+
 				if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm)
 				    || (cm = ct->tg.tg->bind.mgm) || (cm = ct->sr.sr->bind.mgm)
 				    || (cm = ct->sp.sp->bind.mgm) || (cm = master.bind.mgm)) {
@@ -11496,6 +11742,7 @@ isup_recv_iam(queue_t *q, struct ct *ct, isup_msg_t * m)
 			} else if (ct_tst(ct, CCTF_REM_H_BLOCKED)
 				   && !(ct_tst(ct, CCTF_REM_H_UNBLOCK_PENDING))) {
 				struct cc *cm;
+
 				if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm)
 				    || (cm = ct->tg.tg->bind.mgm) || (cm = ct->sr.sr->bind.mgm)
 				    || (cm = ct->sp.sp->bind.mgm) || (cm = master.bind.mgm)) {
@@ -11617,6 +11864,7 @@ STATIC int
 isup_recv_sam(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: SAM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
@@ -11692,6 +11940,7 @@ STATIC int
 isup_recv_cot(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: COT <-\n", DRV_NAME, ct));
 	/* 
 	   does not interrupt segmentation */
@@ -11834,6 +12083,7 @@ STATIC int
 isup_recv_acm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: ACM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
@@ -11921,6 +12171,7 @@ STATIC int
 isup_recv_con(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: CON <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
@@ -11970,6 +12221,7 @@ STATIC int
 isup_recv_fot(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: FOT <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_ANM:
@@ -12005,6 +12257,7 @@ STATIC int
 isup_recv_anm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: ANM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ANM:
@@ -12069,6 +12322,7 @@ STATIC int
 isup_recv_rel(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: REL <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_CCR:
@@ -12243,6 +12497,7 @@ STATIC int
 isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: SUS <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_ANSWERED:
@@ -12274,6 +12529,7 @@ isup_recv_sus(queue_t *q, struct ct *ct, isup_msg_t * m)
 	case CTS_OGC_ANSWERED:
 	{
 		struct tg *tg = ct->tg.tg;
+
 		if (tg->config.flags & ISUP_TGF_CONTROLLING_EXCHANGE) {
 			switch (m->msg.sus.sris & ISUP_SRIS_MASK) {
 			case ISUP_SRIS_NETWORK_INITIATED:
@@ -12339,6 +12595,7 @@ STATIC int
 isup_recv_res(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: RES <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_SUSPENDED:
@@ -12401,6 +12658,7 @@ STATIC int
 isup_recv_rlc(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: RLC <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
@@ -12545,6 +12803,7 @@ isup_recv_ccr(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct cc *ck;
+
 	printd(("%s; %p: CCR <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_IDLE:
@@ -12655,6 +12914,7 @@ isup_recv_rsc(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct cc *cm;
+
 	printd(("%s; %p: RSC <-\n", DRV_NAME, ct));
 	if (ct_get_c_state(ct) != CTS_IDLE) {
 		switch (ct_get_c_state(ct)) {
@@ -12784,6 +13044,7 @@ STATIC int
 isup_recv_blo(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: BLO <-\n", DRV_NAME, ct));
 	/* 
 	   does not interrupt segmentation */
@@ -12814,6 +13075,7 @@ isup_recv_blo(queue_t *q, struct ct *ct, isup_msg_t * m)
 	}
 	if (!ct_tst(ct, CCTF_REM_M_BLOCK_PENDING)) {
 		struct cc *cm;
+
 		if ((cm = ct->bind.mgm) || (cm = ct->cg.cg->bind.mgm) || (cm = ct->tg.tg->bind.mgm)
 		    || (cm = ct->sr.sr->bind.mgm) || (cm = ct->sp.sp->bind.mgm)
 		    || (cm = master.bind.mgm)) {
@@ -12865,9 +13127,11 @@ STATIC int
 isup_recv_ubl(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: UBL <-\n", DRV_NAME, ct));
 	if (!ct_tst(ct, CCTF_REM_M_UNBLOCK_PENDING)) {
 		struct cc *cm;
+
 		/* 
 		   does not interrupt segmentation */
 		/* 
@@ -12905,6 +13169,7 @@ STATIC int
 isup_recv_bla(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: BLA <-\n", DRV_NAME, ct));
 	if (ct_tst(ct, CCTF_LOC_M_BLOCK_PENDING)) {
 		if (ct_get_m_state(ct) == CMS_WCON_BLREQ) {
@@ -12955,6 +13220,7 @@ STATIC int
 isup_recv_uba(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: UBA <-\n", DRV_NAME, ct));
 	if (ct_tst(ct, CCTF_LOC_M_UNBLOCK_PENDING)) {
 		if (ct_get_m_state(ct) == CMS_WCON_UBREQ) {
@@ -12999,6 +13265,7 @@ isup_recv_grs(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct ct *ct;
 	struct cg *cg = bc->cg.cg;
 	uchar rs[RS_MAX_RANGE] = { 0, };
+
 	printd(("%s; %p: GRS <-\n", DRV_NAME, cg));
 	/* 
 	   TODO: handle prearranged circuits when rs[0] == 0 */
@@ -13135,6 +13402,7 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	int o, i, j;
 	uchar rs[RS_MAX_RANGE] = { 0, };
+
 	printd(("%s; %p: CGB <-\n", DRV_NAME, cg));
 	rs[0] = m->msg.cgb.rs.ptr[0];	/* TODO: handle prearranged */
 	switch (m->msg.cgb.cgi & 0x03) {
@@ -13195,6 +13463,7 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		if (!cg_tst(cg, CCTF_REM_M_BLOCK_PENDING)) {
 			struct cc *cm;
+
 			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
 			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
@@ -13305,6 +13574,7 @@ isup_recv_cgb(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		if (!cg_tst(cg, CCTF_REM_H_BLOCK_PENDING)) {
 			struct cc *cm;
+
 			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
 			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
@@ -13354,6 +13624,7 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	int o, i, j;
 	uchar rs[RS_MAX_RANGE] = { 0, };
+
 	printd(("%s; %p: CGU <-\n", DRV_NAME, cg));
 	rs[0] = m->msg.cgu.rs.ptr[0];	/* TODO: handle prearranged */
 	switch (m->msg.cgu.cgi & 0x03) {
@@ -13371,6 +13642,7 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		if (!cg_tst(cg, CCTF_REM_M_UNBLOCK_PENDING)) {
 			struct cc *cm;
+
 			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
 			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
@@ -13413,6 +13685,7 @@ isup_recv_cgu(queue_t *q, struct ct *bc, isup_msg_t * m)
 		}
 		if (!cg_tst(cg, CCTF_REM_H_UNBLOCK_PENDING)) {
 			struct cc *cm;
+
 			if ((cm = cg->bind.mgm) || (cm = cg->sr.sr->bind.mgm)
 			    || (cm = cg->sp.sp->bind.mgm)
 			    || (cm = master.bind.mgm)) {
@@ -13460,6 +13733,7 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	ulong CCTF_LOC_X_BLOCKED;
 	ulong CCTF_LOC_X_BLOCK_PENDING;
+
 	printd(("%s; %p: CGBA <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_len != m->msg.cgba.rs.len
 	    || cg->rs_ptr[0] != m->msg.cgba.rs.ptr[0])
@@ -13538,6 +13812,7 @@ isup_recv_cgba(queue_t *q, struct ct *bc, isup_msg_t * m)
 	for (i = 1; i < cg->rs_len; i++) {
 		for (j = 0; j < 8; j++) {
 			ulong cic = bc->cic + (j << 3) + i;
+
 			ask = cg->rs_ptr[i] & (0x1 << j);
 			ack = m->msg.cgba.rs.ptr[i] & (0x1 << j);
 			if (!ask & ack) {
@@ -13586,6 +13861,7 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 	int o, i, j, ask, ack;
 	ulong CCTF_LOC_X_BLOCKED;
 	ulong CCTF_LOC_X_UNBLOCK_PENDING;
+
 	printd(("%s; %p: CGUA <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_len != m->msg.cgua.rs.len
 	    || cg->rs_ptr[0] != m->msg.cgua.rs.ptr[0])
@@ -13664,6 +13940,7 @@ isup_recv_cgua(queue_t *q, struct ct *bc, isup_msg_t * m)
 	for (i = 1; i < cg->rs_len; i++) {
 		for (j = 0; j < 8; j++) {
 			ulong cic = bc->cic + (j << 3) + i;
+
 			ask = cg->rs_ptr[i] & (0x1 << j);
 			ack = m->msg.cgua.rs.ptr[i] & (0x1 << j);
 			if (!ask & ack) {
@@ -13795,6 +14072,7 @@ STATIC int
 isup_recv_lpa(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: LPA <-\n", DRV_NAME, ct));
 	if (ct->tg.tg->proto.popt & SS7_POPT_LPA) {
 		if (!ct_tst(ct, CCTF_LPA_PENDING))
@@ -13855,6 +14133,7 @@ isup_recv_gra(queue_t *q, struct ct *bc, isup_msg_t * m)
 	int o, i, j, mblock;
 	struct ct *ct;
 	struct cg *cg = bc->cg.cg;
+
 	printd(("%s; %p: GRA <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_ptr[0] != m->msg.gra.rs.ptr[0])
 		goto unexpected;
@@ -13897,9 +14176,11 @@ isup_recv_cqm(queue_t *q, struct ct *bc, isup_msg_t * m)
 	struct cg *cg = bc->cg.cg;
 	int j;
 	uchar csi[RS_MAX_RANGE] = { 0, };
+
 	printd(("%s; %p: CQM <-\n", DRV_NAME, cg));
 	if (!cg_tst(cg, CCTF_REM_QUERY_PENDING)) {
 		struct cc *cm;
+
 		for (ct = bc; ct; ct = ct->sr.next) {
 			j = ct->cic - bc->cic;
 			if (m->msg.cqm.rs.ptr[0] <= j)
@@ -14006,6 +14287,7 @@ isup_recv_cqr(queue_t *q, struct ct *bc, isup_msg_t * m)
 	int j;
 	struct ct *ct;
 	struct cg *cg = bc->cg.cg;
+
 	printd(("%s; %p: CQR <-\n", DRV_NAME, cg));
 	if (cg->cic != bc->cic || cg->rs_ptr[0] != m->msg.cqr.rs.ptr[0])
 		goto unexpected;
@@ -14211,6 +14493,7 @@ STATIC int
 isup_recv_cpg(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: CPG <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_ACM:
@@ -14314,6 +14597,7 @@ STATIC int
 isup_recv_ucic(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: UCIC <-\n", DRV_NAME, ct));
 	/* 
 	   unexpected message */
@@ -14348,6 +14632,7 @@ STATIC int
 isup_recv_olm(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: OLM <-\n", DRV_NAME, ct));
 	switch (ct_get_c_state(ct)) {
 	case CTS_OGC_WAIT_SAM:
@@ -14436,6 +14721,7 @@ STATIC int
 isup_recv_upt(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
+
 	printd(("%s; %p: UPT <-\n", DRV_NAME, ct));
 	if ((err = isup_send_upa(q, ct, NULL, 0)))
 		return (err);
@@ -14451,6 +14737,7 @@ isup_recv_upa(queue_t *q, struct ct *ct, isup_msg_t * m)
 {
 	int err;
 	struct sr *sr = ct->sr.sr;
+
 	printd(("%s; %p: UPA <-\n", DRV_NAME, ct));
 	if (!(sr->proto.popt & SS7_POPT_UPT))
 		goto unexpected;
@@ -14521,6 +14808,7 @@ isup_recv_sgm(queue_t *q, struct ct *ct, isup_msg_t * m)
 			   the simple segmentation indicator, the segmenetation, message shall be
 			   discarded; */
 			int err;
+
 			if ((err = cc_maint_ind(q, ct, ISUP_MAINT_SEGMENTATION_DISCARDED)))
 				return (err);
 			/* 
@@ -14692,6 +14980,7 @@ isup_dec_iam(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((rtn = unpack_nci(pvar, p, e, &m->msg.iam.nci)) < 0)
 		return (rtn);	/* NCI F */
 	p += rtn;
@@ -14734,6 +15023,7 @@ isup_dec_sam(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
@@ -14755,6 +15045,7 @@ STATIC INLINE int
 isup_dec_inr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_inri(pvar, p, e, &m->msg.inr.inri)) < 0)
 		return (rtn);	/* INRI F */
 	p += rtn;
@@ -14773,6 +15064,7 @@ STATIC INLINE int
 isup_dec_inf(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_infi(pvar, p, e, &m->msg.inf.infi)) < 0)
 		return (rtn);	/* INFI F */
 	p += rtn;
@@ -14791,6 +15083,7 @@ STATIC INLINE int
 isup_dec_cot(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_coti(pvar, p, e, &m->msg.cot.coti)) < 0)
 		return (rtn);	/* COTI F */
 	p += rtn;
@@ -14807,6 +15100,7 @@ STATIC INLINE int
 isup_dec_acm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_bci(pvar, p, e, &m->msg.acm.bci)) < 0)
 		return (rtn);	/* BCI F */
 	p += rtn;
@@ -14825,6 +15119,7 @@ STATIC INLINE int
 isup_dec_con(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_bci(pvar, p, e, &m->msg.con.bci)) < 0)
@@ -14874,6 +15169,7 @@ isup_dec_rel(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
 		return (-EMSGSIZE);
 	if ((rtn = unpack_caus(pvar, pp, ep, &m->msg.rel.caus)) < 0)
@@ -14893,6 +15189,7 @@ STATIC INLINE int
 isup_dec_sus(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_sris(pvar, p, e, &m->msg.sus.sris)) < 0)
 		return (rtn);
 	p += rtn;
@@ -14911,6 +15208,7 @@ STATIC INLINE int
 isup_dec_res(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_sris(pvar, p, e, &m->msg.res.sris)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15017,6 +15315,7 @@ isup_dec_grs(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.grs.rs;
+
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
 		return (-EMSGSIZE);
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
@@ -15049,6 +15348,7 @@ isup_dec_cgb(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.cgb.rs;
+
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgb.cgi)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15071,6 +15371,7 @@ isup_dec_cgb(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	case SS7_PVAR_ITUT:
 	{
 		int i, j, set;
+
 		if (v->len < 2 || v->len > 33 || v->ptr[0] < 1 || v->ptr[0] > 31)
 			return (-EINVAL);
 		for (set = 0, i = 1; i < v->len; i++)
@@ -15096,6 +15397,7 @@ isup_dec_cgu(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.cgu.rs;
+
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgu.cgi)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15117,6 +15419,7 @@ isup_dec_cgu(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	default:
 	{
 		int i, j, set;
+
 		if (v->len < 2 || v->len > 33 || v->ptr[0] < 1 || v->ptr[0] > 31)
 			return (-EINVAL);
 		for (set = 0, i = 1; i < v->len; i++)
@@ -15142,6 +15445,7 @@ isup_dec_cgba(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.cgba.rs;
+
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgba.cgi)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15164,6 +15468,7 @@ isup_dec_cgba(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	case SS7_PVAR_ITUT:
 	{
 		int i, j, set;
+
 		if (v->len < 2 || v->len > 33 || v->ptr[0] < 1 || v->ptr[0] > 31)
 			return (-EINVAL);
 		for (set = 0, i = 1; i < v->len; i++)
@@ -15189,6 +15494,7 @@ isup_dec_cgua(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.cgua.rs;
+
 	if ((rtn = unpack_cgi(pvar, p, e, &m->msg.cgua.cgi)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15211,6 +15517,7 @@ isup_dec_cgua(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	case SS7_PVAR_ITUT:
 	{
 		int i, j, set;
+
 		if (v->len < 2 || v->len > 33 || v->ptr[0] < 1 || v->ptr[0] > 31)
 			return (-EINVAL);
 		for (set = 0, i = 1; i < v->len; i++)
@@ -15234,6 +15541,7 @@ STATIC INLINE int
 isup_dec_cmr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_cmi(pvar, p, e, &m->msg.cmr.cmi)) < 0)
@@ -15254,6 +15562,7 @@ STATIC INLINE int
 isup_dec_cmc(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_cmi(pvar, p, e, &m->msg.cmr.cmi)) < 0)
@@ -15274,6 +15583,7 @@ STATIC INLINE int
 isup_dec_cmrj(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_cmi(pvar, p, e, &m->msg.cmr.cmi)) < 0)
@@ -15294,6 +15604,7 @@ STATIC INLINE int
 isup_dec_far(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_faci(pvar, p, e, &m->msg.far.faci)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15312,6 +15623,7 @@ STATIC INLINE int
 isup_dec_faa(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_faci(pvar, p, e, &m->msg.faa.faci)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15331,6 +15643,7 @@ isup_dec_frj(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((rtn = unpack_faci(pvar, p, e, &m->msg.frj.faci)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15353,6 +15666,7 @@ STATIC INLINE int
 isup_dec_fad(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_faci(pvar, p, e, &m->msg.fad.faci)) < 0)
@@ -15373,6 +15687,7 @@ STATIC INLINE int
 isup_dec_fai(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_faci(pvar, p, e, &m->msg.fai.faci)) < 0)
@@ -15408,6 +15723,7 @@ STATIC INLINE int
 isup_dec_drs(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15426,6 +15742,7 @@ STATIC INLINE int
 isup_dec_pam(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	swerr();
 	return (-EFAULT);
@@ -15442,6 +15759,7 @@ isup_dec_gra(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
 		return (-EMSGSIZE);
 	if ((rtn = unpack_rs(pvar, pp, ep, &m->msg.gra.rs)) < 0)
@@ -15461,6 +15779,7 @@ isup_dec_cqm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 	int rtn;
 	uchar *pp, *ep;
 	isup_var_t *v = &m->msg.cqm.rs;
+
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
 		return (-EMSGSIZE);
 	if ((rtn = unpack_rs(pvar, pp, ep, v)) < 0)
@@ -15492,6 +15811,7 @@ isup_dec_cqr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
 		return (-EMSGSIZE);
 	if ((rtn = unpack_rs(pvar, pp, ep, &m->msg.cqr.rs)) < 0)
@@ -15513,6 +15833,7 @@ STATIC INLINE int
 isup_dec_cpg(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((rtn = unpack_evnt(pvar, p, e, &m->msg.cpg.evnt)) < 0)
 		return (rtn);
 	p += rtn;
@@ -15532,6 +15853,7 @@ isup_dec_usr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
@@ -15566,6 +15888,7 @@ isup_dec_cfn(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
 	uchar *pp, *ep;
+
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((pp = p + *p++) > e || (ep = pp + *pp++ + 1) > e)
@@ -15603,6 +15926,7 @@ STATIC INLINE int
 isup_dec_crg(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	switch (pvar & SS7_PVAR_MASK) {
 	case SS7_PVAR_ANSI:
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15632,6 +15956,7 @@ STATIC INLINE int
 isup_dec_nrm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15650,6 +15975,7 @@ STATIC INLINE int
 isup_dec_fac(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15668,6 +15994,7 @@ STATIC INLINE int
 isup_dec_upt(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15686,6 +16013,7 @@ STATIC INLINE int
 isup_dec_upa(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15704,6 +16032,7 @@ STATIC INLINE int
 isup_dec_idr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15722,6 +16051,7 @@ STATIC INLINE int
 isup_dec_irs(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15740,6 +16070,7 @@ STATIC INLINE int
 isup_dec_sgm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) == SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15758,6 +16089,7 @@ STATIC INLINE int
 isup_dec_cra(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	(void) rtn;
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
@@ -15774,6 +16106,7 @@ STATIC INLINE int
 isup_dec_crm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_nci(pvar, p, e, &m->msg.crm.nci)) < 0)
@@ -15792,6 +16125,7 @@ STATIC INLINE int
 isup_dec_cvr(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_ANSI)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_cvri(pvar, p, e, &m->msg.cvr.cvri)) < 0)
@@ -15846,6 +16180,7 @@ STATIC INLINE int
 isup_dec_non(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_SPAN)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_ton(pvar, p, e, &m->msg.non.ton)) < 0)
@@ -15895,6 +16230,7 @@ STATIC INLINE int
 isup_dec_tcm(uint pvar, uchar *p, uchar *e, isup_msg_t * m)
 {
 	int rtn;
+
 	if ((pvar & SS7_PVAR_MASK) != SS7_PVAR_SING)
 		return isup_dec_unrecognized(pvar, p, e, m);
 	if ((rtn = unpack_cri(pvar, p, e, &m->msg.tcm.cri)) < 0)
@@ -15946,6 +16282,7 @@ ct_t1_timeout(struct ct *ct)
 {
 	int err;
 	mblk_t *mp;
+
 #if 0
 	if (ct_get_t_state(ct) == CKS_WCON_RELREQ) {
 		if ((err = cc_release_con(NULL, ct->tst.cc, ct, NULL)))
@@ -15966,6 +16303,7 @@ ct_t1_timeout(struct ct *ct)
 	{
 		struct mtp *mtp;
 		struct sr *sr = ct->sr.sr;
+
 		ct_timer_start(ct, t1);
 		/* 
 		   resend contents of retrans buffer */
@@ -15992,6 +16330,7 @@ STATIC int
 ct_t2_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_i_state(ct)) {
 	case CCS_SUSPENDED:
 		/* 
@@ -16081,6 +16420,7 @@ STATIC int
 sr_t4_timeout(struct sr *sr)
 {
 	int err;
+
 	if (sr->flags & CCTF_UPT_PENDING) {
 		if ((sr->proto.popt & SS7_POPT_UPT) && sr->ct.list) {
 			if ((err = isup_send_upt(NULL, sr->ct.list, NULL, 0)))
@@ -16106,6 +16446,7 @@ STATIC int
 ct_t5_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_get_t_state(ct) == CKS_WCON_RELREQ) {
 		if ((err = cc_release_con(NULL, ct->tst.cc, ct, NULL)))
 			return (err);
@@ -16158,6 +16499,7 @@ STATIC int
 ct_t6_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_i_state(ct)) {
 	case CCS_SUSPENDED:
 		/* 
@@ -16198,6 +16540,7 @@ STATIC int
 ct_t7_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_i_state(ct)) {
 	case CCS_WIND_MORE:
 	case CCS_WREQ_INFO:
@@ -16243,6 +16586,7 @@ STATIC int
 ct_t8_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_SAM:
 		ct_timer_stop(ct, t35);
@@ -16291,6 +16635,7 @@ STATIC int
 ct_t9_timeout(struct ct *ct)
 {
 	int err;
+
 	/* 
 	   this should probably be only in the backward direction */
 	switch (ct_get_i_state(ct)) {
@@ -16353,6 +16698,7 @@ ct_t10_timeout(struct ct *ct)
 {
 	int err;
 	ulong bci = 0;
+
 	fixme(("Set bci value properly\n"));
 	switch (ct_get_i_state(ct)) {
 	case CCS_WREQ_MORE:
@@ -16397,6 +16743,7 @@ STATIC int
 ct_t11_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_i_state(ct)) {
 	case CCS_WREQ_MORE:
 	case CCS_WIND_INFO:
@@ -16429,6 +16776,7 @@ STATIC int
 ct_t12_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_LOC_M_BLOCK_PENDING)) {
 		if ((err = isup_send_blo(NULL, ct)))
 			return (err);
@@ -16451,6 +16799,7 @@ STATIC int
 ct_t13_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_LOC_M_BLOCK_PENDING)) {
 		ct_timer_stop(ct, t12);
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T13_TIMEOUT)))
@@ -16482,6 +16831,7 @@ STATIC int
 ct_t14_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_LOC_M_UNBLOCK_PENDING)) {
 		if ((err = isup_send_ubl(NULL, ct)))
 			return (err);
@@ -16500,6 +16850,7 @@ STATIC int
 ct_t15_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_LOC_M_UNBLOCK_PENDING)) {
 		ct_timer_stop(ct, t14);
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T15_TIMEOUT)))
@@ -16527,6 +16878,7 @@ STATIC int
 ct_t16_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
 		if ((err = isup_send_rsc(NULL, ct)))
 			return (err);
@@ -16549,6 +16901,7 @@ STATIC int
 ct_t17_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
 		ct_timer_stop(ct, t16);
 		if ((err = cc_maint_ind(NULL, ct, ISUP_MAINT_T17_TIMEOUT)))
@@ -16580,8 +16933,10 @@ STATIC int
 cg_t18_timeout(struct cg *cg)
 {
 	int err;
+
 	if (cg_tst(cg, CCTF_LOC_H_BLOCK_PENDING | CCTF_LOC_M_BLOCK_PENDING)) {
 		ulong cgi = 0;
+
 		if (cg_tst(cg, CCTF_LOC_M_BLOCK_PENDING))
 			cgi = ISUP_MAINTENANCE_ORIENTED;
 		if (cg_tst(cg, CCTF_LOC_H_BLOCK_PENDING))
@@ -16607,9 +16962,11 @@ STATIC int
 cg_t19_timeout(struct cg *cg)
 {
 	int err;
+
 	ensure(cg, return (QR_DONE));
 	if (cg_tst(cg, CCTF_LOC_H_BLOCK_PENDING | CCTF_LOC_M_BLOCK_PENDING)) {
 		ulong cgi = 0;
+
 		cg_timer_stop(cg, t18);
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T19_TIMEOUT)))
 			return (err);
@@ -16645,8 +17002,10 @@ STATIC int
 cg_t20_timeout(struct cg *cg)
 {
 	int err;
+
 	if (cg_tst(cg, CCTF_LOC_H_UNBLOCK_PENDING | CCTF_LOC_M_UNBLOCK_PENDING)) {
 		ulong cgi = 0;
+
 		if (cg_tst(cg, CCTF_LOC_M_UNBLOCK_PENDING))
 			cgi = ISUP_MAINTENANCE_ORIENTED;
 		if (cg_tst(cg, CCTF_LOC_H_UNBLOCK_PENDING))
@@ -16672,8 +17031,10 @@ STATIC int
 cg_t21_timeout(struct cg *cg)
 {
 	int err;
+
 	if (cg_tst(cg, CCTF_LOC_H_UNBLOCK_PENDING | CCTF_LOC_M_UNBLOCK_PENDING)) {
 		ulong cgi = 0;
+
 		cg_timer_stop(cg, t20);
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T21_TIMEOUT)))
 			return (err);
@@ -16707,6 +17068,7 @@ STATIC int
 cg_t22_timeout(struct cg *cg)
 {
 	int err;
+
 	if (cg_tst(cg, CCTF_LOC_RESET_PENDING)) {
 		if ((err = isup_send_grs(NULL, cg->ct.list, cg->rs_ptr, cg->rs_len)))
 			return (err);
@@ -16729,6 +17091,7 @@ STATIC int
 cg_t23_timeout(struct cg *cg)
 {
 	int err;
+
 	if (cg_tst(cg, CCTF_LOC_RESET_PENDING)) {
 		cg_timer_stop(cg, t22);
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T23_TIMEOUT)))
@@ -16760,6 +17123,7 @@ STATIC int
 ct_t24_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_tst(ct, CCTF_COT_PENDING)) {
 		switch (ct_get_c_state(ct)) {
 		case CTS_OGC_WAIT_SAM:
@@ -16816,9 +17180,11 @@ STATIC int
 ct_t25_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_get_c_state(ct) == CTS_OGC_WAIT_CCR) {
 		if (!(ct->tg.tg->proto.popt & SS7_POPT_LPA)) {
 			struct cc *ck;
+
 			switch (ct_get_t_state(ct)) {
 			case CKS_IDLE:
 				/* 
@@ -16873,9 +17239,11 @@ STATIC int
 ct_t26_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct_get_c_state(ct) == CTS_OGC_WAIT_CCR) {
 		if (!(ct->tg.tg->proto.popt & SS7_POPT_LPA)) {
 			struct cc *ck;
+
 			switch (ct_get_t_state(ct)) {
 			case CKS_IDLE:
 				/* 
@@ -16937,6 +17305,7 @@ STATIC int
 ct_t27_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_CCR:
 		if (!ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
@@ -16970,8 +17339,10 @@ STATIC int
 cg_t28_timeout(struct cg *cg)
 {
 	int err;
+
 	if (cg_tst(cg, CCTF_LOC_QUERY_PENDING)) {
 		struct ct *ct;
+
 		if ((err = cc_cg_maint_ind(NULL, cg, cg->cic, ISUP_MAINT_T28_TIMEOUT)))
 			return (err);
 		cg_clr(cg, CCTF_LOC_QUERY_PENDING);
@@ -17018,6 +17389,7 @@ STATIC int
 sr_t30_timeout(struct sr *sr)
 {
 	int err;
+
 	if (sr->cong_level) {
 		if (sr->cong_level == 1) {
 			/* 
@@ -17087,6 +17459,7 @@ STATIC int
 ct_t34_timeout(struct ct *ct)
 {
 	int err;
+
 	if (ct->sgm) {
 		fixme(("This will NOT work passing NULL here...\n"));
 		switch ((err = mtp_read(NULL, ct->sgm, ct->sr.sr))) {
@@ -17123,6 +17496,7 @@ STATIC int
 ct_t35_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_i_state(ct)) {
 	case CCS_WREQ_MORE:
 	case CCS_WIND_INFO:
@@ -17172,6 +17546,7 @@ STATIC int
 ct_t36_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_c_state(ct)) {
 	case CTS_ICC_WAIT_CCR:
 		if (!ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
@@ -17312,6 +17687,7 @@ STATIC int
 ct_t38_timeout(struct ct *ct)
 {
 	int err;
+
 	switch (ct_get_i_state(ct)) {
 	case CCS_SUSPENDED:
 		if (ct->cpc.cc)
@@ -17505,10 +17881,12 @@ mtp_hangup(struct mtp *mtp)
 {
 	if (mtp->sr) {
 		struct sr *sr = mtp->sr;
+
 		/* 
 		   perform equivalent of MTP-PAUSE procedure for remote signalling point */
 		if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 			struct ct *ct;
+
 			for (ct = sr->ct.list; ct; ct = ct->sr.next)
 				/* 
 				   this will idle circuits from the idle list */
@@ -17518,11 +17896,13 @@ mtp_hangup(struct mtp *mtp)
 	} else if (mtp->sp) {
 		struct sr *sr;
 		struct sp *sp = mtp->sp;
+
 		for (sr = sp->sr.list; sr; sr = sr->sp.next) {
 			/* 
 			   perform equivalent of MTP-PAUSE procedure for remote signalling point */
 			if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 				struct ct *ct;
+
 				for (ct = sr->ct.list; ct; ct = ct->sr.next)
 					/* 
 					   this will idle circuits from the idle list */
@@ -17553,6 +17933,7 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	isup_msg_t msg = { NULL, };
 	uchar *p, *e;
 	ulong x, y;
+
 	if (!mp)
 		goto efault;
 	if (mp->b_cont && !pullupmsg(mp, -1))
@@ -17567,6 +17948,7 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 #if 0
 	{
 		int i;
+
 		printd(("%s: MSG:", DRV_NAME));
 		for (i = 0; i < mp->b_wptr - mp->b_rptr; i++)
 			printd((" %02X", (unsigned char) mp->b_rptr[i]));
@@ -18131,6 +18513,7 @@ STATIC int
 mtp_ok_ack(queue_t *q, mblk_t *mp)
 {
 	struct MTP_ok_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	goto efault;
@@ -18152,6 +18535,7 @@ STATIC int
 mtp_error_ack(queue_t *q, mblk_t *mp)
 {
 	struct MTP_error_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	goto efault;
@@ -18172,6 +18556,7 @@ STATIC int
 mtp_bind_ack(queue_t *q, mblk_t *mp)
 {
 	struct MTP_bind_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	goto efault;
@@ -18201,6 +18586,7 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	uchar *loc_ptr, *rem_ptr;
 	size_t loc_len, rem_len;
 	struct mtp_addr *loc, *rem;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	loc_ptr = mp->b_rptr + p->mtp_loc_offset;
@@ -18293,6 +18679,7 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	uchar *add_ptr, *loc_ptr = NULL, *rem_ptr = NULL;
 	size_t add_len, loc_len = 0, rem_len = 0;
 	struct mtp_addr *loc, *rem;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->mtp_addr_offset;
@@ -18388,6 +18775,7 @@ STATIC int
 mtp_optmgmt_ack(queue_t *q, mblk_t *mp)
 {
 	struct MTP_optmgmt_ack *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	goto efault;
@@ -18413,6 +18801,7 @@ mtp_transfer_ind(queue_t *q, mblk_t *mp)
 	struct sr *sr;
 	struct mtp_addr *a;
 	struct MTP_transfer_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_srce_offset + p->mtp_srce_length)
@@ -18465,6 +18854,7 @@ mtp_pause_ind(queue_t *q, mblk_t *mp)
 	struct sr *sr;
 	struct mtp_addr *a;
 	struct MTP_pause_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
@@ -18478,6 +18868,7 @@ mtp_pause_ind(queue_t *q, mblk_t *mp)
 		goto ignore;
 	if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 		struct ct *ct;
+
 		for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 			/* 
 			   this will remove idle circuits from the idle list */
@@ -18513,6 +18904,7 @@ mtp_resume_ind(queue_t *q, mblk_t *mp)
 	struct sr *sr;
 	struct mtp_addr *a;
 	struct MTP_resume_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
@@ -18526,6 +18918,7 @@ mtp_resume_ind(queue_t *q, mblk_t *mp)
 		goto ignore;	/* not for us */
 	if (sr->flags & CCTF_LOC_S_BLOCKED) {
 		struct ct *ct;
+
 		for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 			/* 
 			   this will add idle circuits to the idle list */
@@ -18595,6 +18988,7 @@ mtp_status_ind(queue_t *q, mblk_t *mp)
 	struct sr *sr;
 	struct mtp_addr *a;
 	struct MTP_status_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->mtp_addr_offset + p->mtp_addr_length)
@@ -18610,6 +19004,7 @@ mtp_status_ind(queue_t *q, mblk_t *mp)
 	case MTP_STATUS_TYPE_CONG:
 		if (sr->proto.popt & SS7_POPT_MPLEV) {
 			int level;
+
 			/* 
 			   multiple congestion levels ala ANSI */
 			switch (p->mtp_status) {
@@ -18728,6 +19123,7 @@ mtp_restart_complete_ind(queue_t *q, mblk_t *mp)
 	struct mtp *mtp = MTP_PRIV(q);
 	struct sr *sr;
 	struct MTP_restart_complete_ind *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (!mtp->sp && (!mtp->sr || !mtp->sr->sp.sp))
@@ -18735,6 +19131,7 @@ mtp_restart_complete_ind(queue_t *q, mblk_t *mp)
 	for (sr = mtp->sp->sr.list; sr; sr = sr->sp.next) {
 		if (sr->flags & CCTF_LOC_S_BLOCKED) {
 			struct ct *ct;
+
 			for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 				/* 
 				   this will add idle circuits to the idle list */
@@ -18776,6 +19173,7 @@ STATIC int
 isup_check_addr(uchar *p, size_t l)
 {
 	struct isup_addr *a;
+
 	if (l < sizeof(*a)) {
 		trace();
 		return (-EMSGSIZE);
@@ -18825,6 +19223,7 @@ isup_write(queue_t *q, mblk_t *mp)
 {
 	struct cc *cc = CC_PRIV(q);
 	int err;
+
 	(void) cc;
 	(void) err;
 	fixme(("Write this function\n"));
@@ -18841,6 +19240,7 @@ cc_info_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	int err;
 	struct CC_info_req *p = (typeof(p)) mp->b_rptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -18867,6 +19267,7 @@ cc_optmgmt_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	int err;
 	struct CC_optmgmt_req *p = (typeof(p)) mp->b_rptr;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -18896,6 +19297,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	size_t add_len;
 	struct CC_bind_req *p = (typeof(p)) mp->b_rptr;
 	struct isup_addr add = { ISUP_SCOPE_DF, 0 };
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -18917,6 +19319,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISUP_SCOPE_DF:
 	{
 		struct df *df;
+
 		df = &master;
 		/* 
 		   bind to default */
@@ -18945,6 +19348,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISUP_SCOPE_SP:
 	{
 		struct sp *sp;
+
 		if (add.id) {
 			for (sp = master.sp.list; sp && sp->id != add.id; sp = sp->next) ;
 			if (!sp)
@@ -18981,6 +19385,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISUP_SCOPE_SR:
 	{
 		struct sr *sr;
+
 		if (add.id) {
 			for (sr = master.sr.list; sr && sr->id != add.id; sr = sr->next) ;
 			if (!sr)
@@ -19017,6 +19422,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISUP_SCOPE_TG:
 	{
 		struct tg *tg;
+
 		if (add.id) {
 			for (tg = master.tg.list; tg && tg->id != add.id; tg = tg->next) ;
 			if (!tg)
@@ -19053,6 +19459,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISUP_SCOPE_CG:
 	{
 		struct cg *cg;
+
 		if (add.id) {
 			for (cg = master.cg.list; cg && cg->id != add.id; cg = cg->next) ;
 			if (!cg)
@@ -19089,6 +19496,7 @@ cc_bind_req(queue_t *q, mblk_t *mp)
 	case ISUP_SCOPE_CT:
 	{
 		struct ct *ct;
+
 		if (add.id) {
 			for (ct = master.ct.list; ct && ct->id != add.id; ct = ct->next) ;
 			if (!ct)
@@ -19155,6 +19563,7 @@ cc_unbind_req(queue_t *q, mblk_t *mp)
 	struct cc *cc = CC_PRIV(q);
 	int err;
 	struct CC_unbind_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (cs_get_state(cc) != CCS_IDLE)
@@ -19190,7 +19599,7 @@ cc_unbind_req(queue_t *q, mblk_t *mp)
 		sp_put(xchg(&cc->bind.u.sp, NULL));
 		break;
 	case ISUP_BIND_DF:
-		(void)xchg(&cc->bind.u.df, NULL);
+		(void) xchg(&cc->bind.u.df, NULL);
 		break;
 	}
 	cc->bind.type = ISUP_BIND_NONE;
@@ -19224,6 +19633,7 @@ cc_addr_req(queue_t *q, mblk_t *mp)
 	uchar *bind_ptr = (uchar *) &bind, *conn_ptr = (uchar *) &conn;
 	size_t bind_len = sizeof(bind), conn_len = sizeof(conn);
 	ulong cref;
+
 	(void) err;
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
@@ -19309,6 +19719,7 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	size_t cdpn_len, opt_len, add_len;
 	struct CC_setup_req *p = (typeof(p)) mp->b_rptr;
 	struct isup_addr add = { ISUP_SCOPE_DF, 0, 0 };
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p)) {
 		ptrace(("ERROR: message too small for primitive\n"));
 		goto emsgsize;
@@ -19644,6 +20055,7 @@ cc_more_info_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_more_info_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -19714,6 +20126,7 @@ cc_information_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr, *subn_ptr;
 	size_t opt_len, subn_len;
 	struct CC_information_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	subn_ptr = mp->b_rptr + p->cc_subn_offset;
@@ -19804,6 +20217,7 @@ cc_cont_check_req(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_cont_check_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -19877,6 +20291,7 @@ cc_cont_test_req(queue_t *q, mblk_t *mp)
 	struct ct *ct = NULL;
 	int err;
 	struct CC_cont_test_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (cs_get_state(cc) != CCS_WRES_SIND)
@@ -19936,6 +20351,7 @@ cc_cont_report_req(queue_t *q, mblk_t *mp)
 	struct ct *ct = NULL;
 	int err;
 	struct CC_cont_report_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	switch (cs_get_state(cc)) {
@@ -20114,6 +20530,7 @@ cc_setup_res(queue_t *q, mblk_t *mp)
 	struct cc *ac, *cc = CC_PRIV(q);
 	struct ct *ct = NULL;
 	struct CC_setup_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (cs_get_state(cc) != CCS_WRES_SIND)
@@ -20177,6 +20594,7 @@ cc_proceeding_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_proceeding_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20259,6 +20677,7 @@ cc_alerting_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_alerting_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20343,6 +20762,7 @@ cc_progress_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_progress_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20456,6 +20876,7 @@ cc_ibi_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_ibi_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20545,6 +20966,7 @@ cc_connect_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_connect_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	if (mp->b_wptr < mp->b_rptr + p->cc_opt_offset + p->cc_opt_length)
@@ -20641,6 +21063,7 @@ cc_setup_complete_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_setup_complete_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20709,6 +21132,7 @@ cc_forwxfer_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_forwxfer_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20822,6 +21246,7 @@ cc_suspend_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_suspend_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -20854,6 +21279,7 @@ cc_suspend_req(queue_t *q, mblk_t *mp)
 	case CTS_ICC_SUSPENDED:
 	{
 		ulong sris = p->cc_flags;
+
 		ct_set(ct, CCTF_ORIG_SUSPENDED);
 		if ((err = isup_send_sus(q, ct, sris, opt_ptr, opt_len)))
 			return (err);
@@ -20864,6 +21290,7 @@ cc_suspend_req(queue_t *q, mblk_t *mp)
 	case CTS_OGC_ANSWERED:
 	{
 		struct tg *tg = ct->tg.tg;
+
 		if ((tg->config.flags & ISUP_TGF_CONTROLLING_EXCHANGE)) {
 			switch (p->cc_flags & ISUP_SRIS_MASK) {
 			case ISUP_SRIS_NETWORK_INITIATED:
@@ -20956,6 +21383,7 @@ cc_resume_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_resume_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -21001,6 +21429,7 @@ cc_resume_req(queue_t *q, mblk_t *mp)
 	case CTS_ICC_SUSPENDED:
 	{
 		ulong sris = p->cc_flags;
+
 		if ((err = isup_send_res(q, ct, sris, opt_ptr, opt_len)))
 			return (err);
 		ct_clr(ct, CCTF_ORIG_SUSPENDED);
@@ -21013,6 +21442,7 @@ cc_resume_req(queue_t *q, mblk_t *mp)
 	case CTS_OGC_SUSPENDED:
 	{
 		ulong sris = p->cc_flags;
+
 		if ((err = isup_send_res(q, ct, sris, opt_ptr, opt_len)))
 			return (err);
 		ct_clr(ct, CCTF_ORIG_SUSPENDED);
@@ -21068,6 +21498,7 @@ cc_release_req(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_release_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -21226,6 +21657,7 @@ cc_release_res(queue_t *q, mblk_t *mp)
 	uchar *opt_ptr;
 	size_t opt_len;
 	struct CC_release_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	opt_ptr = mp->b_rptr + p->cc_opt_offset;
@@ -21307,6 +21739,7 @@ cc_reset_req(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_reset_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21366,6 +21799,7 @@ cc_reset_res(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_reset_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21389,6 +21823,7 @@ cc_reset_res(queue_t *q, mblk_t *mp)
 			struct ct *bc = NULL;
 			int o, i, j;
 			uchar rs[RS_MAX_RANGE] = { 0, };
+
 			for (ct = cg->ct.list; ct; ct = ct->sr.next) {
 				if (ct_tst(ct, CCTF_REM_RESET_PENDING)) {
 					bc = bc ? bc : ct;
@@ -21457,6 +21892,7 @@ cc_blocking_req(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_blocking_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21475,6 +21911,7 @@ cc_blocking_req(queue_t *q, mblk_t *mp)
 		goto badflag;
 	if (p->cc_flags & ISUP_GROUP) {
 		ulong cgi = (p->cc_flags & ISUP_HARDWARE_FAILURE_ORIENTED);
+
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 			goto noaddr;
 		/* 
@@ -21533,6 +21970,7 @@ cc_blocking_res(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_blocking_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21552,6 +21990,7 @@ cc_blocking_res(queue_t *q, mblk_t *mp)
 		ulong CCTF_REM_X_BLOCK_PENDING =
 		    cgi ? CCTF_REM_H_BLOCK_PENDING : CCTF_REM_M_BLOCK_PENDING;
 		ulong CCTF_REM_X_BLOCKED = cgi ? CCTF_REM_H_BLOCKED : CCTF_REM_M_BLOCKED;
+
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && !(cg = cc->conn.gmg))
 			goto badaddr;
 		/* 
@@ -21560,6 +21999,7 @@ cc_blocking_res(queue_t *q, mblk_t *mp)
 			struct ct *bc = NULL;
 			int o, i, j;
 			uchar rs[RS_MAX_RANGE] = { 0, };
+
 			for (ct = cg->ct.list; ct; ct = ct->sr.next) {
 				if (ct_tst(ct, CCTF_REM_G_BLOCK_PENDING)) {
 					bc = bc ? bc : ct;
@@ -21646,6 +22086,7 @@ cc_unblocking_req(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_unblocking_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21664,6 +22105,7 @@ cc_unblocking_req(queue_t *q, mblk_t *mp)
 		goto badflag;
 	if (p->cc_flags & ISUP_GROUP) {
 		ulong cgi = (p->cc_flags & ISUP_HARDWARE_FAILURE_ORIENTED);
+
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len)) && (!(cg = cc->conn.gmg)))
 			goto badaddr;
 		/* 
@@ -21713,6 +22155,7 @@ cc_unblocking_res(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_unblocking_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21732,6 +22175,7 @@ cc_unblocking_res(queue_t *q, mblk_t *mp)
 		ulong CCTF_REM_X_UNBLOCK_PENDING =
 		    cgi ? CCTF_REM_H_UNBLOCK_PENDING : CCTF_REM_M_UNBLOCK_PENDING;
 		ulong CCTF_REM_X_BLOCKED = cgi ? CCTF_REM_H_BLOCKED : CCTF_REM_M_BLOCKED;
+
 		if (!(cg = isup_find_grp(cc, add_ptr, add_len))
 		    && (!(ct = cc->conn.cpc) || !(cg = ct->cg.cg)))
 			goto badaddr;
@@ -21741,6 +22185,7 @@ cc_unblocking_res(queue_t *q, mblk_t *mp)
 			struct ct *bc = NULL;
 			int o, i, j;
 			uchar rs[RS_MAX_RANGE] = { 0, };
+
 			for (ct = cg->ct.list; ct; ct = ct->sr.next) {
 				if (ct_tst(ct, CCTF_REM_G_UNBLOCK_PENDING)) {
 					bc = bc ? bc : ct;
@@ -21814,6 +22259,7 @@ cc_query_req(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_query_req *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21873,6 +22319,7 @@ cc_query_res(queue_t *q, mblk_t *mp)
 	uchar *add_ptr;
 	size_t add_len;
 	struct CC_query_res *p = (typeof(p)) mp->b_rptr;
+
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto emsgsize;
 	add_ptr = mp->b_rptr + p->cc_addr_offset;
@@ -21898,6 +22345,7 @@ cc_query_res(queue_t *q, mblk_t *mp)
 		int j;
 		uchar rs[RS_MAX_RANGE] = { 0, };
 		uchar csi[RS_MAX_RANGE] = { 0, };
+
 		for (j = 0; j < RS_MAX_RANGE; j++)
 			csi[j] = 0x3;	/* unequipped */
 		for (ct = cg->ct.list; ct; ct = ct->cg.next) {
@@ -21992,6 +22440,7 @@ cc_unsupported_prim(queue_t *q, mblk_t *mp)
 {
 	struct cc *cc = CC_PRIV(q);
 	ulong prim = *((ulong *) mp->b_rptr);
+
 	return cc_error_ack(q, cc, NULL, prim, CCNOTSUPP);
 }
 
@@ -22005,6 +22454,7 @@ cc_unknown_prim(queue_t *q, mblk_t *mp)
 {
 	struct cc *cc = CC_PRIV(q);
 	ulong prim = *((ulong *) mp->b_rptr);
+
 	return cc_error_ack(q, cc, NULL, prim, CCBADPRIM);
 }
 
@@ -22036,6 +22486,7 @@ STATIC int
 isup_opt_get_ct(isup_option_t * arg, struct ct *ct, int size)
 {
 	isup_opt_conf_ct_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!ct)
@@ -22047,6 +22498,7 @@ STATIC int
 isup_opt_get_cg(isup_option_t * arg, struct cg *cg, int size)
 {
 	isup_opt_conf_cg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!cg)
@@ -22058,6 +22510,7 @@ STATIC int
 isup_opt_get_tg(isup_option_t * arg, struct tg *tg, int size)
 {
 	isup_opt_conf_tg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!tg)
@@ -22069,6 +22522,7 @@ STATIC int
 isup_opt_get_sr(isup_option_t * arg, struct sr *sr, int size)
 {
 	isup_opt_conf_sr_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sr)
@@ -22080,6 +22534,7 @@ STATIC int
 isup_opt_get_sp(isup_option_t * arg, struct sp *sp, int size)
 {
 	isup_opt_conf_sp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sp)
@@ -22091,6 +22546,7 @@ STATIC int
 isup_opt_get_mtp(isup_option_t * arg, struct mtp *mtp, int size)
 {
 	isup_opt_conf_mtp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!mtp)
@@ -22102,6 +22558,7 @@ STATIC int
 isup_opt_get_df(isup_option_t * arg, struct df *df, int size)
 {
 	isup_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -22118,6 +22575,7 @@ STATIC int
 isup_opt_set_ct(isup_option_t * arg, struct ct *ct, int size)
 {
 	isup_opt_conf_ct_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!ct)
@@ -22130,6 +22588,7 @@ STATIC int
 isup_opt_set_cg(isup_option_t * arg, struct cg *cg, int size)
 {
 	isup_opt_conf_cg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!cg)
@@ -22142,6 +22601,7 @@ STATIC int
 isup_opt_set_tg(isup_option_t * arg, struct tg *tg, int size)
 {
 	isup_opt_conf_tg_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!tg)
@@ -22154,6 +22614,7 @@ STATIC int
 isup_opt_set_sr(isup_option_t * arg, struct sr *sr, int size)
 {
 	isup_opt_conf_sr_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sr)
@@ -22166,6 +22627,7 @@ STATIC int
 isup_opt_set_sp(isup_option_t * arg, struct sp *sp, int size)
 {
 	isup_opt_conf_sp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!sp)
@@ -22178,6 +22640,7 @@ STATIC int
 isup_opt_set_mtp(isup_option_t * arg, struct mtp *mtp, int size)
 {
 	isup_opt_conf_mtp_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!mtp)
@@ -22190,6 +22653,7 @@ STATIC int
 isup_opt_set_df(isup_option_t * arg, struct df *df, int size)
 {
 	isup_opt_conf_df_t *opt = (typeof(opt)) (arg + 1);
+
 	if ((size -= sizeof(*opt)) < 0)
 		return (-EINVAL);
 	if (!df)
@@ -22207,6 +22671,7 @@ STATIC int
 isup_get_ct(isup_config_t * arg, struct ct *ct, int size)
 {
 	isup_conf_ct_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!ct || size < sizeof(*arg))
@@ -22227,6 +22692,7 @@ isup_get_cg(isup_config_t * arg, struct cg *cg, int size)
 	struct ct *ct;
 	isup_conf_ct_t *chd;
 	isup_conf_cg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!cg)
@@ -22257,6 +22723,7 @@ isup_get_tg(isup_config_t * arg, struct tg *tg, int size)
 	struct ct *ct;
 	isup_conf_ct_t *chd;
 	isup_conf_tg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!tg)
@@ -22290,6 +22757,7 @@ isup_get_sr(isup_config_t * arg, struct sr *sr, int size)
 	isup_conf_cg_t *chc;
 	isup_conf_tg_t *cht;
 	isup_conf_sr_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!sr)
@@ -22335,6 +22803,7 @@ isup_get_sp(isup_config_t * arg, struct sp *sp, int size)
 	struct sr *sr;
 	isup_conf_sr_t *chd;
 	isup_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!sp)
@@ -22370,6 +22839,7 @@ isup_get_mtp(isup_config_t * arg, struct mtp *mtp, int size)
 	isup_conf_sr_t *chr;
 	isup_conf_sp_t *chp;
 	isup_conf_mtp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!mtp)
@@ -22414,6 +22884,7 @@ isup_get_df(isup_config_t * arg, struct df *df, int size)
 	struct sp *sp;
 	isup_conf_sp_t *chd;
 	isup_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if ((size -= sizeof(*cnf)) < sizeof(*arg))
 		return (-EINVAL);
 	if (!df)
@@ -22448,6 +22919,7 @@ isup_add_ct(isup_config_t * arg, struct ct *ct, int size, int force, int test)
 	struct tg *tg = NULL;
 	struct cg *cg = NULL;
 	isup_conf_ct_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (ct || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->tgid)
@@ -22478,6 +22950,7 @@ isup_add_cg(isup_config_t * arg, struct cg *cg, int size, int force, int test)
 {
 	struct sr *sr = NULL;
 	isup_conf_cg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (cg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->srid)
@@ -22497,6 +22970,7 @@ isup_add_tg(isup_config_t * arg, struct tg *tg, int size, int force, int test)
 {
 	struct sr *sr = NULL;
 	isup_conf_tg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (tg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->srid)
@@ -22516,6 +22990,7 @@ isup_add_sr(isup_config_t * arg, struct sr *sr, int size, int force, int test)
 {
 	struct sp *sp = NULL;
 	isup_conf_sr_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (sr || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid)
@@ -22544,6 +23019,7 @@ STATIC int
 isup_add_sp(isup_config_t * arg, struct sp *sp, int size, int force, int test)
 {
 	isup_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (sp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	for (sp = master.sp.list; sp; sp = sp->next)
@@ -22567,6 +23043,7 @@ isup_add_mtp(isup_config_t * arg, struct mtp *mtp, int size, int force, int test
 	struct sp *sp = NULL;
 	struct sr *sr = NULL;
 	isup_conf_mtp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (mtp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid)
@@ -22606,6 +23083,7 @@ STATIC int
 isup_add_df(isup_config_t * arg, struct df *df, int size, int force, int test)
 {
 	isup_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	return (-EINVAL);
@@ -22620,6 +23098,7 @@ isup_cha_ct(isup_config_t * arg, struct ct *ct, int size, int force, int test)
 {
 	struct ct *c;
 	isup_conf_ct_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!ct || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->cgid && cnf->cgid != ct->cg.cg->id)
@@ -22667,6 +23146,7 @@ STATIC int
 isup_cha_cg(isup_config_t * arg, struct cg *cg, int size, int force, int test)
 {
 	isup_conf_cg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!cg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->srid && cnf->srid != cg->sr.sr->id)
@@ -22702,6 +23182,7 @@ STATIC int
 isup_cha_tg(isup_config_t * arg, struct tg *tg, int size, int force, int test)
 {
 	isup_conf_tg_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->srid && cnf->srid != tg->sr.sr->id)
@@ -22726,6 +23207,7 @@ isup_cha_sr(isup_config_t * arg, struct sr *sr, int size, int force, int test)
 {
 	struct sr *s;
 	isup_conf_sr_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!sr || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid && cnf->spid != sr->sp.sp->id)
@@ -22765,6 +23247,7 @@ isup_cha_sp(isup_config_t * arg, struct sp *sp, int size, int force, int test)
 {
 	struct sp *s;
 	isup_conf_sp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	/* 
@@ -22801,6 +23284,7 @@ STATIC int
 isup_cha_mtp(isup_config_t * arg, struct mtp *mtp, int size, int force, int test)
 {
 	isup_conf_mtp_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!mtp || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (cnf->spid && (!mtp->sp || cnf->spid != mtp->sp->id))
@@ -22824,6 +23308,7 @@ STATIC int
 isup_cha_df(isup_config_t * arg, struct df *df, int size, int force, int test)
 {
 	isup_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
@@ -22986,6 +23471,7 @@ STATIC int
 isup_del_df(isup_config_t * arg, struct df *df, int size, int force, int test)
 {
 	isup_conf_df_t *cnf = (typeof(cnf)) (arg + 1);
+
 	if (!df || (size -= sizeof(*cnf)) < 0)
 		return (-EINVAL);
 	if (!force) {
@@ -23006,6 +23492,7 @@ isup_sta_ct(isup_statem_t * arg, struct ct *ct, int size)
 	struct cc *cc;
 	cc_ulong *p;
 	isup_statem_ct_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ct || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = ct->flags;
@@ -23031,6 +23518,7 @@ isup_sta_cg(isup_statem_t * arg, struct cg *cg, int size)
 	struct cc *cc;
 	cc_ulong *p;
 	isup_statem_cg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!cg || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = cg->flags;
@@ -23054,6 +23542,7 @@ isup_sta_tg(isup_statem_t * arg, struct tg *tg, int size)
 	struct cc *cc;
 	cc_ulong *p;
 	isup_statem_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = tg->flags;
@@ -23076,6 +23565,7 @@ isup_sta_sr(isup_statem_t * arg, struct sr *sr, int size)
 	struct cc *cc;
 	cc_ulong *p;
 	isup_statem_sr_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sr || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = sr->flags;
@@ -23099,6 +23589,7 @@ isup_sta_sp(isup_statem_t * arg, struct sp *sp, int size)
 	struct cc *cc;
 	cc_ulong *p;
 	isup_statem_sp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = sp->flags;
@@ -23119,6 +23610,7 @@ STATIC int
 isup_sta_mtp(isup_statem_t * arg, struct mtp *mtp, int size)
 {
 	isup_statem_mtp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mtp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	arg->flags = mtp->flags;
@@ -23132,6 +23624,7 @@ isup_sta_df(isup_statem_t * arg, struct df *df, int size)
 	struct cc *cc;
 	cc_ulong *p;
 	isup_statem_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < sizeof(cc_ulong))
 		return (-EINVAL);
 	arg->flags = 0;
@@ -23527,6 +24020,7 @@ STATIC int
 isup_statp_get_ct(isup_stats_t * arg, struct ct *ct, int size)
 {
 	isup_stats_ct_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ct || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = ct->statsp;
@@ -23536,6 +24030,7 @@ STATIC int
 isup_statp_get_cg(isup_stats_t * arg, struct cg *cg, int size)
 {
 	isup_stats_cg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!cg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = cg->statsp;
@@ -23545,6 +24040,7 @@ STATIC int
 isup_statp_get_tg(isup_stats_t * arg, struct tg *tg, int size)
 {
 	isup_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = tg->statsp;
@@ -23554,6 +24050,7 @@ STATIC int
 isup_statp_get_sr(isup_stats_t * arg, struct sr *sr, int size)
 {
 	isup_stats_sr_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sr || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = sr->statsp;
@@ -23563,6 +24060,7 @@ STATIC int
 isup_statp_get_sp(isup_stats_t * arg, struct sp *sp, int size)
 {
 	isup_stats_sp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = sp->statsp;
@@ -23572,6 +24070,7 @@ STATIC int
 isup_statp_get_mtp(isup_stats_t * arg, struct mtp *mtp, int size)
 {
 	isup_stats_mtp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mtp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = mtp->statsp;
@@ -23581,6 +24080,7 @@ STATIC int
 isup_statp_get_df(isup_stats_t * arg, struct df *df, int size)
 {
 	isup_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = df->statsp;
@@ -23595,6 +24095,7 @@ STATIC int
 isup_statp_set_ct(isup_stats_t * arg, struct ct *ct, int size)
 {
 	isup_stats_ct_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ct || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	ct->statsp = *sta;
@@ -23604,6 +24105,7 @@ STATIC int
 isup_statp_set_cg(isup_stats_t * arg, struct cg *cg, int size)
 {
 	isup_stats_cg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!cg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	cg->statsp = *sta;
@@ -23613,6 +24115,7 @@ STATIC int
 isup_statp_set_tg(isup_stats_t * arg, struct tg *tg, int size)
 {
 	isup_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	tg->statsp = *sta;
@@ -23622,6 +24125,7 @@ STATIC int
 isup_statp_set_sr(isup_stats_t * arg, struct sr *sr, int size)
 {
 	isup_stats_sr_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sr || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	sr->statsp = *sta;
@@ -23631,6 +24135,7 @@ STATIC int
 isup_statp_set_sp(isup_stats_t * arg, struct sp *sp, int size)
 {
 	isup_stats_sp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	sp->statsp = *sta;
@@ -23640,6 +24145,7 @@ STATIC int
 isup_statp_set_mtp(isup_stats_t * arg, struct mtp *mtp, int size)
 {
 	isup_stats_mtp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mtp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	mtp->statsp = *sta;
@@ -23649,6 +24155,7 @@ STATIC int
 isup_statp_set_df(isup_stats_t * arg, struct df *df, int size)
 {
 	isup_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	df->statsp = *sta;
@@ -23663,6 +24170,7 @@ STATIC int
 isup_stat_get_ct(isup_stats_t * arg, struct ct *ct, int size)
 {
 	isup_stats_ct_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ct || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = ct->stats;
@@ -23672,6 +24180,7 @@ STATIC int
 isup_stat_get_cg(isup_stats_t * arg, struct cg *cg, int size)
 {
 	isup_stats_cg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!cg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = cg->stats;
@@ -23681,6 +24190,7 @@ STATIC int
 isup_stat_get_tg(isup_stats_t * arg, struct tg *tg, int size)
 {
 	isup_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = tg->stats;
@@ -23690,6 +24200,7 @@ STATIC int
 isup_stat_get_sr(isup_stats_t * arg, struct sr *sr, int size)
 {
 	isup_stats_sr_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sr || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = sr->stats;
@@ -23699,6 +24210,7 @@ STATIC int
 isup_stat_get_sp(isup_stats_t * arg, struct sp *sp, int size)
 {
 	isup_stats_sp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = sp->stats;
@@ -23708,6 +24220,7 @@ STATIC int
 isup_stat_get_mtp(isup_stats_t * arg, struct mtp *mtp, int size)
 {
 	isup_stats_mtp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mtp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = mtp->stats;
@@ -23717,6 +24230,7 @@ STATIC int
 isup_stat_get_df(isup_stats_t * arg, struct df *df, int size)
 {
 	isup_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	*sta = df->stats;
@@ -23732,6 +24246,7 @@ isup_stat_clr_ct(isup_stats_t * arg, struct ct *ct, int size)
 {
 	uchar *s, *d;
 	isup_stats_ct_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!ct || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23744,6 +24259,7 @@ isup_stat_clr_cg(isup_stats_t * arg, struct cg *cg, int size)
 {
 	uchar *s, *d;
 	isup_stats_cg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!cg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23756,6 +24272,7 @@ isup_stat_clr_tg(isup_stats_t * arg, struct tg *tg, int size)
 {
 	uchar *s, *d;
 	isup_stats_tg_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!tg || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23768,6 +24285,7 @@ isup_stat_clr_sr(isup_stats_t * arg, struct sr *sr, int size)
 {
 	uchar *s, *d;
 	isup_stats_sr_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sr || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23780,6 +24298,7 @@ isup_stat_clr_sp(isup_stats_t * arg, struct sp *sp, int size)
 {
 	uchar *s, *d;
 	isup_stats_sp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!sp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23792,6 +24311,7 @@ isup_stat_clr_mtp(isup_stats_t * arg, struct mtp *mtp, int size)
 {
 	uchar *s, *d;
 	isup_stats_mtp_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!mtp || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23804,6 +24324,7 @@ isup_stat_clr_df(isup_stats_t * arg, struct df *df, int size)
 {
 	uchar *s, *d;
 	isup_stats_df_t *sta = (typeof(sta)) (arg + 1);
+
 	if (!df || (size -= sizeof(*sta)) < 0)
 		return (-EINVAL);
 	s = (typeof(s)) (sta + 1);
@@ -23830,6 +24351,7 @@ isup_iocgoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		isup_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case ISUP_OBJ_TYPE_CT:
@@ -23863,6 +24385,7 @@ isup_iocsoptions(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		isup_option_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case ISUP_OBJ_TYPE_CT:
@@ -23897,6 +24420,7 @@ isup_iocgconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		isup_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->type) {
 			case ISUP_OBJ_TYPE_CT:
@@ -23930,6 +24454,7 @@ isup_iocsconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		isup_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case ISUP_ADD:
@@ -24003,6 +24528,7 @@ isup_ioctconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		isup_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case ISUP_ADD:
@@ -24076,6 +24602,7 @@ isup_ioccconfig(queue_t *q, mblk_t *mp)
 	if (mp->b_cont) {
 		int size = msgdsize(mp);
 		isup_config_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) >= 0)
 			switch (arg->cmd) {
 			case ISUP_ADD:
@@ -24151,6 +24678,7 @@ isup_iocgstatem(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		isup_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -24194,6 +24722,7 @@ isup_ioccmreset(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		isup_statem_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		(void) arg;
 		return (-EOPNOTSUPP);
 	}
@@ -24214,6 +24743,7 @@ isup_iocgstatsp(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -24260,6 +24790,7 @@ isup_iocsstatsp(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -24306,6 +24837,7 @@ isup_iocgstats(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -24352,6 +24884,7 @@ isup_ioccstats(queue_t *q, mblk_t *mp)
 		int ret = QR_DONE;
 		int size = msgdsize(mp);
 		isup_stats_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		if ((size -= sizeof(*arg)) < 0)
 			return (-EMSGSIZE);
 		spin_lock_irqsave(&master.lock, flags);
@@ -24397,6 +24930,7 @@ isup_iocgnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isup_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
@@ -24443,6 +24977,7 @@ isup_iocsnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isup_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
@@ -24489,6 +25024,7 @@ isup_ioccnotify(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		int ret = QR_DONE;
 		isup_notify_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		spin_lock_irqsave(&master.lock, flags);
 		switch (arg->type) {
 		case ISUP_OBJ_TYPE_CT:
@@ -24533,6 +25069,7 @@ isup_ioccmgmt(queue_t *q, mblk_t *mp)
 {
 	if (mp->b_cont) {
 		isup_mgmt_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
+
 		switch (arg->cmd) {
 		case ISUP_MGMT_BLOCK:
 			switch (arg->type) {
@@ -24624,6 +25161,7 @@ isup_ioccpass(queue_t *q, mblk_t *mp)
 		isup_pass_t *arg = (typeof(arg)) mp->b_cont->b_rptr;
 		mblk_t *bp, *dp;
 		struct mtp *mtp;
+
 		for (mtp = master.mtp.list; mtp && mtp->u.mux.index != arg->muxid;
 		     mtp = mtp->next) ;
 		if (!mtp || !mtp->oq)
@@ -24670,8 +25208,10 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 	void *arg = mp->b_cont ? mp->b_cont->b_rptr : NULL;
 	int cmd = iocp->ioc_cmd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
+
 	// struct linkblk *lp = (struct linkblk *) arg;
 	int ret = 0;
+
 	(void) cc;
 	switch (type) {
 	case _IOC_TYPE(__SID):
@@ -24679,6 +25219,7 @@ isup_w_ioctl(queue_t *q, mblk_t *mp)
 		psw_t flags;
 		struct mtp *mtp, **mtpp;
 		struct linkblk *lb;
+
 		if (!(lb = arg)) {
 			swerr();
 			ret = -EINVAL;
@@ -24870,6 +25411,7 @@ isup_w_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct cc *cc = CC_PRIV(q);
 	ulong oldstate = cs_get_state(cc);
+
 	switch (*(ulong *) mp->b_rptr) {
 	case CC_INFO_REQ:
 		printd(("%s: %p: -> CC_INFO_REQ\n", DRV_NAME, cc));
@@ -25043,6 +25585,7 @@ mtp_r_proto(queue_t *q, mblk_t *mp)
 	int rtn;
 	struct mtp *mtp = MTP_PRIV(q);
 	ulong oldstate = mtp->i_state;
+
 	switch (*((ulong *) mp->b_rptr)) {
 	case MTP_OK_ACK:
 		printd(("%s: %p: MTP_OK_ACK <-\n", DRV_NAME, mtp));
@@ -25135,12 +25678,14 @@ STATIC INLINE int
 mtp_r_error(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
+
 	return mtp_hangup(mtp);
 }
 STATIC INLINE int
 mtp_r_hangup(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
+
 	return mtp_hangup(mtp);
 }
 
@@ -25235,6 +25780,7 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = getmajor(*devp);
 	minor_t cminor = getminor(*devp);
 	struct cc *cc, **ccp = &master.cc.list;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -25255,10 +25801,12 @@ isup_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *ccp; ccp = &(*ccp)->next) {
 		major_t dmajor = (*ccp)->u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*ccp)->u.dev.cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -25303,6 +25851,7 @@ isup_close(queue_t *q, int flag, cred_t *crp)
 	head_t *h = (head_t *) cc;
 	str_t *s = (str_t *) cc;
 	psw_t flags;
+
 	(void) flag;
 	(void) crp;
 	(void) s;
@@ -25419,6 +25968,7 @@ STATIC int
 isup_term_caches(void)
 {
 	int err = 0;
+
 	if (isup_cc_cachep) {
 #ifdef HAVE_KTYPE_KMEM_CACHE_T_P
 		if (kmem_cache_destroy(isup_cc_cachep)) {
@@ -25508,6 +26058,7 @@ STATIC struct cc *
 isup_alloc_cc(queue_t *q, struct cc **ccp, dev_t *devp, cred_t *crp)
 {
 	struct cc *cc;
+
 	printd(("%s: %s: create cc dev = %d:%d\n", DRV_NAME, __FUNCTION__, getmajor(*devp),
 		getminor(*devp)));
 	if ((cc = kmem_cache_alloc(isup_cc_cachep, GFP_ATOMIC))) {
@@ -25548,6 +26099,7 @@ isup_free_cc(queue_t *q)
 {
 	struct cc *cc = CC_PRIV(q);
 	psw_t flags;
+
 	ensure(cc, return);
 	printd(("%s: %s: %p: free cc %d:%d\n", DRV_NAME, __FUNCTION__, cc, cc->u.dev.cmajor,
 		cc->u.dev.cminor));
@@ -25668,6 +26220,7 @@ isup_alloc_ct(ulong id, struct tg *tg, struct cg *cg, ulong cic)
 	struct ct *ct, **ctp;
 	struct sr *sr = tg->sr.sr;
 	struct sp *sp = sr->sp.sp;
+
 	assure(sr == cg->sr.sr);
 	printd(("%s: %s: create ct->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((ct = kmem_cache_alloc(isup_ct_cachep, GFP_ATOMIC))) {
@@ -25748,6 +26301,7 @@ isup_free_ct(struct ct *ct)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(ct, return);
 	printd(("%s: %s: %p free ct->id = %ld\n", DRV_NAME, __FUNCTION__, ct, ct->id));
 	spin_lock_irqsave(&ct->lock, flags);
@@ -25944,6 +26498,7 @@ STATIC struct ct *
 ct_lookup(ulong id)
 {
 	struct ct *ct;
+
 	for (ct = master.ct.list; ct && ct->id != id; ct = ct->next) ;
 	return (ct);
 }
@@ -25951,6 +26506,7 @@ STATIC ulong
 ct_get_id(ulong id)
 {
 	struct ct *ct;
+
 	if (!id) {
 		id = 1;
 		for (ct = master.ct.list; ct; ct = ct->next)
@@ -25971,6 +26527,7 @@ STATIC struct cg *
 isup_alloc_cg(ulong id, struct sr *sr)
 {
 	struct cg *cg, **cgp;
+
 	printd(("%s: %s: create cg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((cg = kmem_cache_alloc(isup_cg_cachep, GFP_ATOMIC))) {
 		bzero(cg, sizeof(*cg));
@@ -26025,6 +26582,7 @@ isup_free_cg(struct cg *cg)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(cg, return);
 	printd(("%s: %s: %p free cg->id = %ld\n", DRV_NAME, __FUNCTION__, cg, cg->id));
 	spin_lock_irqsave(&cg->lock, flags);
@@ -26157,6 +26715,7 @@ STATIC struct cg *
 cg_lookup(ulong id)
 {
 	struct cg *cg;
+
 	for (cg = master.cg.list; cg && cg->id != id; cg = cg->next) ;
 	return (cg);
 }
@@ -26164,6 +26723,7 @@ STATIC ulong
 cg_get_id(ulong id)
 {
 	struct cg *cg;
+
 	if (!id) {
 		id = 1;
 		for (cg = master.cg.list; cg; cg = cg->next)
@@ -26184,6 +26744,7 @@ STATIC struct tg *
 isup_alloc_tg(ulong id, struct sr *sr)
 {
 	struct tg *tg, **tgp;
+
 	printd(("%s: %s: create tg->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((tg = kmem_cache_alloc(isup_tg_cachep, GFP_ATOMIC))) {
 		bzero(tg, sizeof(*tg));
@@ -26223,6 +26784,7 @@ isup_free_tg(struct tg *tg)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(tg, return);
 	printd(("%s: %s: %p free tg->id = %ld\n", DRV_NAME, __FUNCTION__, tg, tg->id));
 	spin_lock_irqsave(&tg->lock, flags);
@@ -26331,6 +26893,7 @@ STATIC struct tg *
 tg_lookup(ulong id)
 {
 	struct tg *tg;
+
 	for (tg = master.tg.list; tg && tg->id != id; tg = tg->next) ;
 	return (tg);
 }
@@ -26338,6 +26901,7 @@ STATIC ulong
 tg_get_id(ulong id)
 {
 	struct tg *tg;
+
 	if (!id) {
 		id = 1;
 		for (tg = master.tg.list; tg; tg = tg->next)
@@ -26358,6 +26922,7 @@ STATIC struct sr *
 isup_alloc_sr(ulong id, struct sp *sp, mtp_addr_t * add)
 {
 	struct sr *sr, **srp;
+
 	printd(("%s: %s: create sr->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sr = kmem_cache_alloc(isup_sr_cachep, GFP_ATOMIC))) {
 		bzero(sr, sizeof(*sr));
@@ -26401,6 +26966,7 @@ isup_free_sr(struct sr *sr)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(sr, return);
 	printd(("%s: %s: %p free sr->id = %ld\n", DRV_NAME, __FUNCTION__, sr, sr->id));
 	spin_lock_irqsave(&sr->lock, flags);
@@ -26521,6 +27087,7 @@ STATIC struct sr *
 sr_lookup(ulong id)
 {
 	struct sr *sr;
+
 	for (sr = master.sr.list; sr && sr->id != id; sr = sr->next) ;
 	return (sr);
 }
@@ -26528,6 +27095,7 @@ STATIC ulong
 sr_get_id(ulong id)
 {
 	struct sr *sr;
+
 	if (!id) {
 		id = 1;
 		for (sr = master.sr.list; sr; sr = sr->next)
@@ -26548,6 +27116,7 @@ STATIC struct sp *
 isup_alloc_sp(ulong id, mtp_addr_t * add)
 {
 	struct sp *sp, **spp;
+
 	printd(("%s: %s: create sp->id = %ld\n", DRV_NAME, __FUNCTION__, id));
 	if ((sp = kmem_cache_alloc(isup_sp_cachep, GFP_ATOMIC))) {
 		bzero(sp, sizeof(*sp));
@@ -26574,6 +27143,7 @@ isup_free_sp(struct sp *sp)
 {
 	struct cc *cc;
 	psw_t flags;
+
 	ensure(sp, return);
 	printd(("%s: %s: %p free sp->id = %ld\n", DRV_NAME, __FUNCTION__, sp, sp->id));
 	spin_lock_irqsave(&sp->lock, flags);
@@ -26678,6 +27248,7 @@ STATIC struct sp *
 sp_lookup(ulong id)
 {
 	struct sp *sp;
+
 	for (sp = master.sp.list; sp && sp->id != id; sp = sp->next) ;
 	return (sp);
 }
@@ -26685,6 +27256,7 @@ STATIC ulong
 sp_get_id(ulong id)
 {
 	struct sp *sp;
+
 	if (!id) {
 		id = 1;
 		for (sp = master.sp.list; sp; sp = sp->next)
@@ -26705,6 +27277,7 @@ STATIC struct mtp *
 isup_alloc_mtp(queue_t *q, struct mtp **mpp, ulong index, cred_t *crp)
 {
 	struct mtp *mtp;
+
 	printd(("%s: %s: create mtp index = %lu\n", DRV_NAME, __FUNCTION__, index));
 	if ((mtp = kmem_cache_alloc(isup_mtp_cachep, GFP_ATOMIC))) {
 		bzero(mtp, sizeof(*mtp));
@@ -26739,6 +27312,7 @@ isup_free_mtp(queue_t *q)
 {
 	struct mtp *mtp = MTP_PRIV(q);
 	psw_t flags;
+
 	ensure(mtp, return);
 	printd(("%s: %s: %p free mtp index = %lu\n", DRV_NAME, __FUNCTION__, mtp,
 		mtp->u.mux.index));
@@ -26753,10 +27327,12 @@ isup_free_mtp(queue_t *q)
 		   unlink from signalling relation */
 		if (mtp->sr) {
 			struct sr *sr = mtp->sr;
+
 			if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 				/* 
 				   software block all circuits */
 				struct ct *ct;
+
 				for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 					ct_set(ct, CCTF_LOC_S_BLOCKED);
 				}
@@ -26769,11 +27345,13 @@ isup_free_mtp(queue_t *q)
 		   unlink from signalling point */
 		if (mtp->sp) {
 			struct sr *sr;
+
 			for (sr = mtp->sp->sr.list; sr; sr = sr->sp.next) {
 				if (!(sr->flags & CCTF_LOC_S_BLOCKED)) {
 					/* 
 					   software block all circuits */
 					struct ct *ct;
+
 					for (ct = sr->ct.list; ct; ct = ct->sr.next) {
 						ct_set(ct, CCTF_LOC_S_BLOCKED);
 					}
@@ -26835,6 +27413,7 @@ STATIC struct mtp *
 mtp_lookup(ulong id)
 {
 	struct mtp *mtp;
+
 	for (mtp = master.mtp.list; mtp && mtp->id != id; mtp = mtp->next) ;
 	return (mtp);
 }
@@ -26842,6 +27421,7 @@ STATIC ulong
 mtp_get_id(ulong id)
 {
 	static ulong identifier = 0;
+
 	if (!id) {
 		id = ++identifier;
 	}
@@ -26862,6 +27442,7 @@ mtp_get_id(ulong id)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -26870,6 +27451,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the ISUP driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -26896,6 +27478,7 @@ STATIC int
 isup_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&isup_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -26905,6 +27488,7 @@ STATIC int
 isup_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&isup_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -26922,6 +27506,7 @@ STATIC int
 isup_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &isupinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -26937,6 +27522,7 @@ STATIC int
 isup_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -26948,6 +27534,7 @@ MODULE_STATIC void __exit
 isupterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (isup_majors[mindex]) {
 			if ((err = isup_unregister_strdev(isup_majors[mindex])))
@@ -26966,6 +27553,7 @@ MODULE_STATIC int __init
 isupinit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = isup_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);
