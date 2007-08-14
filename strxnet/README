@@ -1,5 +1,5 @@
 OpenSS7 XTI/TLI Networking -- read me first file.  2007-08-12
-$Id: README,v 0.9.2.32 2007/08/12 15:36:02 brian Exp $
+$Id: README,v 0.9.2.33 2007/08/14 04:00:17 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -94,7 +94,7 @@ When working from `cvs(1)' or `git(1)', please see the `README-cvs',
 file (or see `Downloading from CVS', in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
-This release of the package is published strictly under Version 2 of
+This release of the package is published strictly under Version 3 of
 the `GNU Public License' which can be found in the file `COPYING'.
 Package specific licensing terms (if any) can be found in the file
 `LICENSES'.  Please respect these licensing arrangements.  If you are

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: tpi.h,v 0.9.2.10 2006/10/02 11:32:25 brian Exp $
+ @(#) $Id: tpi.h,v 0.9.2.11 2007/08/14 04:00:45 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:00:45 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi.h,v $
+ Revision 0.9.2.11  2007/08/14 04:00:45  brian
+ - GPLv3 header update
+
  Revision 0.9.2.10  2006/10/02 11:32:25  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -92,7 +95,7 @@
 #ifndef _SYS_TPI_H
 #define _SYS_TPI_H
 
-#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.10 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: tpi.h,v $ $Name:  $($Revision: 0.9.2.11 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 

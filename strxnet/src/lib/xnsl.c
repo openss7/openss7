@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:26 $
+ @(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:00:53 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:26 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:00:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: xnsl.c,v $
+ Revision 0.9.2.5  2007/08/14 04:00:53  brian
+ - GPLv3 header update
+
  Revision 0.9.2.4  2006/10/02 11:32:26  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -82,9 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:26 $"
+#ident "@(#) $RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:00:53 $"
 
-static char const ident[] = "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2006/10/02 11:32:26 $";
+static char const ident[] =
+    "$RCSfile: xnsl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 04:00:53 $";
 
 /* This file cannot be processed with doxygen. */
 
@@ -1277,7 +1281,8 @@ struct __nsl_xlate {
  *  library can also be specified as a name-to-address translation library in
  *  netconfig.  libn2a_inet is provided separately by the strinet package.
  */
-extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service);
+extern struct nd_addrlist *__inet_netdir_getbyname(struct netconfig *nc,
+						   struct nd_hostserv *service);
 extern struct nd_hostservlist *__inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr);
 extern int __inet_netdir_options(struct netconfig *nc, int option, int fd, char *pta);
 extern char *__inet_taddr2uaddr(struct netconfig *nc, struct netbuf *taddr);
@@ -1458,7 +1463,8 @@ __nsl_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *service,
 {
 	if (nc == NULL) {
 		_nderror = ND_BADARG;
-	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0 && __inet_netdir_getbyname) {
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_netdir_getbyname) {
 		return ((*addrs = __inet_netdir_getbyname(nc, service)) ? 0 : -1);
 	} else {
 		struct __nsl_xlate *xl;
@@ -1542,13 +1548,13 @@ __nsl_netdir_free(void *ptr, int struct_type)
 	}
 	switch (struct_type) {
 	case ND_ADDR:
-		return __freenetbuf((struct netbuf *)ptr);
+		return __freenetbuf((struct netbuf *) ptr);
 	case ND_ADDRLIST:
-		return __freeaddrlist((struct nd_addrlist *)ptr);
+		return __freeaddrlist((struct nd_addrlist *) ptr);
 	case ND_HOSTSERV:
-		return __freehostserv((struct nd_hostserv *)ptr);
+		return __freehostserv((struct nd_hostserv *) ptr);
 	case ND_HOSTSERVLIST:
-		return __freehostservlist((struct nd_hostservlist *)ptr);
+		return __freehostservlist((struct nd_hostservlist *) ptr);
 	default:
 		_nderror = ND_UKNWN;
 		break;
@@ -1577,7 +1583,8 @@ __nsl_netdir_options(struct netconfig *nc, int option, int fd, char *pta)
 {
 	if (nc == NULL) {
 		_nderror = ND_BADARG;
-	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0 && __inet_netdir_options) {
+	} else if (nc->nc_nlookups == 0 && strcmp(nc->nc_protofmly, NC_INET) == 0
+		   && __inet_netdir_options) {
 		return (__inet_netdir_options(nc, option, fd, pta));
 	} else {
 		struct __nsl_xlate *xl;
@@ -1897,7 +1904,8 @@ __inet_netdir_getbyname(struct netconfig *nc, struct nd_hostserv *h)
 	if ((n->n_addrs = calloc(cnt, sizeof(struct netbuf))) == NULL)
 		goto nomem;
 	memset(n->n_addrs, 0, cnt * sizeof(struct netbuf));
-	for (b = n->n_addrs, n->n_cnt = 0, ai = res; n->n_cnt < cnt; b++, n->n_cnt++, ai = ai->ai_next) {
+	for (b = n->n_addrs, n->n_cnt = 0, ai = res; n->n_cnt < cnt;
+	     b++, n->n_cnt++, ai = ai->ai_next) {
 		if (ai->ai_addr && ai->ai_addrlen > 0) {
 			if ((b->buf = malloc(ai->ai_addrlen)) == NULL)
 				goto nomem;
@@ -2326,10 +2334,10 @@ __inet_netdir_mergeaddr(struct netconfig *nc, char *caddr, char *saddr)
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.4 $).
+ * This development manual was written for the OpenSS7 NSL Library version \$Name:  $(\$Revision: 0.9.2.5 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.4 $)
- * @date \$Date: 2006/10/02 11:32:26 $
+ * @version \$Name:  $(\$Revision: 0.9.2.5 $)
+ * @date \$Date: 2007/08/14 04:00:53 $
  *
  * @}
  */

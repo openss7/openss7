@@ -1,26 +1,26 @@
 /*****************************************************************************
 
- @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/22 02:10:38 $
+ @(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/14 04:00:52 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This library is free software; you can redistribute it and/or modify it under
- the terms of the GNU Lesser General Public License as published by the Free
- Software Foundation; version 2.1 of the License.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
 
- This library is distributed in the hope that it will be useful, but WITHOUT
+ This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU Lesser Public License for more
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
  details.
 
- You should have received a copy of the GNU Lesser General Public License
- along with this library; if not, write to the Free Software Foundation, Inc.,
- 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/05/22 02:10:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 04:00:52 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: xnet.c,v $
+ Revision 0.9.2.29  2007/08/14 04:00:52  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/22 02:10:38 $"
+#ident "@(#) $RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/14 04:00:52 $"
 
 static char const ident[] =
-    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/05/22 02:10:38 $";
+    "$RCSfile: xnet.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/14 04:00:52 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -3653,7 +3659,6 @@ __xnet_t_rcvleafchange_r(int fd, struct t_leaf_status *change)
 	return (ret);
 }
 
-
 __asm__(".symver __xnet_t_rcvleafchange_r,t_rcvleafchange@@XNET_1.0");
 
 /** @brief Acknolwedge receipt of an orderly release indication.
@@ -4454,9 +4459,8 @@ __xnet_t_rcvvudata(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, uns
 }
 
 int __xnet_t_rcvvopt(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int
-		iovcount, int *flags)
-__attribute__((alias("__xnet_t_rcvvudata")));
-
+		     iovcount, int *flags)
+    __attribute__ ((alias("__xnet_t_rcvvudata")));
 
 /** The reentrant version of __xnet_t_rcvvudata(). */
 int
@@ -4477,8 +4481,8 @@ __xnet_t_rcvvudata_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov,
 }
 
 int __xnet_t_rcvvopt_r(int fd, struct t_unitdata *unitdata, struct t_iovec *iov, unsigned int
-		iovcount, int *flags)
-__attribute__((alias("__xnet_t_rcvvudata_r")));
+		       iovcount, int *flags)
+    __attribute__ ((alias("__xnet_t_rcvvudata_r")));
 
 __asm__(".symver __xnet_t_rcvvudata_r,t_rcvvudata@@XNET_1.0");
 __asm__(".symver __xnet_t_rcvvopt_r,t_rcvvopt@@XNET_1.0");
@@ -6155,10 +6159,10 @@ __asm__(".symver __xnet_t_unbind_r,t_unbind@@XNET_1.0");
 
 /**
   * @section Identification
-  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.28 $).
+  * This development manual was written for the OpenSS7 XNS/XTI Library version \$Name:  $(\$Revision: 0.9.2.29 $).
   * @author Brian F. G. Bidulock
-  * @version \$Name:  $(\$Revision: 0.9.2.28 $)
-  * @date \$Date: 2007/05/22 02:10:38 $
+  * @version \$Name:  $(\$Revision: 0.9.2.29 $)
+  * @date \$Date: 2007/08/14 04:00:52 $
   */
 
 /** @} */
