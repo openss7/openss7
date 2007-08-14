@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:47:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.7  2007/08/14 06:47:36  brian
+ - GPLv3 header update
+
  Revision 0.9.2.6  2007/07/14 01:35:36  brian
  - make license explicit, add documentation
 
@@ -70,9 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $"
 
-static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $";
+static char const ident[] =
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -113,7 +117,7 @@ static char const ident[] = "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) 
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:36 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CD_LICENSE	"GPL v2"
@@ -852,17 +856,16 @@ ch_detach_req(struct ch *ch, queue_t *q, mblk_t *msg)
 #define CD_RC_CONGESTION_DISCARD	(CD_DEVERR + 0x100 + 2)
 #define CD_RC_NO_CONGESTION		(CD_DEVERR + 0x100 + 3)
 #define CD_IAC_CORRECT_SU		(CD_DEVERR + 0x100 + 4)
-#define CD_IAC_ABORT_PROVING		(CD_DEVERR + 0x100 + 5)		/* CD_INITFAILED */
-#define CD_LSC_LINK_FAILURE		(CD_DEVERR + 0x100 + 6)		/* CD_INITFAILED */
+#define CD_IAC_ABORT_PROVING		(CD_DEVERR + 0x100 + 5)	/* CD_INITFAILED */
+#define CD_LSC_LINK_FAILURE		(CD_DEVERR + 0x100 + 6)	/* CD_INITFAILED */
 
 /* Controls (M_CTL) for SS7. */
 #define DAEDT_AERM_START		1
 #define DAEDT_AERM_STOP			2
-#define DAEDT_AERM_SET_NORMAL		3   /* argument is value of tin */
-#define DAEDT_AERM_SET_EMERGENCY	4   /* argument is value of tie */
+#define DAEDT_AERM_SET_NORMAL		3	/* argument is value of tin */
+#define DAEDT_AERM_SET_EMERGENCY	4	/* argument is value of tie */
 #define DAEDT_SUERM_START		5
 #define DAEDT_SUERM_STOP		6
-
 
 /*
  *  SDT State Machine.
@@ -1026,7 +1029,9 @@ sdt_daedt_transmission_request(struct cd *cd, queue_t *q)
 	sl_txc_transmission_request(cd, q);
 }
 
-static inline fastcall register unsigned char cd_rev(register unsigned char byte) __attribute__((const));
+static inline fastcall register unsigned char cd_rev(register unsigned char byte)
+    __attribute__ ((const));
+
 /**
  * cd_rev: reverse bits in a byte
  * @byte: byte in which to reverse bits
@@ -1504,10 +1509,6 @@ ch_rx_process(struct ch *ch, queue_t *q, mblk_t *mp)
 	return (0);
 }
 
-
-
-
-
 /*
  *  CD Primitives received from CD user above.
  *  ------------------------------------------
@@ -1592,10 +1593,9 @@ STATIC noinline __unlikely int
 cd_detach_req(struct cd *cd, queue_t *q, mblk_t *mp)
 {
 	cd_detach_req_t *p = (typeof(p)) mp->b_rptr;
-	int err
+	int err if (mp->b_wptr < mp->b_rptr + sizeof(*p))
+		 goto emsgsize;
 
-	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
-		goto emsgsize;
 	if (cd->info.cd_ppa_style != CD_STYLE2)
 		goto enotsupp;
 	if (cd->info.cd_state != CD_DISABLED)
@@ -2608,6 +2608,7 @@ ch_r_msg(struct ch *ch, queue_t *q, mblk_t *mp)
 {
 	if (likely(DB_TYPE(mp) == M_DATA)) {
 		int err;
+
 		/* link message block to receiver */
 		if ((err = ch_rx_linkb(ch, mp)))
 			return (err);

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:35:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:47:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.7  2007/08/14 06:47:37  brian
+ - GPLv3 header update
+
  Revision 0.9.2.6  2007/07/14 01:35:38  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $"
 
 static char const ident[] =
-    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $";
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -100,7 +103,7 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:35:38 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL v2"
@@ -889,10 +892,10 @@ dl_connect_con(struct dl *dl, queue_t *q, mblk_t *ind)
 		p->dl_qos_offset = 0;
 		p->dl_growth = 0;
 		*mp->b_wptr++ = ind->b_rptr[0];
-		//dl->state = LAPD_ESTABLISHED;
+		// dl->state = LAPD_ESTABLISHED;
 		dl_set_state(dl, DL_DATAXFER);
-		//dl_timer_start(dl, t200);
-		//dl_timer_start(dl, t203);
+		// dl_timer_start(dl, t200);
+		// dl_timer_start(dl, t203);
 		dl->vs = dl->vr = dl->va = 0;
 		printd(("%s: %p: <- DL_CONNECT_CON\n", DRV_NAME, dl));
 		putnext(dl->rq, mp);
@@ -964,7 +967,7 @@ dl_disconnect_ind(struct dl *dl, queue_t *q, mblk_t *ind, ulong orig, ulong reas
 			else
 				dl_set_state(dl, DL_IDLE);
 		} else {
-			//dl->state = LAPD_TEI_ASSIGNED;
+			// dl->state = LAPD_TEI_ASSIGNED;
 			dl_set_state(dl, DL_IDLE);
 		}
 		printd(("%s: %p: <- DL_DISCONNECT_IND\n", DRV_NAME, dl));
@@ -1024,7 +1027,7 @@ dl_reset_con(struct dl *dl, queue_t *q, mblk_t *con)
 		p = (typeof(p)) mp->b_wptr;
 		mp->b_wptr += sizeof(*p);
 		p->dl_primitive = DL_RESET_CON;
-		//dl->state = LAPD_ESTABLISHED;
+		// dl->state = LAPD_ESTABLISHED;
 		dl_set_state(dl, DL_DATAXFER);
 		printd(("%s: %p: <- DL_RESET_CON\n", DRV_NAME, dl));
 		putnext(dl->rq, mp);
@@ -1547,19 +1550,19 @@ dl_allocb_snd(struct dl *dl, queue_t *q, size_t size, int pri, ushort addr, mblk
 	return (mp);
 }
 
-#define DL_MTYPE_RR	0x01 /* 0000 0001 */
-#define DL_MTYPE_RNR	0x05 /* 0000 0101 */
-#define DL_MTYPE_REJ	0x09 /* 0000 1001 */
-#define DL_MTYPE_I	0x00 /* 0000 0000 */
-#define DL_MTYPE_UI	0x03 /* 0000 0011 */
-#define DL_MTYPE_SABM	0x2F /* 0010 1111 */
-#define DL_MTYPE_SABME	0x6F /* 0110 1111 */
-#define DL_MTYPE_SM	0xC3 /* 1100 0011 */
-#define DL_MTYPE_DISC	0x43 /* 0100 0011 */
-#define DL_MTYPE_DM	0x0F /* 0000 1111 */
-#define DL_MTYPE_UA	0x63 /* 0110 0011 */
-#define DL_MTYPE_FRMR	0x87 /* 1000 0111 */
-#define DL_MTYPE_XID	0xAF /* 1010 1111 */
+#define DL_MTYPE_RR	0x01	/* 0000 0001 */
+#define DL_MTYPE_RNR	0x05	/* 0000 0101 */
+#define DL_MTYPE_REJ	0x09	/* 0000 1001 */
+#define DL_MTYPE_I	0x00	/* 0000 0000 */
+#define DL_MTYPE_UI	0x03	/* 0000 0011 */
+#define DL_MTYPE_SABM	0x2F	/* 0010 1111 */
+#define DL_MTYPE_SABME	0x6F	/* 0110 1111 */
+#define DL_MTYPE_SM	0xC3	/* 1100 0011 */
+#define DL_MTYPE_DISC	0x43	/* 0100 0011 */
+#define DL_MTYPE_DM	0x0F	/* 0000 1111 */
+#define DL_MTYPE_UA	0x63	/* 0110 0011 */
+#define DL_MTYPE_FRMR	0x87	/* 1000 0111 */
+#define DL_MTYPE_XID	0xAF	/* 1010 1111 */
 
 static int
 dl_send_i_frame(queue_t *q, mblk_t *dp, ushort pf, ushort nr, ushort ns)
@@ -1745,8 +1748,9 @@ static int
 dl_recv_RR_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 {
 	/* A dl entity receiving an RR with the P bit set to 1 shall set the F bit to 1 in the next
-	 * RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+	   RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
 }
+
 /* RR - Receive Ready */
 static int
 dl_recv_RR_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
@@ -1787,9 +1791,10 @@ dl_recv_RR_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 static int
 dl_recv_RNR_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 {
-	/* A dl entity receiving an RNR with the P bit set to 1 shall set the F bit to 1 in the next
-	 * RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+	/* A dl entity receiving an RNR with the P bit set to 1 shall set the F bit to 1 in the
+	   next RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
 }
+
 /* RNR - Receive Not Ready */
 static int
 dl_recv_RNR_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
@@ -1817,9 +1822,10 @@ dl_recv_RNR_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 static int
 dl_recv_REJ_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
 {
-	/* A dl entity receiving an REJ with the P bit set to 1 shall set the F bit to 1 in the next
-	 * RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+	/* A dl entity receiving an REJ with the P bit set to 1 shall set the F bit to 1 in the
+	   next RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
 }
+
 /* REJ - Reject */
 static int
 dl_recv_REJ_res(queue_t *q, mblk_t *mp, ushort pf, ushort nr)
@@ -1914,6 +1920,7 @@ static int
 dl_recv_XID_cmd(queue_t *q, mblk_t *mp, ushort pf)
 {
 }
+
 /* XID - Exchange Identification */
 static int
 dl_recv_XID_res(queue_t *q, mblk_t *mp, ushort pf)
@@ -1985,7 +1992,7 @@ static int
 dl_recv_I_cmd(queue_t *q, mblk_t *mp, ushort pf, ushort ns, ushort nr)
 {
 	/* A dl entity receiving an I frame with the P bit set to 1 shall set the F bit to 1 in the
-	 * next RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
+	   next RR, RNR, REJ (or FRMR or DM or SREJ in LAPB) frame it transmits. */
 }
 
 static streams_inline streams_fastcall __hot_read int
@@ -2007,19 +2014,19 @@ dl_recv_msg_slow(queue_t *q, mblk_t *mp)
 		goto badsize;
 
 	switch (mod) {
-	case 00:		/* basic - modulo 8*/
+	case 00:		/* basic - modulo 8 */
 		nr = (mp->b_rptr[1] >> 5) & 0x07;
 		ns = (mp->b_rptr[1] >> 1) & 0x07;
 		pf = (mp->b_rptr[1] >> 4) & 0x01;
 		break;
-	case 01:		/* extended - modulo 127*/
+	case 01:		/* extended - modulo 127 */
 		nr = (mp->b_rptr[2] >> 1) & 0x7f;
 		ns = (mp->b_rptr[1] >> 1) & 0x7f;
 		pf = (mp->b_rptr[2] >> 0) & 0x01;
 		break;
 	case 03:		/* super - modulo 32768 */
-		nr = ((ushort)mp->b_rptr[4] << 7) | ((ushort)mp->b_rptr[3] >> 1);
-		ns = ((ushort)mp->b_rptr[2] << 7) | ((ushort)mp->b_rptr[1] >> 1);
+		nr = ((ushort) mp->b_rptr[4] << 7) | ((ushort) mp->b_rptr[3] >> 1);
+		ns = ((ushort) mp->b_rptr[2] << 7) | ((ushort) mp->b_rptr[1] >> 1);
 		pf = (mp->b_rptr[3] >> 0) & 0x01;
 		break;
 	case 02:		/* illegal */

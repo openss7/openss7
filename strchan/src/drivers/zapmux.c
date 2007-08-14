@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:52 $
+ @(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/25 19:00:52 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 06:47:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zapmux.c,v $
+ Revision 0.9.2.4  2007/08/14 06:47:29  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/03/25 19:00:52  brian
  - changes to support 2.6.20-1.2307.fc5 kernel
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:52 $"
+#ident "@(#) $RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:29 $"
 
-static char const ident[] = "$RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/25 19:00:52 $";
+static char const ident[] =
+    "$RCSfile: zapmux.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:29 $";
 
 /*
  *  MX Primitives issued down to MX provider.
@@ -328,10 +332,10 @@ zm_strdoioctl_str(struct mx *mx, int cmd, const void __user *arg, size_t len)
 	union ioctypes *ioc;
 	mblk_t *mp, *dp;
 	long timeo;
-	int err= 0;
+	int err = 0;
 
 #ifdef CONFIG_STREAMS_LIS_BCM
-	static cred_t creds; 
+	static cred_t creds;
 	cred_t *crp = &creds;
 
 	crp->cr_uid = current->euid;
@@ -370,6 +374,7 @@ static int
 zm_wait_for_ack(struct mx *mx)
 {
 	long timeo = drv_msectohz(5000);
+
 #if defined HAVE_KFUNC_PREPARE_TO_WAIT
 	DEFINE_WAIT(wait);
 #else
@@ -594,7 +599,7 @@ zm_ioctl(struct zt_chan *chan, unsigned int cmd, unsigned long data)
 		return (-ENOSR);
 	}
 	dp->b_wptr += sizeof(unsigned long);
-	*(unsigned long *)dp->b_rptr = data;
+	*(unsigned long *) dp->b_rptr = data;
 	DB_TYPE(mp) = M_IOCTL;
 	ioc = (typeof(ioc)) mp->b_rptr;
 	mp->b_wptr += sizeof(union ioctypes);
