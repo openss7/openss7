@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/07/14 01:37:19 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/14 03:31:08 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 0.9.2.40  2007/08/14 03:31:08  brian
+ - GPLv3 header update
+
  Revision 0.9.2.39  2007/07/14 01:37:19  brian
  - make license explicit, add documentation
 
@@ -169,10 +172,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/07/14 01:37:19 $"
+#ident "@(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/14 03:31:08 $"
 
 static char const ident[] =
-    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/07/14 01:37:19 $";
+    "$RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/14 03:31:08 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -225,7 +228,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/07/14 01:37:19 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/14 03:31:08 $"
 #define IP_DEVICE	"SVR 4.2 STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL v2"
@@ -316,7 +319,7 @@ STATIC struct qinit np_rinit = {
 	.qi_putp = ss7_oput,		/* Read put procedure (message from below) */
 	.qi_srvp = ss7_osrv,		/* Read service procedure */
 	.qi_qopen = np_qopen,		/* Each open */
-	.qi_qclose = np_qclose,	/* Last close */
+	.qi_qclose = np_qclose,		/* Last close */
 	.qi_minfo = &np_minfo,		/* Module information */
 	.qi_mstat = &np_mstat,		/* Module statistics */
 };
@@ -627,13 +630,13 @@ npi_get_state(struct np *np)
 }
 
 STATIC INLINE fastcall np_ulong
-npi_chk_state(struct np * np, np_ulong mask)
+npi_chk_state(struct np *np, np_ulong mask)
 {
 	return (((1 << np->i_state) & (mask)) != 0);
 }
 
 STATIC INLINE fastcall np_ulong
-npi_not_state(struct np * np, np_ulong mask)
+npi_not_state(struct np *np, np_ulong mask)
 {
 	return (((1 << np->i_state) & (mask)) == 0);
 }
@@ -751,6 +754,7 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 #else
 static spinlock_t *inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
+
 #define inet_proto_lockp (&inet_proto_lock_)
 #endif
 STATIC struct net_protocol **inet_protosp = (typeof(inet_protosp)) HAVE_INET_PROTOS_ADDR;
@@ -3982,8 +3986,7 @@ ne_data_req(queue_t *q, mblk_t *mp)
 	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
 		     || dlen > np->info.NIDU_size || dlen > np->info.NSDU_size))
 		goto error;
-	if (unlikely
-	    ((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
+	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
 	return (QR_STRIP);
       discard:
@@ -4030,8 +4033,7 @@ ne_exdata_req(queue_t *q, mblk_t *mp)
 	if (unlikely(!(dp = mp->b_cont) || (dlen = msgsize(dp)) == 0
 		     || dlen > np->info.NIDU_size || dlen > np->info.ENSDU_size))
 		goto error;
-	if (unlikely
-	    ((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
+	if (unlikely((NPI_error = npi_senddata(np, np->qos.protocol, np->qos.daddr, dp)) < 0))
 		goto error;
 	return (QR_STRIP);
       discard:
@@ -4240,7 +4242,7 @@ np_w_proto(queue_t *q, mblk_t *mp)
 		case N_INFO_ACK:	/* Information Acknowledgement */
 		case N_BIND_ACK:	/* NS User bound to network address */
 		case N_ERROR_ACK:	/* Error Acknowledgement */
-		case N_OK_ACK:		/* Success Acknowledgement */
+		case N_OK_ACK:	/* Success Acknowledgement */
 		case N_UNITDATA_IND:	/* Connection-less data receive indication */
 		case N_UDERROR_IND:	/* UNITDATA Error Indication */
 		case N_DATACK_IND:	/* Data acknowledgement indication */
@@ -4261,10 +4263,10 @@ np_w_proto(queue_t *q, mblk_t *mp)
 		/* The put and service procedure do not recognize all errors. Sometimes we return
 		   an error to here just to restore the previous state. */
 		switch (rtn) {
-		case -EBUSY:		/* flow controlled */
-		case -EAGAIN:		/* try again */
-		case -ENOMEM:		/* could not allocate memory */
-		case -ENOBUFS:		/* could not allocate an mblk */
+		case -EBUSY:	/* flow controlled */
+		case -EAGAIN:	/* try again */
+		case -ENOMEM:	/* could not allocate memory */
+		case -ENOBUFS:	/* could not allocate an mblk */
 		case -EOPNOTSUPP:	/* primitive not supported */
 			return ne_error_ack(q, prim, rtn);
 		case -EPROTO:
@@ -5149,8 +5151,7 @@ np_qopen(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 				break;
 			if (cminor == (*npp)->u.dev.cminor) {
 				if (++cminor >= NMINORS) {
-					if (++mindex >= CMAJORS
-					    || !(cmajor = npi_majors[mindex]))
+					if (++mindex >= CMAJORS || !(cmajor = npi_majors[mindex]))
 						break;
 					cminor = 0;
 				}

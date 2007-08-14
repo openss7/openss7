@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/02 13:07:56 $
+ @(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 03:31:20 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/04/02 13:07:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldltest.c,v $
+ Revision 0.9.2.13  2007/08/14 03:31:20  brian
+ - GPLv3 header update
+
  Revision 0.9.2.12  2007/04/02 13:07:56  brian
  - fixed option handilng bug in ldltest
 
@@ -94,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/02 13:07:56 $"
+#ident "@(#) $RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 03:31:20 $"
 
 static char const ident[] =
-    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/04/02 13:07:56 $";
+    "$RCSfile: ldltest.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 03:31:20 $";
 
 /*
  *  ldltest: Test program for dlpi driver
@@ -770,8 +773,10 @@ do_info(int fd)
 			printf("\tprovider_style=%ld\n", (ulong) reply.ack.dl_provider_style);
 			printf("\taddr_offset=%lu\n", (ulong) reply.ack.dl_addr_offset);
 			printf("\tversion=%lu\n", (ulong) reply.ack.dl_version);
-			printf("\tbrdcst_addr_length=%lu\n", (ulong) reply.ack.dl_brdcst_addr_length);
-			printf("\tbrdcst_addr_offset=%lu\n", (ulong) reply.ack.dl_brdcst_addr_offset);
+			printf("\tbrdcst_addr_length=%lu\n",
+			       (ulong) reply.ack.dl_brdcst_addr_length);
+			printf("\tbrdcst_addr_offset=%lu\n",
+			       (ulong) reply.ack.dl_brdcst_addr_offset);
 			printf("\tgrowth=%lu\n", (ulong) reply.ack.dl_growth);
 			if (reply.ack.dl_addr_length && reply.ack.dl_addr_offset &&
 			    reply.ack.dl_addr_offset + reply.ack.dl_addr_length <= ctlbuf.len)
@@ -797,7 +802,8 @@ do_info(int fd)
 					printf("\t\ttrans_delay=%ld\n", (long) sel->dl_trans_delay);
 					printf("\t\tpriority=%ld\n", (long) sel->dl_priority);
 					printf("\t\tprotection=%ld\n", (long) sel->dl_protection);
-					printf("\t\tresidual_error=%ld\n", (long) sel->dl_residual_error);
+					printf("\t\tresidual_error=%ld\n",
+					       (long) sel->dl_residual_error);
 				}
 			}
 			if (reply.ack.dl_qos_range_length >= sizeof(unsigned long)
@@ -809,7 +815,8 @@ do_info(int fd)
 				printf("\tQOS range:\n");
 				if (range->dl_qos_type != DL_QOS_CL_RANGE1)
 					printf("\t\tUnknown type %lu, expected %lu\n",
-					       (ulong) range->dl_qos_type, (ulong) DL_QOS_CL_RANGE1);
+					       (ulong) range->dl_qos_type,
+					       (ulong) DL_QOS_CL_RANGE1);
 				else {
 					printf("\t\ttrans_delay(target, accept)=(%ld, %ld)\n",
 					       (long) range->dl_trans_delay.dl_target_value,
@@ -1859,7 +1866,7 @@ _do_rcv_unitdata(int fd, unsigned char *data, int *datalen, unsigned char *src_d
 						"should be at least %lu\n",
 						ctlbuf.len,
 						(ulong) sizeof(dl_unitdata_ind_t) + 2 * (addr_len +
-										 sap_len));
+											 sap_len));
 			}
 			return -1;
 		}

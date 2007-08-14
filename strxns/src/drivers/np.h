@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: np.h,v 0.9.2.1 2006/04/18 18:00:13 brian Exp $
+ @(#) $Id: np.h,v 0.9.2.2 2007/08/14 03:31:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -44,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/04/18 18:00:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.h,v $
+ Revision 0.9.2.2  2007/08/14 03:31:09  brian
+ - GPLv3 header update
+
  Revision 0.9.2.1  2006/04/18 18:00:13  brian
  - added some headers to move event definitions out
 
@@ -57,7 +61,7 @@
 #ifndef __LOCAL_NP_H__
 #define __LOCAL_NP_H__
 
-#ident "@(#) $RCSfile: np.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: np.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #include <sys/npi.h>
 

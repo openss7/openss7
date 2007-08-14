@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:37:22 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.44  2007/08/14 03:31:10  brian
+ - GPLv3 header update
+
  Revision 0.9.2.43  2007/07/14 01:37:22  brian
  - make license explicit, add documentation
 
@@ -199,10 +202,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:37:22 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:37:22 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -263,7 +266,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.43 $) $Date: 2007/07/14 01:37:22 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL v2"
@@ -351,8 +354,8 @@ STATIC struct module_info np_minfo = {
 	.mi_lowat = (1 << 16),		/* Lo water mark */
 };
 
-STATIC struct module_stat np_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat np_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat np_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat np_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 /* Upper multiplex is a N provider following the NPI. */
 
@@ -1376,6 +1379,7 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned int dlen = msgsize(mp);
+
 #if 0
 	unsigned long flags;
 #endif
@@ -1474,6 +1478,7 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
 	unsigned char *beg, *end;
+
 #if 0
 	unsigned long flags;
 #endif
@@ -1616,6 +1621,7 @@ STATIC INLINE streams_fastcall __hot_out struct sk_buff *
 np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 {
 	struct sk_buff *skb;
+
 #if 0
 	unsigned long flags;
 #endif
@@ -2586,7 +2592,8 @@ np_passive(struct np *np, struct sockaddr_in *RES_buffer, const socklen_t RES_le
 		goto recover;
 
 	if (dp != NULL)
-		if (unlikely((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != QR_ABSORBED))
+		if (unlikely
+		    ((err = np_senddata(np, np->qos.protocol, np->qos.daddr, dp)) != QR_ABSORBED))
 			goto recover;
 	if (SEQ_number != NULL) {
 		bufq_unlink(&np->conq, SEQ_number);

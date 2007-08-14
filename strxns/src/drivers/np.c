@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:37:21 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 03:31:09 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:21 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 0.9.2.14  2007/08/14 03:31:09  brian
+ - GPLv3 header update
+
  Revision 0.9.2.13  2007/07/14 01:37:21  brian
  - make license explicit, add documentation
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:37:21 $"
+#ident "@(#) $RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 03:31:09 $"
 
 static char const ident[] =
-    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:37:21 $";
+    "$RCSfile: np.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 03:31:09 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -133,7 +136,7 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/07/14 01:37:21 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/08/14 03:31:09 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL v2"
@@ -631,7 +634,7 @@ np_get_state(struct np *np)
 	return np->np_info.CURRENT_state;
 }
 STATIC INLINE fastcall np_ulong
-np_get_statef(struct np * np)
+np_get_statef(struct np *np)
 {
 	return (1 << np_get_state(np));
 }
@@ -851,7 +854,7 @@ dl_get_state(struct dl *dl)
 	return dl->dl_info.dl_current_state;
 }
 STATIC INLINE fastcall dl_ulong
-dl_get_statef(struct dl * dl)
+dl_get_statef(struct dl *dl)
 {
 	return (1 << dl_get_state(np));
 }
@@ -2432,6 +2435,7 @@ np_ip_v4_steal(struct sk_buff *skb)
 {
 	skb->nh.iph->protocol = 255;
 }
+
 /**
  * np_ip_v4_rcv_next - pass a socket buffer to the next handler
  * @skb: socket buffer to pass
@@ -2445,6 +2449,7 @@ np_ip_v4_rcv_next(struct sk_buff *skb)
 	kfree_skb(skb);
 	return (0);
 }
+
 /**
  * np_ip_v4_err_next - pass a socket buffer to the next error handler
  * @skb: socket buffer to pass
@@ -2457,6 +2462,7 @@ np_ip_v4_err_next(struct sk_buff *skb, __u32 info)
 {
 	return (0);
 }
+
 /**
  * np_ip_init_proto - initialize interception of IP protocol packets
  * @proto: IP protocol number to intercept
@@ -2523,6 +2529,7 @@ STATIC void
 np_ip_v4_steal(struct sk_buff *skb)
 {
 }
+
 /**
  * np_ip_v4_rcv_next - pass a socket buffer to the next handler
  * @skb - socket buffer to pass
@@ -2541,6 +2548,7 @@ np_ip_v4_rcv_next(struct sk_buff *skb)
 	kfree_skb(skb);
 	return (0);
 }
+
 /**
  * np_ip_v4_err_next - pass a socket buffer to the next error handler
  * @skb - socket buffer to pass
@@ -2558,10 +2566,12 @@ np_ip_v4_err_next(struct sk_buff *skb, __u32 info)
 	/* don't free for error handlers */
 	return (0);
 }
+
 #ifdef CONFIG_SMP
 STATIC spinlock_t *inet_proto_lockp = (typeof(inet_proto_lockp)) HAVE_INET_PROTO_LOCK_ADDR;
 #else
 static spinlock_t *inet_proto_lock_ = SPIN_LOCK_UNLOCKED;
+
 #define inet_proto_lockp (&inet_proto_lock_)
 #endif
 
@@ -2645,7 +2655,8 @@ np_ip_term_proto(unsigned char proto)
 STATIC void streamscall
 np_ip_free(caddr_t data)
 {
-	struct sk_buff *skb = (struct sk_buff *)data;
+	struct sk_buff *skb = (struct sk_buff *) data;
+
 	kfree_skb(skb);
 	return;
 }
@@ -2774,6 +2785,7 @@ np_ip_v4_rcv(struct sk_buff *skb)
       too_small:
 	return np_ip_v4_rcv_next(skb);
 }
+
 /**
  * np_ip_v4_err - handle an ICMP received packet
  * @skb: socket buffer containing packet with headers pulled
@@ -2832,7 +2844,8 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 			sin->sin_port = uh->dest;
 			sin->sin_addr.s_addr = iph->daddr;
 			mp->b_wptr += sizeof(*sin);
-			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_UDERROR_IND"); */
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<-
+			   N_UDERROR_IND"); */
 		} else {
 			N_reset_ind_t *p;
 
@@ -2846,7 +2859,8 @@ np_ip_v4_err(struct sk_buff *skb, __u32 info)
 			p->RESET_reason = FIXME;
 			mp->b_wptr += sizeof(*p);
 			np_set_state(np, NS_WRES_RIND);
-			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<- N_RESET_IND"); */
+			/* strlog(DRV_ID, np->u.dev.cminor, NS_LOG_NSP_PRIM, SL_TRACE, "<-
+			   N_RESET_IND"); */
 		}
 		put(np->rq, mp);
 		np_release(&np);
@@ -3122,7 +3136,7 @@ ne_ip_bind_req(struct np *np, struct ne_bind_req *ep)
 		np->ADDR_length = ep->ADDR_length;
 	}
 	NPI_error = NBADADDR;
-	if (sin->sin_port == 0 & ~(np->BIND_flags & (DEFAULT_LISTENER|TOKEN_REQUEST)))
+	if (sin->sin_port == 0 & ~(np->BIND_flags & (DEFAULT_LISTENER | TOKEN_REQUEST)))
 		goto error;
 	if (ep->PROTOID_length == 0) {
 		uchar *proto = (uchar *) np->PROTOID_buffer;
@@ -3195,7 +3209,7 @@ ne_ip_conn_req(struct np *np, struct ne_conn_req *ep)
 			goto error;
 		}
 		mp->b_datap->db_type = M_PROTO;
-		p = (typeof(p))mp->b_wptr;
+		p = (typeof(p)) mp->b_wptr;
 		p->PRIM_type = N_CONN_CON;
 		p->RES_length = np->DEST_length;
 		p->RES_offset = np->DEST_length ? sizeof(*p) : 0;

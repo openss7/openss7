@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: dlpiapi.h,v 0.9.2.1 2007/01/05 06:14:53 brian Exp $
+ @(#) $Id: dlpiapi.h,v 0.9.2.2 2007/08/14 03:31:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/01/05 06:14:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpiapi.h,v $
+ Revision 0.9.2.2  2007/08/14 03:31:12  brian
+ - GPLv3 header update
+
  Revision 0.9.2.1  2007/01/05 06:14:53  brian
  - added GCOM api files, doc updates
 
@@ -58,12 +61,11 @@
 #ifndef __DLPIAPI_H__
 #define __DLPIAPI_H__
 
-#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 0.9.2.1 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: dlpiapi.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #ifdef __BEGIN_DECLS
 __BEGIN_DECLS
 #endif
-
 extern int dlpi_attach_ppa(int dlpi_data, unsigned long ppa);
 extern int dlpi_bind_dlsap(int dlpi_data, unsigned long dlsap, int conind_nr);
 extern int dlpi_clear_zombies(void);

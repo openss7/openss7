@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:37:20 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.39  2007/08/14 03:31:09  brian
+ - GPLv3 header update
+
  Revision 0.9.2.38  2007/07/14 01:37:20  brian
  - make license explicit, add documentation
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -118,7 +121,7 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.38 $) $Date: 2007/07/14 01:37:20 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL v2"
@@ -4992,7 +4995,8 @@ ldl_init(void)
 	if ((err = ldl_register_ioctl32()) < 0)
 		return (err);
 	if ((err = register_strdev(&ldl_cdev, major)) < 0) {
-		cmn_err(CE_WARN, "%s: Cannot register major %d, err = %d\n", DRV_NAME, (int)major, -err);
+		cmn_err(CE_WARN, "%s: Cannot register major %d, err = %d\n", DRV_NAME, (int) major,
+			-err);
 		ldl_unregister_ioctl32();
 		return (err);
 	}
