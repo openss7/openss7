@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:14:07 $
+ @(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 08:14:07 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockpath.c,v $
+ Revision 0.9.2.4  2007/08/14 05:17:23  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2006/12/18 08:14:07  brian
  - resolve device numbering
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:14:07 $"
+#ident "@(#) $RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $"
 
-static char const ident[] = "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/12/18 08:14:07 $";
+static char const ident[] =
+    "$RCSfile: sockpath.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -172,7 +176,7 @@ __sockpath_tsd_alloc(void)
 	ret = pthread_key_create(&__sockpath_tsd_key, __sockpath_tsd_free);
 	buf = malloc(sizeof(struct __sockpath_tsd));
 	memset(buf, 0, sizeof(*buf));
-	ret = pthread_setspecific(__sockpath_tsd_key, (void *)buf);
+	ret = pthread_setspecific(__sockpath_tsd_key, (void *) buf);
 	return;
 }
 
@@ -180,7 +184,7 @@ static struct __sockpath_tsd *
 __sockpath_get_tsd(void)
 {
 	pthread_once(&__sockpath_tsd_once, __sockpath_tsd_alloc);
-	return (struct __sockpath_tsd *)pthread_getspecific(__sockpath_tsd_key);
+	return (struct __sockpath_tsd *) pthread_getspecific(__sockpath_tsd_key);
 }
 
 int *
@@ -381,7 +385,7 @@ __sockpath_getsockpath(void *handle)
 	}
 	pthread_rwlock_unlock(&__sockpath_sp_lock);
 	pthread_rwlock_wrlock(&sh->sh_lock);
-	if (!(sp = (struct sockpath *)(*(sh->sh_curr)))) {
+	if (!(sp = (struct sockpath *) (*(sh->sh_curr)))) {
 		sp_error = SP_NOMOREENTRIES;
 		pthread_rwlock_unlock(&sh->sh_lock);
 		return (NULL);
@@ -593,7 +597,6 @@ __sockpath_sp_sperror(void)
 }
 
 __asm__(".symver __sockpath_sp_sperror,sp_sperror@@SOCKPATH_1.0");
-
 
 /**
  * @fn void sp_perror(const char *msg)

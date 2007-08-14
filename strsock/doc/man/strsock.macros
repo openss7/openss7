@@ -1,10 +1,10 @@
-.\" -*- nroff -*- vim: ft=nroff
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strsock.macros,v 0.9.2.3 2006/12/31 13:48:50 brian Exp $
+.\" @(#) $Id: strsock.macros,v 0.9.2.4 2007/08/14 05:17:05 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (C) 2001-2007  OpenSS7 Corporation <www.openss7.com>
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 .\"
 .\" All Rights Reserved.
 .\"
@@ -23,7 +23,7 @@
 .\" the use of the information contained herein.  The author(s) may not
 .\" have taken the same level of care in the production of this manual,
 .\" which is licensed free of charge, as they might when working
-.\" professionally.
+.\" professionally.  The author(s) will take no responsibility in it.
 .\" 
 .\" Formatted or processed versions of this manual, if unaccompanied by
 .\" the source, must acknowledge the copyright and authors of this work.
@@ -52,7 +52,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2006/12/31 13:48:50 $ by $Author: brian $
+.\" Last Modified $Date: 2007/08/14 05:17:05 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strsock.macros,v $
+.\" Revision 0.9.2.4  2007/08/14 05:17:05  brian
+.\" - GPLv3 header update
 .\"
 .\" =========================================================================
 .de ]<
@@ -309,6 +315,8 @@ The OpenSS7 Project http://www.openss7.org/
 ..
 .de ID
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -319,9 +327,13 @@ The OpenSS7 Project http://www.openss7.org/
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I2
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -334,9 +346,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I3
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -349,9 +365,13 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I4
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
 .PP
@@ -362,12 +382,15 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de I5
 .SH IDENTIFICATION
+.ad l
+.hy 0
 .HP
 @PACKAGE_TITLE@: Package @PACKAGE@ version @VERSION@ released @PACKAGE_DATE@.
-.\"OpenSS7 Iperf: $Name:  $($Revision: 0.9.2.3 $); $Date: 2006/12/31 13:48:50 $.
 .PP
 \f(HRCopyright\ \(co\ 1997-2007\ OpenSS7 Corp.
 .br
@@ -378,6 +401,8 @@ All Rights Reserved.
 All Rights Reserved.
 .br
 .I (See roff source for permission notice.)
+.hy 6
+.ad b
 ..
 .de VR
 .SH "VERSIONS"

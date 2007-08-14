@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sockpath.h,v 0.9.2.2 2006/09/18 13:52:42 brian Exp $
+ @(#) $Id: sockpath.h,v 0.9.2.3 2007/08/14 05:17:20 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockpath.h,v $
+ Revision 0.9.2.3  2007/08/14 05:17:20  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2006/09/18 13:52:42  brian
  - added doxygen markers to sources
 
@@ -61,7 +64,7 @@
 #ifndef __SYS_SOCKPATH_H__
 #define __SYS_SOCKPATH_H__
 
-#ident "@(#) $RCSfile: sockpath.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sockpath.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed with doxygen(1). */
 
@@ -89,8 +92,10 @@ struct sockpath {
 
 #ifdef _REENTRANT
 extern int *__sperror(void);
+
 #define sp_error (*(__sperror()))
 extern char *__sperrbuf(void);
+
 #define sp_errbuf (*(__sperrbuf()))
 #else
 #error Compiled without _REENTRANT defined!

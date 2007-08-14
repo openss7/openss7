@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:22:38 $
+ @(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/25 12:22:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socklib.c,v $
+ Revision 0.9.2.4  2007/08/14 05:17:23  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2006/09/25 12:22:38  brian
  - working up library
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:22:38 $"
+#ident "@(#) $RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $"
 
 static char const ident[] =
-    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/25 12:22:38 $";
+    "$RCSfile: socklib.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -695,7 +698,8 @@ __so_setsockopt(int s, int level, int optname, const void *optval, socklen_t opt
 				    && so->info.sockparams.sp_type == SOCK_STREAM))) {
 				optval = &option;
 				optlen = sizeof(struct t_kpalive);
-				rval = __so_setoption(s, T_INET_TCP, T_TCP_KEEPALIVE, optval, optlen);
+				rval =
+				    __so_setoption(s, T_INET_TCP, T_TCP_KEEPALIVE, optval, optlen);
 				if (rval == 0 || errno != EPERM)
 					return (rval);
 			}

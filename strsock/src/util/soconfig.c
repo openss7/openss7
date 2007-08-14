@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:32:09 $
+ @(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: soconfig.c,v $
+ Revision 0.9.2.4  2007/08/14 05:17:29  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2006/10/02 11:32:09  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -79,9 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:32:09 $"
+#ident "@(#) $RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:29 $"
 
-static char const ident[] = "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/02 11:32:09 $";
+static char const ident[] =
+    "$RCSfile: soconfig.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:29 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -122,7 +126,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 %2$s\n\
 Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 2, included here by reference.\n\
+Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -207,15 +211,15 @@ All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version  2  of  the  License.\n\
+Foundation; Version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
 You should  have received a copy of the GNU  General  Public License  along with\n\
-this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
-Cambridge, MA 02139, USA.\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -286,7 +290,7 @@ cmn_set(int family, int type, int protocol, const char *path)
 	}
 	ioc.ic_cmd = SIOCPROTO;
 	ioc.ic_len = sizeof(prot);
-	ioc.ic_dp = (char *)&prot;
+	ioc.ic_dp = (char *) &prot;
 	ioc.ic_timout = -1;
 	if (ioctl(fd, I_STR, &ioc) == -1) {
 		fprintf(stderr, "%s: %s", "soconfig", strerror(errno));

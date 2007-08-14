@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/06/17 01:57:16 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -11,7 +11,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,19 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/17 01:57:16 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile,v $
-# Revision 0.9.2.3  2007/06/17 01:57:16  brian
-# - updates for release, remove any later language
-#
-# Revision 0.9.2.2  2007/06/13 20:31:52  brian
-# - added papers to release
-#
-# Revision 0.9.2.1  2007/05/03 21:24:21  brian
-# - added paper
+# Last Modified $Date: 2007/08/14 05:17:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -251,3 +239,21 @@ clean: clean-fig clean-dat
 MY_PHONY += clean clean-fig clean-gif clean-png clean-eps clean-pdf clean-dat
 
 .PHONY: $(MY_PHONY)
+
+# =============================================================================
+#
+# $Log: Makefile,v $
+# Revision 0.9.2.4  2007/08/14 05:17:09  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.3  2007/06/17 01:57:16  brian
+# - updates for release, remove any later language
+#
+# Revision 0.9.2.2  2007/06/13 20:31:52  brian
+# - added papers to release
+#
+# Revision 0.9.2.1  2007/05/03 21:24:21  brian
+# - added paper
+#
+# =============================================================================
+# vim: ft=make
