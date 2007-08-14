@@ -5,22 +5,23 @@
 //  --------------------------------------------------------------------------
 //  
 //  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-// 
+//  
 //  All Rights Reserved.
-// 
+//  
 //  This program is free software; you can redistribute it and/or modify it
 //  under the terms of the GNU General Public License as published by the Free
-//  Software Foundation; version 2 of the License.
-// 
+//  Software Foundation; version 3 of the License.
+//  
 //  This program is distributed in the hope that it will be useful, but
 //  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 //  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 //  for more details.
-// 
+//  
 //  You should have received a copy of the GNU General Public License along
-//  with this program; if not, write to the Free Software Foundation, Inc.,
-//  675 Mass Ave, Cambridge, MA 02139, USA.
-// 
+//  with this program.  If not, see <http://www.gnu.org/licenses/>, or write
+//  to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139,
+//  USA.
+//  
 //  --------------------------------------------------------------------------
 //  
 //  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
@@ -39,16 +40,16 @@
 //  (or any successor regulations).
 //  
 //  --------------------------------------------------------------------------
-//
+//  
 //  Commercial licensing and support of this software is available from
 //  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-//
+//  
 //  --------------------------------------------------------------------------
-// 
+//  
 //  Last Modified $Date$ by $Author$
-// 
+//  
 //  --------------------------------------------------------------------------
-// 
+//  
 //  $Log$
 //  ==========================================================================
 

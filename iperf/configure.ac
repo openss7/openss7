@@ -3,18 +3,18 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.22 $) $Date: 2007/03/26 07:56:14 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.1.1.2.23 $) $Date: 2007/08/14 21:03:28 $
 #
 # -----------------------------------------------------------------------------
 #
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,22 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/26 07:56:14 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: configure.ac,v $
-# Revision 1.1.1.1.2.22  2007/03/26 07:56:14  brian
-# - install html images properly, needs autoconf 2.61 and automake 2.10
-#
-# Revision 1.1.1.1.2.21  2007/02/22 08:46:38  brian
-# - updated required autoconf to 2.60
-#
-# Revision 1.1.1.1.2.20  2007/02/12 16:55:51  brian
-# - more autoconf 2.61 support
-#
-# Revision 1.1.1.1.2.19  2007/02/12 10:39:55  brian
-# - added support for autoconf 2.61
+# Last Modified $Date: 2007/08/14 21:03:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([Iperf],[2.0],[bugs@openss7.org],[iperf])
-AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.22 $) $Date: 2007/03/26 07:56:14 $])
+AC_REVISION([$Name:  $($Revision: 1.1.1.1.2.23 $) $Date: 2007/08/14 21:03:28 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -391,6 +376,24 @@ AC_CONFIG_FILES([Makefile
 		src/Makefile])
 AC_OUTPUT
 
+# =============================================================================
+#
+# $Log: configure.ac,v $
+# Revision 1.1.1.1.2.23  2007/08/14 21:03:28  brian
+# - GPLv3 header updates
+#
+# Revision 1.1.1.1.2.22  2007/03/26 07:56:14  brian
+# - install html images properly, needs autoconf 2.61 and automake 2.10
+#
+# Revision 1.1.1.1.2.21  2007/02/22 08:46:38  brian
+# - updated required autoconf to 2.60
+#
+# Revision 1.1.1.1.2.20  2007/02/12 16:55:51  brian
+# - more autoconf 2.61 support
+#
+# Revision 1.1.1.1.2.19  2007/02/12 10:39:55  brian
+# - added support for autoconf 2.61
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
