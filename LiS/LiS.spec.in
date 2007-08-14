@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 # 
-# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.73 $) $Date: 2007/06/24 12:10:05 $
+# @(#) $RCSfile: LiS.spec.in,v $ $Name:  $($Revision: 1.1.6.74 $) $Date: 2007/08/14 10:46:51 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -12,7 +12,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -20,8 +20,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/06/24 12:10:05 $ by $Author: brian $
+# Last Modified $Date: 2007/08/14 10:46:51 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1981,9 +1981,13 @@ fi
 %changelog
 # ---------------------------------------------------------------------------
 # $Log: LiS.spec.in,v $
-# Revision 1.1.6.73  2007/06/24 12:10:05  brian
-# - recognize EL4 and EL5 for kernel-develop
+# Revision 1.1.6.74  2007/08/14 10:46:51  brian
+# - GPLv3 header update
 #
+
+* Sun Jun 24 2007 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.6.73  2007/06/24 12:10:05  brian
+- recognize EL4 and EL5 for kernel-develop
 
 * Wed Jun 20 2007 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.6.72  2007/06/20 09:27:15  brian

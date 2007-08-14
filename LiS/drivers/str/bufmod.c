@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:32:55 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:32:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: bufmod.c,v $
+ Revision 0.9.2.13  2007/08/14 10:46:56  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:32:55 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $"
 
-static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:32:55 $";
-
+static char const ident[] =
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -81,7 +87,7 @@ static char const ident[] = "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.1
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/07/14 01:32:55 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define BUFMOD_LICENSE		"GPL v2"
@@ -141,8 +147,8 @@ STATIC struct module_info bufmod_minfo = {
 	.mi_lowat = 1024,
 };
 
-STATIC struct module_stat bufmod_rstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
-STATIC struct module_stat bufmod_wstat __attribute__((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat bufmod_rstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
+STATIC struct module_stat bufmod_wstat __attribute__ ((__aligned__(SMP_CACHE_BYTES)));
 
 #ifndef unlikely
 #define unlikely(__x) (__x)
@@ -170,9 +176,8 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHDATA);
 		}
 	}
-	if (likely(mp->b_datap->db_type >= QPCTL
-		   || (q->q_first == NULL && !(q->q_flag & QRUNNING)
-		       && bcanputnext(q, mp->b_band)))) {
+	if (likely(mp->b_datap->db_type >= QPCTL || (q->q_first == NULL && !(q->q_flag & QRUNNING)
+						     && bcanputnext(q, mp->b_band)))) {
 		putnext(q, mp);
 		return (0);
 	}
@@ -195,9 +200,8 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHDATA);
 		}
 	}
-	if (likely(mp->b_datap->db_type >= QPCTL
-		   || (q->q_first == NULL && !(q->q_flag & QRUNNING)
-		       && bcanputnext(q, mp->b_band)))) {
+	if (likely(mp->b_datap->db_type >= QPCTL || (q->q_first == NULL && !(q->q_flag & QRUNNING)
+						     && bcanputnext(q, mp->b_band)))) {
 		putnext(q, mp);
 		return (0);
 	}

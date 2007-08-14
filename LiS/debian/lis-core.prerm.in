@@ -2,18 +2,18 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/05/19 02:26:55 $
+# @(#) $RCSfile: lis-core.prerm.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 10:46:54 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -21,8 +21,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/05/19 02:26:55 $ by $Author: brian $
+# Last Modified $Date: 2007/08/14 10:46:54 $ by $Author: brian $
 #
 # =============================================================================
 @mscript_header@
@@ -95,18 +95,18 @@ function prerm_oldmods() {
 }
 
 function prerm_preload() {
-    @WITH_KO_MODULES_FALSE@prel_fil="${sysconfdir}/modules"
-    @WITH_KO_MODULES_TRUE@prel_fil="${sysconfdir}/modprobe.preload"
-    if [ -f $prel_fil ] ; then
-	prel_tmp="$tmppath/modules.tmp.$$"
+    @WITH_KO_MODULES_FALSE@prel_old="${sysconfdir}/modules"
+    @WITH_KO_MODULES_TRUE@prel_old="${sysconfdir}/modprobe.preload"
+    if [ -f $prel_old ] ; then
 	prel_new="$tmppath/modules.new.$$"
-	cp -f -- $prel_fil $prel_new
-	for m in ${KERNEL_PRELOADS} ; do
+	prel_tmp="$tmppath/modules.tmp.$$"
+	cp -f -- $prel_old $prel_new
+	for m in $KERNEL_PRELOADS ; do
 	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new > $prel_tmp
-	    mv -f -- $prel_tmp $tmp_new
+	    mv -f -- $prel_tmp $prel_new
 	done
-	chmod --reference=$prel_fil -- $prel_new
-	cp -fb --suffix=.rpmsave -- $prel_new $prel_fil
+	chmod --reference=$prel_old -- $prel_new
+	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
 	rm -f -- $prel_new
     fi
 }
@@ -143,6 +143,9 @@ subpkg=core
 # =============================================================================
 #
 # $Log: lis-core.prerm.in,v $
+# Revision 0.9.2.7  2007/08/14 10:46:54  brian
+# - GPLv3 header update
+#
 # Revision 0.9.2.6  2007/05/19 02:26:55  brian
 # - corrected array subscripting syntax error
 #
@@ -161,6 +164,5 @@ subpkg=core
 # Revision 0.9.2.1  2005/03/24 01:38:17  brian
 # - better debian build
 #
-#
 # =============================================================================
-# vim: ft=sh sw=4 noet
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

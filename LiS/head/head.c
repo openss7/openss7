@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.13 $) $Date: 2006/02/20 11:38:47 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/02/20 11:38:47 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
@@ -56,6 +56,8 @@
  *****************************************************************************/
 
 #ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.13 $) $Date: 2006/02/20 11:38:47 $"
+
+static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
@@ -632,7 +634,7 @@ struct streamtab strmhd_info = {
 
 extern int lis_await_qsched(stdata_t *hd, queue_t *q);
 extern void lis_qdetach(queue_t *q, int do_close, int flag, cred_t *creds);
-extern void _RP lis_wakeup_close (caddr_t arg);
+extern void _RP lis_wakeup_close(caddr_t arg);
 static void check_for_wantenable(stdata_t *hd);
 static int lis_strdoioctl(struct file *f, stdata_t *hd, strioctl_t * ioc, cred_t *creds,
 			  int do_copyin);
@@ -1017,7 +1019,6 @@ lis_i_unlink(struct inode *i, struct file *f, stdata_t *hd, int l_index, int cmd
 			       lis_queue_name(lnk.l_qtop), hp->sd_name,
 			       lis_queue_name(hp->sd_wq->q_next));
 		}
-
 #if 0
 		/* restore queues */
 		err = lis_set_q_sync(hp->sd_rq, LIS_QLOCK_QUEUE);	/* strm head queue */
@@ -1480,7 +1481,6 @@ lis_alloc_stdata(void)
 			       "failed to allocate queues for stream head\n");
 		return NULL;
 	}
-
 #if 0
 	if (lis_set_q_sync(q, LIS_QLOCK_NONE) < 0) {
 		lis_freeq(q);
@@ -5180,8 +5180,8 @@ lis_strread(struct file *fp, char *ubuff, size_t ulen, loff_t *op)
 			}
 			if (LIS_DEBUG_READ)
 				printk("strread: stream %s: RDOPT=0x%x user buffer %ld bytes, "
-				       "read %ld error %d\n", hd->sd_name, hd->sd_rdopt, (long) ulen, (long) count,
-				       err);
+				       "read %ld error %d\n", hd->sd_name, hd->sd_rdopt,
+				       (long) ulen, (long) count, err);
 			if (ulen == count	/* filled user buffer */
 			    || (hd->sd_rdopt & RMODEMASK) != RNORM || msg_lgth == 0	/* 0-lgth
 											   msg */

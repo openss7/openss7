@@ -1,26 +1,40 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2006/12/18 09:51:12 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2007/08/14 10:47:23 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +59,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/18 09:51:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 10:47:23 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: wrapper.c,v $
+ Revision 1.1.6.6  2007/08/14 10:47:23  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2006/12/18 09:51:12 $"
+#ident "@(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2007/08/14 10:47:23 $"
 
 static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.5 $) $Date: 2006/12/18 09:51:12 $";
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.6.6 $) $Date: 2007/08/14 10:47:23 $";
 
 #include <stdio.h>
 #include <stdlib.h>
