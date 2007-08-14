@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:08 $
+ @(#) $RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 05:17:29 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/02 11:32:08 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: initsock.c,v $
+ Revision 0.9.2.3  2007/08/14 05:17:29  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2006/10/02 11:32:08  brian
  - changes to get master builds working for RPM and DEB
  - added outside licenses to package documentation
@@ -76,9 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:08 $"
+#ident "@(#) $RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 05:17:29 $"
 
-static char const ident[] = "$RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2006/10/02 11:32:08 $";
+static char const ident[] =
+    "$RCSfile: initsock.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 05:17:29 $";
 
 #define _XOPEN_SOURCE 600
 
@@ -112,8 +116,8 @@ version(int argc, char *argv[])
 		return;
 	fprintf(stdout, "\
 %2$s\n\
-Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 2, included here by reference.\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
+Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }
@@ -182,22 +186,22 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version  2  of  the  License.\n\
+Foundation; Version 3 of the License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
 You should  have received a copy of the GNU  General  Public License  along with\n\
-this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
-Cambridge, MA 02139, USA.\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -221,7 +225,6 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 
 enum { CMN_NONE, CMN_FILE, CMN_DELETE, CMN_ADD, } command = CMN_NONE;
 int option_all = 0;
-
 
 int
 main(int argc, char *argv[])
@@ -249,7 +252,8 @@ main(int argc, char *argv[])
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long_only(argc, argv, "f::da:cCqD::v::hVY?W:", long_options, &option_index);
+		c = getopt_long_only(argc, argv, "f::da:cCqD::v::hVY?W:", long_options,
+				     &option_index);
 #else				/* defined _GNU_SOURCE */
 		c = getopt(argc, argv, "f::da:cCqD::v::hVY?");
 #endif				/* defined _GNU_SOURCE */
@@ -266,10 +270,10 @@ main(int argc, char *argv[])
 			if (command != CMN_NONE && command != CMN_FILE)
 				goto bad_option;
 			if (command != CMN_FILE) {
-			if (debug)
-				fprintf(stderr, "%s: setting --file command\n", argv[0]);
-			command = CMN_FILE;
-			/* FIXME: copy file name if present */
+				if (debug)
+					fprintf(stderr, "%s: setting --file command\n", argv[0]);
+				command = CMN_FILE;
+				/* FIXME: copy file name if present */
 			}
 			break;
 		case 'd':	/* -d, --delete */

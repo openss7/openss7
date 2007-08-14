@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 00:09:17 $
+ @(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/10/13 00:09:17 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pthread.c,v $
+ Revision 0.9.2.4  2007/08/14 05:17:23  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2006/10/13 00:09:17  brian
  - fixed segfault in pthread_setcanceltype
 
@@ -61,9 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 00:09:17 $"
+#ident "@(#) $RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $"
 
-static char const ident[] = "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/10/13 00:09:17 $";
+static char const ident[] =
+    "$RCSfile: pthread.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -529,7 +533,7 @@ pthread_rwlock_unlock(pthread_rwlock_t * rwlock)
 	  * locked), decrement the value; minus one (-1) (write locked), set it
 	  * to zero.  Note that if the byte is already set to zero, the lock is
 	  * unlocked.  If debugging, print an error message. */
-	if (*(char *) rwlock == -2 || *(char *)rwlock == 0) {
+	if (*(char *) rwlock == -2 || *(char *) rwlock == 0) {
 #ifdef DEBUG
 		errno = EINVAL;
 		perror(__FUNCTION__);
@@ -589,7 +593,7 @@ struct __pthread_key_data {
 };
 
 /** Array of thread-specific-data keys. */
-static struct __pthread_key_data ___pthread_keys[PTHREAD_KEYS_MAX] = { { 0, }, };
+static struct __pthread_key_data ___pthread_keys[PTHREAD_KEYS_MAX] = { {0,}, };
 
 /** Create a thread-specific data key.
   * This is a non-recursive replacement for the pthread library function,
@@ -677,8 +681,7 @@ pthread_key_delete(pthread_key_t key)
 	  */
 	if (__pthread_key_delete)
 		return __pthread_key_delete(key);
-	/* Otherwise, mark the key available in the statically allocated array.
-	 */
+	/* Otherwise, mark the key available in the statically allocated array. */
 	if (key < 0 || key >= PTHREAD_KEYS_MAX || !___pthread_keys[key].exists)
 		return (EINVAL);
 	___pthread_keys[key].exists = 0;

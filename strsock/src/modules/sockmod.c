@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:49 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:49 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:25 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: sockmod.c,v $
+ Revision 0.9.2.9  2007/08/14 05:17:25  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:49 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:49 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -119,7 +125,7 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:49 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL v2"

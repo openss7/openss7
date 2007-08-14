@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:47 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.9  2007/08/14 05:17:14  brian
+ - GPLv3 header update
+
  Revision 0.9.2.8  2007/07/14 01:36:47  brian
  - make license explicit, add documentation
 
@@ -88,9 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $"
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $";
+static char const ident[] =
+    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -139,7 +143,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:47 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL v2"
@@ -216,7 +220,7 @@ STATIC streamscall int socksys_qclose(queue_t *, int, cred_t *);
 STATIC streamscall int socksys_put(queue_t *, mblk_t *);
 
 STATIC struct qinit socksys_qinit = {
-	.qi_putp = socksys_put,	/* Put procedure (messgae from above or below) */
+	.qi_putp = socksys_put,		/* Put procedure (messgae from above or below) */
 	.qi_qopen = socksys_qopen,	/* Each open */
 	.qi_qclose = socksys_qclose,	/* Last close */
 	.qi_minfo = &socksys_minfo,	/* Module information */
@@ -275,7 +279,6 @@ MODULE_STATIC struct streamtab socksys_info = {
 	local_irq_restore(__flags)
 
 #endif
-
 
 /*
  *  Primary data structures.
@@ -636,16 +639,17 @@ so_socksys(struct socksysreq *req)
 		case SO_GETIPDOMAIN:
 			/* FIXME: 32/64 conversion */
 			todo(("Process SO_GETIPDOMAIN for compatibility.\n"));
-			/* does not exist in Linux, need to use sys_newuname and copy the domainname portion */
+			/* does not exist in Linux, need to use sys_newuname and copy the
+			   domainname portion */
 			err = -ENOSYS;
 			break;
 		case SO_SETIPDOMAIN:
 			/* FIXME: 32/64 conversion */
-			err = sys_setdomainname((char *)req->args[1], req->args[2]);
+			err = sys_setdomainname((char *) req->args[1], req->args[2]);
 			break;
 		case SO_ADJTIME:
 			/* FIXME: 32/64 conversion */
-			err = sys_admtimex((struct timex *)req->args[1]);
+			err = sys_admtimex((struct timex *) req->args[1]);
 			break;
 		case SO_SETREUID:
 			/* FIXME: 32/64 conversion */
@@ -658,12 +662,12 @@ so_socksys(struct socksysreq *req)
 		case SO_GETTIME:
 			/* FIXME: 32/64 conversion */
 			err = sys_gettimeofday((struct timeval *) req->args[1],
-					     (struct timezone *) req->args[2]);
+					       (struct timezone *) req->args[2]);
 			break;
 		case SO_SETTIME:
 			/* FIXME: 32/64 conversion */
 			err = sys_settimeofday((struct timeval *) req->args[1],
-					     (struct timezone *) req->args[2]);
+					       (struct timezone *) req->args[2]);
 			break;
 		case SO_GETITIMER:
 			/* FIXME: 32/64 conversion */
@@ -672,7 +676,7 @@ so_socksys(struct socksysreq *req)
 		case SO_SETITIMER:
 			/* FIXME: 32/64 conversion */
 			err = sys_getitimer(req->args[1], (struct itimerval *) req->args[2],
-					  (struct itimerval *) req->args[3]);
+					    (struct itimerval *) req->args[3]);
 			break;
 		}
 #endif
@@ -775,7 +779,7 @@ socksys_put(queue_t *q, mblk_t *mp)
 		case SIOCSOCKSYS:
 #endif
 		{
-			struct socksysreq sr = { { 0, } };
+			struct socksysreq sr = { {0,} };
 
 #ifdef WITH_32BIT_CONVERSION
 			if (ioc->iocblk.ioc_flag == IOC_ILP32) {
@@ -971,8 +975,7 @@ socksys_qclose(queue_t *q, int oflag, cred_t *crp)
 	(void) oflag;
 	(void) crp;
 	(void) s;
-	_printd(("%s: closing character device %d:%d\n", DRV_NAME, s->dev.cmajor,
-		 s->dev.cminor));
+	_printd(("%s: closing character device %d:%d\n", DRV_NAME, s->dev.cmajor, s->dev.cminor));
 #if defined LIS
 	/* protect against LiS bugs */
 	if (q->q_ptr == NULL) {

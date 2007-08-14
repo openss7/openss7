@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:53 $
+ @(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/09/18 13:52:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 05:17:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socket.c,v $
+ Revision 0.9.2.4  2007/08/14 05:17:23  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2006/09/18 13:52:53  brian
  - added doxygen markers to sources
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:53 $"
+#ident "@(#) $RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $"
 
 static char const ident[] =
-    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2006/09/18 13:52:53 $";
+    "$RCSfile: socket.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 05:17:23 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -446,6 +449,7 @@ __sock_accept(int fd, struct sockaddr *addr, socklen_t * len)
 	struct socksysreq args = {
 		{SO_ACCEPT, fd, (long) addr, (long) len,}
 	};
+
 	if (!(user = (struct _s_user *) malloc(sizeof(*user))))
 		goto enomem;
 	memset(user, 0, sizeof(*user));
@@ -520,6 +524,7 @@ __sock_bind(int fd, const struct sockaddr *addr, socklen_t len)
 	struct socksysreq args = {
 		{SO_BIND, fd, (long) addr, len,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -553,8 +558,9 @@ int
 __sock_connect(int fd, const struct sockaddr *addr, socklen_t len)
 {
 	struct socksysreq args = {
-		{SO_CONNECT, fd, (long)addr, len,}
+		{SO_CONNECT, fd, (long) addr, len,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -593,6 +599,7 @@ __sock_getpeername(int fd, struct sockaddr *addr, socklen_t * len)
 	struct socksysreq args = {
 		{SO_GETPEERNAME, fd, (long) addr, (long) len,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -628,6 +635,7 @@ __sock_getsockname(int fd, struct sockaddr *addr, socklen_t * len)
 	struct socksysreq args = {
 		{SO_GETSOCKNAME, fd, (long) addr, (long) len,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -665,6 +673,7 @@ __sock_getsockopt(int fd, int level, int name, void *value, socklen_t * len)
 	struct socksysreq args = {
 		{SO_GETSOCKOPT, fd, level, name, (long) value, (long) len,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -699,6 +708,7 @@ __sock_listen(int fd, int backlog)
 	struct socksysreq args = {
 		{SO_LISTEN, fd, backlog,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -736,6 +746,7 @@ __sock_setsockopt(int fd, int level, int name, const void *value, socklen_t len)
 	struct socksysreq args = {
 		{SO_SETSOCKOPT, fd, level, name, (long) value, len,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -770,6 +781,7 @@ __sock_shutdown(int fd, int how)
 	struct socksysreq args = {
 		{SO_SHUTDOWN, fd, how,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -807,6 +819,7 @@ __sock_socket(int domain, int type, int protocol)
 	struct socksysreq args = {
 		{SO_SOCKET, domain, type, protocol,}
 	};
+
 	if (!(user = (struct _s_user *) malloc(sizeof(*user))))
 		goto enomem;
 	memset(user, 0, sizeof(*user));
@@ -896,11 +909,12 @@ __asm__(".symver __sock_socket_r,socket@@SOCKET_1.0");
 int
 __sock_socketpair(int domain, int type, int protocol, int socket_vector[2])
 {
-	int err, socks[2] = {-1,-1};
+	int err, socks[2] = { -1, -1 };
 	struct _s_user *user1, *user2;
 	struct socksysreq args = {
 		{SO_SOCKPAIR, domain, type, protocol, (long) socket_vector,}
 	};
+
 	if (!(user1 = (struct _s_user *) malloc(sizeof(*user1))))
 		goto enomem1;
 	memset(user1, 0, sizeof(*user1));
@@ -1028,6 +1042,7 @@ __sock_recv(int fd, void *buf, size_t len, int flags)
 	struct socksysreq args = {
 		{SO_RECV, fd, (long) buf, len, flags,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -1082,6 +1097,7 @@ __sock_recvmsg(int fd, struct msghdr *msg, int flags)
 	struct socksysreq args = {
 		{SO_RECVMSG, fd, (long) msg, flags,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -1131,6 +1147,7 @@ __sock_recvfrom(int fd, void *buf, size_t len, int flags, struct sockaddr *addr,
 	struct socksysreq args = {
 		{SO_RECVFROM, fd, (long) buf, len, flags, (long) addr, (long) alen}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -1174,8 +1191,9 @@ __sock_send(int fd, const void *buf, size_t len, int flags)
 	/* we really just want to put a T_DATA_REQ, T_EXDATA_REQ or T_UNITDATA_REQ message here.
 	   Note that the T_UNITDATA_REQ requires an address from the user structure. */
 	struct socksysreq args = {
-		{SO_SEND, fd, (long)buf, len, flags,}
+		{SO_SEND, fd, (long) buf, len, flags,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -1218,8 +1236,9 @@ __sock_sendmsg(int fd, const struct msghdr *msg, int flags)
 	/* we really just want to put a T_OPTDATA_REQ or T_UNITDATA_REQ message here.  Note that
 	   the T_UNITDATA_REQ requires an address from the user structure. */
 	struct socksysreq args = {
-		{SO_SENDMSG, fd, (long)msg, flags,}
+		{SO_SENDMSG, fd, (long) msg, flags,}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -1265,8 +1284,9 @@ __sock_sendto(int fd, const void *buf, size_t len, int flags, const struct socka
 	/* flags can be MSG_EOR or MSG_OOB */
 	/* we really just want to put a T_OPTDATA_REQ or T_UNITDATA_REQ message here.  */
 	struct socksysreq args = {
-		{SO_SENDTO, fd, (long)buf, len, flags, (long)addr, alen}
+		{SO_SENDTO, fd, (long) buf, len, flags, (long) addr, alen}
 	};
+
 	return __sock_ioctl(&args);
 }
 
@@ -1293,10 +1313,10 @@ __asm__(".symver __sock_sendto_r,sendto@@SOCKET_1.0");
 
 /**
  * @section Identification
- * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.3 $).
+ * This development manual was written for the OpenSS7 Sockets Library version \$Name:  $(\$Revision: 0.9.2.4 $).
  * @author Brian F. G. Bidulock
- * @version \$Name:  $(\$Revision: 0.9.2.3 $)
- * @date \$Date: 2006/09/18 13:52:53 $
+ * @version \$Name:  $(\$Revision: 0.9.2.4 $)
+ * @date \$Date: 2007/08/14 05:17:23 $
  *
  * @}
  */
