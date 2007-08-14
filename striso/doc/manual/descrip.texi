@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo nocin nosi tw=100
 @c =========================================================================
 @c
-@c @(#) $Id: descrip.texi,v 0.9.2.6 2007/01/08 16:24:19 brian Exp $
+@c @(#) $Id: descrip.texi,v 0.9.2.7 2007/08/14 07:04:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 16:24:19 $ by $Author: brian $
+@c Last Modified $Date: 2007/08/14 07:04:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -72,15 +72,15 @@ files from the @file{strxns} package:
 
 @multitable @columnfractions .05 .95
 @item @tab @minus{} @file{<sys/cdi.h>} @cite{Communications Device Interface}
-@item @tab @minus{} @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Version 2.0.0}
-@item @tab @minus{} @file{<sys/npi.h>} @cite{Network Provider Interface Version 2.0.0}
+@item @tab @minus{} @file{<sys/dlpi.h>} @cite{Data Link Provider Interface Revision 2.0.0}
+@item @tab @minus{} @file{<sys/npi.h>} @cite{Network Provider Interface Revision 2.0.0}
 @end multitable
 
 The package uses the following standard @cite{Open Systems Interconnect (OSI)} conforming header
 files from the @file{strxnet} package:
 
 @multitable @columnfractions .05 .95
-@item @tab @minus{} @file{<sys/tihdr.h>} @cite{Transport Provider Interface Version 2.0.0}
+@item @tab @minus{} @file{<sys/tihdr.h>} @cite{Transport Provider Interface Revision 2.0.0}
 @end multitable
 
 The package currently includes the following @dfn{STREAMS} kernel modules and drivers:

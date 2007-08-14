@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:36:23 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:23 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:05:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.15  2007/08/14 07:05:03  brian
+ - GNUv3 header update
+
  Revision 0.9.2.14  2007/07/14 01:36:23  brian
  - make license explicit, add documentation
 
@@ -101,10 +104,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:36:23 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:36:23 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
@@ -156,7 +159,7 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/07/14 01:36:23 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
 #define TP_LICENSE	"GPL v2"
@@ -904,13 +907,13 @@ tpi_get_state(struct tp *tp)
 }
 
 STATIC INLINE fastcall t_scalar_t
-tpi_chk_state(struct tp * tp, t_scalar_t mask)
+tpi_chk_state(struct tp *tp, t_scalar_t mask)
 {
 	return (((1 << tp->i_state) & (mask)) != 0);
 }
 
 STATIC INLINE fastcall t_scalar_t
-tpi_not_state(struct tp * tp, t_scalar_t mask)
+tpi_not_state(struct tp *tp, t_scalar_t mask)
 {
 	return (((1 << tp->i_state) & (mask)) == 0);
 }
@@ -982,13 +985,13 @@ npi_get_state(struct np *np)
 }
 
 STATIC INLINE fastcall np_ulong
-npi_chk_state(struct np * np, np_ulong mask)
+npi_chk_state(struct np *np, np_ulong mask)
 {
 	return (((1 << np->i_state) & (mask)) != 0);
 }
 
 STATIC INLINE fastcall np_ulong
-npi_not_state(struct np * np, np_ulong mask)
+npi_not_state(struct np *np, np_ulong mask)
 {
 	return (((1 << np->i_state) & (mask)) == 0);
 }
@@ -1007,12 +1010,12 @@ tpi_get_n_state(struct tp *tp)
 	return (tp->n_state);
 }
 STATIC INLINE fastcall np_ulong
-tpi_chk_n_state(struct tp * tp, np_ulong mask)
+tpi_chk_n_state(struct tp *tp, np_ulong mask)
 {
 	return (((q << tp->n_state) & (mask)) != 0);
 }
 STATIC INLINE fastcall np_ulong
-tpi_not_n_state(struct tp * tp, np_ulong mask)
+tpi_not_n_state(struct tp *tp, np_ulong mask)
 {
 	return (((1 << tp->n_state) & (mask)) == 0);
 }
@@ -2226,7 +2229,8 @@ tp_pack_cr(struct tp *tp)
 		*p++ = _TP_PT_VERSION;	/* version number */
 		*p++ = 1;
 		*p++ = 1;
-		if (tp->opts.flags & _T_BIT_TCO_PROTECTION & tp->opts.tco.tco_protection != T_UNSPEC) {
+		if (tp->opts.flags & _T_BIT_TCO_PROTECTION & tp->opts.tco.tco_protection !=
+		    T_UNSPEC) {
 			*p++ = _TP_PT_PROTECTION;	/* protection */
 			*p++ = 1;
 			*p++ = tp->opts.tco.tco_protection & ~T_ABSREQ;
@@ -2280,19 +2284,32 @@ tp_pack_cr(struct tp *tp)
 			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 8;
 			*p++ = tp->opts.tco.tco_throughput.maxthrpt.calling.minacceptvalue >> 0;
 			if (tp->flags & _TP_AVG_THROUGHPUT) {
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 16;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 16;
 				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 8;
 				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.targetvalue >> 0;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 0;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 0;
 				*p++ =
-				    tp->opts.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 16;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 8;
-				*p++ = tp->opts.tco.tco_throughput.avgthrpt.calling.minacceptvalue >> 0;
+				    tp->opts.tco.tco_throughput.avgthrpt.called.
+				    minacceptvalue >> 16;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 8;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.called.minacceptvalue >> 0;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 16;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 8;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.calling.targetvalue >> 0;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.calling.
+				    minacceptvalue >> 16;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.calling.
+				    minacceptvalue >> 8;
+				*p++ =
+				    tp->opts.tco.tco_throughput.avgthrpt.calling.
+				    minacceptvalue >> 0;
 			}
 		}
 		if (tp->flags & _TP_RESIDERRRATE) {
@@ -2778,7 +2795,8 @@ tp_pack_ed(queue_t *q, uint32_t nr, mblk_t *dp)
  * @nr: sequence number
  */
 STATIC mblk_t *
-tp_pack_ak(queue_t *q, unsigned short options, unsigned short dref, uint16_t credit, uint32_t nr, int ssn)
+tp_pack_ak(queue_t *q, unsigned short options, unsigned short dref, uint16_t credit, uint32_t nr,
+	   int ssn)
 {
 	register unsigned char *p;
 	struct tp *tp = TP_PRIV(q);
@@ -3235,7 +3253,7 @@ te_unitdata_req(queue_t *q, mblk_t *mp)
 		/* Address consists of a (possibly null) TSAP Selector and an NSAP Address. */
 		/* TSAP Selector is a possibly 20 byte string. */
 		/* NSAP Address is an IDC + DSP.  There are IDC + DSP combinations defined for IP
-		 * based networks. */
+		   based networks. */
 	}
 	if (p->OPT_length) {
 	}

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:25 $
+ @(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 07:05:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:05:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcpns.c,v $
+ Revision 0.9.2.7  2007/08/14 07:05:15  brian
+ - GNUv3 header update
+
  Revision 0.9.2.6  2007/07/14 01:36:25  brian
  - make license explicit, add documentation
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:25 $"
+#ident "@(#) $RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 07:05:15 $"
 
 static char const ident[] =
-    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:25 $";
+    "$RCSfile: tcpns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 07:05:15 $";
 
 /*
  *  ISO Transport over TCP/IP (ISOT)
@@ -109,7 +112,7 @@ static char const ident[] =
 
 #define TCPNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCPNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:36:25 $"
+#define TCPNS_REVISION	"OpenSS7 $RCSfile: tcpns.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/08/14 07:05:15 $"
 #define TCPNS_DEVICE	"SVR 4.2 STREAMS NS Module for RFC 1006/2126 ISOT/ITOT"
 #define TCPNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCPNS_LICENSE	"GPL v2"
@@ -158,12 +161,12 @@ MODULE_ALIAS("streams-tcpns");
 #endif				/* MODULE */
 
 static struct module_info tcpns_minfo = {
-	.mi_idnum = MOD_ID,	/* Module ID number */
-	.mi_idname = MOD_NAME,	/* Module name */
-	.mi_minpsz = 0,		/* Min packet size accepted */
-	.mi_maxpsz = INFPSZ,	/* Max packet size accepted */
-	.mi_hiwat = 1,		/* Hi water mark */
-	.mi_lowat = 0,		/* Lo water mark */
+	.mi_idnum = MOD_ID,		/* Module ID number */
+	.mi_idname = MOD_NAME,		/* Module name */
+	.mi_minpsz = 0,			/* Min packet size accepted */
+	.mi_maxpsz = INFPSZ,		/* Max packet size accepted */
+	.mi_hiwat = 1,			/* Hi water mark */
+	.mi_lowat = 0,			/* Lo water mark */
 };
 
 static streamscall int tcpns_open(queue_t *, dev_t *, int, int, cred_t *);
@@ -173,14 +176,14 @@ static streamscall int tcpns_rput(queue_t *, mblk_t *);
 static streamscall int tcpns_wput(queue_t *, mblk_t *);
 
 static struct qinit tcpns_rinit = {
-	.qi_putp = tcpns_rput,	/* Read put (message from below) */
-	.qi_qopen = tcpns_open,	/* Each open */
+	.qi_putp = tcpns_rput,		/* Read put (message from below) */
+	.qi_qopen = tcpns_open,		/* Each open */
 	.qi_qclose = tcpns_close,	/* Last close */
 	.qi_minfo = &tcpns_minfo,	/* Information */
 };
 
 static struct qinit tcpns_winit = {
-	.qi_putp = tcpns_wput,	/* Write put (message from above) */
+	.qi_putp = tcpns_wput,		/* Write put (message from above) */
 	.qi_minfo = &tcpns_minfo,	/* Information */
 };
 
