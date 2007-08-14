@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:51 $
+ @(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tali_sccp.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:55  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:51 $"
+#ident "@(#) $RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $"
 
 static char const ident[] =
-    "$RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:51 $";
+    "$RCSfile: tali_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $";
 
 #include <sys/os7/compat.h>
 
@@ -92,30 +98,38 @@ static char const ident[] =
  *  return non-zero, they return an error and 'mpp' is untouched.
  */
 
-static int sccp_u_info_req(queue_t * q, mblk_t * mp)
+static int
+sccp_u_info_req(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_u_bind_req(queue_t * q, mblk_t * mp)
+static int
+sccp_u_bind_req(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_u_unbind_req(queue_t * q, mblk_t * mp)
+static int
+sccp_u_unbind_req(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_u_unitdata_req(queue_t * q, mblk_t * mp)
+static int
+sccp_u_unitdata_req(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_u_optmgmt_req(queue_t * q, mblk_t * mp)
+static int
+sccp_u_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 }
 
-static int sccp_u_w_ioctl(queue_t * q, mblk_t * mp)
+static int
+sccp_u_w_ioctl(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_u_w_data(queue_t * q, mblk_t * mp)
+static int
+sccp_u_w_data(queue_t *q, mblk_t *mp)
 {
 	return (-EOPNOTSUPP);
 }
-static int sccp_u_w_proto(queue_t * q, mblk_t * mp)
+static int
+sccp_u_w_proto(queue_t *q, mblk_t *mp)
 {
 	switch (*((long *) mp->b_wptr)) {
 	case N_INFO_REQ:
@@ -131,11 +145,13 @@ static int sccp_u_w_proto(queue_t * q, mblk_t * mp)
 	}
 	return (-EOPNOTSUPP);
 }
-static int sccp_u_w_pcproto(queue_t * q, mblk_t * mp)
+static int
+sccp_u_w_pcproto(queue_t *q, mblk_t *mp)
 {
 	return sccp_u_w_proto(q, mp);
 }
-static int sccp_u_w_prim(queue_t * q, mblk_t * mp)
+static int
+sccp_u_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -156,15 +172,18 @@ static int sccp_u_w_prim(queue_t * q, mblk_t * mp)
  *  TALI --> SCCP User Primitives
  *  -----------------------------------
  */
-static int sccp_u_r_data(queue_t * q, mblk_t * mp)
+static int
+sccp_u_r_data(queue_t *q, mblk_t *mp)
 {
 	return sccp_r_msg(q, mp);
 }
-static int sccp_u_r_ctl(queue_t * q, mblk_t * mp)
+static int
+sccp_u_r_ctl(queue_t *q, mblk_t *mp)
 {
 	return sccp_r_msg(q, mp);
 }
-static int sccp_u_r_prim(queue_t * q, mblk_t * mp)
+static int
+sccp_u_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -184,21 +203,26 @@ static int sccp_u_r_prim(queue_t * q, mblk_t * mp)
  *
  *  -------------------------------------------------------------------------
  */
-static int sccp_l_w_data(queue_t * q, mblk_t * mp)
+static int
+sccp_l_w_data(queue_t *q, mblk_t *mp)
 {
 	return sccp_w_msg(q, mp);
 }
-static int sccp_l_w_ctl(queue_t * q, mblk_t * mp)
+static int
+sccp_l_w_ctl(queue_t *q, mblk_t *mp)
 {
 	return sccp_w_msg(q, mp);
 }
-static int sccp_l_w_error(queue_t * q, mblk_t * mp)
+static int
+sccp_l_w_error(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_l_w_hangup(queue_t * q, mblk_t * mp)
+static int
+sccp_l_w_hangup(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_l_w_prim(queue_t * q, mblk_t * mp)
+static int
+sccp_l_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:
@@ -221,25 +245,32 @@ static int sccp_l_w_prim(queue_t * q, mblk_t * mp)
  *  converts them to TALI M_DATA and M_CTL messages, if required.  If the user
  *  is a local IP, then the primitives are forwarded as is.
  */
-static int sccp_l_info_ack(queue_t * q, mblk_t ** mpp)
+static int
+sccp_l_info_ack(queue_t *q, mblk_t **mpp)
 {
 }
-static int sccp_l_bind_ack(queue_t * q, mblk_t ** mpp)
+static int
+sccp_l_bind_ack(queue_t *q, mblk_t **mpp)
 {
 }
-static int sccp_l_error_ack(queue_t * q, mblk_t ** mpp)
+static int
+sccp_l_error_ack(queue_t *q, mblk_t **mpp)
 {
 }
-static int sccp_l_ok_ack(queue_t * q, mblk_t ** mpp)
+static int
+sccp_l_ok_ack(queue_t *q, mblk_t **mpp)
 {
 }
-static int sccp_l_unitdata_ind(queue_t * q, mblk_t ** mpp)
+static int
+sccp_l_unitdata_ind(queue_t *q, mblk_t **mpp)
 {
 }
-static int sccp_l_uderror_ind(queue_t * q, mblk_t ** mpp)
+static int
+sccp_l_uderror_ind(queue_t *q, mblk_t **mpp)
 {
 }
-static int sccp_l_r_proto(queue_t * q, mblk_t * mp)
+static int
+sccp_l_r_proto(queue_t *q, mblk_t *mp)
 {
 	switch (*((long *) mp->b_rptr)) {
 	case N_INFO_ACK:
@@ -257,17 +288,21 @@ static int sccp_l_r_proto(queue_t * q, mblk_t * mp)
 	}
 	return (-ENOTSUPP);
 }
-static int sccp_l_r_pcproto(queue_t * q, mblk_t * mp)
+static int
+sccp_l_r_pcproto(queue_t *q, mblk_t *mp)
 {
 	return sccp_l_r_proto(q, mp);
 }
-static int sccp_l_r_error(queue_t * q, mblk_t * mp)
+static int
+sccp_l_r_error(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_l_r_hangup(queue_t * q, mblk_t * mp)
+static int
+sccp_l_r_hangup(queue_t *q, mblk_t *mp)
 {
 }
-static int sccp_l_r_prim(queue_t * q, mblk_t * mp)
+static int
+sccp_l_r_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_PROTO:
@@ -294,19 +329,24 @@ static int sccp_l_r_prim(queue_t * q, mblk_t * mp)
  *  TALI --> TCP (SCTP) TLI Transport Primitives
  *  -------------------------------------------------------------------------
  */
-static int tali_x_w_data(queue_t * q, mblk_t * mp)
+static int
+tali_x_w_data(queue_t *q, mblk_t *mp)
 {
 }
-static int tali_x_w_ctl(queue_t * q, mblk_t * mp)
+static int
+tali_x_w_ctl(queue_t *q, mblk_t *mp)
 {
 }
-static int tali_x_w_error(queue_t * q, mblk_t * mp)
+static int
+tali_x_w_error(queue_t *q, mblk_t *mp)
 {
 }
-static int tali_x_w_hangup(queue_t * q, mblk_t * mp)
+static int
+tali_x_w_hangup(queue_t *q, mblk_t *mp)
 {
 }
-static int tali_x_w_prim(queue_t * q, mblk_t * mp)
+static int
+tali_x_w_prim(queue_t *q, mblk_t *mp)
 {
 	switch (mp->b_datap->db_type) {
 	case M_DATA:

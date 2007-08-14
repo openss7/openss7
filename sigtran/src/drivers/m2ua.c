@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:26 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:26 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.7  2007/08/14 08:33:50  brian
+ - GPLv3 header update
+
  Revision 0.9.2.6  2007/07/14 01:33:26  brian
  - make license explicit, add documentation
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:26 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:26 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $";
 
 #define _LFS_SOURCE 1
 
@@ -99,7 +102,7 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:26 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -2936,7 +2939,7 @@ m2ua_send_mgmt_err(queue_t *q, struct xp *xp, uint ecode, uchar *dia_ptr, size_t
  *  -----------------------------------
  */
 STATIC INLINE int
-m2ua_send_mgmt_ntfy(queue_t *q, struct xp *xp, uint status, uint32_t *aspid, uint * iid,
+m2ua_send_mgmt_ntfy(queue_t *q, struct xp *xp, uint status, uint32_t *aspid, uint *iid,
 		    size_t num_iid, uchar *inf_ptr, size_t inf_len)
 {
 	mblk_t *mp;

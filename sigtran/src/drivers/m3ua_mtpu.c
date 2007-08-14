@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $
+ @(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: m3ua_mtpu.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:54  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $"
+#ident "@(#) $RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
+    "$RCSfile: m3ua_mtpu.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $";
 
 #define __NO_VERSION__
 
@@ -70,9 +76,11 @@ static char const ident[] =
  *
  *  =========================================================================
  */
-static inline int mtp_error_reply(queue_t * q, mblk_t * pdu, int prim, int err)
+static inline int
+mtp_error_reply(queue_t *q, mblk_t *pdu, int prim, int err)
 {
 	mblk_t *mp;
+
 	if ((mp = mtp_error_ack(prim, err))) {
 		freemsg(pdu);
 		qreply(q, mp);
@@ -80,10 +88,12 @@ static inline int mtp_error_reply(queue_t * q, mblk_t * pdu, int prim, int err)
 	}
 	return (-ENOBUFS);
 }
-static inline int mtp_uderror_reply(queue_t * q, mblk_t * pdu, int err)
+static inline int
+mtp_uderror_reply(queue_t *q, mblk_t *pdu, int err)
 {
 	mblk_t *mp;
 	N_unitdata_req_t *p = (N_unitdata_req_t *) pdu->b_rptr;
+
 	if ((mp = mtp_uderror_ind(err,
 				  p->DEST_length ? (mtp_addr_t *) (pdu->b_rptr +
 								   p->DEST_offset) : 0,
@@ -95,7 +105,8 @@ static inline int mtp_uderror_reply(queue_t * q, mblk_t * pdu, int err)
 	}
 	return (-ENOBUFS);
 }
-static int parse_options(queue_t * q, mblk_t * pdu, int prim, caddr_t opt_ptr, size_t opt_len)
+static int
+parse_options(queue_t *q, mblk_t *pdu, int prim, caddr_t opt_ptr, size_t opt_len)
 {
 	mtp_t *mtp = (mtp_t *) q->q_ptr;
 	if (opt_len < sizeof(uint32_t))
@@ -104,6 +115,7 @@ static int parse_options(queue_t * q, mblk_t * pdu, int prim, caddr_t opt_ptr, s
 	case N_QOS_SEL_MTP:
 	{
 		N_qos_sel_mtp_t *p = (N_qos_sel_mtp_t *) opt_ptr;
+
 		if (prim == N_OPTMGMT_REQ)
 			goto parse_options_badqostype;
 		if (opt_len < sizeof(*p))
@@ -123,6 +135,7 @@ static int parse_options(queue_t * q, mblk_t * pdu, int prim, caddr_t opt_ptr, s
 	case N_QOS_OPT_SEL_MTP:
 	{
 		N_qos_opt_sel_mtp_t *p = (N_qos_sel_mtp_t *) opt_ptr;
+
 		if (prim != N_OPTMGMT_REQ)
 			goto parse_options_badqostype;
 		if (opt_len < sizeof(*p))
@@ -148,11 +161,13 @@ static int parse_options(queue_t * q, mblk_t * pdu, int prim, caddr_t opt_ptr, s
  *  the connection request.  If SGP are associated we send an ASPAC and wait
  *  for the result before responding with an N_CONN_CON.
  */
-static int mtpu_conn_req(queue_t * q, mblk_t * pdu)
+static int
+mtpu_conn_req(queue_t *q, mblk_t *pdu)
 {
 	mtp_addr_t *a;
 	mtp_t *mtp = (mtp_t *) q->q_ptr;
 	N_conn_req_t *p = (N_conn_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		goto mtpu_conn_req_emsgsize;
 	if (pdu->b_rptr + p->DEST_offset > pdu->b_wptr - p->DEST_length)
@@ -208,13 +223,15 @@ static int mtpu_conn_req(queue_t * q, mblk_t * pdu)
  *  associated SGP (IPC or UAP) and ASPIA Ack procedures with each associated
  *  ASP (IPC).  Reasons are not given.
  */
-static int mtpu_discon_req(queue_t * q, mblk_t * pdu)
+static int
+mtpu_discon_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	size_t dlen = msgdsize(pdu);
 	size_t mlen = pdu->b_wptr - pdu->b_rptr;
 	mtp_t *mpt = (mtp_t *) q->q_ptr;
 	N_discon_req_t *p = (N_discon_req_t *) pdu->b_rptr;
+
 	if (mlen < sizeof(*p))
 		goto mtpu_discon_req_emsgsize;
 	if (dlen > 0)
@@ -253,7 +270,8 @@ static int mtpu_discon_req(queue_t * q, mblk_t * pdu)
  *  the NS_DATA_XFER state, we select an SGP and send DATA messages, otherwise
  *  we return an error or N_DISCON_IND.
  */
-static int mtpu_data_req(queue_t * q, mblk_t * pdu)
+static int
+mtpu_data_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *mp;
 	uint more;
@@ -261,6 +279,7 @@ static int mtpu_data_req(queue_t * q, mblk_t * pdu)
 	size_t mlen = pdu->b_wptr - pdu->b_rptr;
 	mtp_t *mtp = (mtp_t *) q->q_ptr;
 	N_data_req_t *p = (N_data_req_t *) pdu->b_rptr;
+
 	if (mlen < sizeof(*p))
 		goto mtpu_data_req_eproto;
 	if (!dlen || dlen > mtp->nidu)
@@ -307,7 +326,8 @@ static int mtpu_data_req(queue_t * q, mblk_t * pdu)
  *  Valid for both CNLS and CONS.  We always return current information
  *  associated with the interface in an N_INFO_ACK.
  */
-static int mtpu_info_req(queue_t * q, mblk_t * mp)
+static int
+mtpu_info_req(queue_t *q, mblk_t *mp)
 {
 }
 
@@ -320,12 +340,14 @@ static int mtpu_info_req(queue_t * q, mblk_t * mp)
  *  or REG REQ is successful, we perform ASPAC procedures to associated SGP.
  *  For CONS, we bind the local address and return N_BIND_ACK.
  */
-static int mtpu_bind_req(queue_t * q, mblk_t * mp)
+static int
+mtpu_bind_req(queue_t *q, mblk_t *mp)
 {
 	mblk_t *rp;
 	mtp_addr_t *a;
 	mtp_t *mtp = (mtp_t *) q->q_ptr;
 	N_bind_req_t *p = (N_bind_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		goto mtpu_bind_req_emsgsize;
 	if (pdu->b_rptr + p->ADDR_offset > pdu->b_wptr - p->ADDR_length)
@@ -376,11 +398,13 @@ static int mtpu_bind_req(queue_t * q, mblk_t * mp)
  *  the stream also needs to deactivate it.  If the associated AS becomes
  *  inactive due to this, the ASPIA procedures may need to be performed.
  */
-static int mtpu_unbind_req(queue_t * q, mblk_t * pdu)
+static int
+mtpu_unbind_req(queue_t *q, mblk_t *pdu)
 {
 	mblk_t *rp;
 	mtp_t *mtp = (mtp_t *) q->q_ptr;
 	N_unbind_req_t *p = (N_unbind_req_t *) pdu->b_rptr;
+
 	if (pdu->b_wptr - pdu->b_rptr < sizeof(*p))
 		goto mtpu_unbind_req_emsgsize;
 	if (mtp->state != NS_IDLE)
@@ -404,7 +428,8 @@ static int mtpu_unbind_req(queue_t * q, mblk_t * pdu)
  *  NS_IDLE state we formulate a DATA message and send it on to a selected
  *  SGP (or return error).
  */
-static int mtpu_unitdata_req(queue_t * q, mblk_t * mp)
+static int
+mtpu_unitdata_req(queue_t *q, mblk_t *mp)
 {
 	mtp_addr_t *src, *dst;
 	N_qos_sel_mtp_t *qos;
@@ -412,6 +437,7 @@ static int mtpu_unitdata_req(queue_t * q, mblk_t * mp)
 	size_t dlen = msgdsize(pdu);
 	size_t mlen = pdu->b_wptr - pdu->b_rptr;
 	N_unitdata_req_t *p = (N_unitdata_req_t *) pdu->b_rptr;
+
 	if (mlen < sizeof(*p)
 	    || mlen < p->DEST_offset + p->DEST_length
 	    || mlen < p->SRC_offset + p->SRC_length || mlen < p->QOS_offset + p->QOS_length)
@@ -483,7 +509,8 @@ static int mtpu_unitdata_req(queue_t * q, mblk_t * mp)
  *  This depends on a number of factors.  Some requests are local, some
  *  require interaction with the SGP.
  */
-static int mtpu_optmgmt_req(queue_t * q, mblk_t * mp)
+static int
+mtpu_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 }
 
@@ -494,13 +521,15 @@ static int mtpu_optmgmt_req(queue_t * q, mblk_t * mp)
  *  the User has accepted a reset indication.  We change state back to
  *  NS_DATA_XFER.
  */
-static int mtpu_reset_res(queue_t * q, mblk_t * mp)
+static int
+mtpu_reset_res(queue_t *q, mblk_t *mp)
 {
 	int err;
 	mblk_t *rp;
 	size_t mlen = pdu->b_wptr - pdu->b_rptr;
 	mtp_t *mtp = (mtp_t *) q->q_ptr;
 	N_reset_res_t *p = (N_reset_res_t *) pdu->b_rptr;
+
 	if (mlen < sizeof(*p))
 		goto mtpu_reset_res_emsgsize;
 	if (mtp->state == NS_IDLE)
@@ -561,10 +590,12 @@ static int (*mtpu_dstr_prim[]) (queue_t *, mblk_t *) = {
  *  M_DATA Processing
  *  -------------------------------------------------------------------------
  */
-static int mtpu_w_data(queue_t * q, mblk_t * mp)
+static int
+mtpu_w_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	mblk_t *np;
+
 	if (!(np = mtpu_data(q, mp)))
 		return (-ENOBUFS);
 //      if ( (err = m3ua_as_write(q, np)) )
@@ -576,9 +607,11 @@ static int mtpu_w_data(queue_t * q, mblk_t * mp)
  *  M_PROTO, M_PCPROTO Processing
  *  -------------------------------------------------------------------------
  */
-static int mtpu_w_proto(queue_t * q, mblk_t * mp)
+static int
+mtpu_w_proto(queue_t *q, mblk_t *mp)
 {
 	int prim = *((long *) mp->b_wptr);
+
 	if (MTP_DSTR_FIRST <= prim && prim <= MTP_DSTR_LAST && mtpu_dstr_prim[prim])
 		return ((*mtpu_dstr_prim[prim]) (q, mp));
 	return (-EOPNOTSUPP);

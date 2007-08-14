@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:38 $
+ @(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 08:33:56 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua.c,v $
+ Revision 0.9.2.9  2007/08/14 08:33:56  brian
+ - GPLv3 header update
+
  Revision 0.9.2.8  2007/07/14 01:33:38  brian
  - make license explicit, add documentation
 
@@ -76,13 +79,13 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:38 $"
+#ident "@(#) $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 08:33:56 $"
 
 static char const ident[] =
-    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:38 $";
+    "$RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 08:33:56 $";
 
 #define UA_DESCRIP	"SIGTRAN USER ADAPTATION (UA) STREAMS MULTIPLEXING DRIVER."
-#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:33:38 $"
+#define UA_REVISION	"OpenSS7 $RCSfile: ua.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 08:33:56 $"
 #define UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -977,7 +980,7 @@ struct ua_msg {
 #define UA_PARM_DATA		UA_CONST_PHDR(0x0003,0)	/* sua-07 */
 #define UA_PARM_IID_TEXT	UA_CONST_PHDR(0x0003,0)
 #define UA_PARM_INFO		UA_CONST_PHDR(0x0004,0)
-//#define UA_PARM_APC		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* sua-07 */
+//#define UA_PARM_APC           UA_CONST_PHDR(0x0005,sizeof(uint32_t))  /* sua-07 */
 #define UA_PARM_DLCI		UA_CONST_PHDR(0x0005,sizeof(uint32_t))	/* rfc3057 */
 #define UA_PARM_RC		UA_CONST_PHDR(0x0006,sizeof(uint32_t))
 #define UA_PARM_DIAG		UA_CONST_PHDR(0x0007,0)
@@ -987,7 +990,7 @@ struct ua_msg {
 #define UA_PARM_TMODE		UA_CONST_PHDR(0x000b,sizeof(uint32_t))
 #define UA_PARM_ECODE		UA_CONST_PHDR(0x000c,sizeof(uint32_t))
 #define UA_PARM_STATUS		UA_CONST_PHDR(0x000d,sizeof(uint32_t))
-//#define UA_PARM_ASPID		UA_CONST_PHDR(0x000e,sizeof(uint32_t))
+//#define UA_PARM_ASPID         UA_CONST_PHDR(0x000e,sizeof(uint32_t))
 #define UA_PARM_PROT_DATA	UA_CONST_PHDR(0x000e,sizeof(uint32_t))	/* rfc3057, rfc4233 */
 #define UA_PARM_CONG_LEVEL	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* sua-07 */
 #define UA_PARM_REL_REASON	UA_CONST_PHDR(0x000f,sizeof(uint32_t))	/* rfc3057 */
@@ -6941,8 +6944,9 @@ spp_recv_asps_aspup_req(struct pp *pp, queue_t *q, struct ua_msg *m)
 static int
 xs_recv_asps_aspup_req(struct xp *xp, queue_t *q, struct ua_msg *m)
 {
-	return (-EPROTO); /* Unexpected in this direction. */
+	return (-EPROTO);	/* Unexpected in this direction. */
 }
+
 /**
  * xg_recv_asps_aspup_req: - process anonymous ASP Up message
  * @xp: transport on which the message was received
@@ -12022,8 +12026,7 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 		if (msp.aspid.cp)
 			for (pp = xp->pp.list; pp && pp->spp.spp->aspid != msg.aspid.val;
 			     pp = pp->xp.next) ;
-		else
-			if ((pp = xp->pp.list) && pp->xp.next)
+		else if ((pp = xp->pp.list) && pp->xp.next)
 			/* No ASP Id in the message, the SPP list must contain exactly one or zero
 			   SPP or it is an error. */
 			return (-EXDEV);	/* Invalid ASP Id. */
@@ -12040,8 +12043,8 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 				break;
 			case UA_OBJ_TYPE_XP_XSP:
 				/* SGP and SPP messages from a specific SGP or SPP on an ASP X-link
-				 * are treated normally.  ASP messages from the peer ASP on the
-				 * X-link are treated specially. */
+				   are treated normally.  ASP messages from the peer ASP on the
+				   X-link are treated specially. */
 				switch (pp->spp.spp->type) {
 				case UA_OBJ_TYPE_ASP:
 					err = xsp_recv_msg(pp, q, &msg);
@@ -12056,8 +12059,8 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 				break;
 			case UA_OBJ_TYPE_XP_XGP:
 				/* ASP and SPP messages from a specific ASP or SPP on an SGP X-link
-				 * are treated normally.  SGP messages from the peer SGP on the
-				 * X-link are treated specially. */
+				   are treated normally.  SGP messages from the peer SGP on the
+				   X-link are treated specially. */
 				switch (pp->spp.spp->type) {
 				case UA_OBJ_TYPE_ASP:
 					err = asp_recv_msg(pp, q, &msg);
@@ -12071,9 +12074,9 @@ ua_recv_msg(struct xp *xp, queue_t *q, mblk_t *mp)
 				}
 				break;
 			case UA_OBJ_TYPE_XP_XPP:
-				/* ASP and SGP messages are not permitted on an SPP X-link.  Whether
-				 * the message pertains to a peer SPP or not can be determined from
-				 * the SP type. */
+				/* ASP and SGP messages are not permitted on an SPP X-link. Whether 
+				   the message pertains to a peer SPP or not can be determined from 
+				   the SP type. */
 				switch (pp->spp.spp->sp.sp->type) {
 				case UA_OBJ_TYPE_SP:
 					err = xpp_recv_msg(pp, q, &msg);
@@ -22231,7 +22234,7 @@ ua_alloc_rp(struct gp *gp, struct pp *pp)
 		rp->gp.gp = gp;
 		gp->rp.list = rp;
 		gp->rp.numb++;
-		gp->rp.counts[AS_DOWN]++; /* will not change state of GP */
+		gp->rp.counts[AS_DOWN]++;	/* will not change state of GP */
 
 		/* link to PP */
 		if ((rp->pp.next = pp->rp.list))
@@ -22292,6 +22295,7 @@ ua_free_pp(struct pp *pp)
 	}
 	swerr();
 }
+
 /**
  *  ua_alloc_pp: allocate SPP to XP mapping structure
  *  @spp: SPP to map

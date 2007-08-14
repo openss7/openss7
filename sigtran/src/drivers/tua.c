@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:33:36 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua.c,v $
+ Revision 0.9.2.6  2007/08/14 08:33:55  brian
+ - GPLv3 header update
+
  Revision 0.9.2.5  2007/07/14 01:33:36  brian
  - make license explicit, add documentation
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:33:36 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:55 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:33:36 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:55 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -109,7 +112,7 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.5 $) $Date: 2007/07/14 01:33:36 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:55 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -351,12 +354,14 @@ tua_w_ioctl(queue_t *q, mblk_t *mp)
 	int cmd = iocp->ioc_cmnd, count = iocp->ioc_count;
 	int type = _IOC_TYPE(cmd), nr = _IOC_NR(cmd), size = _IOC_SIZE(cmd);
 	int ret = 0;
+
 	switch (type) {
 	case _IOCT_TYPE(__SID):
 	{
 		psw_t flags;
 		struct tua *tua, **tuap;
 		struct linkblk *lb;
+
 		if (!(lb = arg)) {
 			swerr();
 			ret = -EINVAL;
@@ -382,7 +387,7 @@ tua_w_ioctl(queue_t *q, mblk_t *mp)
 				     sccpp = &(*sccpp)->next) ;
 				if ((sccp =
 				     tua_alloc_sccp(lb->l_qbot, sccpp, lb->l_index,
-						     iocp->ioc_cr))) {
+						    iocp->ioc_cr))) {
 					spin_unlock_irqrestore(&master.lock, flags);
 					break;
 				}
@@ -553,6 +558,7 @@ tua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	minor_t cminor = getminor(*devp);
 	minor_t bminor = cminor;
 	struct tua *tua, **tpp = &master.tua.list;
+
 	MOD_INC_USE_COUNT;	/* keep module from unloading */
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -572,10 +578,12 @@ tua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&master.lock, flags);
 	for (; *tpp; tpp = &(*tpp)->next) {
 		major_t dmajor = (*tpp)->u.dev.cmajor;
+
 		if (cmajor != dmajor)
 			break;
 		if (cmajor == dmajor) {
 			minor_t dminor = (*tpp)->u.dev.cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -617,6 +625,7 @@ tua_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct tua *tua = TUA_PRIV(q);
 	psw_t flags;
+
 	(void) flag;
 	(void) crp;
 	(void) tua;
@@ -651,6 +660,7 @@ tua_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -659,6 +669,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the TUA driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -685,6 +696,7 @@ STATIC int
 tua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&tua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -694,6 +706,7 @@ STATIC int
 tua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&tua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -711,6 +724,7 @@ STATIC int
 tua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &tuainfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -726,6 +740,7 @@ STATIC int
 tua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -737,6 +752,7 @@ MODULE_STATIC void __exit
 tuaterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (tua_majors[mindex]) {
 			if ((err = tua_unregister_strdev(tua_majors[mindex])))
@@ -755,6 +771,7 @@ MODULE_STATIC int __init
 tuainit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = tua_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

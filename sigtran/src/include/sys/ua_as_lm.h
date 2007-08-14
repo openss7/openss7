@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ua_as_lm.h,v 0.9.2.3 2007/02/14 14:09:00 brian Exp $
+ @(#) $Id: ua_as_lm.h,v 0.9.2.4 2007/08/14 08:34:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/02/14 14:09:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:34:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as_lm.h,v $
+ Revision 0.9.2.4  2007/08/14 08:34:06  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/02/14 14:09:00  brian
  - broad changes updating support for SS7 MTP and M3UA
 
@@ -120,20 +123,20 @@
 #define AS_ACTIVE	6	/* AS is active */
 
 /* ASP Extension flags */
-#define ASPEXT_ASPEXT	(1<< 0)    /* ASPEXT extension */
-#define ASPEXT_SGINFO	(1<< 1)    /* SGINFO extension */
-#define ASPEXT_LOADSEL	(1<< 2)    /* LOADSEL extension */
-#define ASPEXT_LOADGRP	(1<< 3)    /* LOADGRP extension */
-#define ASPEXT_CORID	(1<< 4)    /* CORID extension */
-#define ASPEXT_REGEXT	(1<< 5)    /* REGEXT extension */
-#define ASPEXT_SESSID	(1<< 6)    /* SESSID extension */
-#define ASPEXT_DYNAMIC	(1<< 7)    /* DYNAMIC option */
-#define ASPEXT_DEIPSP	(1<< 8)    /* DEIPSP option */
-#define ASPEXT_ASPCONG	(1<< 9)    /* ASPCONG extension */
-#define ASPEXT_TEXTIID	(1<<10)    /* TEXTIID option */
+#define ASPEXT_ASPEXT	(1<< 0)	/* ASPEXT extension */
+#define ASPEXT_SGINFO	(1<< 1)	/* SGINFO extension */
+#define ASPEXT_LOADSEL	(1<< 2)	/* LOADSEL extension */
+#define ASPEXT_LOADGRP	(1<< 3)	/* LOADGRP extension */
+#define ASPEXT_CORID	(1<< 4)	/* CORID extension */
+#define ASPEXT_REGEXT	(1<< 5)	/* REGEXT extension */
+#define ASPEXT_SESSID	(1<< 6)	/* SESSID extension */
+#define ASPEXT_DYNAMIC	(1<< 7)	/* DYNAMIC option */
+#define ASPEXT_DEIPSP	(1<< 8)	/* DEIPSP option */
+#define ASPEXT_ASPCONG	(1<< 9)	/* ASPCONG extension */
+#define ASPEXT_TEXTIID	(1<<10)	/* TEXTIID option */
 
 /* UA reason codes */
-#define UA_REASON_UNSPECIFIED			0   /* reason is unspecified or unknown */
+#define UA_REASON_UNSPECIFIED			0	/* reason is unspecified or unknown */
 #define UA_REASON_INVALID_VERSION		1
 #define UA_REASON_UNSUPPORTED_MESSAGE_CLASS	2
 #define UA_REASON_UNSUPPORTED_MESSAGE_TYPE	3
@@ -410,9 +413,9 @@ struct UA_aspdn_ind {
 };
 
 /* UA origins */
-#define UA_ORIGIN_UNSPEC	0   /* origin is unspecified or unknown */
-#define UA_ORIGIN_USER		1   /* origin is the user */
-#define UA_ORIGIN_PROVIDER	2   /* origin is the provider */
+#define UA_ORIGIN_UNSPEC	0	/* origin is unspecified or unknown */
+#define UA_ORIGIN_USER		1	/* origin is the user */
+#define UA_ORIGIN_PROVIDER	2	/* origin is the provider */
 
 #define UA_ASPDN_REASON_UNKNOWN		0	/* Unknown, unspecified */
 #define UA_ASPDN_REASON_ASPDN_ACK	1	/* Unsolicited ASP Down Ack */
@@ -782,6 +785,6 @@ struct UA_notify_ind {
 	uint ASPID;			/* External ASP Identifier */
 };
 
-#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: ua_as_lm.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #endif				/* __SYS_UA_AS_LM_H__ */

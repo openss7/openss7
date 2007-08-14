@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_sg.c,v 0.9.2.7 2007/07/14 01:33:31 brian Exp $
+ @(#) $RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:33:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,14 +19,40 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
- Last Modified $Date: 2007/07/14 01:33:31 $ by $Author: brian $
+ -----------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.8  2007/08/14 08:33:54  brian
+ - GPLv3 header update
+
  Revision 0.9.2.7  2007/07/14 01:33:31  brian
  - make license explicit, add documentation
 
@@ -94,7 +121,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.7 $) $Date: 2007/07/14 01:33:31 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:33:54 $";
 
 #include <sys/os7/compat.h>
 
@@ -409,6 +436,7 @@ static int
 mtp_transfer_req(m3ua_t * m3, mblk_t *mp)
 {
 	mtp_transfer_t *m = (mtp_transfer_ind_t *) mp->b_rptr;
+
 	/* 
 	 *  Find the appropriate AS using the routing information in the
 	 *  request and select an available ASP.  Package up a DATA message
@@ -690,6 +718,7 @@ static inline int
 m3ua_m_data(queue_t *q, mblk_t *mp)
 {
 	m3ua_t *m3 = (m3ua_t *) q->q_ptr;
+
 	trace();
 	m3ua_data(m3, mp);
 	return (0);
@@ -699,6 +728,7 @@ static inline int
 t_m_data(queue_t *q, mblk_t *mp)
 {
 	t_t *t = (t_t *) q->q_ptr;
+
 	trace();
 	t_data(t, mp);
 	return (0);
@@ -970,6 +1000,7 @@ m3ua_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 
 	for (; cminor <= NMINORS && *m3p; m3p = &(*m3p)->next) {
 		int dminor = getminor((*m3p)->devnum);
+
 		if (cminor < dminor)
 			break;
 		if (cminor == dminor) {
@@ -1004,6 +1035,7 @@ static int
 m3ua_close(queue_t *q, int flag, cred_t *crp)
 {
 	m3ua_t *m3 = (m3ua_t *) q->q_ptr;
+
 	kfree(m3);
 	return (0);
 }
@@ -1022,6 +1054,7 @@ m3ua_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -1030,6 +1063,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the INET driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -1056,6 +1090,7 @@ STATIC int
 m3ua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&m3ua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -1065,6 +1100,7 @@ STATIC int
 m3ua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&m3ua_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -1082,6 +1118,7 @@ STATIC int
 m3ua_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &m3uainfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -1097,6 +1134,7 @@ STATIC int
 m3ua_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -1108,6 +1146,7 @@ MODULE_STATIC void __exit
 m3uaterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (m3ua_majors[mindex]) {
 			if ((err = m3ua_unregister_strdev(m3ua_majors[mindex])))
@@ -1126,6 +1165,7 @@ MODULE_STATIC int __init
 m3uainit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = m3ua_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

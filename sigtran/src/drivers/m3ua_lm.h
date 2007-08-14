@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_lm.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $Id: m3ua_lm.h,v 0.9.2.3 2007/08/14 08:33:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_lm.h,v $
+ Revision 0.9.2.3  2007/08/14 08:33:53  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -76,7 +79,7 @@
 #ifndef __M3UA_LM_H__
 #define __M3UA_LM_H__
 
-#ident "@(#) $RCSfile: m3ua_lm.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua_lm.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /*
  *  =========================================================================
@@ -91,11 +94,13 @@
  *  This is the bottom half of pass-through control of any of the links under
  *  the multiplexor from the configuration daemon stream.
  */
-static __inline__ int lm_link_ind(queue_t * q, mblk_t * dp)
+static __inline__ int
+lm_link_ind(queue_t *q, mblk_t *dp)
 {
 	mblk_t *mp;
 	lm_link_ind_t *p;
 	lp_t *lp = (lp_t *) q->q_ptr;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = dp->b_datap->db_type;
 		p = (lm_link_ind_t *) mp->b_wptr;
@@ -117,10 +122,12 @@ static __inline__ int lm_link_ind(queue_t * q, mblk_t * dp)
  *  M_NOTIFY_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *m3_notify_ind(void)
+static __inline__ mblk_t *
+m3_notify_ind(void)
 {
 	mblk_t *mp;
 	m3_notify_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (m3_notify_ind_t *) mp->b_wptr;
@@ -137,10 +144,12 @@ static __inline__ mblk_t *m3_notify_ind(void)
  *  M_ERROR_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ mblk_t *m3_error_ind(void)
+static __inline__ mblk_t *
+m3_error_ind(void)
 {
 	mblk_t *mp;
 	m3_error_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PCPROTO;
 		p = (m3_error_ind_t *) mp->b_wptr;
@@ -161,10 +170,12 @@ static __inline__ mblk_t *m3_error_ind(void)
  *  LM_AS_EVENT_IND
  *  -------------------------------------------------------------------------
  */
-static __inline__ int lm_as_event_ind(uint muxid, uint event, uint asid, uint aspid)
+static __inline__ int
+lm_as_event_ind(uint muxid, uint event, uint asid, uint aspid)
 {
 	mblk_t *mp;
 	LM_as_event_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		mp->b_datap->db_type = M_PROTO;
 		p = (LM_as_event_ind_t *) mp->b_wptr;

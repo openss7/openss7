@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:43 $
+ @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:43 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:34:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_dl.c,v $
+ Revision 0.9.2.4  2007/08/14 08:34:10  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/07/14 01:33:43  brian
  - make license explicit, add documentation
 
@@ -61,14 +64,15 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:43 $"
+#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $"
 
-static char const ident[] = "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:43 $";
+static char const ident[] =
+    "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $";
 
 #include <sys/os7/compat.h>
 
 #define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 DATA LINK (DL) STREAMS MODULE"
-#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/07/14 01:33:43 $"
+#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $"
 #define M2PA_DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define M2PA_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2124,7 +2128,7 @@ dl_get_statistics_req(struct dl *dl, queue_t *q, mblk_t *mp)
 STATIC streams_fastcall int
 dl_notsupported(struct dl *dl, queue_t *q, mblk_t *mp)
 {
-	dl_ulong prim = *(dl_ulong *)mp->b_rptr;
+	dl_ulong prim = *(dl_ulong *) mp->b_rptr;
 
 	return dl_error_ack(dl, q, mp, prim, DL_NOTSUPPORTED, EOPNOTSUPP);
 }

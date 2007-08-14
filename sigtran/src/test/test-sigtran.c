@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:08:56 $
+ @(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:34:18 $
 
  -----------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@
  -----------------------------------------------------------------------------
 
  As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
+ General Public License (GPL) Version 3, so long as the software is distributed
  with, and only used for the testing of, OpenSS7 modules, drivers, and
  libraries.
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:08:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:34:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sigtran.c,v $
+ Revision 0.9.2.8  2007/08/14 08:34:18  brian
+ - GPLv3 header update
+
  Revision 0.9.2.7  2007/03/15 10:08:56  brian
  - updates for release
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:08:56 $"
+#ident "@(#) $RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:34:18 $"
 
-static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/03/15 10:08:56 $";
+static char const ident[] = "$RCSfile: test-sigtran.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:34:18 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   0
@@ -190,6 +193,7 @@ static const char *lpkgname = "SIGnalling TRANsport";
 static const char *lstdname = "RFC 2960/ETSI TS 102 144 V.1.1.1 (2003-05)";
 static const char *sstdname = "RFC 2960";
 static const char *shortname = "SCTP";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/ua-as";
 static char xptname[256] = "/dev/streams/clone/sctp_t";
@@ -300,8 +304,8 @@ int msu_len = MSU_LEN;
 /*
    some globals for compressing events 
  */
-int oldact = 0;			/* previous action */
-int cntact = 0;			/* repeats of previous action */
+int oldact = 0;				/* previous action */
+int cntact = 0;				/* repeats of previous action */
 int oldevt = 0;
 int cntevt = 0;
 
@@ -839,8 +843,9 @@ struct sockaddr_in addrs[4][3];
 struct sockaddr_in addrs[4];
 #endif
 int anums[4] = { 3, 3, 3, 3 };
+
 #define TEST_PORT_NUMBER 18000
-unsigned short ports[4] = { TEST_PORT_NUMBER+0, TEST_PORT_NUMBER+1, TEST_PORT_NUMBER+2, TEST_PORT_NUMBER+3 };
+unsigned short ports[4] = { TEST_PORT_NUMBER + 0, TEST_PORT_NUMBER + 1, TEST_PORT_NUMBER + 2, TEST_PORT_NUMBER + 3 };
 const char *addr_strings[4] = { "127.0.0.1", "127.0.0.2", "127.0.0.3", "127.0.0.4" };
 
 /*
@@ -6007,7 +6012,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -6038,7 +6043,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

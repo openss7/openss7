@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m3ua_asp.h,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $Id: m3ua_asp.h,v 0.9.2.3 2007/08/14 08:33:53 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_asp.h,v $
+ Revision 0.9.2.3  2007/08/14 08:33:53  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __M3UA_ASP_H__
 #define __M3UA_ASP_H__
 
-#ident "@(#) $RCSfile: m3ua_asp.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m3ua_asp.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #include "../ua/ua_asp.h"	/* UA --> UA Common Messages */
 #include "m3ua_msg.h"		/* M3UA specific messages */
@@ -76,8 +79,8 @@
  *  UA_SNMM_DUNA
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_duna(uint32_t na, uint32_t * apcs, size_t num_apcs,
-				caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+m3ua_duna(uint32_t na, uint32_t *apcs, size_t num_apcs, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t mlen = UA_MHDR_SIZE +
@@ -113,8 +116,8 @@ static inline mblk_t *m3ua_duna(uint32_t na, uint32_t * apcs, size_t num_apcs,
  *  UA_SNMM_DAVA
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_dava(uint32_t na, uint32_t * apcs, size_t num_apcs,
-				caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+m3ua_dava(uint32_t na, uint32_t *apcs, size_t num_apcs, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t mlen = UA_MHDR_SIZE +
@@ -150,8 +153,8 @@ static inline mblk_t *m3ua_dava(uint32_t na, uint32_t * apcs, size_t num_apcs,
  *  UA_SNMM_DAUD
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_daud(uint32_t na, uint32_t * apcs, size_t num_apcs,
-				caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+m3ua_daud(uint32_t na, uint32_t *apcs, size_t num_apcs, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t mlen = UA_MHDR_SIZE +
@@ -187,8 +190,9 @@ static inline mblk_t *m3ua_daud(uint32_t na, uint32_t * apcs, size_t num_apcs,
  *  UA_SNMM_SCON
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_scon(uint32_t na, uint32_t * apcs, size_t num_apcs,
-				uint32_t cpc, uint8_t cong_level, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+m3ua_scon(uint32_t na, uint32_t *apcs, size_t num_apcs,
+	  uint32_t cpc, uint8_t cong_level, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t mlen = UA_MHDR_SIZE +
@@ -231,8 +235,8 @@ static inline mblk_t *m3ua_scon(uint32_t na, uint32_t * apcs, size_t num_apcs,
  *  UA_SNMM_DUPU
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_dupu(uint32_t na, uint32_t apc, uint16_t user,
-				uint16_t cause, caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+m3ua_dupu(uint32_t na, uint32_t apc, uint16_t user, uint16_t cause, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t mlen = UA_MHDR_SIZE +
@@ -268,8 +272,8 @@ static inline mblk_t *m3ua_dupu(uint32_t na, uint32_t apc, uint16_t user,
  *  UA_SNMM_DRST
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_drst(uint32_t na, uint32_t * apcs, size_t num_apcs,
-				caddr_t inf_ptr, size_t inf_len)
+static inline mblk_t *
+m3ua_drst(uint32_t na, uint32_t *apcs, size_t num_apcs, caddr_t inf_ptr, size_t inf_len)
 {
 	mblk_t *mp, *np;
 	size_t mlen = UA_MHDR_SIZE +
@@ -305,8 +309,9 @@ static inline mblk_t *m3ua_drst(uint32_t na, uint32_t * apcs, size_t num_apcs,
  *  M3UA_XFER_DATA
  *  -------------------------------------------------------------------------
  */
-static inline mblk_t *m3ua_data(uint32_t na, uint32_t rc, uint32_t opc,
-				uint32_t dpc, uint8_t si, uint8_t mp, uint16_t sls, mblk_t * dp)
+static inline mblk_t *
+m3ua_data(uint32_t na, uint32_t rc, uint32_t opc,
+	  uint32_t dpc, uint8_t si, uint8_t mp, uint16_t sls, mblk_t *dp)
 {
 	mblk_t *mp, *np;
 	size_t dlen = UA_PDHR_SIZE + 3 * sizeof(uint32_t) + msgdsize(dp);

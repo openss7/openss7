@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_mtpp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $
+ @(#) $RCSfile: m3ua_mtpp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: m3ua_mtpp.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:54  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua_mtpp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $"
+#ident "@(#) $RCSfile: m3ua_mtpp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua_mtpp.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
+    "$RCSfile: m3ua_mtpp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:54 $";
 
 #define __NO_VERSION__
 
@@ -97,7 +103,8 @@ static char const ident[] =
  *  MTP_INFO_ACK     16 - Information Acknowledgement
  *  -------------------------------------------------------------------------
  */
-static int mtpp_info_ack(queue_t * q, mblk_t * mp)
+static int
+mtpp_info_ack(queue_t *q, mblk_t *mp)
 {
 	/* 
 	 *  FIXME: might want to look at this one to get some pertinent
@@ -106,6 +113,7 @@ static int mtpp_info_ack(queue_t * q, mblk_t * mp)
 	 */
 	mtpp_t *mtp = Q_MTP(q);
 	N_info_ack_t *p = (N_info_ack_t *) mp->b_rptr;
+
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p))
 		return -EPROTO;
 	mtp->max_sdu = p->NSDU_size;	/* maximum NSDU size */
@@ -127,7 +135,8 @@ static int mtpp_info_ack(queue_t * q, mblk_t * mp)
  *  MTP_BIND_ACK     17 - NS User bound to network address
  *  -------------------------------------------------------------------------
  */
-static int mtpp_bind_ack(queue_t * q, mblk_t * mp)
+static int
+mtpp_bind_ack(queue_t *q, mblk_t *mp)
 {
 	/* 
 	 *  FIXME: might want to look at this one to echo the state of the
@@ -140,7 +149,8 @@ static int mtpp_bind_ack(queue_t * q, mblk_t * mp)
  *  MTP_ERROR_ACK    18 - Error Acknowledgement
  *  -------------------------------------------------------------------------
  */
-static int mtpp_error_ack(queue_t * q, mblk_t * mp)
+static int
+mtpp_error_ack(queue_t *q, mblk_t *mp)
 {
 	/* 
 	 *  FIXME: might want to look at this one to echo the state of the
@@ -153,7 +163,8 @@ static int mtpp_error_ack(queue_t * q, mblk_t * mp)
  *  MTP_OK_ACK       19 - Success Acknowledgement
  *  -------------------------------------------------------------------------
  */
-static int mtpp_ok_ack(queue_t * q, mblk_t * mp)
+static int
+mtpp_ok_ack(queue_t *q, mblk_t *mp)
 {
 	/* 
 	 *  FIXME: might want to look at this one to echo the state of the
@@ -176,7 +187,8 @@ static int mtpp_ok_ack(queue_t * q, mblk_t * mp)
  *  is an SCTP transport, it can do other things with the message, like select
  *  stream.
  */
-static int mtpp_unitdata_ind(queue_t * q, mblk_t * msg)
+static int
+mtpp_unitdata_ind(queue_t *q, mblk_t *msg)
 {
 	sls_t *sls;
 	queue_t *wq;
@@ -246,14 +258,17 @@ static int mtpp_unitdata_ind(queue_t * q, mblk_t * msg)
  *  This covers the MTP-STATUS-Indication, MTP-PAUSE-Indication,
  *  MTP-RESUME-Indication, MTP-RESTART-BEGINS and MTP-RESTART-ENDS.
  */
-static mblk_t *mtpp_uderror_ind(queue_t * q, mblk_t * msg)
+static mblk_t *
+mtpp_uderror_ind(queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	mtpp_t *mtp = Q_MTP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_MED))) {
 		N_uderror_ind_t *p = (N_uderror_ind_t *) msg->b_rptr;
 		struct mtp_rl *rl = (mtp_rl *) (((caddr_t) p) + p->DEST_offset - sizeof(uint32_t));
+
 		mp->b_datap->db_type = M_DATA;
 		switch (p->ERROR_type) {
 		case MTP_DEST_CONGESTED:
@@ -382,7 +397,8 @@ static mblk_t *mtpp_uderror_ind(queue_t * q, mblk_t * msg)
  *  When receipt confirmation is used, the MTP-User should hang onto a copy of
  *  its transmitted messages until this.
  */
-static int mtpp_datack_ind(queue_t * q, mblk_t * msg)
+static int
+mtpp_datack_ind(queue_t *q, mblk_t *msg)
 {
 }
 
@@ -400,12 +416,14 @@ static int mtpp_datack_ind(queue_t * q, mblk_t * msg)
  *  receipt confirmation is on, the MTP-User at the other end will know which
  *  messages have not been received.
  */
-static int mtpp_reset_ind(queue_t * q, mblk_t * msg)
+static int
+mtpp_reset_ind(queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp;
 	mtpp_t *mtp = Q_MTP(q);
 	size_t mlen = FIXME;
 	N_reset_ind_t *p = (N_reset_ind_t *) msg->b_rptr;
+
 	if (msg->b_wptr - msg->b_rptr < sizeof(*p))
 		return (-EFAULT);
 	if ((mp = allocb(mlen, BPRI_MED))) {
@@ -521,7 +539,8 @@ static int mtpp_reset_ind(queue_t * q, mblk_t * msg)
  *  -------------------------------------------------------------------------
  *  This covers only the MTP-TRANSFER-Request primitive.
  */
-static mblk_t *mtpp_unitdata_req(queue_t * q, mblk_t * msg)
+static mblk_t *
+mtpp_unitdata_req(queue_t *q, mblk_t *msg)
 {
 	mblk_t *mp, *db = msg->b_cont;
 	mtpp_t *mtp = Q_MTP(q);
@@ -531,6 +550,7 @@ static mblk_t *mtpp_unitdata_req(queue_t * q, mblk_t * msg)
 		size_t dlen = msgdsize(db);
 		N_unitdata_req_t *p = (N_unitdata_req_t *) msg->b_rptr;
 		struct mtp_rl *rl = (mtp_rl *) (((caddr_t) p) + p->DEST_offset - sizeof(uint32_t));
+
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = M3UA_MAUP_DATA;
 		*((uint32_t *) mp->b_wptr)++ = htonl(mlen + dlen);
@@ -627,20 +647,24 @@ static int (*mtpp_ustr_prim[]) (queue_t *, mblk_t *) {
  *  M_DATA Processing
  *  -------------------------------------------------------------------------
  */
-static int mtpp_w_data(queue_t * q, mblk_t * mp)
+static int
+mtpp_w_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	mblk_t *np;
+
 	if (!(np = mtpp_data(q, mp)))
 		return (-ENOBUFS);
 	if ((err = m3ua_as_write(q, np)))
 		return (err);
 	return (0);
 }
-static int mtpp_r_data(queue_t * q, mblk_t * mp)
+static int
+mtpp_r_data(queue_t *q, mblk_t *mp)
 {
 	int err;
 	mblk_t *np;
+
 	if (!(np = mtpp_data(q, mp)))
 		return (-ENOBUFS);
 	if ((err = m3ua_as_read(q, np)))
@@ -652,16 +676,20 @@ static int mtpp_r_data(queue_t * q, mblk_t * mp)
  *  M_PROTO, M_PCPROTO Processing
  *  -------------------------------------------------------------------------
  */
-static int mtpp_w_proto(queue_t * q, mblk_t * mp)
+static int
+mtpp_w_proto(queue_t *q, mblk_t *mp)
 {
 	int prim = *((long *) mp->b_wptr);
+
 	if (MTP_DSTR_FIRST <= prim && prim <= MTP_DSTR_LAST && mtpp_dstr_prim[prim])
 		return ((*mtpp_dstr_prim[prim]) (q, mp));
 	return (-EOPNOTSUPP);
 }
-static int mtpp_r_proto(queue_t * q, mblk_t * mp)
+static int
+mtpp_r_proto(queue_t *q, mblk_t *mp)
 {
 	int prim = *((long *) mp->b_wptr);
+
 	if (MTP_USTR_FIRST <= prim && prim <= MTP_USTR_LAST && mtpp_ustr_prim[prim])
 		return ((*mtpp_ustr_prim[prim]) (q, mp));
 	return (-EOPNOTSUPP);

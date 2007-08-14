@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: m2ua_ioctl.h,v 0.9.2.3 2006/12/23 13:06:55 brian Exp $
+ @(#) $Id: m2ua_ioctl.h,v 0.9.2.4 2007/08/14 08:34:06 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/23 13:06:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:34:06 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: m2ua_ioctl.h,v $
+ Revision 0.9.2.4  2007/08/14 08:34:06  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
 #ifndef __M2UA_IOCTL_H__
 #define __M2UA_IOCTL_H__
 
-#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: m2ua_ioctl.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -134,9 +140,8 @@ typedef struct m2ua_opt_conf_df {
 typedef struct m2ua_option {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
-	/*
-	   followed by object-specific option structure 
-	 */
+	/* 
+	   followed by object-specific option structure */
 } m2ua_option_t;
 
 #define M2UA_IOCGOPTIONS	_IOR(	M2UA_IOC_MAGIC,	 0,	m2ua_option_t	)
@@ -209,9 +214,8 @@ typedef struct m2ua_config {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
 	ulong cmd;			/* object command */
-	/*
-	   followed by object-specific config structure 
-	 */
+	/* 
+	   followed by object-specific config structure */
 } m2ua_config_t;
 
 #define M2UA_GET	0

@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sua_sccp.c,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $RCSfile: sua_sccp.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,14 +19,40 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: sua_sccp.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:55  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -49,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $";
 
 /*
  *  =========================================================================
@@ -65,11 +92,13 @@ static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 0
  *  Credit (if class 3), saved the SOURCE address and DEST address.  This
  *  function just packages up the message.
  */
-static mblk_t *s_conn_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_conn_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CORE;
@@ -107,11 +136,13 @@ static mblk_t *s_conn_req(queue_t * q, mblk_t * prim)
  *	(because the network appearance is implicit in the source reference
  *	number).
  */
-static mblk_t *s_conn_res(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_conn_res(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COAK;
@@ -147,14 +178,17 @@ static mblk_t *s_conn_res(queue_t * q, mblk_t * prim)
  *	N_DISCON_REQ in NS_DATA_XFER	--> RELRE
  *
  */
-static mblk_t *s_discon_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_discon_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
+
 	switch (sp->state) {
 	case NS_WRES_CIND:
 	{
 		static const size_t mlen = FIXME;
+
 		if ((mp = allocb(mlen, BPRI_HI))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COREF;
@@ -183,6 +217,7 @@ static mblk_t *s_discon_req(queue_t * q, mblk_t * prim)
 	case NS_DATA_XFER:
 	{
 		static const size_t mlen = FIXME;
+
 		if ((mp = allocb(mlen, BPRI_HI))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RELRE;
@@ -213,11 +248,13 @@ static mblk_t *s_discon_req(queue_t * q, mblk_t * prim)
  *  N_DATA_REQ --> CODT
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_data_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_data_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODT;
@@ -244,11 +281,13 @@ static mblk_t *s_data_req(queue_t * q, mblk_t * prim)
  *  N_EXDATA_REQ --> CODT
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_exdata_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_exdata_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODT;
@@ -269,11 +308,13 @@ static mblk_t *s_exdata_req(queue_t * q, mblk_t * prim)
  *  N_UNITDATA_REQ --> CLDT
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_unitdata_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_unitdata_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CLDT;
@@ -294,11 +335,13 @@ static mblk_t *s_unitdata_req(queue_t * q, mblk_t * prim)
  *  N_DATACK_REQ --> CODA
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_datack_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_datack_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODA;
@@ -319,11 +362,13 @@ static mblk_t *s_datack_req(queue_t * q, mblk_t * prim)
  *  N_RESET_REQ --> RESRE
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_reset_req(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_reset_req(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RESRE;
@@ -344,11 +389,13 @@ static mblk_t *s_reset_req(queue_t * q, mblk_t * prim)
  *  N_RESET_RES --> RESCO
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_reset_res(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_reset_res(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RESCO;
@@ -369,11 +416,13 @@ static mblk_t *s_reset_res(queue_t * q, mblk_t * prim)
  *  N_CONN_IND --> CORE
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_conn_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_conn_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CORE;
@@ -394,11 +443,13 @@ static mblk_t *s_conn_ind(queue_t * q, mblk_t * prim)
  *  N_CONN_CON --> COAK
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_conn_con(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_conn_con(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COAK;
@@ -419,14 +470,17 @@ static mblk_t *s_conn_con(queue_t * q, mblk_t * prim)
  *  N_DISCON_IND --> COAK, RELRE, or RELCO
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_discon_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_discon_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
+
 	switch (sp->state) {
 	case NS_WCON_CREQ:
 	{
 		static const size_t mlen = FIXME;
+
 		if ((mp = allocb(mlen, BPRI_HI))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = SUA_CONS_COAK;
@@ -445,6 +499,7 @@ static mblk_t *s_discon_ind(queue_t * q, mblk_t * prim)
 	case NS_WACK_DREQ:
 	{
 		static const size_t mlen = FIXME;
+
 		if ((mp = allocb(mlen, BPRI_HI))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RELCO;
@@ -464,6 +519,7 @@ static mblk_t *s_discon_ind(queue_t * q, mblk_t * prim)
 	case NS_WIND_DREQ:
 	{
 		static const size_t mlen = FIXME;
+
 		if ((mp = allocb(mlen, BPRI_HI))) {
 			mp->b_datap->db_type = M_DATA;
 			*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RELRE;
@@ -486,11 +542,13 @@ static mblk_t *s_discon_ind(queue_t * q, mblk_t * prim)
  *  N_DATA_IND --> CODT
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_data_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_data_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODT;
@@ -511,11 +569,13 @@ static mblk_t *s_data_ind(queue_t * q, mblk_t * prim)
  *  N_EXDATA_IND --> CODT
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_exdata_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_exdata_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODT;
@@ -536,11 +596,13 @@ static mblk_t *s_exdata_ind(queue_t * q, mblk_t * prim)
  *  N_UNITDATA_IND --> CLDT
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_unitdata_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_unitdata_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CNLS_CLDT;
@@ -561,11 +623,13 @@ static mblk_t *s_unitdata_ind(queue_t * q, mblk_t * prim)
  *  N_UDERROR_IND --> CLDR
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_uderror_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_uderror_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CNLS_CLDR;
@@ -586,11 +650,13 @@ static mblk_t *s_uderror_ind(queue_t * q, mblk_t * prim)
  *  N_DATACK_IND --> CODA
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_datack_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_datack_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_CODA;
@@ -611,11 +677,13 @@ static mblk_t *s_datack_ind(queue_t * q, mblk_t * prim)
  *  N_RESET_IND --> RESRE
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_reset_ind(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_reset_ind(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RESRE;
@@ -636,11 +704,13 @@ static mblk_t *s_reset_ind(queue_t * q, mblk_t * prim)
  *  N_RESET_CON --> RESCO
  *  -------------------------------------------------------------------------
  */
-static mblk_t *s_reset_con(queue_t * q, mblk_t * prim)
+static mblk_t *
+s_reset_con(queue_t *q, mblk_t *prim)
 {
 	mblk_t *mp;
 	sccp_t *sp = Q_SCCP(q);
 	static const size_t mlen = FIXME;
+
 	if ((mp = allocb(mlen, BPRI_HI))) {
 		mp->b_datap->db_type = M_DATA;
 		*((uint32_t *) mp->b_wptr)++ = SUA_CONS_RESCO;

@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:33 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2002  OpenSS7 Corporation <http://www.openss7.com>
- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@dallas.net>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,14 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:33:33 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
+
+ $Log: tali.c,v $
+ Revision 0.9.2.7  2007/08/14 08:33:55  brian
+ - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:33 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:33 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $";
 
 #include <sys/os7/compat.h>
 
@@ -70,7 +76,7 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/07/14 01:33:33 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -361,6 +367,7 @@ tali_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	major_t cmajor = bmajor = getmajor(*devp);
 	minor_t cminor = bminor = getminor(*devp);
 	struct tali *ta, **tpp;
+
 	MOD_INC_USE_COUNT;
 	if (q->q_ptr != NULL) {
 		MOD_DEC_USE_COUNT;
@@ -380,8 +387,10 @@ tali_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)
 	spin_lock_irqsave(&master.lock, flags);
 	for (tpp = &master.ta.list; *tpp; tpp = &(*tpp)->next) {
 		major_t dmajor = (*tpp)->u.dev.cmajor;
+
 		if (cmajor != dmajor) {
 			minor_t dminor = (*tpp)->u.dev.cminor;
+
 			if (cminor < dminor)
 				break;
 			if (cminor > dminor)
@@ -423,6 +432,7 @@ tali_close(queue_t *q, int flag, cred_t *crp)
 {
 	struct tali *ta = TA_PRIV(q);
 	psw_t flags;
+
 	(void) ta;
 	printd(("%s: %p: closing character device %hu:%hu\n", DRV_NAME, ta, ta->u.dev.cmajor,
 		ta->u.dev.cminor));
@@ -449,6 +459,7 @@ tali_close(queue_t *q, int flag, cred_t *crp)
  */
 
 unsigned short modid = DRV_ID;
+
 #ifndef module_param
 MODULE_PARM(modid, "h");
 #else
@@ -457,6 +468,7 @@ module_param(modid, ushort, 0444);
 MODULE_PARM_DESC(modid, "Module ID for the TALI driver. (0 for allocation.)");
 
 major_t major = CMAJOR_0;
+
 #ifndef module_param
 MODULE_PARM(major, "h");
 #else
@@ -483,6 +495,7 @@ STATIC int
 tali_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = register_strdev(&tali_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -492,6 +505,7 @@ STATIC int
 tali_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = unregister_strdev(&tali_cdev, major)) < 0)
 		return (err);
 	return (0);
@@ -509,6 +523,7 @@ STATIC int
 tali_register_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_register_strdev(major, &taliinfo, UNITS, DRV_NAME)) < 0)
 		return (err);
 	if (major == 0)
@@ -524,6 +539,7 @@ STATIC int
 tali_unregister_strdev(major_t major)
 {
 	int err;
+
 	if ((err = lis_unregister_strdev(major)) < 0)
 		return (err);
 	return (0);
@@ -535,6 +551,7 @@ MODULE_STATIC void __exit
 taliterminate(void)
 {
 	int err, mindex;
+
 	for (mindex = CMAJORS - 1; mindex >= 0; mindex--) {
 		if (tali_majors[mindex]) {
 			if ((err = tali_unregister_strdev(tali_majors[mindex])))
@@ -553,6 +570,7 @@ MODULE_STATIC int __init
 taliinit(void)
 {
 	int err, mindex = 0;
+
 	cmn_err(CE_NOTE, DRV_BANNER);	/* console splash */
 	if ((err = tali_init_caches())) {
 		cmn_err(CE_WARN, "%s: could not init caches, err = %d", DRV_NAME, err);

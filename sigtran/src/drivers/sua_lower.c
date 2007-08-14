@@ -1,16 +1,17 @@
 /*****************************************************************************
 
- @(#) $Id: sua_lower.c,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $
+ @(#) $RCSfile: sua_lower.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $
 
  -----------------------------------------------------------------------------
 
- Copyright (C) 2001  OpenSS7 Corporation <http://www.openss7.com>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -18,14 +19,40 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:50 $ by $Author: brian $
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+ behalf of the U.S. Government ("Government"), the following provisions apply
+ to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+ is classified as "Commercial Computer Software" under paragraph 252.227-7014
+ of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+ successor regulations) and the Government is acquiring only the license rights
+ granted herein (the license rights customarily provided to non-Government
+ users).  If the Software is supplied to any unit or agency of the Government
+ other than DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19 of the
+ Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+ (or any successor regulations).
+
+ -----------------------------------------------------------------------------
+
+ Commercial licensing and support of this software is available from OpenSS7
+ Corporation at a fee.  See http://www.openss7.com/
+
+ -----------------------------------------------------------------------------
+
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
+
+ -----------------------------------------------------------------------------
 
  $Log: sua_lower.c,v $
+ Revision 0.9.2.3  2007/08/14 08:33:55  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:50  brian
  - updates for release, remove any later language
 
@@ -67,9 +94,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $Id: sua_lower.c,v 0.9.2.2 2007/06/17 02:00:50 brian Exp $"
+#ident "@(#) $Id: sua_lower.c,v 0.9.2.3 2007/08/14 08:33:55 brian Exp $"
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.2 $) $Date: 2007/06/17 02:00:50 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 08:33:55 $";
 
 #include <sys/os7/compat.h>
 
@@ -116,7 +143,8 @@ extern int ss7_r_hangup(queue_t *, mblk_t *);
  *  =========================================================================
  */
 
-static inline int sua_recover(queue_t * q, mblk_t * mp, int err)
+static inline int
+sua_recover(queue_t *q, mblk_t *mp, int err)
 {
 	switch (err) {
 	case -EBUSY:
@@ -129,7 +157,8 @@ static inline int sua_recover(queue_t * q, mblk_t * mp, int err)
 	freemsg(mp);
 	return (err);
 }
-static inline int sua_reservice(queue_t * q, mblk_t * mp, int err)
+static inline int
+sua_reservice(queue_t *q, mblk_t *mp, int err)
 {
 	if (mp->b_datap->db_type < QPCTL)
 		switch (err) {
@@ -148,7 +177,8 @@ static inline int sua_reservice(queue_t * q, mblk_t * mp, int err)
  *  READ PUT and SERVICE (Message from below SCCP/NPI/TPI --> SUA)
  *  -------------------------------------------------------------------------
  */
-static inline int sua_rd(queue_t * q, mblk_t * mp)
+static inline int
+sua_rd(queue_t *q, mblk_t *mp)
 {
 	switch (Q_TYPE(q)) {
 	case Q_TYPE_NPI:
@@ -206,9 +236,11 @@ static inline int sua_rd(queue_t * q, mblk_t * mp)
 	return (-EFAULT);
 }
 
-int sua_l_rput(queue_t * q, mblk_t * mp)
+int
+sua_l_rput(queue_t *q, mblk_t *mp)
 {
 	int err;
+
 	if (mp->b_datap->db_type < QPCTL && (q->q_count || !canputnext(q))) {
 		putq(q, mp);
 		return (0);
@@ -218,11 +250,14 @@ int sua_l_rput(queue_t * q, mblk_t * mp)
 	return (0);
 }
 
-int sua_l_rsrv(queue_t * q)
+int
+sua_l_rsrv(queue_t *q)
 {
 	mblk_t *mp;
+
 	while ((mp = getq(q))) {
 		int err;
+
 		if (!(err = sua_rd(q, mp)))
 			continue;
 		if (mp->b_datap->db_type < QPCTL)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sua_send.h,v 0.9.2.2 2007/06/17 02:00:51 brian Exp $
+ @(#) $Id: sua_send.h,v 0.9.2.3 2007/08/14 08:33:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 02:00:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_send.h,v $
+ Revision 0.9.2.3  2007/08/14 08:33:55  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 02:00:51  brian
  - updates for release, remove any later language
 
@@ -76,12 +79,14 @@
 #ifndef __SUA_SEND_H__
 #define __SUA_SEND_H__
 
-#ident "@(#) $RCSfile: sua_send.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sua_send.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
-static inline mblk_t *sua_get_data_msg(void)
+static inline mblk_t *
+sua_get_data_msg(void)
 {
 	mblk_t mp;
 	N_data_ind_t *p;
+
 	if ((mp = allocb(sizeof(*p), BPRI_MED))) {
 		p = (N_data_ind_t *) mp->b_wptr;
 		mp->b_datap->db_type = M_PROTO;
@@ -97,7 +102,8 @@ static inline mblk_t *sua_get_data_msg(void)
  *  -------------------------------------------------------------------------
  *  FIXME: I should convert the addresses from the primitive.
  */
-static inline int send_cldt(q, prim, src_ptr, src_len, dst_ptr, dst_len)
+static inline int
+send_cldt(q, prim, src_ptr, src_len, dst_ptr, dst_len)
 	queue_t *q;
 	mblk_t *prim;
 	caddr_t src_ptr;
@@ -115,6 +121,7 @@ static inline int send_cldt(q, prim, src_ptr, src_len, dst_ptr, dst_len)
 	    SUA_SIZE(SUA_PARM_SRCE_ADDR) +
 	    SUA_SIZE(SUA_PARM_DEST_ADDR) + PAD4(dst_len) + dp ? SUA_SIZE(SUA_PARM_DATA) : 0;
 	size_t dlen = msgdsize(dp);
+
 	if (!sccp_as_canput(q))
 		return (-EBUSY);
 	if ((tp = sua_get_data_msg())) {
@@ -152,7 +159,8 @@ static inline int send_cldt(q, prim, src_ptr, src_len, dst_ptr, dst_len)
  *  the address to which the stream is bound in PC+SSN format.  The ERROR_type
  *  needs to be converted to the SCCP_Cause.
  */
-static inline int send_cldr(queue_t * q, mblk_t * prim)
+static inline int
+send_cldr(queue_t *q, mblk_t *prim)
 {
 	int err;
 	mblk_t *mp, *tp, *dp = prim->b_cont;
@@ -165,6 +173,7 @@ static inline int send_cldr(queue_t * q, mblk_t * prim)
 	    SUA_SIZE(SUA_PARM_SRCE_ADDR) +
 	    SUA_SIZE(SUA_PARM_DEST_ADDR) + PAD4(dst_len) + dp ? SUA_SIZE(SUA_PARM_DATA) : 0;
 	size_t dlen = msgdsize(dp);
+
 	if (!sccp_as_canput(q))
 		return (-EBUSY);
 	if ((tp = sua_get_data())) {
@@ -206,7 +215,8 @@ static inline int send_cldr(queue_t * q, mblk_t * prim)
  *  CORE - Connection Request
  *  -------------------------------------------------------------------------
  */
-static inline int send_core(queue_t * q, mblk_t * prim)
+static inline int
+send_core(queue_t *q, mblk_t *prim)
 {
 	int err;
 	mblk_t *mp, *tp, *dp = prim->b_cont;
