@@ -1,11 +1,11 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/04/12 20:05:31 $
+# @(#) $RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:26:45 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -33,7 +33,7 @@
 # -----------------------------------------------------------------------------
 #
 # As an exception to the above, this software may be distributed under the
-# GNU General Public License (GPL) Version 2, so long as the software is
+# GNU General Public License (GPL) Version 3, so long as the software is
 # distributed with, and only used for the testing of, OpenSS7 modules,
 # drivers, and libraries.
 #
@@ -60,49 +60,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/04/12 20:05:31 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: netperf_snapshot,v $
-# Revision 0.9.2.14  2007/04/12 20:05:31  brian
-# - changes from performance testing and misc bug fixes
-#
-# Revision 0.9.2.13  2006/07/24 09:00:44  brian
-# - results of udp2 optimizations
-#
-# Revision 0.9.2.12  2006/05/23 22:43:29  brian
-# - updated copyright headers
-#
-# Revision 0.9.2.11  2006/05/23 06:57:49  brian
-# - header updates
-#
-# Revision 0.9.2.10  2005/05/14 08:30:03  brian
-# - copyright header correction
-#
-# Revision 0.9.2.9  2004/08/13 04:34:57  brian
-# - Move device to test specific options.
-#
-# Revision 0.9.2.8  2004/08/12 01:05:54  brian
-# - Added benchmark scripts and documentation.
-#
-# Revision 0.9.2.7  2004/08/11 19:45:30  brian
-# - Add verbose and debugging capability.
-#
-# Revision 0.9.2.6  2004/08/11 12:08:11  brian
-# - A few corrections to scripts.
-#
-# Revision 0.9.2.5  2004/08/11 11:27:44  brian
-# - Somw tweaking.
-#
-# Revision 0.9.2.4  2004/08/11 09:39:48  brian
-# - Tweaks
-#
-# Revision 0.9.2.3  2004/08/11 08:02:30  brian
-# - Working up script, display correct defaults.
-#
-# Revision 0.9.2.2  2004/08/11 07:38:23  brian
-# - Working up snapshot script
+# Last Modified $Date: 2007/08/14 07:26:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -132,7 +90,7 @@ fi
 program=`$ECHO "$0" | $SED -e 's%^.*/%%'`
 modename="$program"
 
-ident='$RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 0.9.2.14 $)'
+ident='$RCSfile: netperf_snapshot,v $ $Name:  $($Revision: 0.9.2.15 $)'
 
 HELP="Try \`$program --help' for more information."
 
@@ -214,8 +172,8 @@ function version()
     cat <<EOF
 $program:
     $ident
-    Copyright (c) 2001-2006  OpenSS7 Corporation.  All Rights Reserved.
-    Distributed by OpenSS7 Corporation under GPL Version 2,
+    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.
+    Distributed by OpenSS7 Corporation under GPL Version 3,
     incorporated here by reference.
     See \`$0 -C' for more information.
 EOF
@@ -328,7 +286,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.
 
 As an exception  to the above,  this software  may be distributed  under the GNU
-General Public License (GPL) Version  2,  so long as the software is distributed
+General Public License (GPL) Version  3,  so long as the software is distributed
 with, and only used for testing of, OpenSS7 modules, drivers and libraries.
 
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
@@ -1068,4 +1026,50 @@ esac
 
 exit 0
 
+# =============================================================================
+#
+# $Log: netperf_snapshot,v $
+# Revision 0.9.2.15  2007/08/14 07:26:45  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.14  2007/04/12 20:05:31  brian
+# - changes from performance testing and misc bug fixes
+#
+# Revision 0.9.2.13  2006/07/24 09:00:44  brian
+# - results of udp2 optimizations
+#
+# Revision 0.9.2.12  2006/05/23 22:43:29  brian
+# - updated copyright headers
+#
+# Revision 0.9.2.11  2006/05/23 06:57:49  brian
+# - header updates
+#
+# Revision 0.9.2.10  2005/05/14 08:30:03  brian
+# - copyright header correction
+#
+# Revision 0.9.2.9  2004/08/13 04:34:57  brian
+# - Move device to test specific options.
+#
+# Revision 0.9.2.8  2004/08/12 01:05:54  brian
+# - Added benchmark scripts and documentation.
+#
+# Revision 0.9.2.7  2004/08/11 19:45:30  brian
+# - Add verbose and debugging capability.
+#
+# Revision 0.9.2.6  2004/08/11 12:08:11  brian
+# - A few corrections to scripts.
+#
+# Revision 0.9.2.5  2004/08/11 11:27:44  brian
+# - Somw tweaking.
+#
+# Revision 0.9.2.4  2004/08/11 09:39:48  brian
+# - Tweaks
+#
+# Revision 0.9.2.3  2004/08/11 08:02:30  brian
+# - Working up script, display correct defaults.
+#
+# Revision 0.9.2.2  2004/08/11 07:38:23  brian
+# - Working up snapshot script
+#
+# =============================================================================
 # vim: ft=sh noet sw=4 nocindent

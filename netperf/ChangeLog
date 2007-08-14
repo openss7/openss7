@@ -1,3 +1,52 @@
+2007-08-13  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GNUv3 header update
+	* Makefile.am: GNUv3 header update
+	* NEWS: GNUv3 header update
+	* README: GNUv3 header update
+	* README-cvs: GNUv3 header update
+	* Release_Notes: GNUv3 header update
+	* THANKS: GNUv3 header update
+	* acinclude.m4: GNUv3 header update
+	* configure.ac: GNUv3 header update
+	* configure.nexusware: GNUv3 header update
+	* netbenchmark: GNUv3 header update
+	* netlib.h: GNUv3 header update
+	* netperf.c: GNUv3 header update
+	* netperf.macros: GNUv3 header update
+	* netperf.refs: GNUv3 header update
+	* netperf.spec.in: GNUv3 header update
+	* netperf_arr: GNUv3 header update
+	* netperf_packet_byte: GNUv3 header update
+	* netperf_sctp_range: GNUv3 header update
+	* netperf_sctp_rr: GNUv3 header update
+	* netperf_sctp_stream: GNUv3 header update
+	* netperf_snapshot: GNUv3 header update
+	* netperf_tcp_range: GNUv3 header update
+	* netperf_tcp_rr: GNUv3 header update
+	* netperf_tcp_stream: GNUv3 header update
+	* netperf_udp_range: GNUv3 header update
+	* netperf_udp_rr: GNUv3 header update
+	* netperf_udp_stream: GNUv3 header update
+	* netserver.c: GNUv3 header update
+	* netsh.c: GNUv3 header update
+	* nettest_bsd.c: GNUv3 header update
+	* nettest_bsd.h: GNUv3 header update
+	* nettest_ipv6.h: GNUv3 header update
+	* nettest_xti.c: GNUv3 header update
+	* nettest_xti.h: GNUv3 header update
+	* sctp_range_script: GNUv3 header update
+	* sctp_rr_script: GNUv3 header update
+	* sctp_stream_script: GNUv3 header update
+	* debian/copyright: GNUv3 header update
+	* debian/mscript_header.in: GNUv3 header update
+	* debian/mscript_postinst.in: GNUv3 header update
+	* debian/mscript_postrm.in: GNUv3 header update
+	* debian/mscript_preinst.in: GNUv3 header update
+	* debian/mscript_prerm.in: GNUv3 header update
+	* debian/rules.in: GNUv3 header update
+	* manual/Makefile.am: GNUv3 header update
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* manual/netperf.texi: GPLv3
