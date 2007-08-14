@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:52 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/14 01:36:52 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 03:04:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.9  2007/08/14 03:04:30  brian
+ - GPLv3 header update
+
  Revision 0.9.2.8  2007/07/14 01:36:52  brian
  - make license explicit, add documentation
 
@@ -83,10 +86,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:52 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:52 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -111,7 +114,7 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/07/14 01:36:52 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define PTY_LICENSE	"GPL v2"

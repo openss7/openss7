@@ -1,17 +1,17 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/03/13 23:54:32 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 03:04:23 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,35 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/13 23:54:32 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.4  2007/03/13 23:54:32  brian
-# - changes to pass check maintenance target
-#
-# Revision 0.9.2.3  2006/10/03 13:53:22  brian
-# - changes to pass make check target
-# - added some package config.h files
-# - removed AUTOCONFIG_H from Makefile.am's
-# - source code changes for compile
-# - added missing manual pages
-# - renamed conflicting manual pages
-# - parameterized include Makefile.am
-# - updated release notes
-#
-# Revision 0.9.2.2  2006/09/29 11:51:00  brian
-# - libtool library tweaks in Makefile.am
-# - better rpm spec handling in *.spec.in
-# - added AC_LIBTOOL_DLOPEN to configure.ac
-# - updated some copyright headers
-# - rationalized item in two packages
-# - added manual pages, drivers and modules to new strtty package
-#
-# Revision 0.9.2.1  2006/08/23 09:53:13  brian
-# - started STREAMS Terminals package
-#
+# Last Modified $Date: 2007/08/14 03:04:23 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -133,4 +105,35 @@ endif
 
 include ../../am/man.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.5  2007/08/14 03:04:23  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.4  2007/03/13 23:54:32  brian
+# - changes to pass check maintenance target
+#
+# Revision 0.9.2.3  2006/10/03 13:53:22  brian
+# - changes to pass make check target
+# - added some package config.h files
+# - removed AUTOCONFIG_H from Makefile.am's
+# - source code changes for compile
+# - added missing manual pages
+# - renamed conflicting manual pages
+# - parameterized include Makefile.am
+# - updated release notes
+#
+# Revision 0.9.2.2  2006/09/29 11:51:00  brian
+# - libtool library tweaks in Makefile.am
+# - better rpm spec handling in *.spec.in
+# - added AC_LIBTOOL_DLOPEN to configure.ac
+# - updated some copyright headers
+# - rationalized item in two packages
+# - added manual pages, drivers and modules to new strtty package
+#
+# Revision 0.9.2.1  2006/08/23 09:53:13  brian
+# - started STREAMS Terminals package
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
