@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:11 $
+ @(#) $RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 07:41:33 $
 
  -----------------------------------------------------------------------------
 
@@ -9,32 +9,18 @@
 
  All Rights Reserved.
 
- Unauthorized distribution or duplication is prohibited.
+ This program is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation, version 3 of the license.
 
- This software and related documentation is protected by copyright and
- distributed under licenses restricting its use, copying, distribution and
- decompilation.  No part of this software or related documentation may be
- reproduced in any form by any means without the prior written authorization
- of the copyright holder, and licensors, if any.
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
 
- The recipient of this document, by its retention and use, warrants that the
- recipient will protect this information and keep it confidential, and will
- not disclose the information contained in this document without the written
- permission of its owner.
-
- The author reserves the right to revise this software and documentation for
- any reason, including but not limited to, conformity with standards
- promulgated by various agencies, utilization of advances in the state of the
- technical arts, or the reflection of changes in the design of any techniques,
- or procedures embodied, described, or referred to herein.  The author is
- under no obligation to provide any feature listed herein.
-
- -----------------------------------------------------------------------------
-
- As an exception to the above, this software may be distributed under the GNU
- General Public License (GPL) Version 2, so long as the software is distributed
- with, and only used for the testing of, OpenSS7 modules, drivers, and
- libraries.
+ You should have received a copy of the GNU General Public License along with
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/03/15 10:23:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:41:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-isdn.c,v $
+ Revision 0.9.2.4  2007/08/14 07:41:33  brian
+ - GPLv3 header update
+
  Revision 0.9.2.3  2007/03/15 10:23:11  brian
  - test case reporting and pushed release date one day
 
@@ -78,9 +67,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:11 $"
+#ident "@(#) $RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 07:41:33 $"
 
-static char const ident[] = "$RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/03/15 10:23:11 $";
+static char const ident[] = "$RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 07:41:33 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -117,7 +106,6 @@ static char const ident[] = "$RCSfile: test-isdn.c,v $ $Name:  $($Revision: 0.9.
 
 #include <linux/limits.h>
 
-
 /*
  *  -------------------------------------------------------------------------
  *
@@ -132,6 +120,7 @@ static const char *lpkgname = "Linux Fast-STREAMS";
 static const char *lstdname = "UNIX SVID/ABI";
 static const char *sstdname = "SVID/ABI";
 static const char *shortname = "ABI";
+
 #ifdef LFS
 static char devname[256] = "/dev/streams/clone/ch";
 #else
@@ -369,7 +358,7 @@ start_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = signal_handler;
-//	act.sa_flags = SA_RESTART | SA_ONESHOT;
+//      act.sa_flags = SA_RESTART | SA_ONESHOT;
 	act.sa_flags = 0;
 	sigemptyset(&act.sa_mask);
 	if (sigaction(SIGALRM, &act, NULL))
@@ -1123,7 +1112,7 @@ print_pipe(int child)
 }
 
 void
-print_open(int child, const char* name)
+print_open(int child, const char *name)
 {
 	static const char *msgs[] = {
 		"open()        ----->v %-30s |  |                   \n",
@@ -1662,7 +1651,7 @@ test_insertfd(int child, int resfd, int offset, struct strbuf *ctrl, struct strb
 	fdi.flags = flags;
 	fdi.fildes = resfd;
 	fdi.offset = offset;
-	if (test_ioctl(child, I_FDINSERT, (intptr_t) & fdi) != __RESULT_SUCCESS)
+	if (test_ioctl(child, I_FDINSERT, (intptr_t) &fdi) != __RESULT_SUCCESS)
 		return __RESULT_FAILURE;
 	return __RESULT_SUCCESS;
 }
@@ -1820,7 +1809,7 @@ test_isastream(int child)
 int
 test_poll(int child, const short events, short *revents, long ms)
 {
-	struct pollfd pfd = { .fd = test_fd[child], .events = events, .revents = 0 };
+	struct pollfd pfd = {.fd = test_fd[child],.events = events,.revents = 0 };
 	int result;
 
 	print_poll(child, events);
@@ -2741,7 +2730,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -2772,7 +2761,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

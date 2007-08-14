@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: isdni_ioctl.h,v 0.9.2.2 2007/06/17 01:57:01 brian Exp $
+ @(#) $Id: isdni_ioctl.h,v 0.9.2.3 2007/08/14 07:41:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@
 
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/06/17 01:57:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/14 07:41:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isdni_ioctl.h,v $
+ Revision 0.9.2.3  2007/08/14 07:41:28  brian
+ - GPLv3 header update
+
  Revision 0.9.2.2  2007/06/17 01:57:01  brian
  - updates for release, remove any later language
 
@@ -58,7 +61,7 @@
 #ifndef __SS7_ISDNI_IOCTL_H__
 #define __SS7_ISDNI_IOCTL_H__
 
-#ident "@(#) $RCSfile: isdni_ioctl.h,v $ $Name:  $($Revision: 0.9.2.2 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: isdni_ioctl.h,v $ $Name:  $($Revision: 0.9.2.3 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -94,9 +97,8 @@ typedef struct isdn_conf_cr {
 	ulong fgid;			/* facility group identifier */
 	ulong ccid;			/* call control idenitifer */
 	ulong cmid;			/* call management identifier */
-	/*
-	   followed by a list channel configurations 
-	 */
+	/* 
+	   followed by a list channel configurations */
 } isdn_conf_cr_t;
 
 typedef struct isdn_opt_conf_cr {
@@ -146,9 +148,8 @@ typedef struct isdn_conf_ch {
 	ulong fgid;			/* facility group identifier */
 	ulong tgid;			/* transmission group identifier */
 	ulong ts;			/* timeslot in transmission group */
-	/*
-	   followed by a null list 
-	 */
+	/* 
+	   followed by a null list */
 } isdn_conf_ch_t;
 
 typedef struct isdn_opt_conf_ch {
@@ -178,12 +179,10 @@ typedef struct isdn_stats_ch {
 typedef struct isdn_conf_tg {
 	ulong egid;			/* equipment group identifier */
 	lmi_option_t proto;		/* protocol options */
-	/*
-	   followed by list of data link configurations 
-	 */
-	/*
-	   followed by list of channel configurations 
-	 */
+	/* 
+	   followed by list of data link configurations */
+	/* 
+	   followed by list of channel configurations */
 } isdn_conf_tg_t;
 
 typedef struct isdn_opt_conf_tg {
@@ -214,12 +213,10 @@ typedef struct isdn_stats_tg {
 typedef struct isdn_conf_fg {
 	ulong egid;			/* equipment group identifier */
 	lmi_option_t proto;		/* protocol options */
-	/*
-	   followed by list of data link configurations 
-	 */
-	/*
-	   followed by list of channel configurations 
-	 */
+	/* 
+	   followed by list of data link configurations */
+	/* 
+	   followed by list of channel configurations */
 } isdn_conf_fg_t;
 
 typedef struct isdn_opt_conf_fg {
@@ -269,12 +266,10 @@ typedef struct isdn_stats_fg {
 typedef struct isdn_conf_eg {
 	ulong xgid;			/* exchange group identifier */
 	lmi_option_t proto;		/* protocol options */
-	/*
-	   followed by list of facility group configurations 
-	 */
-	/*
-	   followed by list of transmission group configurations 
-	 */
+	/* 
+	   followed by list of facility group configurations */
+	/* 
+	   followed by list of transmission group configurations */
 } isdn_conf_eg_t;
 
 typedef struct isdn_opt_conf_eg {
@@ -302,9 +297,8 @@ typedef struct isdn_stats_eg {
  */
 typedef struct isdn_conf_xg {
 	lmi_option_t proto;		/* protocol options */
-	/*
-	   followed by list of equipment group configurations 
-	 */
+	/* 
+	   followed by list of equipment group configurations */
 } isdn_conf_xg_t;
 
 typedef struct isdn_opt_conf_xg {
@@ -386,9 +380,8 @@ typedef struct isdn_stats_dl {
  */
 typedef struct isdn_conf_df {
 	lmi_option_t proto;		/* protocol options */
-	/*
-	   followed by list of exchange group configurations 
-	 */
+	/* 
+	   followed by list of exchange group configurations */
 } isdn_conf_df_t;
 
 typedef struct isdn_opt_conf_df {
@@ -415,9 +408,8 @@ typedef struct isdn_stats_df {
 typedef struct isdn_option {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
-	/*
-	   followed by object-specific options structure 
-	 */
+	/* 
+	   followed by object-specific options structure */
 } isdn_option_t;
 
 #define ISDN_IOCGOPTIONS	_IOWR(	ISDN_IOC_MAGIC,	 0,	isdn_option_t	)
@@ -430,9 +422,8 @@ typedef struct isdn_config {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
 	ulong cmd;			/* object command */
-	/*
-	   followed by object-specific configuration structure 
-	 */
+	/* 
+	   followed by object-specific configuration structure */
 } isdn_config_t;
 
 #define ISDN_GET	0
@@ -453,9 +444,8 @@ typedef struct isdn_statem {
 	ulong id;			/* object id */
 	ulong flags;			/* object primary flags */
 	ulong state;			/* object primary state */
-	/*
-	   followed by object-specific state structure 
-	 */
+	/* 
+	   followed by object-specific state structure */
 } isdn_statem_t;
 
 #define ISDN_IOCGSTATEM		_IOWR(	ISDN_IOC_MAGIC,	 6,	isdn_statem_t	)
@@ -468,9 +458,8 @@ typedef struct isdn_stats {
 	ulong type;			/* object type */
 	ulong id;			/* object id */
 	ulong header;			/* object stats header */
-	/*
-	   followed by object-specific stats structure 
-	 */
+	/* 
+	   followed by object-specific stats structure */
 } isdn_stats_t;
 
 #define ISDN_IOCGSTATSP		_IOWR(	ISDN_IOC_MAGIC,  8,  isdn_stats_t )
@@ -516,9 +505,8 @@ typedef struct isdn_pass {
 	ulong band;			/* band of message block */
 	ulong ctl_length;		/* length of cntl part */
 	ulong dat_length;		/* length of data part */
-	/*
-	   followed by cntl and data part of message to pass to DL 
-	 */
+	/* 
+	   followed by cntl and data part of message to pass to DL */
 } isdn_pass_t;
 
 #define ISDN_IOCCPASS		_IOWR(	ISDN_IOC_MAGIC, 16,  isdn_pass_t )
