@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/07/22 01:09:44 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 09:06:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -14,7 +14,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -22,8 +22,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,50 +48,10 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/07/22 01:09:44 $ by $Author: brian $
+# Last Modified $Date: 2007/08/14 09:06:31 $ by $Author: brian $
 #
-# -----------------------------------------------------------------------------
-#
-# $Log: acinclude.m4,v $
-# Revision 0.9.2.13  2007/07/22 01:09:44  brian
-# - corrections for RHAS4 irq_handler_t and XEN paddr_t
-#
-# Revision 0.9.2.12  2007/05/24 09:29:45  brian
-# - add check for pm_message_t
-#
-# Revision 0.9.2.11  2007/03/25 18:58:16  brian
-# - changes to support 2.6.20-1.2307.fc5 kernel
-#
-# Revision 0.9.2.10  2007/03/05 23:01:34  brian
-# - checking in release changes
-#
-# Revision 0.9.2.9  2007/03/04 23:41:30  brian
-# - additional include path
-#
-# Revision 0.9.2.8  2007/03/04 23:29:55  brian
-# - corrected modversions directory
-#
-# Revision 0.9.2.7  2007/03/04 23:14:19  brian
-# - better search for modversions
-#
-# Revision 0.9.2.6  2007/03/02 10:03:26  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 0.9.2.5  2007/03/01 00:10:16  brian
-# - update to build process for 2.4 kernels
-#
-# Revision 0.9.2.4  2007/02/28 06:30:24  brian
-# - updates and corrections, #ifdef instead of #if
-#
-# Revision 0.9.2.3  2007/02/27 08:38:33  brian
-# - release corrections for 2.4 kernel builds
-#
-# Revision 0.9.2.2  2007/02/27 01:40:10  brian
-# - final corrections to build
-#
-# Revision 0.9.2.1  2007/02/25 12:26:05  brian
-# - added new files for release package
-#
+# =============================================================================
+
 m4_include([m4/openss7.m4])
 m4_include([m4/dist.m4])
 m4_include([m4/pr.m4])
@@ -917,6 +877,51 @@ AC_DEFUN([_OSR61_], [dnl
 ])# _OSR61_
 # =============================================================================
 
+# =============================================================================
+#
+# $Log: acinclude.m4,v $
+# Revision 0.9.2.14  2007/08/14 09:06:31  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.13  2007/07/22 01:09:44  brian
+# - corrections for RHAS4 irq_handler_t and XEN paddr_t
+#
+# Revision 0.9.2.12  2007/05/24 09:29:45  brian
+# - add check for pm_message_t
+#
+# Revision 0.9.2.11  2007/03/25 18:58:16  brian
+# - changes to support 2.6.20-1.2307.fc5 kernel
+#
+# Revision 0.9.2.10  2007/03/05 23:01:34  brian
+# - checking in release changes
+#
+# Revision 0.9.2.9  2007/03/04 23:41:30  brian
+# - additional include path
+#
+# Revision 0.9.2.8  2007/03/04 23:29:55  brian
+# - corrected modversions directory
+#
+# Revision 0.9.2.7  2007/03/04 23:14:19  brian
+# - better search for modversions
+#
+# Revision 0.9.2.6  2007/03/02 10:03:26  brian
+# - updates to common build process and versions for all exported symbols
+#
+# Revision 0.9.2.5  2007/03/01 00:10:16  brian
+# - update to build process for 2.4 kernels
+#
+# Revision 0.9.2.4  2007/02/28 06:30:24  brian
+# - updates and corrections, #ifdef instead of #if
+#
+# Revision 0.9.2.3  2007/02/27 08:38:33  brian
+# - release corrections for 2.4 kernel builds
+#
+# Revision 0.9.2.2  2007/02/27 01:40:10  brian
+# - final corrections to build
+#
+# Revision 0.9.2.1  2007/02/25 12:26:05  brian
+# - added new files for release package
+#
 # =============================================================================
 # 
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>

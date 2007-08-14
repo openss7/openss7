@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/03/02 12:12:33 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 09:06:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -11,7 +11,7 @@
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
-# Foundation; version 2 of the License.
+# Foundation; version 3 of the License.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
 # details.
 #
 # You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc., 675 Mass
-# Ave, Cambridge, MA 02139, USA.
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,25 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/03/02 12:12:33 $ by $Author: brian $
-#
-# -----------------------------------------------------------------------------
-#
-# $Log: Makefile.am,v $
-# Revision 0.9.2.5  2007/03/02 12:12:33  brian
-# - correction
-#
-# Revision 0.9.2.4  2007/03/02 10:03:27  brian
-# - updates to common build process and versions for all exported symbols
-#
-# Revision 0.9.2.3  2007/02/27 01:35:55  brian
-# - documentation updates
-#
-# Revision 0.9.2.2  2007/02/26 07:24:57  brian
-# - synchronizing changes
-#
-# Revision 0.9.2.1  2007/02/25 12:44:57  brian
-# - added new files for release package
+# Last Modified $Date: 2007/08/14 09:06:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -342,4 +324,26 @@ endif
 
 include ../../am/man.am
 
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 0.9.2.6  2007/08/14 09:06:38  brian
+# - GPLv3 header update
+#
+# Revision 0.9.2.5  2007/03/02 12:12:33  brian
+# - correction
+#
+# Revision 0.9.2.4  2007/03/02 10:03:27  brian
+# - updates to common build process and versions for all exported symbols
+#
+# Revision 0.9.2.3  2007/02/27 01:35:55  brian
+# - documentation updates
+#
+# Revision 0.9.2.2  2007/02/26 07:24:57  brian
+# - synchronizing changes
+#
+# Revision 0.9.2.1  2007/02/25 12:44:57  brian
+# - added new files for release package
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
