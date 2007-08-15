@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 09:06:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:10:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 09:06:41 $ by $Author: brian $
+# Last Modified $Date: 2007/08/15 05:10:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,10 +70,12 @@ osr61_TEXINFOS		= \
 			  bugs.texi \
 			  texi/fdl.texi \
 			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
 			  texi/testsuite.texi \
 			  texi/lesser.texi \
+			  texi/lgpl3.texi \
 			  texi/uslbsd.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -99,6 +101,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.6  2007/08/15 05:10:22  brian
+# - GPLv3 updates
+#
 # Revision 0.9.2.5  2007/08/14 09:06:41  brian
 # - GPLv3 header update
 #

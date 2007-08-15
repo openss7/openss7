@@ -1,3 +1,9 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/sctp.c: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: GPLv3 header update

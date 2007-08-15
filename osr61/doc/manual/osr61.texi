@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 % =========================================================================
 %
-% @(#) $Id: osr61.texi,v 0.9.2.6 2007/08/12 06:43:52 brian Exp $
+% @(#) $Id: osr61.texi,v 0.9.2.7 2007/08/15 05:10:22 brian Exp $
 %
 % =========================================================================
 %
@@ -54,7 +54,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2007/08/12 06:43:52 $ by $Author: brian $
+% Last Modified $Date: 2007/08/15 05:10:22 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -294,9 +294,10 @@ Appendices
 
 Licenses
 
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
-* GNU Free Documentation License::	The FDL license
+* GNU General Public License::			The GPL license
+* GNU Lesser General Public License::		The LGPL license
+* GNU General Public License Version 2::	The GPL v2 license
+* GNU Free Documentation License::		The FDL license
 
 Indices
 
@@ -407,6 +408,9 @@ package, @command{@value{PACKAGE}-@value{VERSION}}.@footnote{@url{http://www.ope
 @smallexample
 
 $Log: osr61.texi,v $
+Revision 0.9.2.7  2007/08/15 05:10:22  brian
+- GPLv3 updates
+
 Revision 0.9.2.6  2007/08/12 06:43:52  brian
 - updated licenses in manuals
 
@@ -1165,15 +1169,18 @@ subsystem be tested using the @manref{test-tty(8)} test case executable and the 
 @cindex licenses
 
 @menu
-* GNU General Public License::		The GPL license
-* GNU Lesser General Public License::	The LGPL license
-* GNU Free Documentation License::	The FDL license
+* GNU General Public License::			The GPL license
+* GNU Lesser General Public License::		The LGPL license
+* GNU General Public License Version 2::	The GPL v2 license
+* GNU Free Documentation License::		The FDL license
 @end menu
 
 @page
 @include texi/gpl3.texi
 @page
 @include texi/lgpl3.texi
+@page
+@include texi/gpl.texi
 @page
 @include texi/fdl.texi
 
