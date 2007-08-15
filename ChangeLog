@@ -1,3 +1,28 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* Makefile.am: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* acinclude.m4: GPLv3 updates
+	* configure.ac: GPLv3 updates
+	* configure.nexusware: GPLv3 updates
+	* openss7.macros: GPLv3 updates
+	* openss7.refs: GPLv3 updates
+	* openss7.spec.in: GPLv3 updates
+	* debian/copyright: GPLv3 updates
+	* debian/mscript_header.in: GPLv3 updates
+	* debian/mscript_postinst.in: GPLv3 updates
+	* debian/mscript_postrm.in: GPLv3 updates
+	* debian/mscript_preinst.in: GPLv3 updates
+	* debian/mscript_prerm.in: GPLv3 updates
+	* debian/rules.in: GPLv3 updates
+	* doc/Makefile.am: GPLv3 updates
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+
 2007-08-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* texi/gpl.texi: minor formatting change
