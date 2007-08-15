@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: fifo.h,v 1.1.1.1.12.5 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: fifo.h,v $
+ Revision 1.1.1.1.12.5  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: 
  * Last Modified On: 
  * Update Count    : 0
- * RCS Id          : $Id: fifo.h,v 1.2 1996/01/27 00:40:25 dave Exp $
+ * RCS Id          : $Id: fifo.h,v 1.1.1.1.12.5 2007/08/14 10:47:10 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) Unknown, Use with caution!
@@ -74,7 +77,7 @@
 #ifndef _FIFO_H
 #define _FIFO_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: fifo.h,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2007/08/14 10:47:10 $"
 
 /*  -------------------------------------------------------------------  */
 /*                               Dependencies                            */

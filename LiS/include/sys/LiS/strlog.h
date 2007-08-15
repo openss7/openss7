@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strlog.h,v 1.1.1.1.12.7 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strlog.h,v $
+ Revision 1.1.1.1.12.7  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: 
  * Last Modified On: 
  * Update Count    : 0
- * RCS Id          : $Id: strlog.h,v 1.2 1996/01/27 00:40:30 dave Exp $
+ * RCS Id          : $Id: strlog.h,v 1.1.1.1.12.7 2007/08/14 10:47:10 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) Unknown, Use with caution!
@@ -73,7 +76,7 @@
 #ifndef _STRLOG_H
 #define _STRLOG_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strlog.h,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2007/08/14 10:47:10 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */

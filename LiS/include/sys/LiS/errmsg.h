@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: errmsg.h,v 1.1.1.2.12.4 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: errmsg.h,v $
+ Revision 1.1.1.2.12.4  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: Francisco J. Ballesteros
  * Last Modified On: Tue Sep 26 15:19:24 1995
  * Update Count    : 2
- * RCS Id          : $Id: errmsg.h,v 1.1 1995/12/19 15:58:14 dave Exp $
+ * RCS Id          : $Id: errmsg.h,v 1.1.1.2.12.4 2007/08/14 10:47:10 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) complete, untested, compiled
@@ -79,7 +82,7 @@
 #ifndef _ERRMSG_H
 #define _ERRMSG_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: errmsg.h,v $ $Name:  $($Revision: 1.1.1.2.12.4 $) $Date: 2007/08/14 10:47:10 $"
 
 #ifdef __KERNEL__
 

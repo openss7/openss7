@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/15 04:58:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:58:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mkfifo.c,v $
+ Revision 1.1.1.1.12.8  2007/08/15 04:58:18  brian
+ - GPLv3 updates
+
  Revision 1.1.1.1.12.3  2005/05/14 08:35:16  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $"
+#ident "@(#) $RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/15 04:58:18 $"
 
 static char const ident[] =
-    "$RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:16 $";
+    "$RCSfile: mkfifo.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/15 04:58:18 $";
 
 /* 
  *  mkfifo.c - a mkfifo for LiS FIFOs

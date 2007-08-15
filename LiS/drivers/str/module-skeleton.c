@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: module-skeleton.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2007/08/14 10:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: module-skeleton.c,v $
+ Revision 1.1.1.2.4.5  2007/08/14 10:46:56  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: module-skeleton.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2007/08/14 10:46:56 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: module-skeleton.c,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2007/08/14 10:46:56 $";
 
 #ifdef LINUX
 

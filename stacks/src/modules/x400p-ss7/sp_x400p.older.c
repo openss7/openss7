@@ -1,17 +1,17 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2006/12/08 12:16:13 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2006/12/08 12:16:13 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
@@ -160,7 +160,8 @@ MODULE_LICENSE(SL_X400P_LICENSE);
 MODULE_ALIAS("streams-sl_x400p");
 #endif
 #if defined MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE "-"
+	       PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
 #endif
 #endif				/* LINUX */
 
@@ -361,7 +362,7 @@ typedef struct cd {
 	ulong irq;			/* card irq */
 	ulong iobase;			/* card iobase */
 	struct tasklet_struct tasklet;	/* card tasklet */
-	irqreturn_t (*isr)(int, void *, struct pt_regs *); /* interrupt service routine */
+	 irqreturn_t(*isr) (int, void *, struct pt_regs *);	/* interrupt service routine */
 	sdl_config_t config;		/* card configuration */
 } cd_t;
 
@@ -535,13 +536,20 @@ STATIC struct {
 /* *INDENT-ON* */
 
 STATIC struct pci_device_id xp_pci_tbl[] __devinitdata = {
-	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLX9030},
-	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, PLXDEVBRD},
-	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400P},
-	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, X400PSS7},
-	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V400P},
-	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
-	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00, V401PE},
+	{PCI_VENDOR_ID_PLX, 0x9030, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 PLX9030},
+	{PCI_VENDOR_ID_PLX, 0x3001, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 PLXDEVBRD},
+	{PCI_VENDOR_ID_PLX, 0xD00D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 X400P},
+	{PCI_VENDOR_ID_PLX, 0x0557, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 X400PSS7},
+	{PCI_VENDOR_ID_PLX, 0x4000, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 V400P},
+	{PCI_VENDOR_ID_PLX, 0xD33D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 V401PE},
+	{PCI_VENDOR_ID_PLX, 0xD44D, PCI_ANY_ID, PCI_ANY_ID, PCI_CLASS_BRIDGE_OTHER << 8, 0xffff00,
+	 V401PE},
 	{0,}
 };
 
@@ -1799,7 +1807,8 @@ STATIC sdl_config_t sdl_default_e1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 1,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0},
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
 };
 STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifname = NULL,
@@ -1821,7 +1830,8 @@ STATIC sdl_config_t sdl_default_t1_chan = {
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0},
+	.ifsyncsrc = {0, 0, 0, 0}
+	,
 };
 STATIC sdl_config_t sdl_default_j1_chan = {
 	.ifname = NULL,
@@ -1937,6 +1947,7 @@ xp_start_timer_t8(struct xp *xp)
 {
 	mi_timer_MAC(xp->sdt.timers.t8, xp->sdt.config.t8);
 }
+
 #if 0
 static void
 xp_stop_timer_t9(struct xp *xp)
@@ -2284,34 +2295,34 @@ xp_alloc_timers(struct xp *xp)
 #if 0
 	if (!(tp = xp->sdl.timers.t9 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t9;
+	*(int *) tp->b_rptr = t9;
 #endif
 	/* SDT timer allocation */
 	if (!(tp = xp->sdt.timers.t8 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t8;
+	*(int *) tp->b_rptr = t8;
 	/* SL timer allocation */
 	if (!(tp = xp->sl.timers.t7 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t7;
+	*(int *) tp->b_rptr = t7;
 	if (!(tp = xp->sl.timers.t6 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t6;
+	*(int *) tp->b_rptr = t6;
 	if (!(tp = xp->sl.timers.t5 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t5;
+	*(int *) tp->b_rptr = t5;
 	if (!(tp = xp->sl.timers.t4 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t4;
+	*(int *) tp->b_rptr = t4;
 	if (!(tp = xp->sl.timers.t3 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t3;
+	*(int *) tp->b_rptr = t3;
 	if (!(tp = xp->sl.timers.t2 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t2;
+	*(int *) tp->b_rptr = t2;
 	if (!(tp = xp->sl.timers.t1 = mi_timer_alloc_MAC(xp->oq, sizeof(int))))
 		goto enobufs;
-	*(int *)tp->b_rptr = t1;
+	*(int *) tp->b_rptr = t1;
 	return (0);
       enobufs:
 	xp_free_timers(xp);
@@ -6686,7 +6697,7 @@ lmi_attach_req(queue_t *q, mblk_t *mp)
 
 	if (mp->b_wptr - mp->b_rptr < sizeof(*p) + sizeof(ppa)) {
 		ptrace(("%s: ERROR: primitive too small = %ld bytes\n", DRV_NAME,
-			(long)(mp->b_wptr - mp->b_rptr)));
+			(long) (mp->b_wptr - mp->b_rptr)));
 		goto lmi_badprim;
 	}
 	if (xp->i_state != LMI_UNATTACHED) {
@@ -11138,6 +11149,7 @@ xp_r_sig(queue_t *q, mblk_t *mp)
 	}
 	return (rtn);
 }
+
 /*
  *  M_DATA Handling
  *  -------------------------------------------------------------------------
@@ -11665,7 +11677,7 @@ xp_free_sp(struct sp *sp)
 	} else
 		ptrace(("%s: ERROR: spans cannot exist without cards\n", DRV_NAME));
 	assure(atomic_read(&sp->refcnt) == 1);
-	sp_put(sp); /* final put */
+	sp_put(sp);		/* final put */
 }
 STATIC struct sp *
 sp_get(struct sp *sp)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2007/08/14 10:47:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: buffcall.c,v $
+ Revision 1.1.1.3.4.7  2007/08/14 10:47:00  brian
+ - GPLv3 header update
+
  Revision 1.1.1.3.4.5  2006/04/05 09:53:07  brian
  - fixe buffer call list linkage: fix provided by John Wenker
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2006/04/05 09:53:07 $"
+#ident "@(#) $RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2007/08/14 10:47:00 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: buffcall.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2007/08/14 10:47:00 $";
 
 /*                               -*- Mode: C -*- 
  * buffcall.c --- buffcall management
@@ -65,7 +68,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
  * Last Modified On: Fri Dec 27 09:48:15 CST 1996
- * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.5 2006/04/05 09:53:07 brian Exp $
+ * RCS Id          : $Id: buffcall.c,v 1.1.1.3.4.7 2007/08/14 10:47:00 brian Exp $
  * ----------------______________________________________________
  *
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros,

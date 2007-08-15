@@ -1,4 +1,4 @@
-@c @setfilename gpl3.info
+@setfilename gpl3.info
 
 @node GNU General Public License
 @section GNU General Public License

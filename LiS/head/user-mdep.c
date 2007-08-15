@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: user-mdep.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: user-mdep.c,v $
+ Revision 1.1.1.3.4.5  2007/08/14 10:47:02  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: user-mdep.c,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/07/13 12:01:18 $"
+#ident "@(#) $RCSfile: user-mdep.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: user-mdep.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:02 $";
 
 /************************************************************************
 *                     User Level Testing Routines 			*

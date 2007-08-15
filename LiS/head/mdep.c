@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2007/08/14 10:47:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: mdep.c,v $
+ Revision 1.1.1.1.12.5  2007/08/14 10:47:01  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.2 $) $Date: 2005/07/13 12:01:17 $"
+#ident "@(#) $RCSfile: mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2007/08/14 10:47:01 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: mdep.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2007/08/14 10:47:01 $";
 
 /*
  *    Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>

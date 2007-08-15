@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: cmn_err.h,v 1.1.1.2.4.10 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: cmn_err.h,v $
+ Revision 1.1.1.2.4.10  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -57,7 +60,7 @@
  * Author          : Francisco J. Ballesteros, David Grothe
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: cmn_err.h,v 1.1.1.2.4.7 2005/12/18 05:41:24 brian Exp $
+ * RCS Id          : $Id: cmn_err.h,v 1.1.1.2.4.10 2007/08/14 10:47:08 brian Exp $
  *
  * Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
  */
@@ -65,7 +68,7 @@
 #ifndef _CMD_ERR_H
 #define _CMD_ERR_H 1
 
-#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: cmn_err.h,v $ $Name:  $($Revision: 1.1.1.2.4.10 $) $Date: 2007/08/14 10:47:08 $"
 
 #include <sys/LiS/genconf.h>
 

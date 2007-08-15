@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: stream.h,v 1.1.1.3.4.8 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: stream.h,v $
+ Revision 1.1.1.3.4.8  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
  * <stream.h> --- Linux STREAMS common declarations. 
  * Author          : gram & nemo
  * Created On      : Mon Oct 17 11:37:12 1994
- * RCS Id          ; $Id: stream.h,v 1.8 1996/01/27 00:40:01 dave Exp $
+ * RCS Id          ; $Id: stream.h,v 1.1.1.3.4.8 2007/08/14 10:47:10 brian Exp $
  * Last Modified By: David Grothe
  * Restrictions    : SHAREd items can be read/writen by usr
  *                 : EXPORTed items can only be read by usr
@@ -74,7 +77,7 @@
 #ifndef __SYS_LIS_STREAM_H__
 #define __SYS_LIS_STREAM_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: stream.h,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2007/08/14 10:47:10 $"
 
 /*  -------------------------------------------------------------------  */
 /*                               Dependencies                            */

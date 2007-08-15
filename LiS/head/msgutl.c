@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: msgutl.c,v $
+ Revision 1.1.1.5.4.6  2007/08/14 10:47:01  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.4 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:01 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: msgutl.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:01 $";
 
 /*                               -*- Mode: C -*- 
  * msgutl.c --- streams message utilities.
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msgutl.c,v 1.1.1.5.4.4 2005/12/19 03:22:19 brian Exp $
+ * RCS Id          : $Id: msgutl.c,v 1.1.1.5.4.6 2007/08/14 10:47:01 brian Exp $
  * Purpose         : here you have utilites to handle str messages.
  * ----------------______________________________________________
  *

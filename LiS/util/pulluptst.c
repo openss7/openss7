@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: pulluptst.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: pulluptst.c,v $
+ Revision 1.1.1.1.12.4  2007/08/14 10:47:24  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: pulluptst.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:24 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: pulluptst.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:24 $";
 
 /************************************************************************
 *                   Test Program for Pullupmsg                          *

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2007/08/14 10:47:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: msg.c,v $
+ Revision 1.1.1.4.4.7  2007/08/14 10:47:01  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2007/08/14 10:47:01 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: msg.c,v $ $Name:  $($Revision: 1.1.1.4.4.7 $) $Date: 2007/08/14 10:47:01 $";
 
 /*                               -*- Mode: C -*- 
  * msg.c --- streams message handling
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: msg.c,v 1.1.1.4.4.4 2005/12/19 03:22:19 brian Exp $
+ * RCS Id          : $Id: msg.c,v 1.1.1.4.4.7 2007/08/14 10:47:01 brian Exp $
  * Purpose         : provide streams message handling
  *                 : this is the main memory allocation related module.
  * ----------------______________________________________________

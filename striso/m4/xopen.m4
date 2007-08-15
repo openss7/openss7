@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/12 19:05:32 $
+# @(#) $RCSfile: xopen.m4,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/13 21:41:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/12 19:05:32 $ by $Author: brian $
+# Last Modified $Date: 2007/08/13 21:41:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -90,7 +90,7 @@ AC_DEFUN([_XOPEN_CHECK_SCTP], [dnl
 	[with_sctp='no'])
     AC_ARG_WITH([sctp2],
 	AS_HELP_STRING([--with-sctp2],
-	    [include xopen sctp version 2 driver in build.  @<:@default=no@:>@]),
+	    [include xopen sctp release 2 driver in build.  @<:@default=no@:>@]),
 	[with_sctp2="$withval"],
 	[with_sctp2='no'])
 ])# _XOPEN_CHECK_SCTP
@@ -357,6 +357,9 @@ AC_DEFUN([_XOPEN_], [dnl
 # =============================================================================
 #
 # $Log: xopen.m4,v $
+# Revision 0.9.2.15  2007/08/13 21:41:37  brian
+# - update versions
+#
 # Revision 0.9.2.14  2007/08/12 19:05:32  brian
 # - rearrange and update headers
 #

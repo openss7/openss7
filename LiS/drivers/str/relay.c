@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2007/08/15 04:57:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:57:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: relay.c,v $
+ Revision 1.1.1.3.4.11  2007/08/15 04:57:59  brian
+ - GPLv3 updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2005/12/19 03:22:18 $"
+#ident "@(#) $RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2007/08/15 04:57:59 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: relay.c,v $ $Name:  $($Revision: 1.1.1.3.4.11 $) $Date: 2007/08/15 04:57:59 $";
 
 /*                               -*- Mode: C -*- 
  * relay.c --- A simple relay pushable module
  * Author          : Dave Grothe
  * Created On      : Dec 30, 1995
  * Last Modified By: Dave Grothe
- * RCS Id          : $Id: relay.c,v 1.1.1.3.4.6 2005/12/19 03:22:18 brian Exp $
+ * RCS Id          : $Id: relay.c,v 1.1.1.3.4.11 2007/08/15 04:57:59 brian Exp $
  * Purpose         : relay messages just to test pushable modules
  * ----------------______________________________________________
  *

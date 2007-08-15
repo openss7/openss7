@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.13 $) $Date: 2007/08/15 04:57:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: fifo.c,v $
+ Revision 1.1.1.2.4.13  2007/08/15 04:57:58  brian
+ - GPLv3 updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.8 $) $Date: 2005/12/18 06:37:53 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.13 $) $Date: 2007/08/15 04:57:58 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.1.2.4.13 $) $Date: 2007/08/15 04:57:58 $";
 
 /*
  *  fifo.c - FIFO pseudo-driver

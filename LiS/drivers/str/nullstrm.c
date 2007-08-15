@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: nullstrm.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2007/08/14 10:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: nullstrm.c,v $
+ Revision 1.1.1.2.4.7  2007/08/14 10:46:56  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullstrm.c,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: nullstrm.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2007/08/14 10:46:56 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: nullstrm.c,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2007/08/14 10:46:56 $";
 
 /*                               -*- Mode: C -*- 
  * nullstrm.c --- Streams NULL driver

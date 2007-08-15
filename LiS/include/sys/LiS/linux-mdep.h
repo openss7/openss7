@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: linux-mdep.h,v 1.1.1.7.4.16 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: linux-mdep.h,v $
+ Revision 1.1.1.7.4.16  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -57,7 +60,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.11 2005/12/19 12:42:48 brian Exp $
+ * RCS Id          : $Id: linux-mdep.h,v 1.1.1.7.4.16 2007/08/14 10:47:10 brian Exp $
  * Purpose         : provide kernel independence as much as possible
  *                 : This could be also considered to be en embryo for
  *                 : dki stuff,i.e. linux-dki
@@ -74,7 +77,7 @@
 #ifndef _LIS_M_DEP_H
 #define _LIS_M_DEP_H 1
 
-#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.11 $) $Date: 2005/12/19 12:42:48 $"
+#ident "@(#) $RCSfile: linux-mdep.h,v $ $Name:  $($Revision: 1.1.1.7.4.16 $) $Date: 2007/08/14 10:47:10 $"
 
 #ifdef __KERNEL__
 #include <linux/autoconf.h>

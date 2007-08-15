@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: port-mdep.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2007/08/14 10:47:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: port-mdep.c,v $
+ Revision 1.1.1.4.4.4  2007/08/14 10:47:01  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: port-mdep.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2007/08/14 10:47:01 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: port-mdep.c,v $ $Name:  $($Revision: 1.1.1.4.4.4 $) $Date: 2007/08/14 10:47:01 $";
 
 /************************************************************************
 *                  Portable Machine Dependent Code                      *

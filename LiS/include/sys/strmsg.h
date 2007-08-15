@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strmsg.h,v 1.1.1.2.4.7 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strmsg.h,v $
+ Revision 1.1.1.2.4.7  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
  * <strmsg.h> --- Linux STREAMS message types
  * Author          : gram & nemo
  * Created On      : Mon Oct 17 11:37:12 1994
- * RCS Id          ; $Id: strmsg.h,v 1.1.1.2.4.2 2005/07/13 12:01:19 brian Exp $
+ * RCS Id          ; $Id: strmsg.h,v 1.1.1.2.4.7 2007/08/14 10:47:08 brian Exp $
  * Last Modified By: David Grothe
  * Purpose         : Provide Streams message types
  *                 :
@@ -72,7 +75,7 @@
 #ifndef _STR_MSG_H
 #define _STR_MSG_H 1
 
-#ident "@(#) $RCSfile: strmsg.h,v $ $Name:  $($Revision: 1.1.1.2.4.2 $) $Date: 2005/07/13 12:01:19 $"
+#ident "@(#) $RCSfile: strmsg.h,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2007/08/14 10:47:08 $"
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */

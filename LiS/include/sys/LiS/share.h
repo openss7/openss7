@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: share.h,v 1.1.1.2.4.6 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: share.h,v $
+ Revision 1.1.1.2.4.6  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: Francisco J. Ballesteros
  * Last Modified On: Fri Sep 29 17:33:41 1995
  * Update Count    : 6
- * RCS Id          : $Id: share.h,v 1.1.1.2.4.3 2005/12/18 05:41:24 brian Exp $
+ * RCS Id          : $Id: share.h,v 1.1.1.2.4.6 2007/08/14 10:47:10 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) Unknown, Use with caution!
@@ -79,7 +82,7 @@
 #ifndef _SHARE_H
 #define _SHARE_H 1
 
-#ident "@(#) $RCSfile: share.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: share.h,v $ $Name:  $($Revision: 1.1.1.2.4.6 $) $Date: 2007/08/14 10:47:10 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */

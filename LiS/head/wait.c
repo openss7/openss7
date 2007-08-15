@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: wait.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2007/08/14 10:47:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: wait.c,v $
+ Revision 1.1.1.2.4.4  2007/08/14 10:47:02  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: wait.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2007/08/14 10:47:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: wait.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2007/08/14 10:47:02 $";
 
 /*                               -*- Mode: C -*- 
  * wait.c --- wait queues management
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: wait.c,v 1.2 1995/12/27 01:02:53 dave Exp $
+ * RCS Id          : $Id: wait.c,v 1.1.1.2.4.4 2007/08/14 10:47:02 brian Exp $
  * Purpose         : keep close all the wait related stuff.
  * ----------------______________________________________________
  *

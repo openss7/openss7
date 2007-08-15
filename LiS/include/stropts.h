@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: stropts.h,v 1.1.1.1.12.7 2007/08/14 10:47:07 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: stropts.h,v $
+ Revision 1.1.1.1.12.7  2007/08/14 10:47:07  brian
+ - GPLv3 header update
+
  Revision 1.1.1.1.12.2  2005/05/14 08:35:09  brian
  - copyright header correction
 
@@ -62,7 +65,7 @@
 #define _STROPTS_H
 #define _LIS_STROPTS_H
 
-#ident "@(#) $Name:  $($Revision: 1.1.1.1.12.2 $) Copyright (c) 1997-2005  Open SS7 Corporation"
+#ident "@(#) $Name:  $($Revision: 1.1.1.1.12.7 $) Copyright (c) 1997-2005  Open SS7 Corporation"
 
 /* This file can be processed with doxygen(1). */
 

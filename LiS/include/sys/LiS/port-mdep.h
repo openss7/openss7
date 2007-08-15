@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: port-mdep.h,v 1.1.1.2.4.5 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: port-mdep.h,v $
+ Revision 1.1.1.2.4.5  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -57,7 +60,7 @@
  * Author          : David Grothe
  * Created On      : Sat Dec 23 11:45:00 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: port-mdep.h,v 1.10 1996/01/27 00:40:28 dave Exp $
+ * RCS Id          : $Id: port-mdep.h,v 1.1.1.2.4.5 2007/08/14 10:47:10 brian Exp $
  * Purpose         : Map certain environment provided functions into abstract
  *		   : names so that routines can be written for different
  *		   : operating system environments.
@@ -92,7 +95,7 @@
 #ifndef _PORT_MDEP_H
 #define _PORT_MDEP_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: port-mdep.h,v $ $Name:  $($Revision: 1.1.1.2.4.5 $) $Date: 2007/08/14 10:47:10 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: ddi.h,v 1.1.1.3.4.4 2007/08/14 10:47:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ddi.h,v $
+ Revision 1.1.1.3.4.4  2007/08/14 10:47:09  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: 
  * Last Modified On: 
  * Update Count    : 0
- * RCS Id          : $Id: ddi.h,v 1.1 1995/12/19 15:52:08 dave Exp $
+ * RCS Id          : $Id: ddi.h,v 1.1.1.3.4.4 2007/08/14 10:47:09 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) Unknown, Use with caution!
@@ -75,7 +78,7 @@
 #ifndef __SYS_LIS_DDI_H__
 #define __SYS_LIS_DDI_H__ 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ddi.h,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2007/08/14 10:47:09 $"
 
 #include <sys/LiS/genconf.h>
 

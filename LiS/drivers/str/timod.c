@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2007/08/15 04:57:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:57:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: timod.c,v $
+ Revision 1.1.1.3.4.9  2007/08/15 04:57:59  brian
+ - GPLv3 updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.1.3.4.4 $) $Date: 2005/07/13 12:01:14 $"
+#ident "@(#) $RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2007/08/15 04:57:59 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: timod.c,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2007/08/15 04:57:59 $";
 
 /*
  *  timod module.

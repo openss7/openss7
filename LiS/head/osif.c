@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.16 $) $Date: 2007/08/14 10:47:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,19 +45,22 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: osif.c,v $
+ Revision 1.1.1.4.4.16  2007/08/14 10:47:01  brian
+ - GPLv3 header update
+
  Revision 1.1.1.4.4.14  2006/02/20 11:38:50  brian
  - corrections for some 64bit architectures, from patches
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.14 $) $Date: 2006/02/20 11:38:50 $"
+#ident "@(#) $RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.16 $) $Date: 2007/08/14 10:47:01 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: osif.c,v $ $Name:  $($Revision: 1.1.1.4.4.16 $) $Date: 2007/08/14 10:47:01 $";
 
 /************************************************************************
 *                   Operating System Interface                          *

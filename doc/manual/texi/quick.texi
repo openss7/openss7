@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi
 @c =========================================================================
 @c
-@c @(#) $Id: quick.texi,v 0.9.2.9 2007/01/08 11:10:08 brian Exp $
+@c @(#) $Id: quick.texi,v 0.9.2.10 2007/08/13 20:40:06 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/01/08 11:10:08 $ by $Author: brian $
+@c Last Modified $Date: 2007/08/13 20:40:06 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -103,7 +103,7 @@ file (or
 @pxrefman{Downloading from CVS}).
 An abbreviated installation procedure that works for most applications appears below.
 
-This release of the package is published strictly under Version 2 of the @cite{GNU Public License}
+This release of the package is published strictly under Version 3 of the @cite{GNU Public License}
 which can be found in the file
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/COPYING,, @file{COPYING}}.
 Package specific licensing terms (if any) can be found in the file

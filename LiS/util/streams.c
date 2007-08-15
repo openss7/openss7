@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/15 04:58:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:58:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: streams.c,v $
+ Revision 1.1.1.6.4.8  2007/08/15 04:58:12  brian
+ - GPLv3 updates
+
  Revision 1.1.1.6.4.5  2005/07/13 12:01:22  brian
  - working up compat and check pass (finally lindented LiS)
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.5 $) $Date: 2005/07/13 12:01:22 $"
+#ident "@(#) $RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/15 04:58:12 $"
 
 static char const ident[] =
-    "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.5 $) $Date: 2005/07/13 12:01:22 $";
+    "$RCSfile: streams.c,v $ $Name:  $($Revision: 1.1.1.6.4.8 $) $Date: 2007/08/15 04:58:12 $";
 
 #include <sys/types.h>
 #undef GCOM_OPEN

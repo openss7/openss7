@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.30 $) $Date: 2007/08/15 04:58:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:58:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: linux-mdep.c,v $
+ Revision 1.1.1.11.4.30  2007/08/15 04:58:06  brian
+ - GPLv3 updates
+
  Revision 1.1.1.11.4.23  2006/03/05 04:03:03  brian
  - changes primarily for fc4 x86_64 gcc 4.0.4 2.6.15 SMP
  - updates for new release
@@ -59,16 +62,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.23 $) $Date: 2006/03/05 04:03:03 $"
+#ident "@(#) $RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.30 $) $Date: 2007/08/15 04:58:06 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: linux-mdep.c,v $ $Name:  $($Revision: 1.1.1.11.4.30 $) $Date: 2007/08/15 04:58:06 $";
 
 /*                               -*- Mode: C -*- 
  * linux-mdep.c --- Linux kernel dependent support for LiS.
  * Author          : Francisco J. Ballesteros
  * Created On      : Sat Jun  4 20:56:03 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.23 2006/03/05 04:03:03 brian Exp $
+ * RCS Id          : $Id: linux-mdep.c,v 1.1.1.11.4.30 2007/08/15 04:58:06 brian Exp $
  * Purpose         : provide Linux kernel <-> LiS entry points.
  * ----------------______________________________________________
  *

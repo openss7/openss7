@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/14 10:47:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: psfd.c,v $
+ Revision 1.1.1.1.12.8  2007/08/14 10:47:33  brian
+ - GPLv3 header update
+
  Revision 1.1.1.1.12.5  2005/07/13 12:01:24  brian
  - working up compat and check pass (finally lindented LiS)
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2005/07/13 12:01:24 $"
+#ident "@(#) $RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/14 10:47:33 $"
 
 static char const ident[] =
-    "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2005/07/13 12:01:24 $";
+    "$RCSfile: psfd.c,v $ $Name:  $($Revision: 1.1.1.1.12.8 $) $Date: 2007/08/14 10:47:33 $";
 
 /* 
  *  psfd.c - pass a pipe end's FD to itself

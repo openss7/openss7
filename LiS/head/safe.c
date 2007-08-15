@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: safe.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: safe.c,v $
+ Revision 1.1.1.5.4.6  2007/08/14 10:47:02  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: safe.c,v $ $Name:  $($Revision: 1.1.1.5.4.3 $) $Date: 2005/12/18 05:41:23 $"
+#ident "@(#) $RCSfile: safe.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: safe.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2007/08/14 10:47:02 $";
 
 /*                               -*- Mode: C -*- 
  * safe.c --- stream safe
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: safe.c,v 1.1.1.5.4.3 2005/12/18 05:41:23 brian Exp $
+ * RCS Id          : $Id: safe.c,v 1.1.1.5.4.6 2007/08/14 10:47:02 brian Exp $
  * Purpose         : stream safe processing stuff
  * ----------------______________________________________________
  *
