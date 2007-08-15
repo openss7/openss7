@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:14:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:15:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:14:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 0.9.2.8  2007/08/15 05:14:11  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/12 16:15:37  brian
  -
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $"
+#ident "@(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:14:11 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $";
+    "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:14:11 $";
 
 #define _LFS_SOURCE	1
 #define _SUN_SOURCE	1
@@ -99,11 +102,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:15:37 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:14:11 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_SCTP_LICENSE	"GPL v2"
+#define SDT_SCTP_LICENSE	"GPL"
 #define SDT_SCTP_BANNER		SDT_SCTP_DESCRIP	"\n" \
 				SDT_SCTP_REVISION	"\n" \
 				SDT_SCTP_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 08:34:11 $
+ @(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:14:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:34:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:14:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_tpi.c,v $
+ Revision 0.9.2.11  2007/08/15 05:14:12  brian
+ - GPLv3 updates
+
  Revision 0.9.2.10  2007/08/14 08:34:11  brian
  - GPLv3 header update
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 08:34:11 $"
+#ident "@(#) $RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:14:12 $"
 
 static char const ident[] =
-    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 08:34:11 $";
+    "$RCSfile: sl_tpi.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:14:12 $";
 
 /*
  *  This is a SL/SDT (Signalling Link/Signalling Data Terminal) module which
@@ -92,7 +95,7 @@ static char const ident[] =
 #define SL_TPI_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_TPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_TPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SL_TPI_LICENSE		"GPL v2"
+#define SL_TPI_LICENSE		"GPL"
 #define SL_TPI_BANNER		SL_TPI_DESCRIP		"\n" \
 				SL_TPI_COPYRIGHT	"\n" \
 				SL_TPI_DEVICE		"\n" \

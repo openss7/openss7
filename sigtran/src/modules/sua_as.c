@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 08:34:11 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:14:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:34:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:14:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.6  2007/08/15 05:14:12  brian
+ - GPLv3 updates
+
  Revision 0.9.2.5  2007/08/14 08:34:11  brian
  - GPLv3 header update
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 08:34:11 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:14:12 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 08:34:11 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:14:12 $";
 
 /*
  *  This is the AS side of SUA implemented as a pushable module that pushes over an SCTP NPI
@@ -149,11 +152,11 @@ static char const ident[] =
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 08:34:11 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:14:12 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SUA_AS_LICENSE		"GPL v2"
+#define SUA_AS_LICENSE		"GPL"
 #define SUA_AS_BANNER		SUA_AS_DESCRIP		"\n" \
 				SUA_AS_REVISION		"\n" \
 				SUA_AS_COPYRIGHT	"\n" \

@@ -1,3 +1,38 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/drivers/isua_as.c: GPLv3 updates
+	* src/drivers/m2ua.c: GPLv3 updates
+	* src/drivers/m2ua_as.c: GPLv3 updates
+	* src/drivers/m3ua.c: GPLv3 updates
+	* src/drivers/m3ua_as.c: GPLv3 updates
+	* src/drivers/m3ua_sg.c: GPLv3 updates
+	* src/drivers/sua.c: GPLv3 updates
+	* src/drivers/sua_as.c: GPLv3 updates
+	* src/drivers/tali.c: GPLv3 updates
+	* src/drivers/tua.c: GPLv3 updates
+	* src/drivers/tua_as.c: GPLv3 updates
+	* src/drivers/ua.c: GPLv3 updates
+	* src/drivers/ua_as.c: GPLv3 updates
+	* src/modules/m2pa_dl.c: GPLv3 updates
+	* src/modules/m2pa_sl.c: GPLv3 updates
+	* src/modules/m2tp.c: GPLv3 updates
+	* src/modules/m2ua_as.c: GPLv3 updates
+	* src/modules/m3ua_as.c: GPLv3 updates
+	* src/modules/sdl_sctp.c: GPLv3 updates
+	* src/modules/sdt_sctp.c: GPLv3 updates
+	* src/modules/sdt_tpi.c: GPLv3 updates
+	* src/modules/sl_dl.c: GPLv3 updates
+	* src/modules/sl_tpi.c: GPLv3 updates
+	* src/modules/sua_as.c: GPLv3 updates
+	* src/modules/tua_as.c: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 header update

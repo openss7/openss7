@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:15:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:13:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.10  2007/08/15 05:13:37  brian
+ - GPLv3 updates
+
  Revision 0.9.2.9  2007/08/12 16:15:11  brian
  -
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -153,11 +156,11 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/08/12 16:15:11 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ISUA_AS_LICENSE	"GPL v2"
+#define ISUA_AS_LICENSE	"GPL"
 #define ISUA_AS_BANNER	ISUA_AS_DESCRIP	"\n" \
 			ISUA_AS_REVISION	"\n" \
 			ISUA_AS_COPYRIGHT	"\n" \
