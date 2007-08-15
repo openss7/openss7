@@ -256,15 +256,14 @@ const char version[] =
 const char copying[] = "\n\
  ----------------------------------------------------------------------------\n\
 \n\
- Copyright (c) 2001-2005  OpenSS7 Corporation <http://www.openss7.com>\n\
+ Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>\n\
  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
  All Rights Reserved.\n\
 \n\
  This program is free software; you can redistribute it and/or modify it under\n\
  the terms of the GNU General Public License as published by the Free Software\n\
- Foundation; either version 2 of the License, or (at your option) any later\n\
- version.\n\
+ Foundation; version 3 of the License.\n\
 \n\
  This program is distributed in the hope that it will be useful, but WITHOUT\n\
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS\n\
@@ -272,8 +271,8 @@ const char copying[] = "\n\
  details.\n\
 \n\
  You should have received a copy of the GNU General Public License along with\n\
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass\n\
- Ave, Cambridge, MA 02139, USA.\n\
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the\n\
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 \n\
  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on\n\
  behalf of the U.S. Government (\"Government\"), the following provisions apply\n\
