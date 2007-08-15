@@ -408,9 +408,8 @@ lis_secs(void)
 
 /*
  * Macro to determine whether there are any processes waiting on a poll
- * for a given stream.  When using kernel version 2.1 style polling the
- * queue head is a Linux specific structure, not our portable poll list
- * head.
+ * for a given stream.  When using kernel 2.1 style polling the queue
+ * head is a Linux specific structure, not our portable poll list head.
  */
 #if defined(PORTABLE_POLL)
 #define	POLL_WAITING(hdp)	( (hdp)->sd_polllist.ph_list != NULL )

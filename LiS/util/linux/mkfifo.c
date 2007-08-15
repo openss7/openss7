@@ -139,10 +139,10 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2005  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 2000       John A. Boyd Jr.  protologos, LLC\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     included here by reference.\n\
 \n\
     See `%1$s --copying' for copying permissions.\n\

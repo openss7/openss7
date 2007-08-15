@@ -1,3 +1,41 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile: GPLv3 updates
+	* config.in.in: GPLv3 updates
+	* strms_down: GPLv3 updates
+	* strms_status: GPLv3 updates
+	* strms_up: GPLv3 updates
+	* drivers/str/bufmod.c: GPLv3 updates
+	* drivers/str/echo.c: GPLv3 updates
+	* drivers/str/fifo.c: GPLv3 updates
+	* drivers/str/loop.c: GPLv3 updates
+	* drivers/str/mux.c: GPLv3 updates
+	* drivers/str/nullmod.c: GPLv3 updates
+	* drivers/str/nuls.c: GPLv3 updates
+	* drivers/str/pipemod.c: GPLv3 updates
+	* drivers/str/relay.c: GPLv3 updates
+	* drivers/str/sad.c: GPLv3 updates
+	* drivers/str/testmod.c: GPLv3 updates
+	* drivers/str/timod.c: GPLv3 updates
+	* drivers/str/tirdwr.c: GPLv3 updates
+	* drivers/str/linux/connld.c: GPLv3 updates
+	* drivers/str/linux/ip_to_dlpi.c: GPLv3 updates
+	* drivers/str/linux/ldl.c: GPLv3 updates
+	* drivers/str/linux/liskmod.c: GPLv3 updates
+	* drivers/str/linux/mtdrv.c: GPLv3 updates
+	* head/head.c: GPLv3 updates
+	* head/linux-mdep.c: GPLv3 updates
+	* head/poll.c: GPLv3 updates
+	* head/version.c: GPLv3 updates
+	* manual/Makefile.am: GPLv3 updates
+	* manual/news.texi: GPLv3 updates
+	* util/streams.c: GPLv3 updates
+	* util/test-fifo.c: GPLv3 updates
+	* util/test-pipe.c: GPLv3 updates
+	* util/test-sad.c: GPLv3 updates
+	* util/test-streams.c: GPLv3 updates
+	* util/linux/mkfifo.c: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* LiS.dox.in: GPLv3 header update

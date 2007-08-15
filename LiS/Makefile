@@ -199,7 +199,7 @@ endif
 ifneq ($(wildcard .config_mk),)
 #
 # determine the preferred name for /etc/modules.conf or its equivalent:
-# - kernel version 2.5 or later (MODULE_INIT_TOOLS) = modprobe.conf
+# - kernel release 2.5 or later (MODULE_INIT_TOOLS) = modprobe.conf
 # - older kernels - if not using DESTDIR, check existing file(s); use
 #   modules.conf if it exists, else conf.modules
 #
@@ -432,7 +432,7 @@ STRCONF_XOPTS	= -rmake_nodes -Muser_mknod
 else
 
 #
-# Kernel version 2.3, 2.4 have major device numbers allocated up
+# Kernel release 2.3, 2.4 have major device numbers allocated up
 # into the 180 region.  We want to get safely above those.  One of
 # these days the kernel developers are going to have to fix the
 # 8-bit major/minor problem.  DMG 1-7-00

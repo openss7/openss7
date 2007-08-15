@@ -125,7 +125,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  * is also supposed to span LGPL.
  */
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("The Software Group Ltd.");
