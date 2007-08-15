@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $
+ @(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slm.c,v $
+ Revision 0.9.2.17  2007/08/15 05:20:18  brian
+ - GPLv3 updates
+
  Revision 0.9.2.16  2007/08/12 16:20:29  brian
  - new PPA handling
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $"
+#ident "@(#) $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:18 $"
 
-static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $";
+static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:18 $";
 
 /*
  *  This is an SLM (Signalling Link Management) multiplexing driver which also supports M2UA.  It
@@ -100,11 +103,11 @@ static char const ident[] = "$RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $
 #include <ss7/ua_lm_ioctl.h>
 
 #define SLM_DESCRIP	"SLM: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/12 16:20:29 $"
+#define SLM_REVISION	"OpenSS7 $RCSfile: slm.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:18 $"
 #define SLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SLM_DEVICE	"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SLM_LICENSE	"GPL v2"
+#define SLM_LICENSE	"GPL"
 #define SLM_BANNER	SLM_DESCRIP	"\n" \
 			SLM_REVISION	"\n" \
 			SLM_COPYRIGHT	"\n" \

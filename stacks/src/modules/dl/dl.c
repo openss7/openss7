@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:27 $
+ @(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:18:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:27 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl.c,v $
+ Revision 0.9.2.19  2007/08/15 05:18:24  brian
+ - GPLv3 updates
+
  Revision 0.9.2.18  2007/08/14 12:17:27  brian
  - GPLv3 header updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:27 $"
+#ident "@(#) $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:18:24 $"
 
 static char const ident[] =
-    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:27 $";
+    "$RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:18:24 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -83,12 +86,12 @@ static char const ident[] =
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.18 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/14 12:17:27 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 0.9.2.19 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:18:24 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DL_LICENSE	"GPL v2"
+#define DL_LICENSE	"GPL"
 #define DL_BANNER	DL_DESCRIP	"\n" \
 			DL_REVISION	"\n" \
 			DL_COPYRIGHT	"\n" \

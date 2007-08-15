@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $
+ @(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_x400p.c,v $
+ Revision 0.9.2.22  2007/08/15 05:20:51  brian
+ - GPLv3 updates
+
  Revision 0.9.2.21  2007/08/14 12:19:00  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $"
+#ident "@(#) $RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $";
+    "$RCSfile: sdl_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $";
 
 /*
  *  This is an SDL (Signalling Data Link) kernel module which provides all of
@@ -111,11 +114,11 @@ static char const ident[] =
 
 #define SDL_X400P_DESCRIP	"E/T400P-SS7: SS7/SDL (Signalling Data Link) STREAMS DRIVER."
 #define SDL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $"
+#define SDL_X400P_REVISION	"OpenSS7 $RCSfile: sdl_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $"
 #define SDL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_X400P_DEVICE	"Supports the T/E400P-SS7 T1/E1 PCI boards."
 #define SDL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDL_X400P_LICENSE	"GPL v2"
+#define SDL_X400P_LICENSE	"GPL"
 #define SDL_X400P_BANNER	SDL_X400P_DESCRIP	"\n" \
 				SDL_X400P_EXTRA		"\n" \
 				SDL_X400P_REVISION	"\n" \

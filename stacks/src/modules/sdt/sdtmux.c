@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:45 $
+ @(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:20:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdtmux.c,v $
+ Revision 0.9.2.11  2007/08/15 05:20:15  brian
+ - GPLv3 updates
+
  Revision 0.9.2.10  2007/08/14 12:18:45  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:45 $"
+#ident "@(#) $RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:20:15 $"
 
 static char const ident[] =
-    "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:18:45 $";
+    "$RCSfile: sdtmux.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:20:15 $";
 
 /*
  *  This is an SDT multiplexing driver for multiplexing SDT upper streams into
@@ -82,7 +85,7 @@ static char const ident[] =
 #define SDTM_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define SDTM_DEVICE	"Part of the OpenSS7 Stack for STREAMS."
 #define SDTM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDTM_LICENSE	"GPL v2"
+#define SDTM_LICENSE	"GPL"
 #define SDTM_BANNER	SDTM_DESCRIP	"\n" \
 			SDTM_COPYRIGHT	"\n" \
 			SDTM_DEVICE	"\n" \

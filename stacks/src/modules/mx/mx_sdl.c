@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $
+ @(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:19:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:19:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_sdl.c,v $
+ Revision 0.9.2.18  2007/08/15 05:19:31  brian
+ - GPLv3 updates
+
  Revision 0.9.2.17  2007/08/14 12:18:10  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $"
+#ident "@(#) $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:19:31 $"
 
 static char const ident[] =
-    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $";
+    "$RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:19:31 $";
 
 /*
  *  This module converts and SDL interface provided by (for example) the
@@ -103,11 +106,11 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_SDL_DESCRIP	"SDL MULTIPLEX (MX) STREAMS MODULE."
-#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:10 $"
+#define MX_SDL_REVISION	"LfS $RCSfile: mx_sdl.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:19:31 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MX_SDL_LICENSE	"GPL v2"
+#define MX_SDL_LICENSE	"GPL"
 #define MX_SDL_BANNER	MX_SDL_DESCRIP	"\n" \
 			MX_SDL_REVISION	"\n" \
 			MX_SDL_COPYRIGHT	"\n" \

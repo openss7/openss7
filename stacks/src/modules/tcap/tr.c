@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:18:55 $
+ @(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 05:20:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr.c,v $
+ Revision 0.9.2.14  2007/08/15 05:20:41  brian
+ - GPLv3 updates
+
  Revision 0.9.2.13  2007/08/14 12:18:55  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:18:55 $"
+#ident "@(#) $RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 05:20:41 $"
 
 static char const ident[] =
-    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:18:55 $";
+    "$RCSfile: tr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 05:20:41 $";
 
 /*
  *  This is a TR (Transaction Sub-Layer) mulitplexing driver for SS7 TCAP.
@@ -74,11 +77,11 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TR_DESCRIP	"TCAP TR STREAMS MULTIPLEXING DRIVER."
-#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date"
+#define TR_REVISION	"LfS $RCSfile: tr.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TR_LICENSE	"GPL v2"
+#define TR_LICENSE	"GPL"
 #define TR_BANNER	TR_DESCRIP	"\n" \
 			TR_REVISION	"\n" \
 			TR_COPYRIGHT	"\n" \

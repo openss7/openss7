@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:28 $
+ @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:18:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_sl.c,v $
+ Revision 0.9.2.5  2007/08/15 05:18:24  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 12:17:28  brian
  - GPLv3 header updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:28 $"
+#ident "@(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:18:24 $"
 
 static char const ident[] =
-    "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:28 $";
+    "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:18:24 $";
 
 /*
  *  This is a simple conversion module that converts between the OpenSS7 Signalling Link Interface
@@ -77,11 +80,11 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define DL_SL_DESCRIP	"DLPI/SLI CONVERSION STREAMS MODULE."
-#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 12:17:28 $"
+#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:18:24 $"
 #define DL_SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define DL_SL_LICENSE	"GPL v2"
+#define DL_SL_LICENSE	"GPL"
 #define DL_SL_BANNER	DL_SL_DESCRIP	"\n" \
 			DL_SL_REVISION	"\n" \
 			DL_SL_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $
+ @(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:19:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:06 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:19:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_npi.c,v $
+ Revision 0.9.2.25  2007/08/15 05:19:28  brian
+ - GPLv3 updates
+
  Revision 0.9.2.24  2007/08/14 12:18:06  brian
  - GPLv3 header updates
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $"
+#ident "@(#) $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:19:28 $"
 
 static char const ident[] =
-    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $";
+    "$RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:19:28 $";
 
 /*
  *  This is a MTP NPI module which can be pushed over an MTPI (Message Transfer Part Interface)
@@ -120,11 +123,11 @@ static char const ident[] =
 #include <sys/xti_mtp.h>
 
 #define MTP_NPI_DESCRIP		"SS7 Message Transfer Part (MTP) NPI STREAMS MODULE."
-#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 12:18:06 $"
+#define MTP_NPI_REVISION	"LfS $RCSfile: mtp_npi.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:19:28 $"
 #define MTP_NPI_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_NPI_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_NPI_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_NPI_LICENSE		"GPL v2"
+#define MTP_NPI_LICENSE		"GPL"
 #define MTP_NPI_BANNER		MTP_NPI_DESCRIP		"\n" \
 				MTP_NPI_REVISION	"\n" \
 				MTP_NPI_COPYRIGHT	"\n" \

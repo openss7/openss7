@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:18:51 $
+ @(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:20:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n2.c,v $
+ Revision 0.9.2.12  2007/08/15 05:20:29  brian
+ - GPLv3 updates
+
  Revision 0.9.2.11  2007/08/14 12:18:51  brian
  - GPLv3 header updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:18:51 $"
+#ident "@(#) $RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:20:29 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/14 12:18:51 $";
+    "$RCSfile: sscop_n2.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:20:29 $";
 
 #include <sys/os7/compat.h>
 
@@ -72,7 +75,7 @@ static char const ident[] =
 #define SSCOP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSCOP_LICENSE	"GPL v2"
+#define SSCOP_LICENSE	"GPL"
 #define SSCOP_BANNER	SSCOP_DESCIP	"\n" \
 			SSCOP_COPYTIGHT	"\n" \
 			SSCOP_DEVICE	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $
+ @(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_ch.c,v $
+ Revision 0.9.2.3  2007/08/15 05:20:11  brian
+ - GPLv3 updates
+
  Revision 0.9.2.2  2007/08/12 16:20:25  brian
  - new PPA handling
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $"
+#ident "@(#) $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:11 $"
 
-static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $";
+static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:11 $";
 
 #define _MPS_SOURCE 1
 #define _LFS_SOURCE 1
@@ -89,11 +92,11 @@ static char const ident[] = "$RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2
 #include <sys/chi_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:25 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_ch.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:11 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL-CH module."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDL_LICENSE	"GPL v2"
+#define SDL_LICENSE	"GPL"
 #define SDL_BANNER	SDL_DESCRIP	"\n" \
 			SDL_REVISION	"\n" \
 			SDL_COPYRIGHT	"\n" \

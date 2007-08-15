@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:40:42 $
+ @(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:14 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:40:42 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt.c,v $
+ Revision 0.9.2.21  2007/08/15 05:20:14  brian
+ - GPLv3 updates
+
  Revision 0.9.2.20  2007/08/12 16:40:42  brian
  - header error
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:40:42 $"
+#ident "@(#) $RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:14 $"
 
 static char const ident[] =
-    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:40:42 $";
+    "$RCSfile: sdt.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:14 $";
 
 /*
  *  This is a SDT (Signalling Data Terminal) kernel module.  It provides the
@@ -87,11 +90,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:40:42 $"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:14 $"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports OpenSS7 SDL drivers."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_LICENSE	"GPL v2"
+#define SDT_LICENSE	"GPL"
 #define SDT_BANNER	SDT_DESCRIP	"\n" \
 			SDT_REVISION	"\n" \
 			SDT_COPYRIGHT	"\n" \

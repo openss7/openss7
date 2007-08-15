@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $
+ @(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:27 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_lapd.c,v $
+ Revision 0.9.2.22  2007/08/15 05:18:24  brian
+ - GPLv3 updates
+
  Revision 0.9.2.21  2007/08/14 12:17:27  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $"
+#ident "@(#) $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:24 $"
 
 static char const ident[] =
-    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $";
+    "$RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:24 $";
 
 #include <sys/os7/compat.h>
 
@@ -94,11 +97,11 @@ static char const ident[] =
 
 #define DL_LAPD_DESCRIP		"LAPD Data Link (DL-LAPD) STREAMS (DLPI) DRIVER" "\n" \
 				"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:27 $"
+#define DL_LAPD_REVISION	"OpenSS7 $RCSfile: dl_lapd.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:24 $"
 #define DL_LAPD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_LAPD_DEVICE		"Supports Linux Fast-STREAMS and OpenSS7 CDI Devices."
 #define DL_LAPD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define DL_LAPD_LICENSE		"GPL v2"
+#define DL_LAPD_LICENSE		"GPL"
 #define DL_LAPD_BANNER		DL_LAPD_DESCRIP		"\n" \
 				DL_LAPD_REVISION	"\n" \
 				DL_LAPD_COPYRIGHT	"\n" \

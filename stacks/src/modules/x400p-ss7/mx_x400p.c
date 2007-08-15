@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $
+ @(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_x400p.c,v $
+ Revision 0.9.2.22  2007/08/15 05:20:51  brian
+ - GPLv3 updates
+
  Revision 0.9.2.21  2007/08/14 12:19:00  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $"
+#ident "@(#) $RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $"
 
 static char const ident[] =
-    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $";
+    "$RCSfile: mx_x400p.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $";
 
 #include <sys/os7/compat.h>
 
@@ -92,11 +95,11 @@ static char const ident[] =
 
 #define MX_SDL_DESCRIP		"X400P-SS7 MULTIPLEX (MX) STREAMS MODULE."
 #define MX_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:19:00 $"
+#define MX_SDL_REVISION		"OpenSS7 $RCSfile: mx_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:51 $"
 #define MX_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define MX_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MX_SDL_LICENSE		"GPL v2"
+#define MX_SDL_LICENSE		"GPL"
 #define MX_SDL_BANNER		MX_SDL_DESCRIP		"\n" \
 				MX_SDL_EXTRA		"\n" \
 				MX_SDL_REVISION		"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:30 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.8  2007/08/15 05:20:19  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/12 16:20:30  brian
  - new PPA handling
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $"
 
 static char const ident[] =
-    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $";
+    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -107,11 +110,11 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:20:30 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SL_LICENSE	"GPL v2"
+#define SL_LICENSE	"GPL"
 #define SL_BANNER	SL_DESCRIP	"\n" \
 			SL_REVISION	"\n" \
 			SL_COPYRIGHT	"\n" \

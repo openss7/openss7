@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $
+ @(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:29 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:51 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:29 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_t.c,v $
+ Revision 0.9.2.18  2007/08/15 05:20:29  brian
+ - GPLv3 updates
+
  Revision 0.9.2.17  2007/08/14 12:18:51  brian
  - GPLv3 header updates
 
@@ -73,19 +76,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $"
+#ident "@(#) $RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:29 $"
 
 static char const ident[] =
-    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $";
+    "$RCSfile: sscop_t.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:29 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_TPI_DESCRIP	"SSCOP-MCE/IP STREAMS DRIVER."
-#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:51 $"
+#define SSCOP_TPI_REVISION	"OpenSS7 $RCSfile: sscop_t.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:29 $"
 #define SSCOP_TPI_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SSCOP_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SSCOP_TPI_LICENSE	"GPL v2"
+#define SSCOP_TPI_LICENSE	"GPL"
 #define SSCOP_TPI_BANNER	SSCOP_TPI_DESCRIP	"\n" \
 				SSCOP_TPI_REVISION	"\n" \
 				SSCOP_TPI_COPYRIGHT	"\n" \

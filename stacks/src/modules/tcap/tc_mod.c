@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:55 $
+ @(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc_mod.c,v $
+ Revision 0.9.2.3  2007/08/15 05:20:37  brian
+ - GPLv3 updates
+
  Revision 0.9.2.2  2007/08/14 12:18:55  brian
  - GPLv3 header updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:55 $"
+#ident "@(#) $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:37 $"
 
 static char const ident[] =
-    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:55 $";
+    "$RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:37 $";
 
 /*
  * This is TC-MOD.  It is a simplified Transaction Component Interface (TCI) module for TCAP that
@@ -123,11 +126,11 @@ static char const ident[] =
 #include <sys/xti_tcap.h>
 
 #define TC_DESCRIP	"SS7/TCAP-TC (TCAP Component Handling) STREAMS MODULE."
-#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:55 $"
+#define TC_REVISION	"OpenSS7 $RCSfile: tc_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:37 $"
 #define TC_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Provides OpenSS7 TCAP-TC module."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TC_LICENSE	"GPL v2"
+#define TC_LICENSE	"GPL"
 #define TC_BANNER	TC_DESCRIP	"\n" \
 			TC_REVISION	"\n" \
 			TC_COPYRIGHT	"\n" \

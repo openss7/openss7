@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $
+ @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:27 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_pmod.c,v $
+ Revision 0.9.2.5  2007/08/15 05:20:15  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/12 16:20:27  brian
  - new PPA handling
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $"
+#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $";
+    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -105,11 +108,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:20:27 $A"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $A"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDT_LICENSE	"GPL v2"
+#define SDT_LICENSE	"GPL"
 #define SDT_BANNER	SDT_DESCRIP	"\n" \
 			SDT_REVISION	"\n" \
 			SDT_COPYRIGHT	"\n" \

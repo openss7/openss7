@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:46 $
+ @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:46 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.new.c,v $
+ Revision 0.9.2.3  2007/08/15 05:20:18  brian
+ - GPLv3 updates
+
  Revision 0.9.2.2  2007/08/14 12:18:46  brian
  - GPLv3 header updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:46 $"
+#ident "@(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $"
 
 char const ident[] =
-    "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:46 $";
+    "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $";
 
 /*
  *  This is a Signalling Link (SL) multiplexor that provides a convenient way of organizing various
@@ -104,11 +107,11 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:18:46 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:18 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SL_MUX_LICENSE		"GPL v2"
+#define SL_MUX_LICENSE		"GPL"
 #define SL_MUX_BANNER		SL_MUX_DESCRIP		"\n" \
 				SL_MUX_REVISION		"\n" \
 				SL_MUX_COPYRIGHT	"\n" \
