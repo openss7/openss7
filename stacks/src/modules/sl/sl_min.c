@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 15:10:05 $
+ @(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:10:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_min.c,v $
+ Revision 0.9.2.25  2007/08/15 05:20:18  brian
+ - GPLv3 updates
+
  Revision 0.9.2.24  2007/08/12 15:10:05  brian
  - moved files around
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 15:10:05 $"
+#ident "@(#) $RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $"
 
 char const ident[] =
-    "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 15:10:05 $";
+    "$RCSfile: sl_min.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $";
 
 #include <sys/os7/compat.h>
 
@@ -87,11 +90,11 @@ char const ident[] =
 #include <ss7/sli.h>
 
 #define SL_MIN_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/12 15:10:05 $"
+#define SL_MIN_REVISION		"LfS $RCSname$ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $"
 #define SL_MIN_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_MIN_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MIN_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SL_MIN_LICENSE		"GPL v2"
+#define SL_MIN_LICENSE		"GPL"
 #define SL_MIN_BANNER		SL_MIN_DESCRIP		"\n" \
 				SL_MIN_REVISION		"\n" \
 				SL_MIN_COPYRIGHT	"\n" \

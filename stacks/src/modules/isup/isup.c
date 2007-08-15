@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:47 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 0.9.2.22  2007/08/15 05:18:46  brian
+ - GPLv3 updates
+
  Revision 0.9.2.21  2007/08/14 12:17:47  brian
  - GPLv3 header updates
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $"
+#ident "@(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:46 $"
 
 static char const ident[] =
-    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $";
+    "$RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:46 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -112,11 +115,11 @@ static char const ident[] =
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:17:47 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:18:46 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ISUP_LICENSE	"GPL v2"
+#define ISUP_LICENSE	"GPL"
 #define ISUP_BANNER	ISUP_DESCRIP	"\n" \
 			ISUP_REVISION	"\n" \
 			ISUP_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $
+ @(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:18:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_acb56.c,v $
+ Revision 0.9.2.18  2007/08/15 05:18:18  brian
+ - GPLv3 updates
+
  Revision 0.9.2.17  2007/08/14 12:17:18  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $"
+#ident "@(#) $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:18:18 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $";
+    "$RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:18:18 $";
 
 /*
  *  This is an implementation of the Signalling Data Terminal for the SeaLevel
@@ -84,11 +87,11 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define ACB56_DESCRIP	"ACB56: SS7/SDT (Signalling Data Terminal) STREAMS DRIVER."
-#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:17:18 $"
+#define ACB56_REVISION	"LfS $RCSfile: sdt_acb56.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:18:18 $"
 #define ACB56_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corpoation.  All Rights Reserved."
 #define ACB56_DEVICES	"Supports the SeaLevel ACB56(tm) V.35 boards."
 #define ACB56_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ACB56_LICENSE	"GPL v2"
+#define ACB56_LICENSE	"GPL"
 #define ACB56_BANNER	ACB56_DESCRIP	"\n" \
 			ACB56_REVISION	"\n" \
 			ACB56_COPYRIGHT	"\n" \

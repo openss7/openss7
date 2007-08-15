@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $
+ @(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:19:28 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:19:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp_mod.c,v $
+ Revision 0.9.2.3  2007/08/15 05:19:28  brian
+ - GPLv3 updates
+
  Revision 0.9.2.2  2007/08/12 16:20:12  brian
  - new PPA handling
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $"
+#ident "@(#) $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:19:28 $"
 
-static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $";
+static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:19:28 $";
 
 /*
  * MTP-MOD is a minimal MTP in the spirit of Q.710 but which also supports ANSI and other variants.
@@ -98,11 +101,11 @@ static char const ident[] = "$RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.
 #include <ss7/mtpi_ioctl.h>
 
 #define MT_DESCRIP	"SS7/MTP (Minimal MTP) STREAMS MODULE."
-#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/12 16:20:12 $"
+#define MT_REVISION	"OpenSS7 $RCSfile: mtp_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:19:28 $"
 #define MT_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MT_DEVICE	"Provides OpenSS7 MTP Minimal Module."
 #define MT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MT_LICENSE	"GPL v2"
+#define MT_LICENSE	"GPL"
 #define MT_BANNER	MT_DESCRIP	"\n" \
 			MT_REVISION	"\n" \
 			MT_COPYRIGHT	"\n" \

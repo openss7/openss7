@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:18:49 $
+ @(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:25 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:49 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:25 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_sctp.c,v $
+ Revision 0.9.2.22  2007/08/15 05:20:25  brian
+ - GPLv3 updates
+
  Revision 0.9.2.21  2007/08/14 12:18:49  brian
  - GPLv3 header updates
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:18:49 $"
+#ident "@(#) $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:25 $"
 
 static char const ident[] =
-    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:18:49 $";
+    "$RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:25 $";
 
 #include <sys/os7/compat.h>
 
@@ -91,11 +94,11 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDL) STREAMS MODULE."
-#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/14 12:18:49 $"
+#define SDL_SCTP_REVISION	"OpenSS7 $RCSfile: sdl_sctp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:25 $"
 #define SDL_SCTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDL_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDL_SCTP_LICENSE	"GPL v2"
+#define SDL_SCTP_LICENSE	"GPL"
 #define SDL_SCTP_BANNER		SDL_SCTP_DESCRIP	"\n" \
 				SDL_SCTP_REVISION	"\n" \
 				SDL_SCTP_COPYRIGHT	"\n" \

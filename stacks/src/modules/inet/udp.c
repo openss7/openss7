@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:17:40 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:18:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:40 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 0.9.2.9  2007/08/15 05:18:39  brian
+ - GPLv3 updates
+
  Revision 0.9.2.8  2007/08/14 12:17:40  brian
  - GPLv3 header updates
 
@@ -221,10 +224,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:17:40 $"
+#ident "@(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:18:39 $"
 
 static char const ident[] =
-    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:17:40 $";
+    "$RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:18:39 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -306,10 +309,10 @@ static char const ident[] =
 #define UDP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UDP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define UDP_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 12:17:40 $"
+#define UDP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:18:39 $"
 #define UDP_DEVICE	"SVR 4.2 STREAMS UDP Driver"
 #define UDP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define UDP_LICENSE	"GPL v2"
+#define UDP_LICENSE	"GPL"
 #define UDP_BANNER	UDP_DESCRIP	"\n" \
 			UDP_EXTRA	"\n" \
 			UDP_REVISION	"\n" \

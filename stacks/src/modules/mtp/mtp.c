@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:19:54 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:19:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 0.9.2.23  2007/08/15 05:19:10  brian
+ - GPLv3 updates
+
  Revision 0.9.2.22  2007/08/12 16:19:54  brian
  - new PPA handling
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $"
+#ident "@(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $"
 
 static char const ident[] =
-    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $";
+    "$RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -128,11 +131,11 @@ static char const ident[] =
 #define STRLOGDA	6	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:19:54 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:19:10 $"
 #define MTP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MTP_LICENSE	"GPL v2"
+#define MTP_LICENSE	"GPL"
 #define MTP_BANNER	MTP_DESCRIP	"\n" \
 			MTP_REVISION	"\n" \
 			MTP_COPYRIGHT	"\n" \

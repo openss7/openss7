@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:54 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:54 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tali.c,v $
+ Revision 0.9.2.18  2007/08/15 05:20:34  brian
+ - GPLv3 updates
+
  Revision 0.9.2.17  2007/08/14 12:18:54  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:54 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:34 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:54 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:34 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,11 +79,11 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/08/14 12:18:54 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.18 $) $Date: 2007/08/15 05:20:34 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TALI_LICENSE	"GPL v2"
+#define TALI_LICENSE	"GPL"
 #define TALI_BANNER	TALI_DESCRIP	"\n" \
 			TALI_REVISION	"\n" \
 			TALI_COPYRIGHT	"\n" \

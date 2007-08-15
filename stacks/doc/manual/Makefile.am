@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/13 15:21:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/15 05:18:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:21:58 $ by $Author: brian $
+# Last Modified $Date: 2007/08/15 05:18:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ info_TEXINFOS		=
 if DEVELOPMENT
 ## DEVELOPMENT
 
-info_TEXINFOS		+= strss7.texi # libxnet.texi
+info_TEXINFOS		+= strss7.texi x400p.texi # libxnet.texi
 
 strss7_TEXINFOS		= \
 			  configure.texi \
@@ -70,10 +70,10 @@ strss7_TEXINFOS		= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
-			  texi/lesser.texi \
+			  texi/lgpl3.texi \
 			  texi/testsuite.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -81,10 +81,18 @@ strss7_TEXINFOS		= \
 			  $(top_srcdir)/scripts/texi/mail.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
+x400p_TEXINFOS		= \
+			  texi/fdl.texi \
+			  texi/gpl3.texi \
+			  texi/lgpl3.texi \
+			  $(top_srcdir)/scripts/texi/macros.texi \
+			  $(top_srcdir)/scripts/texi/versions.texi \
+			  $(top_srcdir)/scripts/texi/funding.texi
+
 libxnet_TEXINFOS	= \
 			  texi/fdl.texi \
-			  texi/gpl.texi \
-			  texi/lesser.texi \
+			  texi/gpl3.texi \
+			  texi/lgpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
@@ -110,6 +118,9 @@ include ../../am/info.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.36  2007/08/15 05:18:16  brian
+## - GPLv3 updates
+##
 ## Revision 0.9.2.35  2007/08/13 15:21:58  brian
 ## - header updates, added references
 ##

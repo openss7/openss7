@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:18:55 $
+ @(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:20:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tc.c,v $
+ Revision 0.9.2.15  2007/08/15 05:20:37  brian
+ - GPLv3 updates
+
  Revision 0.9.2.14  2007/08/14 12:18:55  brian
  - GPLv3 header updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:18:55 $"
+#ident "@(#) $RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:20:37 $"
 
 static char const ident[] =
-    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 12:18:55 $";
+    "$RCSfile: tc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:20:37 $";
 
 /*
  *  This is a TC (Transaction Capabilities) mulitplexing driver for SS7 TCAP.
@@ -92,7 +95,7 @@ static char const ident[] =
 #define TC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TC_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TC_LICENSE	"GPL v2"
+#define TC_LICENSE	"GPL"
 #define TC_BANNER	TC_DESCRIP	"\n" \
 			TC_COPYRIGHT	"\n" \
 			TC_DEVICE	"\n" \

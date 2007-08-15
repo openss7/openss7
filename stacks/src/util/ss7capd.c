@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:49:58 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:21:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:49:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:21:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 0.9.2.5  2007/08/15 05:21:05  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/12 16:49:58  brian
  - header updates
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:49:58 $"
+#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:21:05 $"
 
 static char const ident[] =
-    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/12 16:49:58 $";
+    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:21:05 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -240,15 +243,15 @@ All Rights Reserved.\n\
 --------------------------------------------------------------------------------\n\
 This program is free software; you can  redistribute  it and/or modify  it under\n\
 the terms  of the GNU General Public License  as  published by the Free Software\n\
-Foundation; version  2  of  the  License.\n\
+Foundation; version  3  of  the  License.\n\
 \n\
 This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
 WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
 You should  have received a copy of the GNU  General  Public License  along with\n\
-this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
-Cambridge, MA 02139, USA.\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 --------------------------------------------------------------------------------\n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
@@ -419,7 +422,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.4 2007/08/12 16:49:58 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.5 2007/08/15 05:21:05 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:31 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 0.9.2.21  2007/08/15 05:20:37  brian
+ - GPLv3 updates
+
  Revision 0.9.2.20  2007/08/12 16:20:31  brian
  - new PPA handling
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $"
+#ident "@(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:37 $"
 
 static char const ident[] =
-    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
+    "$RCSfile: tcap.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:37 $ Copyright (c) 1997-2003 OpenSS7 Corporation.";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -126,11 +129,11 @@ static char const ident[] =
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:31 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:20:37 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TCAP_LICENSE	"GPL v2"
+#define TCAP_LICENSE	"GPL"
 #define TCAP_BANNER	TCAP_DESCRIP	"\n" \
 			TCAP_EXTRA	"\n" \
 			TCAP_REVISION	"\n" \

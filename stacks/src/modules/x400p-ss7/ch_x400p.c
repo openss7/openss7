@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $
+ @(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:20:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_x400p.c,v $
+ Revision 0.9.2.20  2007/08/15 05:20:50  brian
+ - GPLv3 updates
+
  Revision 0.9.2.19  2007/08/14 12:19:00  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $"
+#ident "@(#) $RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:20:50 $"
 
 static char const ident[] =
-    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $";
+    "$RCSfile: ch_x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:20:50 $";
 
 #include <sys/os7/compat.h>
 
@@ -92,11 +95,11 @@ static char const ident[] =
 
 #define CH_SDL_DESCRIP		"X400P-SS7 CHANNEL (CH) STREAMS MODULE."
 #define CH_SDL_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:19:00 $"
+#define CH_SDL_REVISION		"OpenSS7 $RCSfile: ch_x400p.c,v $ $Name:  $ ($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:20:50 $"
 #define CH_SDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_SDL_DEVICE		"Supports SDLI pseudo-device drivers."
 #define CH_SDL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define CH_SDL_LICENSE		"GPL v2"
+#define CH_SDL_LICENSE		"GPL"
 #define CH_SDL_BANNER		CH_SDL_DESCRIP		"\n" \
 				CH_SDL_EXTRA		"\n" \
 				CH_SDL_REVISION		"\n" \

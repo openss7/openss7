@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:19:39 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:19:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 0.9.2.26  2007/08/15 05:19:39  brian
+ - GPLv3 updates
+
  Revision 0.9.2.25  2007/08/14 12:18:14  brian
  - GPLv3 header updates
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $"
+#ident "@(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:19:39 $"
 
 static char const ident[] =
-    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $";
+    "$RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:19:39 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -125,11 +128,11 @@ static char const ident[] =
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:18:14 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:19:39 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SCCP_LICENSE	"GPL v2"
+#define SCCP_LICENSE	"GPL"
 #define SCCP_BANNER	SCCP_DESCRIP	"\n" \
 			SCCP_REVISION	"\n" \
 			SCCP_COPYRIGHT	"\n" \

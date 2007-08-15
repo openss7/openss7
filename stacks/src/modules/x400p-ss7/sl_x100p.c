@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/12 16:20:35 $
+ @(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/15 05:20:52 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:35 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x100p.c,v $
+ Revision 0.9.2.27  2007/08/15 05:20:52  brian
+ - GPLv3 updates
+
  Revision 0.9.2.26  2007/08/12 16:20:35  brian
  - new PPA handling
 
@@ -94,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/12 16:20:35 $"
+#ident "@(#) $RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/15 05:20:52 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/12 16:20:35 $";
+    "$RCSfile: sl_x100p.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/15 05:20:52 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -134,11 +137,11 @@ static char const ident[] =
 
 #define SL_X100P_DESCRIP	"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.26 $) $Date: 2007/08/12 16:20:35 $"
+#define SL_X100P_REVISION	"OpenSS7 $RCSfile: sl_x100p.c,v $ $Name:  $ ($Revision: 0.9.2.27 $) $Date: 2007/08/15 05:20:52 $"
 #define SL_X100P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define SL_X100P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SL_X100P_LICENSE	"GPL v2"
+#define SL_X100P_LICENSE	"GPL"
 #define SL_X100P_BANNER		SL_X100P_DESCRIP	"\n" \
 				SL_X100P_EXTRA		"\n" \
 				SL_X100P_REVISION	"\n" \

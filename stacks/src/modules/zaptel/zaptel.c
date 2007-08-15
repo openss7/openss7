@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:19:05 $
+ @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:21:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zaptel.c,v $
+ Revision 0.9.2.4  2007/08/15 05:21:02  brian
+ - GPLv3 updates
+
  Revision 0.9.2.3  2007/08/14 12:19:05  brian
  - GPLv3 header updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:19:05 $"
+#ident "@(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $"
 
 static char const ident[] =
-    "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:19:05 $";
+    "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $";
 
 /*
  *  This module pushes over an OpenSS7 MX Stream and provides a zaptel drvier
@@ -97,11 +100,11 @@ static char const ident[] =
 #include <ss7/zap_ioctl.h>
 
 #define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
-#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.3 $) $Date: 2007/08/14 12:19:05 $"
+#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 0.9.2.4 $) $Date: 2007/08/15 05:21:02 $"
 #define ZAP_MX_COPYRIGHT    "Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
-#define ZAP_MX_LICENSE	"GPL v2"
+#define ZAP_MX_LICENSE	"GPL"
 #define ZAP_MX_BANNER	ZAP_MX_DESCRIP		"\n" \
 			ZAP_MX_REVISION		"\n" \
 			ZAP_MX_COPYRIGHT	"\n" \

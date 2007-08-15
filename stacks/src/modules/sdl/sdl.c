@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:36:53 $
+ @(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:36:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl.c,v $
+ Revision 0.9.2.22  2007/08/15 05:20:11  brian
+ - GPLv3 updates
+
  Revision 0.9.2.21  2007/08/12 16:36:53  brian
  - header error
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:36:53 $"
+#ident "@(#) $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:11 $"
 
 static char const ident[] =
-    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:36:53 $";
+    "$RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:11 $";
 
 #define _LFS_SOURCE	1
 //#define _SVR4_SOURCE	1
@@ -80,11 +83,11 @@ static char const ident[] =
 #include <ss7/sdli_ioctl.h>
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/12 16:36:53 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/15 05:20:11 $"
 #define SDL_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corporation.  All Rights Reserved."
 #define SDL_DEVICE	"Supports STREAMS pipes."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDL_LICENSE	"GPL v2"
+#define SDL_LICENSE	"GPL"
 #define SDL_BANNER	SDL_DESCRIP	"\n" \
 			SDL_REVISION	"\n" \
 			SDL_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:19:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:19:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.21  2007/08/15 05:19:00  brian
+ - GPLv3 updates
+
  Revision 0.9.2.20  2007/08/14 12:17:58  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:19:00 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:19:00 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -94,11 +97,11 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/14 12:17:58 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:19:00 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define M2UA_LICENSE	"GPL v2"
+#define M2UA_LICENSE	"GPL"
 #define M2UA_BANNER	M2UA_DESCRIP	"\n" \
 			M2UA_REVISION	"\n" \
 			M2UA_COPYRIGHT	"\n" \

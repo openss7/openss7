@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:58 $
+ @(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:47 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:18:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua.c,v $
+ Revision 0.9.2.17  2007/08/15 05:20:47  brian
+ - GPLv3 updates
+
  Revision 0.9.2.16  2007/08/14 12:18:58  brian
  - GPLv3 header updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:58 $"
+#ident "@(#) $RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:47 $"
 
 static char const ident[] =
-    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:58 $";
+    "$RCSfile: tua.c,v $ $Name:  $($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:47 $";
 
 #include <sys/os7/compat.h>
 #include <linux/socket.h>
@@ -109,11 +112,11 @@ static char const ident[] =
 
 #define TUA_DESCRIP	"TUA STREAMS MULTIPLEXING DRIVER."
 #define TUA_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/08/14 12:18:58 $"
+#define TUA_REVISION	"OpenSS7 $RCSfile: tua.c,v $ $Name:  $ ($Revision: 0.9.2.17 $) $Date: 2007/08/15 05:20:47 $"
 #define TUA_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_DEVICE	"Supports OpenSS7 TCAP TCI/TRI Interface Pseudo-Device Drivers."
 #define TUA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TUA_LICENSE	"GPL v2"
+#define TUA_LICENSE	"GPL"
 #define TUA_BANNER	TUA_DESCRIP	"\n" \
 			TUA_EXTRA	"\n" \
 			TUA_REVISION	"\n" \

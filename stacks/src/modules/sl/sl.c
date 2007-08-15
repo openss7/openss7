@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $
+ @(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:17 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl.c,v $
+ Revision 0.9.2.23  2007/08/15 05:20:17  brian
+ - GPLv3 updates
+
  Revision 0.9.2.22  2007/08/12 16:20:29  brian
  - new PPA handling
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $"
+#ident "@(#) $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:17 $"
 
 static char const ident[] =
-    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $";
+    "$RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:17 $";
 
 /*
  *  This is an SL (Signalling Link) module which can be pushed over an SDT
@@ -103,11 +106,11 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"SS7/IP SIGNALLING LINK (SL) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:20:29 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: sl.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:17 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SL_LICENSE	"GPL v2"
+#define SL_LICENSE	"GPL"
 #define SL_BANNER	SL_DESCRIP	"\n" \
 			SL_REVISION	"\n" \
 			SL_COPYRIGHT	"\n" \

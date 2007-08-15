@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:38:45 $
+ @(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:11 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:38:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:20:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlm.c,v $
+ Revision 0.9.2.23  2007/08/15 05:20:11  brian
+ - GPLv3 updates
+
  Revision 0.9.2.22  2007/08/12 16:38:45  brian
  - header error
 
@@ -58,9 +61,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:38:45 $"
+#ident "@(#) $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:11 $"
 
-static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:38:45 $";
+static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:11 $";
 
 /*
  *  A Signalling Data Link Multiplexor for the OpenSS7 SS7 Stack.
@@ -89,11 +92,11 @@ static char const ident[] = "$RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.22 
 
 #define SDLM_DESCRIP	"SS7/SDL: (Signalling Data Link) MULTIPLEXING STREAMS DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.22 $) $Date: 2007/08/12 16:38:45 $"
+#define SDLM_REVISION	"OpenSS7 $RCSfile: sdlm.c,v $ $Name:  $($Revision: 0.9.2.23 $) $Date: 2007/08/15 05:20:11 $"
 #define SDLM_COPYRIGHT	"Copyright (c) 1997-2002 OpenSS7 Corp.  All Rights Reserved."
 #define SDLM_DEVICE	"Supports OpenSS7 SDL Drivers."
 #define SDLM_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SDLM_LICENSE	"GPL v2"
+#define SDLM_LICENSE	"GPL"
 #define SDLM_BANNER	SDLM_DESCRIP	"\n" \
 			SDLM_REVISION	"\n" \
 			SDLM_COPYRIGHT	"\n" \

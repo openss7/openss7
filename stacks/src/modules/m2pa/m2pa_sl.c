@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/14 12:17:55 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:18:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.29  2007/08/15 05:18:54  brian
+ - GPLv3 updates
+
  Revision 0.9.2.28  2007/08/14 12:17:55  brian
  - GPLv3 header updates
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/14 12:17:55 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/14 12:17:55 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -119,11 +122,11 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/14 12:17:55 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define M2PA_SL_LICENSE		"GPL v2"
+#define M2PA_SL_LICENSE		"GPL"
 #define M2PA_SL_BANNER		M2PA_SL_DESCRIP		"\n" \
 				M2PA_SL_REVISION	"\n" \
 				M2PA_SL_COPYRIGHT	"\n" \
