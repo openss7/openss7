@@ -174,7 +174,7 @@ char lis_date[] = PACKAGE_DATE;
 	Prevent running of queues interrupting putnext operation.
 	Ioctl default timeout now implemented (15 secs).
 
-1.25	Candidate final changes for kernel version 2.2.x compatibility.
+1.25	Candidate final changes for kernel release 2.2.x compatibility.
 	Fixed bug in which stream head putpmsg did not send M_PCPROTO
 	downstream if flow control blocked; it returned EAGAIN instead.
 	Queues run either as bottom half or as kernel thread.
@@ -206,7 +206,7 @@ char lis_date[] = PACKAGE_DATE;
 2.5	Fix locking for multiple writers to same stream.
 	Update html documentation.
 
-2.6	Make ip_strm_mod work properly and for kernel version 2.2.x.
+2.6	Make ip_strm_mod work properly and for kernel release 2.2.x.
 	Improve installation vis a vis SMP.
 	Additions to osif.[ch].
 	Add raw HDLC interface type to ldl.

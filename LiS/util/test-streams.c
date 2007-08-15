@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 10:47:27 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 04:58:13 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:47:27 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 04:58:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 0.9.2.11  2007/08/15 04:58:13  brian
+ - GPLv3 updates
+
  Revision 0.9.2.10  2007/08/14 10:47:27  brian
  - GPLv3 header update
 
@@ -267,9 +270,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 10:47:27 $"
+#ident "@(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 04:58:13 $"
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 10:47:27 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 04:58:13 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -323,7 +326,7 @@ typedef ulong t_uscalar_t;
 static const char *lpkgname = "Linux Fast-STREAMS";
 
 /* static const char *spkgname = "LfS"; */
-static const char *lstdname = "UNIX 98/SUS Version 2";
+static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "STREAMS";
 

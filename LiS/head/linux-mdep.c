@@ -4965,7 +4965,7 @@ lis_umount2(char *path, int flags)
 /* Note: this release is GPL. -bb */
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("David Grothe <dave@gcom.com>");

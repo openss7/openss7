@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 10:46:56 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 04:57:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 0.9.2.15  2007/08/15 04:57:58  brian
+ - GPLv3 updates
+
  Revision 0.9.2.14  2007/08/14 10:46:56  brian
  - GPLv3 header update
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 10:46:56 $"
+#ident "@(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 04:57:58 $"
 
 static char const ident[] =
-    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 10:46:56 $";
+    "$RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 04:57:58 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -102,10 +105,10 @@ static char const ident[] =
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/14 10:46:56 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 04:57:58 $"
 #define MUX_DEVICE	"SVR 4.2 STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MUX_LICENSE	"GPL v2"
+#define MUX_LICENSE	"GPL"
 #define MUX_BANNER	MUX_DESCRIP	"\n" \
 			MUX_COPYRIGHT	"\n" \
 			MUX_REVISION	"\n" \

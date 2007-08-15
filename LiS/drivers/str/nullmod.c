@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $
+ @(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nullmod.c,v $
+ Revision 0.9.2.13  2007/08/15 04:57:58  brian
+ - GPLv3 updates
+
  Revision 0.9.2.12  2007/08/14 10:46:56  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $"
+#ident "@(#) $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $"
 
 static char const ident[] =
-    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $";
+    "$RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $";
 
 /*
  *  This is NULLMOD a STREAMS null module that performs no actions other than acting as a STREAMS
@@ -90,10 +93,10 @@ static char const ident[] =
 
 #define NULLMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULLMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 10:46:56 $"
+#define NULLMOD_REVISION	"LfS $RCSfile: nullmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 04:57:58 $"
 #define NULLMOD_DEVICE		"SVR 4.2 Null Module (NULLMOD) for STREAMS"
 #define NULLMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define NULLMOD_LICENSE		"GPL v2"
+#define NULLMOD_LICENSE		"GPL"
 #define NULLMOD_BANNER		NULLMOD_DESCRIP		"\n" \
 				NULLMOD_COPYRIGHT	"\n" \
 				NULLMOD_REVISION	"\n" \

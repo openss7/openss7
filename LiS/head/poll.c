@@ -470,7 +470,7 @@ lis_poll(struct pollfd *fds, int nfds, int time_out)
 *                           lis_poll_2_1                                *
 *************************************************************************
 *									*
-* This is the kernel version 2.1 poll routine.  It is pointed to by	*
+* This is the kernel release 2.1 poll routine.  It is pointed to by	*
 * the fops structure for STREAMS.  It handles polling for one stream.	*
 * It builds a list of processes waiting on the stream in the task list	*
 * owned in the stdata structure.					*

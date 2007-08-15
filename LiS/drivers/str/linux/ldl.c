@@ -64,22 +64,6 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
  *  Copyright (C) 1998, 1999 Ole Husgaard (sparre@login.dknet.dk)
  *
  *  Token ring support by Dave Grothe Copyright (C) 1999
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * 
  * 
  * This driver does not attempt to do any hardware programming. Instead
  * this driver is an interface between the existing Linux network device
@@ -4571,7 +4555,7 @@ module_exit(ldl_cleanup_module);
 
 #if defined(LINUX)		/* linux kernel */
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("Ole Husgaard (sparre@login.dknet.dk");

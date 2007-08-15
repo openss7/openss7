@@ -174,7 +174,7 @@ put_unused_fd(unsigned int fd)
 }
 
 #  else
-	/* kernel version 2.2.17 should have this visible */
+	/* kernel 2.2.17 should have this visible */
 #  endif
 # endif
 
@@ -202,7 +202,7 @@ put_unused_fd(unsigned int fd)
 }
 
 # else
-	/* kernel version 2.4.1 should have this visible */
+	/* kernel 2.4.1 should have this visible */
 # endif
 
 #endif
@@ -273,7 +273,7 @@ igrab(struct inode *inode)
 ************************************************************************/
 
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("GPL");
 #endif
 #if defined(MODULE_AUTHOR)
 MODULE_AUTHOR("David Grothe <dave@gcom.com>");

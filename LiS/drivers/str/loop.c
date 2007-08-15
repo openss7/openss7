@@ -933,7 +933,7 @@ module_init(loop_init_module);
 module_exit(loop_cleanup_module);
 #endif
 #if defined(MODULE_LICENSE)
-MODULE_LICENSE("GPL v2");
+MODULE_LICENSE("GPL");
 #endif
 
 #endif				/* !defined __NO_VERSION__ */

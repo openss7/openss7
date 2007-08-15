@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $
+ @(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 04:57:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 10:46:56 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: bufmod.c,v $
+ Revision 0.9.2.14  2007/08/15 04:57:58  brian
+ - GPLv3 updates
+
  Revision 0.9.2.13  2007/08/14 10:46:56  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $"
+#ident "@(#) $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 04:57:58 $"
 
 static char const ident[] =
-    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $";
+    "$RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 04:57:58 $";
 
 /*
  *  This is BUFMOD a STREAMS buffering module that performs no actions other than acting as a
@@ -87,10 +90,10 @@ static char const ident[] =
 
 #define BUFMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define BUFMOD_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 10:46:56 $"
+#define BUFMOD_REVISION		"LfS $RCSfile: bufmod.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/15 04:57:58 $"
 #define BUFMOD_DEVICE		"SVR 4.2 Buffer Module (BUFMOD) for STREAMS"
 #define BUFMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define BUFMOD_LICENSE		"GPL v2"
+#define BUFMOD_LICENSE		"GPL"
 #define BUFMOD_BANNER		BUFMOD_DESCRIP		"\n" \
 				BUFMOD_COPYRIGHT	"\n" \
 				BUFMOD_REVISION		"\n" \
