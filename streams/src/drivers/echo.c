@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/08/13 22:46:14 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/15 05:33:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: echo.c,v $
+ Revision 0.9.2.61  2007/08/15 05:33:20  brian
+ - GPLv3 updates
+
  Revision 0.9.2.60  2007/08/13 22:46:14  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/08/13 22:46:14 $"
+#ident "@(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/15 05:33:20 $"
 
 static char const ident[] =
-    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/08/13 22:46:14 $";
+    "$RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/15 05:33:20 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -79,10 +82,10 @@ static char const ident[] =
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.60 $) $Date: 2007/08/13 22:46:14 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/15 05:33:20 $"
 #define ECHO_DEVICE	"SVR 4.2 STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define ECHO_LICENSE	"GPL v2"
+#define ECHO_LICENSE	"GPL"
 #define ECHO_BANNER	ECHO_DESCRIP	"\n" \
 			ECHO_COPYRIGHT	"\n" \
 			ECHO_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: vf.c,v $
+ Revision 0.9.2.15  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.14  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
@@ -94,10 +97,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: vf.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:33:21 $";
 
 /*
  *  This driver provides some capabilities for testing Linux Fast-STREAMS.  It functions as a Null
@@ -125,10 +128,10 @@ static char const ident[] =
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define VF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/08/13 22:46:15 $"
+#define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/08/15 05:33:21 $"
 #define VF_DEVICE	"SVR 4.2 STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define VF_LICENSE	"GPL v2"
+#define VF_LICENSE	"GPL"
 #define VF_BANNER	VF_DESCRIP	"\n" \
 			VF_COPYRIGHT	"\n" \
 			VF_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $
+ @(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: liscompat.c,v $
+ Revision 0.9.2.50  2007/08/15 05:33:09  brian
+ - GPLv3 updates
+
  Revision 0.9.2.49  2007/08/12 15:51:18  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $"
+#ident "@(#) $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $"
 
 static char const ident[] =
-    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $";
+    "$RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -108,10 +111,10 @@ static char const ident[] =
 
 #define LISCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LISCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/12 15:51:18 $"
+#define LISCOMP_REVISION	"LfS $RCSfile: liscompat.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:09 $"
 #define LISCOMP_DEVICE		"LiS 2.16 and 2.18 Compatibility"
 #define LISCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define LISCOMP_LICENSE		"GPL v2"
+#define LISCOMP_LICENSE		"GPL"
 #define LISCOMP_BANNER		LISCOMP_DESCRIP		"\n" \
 				LISCOMP_COPYRIGHT	"\n" \
 				LISCOMP_REVISION	"\n" \

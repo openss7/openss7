@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $
+ @(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:05:03 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tp.c,v $
+ Revision 0.9.2.16  2007/08/15 05:34:18  brian
+ - GPLv3 updates
+
  Revision 0.9.2.15  2007/08/14 07:05:03  brian
  - GNUv3 header update
 
@@ -104,18 +107,18 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
+#ident "@(#) $RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $"
 
 static char const ident[] =
-    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $";
+    "$RCSfile: tp.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $";
 
 /*
  *  This file provides both a module and a multiplexing driver for the ISO/OSI X.224
  *  Connection-Oriented Transport Protocol.  The module can be pushed over any stream providing the
- *  Network Service Interface using Network Provider Interface (NPI) Version 2.0.0. primitives.  An
+ *  Network Service Interface using Network Provider Interface (NPI) Revision 2.0.0. primitives.  An
  *  example is an X.25 Packet Layer Protocol or Frame Relay Stream.  Another good example is the RFC
  *  1006 Network Provider Interface for TCP and UDP.  Any stream providing the Network Service
- *  Interface using the Network Provider Interface (NPI) Version 2.0.0 can also be linked underneath
+ *  Interface using the Network Provider Interface (NPI) Revision 2.0.0 can also be linked underneath
  *  the multiplexing driver.
  *
  *  A single CLNS stream must be linked beneath the driver for Transport Protocol Class 4 over CLNS.
@@ -159,10 +162,10 @@ typedef unsigned int socklen_t;
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: tp.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $"
 #define TP_DEVICE	"SVR 4.2 STREAMS TPI OSI Transport Provider Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@opens7.org>"
-#define TP_LICENSE	"GPL v2"
+#define TP_LICENSE	"GPL"
 #define TP_BANNER	TP_DESCRIP	"\n" \
 			TP_EXTRA	"\n" \
 			TP_COPYRIGHT	"\n" \

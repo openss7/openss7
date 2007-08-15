@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 12:58:01 $
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/15 05:35:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sad.c,v $
+ Revision 0.9.2.43  2007/08/15 05:35:01  brian
+ - GPLv3 updates
+
  Revision 0.9.2.42  2007/08/14 12:58:01  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 12:58:01 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/15 05:35:01 $"
 
 static char const ident[] =
-    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 12:58:01 $";
+    "$RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/15 05:35:01 $";
 
 /*
  * STREAMS Administrative Driver (SAD) for Linux Fast-STREAMS.  Note that this driver also acts as a
@@ -89,10 +92,10 @@ static char const ident[] =
 
 #define SAD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SAD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/14 12:58:01 $"
+#define SAD_REVISION	"LfS $RCSfile: sad.c,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/08/15 05:35:01 $"
 #define SAD_DEVICE	"SVR 4.2 STREAMS Administrative Driver (SAD)"
 #define SAD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SAD_LICENSE	"GPL v2"
+#define SAD_LICENSE	"GPL"
 #define SAD_BANNER	SAD_DESCRIP	"\n" \
 			SAD_COPYRIGHT	"\n" \
 			SAD_REVISION	"\n" \

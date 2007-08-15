@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:47:28 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:32:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 0.9.2.9  2007/08/15 05:32:54  brian
+ - GPLv3 updates
+
  Revision 0.9.2.8  2007/08/14 06:47:28  brian
  - GPLv3 header update
 
@@ -79,10 +82,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:47:28 $"
+#ident "@(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:32:54 $"
 
 static char const ident[] =
-    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:47:28 $";
+    "$RCSfile: mx.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:32:54 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device /dev/streams/matrix
@@ -102,11 +105,11 @@ static char const ident[] =
 #include <ss7/mxi_ioctl.h>
 
 #define MX_MUX_DESCRIP		"MX MULTIPLEX (MX-MUX) STREAMS MULTIPLEXING DRIVER."
-#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/08/14 06:47:28 $"
+#define MX_MUX_REVISION		"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:32:54 $"
 #define MX_MUX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MX_MUX_LICENSE		"GPL v2"
+#define MX_MUX_LICENSE		"GPL"
 #define MX_MUX_BANNER		MX_MUX_DESCRIP		"\n" \
 				MX_MUX_REVISION		"\n" \
 				MX_MUX_COPYRIGHT	"\n" \

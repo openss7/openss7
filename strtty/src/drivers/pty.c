@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $
+ @(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:04:30 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pty.c,v $
+ Revision 0.9.2.10  2007/08/15 05:34:49  brian
+ - GPLv3 updates
+
  Revision 0.9.2.9  2007/08/14 03:04:30  brian
  - GPLv3 header update
 
@@ -86,10 +89,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $"
+#ident "@(#) $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:49 $"
 
 static char const ident[] =
-    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $";
+    "$RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:49 $";
 
 /*
  *  This is the start of a STREAMS pseudo-terminal (pty) driver for Linux.  It
@@ -114,10 +117,10 @@ static char const ident[] =
 
 #define PTY_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTY_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:04:30 $"
+#define PTY_REVISION	"OpenSS7 $RCSfile: pty.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:49 $"
 #define PTY_DEVICE	"SVR 4.2 STREAMS Pseudo-Terminal Driver (PTY)"
 #define PTY_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define PTY_LICENSE	"GPL v2"
+#define PTY_LICENSE	"GPL"
 #define PTY_BANNER	PTY_DESCRIP	"\n" \
 			PTY_COPYRIGHT	"\n" \
 			PTY_REVISION	"\n" \

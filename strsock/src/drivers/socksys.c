@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 05:17:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 0.9.2.10  2007/08/15 05:34:41  brian
+ - GPLv3 updates
+
  Revision 0.9.2.9  2007/08/14 05:17:14  brian
  - GPLv3 header update
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $"
+#ident "@(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:41 $"
 
 static char const ident[] =
-    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $";
+    "$RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:41 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -143,10 +146,10 @@ static char const ident[] =
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:14 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:41 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SOCKSYS_LICENSE		"GPL v2"
+#define SOCKSYS_LICENSE		"GPL"
 #define SOCKSYS_BANNER		SOCKSYS_DESCRIP		"\n" \
 				SOCKSYS_COPYRIGHT	"\n" \
 				SOCKSYS_REVISION	"\n" \

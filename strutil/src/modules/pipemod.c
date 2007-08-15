@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $
+ @(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipemod.c,v $
+ Revision 0.9.2.34  2007/08/15 05:35:05  brian
+ - GPLv3 updates
+
  Revision 0.9.2.33  2007/08/14 12:58:05  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $"
+#ident "@(#) $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $"
 
 static char const ident[] =
-    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $";
+    "$RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $";
 
 /* 
  *  This is PIPEMOD a STREAMS-based pipe (s_pipe(3)) module that reverses the
@@ -79,10 +82,10 @@ static char const ident[] =
 
 #define PIPEMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPEMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $"
+#define PIPEMOD_REVISION	"LfS $RCSfile: pipemod.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:05 $"
 #define PIPEMOD_DEVICE		"SVR 4.2 Pipe Module for STREAMS-based Pipes"
 #define PIPEMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define PIPEMOD_LICENSE		"GPL v2"
+#define PIPEMOD_LICENSE		"GPL"
 #define PIPEMOD_BANNER		PIPEMOD_DESCRIP		"\n" \
 				PIPEMOD_COPYRIGHT	"\n" \
 				PIPEMOD_REVISION	"\n" \

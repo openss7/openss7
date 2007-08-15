@@ -1,3 +1,28 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* configure.nexusware: GPLv3 updates
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/kernel/aixcompat.c: GPLv3 updates
+	* src/kernel/hpuxcompat.c: GPLv3 updates
+	* src/kernel/irixcompat.c: GPLv3 updates
+	* src/kernel/lfscompat.c: GPLv3 updates
+	* src/kernel/liscompat.c: GPLv3 updates
+	* src/kernel/maccompat.c: GPLv3 updates
+	* src/kernel/mpscompat.c: GPLv3 updates
+	* src/kernel/os7compat.c: GPLv3 updates
+	* src/kernel/osfcompat.c: GPLv3 updates
+	* src/kernel/suncompat.c: GPLv3 updates
+	* src/kernel/svr3compat.c: GPLv3 updates
+	* src/kernel/svr4compat.c: GPLv3 updates
+	* src/kernel/uw7compat.c: GPLv3 updates
+	* tests/dummy1.m4: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: updated to GPLv3 headers

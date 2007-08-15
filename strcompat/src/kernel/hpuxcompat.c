@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $
+ @(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:33:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hpuxcompat.c,v $
+ Revision 0.9.2.31  2007/08/15 05:33:08  brian
+ - GPLv3 updates
+
  Revision 0.9.2.30  2007/08/12 15:51:18  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $"
+#ident "@(#) $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:33:08 $"
 
 static char const ident[] =
-    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $";
+    "$RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:33:08 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -98,10 +101,10 @@ static char const ident[] =
 
 #define HPUXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define HPUXCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/12 15:51:18 $"
+#define HPUXCOMP_REVISION	"LfS $RCSfile: hpuxcompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:33:08 $"
 #define HPUXCOMP_DEVICE		"HP-UX 11i v2 Compatibility"
 #define HPUXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define HPUXCOMP_LICENSE	"GPL v2"
+#define HPUXCOMP_LICENSE	"GPL"
 #define HPUXCOMP_BANNER		HPUXCOMP_DESCRIP	"\n" \
 				HPUXCOMP_COPYRIGHT	"\n" \
 				HPUXCOMP_REVISION	"\n" \

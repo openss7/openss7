@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $
+ @(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:04 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: connld.c,v $
+ Revision 0.9.2.34  2007/08/15 05:35:04  brian
+ - GPLv3 updates
+
  Revision 0.9.2.33  2007/08/14 12:58:05  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $"
+#ident "@(#) $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:04 $"
 
 static char const ident[] =
-    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $";
+    "$RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:04 $";
 
 /* 
  *  This is CONNLD, a pipe module which generate new pipes for each open of an
@@ -76,10 +79,10 @@ static char const ident[] =
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CONNLD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 12:58:05 $"
+#define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:04 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define CONNLD_LICENSE		"GPL v2"
+#define CONNLD_LICENSE		"GPL"
 #define CONNLD_BANNER		CONNLD_DESCRIP		"\n" \
 				CONNLD_COPYRIGHT	"\n" \
 				CONNLD_REVISION		"\n" \

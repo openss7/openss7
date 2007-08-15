@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:27 $
+ @(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:33:33 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:27 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-clone.c,v $
+ Revision 0.9.2.26  2007/08/15 05:33:33  brian
+ - GPLv3 updates
+
  Revision 0.9.2.25  2007/08/13 22:46:27  brian
  - GPLv3 header updates
 
@@ -150,9 +153,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:27 $"
+#ident "@(#) $RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:33:33 $"
 
-static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/13 22:46:27 $";
+static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/15 05:33:33 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -202,7 +205,7 @@ static char const ident[] = "$RCSfile: test-clone.c,v $ $Name:  $($Revision: 0.9
 static const char *lpkgname = "Linux Fast-STREAMS";
 
 /* static const char *spkgname = "LfS"; */
-static const char *lstdname = "UNIX 98/SUS Version 2";
+static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "CLONE";
 

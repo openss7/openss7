@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/15 05:33:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:17 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strmain.c,v $
+ Revision 0.9.2.35  2007/08/15 05:33:23  brian
+ - GPLv3 updates
+
  Revision 0.9.2.34  2007/08/13 22:46:17  brian
  - GPLv3 header updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $"
+#ident "@(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/15 05:33:23 $"
 
 static char const ident[] =
-    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $";
+    "$RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/15 05:33:23 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -78,10 +81,10 @@ static char const ident[] =
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/13 22:46:17 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/15 05:33:23 $"
 #define STREAMS_DEVICE		"SVR 4.2 STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define STREAMS_LICENSE		"GPL v2"
+#define STREAMS_LICENSE		"GPL"
 #define STREAMS_BANNER		STREAMS_DESCRIP		"\n" \
 				STREAMS_COPYRIGHT	"\n" \
 				STREAMS_REVISION	"\n" \

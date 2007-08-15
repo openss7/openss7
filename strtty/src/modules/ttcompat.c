@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:04:36 $
+ @(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:04:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ttcompat.c,v $
+ Revision 0.9.2.7  2007/08/15 05:34:51  brian
+ - GPLv3 updates
+
  Revision 0.9.2.6  2007/08/14 03:04:36  brian
  - GPLv3 header update
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:04:36 $"
+#ident "@(#) $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:51 $"
 
 static char const ident[] =
-    "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:04:36 $";
+    "$RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:51 $";
 
 /*
  * Terminal compatibility module.  Provides ioctl inteface to user.  Provides
@@ -500,10 +503,10 @@ struct ltchars {
 
 #define TTCOMPAT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TTCOMPAT_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 03:04:36 $"
+#define TTCOMPAT_REVISION	"OpenSS7 $RCSfile: ttcompat.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:51 $"
 #define TTCOMPAT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (TTCOMPAT)"
 #define TTCOMPAT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TTCOMPAT_LICENSE	"GPL v2"
+#define TTCOMPAT_LICENSE	"GPL"
 #define TTCOMPAT_BANNER		TTCOMPAT_DESCRIP	"\n" \
 				TTCOMPAT_COPYRIGHT	"\n" \
 				TTCOMPAT_REVISION	"\n" \

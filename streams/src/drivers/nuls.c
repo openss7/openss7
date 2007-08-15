@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nuls.c,v $
+ Revision 0.9.2.57  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.56  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/08/15 05:33:21 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -79,10 +82,10 @@ static char const ident[] =
 
 #define NULS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NULS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.56 $) $Date: 2007/08/13 22:46:15 $"
+#define NULS_REVISION	"LfS $RCSfile: nuls.c,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/08/15 05:33:21 $"
 #define NULS_DEVICE	"SVR 4.2 STREAMS Null Stream (NULS) Device"
 #define NULS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NULS_LICENSE	"GPL v2"
+#define NULS_LICENSE	"GPL"
 #define NULS_BANNER	NULS_DESCRIP	"\n" \
 			NULS_COPYRIGHT	"\n" \
 			NULS_REVISION	"\n" \

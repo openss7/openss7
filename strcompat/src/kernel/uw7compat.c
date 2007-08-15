@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $
+ @(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: uw7compat.c,v $
+ Revision 0.9.2.28  2007/08/15 05:33:10  brian
+ - GPLv3 updates
+
  Revision 0.9.2.27  2007/08/12 15:51:19  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
+#ident "@(#) $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:10 $"
 
 static char const ident[] =
-    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $";
+    "$RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:10 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -89,10 +92,10 @@ static char const ident[] =
 
 #define UW7COMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define UW7COMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
+#define UW7COMP_REVISION	"LfS $RCSfile: uw7compat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:10 $"
 #define UW7COMP_DEVICE		"UnixWare(R) 7.1.3 Compatibility"
 #define UW7COMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define UW7COMP_LICENSE		"GPL v2"
+#define UW7COMP_LICENSE		"GPL"
 #define UW7COMP_BANNER		UW7COMP_DESCRIP		"\n" \
 				UW7COMP_COPYRIGHT	"\n" \
 				UW7COMP_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: log.c,v $
+ Revision 0.9.2.53  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.52  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/15 05:33:21 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -101,10 +104,10 @@ static char const ident[] =
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/13 22:46:15 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/15 05:33:21 $"
 #define LOG_DEVICE	"SVR 4.2 STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LOG_LICENSE	"GPL v2"
+#define LOG_LICENSE	"GPL"
 #define LOG_BANNER	LOG_DESCRIP	"\n" \
 			LOG_COPYRIGHT	"\n" \
 			LOG_REVISION	"\n" \

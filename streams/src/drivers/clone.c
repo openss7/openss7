@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/08/15 05:33:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.62  2007/08/15 05:33:20  brian
+ - GPLv3 updates
+
  Revision 0.9.2.61  2007/08/13 22:46:14  brian
  - GPLv3 header updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/08/15 05:33:20 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/08/15 05:33:20 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -96,10 +99,10 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.61 $) $Date: 2007/08/13 22:46:14 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.62 $) $Date: 2007/08/15 05:33:20 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CLONE_LICENSE	"GPL v2"
+#define CLONE_LICENSE	"GPL"
 #define CLONE_BANNER	CLONE_DESCRIP	"\n" \
 			CLONE_COPYRIGHT	"\n" \
 			CLONE_REVISION	"\n" \

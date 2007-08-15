@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/14 12:58:01 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/15 05:35:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: spx.c,v $
+ Revision 0.9.2.36  2007/08/15 05:35:01  brian
+ - GPLv3 updates
+
  Revision 0.9.2.35  2007/08/14 12:58:01  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/14 12:58:01 $"
+#ident "@(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/15 05:35:01 $"
 
 static char const ident[] =
-    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/14 12:58:01 $";
+    "$RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/15 05:35:01 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -71,10 +74,10 @@ static char const ident[] =
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.35 $) $Date: 2007/08/14 12:58:01 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/15 05:35:01 $"
 #define SPX_DEVICE	"SVR 4.2 STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SPX_LICENSE	"GPL v2"
+#define SPX_LICENSE	"GPL"
 #define SPX_BANNER	SPX_DESCRIP	"\n" \
 			SPX_COPYRIGHT	"\n" \
 			SPX_REVISION	"\n" \

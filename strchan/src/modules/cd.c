@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $
+ @(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd.c,v $
+ Revision 0.9.2.8  2007/08/15 05:32:58  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/14 06:47:36  brian
  - GPLv3 header update
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $"
+#ident "@(#) $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:58 $"
 
 static char const ident[] =
-    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $";
+    "$RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:58 $";
 
 /*
  *  This is a pushable STREAMS module that provides the High-Level Data Link
@@ -117,10 +120,10 @@ static char const ident[] =
 
 #define CD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMD FOR LINUX"
 #define CD_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:36 $"
+#define CD_REVISION	"OpenSS7 $RCSfile: cd.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:58 $"
 #define CD_DEVICE	"SVR 4.2 STREAMS Communications Device (CD)"
 #define CD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CD_LICENSE	"GPL v2"
+#define CD_LICENSE	"GPL"
 #define CD_BANNER	CD_DESCRIP	"\n" \
 			CD_COPYRIGHT	"\n" \
 			CD_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 06:47:37 $
+ @(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:32:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd_old.c,v $
+ Revision 0.9.2.16  2007/08/15 05:32:58  brian
+ - GPLv3 updates
+
  Revision 0.9.2.15  2007/08/14 06:47:37  brian
  - GPLv3 header update
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 06:47:37 $"
+#ident "@(#) $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:32:58 $"
 
 static char const ident[] =
-    "$RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 06:47:37 $";
+    "$RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:32:58 $";
 
 //#define EXPORT_SYMTAB
 
@@ -94,11 +97,11 @@ static char const ident[] =
 #include "cd/cd.h"
 
 #define HDLC_DESCRIP	"ISO 3309/4335 HDLC: (High-Level Data Link Control) STREAMS MODULE."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 06:47:37 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: cd_old.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:32:58 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICES	"Supports OpenSS7 Channel Drivers."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define HDLC_LICENSE	"GPL v2"
+#define HDLC_LICENSE	"GPL"
 #define HDLC_BANNER	HDLC_DESCRIP   "\n" \
 			HDLC_COPYRIGHT "\n" \
 			HDLC_DEVICES   "\n" \

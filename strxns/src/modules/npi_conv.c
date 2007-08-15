@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $
+ @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_conv.c,v $
+ Revision 0.9.2.5  2007/08/15 05:35:46  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 03:31:19  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $"
+#ident "@(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $"
 
 static char const ident[] =
-    "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $";
+    "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $";
 
 /*
  *  NPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -81,10 +84,10 @@ static char const ident[] =
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:19 $"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:46 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NPI_CONV_LICENSE	"GPL v2"
+#define NPI_CONV_LICENSE	"GPL"
 #define NPI_CONV_BANNER		NPI_CONV_DESCRIP	"\n" \
 				NPI_CONV_COPYRIGHT	"\n" \
 				NPI_CONV_REVISION	"\n" \

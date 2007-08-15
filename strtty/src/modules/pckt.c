@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $
+ @(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:34:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:04:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pckt.c,v $
+ Revision 0.9.2.8  2007/08/15 05:34:51  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/14 03:04:36  brian
  - GPLv3 header update
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $"
+#ident "@(#) $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:34:51 $"
 
 static char const ident[] =
-    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $";
+    "$RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:34:51 $";
 
 /*
  * This is the pckt(4) STREAMS module, a Packet Mode module to be pushed on the
@@ -244,7 +247,7 @@ static char const ident[] =
  *	[6] XBD Issue 5, X/Open System Interface Definitions, Open Group, Open
  *	    Group Publication.  <http://www.opengroup.org/onlinepubs/>
  *
- *	[7] SUS Version 2, Single UNIX Specification, Open Group, Open Group
+ *	[7] SUS Issue 2, Single UNIX Specification, Open Group, Open Group
  *	    Publication.  <http://www.opengroup.org/onlinepubs/>
  *
  *	[8] SUS Version 3, Single UNIX Specification, Open Group, Open Group
@@ -258,10 +261,10 @@ static char const ident[] =
 
 #define PCKT_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PCKT_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 03:04:36 $"
+#define PCKT_REVISION		"OpenSS7 $RCSfile: pckt.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:34:51 $"
 #define PCKT_DEVICE		"SVR 4.2 STREAMS Packet Mode Module (PCKT)"
 #define PCKT_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define PCKT_LICENSE		"GPL v2"
+#define PCKT_LICENSE		"GPL"
 #define PCKT_BANNER		PCKT_DESCRIP	"\n" \
 				PCKT_COPYRIGHT	"\n" \
 				PCKT_REVISION	"\n" \

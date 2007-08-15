@@ -1,3 +1,34 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/drivers/clone.c: GPLv3 updates
+	* src/drivers/echo.c: GPLv3 updates
+	* src/drivers/fifo.c: GPLv3 updates
+	* src/drivers/log.c: GPLv3 updates
+	* src/drivers/nsdev.c: GPLv3 updates
+	* src/drivers/nuls.c: GPLv3 updates
+	* src/drivers/pipe.c: GPLv3 updates
+	* src/drivers/sad.c: GPLv3 updates
+	* src/drivers/sfx.c: GPLv3 updates
+	* src/drivers/spx.c: GPLv3 updates
+	* src/modules/connld.c: GPLv3 updates
+	* src/modules/pipemod.c: GPLv3 updates
+	* src/modules/sc.c: GPLv3 updates
+	* src/test/test-clone.c: GPLv3 updates
+	* src/test/test-connld.c: GPLv3 updates
+	* src/test/test-echo.c: GPLv3 updates
+	* src/test/test-fifo.c: GPLv3 updates
+	* src/test/test-log.c: GPLv3 updates
+	* src/test/test-nsdev.c: GPLv3 updates
+	* src/test/test-nuls.c: GPLv3 updates
+	* src/test/test-pipe.c: GPLv3 updates
+	* src/test/test-pipemod.c: GPLv3 updates
+	* src/test/test-sad.c: GPLv3 updates
+	* src/test/test-sc.c: GPLv3 updates
+	* src/test/test-streams.c: GPLv3 updates
+	* src/util/strace.c: GPLv3 updates
+
 2007-08-14  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: GPLv3 header updates

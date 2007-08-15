@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nsdev.c,v $
+ Revision 0.9.2.49  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.48  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/15 05:33:21 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -79,10 +82,10 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/13 22:46:15 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/15 05:33:21 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NSDEV_LICENSE	"GPL v2"
+#define NSDEV_LICENSE	"GPL"
 #define NSDEV_BANNER	NSDEV_DESCRIP	"\n" \
 			NSDEV_COPYRIGHT	"\n" \
 			NSDEV_REVISION	"\n" \

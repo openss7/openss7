@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:00:55 $
+ @(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 04:00:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpi_conv.c,v $
+ Revision 0.9.2.5  2007/08/15 05:35:34  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 04:00:55  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:00:55 $"
+#ident "@(#) $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:34 $"
 
 static char const ident[] =
-    "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:00:55 $";
+    "$RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:34 $";
 
 /*
  *  TPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -84,10 +87,10 @@ static char const ident[] =
 
 #define TPI_CONV_DESCRIP	"TPI ENDIAN CONVERSION (TPI-CONV) FOR LINUX FAST-STREAMS"
 #define TPI_CONV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 04:00:55 $"
+#define TPI_CONV_REVISION	"OpenSS7 $RCSfile: tpi_conv.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:34 $"
 #define TPI_CONV_DEVICE		"SVR 4.2 TPI Endian Conversion (TPI-CONV) for STREAMS"
 #define TPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TPI_CONV_LICENSE	"GPL v2"
+#define TPI_CONV_LICENSE	"GPL"
 #define TPI_CONV_BANNER		TPI_CONV_DESCRIP	"\n" \
 				TPI_CONV_COPYRIGHT	"\n" \
 				TPI_CONV_REVISION	"\n" \

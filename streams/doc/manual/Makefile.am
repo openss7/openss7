@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.53 $) $Date: 2007/08/13 22:45:59 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/08/15 05:33:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:45:59 $ by $Author: brian $
+# Last Modified $Date: 2007/08/15 05:33:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,10 +73,10 @@ STREAMS_TEXINFOS	= \
 			  utilities.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
-			  texi/lesser.texi \
+			  texi/lgpl3.texi \
 			  texi/testsuite.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -85,7 +85,7 @@ STREAMS_TEXINFOS	= \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 STREAMS_FAQ_TEXINFOS	= \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -93,21 +93,21 @@ STREAMS_FAQ_TEXINFOS	= \
 
 
 SPG2_TEXINFOS		= \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 SPG_TEXINFOS		= \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
 
 porting_TEXINFOS	= \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/fdl.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
@@ -210,6 +210,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.54  2007/08/15 05:33:18  brian
+# - GPLv3 updates
+#
 # Revision 0.9.2.53  2007/08/13 22:45:59  brian
 # - GPLv3 header updates
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $
+ @(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:05:03 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clns.c,v $
+ Revision 0.9.2.16  2007/08/15 05:34:18  brian
+ - GPLv3 updates
+
  Revision 0.9.2.15  2007/08/14 07:05:03  brian
  - GNUv3 header update
 
@@ -122,10 +125,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
+#ident "@(#) $RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $"
 
 static char const ident[] =
-    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $";
+    "$RCSfile: clns.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $";
 
 /*
  *  This is an X.233 CLNS driver.
@@ -216,10 +219,10 @@ static char const ident[] =
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define CLNS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.15 $) $Date: 2007/08/14 07:05:03 $"
+#define CLNS_REVISION	"OpenSS7 $RCSfile: clns.c,v $ $Name:  $ ($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:34:18 $"
 #define CLNS_DEVICE	"SVR 4.2 STREAMS CLNS OSI Network Provider"
 #define CLNS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CLNS_LICENSE	"GPL v2"
+#define CLNS_LICENSE	"GPL"
 #define CLNS_BANNER	CLNS_DESCRIP	"\n" \
 			CLNS_EXTRA	"\n" \
 			CLNS_COPYRIGHT	"\n" \

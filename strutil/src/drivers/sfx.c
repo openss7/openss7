@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/14 12:58:01 $
+ @(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/15 05:35:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sfx.c,v $
+ Revision 0.9.2.33  2007/08/15 05:35:01  brian
+ - GPLv3 updates
+
  Revision 0.9.2.32  2007/08/14 12:58:01  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/14 12:58:01 $"
+#ident "@(#) $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/15 05:35:01 $"
 
 static char const ident[] =
-    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/14 12:58:01 $";
+    "$RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/15 05:35:01 $";
 
 #define _LFS_SOURCE
 #include <sys/os7/compat.h>
@@ -75,10 +78,10 @@ extern struct file_operations strm_f_ops;
 
 #define SFX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SFX_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/14 12:58:01 $"
+#define SFX_REVISION	"LfS $RCSfile: sfx.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/15 05:35:01 $"
 #define SFX_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define SFX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SFX_LICENSE	"GPL v2"
+#define SFX_LICENSE	"GPL"
 #define SFX_BANNER	SFX_DESCRIP	"\n" \
 			SFX_COPYRIGHT	"\n" \
 			SFX_REVISION	"\n" \

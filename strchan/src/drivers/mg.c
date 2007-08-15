@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:28 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 0.9.2.8  2007/08/15 05:32:54  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/14 06:47:28  brian
  - GPLv3 header update
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:28 $"
+#ident "@(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:54 $"
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:28 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:54 $";
 
 #include <sys/os7/compat.h>
 
@@ -97,11 +100,11 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:28 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:54 $"
 #define MG_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MG_LICENSE	"GPL v2"
+#define MG_LICENSE	"GPL"
 #define MG_BANNER	MG_DESCRIP	"\n" \
 			MG_REVISION	"\n" \
 			MG_COPYRIGHT	"\n" \

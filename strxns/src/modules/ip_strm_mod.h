@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ip_strm_mod.h,v 0.9.2.4 2007/08/14 03:31:19 brian Exp $
+ @(#) $Id: ip_strm_mod.h,v 0.9.2.5 2007/08/15 05:35:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.h,v $
+ Revision 0.9.2.5  2007/08/15 05:35:46  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 03:31:19  brian
  - GPLv3 header update
 
@@ -61,26 +64,7 @@
 #ifndef __LOCAL_IP_STRM_MOD_H__
 #define __LOCAL_IP_STRM_MOD_H__
 
-#ident "@(#) $RCSfile: ip_strm_mod.h,v $ $Name:  $($Revision: 0.9.2.4 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
-
-/*
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- * 
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
- * MA 02139, USA.
- * 
- */
+#ident "@(#) $RCSfile: ip_strm_mod.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #if defined(__KERNEL__)
 

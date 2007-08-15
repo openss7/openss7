@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 03:31:08 $
+ @(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:08 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_to_dlpi.c,v $
+ Revision 0.9.2.31  2007/08/15 05:35:42  brian
+ - GPLv3 updates
+
  Revision 0.9.2.30  2007/08/14 03:31:08  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 03:31:08 $"
+#ident "@(#) $RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $"
 
 static char const ident[] =
-    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 03:31:08 $";
+    "$RCSfile: ip_to_dlpi.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $";
 
 #include <sys/os7/compat.h>
 
@@ -80,10 +83,10 @@ static char const ident[] =
 #define IP2XINET_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP2XINET_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP2XINET_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation. All Rights Reserved."
-#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.30 $) $Date: 2007/08/14 03:31:08 $"
+#define IP2XINET_REVISION	"LfS $RCSfile: ip_to_dlpi.c,v $ $Name:  $ ($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:42 $"
 #define IP2XINET_DEVICE		"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define IP2XINET_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define IP2XINET_LICENSE	"GPL v2"
+#define IP2XINET_LICENSE	"GPL"
 #define IP2XINET_BANNER		IP2XINET_DESCRIP	"\n" \
 				IP2XINET_EXTRA		"\n" \
 				IP2XINET_REVISION	"\n" \
@@ -180,21 +183,6 @@ STATIC struct streamtab ip2xinet_info = {
  *
  *  Copyright (C)  1998-2003 The Software Group Limited.
  *
- *  This library is free software; you can redistribute it and/or
- *  modify it under the terms of the GNU Library General Public
- *  License as published by the Free Software Foundation; either
- *  version 2 of the License, or (at your option) any later version.
- * 
- *  This library is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *  Library General Public License for more details.
- * 
- *  You should have received a copy of the GNU Library General Public
- *  License along with this library; if not, write to the
- *  Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
- *  MA 02139, USA.
- * 
  *************************************************************************/
 
 /*

@@ -1,5 +1,5 @@
-OpenSS7 XNS Networking -- read me first file.  2007-08-12
-$Id: README,v 0.9.2.34 2007/08/14 03:30:49 brian Exp $
+OpenSS7 XNS Networking -- read me first file.  2007-08-14
+$Id: README,v 0.9.2.35 2007/08/15 05:35:36 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -7,7 +7,7 @@ See the end for copying conditions (for this file).
  OpenSS7 XNS Networking
 =======================
 
-Package strxns-0.9.2.7 was released under GPLv2 2007-08-12.
+Package strxns-0.9.2.7 was released under GPLv2 2007-08-14.
 
 The `OpenSS7 XNS Networking' package is an implementation of X/Open
 Network Services (XNS 5.2) for Linux Fast-STREAMS and provides OSI
@@ -22,8 +22,8 @@ The package contains the following standard `Open Systems Interconnect
 (OSI)' conforming header files:
 
      - `<sys/cdi.h>' `Communications Device Interface'
-     - `<sys/dlpi.h>' `Data Link Provider Interface Version 2.0.0'
-     - `<sys/npi.h>' `Network Provider Interface Version 2.0.0'
+     - `<sys/dlpi.h>' `Data Link Provider Interface Revision 2.0.0'
+     - `<sys/npi.h>' `Network Provider Interface Revision 2.0.0'
 
 Note that the `Transport Provider Interface (TPI)' header files are
 contained in the `strxnet' package.
@@ -43,7 +43,7 @@ and drivers:
      subsequently modified by Dave Grothe and later by Brian Bidulock
      of The OpenSS7 Project (http://www.openss7.org/).  It is
      distributed under the terms of the `GNU Public License (GPL)
-     Version 2'.
+     Version 3'.
 
 `ip2xnet(4)'
      The `ip2xnet(4)' driver attempts the reverse: to take a STREAMS
@@ -55,7 +55,7 @@ and drivers:
      (http://www.openss7.org/).  It was originally distributed under
      the terms of the `LGPL', but is distributed by `The OpenSS7
      Project' under the terms of the `GNU Public License (GPL) Version
-     2'.
+     3'.
 
 `ip_strms(4)'
      The `ip_strms(4)' module is similar to the `ip2xnet(4)' driver,
@@ -68,7 +68,7 @@ and drivers:
      (http://www.openss7.org/).  It was originally distributed under
      the terms of the `LGPL', but is distributed by `The OpenSS7
      Project' under the terms of the `GNU Public License (GPL) Version
-     2'.
+     3'.
 
 `np_ip(4)'
      The `np_ip(4)' driver provides a "Network Service Provider" using
@@ -92,7 +92,7 @@ well.
  Release
 --------
 
-This is the `strxns-0.9.2.7' package, released 2007-08-12.  This
+This is the `strxns-0.9.2.7' package, released 2007-08-14.  This
 `0.9.2.7' release, and the latest version, can be obtained from the
 download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
