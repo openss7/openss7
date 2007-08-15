@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:11 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:34:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:14:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.5  2007/08/15 05:14:12  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 08:34:11  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:11 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:11 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $";
 
 /*
  *  This is the AS side of TUA implemented as a pushable module that pushes over an SCTP NPI
@@ -93,11 +96,11 @@ static char const ident[] =
 #include <sys/tpi_tcap.h>
 
 #define TUA_AS_DESCRIP		"TUA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:11 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TUA_AS_LICENSE		"GPL v2"
+#define TUA_AS_LICENSE		"GPL"
 #define TUA_AS_BANNER		TUA_AS_DESCRIP		"\n" \
 				TUA_AS_REVISION		"\n" \
 				TUA_AS_COPYRIGHT	"\n" \

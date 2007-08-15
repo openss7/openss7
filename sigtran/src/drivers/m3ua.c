@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:53 $
+ @(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:13:48 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:33:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:13:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua.c,v $
+ Revision 0.9.2.7  2007/08/15 05:13:48  brian
+ - GPLv3 updates
+
  Revision 0.9.2.6  2007/08/14 08:33:53  brian
  - GPLv3 header update
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:53 $"
+#ident "@(#) $RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:13:48 $"
 
 static char const ident[] =
-    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:53 $";
+    "$RCSfile: m3ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:13:48 $";
 
 #include <sys/os7/compat.h>
 
@@ -98,11 +101,11 @@ static char const ident[] =
  */
 
 #define M3UA_DESCRIP	"M3UA STREAMS MULTIPLEXING DRIVER."
-#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.6 $) $Date: 2007/08/14 08:33:53 $"
+#define M3UA_REVISION	"OpenSS7 $RCSfile: m3ua.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:13:48 $"
 #define M3UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corp.  All Rights Reserved."
 #define M3UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define M3UA_LICENSE	"GPL v2"
+#define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
 			M3UA_REVISION	"\n" \
 			M3UA_COPYRIGHT	"\n" \

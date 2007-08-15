@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $
+ @(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:33:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:13:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tali.c,v $
+ Revision 0.9.2.8  2007/08/15 05:13:57  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/14 08:33:55  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $"
+#ident "@(#) $RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:57 $"
 
 static char const ident[] =
-    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $";
+    "$RCSfile: tali.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:57 $";
 
 #include <sys/os7/compat.h>
 
@@ -76,11 +79,11 @@ static char const ident[] =
 
 #define TALI_DESCRIP	"TALI STREAMS MULTIPLEXING DRIVER." "\n" \
 			"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:55 $"
+#define TALI_REVISION	"OpenSS7 $RCSfile: tali.c,v $ $Name:  $ ($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:57 $"
 #define TALI_COPYRIGHT	"Copyright (c) 1997-2004 OpenSS7 Corporation.  All Rights Reserved."
 #define TALI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TALI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define TALI_LICENSE	"GPL v2"
+#define TALI_LICENSE	"GPL"
 #define TALI_BANNER	TALI_DESCRIP	"\n" \
 			TALI_REVISION	"\n" \
 			TALI_COPYRIGHT	"\n" \

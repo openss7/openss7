@@ -1,5 +1,5 @@
-OpenSS7 STREAMS SIGTRAN -- history of user visible changes.  2007-08-13
-$Id: NEWS,v 0.9.2.19 2007/08/14 08:33:17 brian Exp $
+OpenSS7 STREAMS SIGTRAN -- history of user visible changes.  2007-08-14
+$Id: NEWS,v 0.9.2.20 2007/08/15 05:13:33 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -37,8 +37,32 @@ Major features since the last public release are as follows:
 
    - Minor documentation corrections.
 
-   - Made kernel modules license explicit GPL v2.
+   - Kernel module license made explicit "GPL v2".  And then changed
+     back to "GPL".
 
+   - Licence upgrade to GPL Version 3.
+
+
+_This is a public stable production grade release of the package: it
+deprecates previous releases.  Please upgrade to the current release
+before reporting bugs._
+
+As with other OpenSS7 releases, this release configures, compiles,
+installs and builds RPMs and DEBs for a wide range of Linux 2.4 and 2.6
+RPM- and DPKG-based distributions, and can be used on production
+kernels without patching or recompiling the kernel.
+
+This package is publicly released under the `GNU General Public License
+Version 3'.  The release is available as an `autoconf' tarball, SRPM,
+DSC, and set of binary RPMs and DEBs.  See the downloads page
+(http://www.openss7.org/download.html) for the `autoconf' tarballs,
+SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
+see the sigtran package page (http://www.openss7.org/sigtran_pkg.html).
+
+See `http://www.openss7.org/codefiles/sigtran-0.9.2.4/ChangeLog' and
+`http://www.openss7.org/codefiles/sigtran-0.9.2.4/NEWS' in the release
+for more information.  Also, see the `sigtran.pdf' manual in the
+release (also in html `http://www.openss7.org/sigtran_manual.html').
 
  Major changes for release sigtran-0.9.2.3
 ------------------------------------------

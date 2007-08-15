@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $
+ @(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:10 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:34:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:14:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_dl.c,v $
+ Revision 0.9.2.5  2007/08/15 05:14:10  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 08:34:10  brian
  - GPLv3 header update
 
@@ -64,19 +67,19 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $"
+#ident "@(#) $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:10 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $";
+    "$RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:10 $";
 
 #include <sys/os7/compat.h>
 
 #define M2PA_DL_DESCRIP		"M2PA/SCTP SS7 DATA LINK (DL) STREAMS MODULE"
-#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 08:34:10 $"
+#define M2PA_DL_REVISION	"OpenSS7 $RCSfile: m2pa_dl.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:10 $"
 #define M2PA_DL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_DL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS"
 #define M2PA_DL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define M2PA_DL_LICENSE		"GPL v2"
+#define M2PA_DL_LICENSE		"GPL"
 #define M2PA_DL_BANNER		M2PA_DL_DESCRIP		"\n" \
 				M2PA_DL_REVISION	"\n" \
 				M2PA_DL_COPYRIGHT	"\n" \

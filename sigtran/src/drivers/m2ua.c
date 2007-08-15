@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $
+ @(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:33:50 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:13:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua.c,v $
+ Revision 0.9.2.8  2007/08/15 05:13:38  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/14 08:33:50  brian
  - GPLv3 header update
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $"
+#ident "@(#) $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:38 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $";
+    "$RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:38 $";
 
 #define _LFS_SOURCE 1
 
@@ -102,11 +105,11 @@ static char const ident[] =
 #include <sys/xti_sctp.h>
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 08:33:50 $"
+#define M2UA_REVISION	"LfS $RCSfile: m2ua.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:13:38 $"
 #define M2UA_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define M2UA_LICENSE	"GPL v2"
+#define M2UA_LICENSE	"GPL"
 #define M2UA_BANNER	M2UA_DESCRIP	"\n" \
 			M2UA_REVISION	"\n" \
 			M2UA_COPYRIGHT	"\n" \

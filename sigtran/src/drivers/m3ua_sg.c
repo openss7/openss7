@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:33:54 $
+ @(#) $RCSfile: m3ua_sg.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:13:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 08:33:54 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:13:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_sg.c,v $
+ Revision 0.9.2.9  2007/08/15 05:13:53  brian
+ - GPLv3 updates
+
  Revision 0.9.2.8  2007/08/14 08:33:54  brian
  - GPLv3 header update
 
@@ -121,7 +124,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 08:33:54 $";
+static char const ident[] = "$Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/15 05:13:53 $";
 
 #include <sys/os7/compat.h>
 
@@ -132,7 +135,7 @@ static char const ident[] = "$Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/14 0
 #define M3UA_COPYRIGHT	"Copyright (c) 2001 OpenSS7 Corp. All Rights Reserved."
 #define M3UA_DEVICES	"Supports OpenSS7 drivers."
 #define M3UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define M3UA_LICENSE	"GPL v2"
+#define M3UA_LICENSE	"GPL"
 #define M3UA_BANNER	M3UA_DESCRIP	"\n" \
 			M3UA_COPYRIGHT	"\n" \
 			M3UA_DEVICES	"\n" \

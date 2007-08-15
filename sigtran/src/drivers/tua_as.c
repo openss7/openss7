@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/12 16:15:28 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:15:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:13:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.11  2007/08/15 05:13:57  brian
+ - GPLv3 updates
+
  Revision 0.9.2.10  2007/08/12 16:15:28  brian
  -
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/12 16:15:28 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/12 16:15:28 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>
@@ -156,11 +159,11 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/08/12 16:15:28 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TUA_AS_LICENSE		"GPL v2"
+#define TUA_AS_LICENSE		"GPL"
 #define UA_AS_BANNER		TUA_AS_DESCRIP		"\n" \
 				TUA_AS_REVISION		"\n" \
 				TUA_AS_COPYRIGHT	"\n" \
