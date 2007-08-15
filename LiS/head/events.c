@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: events.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: events.c,v $
+ Revision 1.1.1.1.12.4  2007/08/14 10:47:00  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: events.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:00 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: events.c,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:00 $";
 
 /*                               -*- Mode: C -*- 
  * events.c --- streams events
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: events.c,v 1.3 1996/01/10 16:48:04 dave Exp $
+ * RCS Id          : $Id: events.c,v 1.1.1.1.12.4 2007/08/14 10:47:00 brian Exp $
  * Purpose         : provide streams events
  *                 : 
  * ----------------______________________________________________

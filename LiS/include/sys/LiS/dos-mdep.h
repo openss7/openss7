@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: dos-mdep.h,v 1.1.1.2.4.3 2007/08/14 10:47:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: dos-mdep.h,v $
+ Revision 1.1.1.2.4.3  2007/08/14 10:47:09  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 #ifndef __SYS_LIS_DOS_MDEP_H__
 #define __SYS_LIS_DOS_MDEP_H__
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: dos-mdep.h,v $ $Name:  $($Revision: 1.1.1.2.4.3 $) $Date: 2007/08/14 10:47:09 $"
 
 /*                               -*- Mode: C -*- 
  * dos-mdep.c --- Testing environment for LiS under MS-Dog.
@@ -64,7 +67,7 @@
  * Last Modified By: Francisco J. Ballesteros
  * Last Modified On: Fri Sep 29 13:25:04 1995
  * Update Count    : 5
- * RCS Id          : $Id: dos-mdep.h,v 1.2 1996/01/20 17:01:57 dave Exp $
+ * RCS Id          : $Id: dos-mdep.h,v 1.1.1.2.4.3 2007/08/14 10:47:09 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) incomplete,untested,compiled

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: events.h,v 1.1.1.1.12.5 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: events.h,v $
+ Revision 1.1.1.1.12.5  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: Francisco J. Ballesteros
  * Last Modified On: Tue Sep 26 15:20:42 1995
  * Update Count    : 2
- * RCS Id          : $Id: events.h,v 1.3 1996/01/27 00:40:25 dave Exp $
+ * RCS Id          : $Id: events.h,v 1.1.1.1.12.5 2007/08/14 10:47:10 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) complete, untested, compiled
@@ -79,7 +82,7 @@
 #ifndef _EVENTS_H
 #define _EVENTS_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: events.h,v $ $Name:  $($Revision: 1.1.1.1.12.5 $) $Date: 2007/08/14 10:47:10 $"
 
 #ifndef _SYS_TYPES_H
 #if	defined(LINUX)

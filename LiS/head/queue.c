@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2007/08/14 10:47:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: queue.c,v $
+ Revision 1.1.1.5.4.8  2007/08/14 10:47:02  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.6 $) $Date: 2005/12/19 03:22:19 $"
+#ident "@(#) $RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2007/08/14 10:47:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: queue.c,v $ $Name:  $($Revision: 1.1.1.5.4.8 $) $Date: 2007/08/14 10:47:02 $";
 
 /*                               -*- Mode: C -*- 
  * queue.c --- streams statistics
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: queue.c,v 1.1.1.5.4.6 2005/12/19 03:22:19 brian Exp $
+ * RCS Id          : $Id: queue.c,v 1.1.1.5.4.8 2007/08/14 10:47:02 brian Exp $
  * Purpose         : provide some queue for LiS
  * ----------------______________________________________________
  *

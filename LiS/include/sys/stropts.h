@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: stropts.h,v 1.1.1.3.4.10 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: stropts.h,v $
+ Revision 1.1.1.3.4.10  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
  * <stropts> --- STREAMS ops.
  * Author          : gram & nemo
  * Created On      : Mon Oct 17 11:37:12 1994
- * RCS Id          ; $Id: stropts.h,v 1.1.1.3.4.2 2005/04/12 22:45:21 brian Exp $
+ * RCS Id          ; $Id: stropts.h,v 1.1.1.3.4.10 2007/08/14 10:47:08 brian Exp $
  * Last Modified By: David Grothe
  *                 :
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros
@@ -70,7 +73,7 @@
 #define _SYS_STROPTS_H
 #define	_LIS_SYS_STROPTS_H	/**< So you can tell which stropts.h you got. */
 
-#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.3.4.2 $) $Date: 2005/04/12 22:45:21 $"
+#ident "@(#) $RCSfile: stropts.h,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2007/08/14 10:47:08 $"
 
 /* This file can be processed with doxygen(1). */
 

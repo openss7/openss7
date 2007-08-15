@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strport.h,v 1.1.1.3.4.8 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,18 +45,21 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strport.h,v $
+ Revision 1.1.1.3.4.8  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
  * <strport.h> --- Linux STREAMS portability declarations. 
  * Author          : gram & nemo
  * Created On      : Fri Mar 24 2:40:21 1995
- * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.5 2005/12/19 03:22:21 brian Exp $
+ * RCS Id          ; $Id: strport.h,v 1.1.1.3.4.8 2007/08/14 10:47:08 brian Exp $
  * Last Modified By: David Grothe
  * Restrictions    : SHAREd items can be read/writen by usr
  *                 : EXPORTed items can only be read by usr
@@ -76,7 +79,7 @@
 #ifndef _STRPORT_H
 #define _STRPORT_H
 
-#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/12/19 03:22:21 $"
+#ident "@(#) $RCSfile: strport.h,v $ $Name:  $($Revision: 1.1.1.3.4.8 $) $Date: 2007/08/14 10:47:08 $"
 
 /*  *******************************************************************  */
 /*                               Dependencies                            */

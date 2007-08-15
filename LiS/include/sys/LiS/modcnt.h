@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: modcnt.h,v 1.1.1.1.4.5 2007/08/14 10:47:10 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: modcnt.h,v $
+ Revision 1.1.1.1.4.5  2007/08/14 10:47:10  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 #ifndef LIS_MODCNT_H
 #define LIS_MODCNT_H	1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: modcnt.h,v $ $Name:  $($Revision: 1.1.1.1.4.5 $) $Date: 2007/08/14 10:47:10 $"
 
 /*
  *  This file is intended to address the different situations for which

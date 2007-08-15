@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.17 $) $Date: 2007/08/15 04:58:06 $
 
  -----------------------------------------------------------------------------
 
@@ -45,26 +45,29 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:58:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: head.c,v $
+ Revision 1.1.1.12.4.17  2007/08/15 04:58:06  brian
+ - GPLv3 updates
+
  Revision 1.1.1.12.4.13  2006/02/20 11:38:47  brian
  - corrections for some 64bit architectures, from patches
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.13 $) $Date: 2006/02/20 11:38:47 $"
+#ident "@(#) $RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.17 $) $Date: 2007/08/15 04:58:06 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: head.c,v $ $Name:  $($Revision: 1.1.1.12.4.17 $) $Date: 2007/08/15 04:58:06 $";
 
 /*                               -*- Mode: C -*- 
  * head.c --- LiS stream head processing
  * Author          : Graham Wheeler, Francisco J. Ballesteros
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: John A. Boyd Jr.
- * RCS Id          : $Id: head.c,v 1.1.1.12.4.13 2006/02/20 11:38:47 brian Exp $
+ * RCS Id          : $Id: head.c,v 1.1.1.12.4.17 2007/08/15 04:58:06 brian Exp $
  * Purpose         : stream head processing stuff
  * ----------------______________________________________________
  *

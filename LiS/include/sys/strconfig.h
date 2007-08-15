@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: strconfig.h,v 1.1.1.3.4.6 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strconfig.h,v $
+ Revision 1.1.1.3.4.6  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -57,7 +60,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: strconfig.h,v 1.3 1996/01/07 20:48:32 dave Exp $
+ * RCS Id          : $Id: strconfig.h,v 1.1.1.3.4.6 2007/08/14 10:47:08 brian Exp $
  * Purpose         : just document symbols
  * ----------------______________________________________________
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros
@@ -70,7 +73,7 @@
 #ifndef _LIS_CONFIG_H
 #define _LIS_CONFIG_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strconfig.h,v $ $Name:  $($Revision: 1.1.1.3.4.6 $) $Date: 2007/08/14 10:47:08 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */

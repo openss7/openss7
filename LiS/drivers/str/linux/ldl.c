@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2007/08/15 04:58:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:58:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ldl.c,v $
+ Revision 1.1.1.5.4.10  2007/08/15 04:58:02  brian
+ - GPLv3 updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2007/08/15 04:58:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2007/08/15 04:58:02 $";
 
 /* 
  *  ldl: Yet another unfinished DLPI driver

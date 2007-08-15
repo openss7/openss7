@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: stats.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2007/08/14 10:47:02 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: stats.c,v $
+ Revision 1.1.1.2.4.4  2007/08/14 10:47:02  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: stats.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2007/08/14 10:47:02 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: stats.c,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2007/08/14 10:47:02 $";
 
 /*                               -*- Mode: C -*- 
  * stats.c --- streams statistics
  * Author          : Graham Wheeler
  * Created On      : Tue May 31 22:25:19 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: stats.c,v 1.1 1995/12/19 15:50:04 dave Exp $
+ * RCS Id          : $Id: stats.c,v 1.1.1.2.4.4 2007/08/14 10:47:02 brian Exp $
  * Purpose         : provide some stats for LiS
  * ----------------______________________________________________
  *

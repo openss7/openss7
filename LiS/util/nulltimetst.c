@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.6 $) $Date: 2007/08/14 10:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: nulltimetst.c,v $
+ Revision 1.1.1.1.12.6  2007/08/14 10:47:24  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/07/18 11:51:27 $"
+#ident "@(#) $RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.6 $) $Date: 2007/08/14 10:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/07/18 11:51:27 $";
+    "$RCSfile: nulltimetst.c,v $ $Name:  $($Revision: 1.1.1.1.12.6 $) $Date: 2007/08/14 10:47:24 $";
 
 #define	inline			/* make disappear */
 

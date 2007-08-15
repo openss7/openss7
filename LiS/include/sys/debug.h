@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: debug.h,v 1.1.1.1.12.4 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: debug.h,v $
+ Revision 1.1.1.1.12.4  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -59,7 +62,7 @@
  * Last Modified By: 
  * Last Modified On: 
  * Update Count    : 0
- * RCS Id          : $Id: debug.h,v 1.1 1995/12/19 15:52:08 dave Exp $
+ * RCS Id          : $Id: debug.h,v 1.1.1.1.12.4 2007/08/14 10:47:08 brian Exp $
  * Usage           : see below :)
  * Required        : see below :)
  * Status          : ($State: Exp $) Unknown, Use with caution!
@@ -75,7 +78,7 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: debug.h,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:08 $"
 
 /* This file has to be updated with the Linux counterpart of SVR4 <sys/debug.h>
  * header file. 

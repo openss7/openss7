@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2007/08/14 10:47:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fdetach.c,v $
+ Revision 1.1.1.1.12.7  2007/08/14 10:47:33  brian
+ - GPLv3 header update
+
  Revision 1.1.1.1.12.3  2005/05/14 08:35:15  brian
  - copyright header correction
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:15 $"
+#ident "@(#) $RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2007/08/14 10:47:33 $"
 
 static char const ident[] =
-    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.3 $) $Date: 2005/05/14 08:35:15 $";
+    "$RCSfile: fdetach.c,v $ $Name:  $($Revision: 1.1.1.1.12.7 $) $Date: 2007/08/14 10:47:33 $";
 
 /*
  *  fdetach.c - try to fdetach a list of paths.

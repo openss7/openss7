@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2007/08/14 10:47:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: putpmsg.c,v $
+ Revision 1.1.1.3.4.10  2007/08/14 10:47:13  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:27 $"
+#ident "@(#) $RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2007/08/14 10:47:13 $"
 
 static char const ident[] =
-    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2005/07/18 11:51:27 $";
+    "$RCSfile: putpmsg.c,v $ $Name:  $($Revision: 1.1.1.3.4.10 $) $Date: 2007/08/14 10:47:13 $";
 
 /* This file can be processed with doxygen(1). */
 

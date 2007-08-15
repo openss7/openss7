@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 1.1.1.2.12.8 $) $Date: 2007/08/14 10:47:13 $
 
  -----------------------------------------------------------------------------
 
@@ -45,17 +45,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: isastream.c,v $
+ Revision 1.1.1.2.12.8  2007/08/14 10:47:13  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 1.1.1.2.12.2 $) $Date: 2005/04/12 22:45:29 $"
+#ident "@(#) $RCSfile: isastream.c,v $ $Name:  $($Revision: 1.1.1.2.12.8 $) $Date: 2007/08/14 10:47:13 $"
 
 static char const ident[] =
-    "$RCSfile: isastream.c,v $ $Name:  $($Revision: 1.1.1.2.12.2 $) $Date: 2005/04/12 22:45:29 $";
+    "$RCSfile: isastream.c,v $ $Name:  $($Revision: 1.1.1.2.12.8 $) $Date: 2007/08/14 10:47:13 $";
 
 /* This file can be processed with doxygen(1). */
 

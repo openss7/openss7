@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: buffcall.h,v 1.1.1.2.4.7 2007/08/14 10:47:09 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: buffcall.h,v $
+ Revision 1.1.1.2.4.7  2007/08/14 10:47:09  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -57,7 +60,7 @@
  * Author          : Francisco J. Ballesteros & Graham Wheeler
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: buffcall.h,v 1.1.1.2.4.4 2005/12/18 05:41:24 brian Exp $
+ * RCS Id          : $Id: buffcall.h,v 1.1.1.2.4.7 2007/08/14 10:47:09 brian Exp $
  * ----------------______________________________________________
  *
  *    Copyright (C) 1995  Graham Wheeler, Francisco J. Ballesteros,
@@ -71,7 +74,7 @@
 #ifndef _BUFFCALL_H
 #define _BUFFCALL_H 1
 
-#ident "@(#) $RCSfile: buffcall.h,v $ $Name:  $($Revision: 1.1.1.2.4.4 $) $Date: 2005/12/18 05:41:24 $"
+#ident "@(#) $RCSfile: buffcall.h,v $ $Name:  $($Revision: 1.1.1.2.4.7 $) $Date: 2007/08/14 10:47:09 $"
 
 /*  -------------------------------------------------------------------  */
 /*				 Dependencies                            */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id$
+ @(#) $Id: cred.h,v 1.1.1.1.12.4 2007/08/14 10:47:08 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: cred.h,v $
+ Revision 1.1.1.1.12.4  2007/08/14 10:47:08  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
 /*                               -*- Mode: C -*- 
@@ -57,7 +60,7 @@
  * Author          : Francisco J. Ballesteros
  * Created On      : Tue May 31 21:40:37 1994
  * Last Modified By: David Grothe
- * RCS Id          : $Id: cred.h,v 1.2 1996/01/27 00:39:49 dave Exp $
+ * RCS Id          : $Id: cred.h,v 1.1.1.1.12.4 2007/08/14 10:47:08 brian Exp $
  * Purpose         : provide user credentials
  *
  * Copyright (C) 1997  David Grothe, Gcom, Inc <dave@gcom.com>
@@ -67,7 +70,7 @@
 #ifndef _CRED_H
 #define _CRED_H 1
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: cred.h,v $ $Name:  $($Revision: 1.1.1.1.12.4 $) $Date: 2007/08/14 10:47:08 $"
 
 /* This file has to be updated with the Linux counterpart of SVR4 <sys/cred.h>
  * header file. 

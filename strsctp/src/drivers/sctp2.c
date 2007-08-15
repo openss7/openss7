@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/07/18 17:02:19 $
+ @(#) $RCSfile$ $Name$($Revision$) $Date$
 
  -----------------------------------------------------------------------------
 
@@ -9,9 +9,9 @@
 
  All Rights Reserved.
 
- This program is free software; you can redistribute it and/or modify it under
+ This program is free software: you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
- Foundation; version 2 of the License.
+ Foundation, version 3 of the license.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -19,8 +19,8 @@
  details.
 
  You should have received a copy of the GNU General Public License along with
- this program; if not, write to the Free Software Foundation, Inc., 675 Mass
- Ave, Cambridge, MA 02139, USA.
+ this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+ Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  -----------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/07/18 17:02:19 $ by $Author: brian $
+ Last Modified $Date$ by $Author$
 
  -----------------------------------------------------------------------------
 
@@ -179,7 +179,7 @@ static char const ident[] =
 #define SCTP_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SCTP_LICENSE	"GPL v2"
+#define SCTP_LICENSE	"GPL"
 #define SCTP_BANNER	SCTP_DESCRIP	"\n" \
 			SCTP_EXTRA	"\n" \
 			SCTP_REVISION	"\n" \
@@ -519,6 +519,7 @@ struct sctp_daddr {
 	atomic_t refcnt;		/* reference count */
 	uint dif;			/* device interface */
 	uint flags;			/* flags for this destination */
+	uint32_t m_ack;			/* maximum gap acked TSN */
 	size_t header_len;		/* header length */
 	size_t mtu;			/* mtu */
 	size_t dmps;			/* dest max payload size */
@@ -531,7 +532,7 @@ struct sctp_daddr {
 	size_t cwnd;			/* congestion window */
 	size_t ssthresh;		/* slow start threshold */
 	long timers;			/* deferred timer flags */
-	volatile toid_t timer_heartbeat;/* heartbeat timer (for acks) */
+	volatile toid_t timer_heartbeat;	/* heartbeat timer (for acks) */
 	volatile toid_t timer_retrans;	/* retrans (RTO) timer */
 	volatile toid_t timer_idle;	/* idle timer */
 	ulong when;			/* last time transmitting */
@@ -564,7 +565,9 @@ struct sctp_daddr {
 #define SCTP_DESTF_DROPPING	0x0080	/* DEST is dropping packets */
 #define SCTP_DESTF_FORWDTSN	0x0100	/* DEST has forward tsn outstanding */
 #define SCTP_DESTF_NEEDVRFY	0x0200	/* DEST needs to be verified SCTP IG 2.36 */
+#if 0
 #define SCTP_DESTF_ELIGIBLE	0x0400	/* DEST is eligible for FR */
+#endif
 #define SCTP_DESTM_DONT_USE	(SCTP_DESTF_INACTIVE| \
 				 SCTP_DESTF_UNUSABLE| \
 				 SCTP_DESTF_ROUTFAIL| \
@@ -991,7 +994,8 @@ STATIC atomic_t sctp_stream_count = ATOMIC_INIT(0);
 #define SCTPCB_FLAG_LAST_FRAG	    0x0001	/* aligned with SCTP DATA chunk flags */
 #define SCTPCB_FLAG_FIRST_FRAG	    0x0002	/* aligned with SCTP DATA chunk flags */
 #define SCTPCB_FLAG_URG		    0x0004	/* aligned with SCTP DATA chunk flags */
-#define SCTPCB_FLAG_CKSUMMED	    0x0100
+#define SCTPCB_FLAG_CKSUMMED	    0x0100	/* not used */
+#define SCTPCB_FLAG_ELIGIBLE	    0x0100	/* also eligible for fast retransmit */
 #define SCTPCB_FLAG_DELIV	    0x0200	/* delivered on receive */
 #define SCTPCB_FLAG_DROPPED	    0x0200	/* also dropped on transmit */
 #define SCTPCB_FLAG_ACK		    0x0400
@@ -1233,7 +1237,8 @@ sctp_change_state(struct sctp *sp, int newstate, const char *file, int line)
 	int oldstate;
 
 	if ((oldstate = xchg(&sp->state, newstate)) != newstate)
-		sctplogst(sp, "%s <- %s (%s +%d)", sctp_statename(newstate), sctp_statename(oldstate), file, line);
+		sctplogst(sp, "%s <- %s (%s +%d)", sctp_statename(newstate),
+			  sctp_statename(oldstate), file, line);
 	return (oldstate);
 }
 
@@ -2651,18 +2656,18 @@ sctp_dupmsg(struct sctp *sp, mblk_t *bp)
  * that runs like a put() procedure.
  */
 STATIC inline fastcall void
-sp_timeout(struct sctp *sp, void fastcall (*fcn)(struct sctp *), uint bit)
+sp_timeout(struct sctp *sp, void fastcall(*fcn) (struct sctp *), uint bit)
 {
 	if (sctp_trylock_timer(sp, NULL, bit)) {
-		(*fcn)(sp);
+		(*fcn) (sp);
 		sctp_unlockq(sp);
 	}
 }
 STATIC inline fastcall void
-sd_timeout(struct sctp_daddr *sd, void fastcall (*fcn)(struct sctp_daddr *), uint bit)
+sd_timeout(struct sctp_daddr *sd, void fastcall(*fcn) (struct sctp_daddr *), uint bit)
 {
 	if (sctp_trylock_timer(sd->sp, sd, bit)) {
-		(*fcn)(sd);
+		(*fcn) (sd);
 		sctp_unlockq(sd->sp);
 	}
 }
@@ -2685,7 +2690,7 @@ sctp_timeout_pending(volatile toid_t *tidp)
 }
 
 STATIC inline toid_t
-sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn) (void *), clock_t ticks)
 {
 	toid_t tid_new, tid_old;
 
@@ -2696,7 +2701,8 @@ sp_timer(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *)
 	return (tid_new);
 }
 STATIC inline toid_t
-sd_timer(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sd_timer(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn) (void *),
+	 clock_t ticks)
 {
 	toid_t tid_new, tid_old;
 
@@ -2813,12 +2819,14 @@ sd_timer_idle(struct sctp_daddr *sd, clock_t ticks)
 }
 
 STATIC inline toid_t
-sp_timer_cond(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sp_timer_cond(struct sctp *sp, volatile toid_t *tidp, void streamscall (*fcn) (void *),
+	      clock_t ticks)
 {
 	return (*tidp ? 0 : sp_timer(sp, tidp, fcn, ticks));
 }
 STATIC inline toid_t
-sd_timer_cond(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn)(void *), clock_t ticks)
+sd_timer_cond(struct sctp_daddr *sd, volatile toid_t *tidp, void streamscall (*fcn) (void *),
+	      clock_t ticks)
 {
 	return (*tidp ? 0 : sd_timer(sd, tidp, fcn, ticks));
 }
@@ -2929,7 +2937,7 @@ sp_timer_cancel(struct sctp *sp, volatile toid_t *tidp)
 {
 	toid_t tid;
 
-	if ((tid = xchg(tidp, (toid_t)0)) != (toid_t) 0)
+	if ((tid = xchg(tidp, (toid_t) 0)) != (toid_t) 0)
 		quntimeout(sp->rq, tid);
 	return (tid);
 }
@@ -3117,6 +3125,7 @@ __sctp_daddr_alloc(sctp_t * sp, uint32_t daddr, int *errp)
 		sp->daddr = sd;
 		sp->danum++;
 		sd->sp = sp;
+		sd->m_ack = sp->t_ack;
 		sd->daddr = daddr;
 		sd->mtu = 576;	/* fix up after routing */
 		sd->dmps =
@@ -3407,7 +3416,7 @@ __sctp_saddr_alloc(sctp_t * sp, uint32_t saddr, int *errp)
 
 	assert(errp);
 	__ensure(sp, *errp = -EFAULT;
-	       return (NULL));
+		 return (NULL));
 	if (saddr == INADDR_ANY) {
 		sctplogno(sp, "skipping INADDR_ANY");
 		return (NULL);
@@ -5331,7 +5340,6 @@ sctp_queue_xmit(struct sk_buff *skb)
 #else
 #define SCTP_NO_CSUM (NETIF_F_NO_CSUM)
 #endif
-
 
 /*
  *  XMIT OOTB (Disconnect Send with no Listening Socket or STREAM).
@@ -9281,10 +9289,12 @@ sctp_dest_calc(struct sctp *sp)
 			sd->partial_ack = 0;
 			sd->flags &= ~SCTP_DESTF_DROPPING;
 		}
+#if 0
 		if (sd->flags & SCTP_DESTF_ELIGIBLE) {
 			rare();
 			sd->flags &= ~SCTP_DESTF_ELIGIBLE;
 		}
+#endif
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 		sd->flags &= ~SCTP_DESTF_FORWDTSN;
 #endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
@@ -9328,6 +9338,13 @@ sctp_cumm_ack(struct sctp *sp, uint32_t ack)
 	assert(sp);
 	/* PR-SCTP 3.5 (A3) */
 	sp->t_ack = ack;
+	{
+		struct sctp_daddr *sd;
+
+		for (sd = sp->daddr; sd; sd = sd->next)
+			if (before(sd->m_ack, ack))
+				sd->m_ack = ack;
+	}
 	pl = bufq_lock(&sp->rtxq);
 	while ((mp = bufq_head(&sp->rtxq)) && !after(SCTP_TCB(mp)->tsn, ack)) {
 		sctp_tcb_t *cb = SCTP_TCB(mp);
@@ -9472,7 +9489,7 @@ sctp_deliver_data(struct sctp *sp)
 						continue;
 				}
 			}
-			if ((db = sctp_dupb(sp, mp, 0))) { /* must be a dup, not a copy */
+			if ((db = sctp_dupb(sp, mp, 0))) {	/* must be a dup, not a copy */
 				pl_t pl;
 
 				pl = bufq_lock(&sp->oooq);
@@ -10004,7 +10021,6 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 	}
 	ack = ntohl(m->c_tsn);
 	rwnd = ntohl(m->a_rwnd);
-	gaps = m->gaps;
 	/* RFC 2960 6.2.1 (D) i) */
 	if (before(ack, sp->t_ack))
 		goto discard;
@@ -10022,8 +10038,8 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 		sctp_cumm_ack(sp, ack);
 		/* if we have cummulatively acked something, we will skip FR analysis for this
 		   SACK. */
-		/* XXX: for now just assume that if something is cummulatively
-		 * acked that the write queue needs to be enabled. */
+		/* XXX: for now just assume that if something is cummulatively acked that the write 
+		   queue needs to be enabled. */
 		qenable(sp->wq);
 		goto skip_rtx_analysis;
 	}
@@ -10062,7 +10078,9 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 		}
 		bufq_unlock(&sp->rtxq, pl);
 	} else {
+#if 0
 		int eligible = 0;
+#endif
 
 		{
 			struct sctp_daddr *sd;
@@ -10077,6 +10095,21 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			goto skip_rtx_analysis;
 		}
 	      do_gap_analysis:
+		/* IMPLEMENTATION NOTE:- This is a preparation to avoid FR algorithm on
+		   destinations that are not dropping.  Destinations acknowledge TSNs in the order
+		   in which they were received.  If a peer gap acknowledges a TSN that was sent to
+		   a destination and there exists an earlier TSN sent to the same destination that
+		   has not been gap acknowledged, then those ealier TSNs are eligible for FR.
+		   Therfore, the negatively acknowledged TSNs that are not eligible for FR are
+		   those for which a gap acked later TSN does not exist.  This works best if the
+		   retransmission queue is walked backwards.  The destination is not eligible until 
+		   the first gap acked TSN sent to it is encountered moving backward.  Once a
+		   destination becomes eligible, all negatively acked TSNs are eligible. */
+
+		pl = bufq_lock(&sp->rtxq);
+#if 0
+#if 0
+		gaps = m->gaps;
 		/* perform fast retransmission algorithm on gaps */
 		while (ngaps--) {
 			uint32_t beg = ack + ntohs(*gaps++);
@@ -10087,7 +10120,6 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 				continue;
 			}
 			/* move to the acks */
-			pl = bufq_lock(&sp->rtxq);
 			dp = bufq_head(&sp->rtxq);
 			for (; dp && before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_next) {
 				sctp_tcb_t *cb = SCTP_TCB(dp);
@@ -10116,10 +10148,8 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 					eligible++;
 				}
 			}
-			bufq_unlock(&sp->rtxq, pl);
 		}
 		/* walk the whole retrans buffer looking for holes and renegs */
-		pl = bufq_lock(&sp->rtxq);
 		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
 			sctp_tcb_t *cb = SCTP_TCB(dp);
 			struct sctp_daddr *sd = cb->daddr;
@@ -10223,6 +10253,299 @@ sctp_recv_sack(struct sctp *sp, mblk_t *mp)
 			/* msg is after all gapack blocks */
 			break;
 		}
+#else
+		/* try this backward */
+		dp = bufq_tail(&sp->rtxq);
+		gaps = &m->gaps[(ngaps << 1) - 1];
+		{
+			uint32_t end = ack + ntohs(*gaps);
+
+			for (; dp; dp = dp->b_prev) {
+				sctp_tcb_t *cb = SCTP_TCB(dp);
+
+				if (!after(cb->tsn, end) || (cb->flags & SCTPCB_FLAG_SACKED))
+					break;
+			}
+		}
+		while (ngaps--) {
+			uint32_t end = ack + ntohs(*gaps--);
+			uint32_t beg = ack + ntohs(*gaps--);
+
+			if (before(end, beg)) {
+				rare();
+				continue;
+			}
+			/* move to the acks */
+			for (; dp && after(SCTP_TCB(dp)->tsn, end); dp = dp->b_prev) {
+				sctp_tcb_t *cb = SCTP_TCB(dp);
+				struct sctp_daddr *sd;
+
+				cb->flags |= SCTPCB_FLAG_NACK;
+				if ((sd = cb->daddr)) {
+					if ((cb->flags & SCTPCB_FLAG_SACKED))
+						sd->flags |= SCTP_DESTF_ELIGIBLE;
+					if ((sd->flags & SCTP_DESTF_ELIGIBLE))
+						cb->flags |= SCTPCB_FLAG_ELIGIBLE;
+				} else {
+					if ((cb->flags & SCTPCB_FLAG_SACKED))
+						cb->flags |= SCTPCB_FLAG_ELIGIBLE;
+				}
+			}
+			/* process the acks */
+			for (; dp && !before(SCTP_TCB(dp)->tsn, beg); dp = dp->b_prev) {
+				sctp_tcb_t *cb = SCTP_TCB(dp);
+				struct sctp_daddr *sd;
+
+				cb->flags |= SCTPCB_FLAG_ACK;
+				if ((sd = cb->daddr)) {
+					sd->flags |= SCTP_DESTF_ELIGIBLE;
+				}
+			}
+		}
+		/* this is for the interval between the cumulative ack and the beginning of the
+		   first gap ack block */
+		for (; dp && after(SCTP_TCB(dp)->tsn, ack); dp = dp->b_prev) {
+			sctp_tcb_t *cb = SCTP_TCB(dp);
+			struct sctp_daddr *sd;
+
+			cb->flags |= SCTPCB_FLAG_NACK;
+			if ((sd = cb->daddr)) {
+				if ((cb->flags & SCTPCB_FLAG_SACKED))
+					sd->flags |= SCTP_DESTF_ELIGIBLE;
+				if ((sd->flags & SCTP_DESTF_ELIGIBLE))
+					cb->flags |= SCTPCB_FLAG_ELIGIBLE;
+			} else {
+				if ((cb->flags & SCTPCB_FLAG_SACKED))
+					cb->flags |= SCTPCB_FLAG_ELIGIBLE;
+			}
+		}
+		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
+			sctp_tcb_t *cb = SCTP_TCB(dp);
+			struct sctp_daddr *sd = cb->daddr;
+			int flags = cb->flags;
+
+			cb->flags &= ~(SCTPCB_FLAG_ACK | SCTPCB_FLAG_NACK | SCTPCB_FLAG_ELIGIBLE);
+			if (sd)
+				sd->flags &= ~(SCTP_DESTF_ELIGIBLE);
+
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+			/* msg was dropped */
+			if (flags & SCTPCB_FLAG_DROPPED)
+				continue;
+#endif				/* SCTP_CONFIG_PARTIAL_RELIABILITY */
+			/* msg is inside gapack block */
+			if (flags & SCTPCB_FLAG_ACK) {
+				if (!(flags & SCTPCB_FLAG_SACKED)) {
+					cb->flags |= SCTPCB_FLAG_SACKED;
+					sp->nsack++;
+					/* RFC 2960 6.3.1 (C5) */
+					if (sd && cb->trans < 2) {
+						/* remember latest transmitted packet acked for rtt 
+						   calc */
+						sd->when = (sd->when > cb->when)
+						    ? sd->when : cb->when;
+					}
+					if (flags & SCTPCB_FLAG_RETRANS) {
+						cb->flags &= ~SCTPCB_FLAG_RETRANS;
+						ensure(sp->nrtxs > 0, sp->nrtxs = 1);
+						sp->nrtxs--;
+					} else {
+						size_t dlen = cb->dlen;
+
+						if (sd) {
+							/* credit destination */
+							normal(sd->in_flight >= dlen);
+							sd->in_flight =
+							    (sd->in_flight >
+							     dlen) ? sd->in_flight - dlen : 0;
+						}
+						/* credit association */
+						normal(sp->in_flight >= dlen);
+						sp->in_flight = (sp->in_flight > dlen)
+						    ? sp->in_flight - dlen : 0;
+					}
+				}
+				continue;
+			}
+			/* msg is between gapack blocks */
+			if (flags & SCTPCB_FLAG_NACK) {
+				/* RFC 2960 7.2.4 */
+				if ((flags & SCTPCB_FLAG_ELIGIBLE)
+				    && !(flags & SCTPCB_FLAG_RETRANS)
+				    && ++(cb->sacks) == SCTP_FR_COUNT) {
+					/* IMPLEMENTATION NOTE:- Performing fast retransmission can
+					   be bad when large or many chunks have gotten reordered or
+					   delayed (and gap reported) yet progress on those gaps are
+					   (now) being reported, it indicates that reordered or
+					   delayed packets are now arriving and fast retransmission
+					   should not be considered, because the packets are not
+					   likely missing. */
+					size_t dlen = cb->dlen;
+
+					/* RFC 2960 7.2.4 (1) */
+					cb->flags |= SCTPCB_FLAG_RETRANS;
+					sp->nrtxs++;
+					if (sd) {
+						/* RFC 2960 7.2.4 (2) */
+						sd->flags |= SCTP_DESTF_DROPPING;
+						/* credit destination (now) */
+						normal(sd->in_flight >= dlen);
+						sd->in_flight = (sd->in_flight > dlen)
+						    ? sd->in_flight - dlen : 0;
+					}
+					/* credit association (now) */
+					normal(sp->in_flight >= dlen);
+					sp->in_flight = (sp->in_flight > dlen)
+					    ? sp->in_flight - dlen : 0;
+				}
+				/* RFC 2960 6.3.2 (R4) (reneg) */
+				if (cb->flags & SCTPCB_FLAG_SACKED) {
+					cb->flags &= ~SCTPCB_FLAG_SACKED;
+					ensure(sp->nsack, sp->nsack = 1);
+					sp->nsack--;
+					if (sd)
+						sd_timer_cond_retrans(sd, sd->rto);
+					else
+						seldom();
+				}
+				continue;
+			}
+			/* msg is after all gapack blocks */
+			break;
+		}
+#endif
+#else
+		/* one more time */
+		gaps = m->gaps;
+		/* perform fast retransmission algorithm on gaps */
+		dp = bufq_head(&sp->rtxq);
+		while (ngaps--) {
+			uint32_t beg = ack + ntohs(*gaps++);
+			uint32_t end = ack + ntohs(*gaps++);
+
+			if (unlikely(before(end, beg)))
+				continue;
+			/* move to the acks */
+			for (; dp; dp = dp->b_next) {
+				sctp_tcb_t *cb = SCTP_TCB(dp);
+
+				if (!before(cb->tsn, beg))
+					break;
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+				if (unlikely(cb->flags & SCTPCB_FLAG_DROPPED))
+					continue;
+#endif
+				cb->flags |= SCTPCB_FLAG_NACK;
+			}
+			/* process the acks */
+			for (; dp && !after(SCTP_TCB(dp)->tsn, end); dp = dp->b_next) {
+				sctp_tcb_t *cb = SCTP_TCB(dp);
+				struct sctp_daddr *sd;
+
+				if (after(cb->tsn, end))
+					break;
+				if (likely((sd = cb->daddr) != NULL) && before(sd->m_ack, cb->tsn))
+					sd->m_ack = cb->tsn;
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+				if (unlikely(SCTP_TCB(dp)->flags & SCTPCB_FLAG_DROPPED))
+					continue;
+#endif
+				SCTP_TCB(dp)->flags |= SCTPCB_FLAG_ACK;
+			}
+		}
+		/* walk the covered retrans buffer looking for holes and renegs */
+		for (dp = bufq_head(&sp->rtxq); dp; dp = dp->b_next) {
+			sctp_tcb_t *cb = SCTP_TCB(dp);
+			struct sctp_daddr *sd = cb->daddr;
+
+#ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
+			/* msg was dropped */
+			if (unlikely(cb->flags & SCTPCB_FLAG_DROPPED))
+				continue;
+#endif
+			/* msg is inside gapack block */
+			if (likely(cb->flags & SCTPCB_FLAG_ACK)) {
+				cb->flags &= ~SCTPCB_FLAG_ACK;
+				if (!(cb->flags & SCTPCB_FLAG_SACKED)) {
+					cb->flags |= SCTPCB_FLAG_SACKED;
+					sp->nsack++;
+					/* RFC 2960 6.3.1 (C5) */
+					if (likely(!!sd) && cb->trans < 2) {
+						/* remember latest transmitted packet acked for rtt 
+						   calc */
+						sd->when = (sd->when > cb->when)
+						    ? sd->when : cb->when;
+					}
+					if (unlikely(cb->flags & SCTPCB_FLAG_RETRANS)) {
+						cb->flags &= ~SCTPCB_FLAG_RETRANS;
+						ensure(sp->nrtxs > 0, sp->nrtxs = 1);
+						sp->nrtxs--;
+					} else {
+						size_t dlen = cb->dlen;
+
+						if (likely(!!sd)) {
+							/* credit destination */
+							normal(sd->in_flight >= dlen);
+							sd->in_flight =
+							    (sd->in_flight >
+							     dlen) ? sd->in_flight - dlen : 0;
+						}
+						/* credit association */
+						normal(sp->in_flight >= dlen);
+						sp->in_flight = (sp->in_flight > dlen)
+						    ? sp->in_flight - dlen : 0;
+					}
+				}
+				continue;
+			}
+			/* msg is between gapack blocks */
+			if (likely(cb->flags & SCTPCB_FLAG_NACK)) {
+				cb->flags &= ~SCTPCB_FLAG_NACK;
+				/* RFC 2960 7.2.4 */
+				if (!(cb->flags & SCTPCB_FLAG_RETRANS) &&
+				    (!sd || !after(cb->tsn, sd->m_ack))
+				    && ++(cb->sacks) == SCTP_FR_COUNT) {
+					/* IMPLEMENTATION NOTE:- To avoid excessive spurious fast
+					   retransmissions when performing CMT, a nack'ed packet is
+					   only eligible for retransmission if it is not already
+					   marked for retransmission, it is considered missing for
+					   the destination (it is not after the maximum acked TSN
+					   for the destination) and the fast retransmission count
+					   has been reached. */
+					size_t dlen = cb->dlen;
+
+					/* RFC 2960 7.2.4 (1) */
+					cb->flags |= SCTPCB_FLAG_RETRANS;
+					sp->nrtxs++;
+					if (sd) {
+						/* RFC 2960 7.2.4 (2) */
+						sd->flags |= SCTP_DESTF_DROPPING;
+						/* credit destination (now) */
+						normal(sd->in_flight >= dlen);
+						sd->in_flight = (sd->in_flight > dlen)
+						    ? sd->in_flight - dlen : 0;
+					}
+					/* credit association (now) */
+					normal(sp->in_flight >= dlen);
+					sp->in_flight = (sp->in_flight > dlen)
+					    ? sp->in_flight - dlen : 0;
+				}
+				/* RFC 2960 6.3.2 (R4) (reneg) */
+				if (cb->flags & SCTPCB_FLAG_SACKED) {
+					cb->flags &= ~SCTPCB_FLAG_SACKED;
+					ensure(sp->nsack, sp->nsack = 1);
+					sp->nsack--;
+					if (sd)
+						sd_timer_cond_retrans(sd, sd->rto);
+					else
+						seldom();
+				}
+				continue;
+			}
+			/* msg is after all gapack blocks */
+			break;
+		}
+#endif
 		bufq_unlock(&sp->rtxq, pl);
 	}
       skip_rtx_analysis:
@@ -11033,7 +11356,8 @@ sctp_recv_init_ack(struct sctp *sp, mblk_t *mp)
 	goto disconnect;
       invalid_parm:
 	err = SCTP_CAUSE_INVALID_PARM;
-	sctplogrx(sp, "%s(): missing initiate tag or invalid number of streams requested", __FUNCTION__);
+	sctplogrx(sp, "%s(): missing initiate tag or invalid number of streams requested",
+		  __FUNCTION__);
 	goto disconnect;
       bad_parm:
 	err = SCTP_CAUSE_BAD_PARM;
@@ -11097,6 +11421,12 @@ sctp_update_from_cookie(struct sctp *sp, struct sctp_cookie *ck)
 	    sp->l_asn =
 #endif				/* SCTP_CONFIG_ADD_IP */
 	    ck->v_tag - 1;
+	{
+		struct sctp_daddr *sd;
+
+		for (sd = sp->daddr; sd; sd = sd->next)
+			sd->m_ack = sp->t_ack;
+	}
 	sp->r_ack =
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 	    sp->p_fsn =
@@ -13090,6 +13420,12 @@ sctp_conn_req(struct sctp *sp, uint16_t dport, struct sockaddr_in *dsin, size_t 
 	    sp->l_asn =
 #endif				/* SCTP_CONFIG_ADD_IP */
 	    sp->v_tag - 1;
+	{
+		struct sctp_daddr *sd;
+
+		for (sd = sp->daddr; sd; sd = sd->next)
+			sd->m_ack = sp->t_ack;
+	}
 	sp->r_ack =
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 	    sp->p_fsn =
@@ -13321,6 +13657,12 @@ sctp_conn_res(struct sctp *sp, mblk_t *cp, struct sctp *ap, mblk_t *dp)
 	    ap->l_asn =
 #endif				/* SCTP_CONFIG_ADD_IP */
 	    ck->v_tag - 1;
+	{
+		struct sctp_daddr *sd;
+
+		for (sd = ap->daddr; sd; sd = sd->next)
+			sd->m_ack = ap->t_ack;
+	}
 	ap->r_ack =
 #ifdef SCTP_CONFIG_PARTIAL_RELIABILITY
 	    ap->p_fsn =
@@ -13390,7 +13732,8 @@ sctp_ordrel_req(struct sctp *sp)
 			sctp_send_shutdown_ack(sp);
 		break;
 	default:
-		sctplogerr(sp, "%s() in unexpected state %s", __FUNCTION__, sctp_statename(sp->state));
+		sctplogerr(sp, "%s() in unexpected state %s", __FUNCTION__,
+			   sctp_statename(sp->state));
 		return (-EPROTO);
 	}
 	return (0);
@@ -14683,7 +15026,7 @@ STATIC inline void
 sctp_n_setstate(struct sctp *sp, t_scalar_t newstate)
 {
 	t_scalar_t oldstate;
-	
+
 	if ((oldstate = XCHG(&sp->i_state, newstate)) != newstate)
 		sctplogst(sp, "%s <- %s", sctp_n_statename(newstate), sctp_n_statename(oldstate));
 }
@@ -17378,7 +17721,7 @@ STATIC inline void
 sctp_t_setstate(struct sctp *sp, t_scalar_t newstate)
 {
 	t_scalar_t oldstate;
-	
+
 	if ((oldstate = XCHG(&sp->i_state, newstate)) != newstate)
 		sctplogst(sp, "%s <- %s", sctp_t_statename(newstate), sctp_t_statename(oldstate));
 }
@@ -26899,7 +27242,7 @@ t_optdata_ind(struct sctp *sp, uint32_t ppi, uint16_t sid, uint16_t ssn, uint32_
 /*
  *  T_ADDR_ACK      27 - address acknowledgement
  *  -----------------------------------------------------------------
- *  Version 2 uses socket addresses instead of the Version 1 sctp_addr_t.
+ *  Release 2 uses socket addresses instead of the Release 1 sctp_addr_t.
  */
 STATIC int
 t_addr_ack(struct sctp *sp)
@@ -29440,12 +29783,12 @@ sctp_v4_rcv(struct sk_buff *skb)
 			goto bad_chunk_len;
 	}
 #ifdef COPY_INSTEAD_OF_ESBALLOC
-	/* There seems to be some problem with skbuff corruption, so we will
-	 * try this: allocate a full STREAMS message block and copy the data
-	 * into the STREAMS message block and free the SKBUFF. */
+	/* There seems to be some problem with skbuff corruption, so we will try this: allocate a
+	   full STREAMS message block and copy the data into the STREAMS message block and free the 
+	   SKBUFF. */
 	{
 		size_t plen = skb->len + (skb->data - skb->nh.raw);
-		
+
 		if (!(mp = allocb(plen, BPRI_MED)))
 			goto no_buffers;
 		bcopy(skb->nh.raw, mp->b_wptr, plen);

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2007/08/15 04:57:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:57:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: sad.c,v $
+ Revision 1.1.1.3.4.14  2007/08/15 04:57:59  brian
+ - GPLv3 updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.9 $) $Date: 2005/12/19 03:22:18 $"
+#ident "@(#) $RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2007/08/15 04:57:59 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: sad.c,v $ $Name:  $($Revision: 1.1.1.3.4.14 $) $Date: 2007/08/15 04:57:59 $";
 
 /*
  *  sad: STREAMS Administrative Driver

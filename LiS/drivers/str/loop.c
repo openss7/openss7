@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2007/08/15 04:57:58 $
 
  -----------------------------------------------------------------------------
 
@@ -45,23 +45,26 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/15 04:57:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: loop.c,v $
+ Revision 1.1.1.3.4.12  2007/08/15 04:57:58  brian
+ - GPLv3 updates
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.7 $) $Date: 2005/12/19 03:22:18 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2007/08/15 04:57:58 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.1.3.4.12 $) $Date: 2007/08/15 04:57:58 $";
 
 /*                               -*- Mode: C -*- 
  * loop.c --- Streams loopback driver, as of Sun manual 
  * Author          : Graham Wheeler
  * Created On      : Sat Oct  7 05:01:31 1995
  * Last Modified By: David Grothe
- * RCS Id          : $Id: loop.c,v 1.1.1.3.4.7 2005/12/19 03:22:18 brian Exp $
+ * RCS Id          : $Id: loop.c,v 1.1.1.3.4.12 2007/08/15 04:57:58 brian Exp $
  * Purpose         : provide loopback streams driver
  * ----------------______________________________________________
  *

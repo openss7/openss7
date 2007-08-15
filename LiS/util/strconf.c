@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: strconf.c,v $
+ Revision 1.1.1.3.4.5  2007/08/14 10:47:24  brian
+ - GPLv3 header update
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:24 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: strconf.c,v $ $Name:  $($Revision: 1.1.1.3.4.5 $) $Date: 2007/08/14 10:47:24 $";
 
 /************************************************************************
 *                       STREAMS Configuration                           *

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.12 $) $Date: 2007/08/14 10:47:24 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/14 10:47:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strtst.c,v $
+ Revision 1.1.1.5.4.12  2007/08/14 10:47:24  brian
+ - GPLv3 header update
+
  Revision 1.1.1.5.4.10  2005/07/13 12:01:22  brian
  - working up compat and check pass (finally lindented LiS)
 
@@ -77,10 +80,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/07/13 12:01:22 $"
+#ident "@(#) $RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.12 $) $Date: 2007/08/14 10:47:24 $"
 
 static char const ident[] =
-    "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.10 $) $Date: 2005/07/13 12:01:22 $";
+    "$RCSfile: strtst.c,v $ $Name:  $($Revision: 1.1.1.5.4.12 $) $Date: 2007/08/14 10:47:24 $";
 
 /*
  * Copyright (C)  1997-2000  David Grothe, Gcom, Inc <dave@gcom.com>
