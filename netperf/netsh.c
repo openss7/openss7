@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/08/14 07:26:45 $
+ @(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/08/15 05:06:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 07:26:45 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:06:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netsh.c,v $
+ Revision 1.1.1.18  2007/08/15 05:06:38  brian
+ - GPLv3 updates
+
  Revision 1.1.1.17  2007/08/14 07:26:45  brian
  - GPLv3 header update
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/08/14 07:26:45 $"
+#ident "@(#) $RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/08/15 05:06:38 $"
 
 static char const ident[] =
-    "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.17 $) $Date: 2007/08/14 07:26:45 $";
+    "$RCSfile: netsh.c,v $ $Name:  $($Revision: 1.1.1.18 $) $Date: 2007/08/15 05:06:38 $";
 
 #ifdef NEED_MAKEFILE_EDIT
 #error you must first edit and customize the makefile to your platform
@@ -548,8 +551,8 @@ print_netperf_version(int argc, char *argv[])
 	fprintf(stdout, "\
 %1$s:\n\
     %2$s\n\
-    COPYRIGHT (C) 2001-2004  OPENSS7 CORPORATION.  ALL RIGHTS RESERVED.\n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    COPYRIGHT (C) 2001-2007  OPENSS7 CORPORATION.  ALL RIGHTS RESERVED.\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
     See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
@@ -1079,7 +1082,7 @@ print_netperf_copying(int argc, char *argv[])
 {
 	fprintf(stdout, "\
 \n\
-COPYRIGHT (C) 2001-2004 OPENSS7 CORPORATION <http://www.openss7.com/>\n\
+COPYRIGHT (C) 2001-2007 OPENSS7 CORPORATION <http://www.openss7.com/>\n\
 COPYRIGHT (C) 1997-2001 BRIAN F. G. BIDULOCK <bidulock@openss7.org>\n\
 \n\
 ALL RIGHTS RESERVED.\n\
@@ -1105,7 +1108,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\

@@ -1,3 +1,16 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* netserver.c: GPLv3 updates
+	* netsh.c: GPLv3 updates
+	* manual/Makefile.am: GPLv3 updates
+	* manual/descrip.texi: GPLv3 updates
+	* manual/news.texi: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GNUv3 header update
