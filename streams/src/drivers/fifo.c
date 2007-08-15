@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 0.9.2.50  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.49  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:21 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -84,10 +87,10 @@ static char const ident[] =
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.49 $) $Date: 2007/08/13 22:46:15 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.50 $) $Date: 2007/08/15 05:33:21 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define FIFO_LICENSE	"GPL v2"
+#define FIFO_LICENSE	"GPL"
 #define FIFO_BANNER	FIFO_DESCRIP	"\n" \
 			FIFO_COPYRIGHT	"\n" \
 			FIFO_REVISION	"\n" \

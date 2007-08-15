@@ -1,3 +1,19 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* striso.dox.in: GPLv3 updates
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/drivers/clns.c: GPLv3 updates
+	* src/drivers/tp.c: GPLv3 updates
+	* src/modules/itot.c: GPLv3 updates
+	* src/modules/tcpns.c: GPLv3 updates
+	* tests/local.at: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GNUv3 header update

@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: modules.texi,v 0.9.2.5 2007/06/22 00:18:46 brian Exp $
+@c @(#) $Id: modules.texi,v 0.9.2.6 2007/08/15 05:33:18 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -53,7 +53,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2007/06/22 00:18:46 $ by $Author: brian $
+@c Last Modified $Date: 2007/08/15 05:33:18 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -200,7 +200,7 @@ See
 @cite{SVID},@footnote{@cite{SVID, System V, Interface Definition, No. Fourth Edition.}}
 @cite{XID},@footnote{@cite{XBD Issue 5, X/Open System Interface Definitions, Open Group, Open Group
 Publication.  <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv2},@footnote{@cite{SUS
-Version 2, Single UNIX Specification, Open Group, Open Group Publication.
+Issue 2, Single UNIX Specification, Open Group, Open Group Publication.
 <@url{http://www.opengroup.org/onlinepubs/}>}} @cite{SUSv3}.@footnote{@cite{SUS Version 3, Single
 UNIX Specification, Open Group, Open Group Publication.
 <@url{http://www.opengroup.org/onlinepubs/}>}} Conformance is verified using the

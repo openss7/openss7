@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/14 03:30:58 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/15 05:35:38 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 03:30:58 $ by $Author: brian $
+# Last Modified $Date: 2007/08/15 05:35:38 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,13 +69,13 @@ strxns_TEXINFOS		= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/uidlpi.texi \
 			  texi/uinpi.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
 			  texi/testsuite.texi \
-			  texi/lesser.texi \
+			  texi/lgpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
@@ -100,6 +100,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.31  2007/08/15 05:35:38  brian
+# - GPLv3 updates
+#
 # Revision 0.9.2.30  2007/08/14 03:30:58  brian
 # - GPLv3 header update
 #

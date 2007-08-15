@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: osfcompat.c,v $
+ Revision 0.9.2.28  2007/08/15 05:33:09  brian
+ - GPLv3 updates
+
  Revision 0.9.2.27  2007/08/12 15:51:19  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
+#ident "@(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:09 $"
 
 static char const ident[] =
-    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $";
+    "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -95,10 +98,10 @@ static char const ident[] =
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.27 $) $Date: 2007/08/12 15:51:19 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 0.9.2.28 $) $Date: 2007/08/15 05:33:09 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define OSFCOMP_LICENSE		"GPL v2"
+#define OSFCOMP_LICENSE		"GPL"
 #define OSFCOMP_BANNER		OSFCOMP_DESCRIP		"\n" \
 				OSFCOMP_COPYRIGHT	"\n" \
 				OSFCOMP_REVISION	"\n" \

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/14 04:56:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/15 05:34:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 04:56:45 $ by $Author: brian $
+# Last Modified $Date: 2007/08/15 05:34:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,12 +69,12 @@ strnsl_TEXINFOS		= \
 			  tree.texi \
 			  bugs.texi \
 			  texi/fdl.texi \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  texi/sunrpc.texi \
 			  texi/quick.texi \
 			  texi/install.texi \
 			  texi/testsuite.texi \
-			  texi/lesser.texi \
+			  texi/lgpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/compat.texi \
@@ -83,7 +83,7 @@ strnsl_TEXINFOS		= \
 
 libxnsl_TEXINFOS	= \
 			  texi/fdl.texi \
-			  texi/gpl.texi \
+			  texi/gpl3.texi \
 			  $(top_srcdir)/scripts/texi/macros.texi \
 			  $(top_srcdir)/scripts/texi/versions.texi \
 			  $(top_srcdir)/scripts/texi/funding.texi
@@ -109,6 +109,9 @@ include ../../am/info.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.7  2007/08/15 05:34:26  brian
+# - GPLv3 updates
+#
 # Revision 0.9.2.6  2007/08/14 04:56:45  brian
 # - GPLv3 header update
 #

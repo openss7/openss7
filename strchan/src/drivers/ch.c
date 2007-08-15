@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 06:47:28 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:32:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:28 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 0.9.2.6  2007/08/15 05:32:54  brian
+ - GPLv3 updates
+
  Revision 0.9.2.5  2007/08/14 06:47:28  brian
  - GPLv3 header update
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 06:47:28 $"
+#ident "@(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:32:54 $"
 
 static char const ident[] =
-    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 06:47:28 $";
+    "$RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:32:54 $";
 
 /*
  * This is a CH multiplexing driver.  MX stream are linked beneath the lower multiplex and CH
@@ -100,11 +103,11 @@ static char const ident[] =
 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 06:47:28 $"
+#define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:32:54 $"
 #define CHMUX_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CHMUX_LICENSE	"GPL v2"
+#define CHMUX_LICENSE	"GPL"
 #define CHMUX_BANNER	CHMUX_DESCRIP	"\n" \
 			CHMUX_EXTRA	"\n" \
 			CHMUX_REVISION	"\n" \

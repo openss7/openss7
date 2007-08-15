@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 0.9.2.5  2007/08/15 05:35:42  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 03:31:09  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $"
+#ident "@(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:42 $"
 
 static char const ident[] =
-    "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $";
+    "$RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:42 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -110,10 +113,10 @@ static char const ident[] =
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:31:09 $"
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:35:42 $"
 #define NF_DEVICE	"SVR 4.2 STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NF_LICENSE	"GPL v2"
+#define NF_LICENSE	"GPL"
 #define NF_BANNER	NF_DESCRIP	"\n" \
 			NF_EXTRA	"\n" \
 			NF_REVISION	"\n" \

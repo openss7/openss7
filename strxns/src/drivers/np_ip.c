@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 0.9.2.45  2007/08/15 05:35:43  brian
+ - GPLv3 updates
+
  Revision 0.9.2.44  2007/08/14 03:31:10  brian
  - GPLv3 header update
 
@@ -202,10 +205,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $"
+#ident "@(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $"
 
 static char const ident[] =
-    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $";
+    "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -266,10 +269,10 @@ static char const ident[] =
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.44 $) $Date: 2007/08/14 03:31:10 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 0.9.2.45 $) $Date: 2007/08/15 05:35:43 $"
 #define NP_DEVICE	"SVR 4.2 STREAMS NPI NP_IP Data Link Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NP_LICENSE	"GPL v2"
+#define NP_LICENSE	"GPL"
 #define NP_BANNER	NP_DESCRIP	"\n" \
 			NP_EXTRA	"\n" \
 			NP_REVISION	"\n" \

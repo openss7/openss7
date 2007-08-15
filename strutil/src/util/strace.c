@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:58:13 $
+ @(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:35:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:13 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strace.c,v $
+ Revision 0.9.2.20  2007/08/15 05:35:15  brian
+ - GPLv3 updates
+
  Revision 0.9.2.19  2007/08/14 12:58:13  brian
  - GNUv3 header updates
 
@@ -66,10 +69,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:58:13 $"
+#ident "@(#) $RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:35:15 $"
 
 static char const ident[] =
-    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/14 12:58:13 $";
+    "$RCSfile: strace.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:35:15 $";
 
 /*
  *  SVR 4.2 Utility: strace - Prints STREAMS trace messages.
@@ -622,7 +625,7 @@ version(int argc, char **argv)
 	fprintf(stdout, "\
 %2$s\n\
 Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-Distributed under GPL Version 2, included here by reference.\n\
+Distributed under GPL Version 3, included here by reference.\n\
 See `%1$s --copying' for copying permissions.\n\
 ", argv[0], ident);
 }

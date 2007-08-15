@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $
+ @(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch_pmod.c,v $
+ Revision 0.9.2.5  2007/08/15 05:32:59  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 06:47:37  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $"
+#ident "@(#) $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
 
 static char const ident[] =
-    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $";
+    "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $";
 
 /*
  *  This is CH-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -90,11 +93,11 @@ static char const ident[] =
 #undef unfreezestr
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
 #define CH_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CH_LICENSE	"GPL v2"
+#define CH_LICENSE	"GPL"
 #define CH_BANNER	CH_DESCRIP	"\n" \
 			CH_REVISION	"\n" \
 			CH_COPYRIGHT	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/08/14 04:27:07 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 04:27:07 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 0.9.2.88  2007/08/15 05:33:49  brian
+ - GPLv3 updates
+
  Revision 0.9.2.87  2007/08/14 04:27:07  brian
  - GPLv3 header update
 
@@ -139,10 +142,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/08/14 04:27:07 $"
+#ident "@(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $"
 
 static char const ident[] =
-    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/08/14 04:27:07 $";
+    "$RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -630,10 +633,10 @@ tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.87 $) $Date: 2007/08/14 04:27:07 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 0.9.2.88 $) $Date: 2007/08/15 05:33:49 $"
 #define SS__DEVICE	"SVR 4.2 STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SS__LICENSE	"GPL v2"
+#define SS__LICENSE	"GPL"
 #define SS__BANNER	SS__DESCRIP	"\n" \
 			SS__EXTRA	"\n" \
 			SS__REVISION	"\n" \

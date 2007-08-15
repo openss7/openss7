@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: pipe.c,v $
+ Revision 0.9.2.40  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.39  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:33:21 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -79,10 +82,10 @@ static char const ident[] =
 
 #define PIPE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PIPE_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/13 22:46:15 $"
+#define PIPE_REVISION	"LfS $RCSfile: pipe.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:33:21 $"
 #define PIPE_DEVICE	"SVR 4.2 STREAMS-based PIPEs"
 #define PIPE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define PIPE_LICENSE	"GPL v2"
+#define PIPE_LICENSE	"GPL"
 #define PIPE_BANNER	PIPE_DESCRIP	"\n" \
 			PIPE_COPYRIGHT	"\n" \
 			PIPE_REVISION	"\n" \

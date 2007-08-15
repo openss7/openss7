@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 03:31:19 $
+ @(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_strm_mod.c,v $
+ Revision 0.9.2.25  2007/08/15 05:35:46  brian
+ - GPLv3 updates
+
  Revision 0.9.2.24  2007/08/14 03:31:19  brian
  - GPLv3 header update
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 03:31:19 $"
+#ident "@(#) $RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $"
 
 static char const ident[] =
-    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/14 03:31:19 $";
+    "$RCSfile: ip_strm_mod.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $";
 
 #include <sys/os7/compat.h>
 
@@ -104,10 +107,10 @@ static char const ident[] =
 #define IP_TO_STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 STREAMS FOR LINUX"
 #define IP_TO_STREAMS_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define IP_TO_STREAMS_COPYRIGHT		"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.24 $) $Date: 2007/08/14 03:31:19 $"
+#define IP_TO_STREAMS_REVISION		"LfS $RCSfile: ip_strm_mod.c,v $ $Name:  $ ($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:35:46 $"
 #define IP_TO_STREAMS_DEVICE		"SVR 4.2 STREAMS IP STREAMS Module (IP_TO_STREAMS)"
 #define IP_TO_STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define IP_TO_STREAMS_LICENSE		"GPL v2"
+#define IP_TO_STREAMS_LICENSE		"GPL"
 #define IP_TO_STREAMS_BANNER		IP_TO_STREAMS_DESCRIP	"\n" \
 					IP_TO_STREAMS_EXTRA	"\n" \
 					IP_TO_STREAMS_REVISION	"\n" \
@@ -195,22 +198,6 @@ STATIC struct streamtab ip_to_streams_info = {
 *									*
 ************************************************************************/
 /*
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Library General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Library General Public License for more details.
- * 
- * You should have received a copy of the GNU Library General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330, Cambridge,
- * MA 02139, USA.
- * 
  * This is a pushable streams module that bridges a DLPI stream to
  * an IP masquerading as a network driver.
  *

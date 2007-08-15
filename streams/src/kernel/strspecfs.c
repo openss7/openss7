@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/08/13 22:46:19 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2007/08/15 05:33:23 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 0.9.2.81  2007/08/15 05:33:23  brian
+ - GPLv3 updates
+
  Revision 0.9.2.80  2007/08/13 22:46:19  brian
  - GPLv3 header updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/08/13 22:46:19 $"
+#ident "@(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2007/08/15 05:33:23 $"
 
 static char const ident[] =
-    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/08/13 22:46:19 $";
+    "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2007/08/15 05:33:23 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -121,10 +124,10 @@ static char const ident[] =
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.80 $) $Date: 2007/08/13 22:46:19 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 0.9.2.81 $) $Date: 2007/08/15 05:33:23 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define SPECFS_LICENSE		"GPL v2"
+#define SPECFS_LICENSE		"GPL"
 #define SPECFS_BANNER		SPECFS_DESCRIP		"\n" \
 				SPECFS_COPYRIGHT	"\n" \
 				SPECFS_REVISION		"\n" \

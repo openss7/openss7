@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:31:24 $
+ @(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:35:50 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:24 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldlconfig.c,v $
+ Revision 0.9.2.10  2007/08/15 05:35:50  brian
+ - GPLv3 updates
+
  Revision 0.9.2.9  2007/08/14 03:31:24  brian
  - GPLv3 header update
 
@@ -85,31 +88,16 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:31:24 $"
+#ident "@(#) $RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:35:50 $"
 
 static char const ident[] =
-    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 03:31:24 $";
+    "$RCSfile: ldlconfig.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:35:50 $";
 
 /*
  *  ldlconfig: A configuration helper for ldl clients
  *
  *  Copyright (C) 1998 Ole Husgaard (sparre@login.dknet.dk)
  *  Copyright (C) 1999 David Grothe (dave@gcom.com)
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
  */
 
 #ident "@(#) LiS ldlconfig.c 1.4 12/11/00"
@@ -794,7 +782,7 @@ copying(int argc, char *argv[])
 \n\
 %1$s %2$s:\n\
 \n\
-Copyright (c) 2001-2006  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
 Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
@@ -803,15 +791,15 @@ All Rights Reserved.\n\
 \n\
 This program is free software;  you can  redistribute  it and/or modify it under\n\
 the terms of the GNU General  Public License as  published by the  Free Software\n\
-Foundation; version 2 of  the  License.\n\
+Foundation; version 3 of  the  License.\n\
 \n\
 This program is distributed in the hope that it will be  useful, but WITHOUT ANY\n\
 WARRANTY;  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
 PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
 You should  have received  a copy of the GNU  General  Public License along with\n\
-this program; if not, write to the Free Software Foundation, Inc., 675 Mass Ave,\n\
-Cambridge, MA 02139, USA.\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -838,11 +826,11 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
-    Copyright (c) 2003-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+    Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1999       David Grothe (dave@gcom.com)\n\
     Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     included here by reference.\n\
 \n\
     See `%1$s --copying' for copying permissions.\n\

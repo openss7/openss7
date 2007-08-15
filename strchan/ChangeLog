@@ -1,3 +1,30 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/drivers/biquad.h: GPLv3 updates
+	* src/drivers/ch.c: GPLv3 updates
+	* src/drivers/ecdis.h: GPLv3 updates
+	* src/drivers/hdlc.c: GPLv3 updates
+	* src/drivers/mg.c: GPLv3 updates
+	* src/drivers/mx.c: GPLv3 updates
+	* src/drivers/v401p.c: GPLv3 updates
+	* src/drivers/zaptel.h: GPLv3 updates
+	* src/modules/cd.c: GPLv3 updates
+	* src/modules/cd_daed.c: GPLv3 updates
+	* src/modules/cd_hdlc.c: GPLv3 updates
+	* src/modules/cd_old.c: GPLv3 updates
+	* src/modules/ch.c: GPLv3 updates
+	* src/modules/ch_pmod.c: GPLv3 updates
+	* src/modules/lapb.c: GPLv3 updates
+	* src/modules/mx_pmod.c: GPLv3 updates
+	* src/modules/zaptel.c: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 header update

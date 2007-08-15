@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 03:04:36 $
+ @(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:34:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:04:36 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldterm.c,v $
+ Revision 0.9.2.6  2007/08/15 05:34:51  brian
+ - GPLv3 updates
+
  Revision 0.9.2.5  2007/08/14 03:04:36  brian
  - GPLv3 header update
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 03:04:36 $"
+#ident "@(#) $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:34:51 $"
 
 static char const ident[] =
-    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 03:04:36 $";
+    "$RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:34:51 $";
 
 /*
  * This is ldterm (line discipline terminal) module.
@@ -165,10 +168,10 @@ static char const ident[] =
 
 #define LDTERM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDTERM_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 03:04:36 $"
+#define LDTERM_REVISION		"OpenSS7 $RCSfile: ldterm.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:34:51 $"
 #define LDTERM_DEVICE		"SVR 4.2 STREAMS Line Discipline Module (LDTERM)"
 #define LDTERM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define LDTERM_LICENSE		"GPL v2"
+#define LDTERM_LICENSE		"GPL"
 #define LDTERM_BANNER		LDTERM_DESCRIP		"\n" \
 				LDTERM_COPYRIGHT	"\n" \
 				LDTERM_REVISION		"\n" \

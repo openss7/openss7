@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:04:38 $
+ @(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:34:53 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:04:38 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tty.c,v $
+ Revision 0.9.2.5  2007/08/15 05:34:53  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 03:04:38  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:04:38 $"
+#ident "@(#) $RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:34:53 $"
 
 static char const ident[] =
-    "$RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 03:04:38 $";
+    "$RCSfile: test-tty.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:34:53 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2776,7 +2779,7 @@ ied, described, or  referred to herein.   The author  is under no  obligation to
 provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
-General Public License (GPL) Version 2,  so long as the  software is distributed\n\
+General Public License (GPL) Version 3,  so long as the  software is distributed\n\
 with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
@@ -2807,7 +2810,7 @@ version(int argc, char *argv[])
     %2$s\n\
     Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 2,\n\
+    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
     incorporated here by reference.\n\
 \n\
     See `%1$s --copying' for copying permission.\n\

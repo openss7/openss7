@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/08/13 22:46:22 $
+ @(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/08/15 05:33:26 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:22 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sc.c,v $
+ Revision 0.9.2.55  2007/08/15 05:33:26  brian
+ - GPLv3 updates
+
  Revision 0.9.2.54  2007/08/13 22:46:22  brian
  - GPLv3 header updates
 
@@ -89,10 +92,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/08/13 22:46:22 $"
+#ident "@(#) $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/08/15 05:33:26 $"
 
 static char const ident[] =
-    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/08/13 22:46:22 $";
+    "$RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/08/15 05:33:26 $";
 
 /* 
  *  This is SC, a STREAMS Configuration module for Linux Fast-STREAMS.  This
@@ -119,10 +122,10 @@ static char const ident[] =
 
 #define SC_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SC_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.54 $) $Date: 2007/08/13 22:46:22 $"
+#define SC_REVISION	"LfS $RCSfile: sc.c,v $ $Name:  $($Revision: 0.9.2.55 $) $Date: 2007/08/15 05:33:26 $"
 #define SC_DEVICE	"SVR 4.2 STREAMS STREAMS Configuration Module (SC)"
 #define SC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SC_LICENSE	"GPL v2"
+#define SC_LICENSE	"GPL"
 #define SC_BANNER	SC_DESCRIP	"\n" \
 			SC_COPYRIGHT	"\n" \
 			SC_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:58:09 $
+ @(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:35:10 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sc.c,v $
+ Revision 0.9.2.16  2007/08/15 05:35:10  brian
+ - GPLv3 updates
+
  Revision 0.9.2.15  2007/08/14 12:58:09  brian
  - GNUv3 header updates
 
@@ -117,9 +120,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:58:09 $"
+#ident "@(#) $RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:35:10 $"
 
-static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.15 $) $Date: 2007/08/14 12:58:09 $";
+static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.16 $) $Date: 2007/08/15 05:35:10 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -171,7 +174,7 @@ static char const ident[] = "$RCSfile: test-sc.c,v $ $Name:  $($Revision: 0.9.2.
 static const char *lpkgname = "Linux Fast-STREAMS";
 
 /* static const char *spkgname = "LfS"; */
-static const char *lstdname = "UNIX 98/SUS Version 2";
+static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "SC";
 

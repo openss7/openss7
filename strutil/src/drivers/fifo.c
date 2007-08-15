@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/14 12:58:00 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:35:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 0.9.2.37  2007/08/15 05:35:00  brian
+ - GPLv3 updates
+
  Revision 0.9.2.36  2007/08/14 12:58:00  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/14 12:58:00 $"
+#ident "@(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:35:00 $"
 
 static char const ident[] =
-    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/14 12:58:00 $";
+    "$RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:35:00 $";
 
 #define _LFS_SOURCE
 
@@ -81,10 +84,10 @@ extern struct file_operations strm_f_ops;
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.36 $) $Date: 2007/08/14 12:58:00 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 0.9.2.37 $) $Date: 2007/08/15 05:35:00 $"
 #define FIFO_DEVICE	"SVR 4.2 STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define FIFO_LICENSE	"GPL v2"
+#define FIFO_LICENSE	"GPL"
 #define FIFO_BANNER	FIFO_DESCRIP	"\n" \
 			FIFO_COPYRIGHT	"\n" \
 			FIFO_REVISION	"\n" \

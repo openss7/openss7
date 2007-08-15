@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/13 22:46:15 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:33:21 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 0.9.2.20  2007/08/15 05:33:21  brian
+ - GPLv3 updates
+
  Revision 0.9.2.19  2007/08/13 22:46:15  brian
  - GPLv3 header updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/13 22:46:15 $"
+#ident "@(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:33:21 $"
 
 static char const ident[] =
-    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/13 22:46:15 $";
+    "$RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:33:21 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 STREAMS.  The loop driver is a general
@@ -100,10 +103,10 @@ static char const ident[] =
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/13 22:46:15 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/15 05:33:21 $"
 #define LOOP_DEVICE	"SVR 4.2 STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LOOP_LICENSE	"GPL v2"
+#define LOOP_LICENSE	"GPL"
 #define LOOP_BANNER	LOOP_DESCRIP	"\n" \
 			LOOP_COPYRIGHT	"\n" \
 			LOOP_REVISION	"\n" \

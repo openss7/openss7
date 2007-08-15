@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $
+ @(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/15 05:33:08 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lfscompat.c,v $
+ Revision 0.9.2.32  2007/08/15 05:33:08  brian
+ - GPLv3 updates
+
  Revision 0.9.2.31  2007/08/12 15:51:18  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -145,10 +148,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $"
+#ident "@(#) $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/15 05:33:08 $"
 
 static char const ident[] =
-    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $";
+    "$RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/15 05:33:08 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -172,10 +175,10 @@ static char const ident[] =
 
 #define LFSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LFSCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.31 $) $Date: 2007/08/12 15:51:18 $"
+#define LFSCOMP_REVISION	"LfS $RCSfile: lfscompat.c,v $ $Name:  $($Revision: 0.9.2.32 $) $Date: 2007/08/15 05:33:08 $"
 #define LFSCOMP_DEVICE		"Linux Fast-STREAMS (LfS) 0.9.2.1 Compatibility"
 #define LFSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define LFSCOMP_LICENSE		"GPL v2"
+#define LFSCOMP_LICENSE		"GPL"
 #define LFSCOMP_BANNER		LFSCOMP_DESCRIP	"\n" \
 				LFSCOMP_COPYRIGHT	"\n" \
 				LFSCOMP_REVISION	"\n" \

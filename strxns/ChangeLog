@@ -1,3 +1,32 @@
+2007-08-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: GPLv3 updates
+	* NEWS: GPLv3 updates
+	* README: GPLv3 updates
+	* README-cvs: GPLv3 updates
+	* THANKS: GPLv3 updates
+	* doc/manual/Makefile.am: GPLv3 updates
+	* doc/manual/news.texi: GPLv3 updates
+	* src/drivers/cd.c: GPLv3 updates
+	* src/drivers/dl.c: GPLv3 updates
+	* src/drivers/dl2.c: GPLv3 updates
+	* src/drivers/dl_ip.c: GPLv3 updates
+	* src/drivers/hdlc.c: GPLv3 updates
+	* src/drivers/ip.c: GPLv3 updates
+	* src/drivers/ip_to_dlpi.c: GPLv3 updates
+	* src/drivers/ldl.c: GPLv3 updates
+	* src/drivers/nf.c: GPLv3 updates
+	* src/drivers/np.c: GPLv3 updates
+	* src/drivers/np_ip.c: GPLv3 updates
+	* src/modules/cdi_conv.c: GPLv3 updates
+	* src/modules/dlpi_conv.c: GPLv3 updates
+	* src/modules/ip_strm_mod.c: GPLv3 updates
+	* src/modules/ip_strm_mod.h: GPLv3 updates
+	* src/modules/npi_conv.c: GPLv3 updates
+	* src/test/ldltest.c: GPLv3 updates
+	* src/util/ldlconfig.c: GPLv3 updates
+	* tests/local.at: GPLv3 updates
+
 2007-08-13  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: GPLv3 header update

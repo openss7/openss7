@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $
+ @(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx_pmod.c,v $
+ Revision 0.9.2.5  2007/08/15 05:32:59  brian
+ - GPLv3 updates
+
  Revision 0.9.2.4  2007/08/14 06:47:37  brian
  - GPLv3 header update
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $"
+#ident "@(#) $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
 
 static char const ident[] =
-    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $";
+    "$RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $";
 
 /*
  *  This is MX-PMOD.  This is a pushable STREAMS module that can be pushed on one end of a
@@ -90,11 +93,11 @@ static char const ident[] =
 #undef unfreezestr
 
 #define MX_DESCRIP	"MX (Multiplex) STREAMS PIPE MODULE."
-#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/08/14 06:47:37 $"
+#define MX_REVISION	"OpenSS7 $RCSfile: mx_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:32:59 $"
 #define MX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define MX_DEVICE	"Provides OpenSS7 MX pipe driver."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define MX_LICENSE	"GPL v2"
+#define MX_LICENSE	"GPL"
 #define MX_BANNER	MX_DESCRIP	"\n" \
 			MX_REVISION	"\n" \
 			MX_COPYRIGHT	"\n" \

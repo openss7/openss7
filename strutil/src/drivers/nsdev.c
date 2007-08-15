@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/14 12:58:01 $
+ @(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:01 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nsdev.c,v $
+ Revision 0.9.2.39  2007/08/15 05:35:00  brian
+ - GPLv3 updates
+
  Revision 0.9.2.38  2007/08/14 12:58:01  brian
  - GNUv3 header updates
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/14 12:58:01 $"
+#ident "@(#) $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $"
 
 static char const ident[] =
-    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/14 12:58:01 $";
+    "$RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $";
 
 #define _LFS_SOURCE
 
@@ -76,10 +79,10 @@ static char const ident[] =
 
 #define NSDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NSDEV_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.38 $) $Date: 2007/08/14 12:58:01 $"
+#define NSDEV_REVISION	"LfS $RCSfile: nsdev.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/15 05:35:00 $"
 #define NSDEV_DEVICE	"SVR 4.2 STREAMS Named Stream Device (NSDEV) Driver"
 #define NSDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define NSDEV_LICENSE	"GPL v2"
+#define NSDEV_LICENSE	"GPL"
 #define NSDEV_BANNER	NSDEV_DESCRIP	"\n" \
 			NSDEV_COPYRIGHT	"\n" \
 			NSDEV_REVISION	"\n" \

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 04:00:55 $
+ @(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 04:00:55 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tirdwr.c,v $
+ Revision 0.9.2.34  2007/08/15 05:35:34  brian
+ - GPLv3 updates
+
  Revision 0.9.2.33  2007/08/14 04:00:55  brian
  - GPLv3 header update
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 04:00:55 $"
+#ident "@(#) $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $"
 
 static char const ident[] =
-    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 04:00:55 $";
+    "$RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $";
 
 #include <sys/os7/compat.h>
 
@@ -97,10 +100,10 @@ static char const ident[] =
 
 #define TIRDWR_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TIRDWR_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.33 $) $Date: 2007/08/14 04:00:55 $"
+#define TIRDWR_REVISION		"OpenSS7 $RCSfile: tirdwr.c,v $ $Name:  $($Revision: 0.9.2.34 $) $Date: 2007/08/15 05:35:34 $"
 #define TIRDWR_DEVICE		"SVR 4.2 STREAMS Read Write Module for XTI/TLI Devices (TIRDWR)"
 #define TIRDWR_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define TIRDWR_LICENSE		"GPL v2"
+#define TIRDWR_LICENSE		"GPL"
 #define TIRDWR_BANNER		TIRDWR_DESCRIP		"\n" \
 				TIRDWR_COPYRIGHT	"\n" \
 				TIRDWR_REVISION		"\n" \

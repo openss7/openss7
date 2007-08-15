@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/13 22:46:29 $
+ @(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:33:35 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/13 22:46:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-nsdev.c,v $
+ Revision 0.9.2.25  2007/08/15 05:33:35  brian
+ - GPLv3 updates
+
  Revision 0.9.2.24  2007/08/13 22:46:29  brian
  - GPLv3 header updates
 
@@ -147,9 +150,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/13 22:46:29 $"
+#ident "@(#) $RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:33:35 $"
 
-static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.24 $) $Date: 2007/08/13 22:46:29 $";
+static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:33:35 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -199,7 +202,7 @@ static char const ident[] = "$RCSfile: test-nsdev.c,v $ $Name:  $($Revision: 0.9
 static const char *lpkgname = "Linux Fast-STREAMS";
 
 /* static const char *spkgname = "LfS"; */
-static const char *lstdname = "UNIX 98/SUS Version 2";
+static const char *lstdname = "UNIX 98/SUS Issue 2";
 static const char *sstdname = "XSI/XSR";
 static const char *shortname = "NSDEV";
 static char devname[256] = "/dev/nuls.nsdev";

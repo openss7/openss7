@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 05:17:25 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:34:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockmod.c,v $
+ Revision 0.9.2.10  2007/08/15 05:34:43  brian
+ - GPLv3 updates
+
  Revision 0.9.2.9  2007/08/14 05:17:25  brian
  - GPLv3 header update
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $"
+#ident "@(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:43 $"
 
 static char const ident[] =
-    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $";
+    "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:43 $";
 
 /*
  *  SOCKMOD - A socket module for Linux Fast-STREAMS.
@@ -125,10 +128,10 @@ static char const ident[] =
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/14 05:17:25 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:34:43 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define SMOD_LICENSE	"GPL v2"
+#define SMOD_LICENSE	"GPL"
 #define SMOD_BANNER	SMOD_DESCRIP	"\n" \
 			SMOD_COPYRIGHT	"\n" \
 			SMOD_REVISION	"\n" \

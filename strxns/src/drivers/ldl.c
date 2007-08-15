@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 0.9.2.40  2007/08/15 05:35:42  brian
+ - GPLv3 updates
+
  Revision 0.9.2.39  2007/08/14 03:31:09  brian
  - GPLv3 header update
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $"
+#ident "@(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $"
 
 static char const ident[] =
-    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $";
+    "$RCSfile: ldl.c,v $ $Name:  $($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $";
 
 #define _SVR4_SOURCE
 #define _LIS_SOURCE
@@ -121,10 +124,10 @@ static char const ident[] =
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation. All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.39 $) $Date: 2007/08/14 03:31:09 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 0.9.2.40 $) $Date: 2007/08/15 05:35:42 $"
 #define LDL_DEVICE	"SVR 4.2 STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LDL_LICENSE	"GPL v2"
+#define LDL_LICENSE	"GPL"
 #define LDL_BANNER	LDL_DESCRIP	"\n" \
 			LDL_EXTRA	"\n" \
 			LDL_REVISION	"\n" \
@@ -234,22 +237,6 @@ struct streamtab ldl_info = {
  *
  *  Token ring support by Dave Grothe Copyright (C) 1999
  *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- * 
- * 
  * This driver does not attempt to do any hardware programming. Instead
  * this driver is an interface between the existing Linux network device
  * driver interface and the DLPI interface.

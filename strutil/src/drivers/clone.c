@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:58:00 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:35:00 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 0.9.2.47  2007/08/15 05:35:00  brian
+ - GPLv3 updates
+
  Revision 0.9.2.46  2007/08/14 12:58:00  brian
  - GNUv3 header updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $"
+#ident "@(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $"
 
 static char const ident[] =
-    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $";
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $";
 
 #define _LFS_SOURCE
 
@@ -90,10 +93,10 @@ static char const ident[] =
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/14 12:58:00 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/15 05:35:00 $"
 #define CLONE_DEVICE	"SVR 4.2 STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define CLONE_LICENSE	"GPL v2"
+#define CLONE_LICENSE	"GPL"
 #define CLONE_BANNER	CLONE_DESCRIP	"\n" \
 			CLONE_COPYRIGHT	"\n" \
 			CLONE_REVISION	"\n" \

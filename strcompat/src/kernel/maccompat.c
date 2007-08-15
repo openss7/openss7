@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:33:09 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: maccompat.c,v $
+ Revision 0.9.2.21  2007/08/15 05:33:09  brian
+ - GPLv3 updates
+
  Revision 0.9.2.20  2007/08/12 15:51:19  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $"
+#ident "@(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:33:09 $"
 
 static char const ident[] =
-    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $";
+    "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:33:09 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -89,10 +92,10 @@ static char const ident[] =
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 1997-2005 OpenSS7 Corporation.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 15:51:19 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/15 05:33:09 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
-#define MACCOMP_LICENSE		"GPL v2"
+#define MACCOMP_LICENSE		"GPL"
 #define MACCOMP_BANNER		MACCOMP_DESCRIP		"\n" \
 				MACCOMP_COPYRIGHT	"\n" \
 				MACCOMP_REVISION	"\n" \

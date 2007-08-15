@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/08/14 04:27:14 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/15 05:33:56 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 04:27:14 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:33:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 0.9.2.52  2007/08/15 05:33:56  brian
+ - GPLv3 updates
+
  Revision 0.9.2.51  2007/08/14 04:27:14  brian
  - GPLv3 header update
 
@@ -224,10 +227,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/08/14 04:27:14 $"
+#ident "@(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/15 05:33:56 $"
 
 static char const ident[] =
-    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/08/14 04:27:14 $";
+    "$RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/15 05:33:56 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -308,10 +311,10 @@ static char const ident[] =
 #define RAW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RAW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RAW_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.51 $) $Date: 2007/08/14 04:27:14 $"
+#define RAW_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 0.9.2.52 $) $Date: 2007/08/15 05:33:56 $"
 #define RAW_DEVICE	"SVR 4.2 STREAMS RAW IP Driver"
 #define RAW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define RAW_LICENSE	"GPL v2"
+#define RAW_LICENSE	"GPL"
 #define RAW_BANNER	RAW_DESCRIP	"\n" \
 			RAW_EXTRA	"\n" \
 			RAW_REVISION	"\n" \

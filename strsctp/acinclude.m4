@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.72 $) $Date: 2007/08/14 06:22:03 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 0.9.2.73 $) $Date: 2007/08/15 05:34:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 06:22:03 $ by $Author: brian $
+# Last Modified $Date: 2007/08/15 05:34:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -182,12 +182,12 @@ dnl _SCTP_CHECK_SCTP
 AC_DEFUN([_SCTP_CHECK_SCTP], [dnl
     AC_ARG_WITH([sctp],
 	AS_HELP_STRING([--with-sctp],
-	    [include sctp version 1 driver in build.  @<:@default=no@:>@]),
+	    [include sctp release 1 driver in build.  @<:@default=no@:>@]),
 	[with_sctp="$withval"],
 	[with_sctp='no'])
     AC_ARG_WITH([sctp2],
 	AS_HELP_STRING([--with-sctp2],
-	    [include sctp version 2 driver in build.  @<:@default=yes@:>@]),
+	    [include sctp release 2 driver in build.  @<:@default=yes@:>@]),
 	[with_sctp2="$withval"],
 	[with_sctp2='yes'])
     AC_MSG_CHECKING([for sctp version])
@@ -195,21 +195,21 @@ AC_DEFUN([_SCTP_CHECK_SCTP], [dnl
 	with_sctp='no'
 	sctp_cv_sctp_version=2
 	AC_DEFINE([SCTP_VERSION_2], [1], [
-	    Define for SCTP Version 2.  This define is needed by test programs
+	    Define for SCTP Release 2.  This define is needed by test programs
 	    and other programs that need to determine the difference between
 	    the address format and options conventions for the two versions.])
     else
 	with_sctp='yes'
 	sctp_cv_sctp_version=1
 	AC_DEFINE([SCTP_VERSION_1], [1], [
-	    Define for SCTP Version 1.  This define is needed by test programs
+	    Define for SCTP Release 1.  This define is needed by test programs
 	    and other programs that need to determine the difference between
 	    the address format and options conventions for the two versions.])
     fi
     AM_CONDITIONAL([WITH_SCTP], [test :"$sctp_cv_sctp_version" = :1])dnl
     AM_CONDITIONAL([WITH_SCTP2], [test :"$sctp_cv_sctp_version" = :2])dnl
     AC_DEFINE_UNQUOTED([SCTP_VERSION], [$sctp_cv_sctp_version], [
-	Define to 1 for SCTP Version 1.  Define to 2 for SCTP Version 2.  This
+	Define to 1 for SCTP Release 1.  Define to 2 for SCTP Release 2.  This
 	define is needed by test programs that must determine the difference
 	between the address format and options conventions for the two
 	versions.])
@@ -1247,6 +1247,9 @@ AC_DEFUN([_SCTP_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 0.9.2.73  2007/08/15 05:34:28  brian
+# - GPLv3 updates
+#
 # Revision 0.9.2.72  2007/08/14 06:22:03  brian
 # - GPLv3 header update
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: zaptel.h,v 0.9.2.2 2007/08/14 06:47:29 brian Exp $
+ @(#) $Id: zaptel.h,v 0.9.2.3 2007/08/15 05:32:55 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zaptel.h,v $
+ Revision 0.9.2.3  2007/08/15 05:32:55  brian
+ - GPLv3 updates
+
  Revision 0.9.2.2  2007/08/14 06:47:29  brian
  - GPLv3 header update
 
@@ -67,21 +70,7 @@
  *
  * All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
- *
- * $Id: zaptel.h,v 0.9.2.2 2007/08/14 06:47:29 brian Exp $
+ * $Id: zaptel.h,v 0.9.2.3 2007/08/15 05:32:55 brian Exp $
  */
 
 #ifndef _LINUX_ZAPTEL_H

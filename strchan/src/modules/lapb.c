@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:59 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 06:47:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/15 05:32:59 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 0.9.2.8  2007/08/15 05:32:59  brian
+ - GPLv3 updates
+
  Revision 0.9.2.7  2007/08/14 06:47:37  brian
  - GPLv3 header update
 
@@ -73,10 +76,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $"
+#ident "@(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:59 $"
 
 static char const ident[] =
-    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $";
+    "$RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:59 $";
 
 /*
  *  This is a pushable STREAMS module that provides the Link Access Procedure
@@ -103,10 +106,10 @@ static char const ident[] =
 
 #define LAPB_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LAPB_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 06:47:37 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:32:59 $"
 #define LAPB_DEVICE	"SVR 4.2 STREAMS Link Access Procedure Balanced (LAPB)"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
-#define LAPB_LICENSE	"GPL v2"
+#define LAPB_LICENSE	"GPL"
 #define LAPB_BANNER	LAPB_DESCRIP	"\n" \
 			LAPB_COPYRIGHT	"\n" \
 			LAPB_REVISION	"\n" \
