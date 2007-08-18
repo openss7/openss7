@@ -785,9 +785,14 @@ help_command:
     - Provides help on a number of commands.  COMMAND may be one of\n\
       the following:\n\
 \n\
-	open	    close	attach	    detach	enable\n\
-	disable	    start	stop	    emergency	normal\n\
-	usage	    copying	version	    help	msu\n\
+	help		version		usage		copying\n\
+\n\
+	open		close		attach		detach		enable\n\
+	disable		start		stop		emergency	normal\n\
+	msu\n\
+\n\
+	add		cha		del		get		set\n\
+	remove\n\
 \n\
     - Example:\n\
 \n\
