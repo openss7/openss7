@@ -142,6 +142,12 @@ static struct select sel = { "/dev/x400p-sl", "", 0, 1, 1, 1, 0 };
 
 /* BISON DECLARATIONS */
 
+%debug
+%defines
+%locations
+%token_table
+%verbose
+
 %union {
     int val;
     char *str;

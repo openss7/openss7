@@ -120,6 +120,12 @@ extern FILE *yyin, *yyout;
 
 /* BISON DECLARATIONS */
 
+%debug
+%defines
+%locations
+%token_table
+%verbose
+
 /* %token_table */
 
 %token TOK_EOL

@@ -72,8 +72,6 @@ include am/pr.am
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
 
-YFLAGS				= -d
-
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
