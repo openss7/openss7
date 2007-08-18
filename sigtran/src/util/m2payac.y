@@ -150,10 +150,18 @@ struct select {
 
 int handle = 0;
 
+struct select cur, sel[MAX_HANDLES];
+
 
 %}
 
 /* BISON DECLARATIONS */
+
+%debug
+%defines
+%locations
+%token_table
+%verbose
 
 %union {
     int val;
