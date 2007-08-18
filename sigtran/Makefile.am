@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/14 08:33:17 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/18 03:53:07 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,7 +45,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/14 08:33:17 $ by $Author: brian $
+# Last Modified $Date: 2007/08/18 03:53:07 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,6 +72,8 @@ include am/pr.am
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
 
+YFLAGS				= -d
+
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -88,7 +90,8 @@ pkglibexec_PROGRAMS		= test-sigtran \
 				  test-m2pa \
 				  test-m2ua_as
 
-sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod
+sbin_PROGRAMS			= @PACKAGE_TARNAME@_mknod \
+				  m2paconfig
 
 bin_PROGRAMS			= 
 
@@ -103,6 +106,14 @@ dist_sbin_SCRIPTS		=
 @PACKAGE_TARNAME@_mknod_LDADD		=
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
+
+m2paconfig_SOURCES		= src/util/m2payac.y \
+				  src/util/m2palex.l
+m2paconfig_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+m2paconfig_LDADD		= $(STREAMS_LDADD)
+m2paconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+m2paconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+m2paconfig_CFLAGS		= $(USER_CFLAGS)
 
 test_sigtran_SOURCES		= src/test/test-sigtran.c
 test_sigtran_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -475,6 +486,9 @@ MAINTAINERCLEANFILES		+= \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 0.9.2.13  2007/08/18 03:53:07  brian
+# - working up configuration files
+#
 # Revision 0.9.2.12  2007/08/14 08:33:17  brian
 # - GPLv3 header update
 #

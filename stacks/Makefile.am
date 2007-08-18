@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.96 $) $Date: 2007/08/13 15:21:55 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.97 $) $Date: 2007/08/18 03:53:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:21:55 $ by $Author: brian $
+# Last Modified $Date: 2007/08/18 03:53:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,6 +72,8 @@ include am/pr.am
 
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
+
+AM_YFLAGS			= -d -k
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -135,7 +137,10 @@ endif
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod \
+				  x400config \
+				  mtpconfig \
 				  sdlconfig \
+				  slconfig \
 				  slconfd \
 				  slmon \
 				  ss7capd
@@ -146,7 +151,32 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-sdlconfig_SOURCES		= src/util/sdlconf.c
+slconfig_SOURCES		= src/util/slconf_yac.y \
+				  src/util/slconf_lex.l \
+				  src/util/slconf.c
+slconfig_LDADD			= $(STREAMS_LDADD)
+slconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+slconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+slconfig_CFLAGS			= $(USER_CFLAGS)
+
+mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
+				  src/util/mtpconf_lex.l
+mtpconfig_LDADD			= $(STREAMS_LDADD)
+mtpconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+mtpconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+mtpconfig_CFLAGS		= $(USER_CFLAGS)
+
+x400config_SOURCES		= src/util/x400yac.y \
+				  src/util/x400lex.l \
+				  src/util/x400config.h
+x400config_LDADD		= $(STREAMS_LDADD)
+x400config_LDFLAGS		= $(STREAMS_LDFLAGS)
+x400config_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x400config_CFLAGS		= $(USER_CFLAGS)
+
+sdlconfig_SOURCES		= src/util/sdlconf.c \
+				  src/util/sdlyac.y \
+				  src/util/sdllex.l
 sdlconfig_LDADD			= $(STREAMS_LDADD)
 sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -461,7 +491,10 @@ endif
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod \
+				  x400config \
+				  mtpconfig \
 				  sdlconfig \
+				  slconfig \
 				  slconfd \
 				  slmon \
 				  ss7capd
@@ -472,7 +505,32 @@ sbin_PROGRAMS			= \
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS)
 
-sdlconfig_SOURCES		= src/util/sdlconf.c
+slconfig_SOURCES		= src/util/slconf_yac.y \
+				  src/util/slconf_lex.l \
+				  src/util/slconf.c
+slconfig_LDADD			= $(STREAMS_LDADD)
+slconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+slconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+slconfig_CFLAGS			= $(USER_CFLAGS)
+
+mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
+				  src/util/mtpconf_lex.l
+mtpconfig_LDADD			= $(STREAMS_LDADD)
+mtpconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
+mtpconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+mtpconfig_CFLAGS		= $(USER_CFLAGS)
+
+x400config_SOURCES		= src/util/x400yac.y \
+				  src/util/x400lex.l \
+				  src/util/x400config.h
+x400config_LDADD		= $(STREAMS_LDADD)
+x400config_LDFLAGS		= $(STREAMS_LDFLAGS)
+x400config_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+x400config_CFLAGS		= $(USER_CFLAGS)
+
+sdlconfig_SOURCES		= src/util/sdlconf.c \
+				  src/util/sdlyac.y \
+				  src/util/sdllex.l
 sdlconfig_LDADD			= $(STREAMS_LDADD)
 sdlconfig_LDFLAGS		= $(STREAMS_LDFLAGS)
 sdlconfig_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
@@ -1374,6 +1432,9 @@ MAINTAINERCLEANFILES		+= \
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.97  2007/08/18 03:53:10  brian
+## - working up configuration files
+##
 ## Revision 0.9.2.96  2007/08/13 15:21:55  brian
 ## - header updates, added references
 ##

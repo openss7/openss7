@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/13 15:21:55 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/18 03:53:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:21:55 $ by $Author: brian $
+# Last Modified $Date: 2007/08/18 03:53:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.46 $) $Date: 2007/08/13 15:21:55 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/18 03:53:10 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -97,6 +97,7 @@ AC_ARG_VAR([LD], [Linker loader command])
 AC_PROG_LD
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+AC_PROG_LEX
 AC_PROG_YACC
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
@@ -216,6 +217,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.47  2007/08/18 03:53:10  brian
+# - working up configuration files
+#
 # Revision 0.9.2.46  2007/08/13 15:21:55  brian
 # - header updates, added references
 #
