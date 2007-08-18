@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: lmi_ioctl.h,v 0.9.2.6 2007/08/14 12:17:10 brian Exp $
+ @(#) $Id: lmi_ioctl.h,v 0.9.2.7 2007/08/18 03:53:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/18 03:53:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lmi_ioctl.h,v $
+ Revision 0.9.2.7  2007/08/18 03:53:12  brian
+ - working up configuration files
+
  Revision 0.9.2.6  2007/08/14 12:17:10  brian
  - GPLv3 header updates
 
@@ -64,7 +67,7 @@
 #ifndef __LMI_IOCTL_H__
 #define __LMI_IOCTL_H__
 
-#ident "@(#) $RCSfile: lmi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: lmi_ioctl.h,v $ $Name:  $($Revision: 0.9.2.7 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 
@@ -113,6 +116,7 @@ typedef struct lmi_option {
 #define SS7_PVAR_92	0x0001
 #define SS7_PVAR_96	0x0002
 #define SS7_PVAR_00	0x0003
+#define SS7_PVAR_04	0x0004
 #define SS7_PVAR_YR	0x00ff
 
 enum {

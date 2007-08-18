@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:49:58 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/18 03:53:15 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:49:58 $ by $Author: brian $
+ Last Modified $Date: 2007/08/18 03:53:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlconf.c,v $
+ Revision 0.9.2.8  2007/08/18 03:53:15  brian
+ - working up configuration files
+
  Revision 0.9.2.7  2007/08/12 16:49:58  brian
  - header updates
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:49:58 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/18 03:53:15 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/12 16:49:58 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/18 03:53:15 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -276,6 +279,9 @@ int card = 0;
 int span = 0;
 int slot = 1;
 
+int my_argc = 0;
+char **my_argv = NULL;
+
 int output = 1;
 
 char devname[256] = "/dev/x400p-sl";
@@ -315,7 +321,7 @@ provide any feature listed herein.\n\
 \n\
 As an exception to the above,  this software may be  distributed  under the  GNU\n\
 General Public License (GPL) Version 3,  so long as the  software is distributed\n\
-with, and only used for the testing of, OpenSS7 modules, drivers, and libraries.\n\
+with, and only used for management of, OpenSS7 modules, drivers, and libraries.\n\
 \n\
 U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
 of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
@@ -589,7 +595,7 @@ show_stats(sdl_stats_t * sta)
 #define BUFSIZE 128
 
 void
-slconf_get(void)
+sdlconf_get(void)
 {
 	sdl_config_t cfg;
 #if 0
@@ -673,7 +679,7 @@ slconf_get(void)
 }
 
 void
-slconf_set(void)
+sdlconf_set(void)
 {
 	sdl_config_t cfg;
 	struct strioctl ctl;
@@ -752,8 +758,10 @@ slconf_set(void)
 		show_config(&cfg, 1);
 }
 
+extern void sdlconf_int(void);
+
 void
-slconf_cfg(void)
+sdlconf_cfg(void)
 {
 	fprintf(stderr, "%s: %s: file option not currently available\n", "sdlconf", __FUNCTION__);
 	exit(1);
@@ -768,8 +776,12 @@ main(int argc, char **argv)
 		CMD_NONE = 0,
 		CMD_GET,		/* get device */
 		CMD_SET,		/* set device */
+		CMD_INT,		/* interactive */
 		CMD_CFG,		/* configure from file */
 	} cmd = CMD_NONE;
+
+	my_argc = argc;
+	my_argv = argv;
 
 	while (1) {
 		int option_index = 0;
@@ -777,6 +789,7 @@ main(int argc, char **argv)
 		static struct option long_options[] = {
 			{"get",		no_argument,		NULL, 'g'},
 			{"set",		no_argument,		NULL, 's'},
+			{"interactive",	no_argument,		NULL, 'i'},
 			{"file",	required_argument,	NULL, 'f'},
 			{"device",	required_argument,	NULL, 'd'},
 			{"card",	required_argument,	NULL, 'c'},
@@ -804,7 +817,7 @@ main(int argc, char **argv)
 		};
 		/* *INDENT-ON* */
 
-		c = getopt_long(argc, argv, "gsf:c:p:t:qvhVC?", long_options, &option_index);
+		c = getopt_long(argc, argv, "gsif:c:p:t:qvhVC?", long_options, &option_index);
 		if (c == -1)
 			break;
 		switch (c) {
@@ -820,6 +833,11 @@ main(int argc, char **argv)
 			if (cmd != CMD_NONE)
 				goto bad_option;
 			cmd = CMD_SET;
+			break;
+		case 'i':
+			if (cmd != CMD_NONE)
+				goto bad_option;
+			cmd = CMD_INT;
 			break;
 		case 'f':	/* -f, --file file */
 			if (cmd != CMD_NONE)
@@ -963,13 +981,16 @@ main(int argc, char **argv)
 		help(argc, argv);
 		exit(0);
 	case CMD_GET:
-		slconf_get();
+		sdlconf_get();
 		exit(0);
 	case CMD_SET:
-		slconf_set();
+		sdlconf_set();
+		exit(0);
+	case CMD_INT:
+		sdlconf_int();
 		exit(0);
 	case CMD_CFG:
-		slconf_cfg();
+		sdlconf_cfg();
 		exit(0);
 	}
 	exit(4);
