@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $
+ @(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/18 03:53:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slconf_lex.l,v $
+ Revision 0.9.2.2  2007/08/19 11:24:03  brian
+ - flex version nuances
+
  Revision 0.9.2.1  2007/08/18 03:53:15  brian
  - working up configuration files
 
@@ -59,11 +62,11 @@
 
 %{
 
-#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $"
+#ident "@(#) $RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $"
 
-static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $";
+static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:03 $";
 
-#include <unistd.h>
+#include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
 #include <stdlib.h>
 #include <stropts.h>

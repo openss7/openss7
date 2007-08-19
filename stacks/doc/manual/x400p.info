@@ -8,7 +8,7 @@ END-INFO-DIR-ENTRY
 
 This file provides the Installation and Reference Manual for X400P Driver.
 
-This is Edition 8.rc1, last updated 2007-08-15, of the `X400P Driver
+This is Edition 8.rc1, last updated 2007-08-19, of the `X400P Driver
 Installation and Reference Manual', for Version 0.9a Release 8.rc1.
 
 Copyright (C) 2001-2007  OpenSS7 Corporation (http://www.openss7.com/)
@@ -37,7 +37,7 @@ File: x400p.info,  Node: Top,  Next: Overview,  Up: (dir)
  About This Manual
 ******************
 
-This is Edition 8.rc1, last updated 2007-08-15, of `The X400P Driver
+This is Edition 8.rc1, last updated 2007-08-19, of `The X400P Driver
 Installation and Reference Manual', for Version 0.9a release 8.rc1 of the
 OpenSS7 SS7 Stack package.
 

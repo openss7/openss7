@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.57 $) $Date: 2007/08/13 22:45:52 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.58 $) $Date: 2007/08/19 11:21:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 22:45:52 $ by $Author: brian $
+# Last Modified $Date: 2007/08/19 11:21:22 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([streams],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.57 $) $Date: 2007/08/13 22:45:52 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.58 $) $Date: 2007/08/19 11:21:22 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -180,11 +180,16 @@ AC_CONFIG_FILES([Makefile
 		 src/modules/Config
 		 src/drivers/Config])
 
+_OPENSS7_OUTPUT
+
 AC_OUTPUT
 
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.58  2007/08/19 11:21:22  brian
+# - instead of hardcoding directories
+#
 # Revision 0.9.2.57  2007/08/13 22:45:52  brian
 # - GPLv3 header updates
 #

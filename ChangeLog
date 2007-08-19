@@ -1,3 +1,8 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* texi/install.texi: add bison and flex to dependencies
+	* m4/openss7.m4: added defines for various directories
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates
