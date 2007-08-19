@@ -1,3 +1,9 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/ch.c: move stdbool.h
+	* src/drivers/hdlc.c: move stdbool.h
+	* src/drivers/v401p.c: move stdbool.h
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates
