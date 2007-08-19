@@ -63,6 +63,8 @@
 
 static char const ident[] = "$RCSfile: slconf_lex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $";
 
+#include <unistd.h>
+
 #include <stdlib.h>
 #include <stropts.h>
 #include <string.h>
@@ -639,6 +641,7 @@ OPTIONS		({OPTION})(","{OPTION})*
 static void dummy(void) {
 	(void) dummy;
 	(void) yyunput;
+	(void) yy_flex_realloc;
 }
 
 static YY_BUFFER_STATE buf = NULL;
