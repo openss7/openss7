@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: compat.h,v 0.9.2.37 2007/08/12 15:51:10 brian Exp $
+ @(#) $Id: compat.h,v 0.9.2.38 2007/08/19 12:01:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 12:01:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: compat.h,v $
+ Revision 0.9.2.38  2007/08/19 12:01:48  brian
+ - move stdbool.h to compat.h
+
  Revision 0.9.2.37  2007/08/12 15:51:10  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -61,7 +64,7 @@
 #ifndef __LOCAL_COMPAT_H__
 #define __LOCAL_COMPAT_H__
 
-#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.37 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: compat.h,v $ $Name:  $($Revision: 0.9.2.38 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #define __OPTIMIZE__ 1
 
