@@ -89,10 +89,6 @@ static char const ident[] =
  *  way begin life as a raw-HDLC device but can be configured using the sethdlc utility for Linux.
  */
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 #define _DEBUG 1
 // #undef _DEBUG
 

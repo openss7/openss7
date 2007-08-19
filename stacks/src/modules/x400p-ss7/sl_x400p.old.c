@@ -106,8 +106,6 @@ static char const ident[] =
 
 #include <sys/os7/compat.h>
 
-#include <stdbool.h>
-
 #ifdef LINUX
 #include <linux/ioport.h>
 #include <asm/io.h>

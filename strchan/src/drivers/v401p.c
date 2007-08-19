@@ -259,10 +259,6 @@ static char const ident[] =
  *  layer module.
  */
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 #define _DEBUG 1
 // #undef _DEBUG
 

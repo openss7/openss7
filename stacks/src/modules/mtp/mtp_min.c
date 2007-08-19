@@ -3475,11 +3475,10 @@ static int
 mtp_up_status_ind(queue_t *q, struct mt *mtp, uint32_t dest, uint user, uint status)
 {
 	mtp_addr_t dst = mtp->src;
-	uint error;
 
 	dst.pc = dest;
 	dst.si = user;
-	return mtp_status_ind(q, mtp, &dst, error);
+	return mtp_status_ind(q, mtp, &dst, status);
 }
 static inline int
 mtp_up_status_ind_all_local(queue_t *q, uint32_t dest, uint si, uint status)

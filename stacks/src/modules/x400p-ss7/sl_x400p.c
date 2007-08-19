@@ -159,10 +159,6 @@ static char const ident[] =
  *  complete SS7 MTP Level 2 OpenSS7 implementation.
  */
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 //#define _DEBUG 1
 #undef _DEBUG
 

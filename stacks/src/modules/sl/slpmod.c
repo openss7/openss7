@@ -81,10 +81,6 @@
 static char const ident[] =
     "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $";
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
  *  pseudo-signalling link.  Service primitives on the SL interface at one end of the pipe are

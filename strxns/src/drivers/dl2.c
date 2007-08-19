@@ -94,10 +94,6 @@ static char const ident[] =
  *  This driver is a replacement for the unsupported LDL driver.
  */
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 #define _DEBUG 1
 //#undef _DEBUG
 /

@@ -77,10 +77,6 @@ static char const ident[] =
  *  stream.
  */
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 #define _LFS_SOURCE 1
 #define _DEBUG 1
 
