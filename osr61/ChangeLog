@@ -1,3 +1,7 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/dlgn/source/srmap.c: some stdbool.h (incorrectly) define true as a macro
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates
