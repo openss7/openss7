@@ -1,9 +1,9 @@
-@c @setfilename gpl.info
+@setfilename gpl2.info
 
-@node GNU General Public License
-@section GNU General Public License
-@cindex license, GPL
-@cindex license, GNU General Public License
+@node GNU General Public License Version 2
+@section GNU General Public License Version 2
+@cindex license, GPL v2
+@cindex license, GNU General Public License Version 2
 
 @sp 2
 @center GNU GENERAL PUBLIC LICENSE
@@ -358,8 +358,8 @@ when it starts in an interactive mode:
 @smallexample
 Gnomovision version 69, Copyright (C) 19@var{yy} @var{name of author}
 Gnomovision comes with ABSOLUTELY NO WARRANTY; for details
-type `show w'.  This is free software, and you are welcome
-to redistribute it under certain conditions; type `show c' 
+type @samp{show w}.  This is free software, and you are welcome
+to redistribute it under certain conditions; type @samp{show c}
 for details.
 @end smallexample
 

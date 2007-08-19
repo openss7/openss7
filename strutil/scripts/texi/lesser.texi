@@ -1,9 +1,9 @@
-@c @setfilename lesser.info
+@setfilename lgpl2.info
 
-@node GNU Lesser General Public License
-@section GNU Lesser General Public License
-@cindex license, Lesser General Public License
-@cindex license, LGPL
+@node GNU Lesser General Public License Version 2.1
+@section GNU Lesser General Public License Version 2.1
+@cindex license, Lesser General Public License Version 2.1
+@cindex license, LGPL v2.1
 
 @sp 2
 @center GNU LESSER GENERAL PUBLIC LICENSE

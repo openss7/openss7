@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $
+ @(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:01 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/18 03:53:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:24:01 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2palex.l,v $
+ Revision 0.9.2.2  2007/08/19 11:24:01  brian
+ - flex version nuances
+
  Revision 0.9.2.1  2007/08/18 03:53:18  brian
  - working up configuration files
 
@@ -59,11 +62,11 @@
 
 %{
 
-#ident "@(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $"
+#ident "@(#) $RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:01 $"
 
-static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $";
+static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:24:01 $";
 
-#include <unistd.h>
+#include <unistd.h> /* isatty(), official flex 2.5.4a skeleton misses this */
 
 #include "m2payac.h"
 

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/18 03:53:10 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/19 11:21:13 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/18 03:53:10 $ by $Author: brian $
+# Last Modified $Date: 2007/08/19 11:21:13 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([strss7],[0.9a],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/18 03:53:10 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.48 $) $Date: 2007/08/19 11:21:13 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -212,11 +212,16 @@ AC_CONFIG_FILES([Makefile
 		 src/modules/isdn/lis.conf
 		 src/modules/h225/lis.conf])
 
+_OPENSS7_OUTPUT
+
 AC_OUTPUT
 
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.48  2007/08/19 11:21:13  brian
+# - instead of hardcoding directories
+#
 # Revision 0.9.2.47  2007/08/18 03:53:10  brian
 # - working up configuration files
 #
