@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,21 +45,45 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/19 05:19:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: ss7statsd.c,v $
+ Revision 0.9.2.1  2007/08/19 05:19:33  brian
+ - added more daemon files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $";
 
 /*
  * This is ss7statsd(8).  The purpose of the daemon is to spawn a daemon process to collect
  * statistics and log them to a statistics collection log.
  */
+
+#include <stropts.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <ctype.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/poll.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <getopt.h>
+#include <time.h>
+#include <signal.h>
+#include <syslog.h>
+#include <sys/utsname.h>
 
 #ifndef MAX_PATH_LENGTH
 #define MAX_PATH_LENGTH 256
@@ -67,6 +91,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 int verbose = 1;
 int debug = 0;
+int nomead = 1;
 
 long interval = 300000;			/* 5 minutes in milliseconds. */
 
@@ -86,13 +111,13 @@ long interval = 300000;			/* 5 minutes in milliseconds. */
 #define SS7STATSD_DEFAULT_DEVNAME "/dev/ss7-stats"
 #endif				/* SS7STATSD_DEFAULT_DEVNAME */
 
-char *outpdir[MAX_PATH_LENGTH] = "";
-char *outfile[MAX_PATH_LENGTH] = "";
-char *errfile[MAX_PATH_LENGTH] = "";
-char *cfgfile[MAX_PATH_LENGTH] = "";
-char *outpath[MAX_PATH_LENGTH] = "";
-char *errpath[MAX_PATH_LENGTH] = "";
-char *devname[MAX_PATH_LENGTH] = "";
+char outpdir[MAX_PATH_LENGTH] = "";
+char outfile[MAX_PATH_LENGTH] = "";
+char errfile[MAX_PATH_LENGTH] = "";
+char cfgfile[MAX_PATH_LENGTH] = "";
+char outpath[MAX_PATH_LENGTH] = "";
+char errpath[MAX_PATH_LENGTH] = "";
+char devname[MAX_PATH_LENGTH] = "";
 
 void
 copying(const char *name)
@@ -100,9 +125,6 @@ copying(const char *name)
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-\n\
-%1$s: %2$s\n\
-\n\
 Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>\n\
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -137,8 +159,7 @@ the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR\n
 \n\
 Commercial licensing and support of this software is available from OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
-\n\
-", name, ident);
+");
 }
 
 void
@@ -147,19 +168,17 @@ version(const char *name)
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+Written by Brian Bidulock.\n\
 \n\
-%1$s:\n\
-Version: %2$s\n\
-\n\
-Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>\n\
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
-\n\
-All Rights Reserved.\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation\n\
+Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
-incorporated herein by reference.  See `%1$s --copying' for permissions.\n\
-\n\
-", name, ident);
+incorporated here by reference.  See `%1$s --copying' for copying permission.\n\
+", "ss7statsd", PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
 }
 
 void
@@ -207,27 +226,27 @@ Options:\n\
     {-C, --copying}\n\
         print copying permissions and exit\n\
   Daemon Options:\n\
-    {-i, --interval=}INTERVAL			    (default: %5$ld)\n\
+    {-i, --interval=}INTERVAL			    (default: %4$ld)\n\
 	statistics collection interval in milliseconds\n\
-    {-O, --outpdir=}DIRECTORY			    (default: %6$s)\n\
+    {-O, --outpdir=}DIRECTORY			    (default: %5$s)\n\
 	specify directory for output files\n\
-    {-o, --outfile=}FILENAME			    (default: %7$s)\n\
+    {-o, --outfile=}FILENAME			    (default: %6$s)\n\
 	specify output filename\n\
-    {-l, --logfile=}FILENAME			    (default: %8$s)\n\
+    {-l, --logfile=}FILENAME			    (default: %7$s)\n\
 	specify error log filename\n\
-    {-f, --cfgfile=}FILENAME			    (default: %9$s)\n\
+    {-f, --cfgfile=}FILENAME			    (default: %8$s)\n\
 	specify configuration filename\n\
-    {-e, --devname=}DEVNAME			    (default: %10$s)\n\
+    {-e, --devname=}DEVNAME			    (default: %9$s)\n\
 	specify device name\n\
   General Options:\n\
     {-q, --quiet}\n\
         suppress normal output\n\
-    {-d, --debug[=]}[LEVEL]			    (default: %3$d)\n\
+    {-d, --debug[=]}[LEVEL]			    (default: %2$d)\n\
         increase or set debugging output level\n\
-    {-v, --verbose[=]}[LEVEL]			    (default: %4$d)\n\
+    {-v, --verbose[=]}[LEVEL]			    (default: %3$d)\n\
         increase or set output verbosity level\n\
 \n\
-", name, ident, debug, verbose, interval, SS7STATSD_DEFAULT_OUTPDIR, SS7STATSD_DEFAULT_OUTFILE, SS7STATSD_DEFAULT_LOGFILE, SS7STATSD_DEFAULT_CFGFILE, SS7STATSD_DEFAULT_DEVNAME);
+", name, debug, verbose, interval, SS7STATSD_DEFAULT_OUTPDIR, SS7STATSD_DEFAULT_OUTFILE, SS7STATSD_DEFAULT_ERRFILE, SS7STATSD_DEFAULT_CFGFILE, SS7STATSD_DEFAULT_DEVNAME);
 }
 
 void
@@ -236,7 +255,7 @@ option_error(int argc, char *argv[], int optind, const char *str, int retval)
 	fprintf(stderr, "%s --", str);
 	while (optind < argc)
 		fprintf(stderr, " %s", argv[optind++]);
-	fprintf(stderr, '\0');
+	fprintf(stderr, "\n");
 	exit(retval);
 }
 
@@ -324,7 +343,7 @@ main(int argc, char *argv[])
 			strncpy(devname, optarg, sizeof(devname));
 			break;
 		case 'q':	/* -q, --quiet */
-		      verbose -= verbose > 1: 1:verbose;
+		        verbose -= verbose > 1 ? 1 : verbose;
 			break;
 		case 'd':	/* -d, --debug [LEVEL] */
 			if (optarg != NULL) {
@@ -362,7 +381,7 @@ main(int argc, char *argv[])
 			option_error(argc, argv, optind - 1, "syntax error", 2);
 		}
 	}
-	if (optind < optarg)
+	if (optind < argc)
 		option_error(argc, argv, optind, "trailing arguments", 2);
-	
+	exit(0);
 }
