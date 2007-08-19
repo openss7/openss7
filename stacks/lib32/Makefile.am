@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/13 15:22:12 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:22:12 $ by $Author: brian $
+# Last Modified $Date: 2007/08/19 11:55:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -373,6 +373,9 @@ include ../am/libraries.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.9  2007/08/19 11:55:41  brian
+## - move stdbool.h, obviate need for YFLAGS, general workup
+##
 ## Revision 0.9.2.8  2007/08/13 15:22:12  brian
 ## - header updates, added references
 ##

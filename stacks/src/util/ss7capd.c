@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:21:05 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:57:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:21:05 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 0.9.2.6  2007/08/19 11:57:41  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.5  2007/08/15 05:21:05  brian
  - GPLv3 updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:21:05 $"
+#ident "@(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:57:41 $"
 
 static char const ident[] =
-    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:21:05 $";
+    "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:57:41 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -159,7 +162,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.6 $ $Date: 2007/08/19 11:57:41 $");
 }
 
 void
@@ -428,7 +431,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.5 2007/08/15 05:21:05 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 0.9.2.6 2007/08/19 11:57:41 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

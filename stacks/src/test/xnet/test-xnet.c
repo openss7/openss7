@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:20:15 $
+ @(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:57:36 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:20:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnet.c,v $
+ Revision 0.9.2.14  2007/08/19 11:57:36  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.13  2007/08/14 12:20:15  brian
  - GPLv3 header updates
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:20:15 $"
+#ident "@(#) $RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:57:36 $"
 
-static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:20:15 $";
+static char const ident[] = "$RCSfile: test-xnet.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:57:36 $";
 
 /*
  *  This is a ferry-clip XTI/TLI conformance test program for testing the
@@ -18224,7 +18227,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.14 $ $Date: 2007/08/19 11:57:36 $");
 }
 
 void

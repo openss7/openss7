@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:48 $
+ @(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:56:57 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:48 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:56:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-etsi_t.c,v $
+ Revision 0.9.2.6  2007/08/19 11:56:57  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.5  2007/08/14 12:19:48  brian
  - GPLv3 header updates
 
@@ -102,9 +105,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:48 $"
+#ident "@(#) $RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:56:57 $"
 
-static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:48 $";
+static char const ident[] = "$RCSfile: test-etsi_t.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:56:57 $";
 
 /*
  *  This file is for testing the sctp_t module.  It is provided for the
@@ -12110,7 +12113,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-etsi_t", PACKAGE, VERSION, "$Revision$ $Date$");
+", "test-etsi_t", PACKAGE, VERSION, "$Revision: 0.9.2.6 $ $Date: 2007/08/19 11:56:57 $");
 }
 
 void

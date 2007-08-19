@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:29 $
+ @(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/19 11:56:32 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:29 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:56:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_t.c,v $
+ Revision 0.9.2.8  2007/08/19 11:56:32  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.7  2007/08/14 12:19:29  brian
  - GPLv3 header updates
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:29 $"
+#ident "@(#) $RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/19 11:56:32 $"
 
-static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:29 $";
+static char const ident[] = "$RCSfile: test-sctp_t.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/19 11:56:32 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -42999,7 +43002,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp_t", PACKAGE, VERSION, "$Revision$ $Date$");
+", "test-sctp_t", PACKAGE, VERSION, "$Revision: 0.9.2.8 $ $Date: 2007/08/19 11:56:32 $");
 }
 
 void

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:20:10 $
+ @(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:57:24 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:20:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:24 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-tirdwr.c,v $
+ Revision 0.9.2.14  2007/08/19 11:57:24  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.13  2007/08/14 12:20:10  brian
  - GPLv3 header updates
 
@@ -90,9 +93,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:20:10 $"
+#ident "@(#) $RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:57:24 $"
 
-static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:20:10 $";
+static char const ident[] = "$RCSfile: test-tirdwr.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:57:24 $";
 
 /*
  *  These is a ferry-clip TIRDWR conformance test program for testing the
@@ -9186,7 +9189,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.14 $ $Date: 2007/08/19 11:57:24 $");
 }
 
 void
