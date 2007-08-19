@@ -1,5 +1,5 @@
-OpenSS7 STREAMS SIGTRAN -- read me CVS file.  2007-08-14
-$Id: README-cvs,v 0.9.2.16 2007/08/15 05:13:33 brian Exp $
+OpenSS7 STREAMS SIGTRAN -- read me CVS file.  2007-08-19
+$Id: README-cvs,v 0.9.2.17 2007/08/19 12:39:53 brian Exp $
 Copyright (c) 2001-2007  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -47,6 +47,10 @@ The build host requires the following GNU tools:
 
    * `gettext 0.16.1'
 
+   * `bison 2.3'
+
+   * `flex 2.5.4a'
+
 These tools can be acquired from the FSF website (http://www.fsf.org/)
 in the free software directory, and also at the following locations:
 
@@ -61,6 +65,10 @@ in the free software directory, and also at the following locations:
 
    * gettext-0.16.1
      (http://www.openss7.org/tarballs/gettext-0.16.1.tar.gz)
+
+   * bison-2.3 (http://www.openss7.org/tarballs/bison-2.3.tar.bz2)
+
+   * flex-2.5.4a (http://www.openss7.org/tarballs/flex-2.5.4a.tar.gz)
 
 It should be stressed that, in particular, the `autoconf(1)', and `automake(1)',
 must be at version releases `2.61' and `1.10'.  _The versions normally
