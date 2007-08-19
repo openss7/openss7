@@ -1,3 +1,7 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/include/sys/os7/compat.h: move stdbool.h here
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates
