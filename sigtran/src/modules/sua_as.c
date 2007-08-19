@@ -107,10 +107,6 @@ static char const ident[] =
  *  into SCCP-primitives and sent upstream.
  */
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1

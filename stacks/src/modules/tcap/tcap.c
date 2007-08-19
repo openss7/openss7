@@ -2236,7 +2236,7 @@ static int
 unpack_priv_component_portion(uchar **p, uchar *e, struct tr_msg *m, t_uscalar_t opt)
 {
 	t_uscalar_t err;
-	t_uscalar_t tag;
+	t_uscalar_t tag = 0; /* XXX */
 
 	if (opt) {
 		if (*p >= e)
@@ -2372,7 +2372,7 @@ static inline int
 unpack_appl_origid(uchar **p, uchar *e, struct tr_msg *m)
 {
 	t_uscalar_t err;
-	t_uscalar_t tag;
+	t_uscalar_t tag = 0; /* XXX */
 
 	if ((err = unpack_appl_prim(p, &e, &tag)))
 		return (err);
@@ -2388,7 +2388,7 @@ static inline int
 unpack_appl_destid(uchar **p, uchar *e, struct tr_msg *m)
 {
 	t_uscalar_t err;
-	t_uscalar_t tag;
+	t_uscalar_t tag = 0; /* XXX */
 
 	if ((err = unpack_appl_prim(p, &e, &tag)))
 		return (err);
@@ -2454,7 +2454,7 @@ static int
 unpack_appl_component_portion(uchar **p, uchar *e, struct tr_msg *m, t_uscalar_t opt)
 {
 	t_uscalar_t err;
-	t_uscalar_t tag;
+	t_uscalar_t tag = 0; /* XXX */
 
 	if (opt) {
 		if (*p >= e)

@@ -90,10 +90,6 @@
 static char const ident[] =
     "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $";
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 #define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
 #define _MPS_SOURCE 1

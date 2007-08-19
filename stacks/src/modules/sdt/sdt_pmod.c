@@ -72,10 +72,6 @@
 static char const ident[] =
     "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $";
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
  *  a pair of connected signalling data terminals.  Each end of the pipe presents the SDTI

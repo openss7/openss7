@@ -63,10 +63,6 @@
 static char const ident[] =
     "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 03:31:09 $";
 
-#ifndef HAVE_KTYPE_BOOL
-#include <stdbool.h>
-#endif
-
 /*
  * This is a DL driver for LLC1, LLC2 and LLC3 connections over 802.2.  It
  * hooks into the Linux networking layer and has access to all 802.2 devices

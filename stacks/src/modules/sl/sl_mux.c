@@ -4084,7 +4084,7 @@ static noinline fastcall int
 sl_w_other(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
-	int err;
+	int err = 0;
 
 	if (likely(!!(sl = sl_acquire(q)))) {
 		read_lock(&sl_mux_lock);
@@ -4442,7 +4442,7 @@ static noinline fastcall int
 sl_r_other(queue_t *q, mblk_t *mp)
 {
 	struct sl *sl;
-	int err;
+	int err = 0;
 
 	read_lock(&sl_mux_lock);
 	sl = sl_acquire(q);
