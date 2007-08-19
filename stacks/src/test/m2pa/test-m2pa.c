@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:19:41 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:56:48 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:56:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 0.9.2.26  2007/08/19 11:56:48  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.25  2007/08/14 12:19:41  brian
  - GPLv3 header updates
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:19:41 $"
+#ident "@(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:56:48 $"
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/14 12:19:41 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:56:48 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -21419,7 +21422,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.26 $ $Date: 2007/08/19 11:56:48 $");
 }
 
 void

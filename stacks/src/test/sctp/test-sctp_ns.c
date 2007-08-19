@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:52 $
+ @(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/19 11:57:03 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:52 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_ns.c,v $
+ Revision 0.9.2.8  2007/08/19 11:57:03  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.7  2007/08/14 12:19:52  brian
  - GPLv3 header updates
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:52 $"
+#ident "@(#) $RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/19 11:57:03 $"
 
-static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/14 12:19:52 $";
+static char const ident[] = "$RCSfile: test-sctp_ns.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/19 11:57:03 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -615,7 +618,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sctp_ns", PACKAGE, VERSION, "$Revision$ $Date$");
+", "test-sctp_ns", PACKAGE, VERSION, "$Revision: 0.9.2.8 $ $Date: 2007/08/19 11:57:03 $");
 }
 
 void

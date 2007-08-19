@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $
+ @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,20 +45,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 05:19:33 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7statsd.c,v $
+ Revision 0.9.2.2  2007/08/19 11:57:41  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.1  2007/08/19 05:19:33  brian
  - added more daemon files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $"
+#ident "@(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $"
 
 static char const ident[] =
-    "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $";
+    "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $";
 
 /*
  * This is ss7statsd(8).  The purpose of the daemon is to spawn a daemon process to collect
@@ -164,7 +167,7 @@ regulations).\n\
 Commercial licensing and  support  of  this  software is available from  OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
 \n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
 }
 
 void
@@ -184,7 +187,7 @@ Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
 }
 
 void

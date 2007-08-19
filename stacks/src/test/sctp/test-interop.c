@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:49 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:56:58 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:49 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:56:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 0.9.2.6  2007/08/19 11:56:58  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.5  2007/08/14 12:19:49  brian
  - GPLv3 header updates
 
@@ -114,9 +117,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:49 $"
+#ident "@(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:56:58 $"
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/14 12:19:49 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:56:58 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the
@@ -10663,7 +10666,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-interop", PACKAGE, VERSION, "$Revision$ $Date$");
+", "test-interop", PACKAGE, VERSION, "$Revision: 0.9.2.6 $ $Date: 2007/08/19 11:56:58 $");
 }
 
 void

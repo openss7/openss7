@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $
+ @(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:55:51 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:20:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:55:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_pmod.c,v $
+ Revision 0.9.2.6  2007/08/19 11:55:51  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.5  2007/08/15 05:20:15  brian
  - GPLv3 updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $"
+#ident "@(#) $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:55:51 $"
 
 static char const ident[] =
-    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $";
+    "$RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:55:51 $";
 
 /*
  *  This is a module that can be pushed over one end of a STREAMS-based pipe to form a simulation of
@@ -104,7 +107,7 @@ static char const ident[] =
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_DESCRIP	"SS7/SDT: (Signalling Data Terminal) STREAMS PIPE MODULE."
-#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:20:15 $A"
+#define SDT_REVISION	"OpenSS7 $RCSfile: sdt_pmod.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:55:51 $A"
 #define SDT_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define SDT_DEVICE	"Supports STREAMS-based Pipes."
 #define SDT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

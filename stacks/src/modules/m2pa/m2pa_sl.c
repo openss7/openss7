@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/19 11:55:43 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:18:54 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:55:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.30  2007/08/19 11:55:43  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.29  2007/08/15 05:18:54  brian
  - GPLv3 updates
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/19 11:55:43 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/19 11:55:43 $";
 
 #define _LFS_SOURCE 1
 #define _SVR4_SOURCE 1
@@ -118,7 +121,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.29 $) $Date: 2007/08/15 05:18:54 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.30 $) $Date: 2007/08/19 11:55:43 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

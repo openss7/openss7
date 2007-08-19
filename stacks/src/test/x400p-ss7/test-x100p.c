@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:20:12 $
+ @(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:57:27 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:20:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x100p.c,v $
+ Revision 0.9.2.11  2007/08/19 11:57:27  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.10  2007/08/14 12:20:12  brian
  - GPLv3 header updates
 
@@ -87,9 +90,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:20:12 $"
+#ident "@(#) $RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:57:27 $"
 
-static char const ident[] = "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/14 12:20:12 $";
+static char const ident[] = "$RCSfile: test-x100p.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:57:27 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -10362,7 +10365,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.11 $ $Date: 2007/08/19 11:57:27 $");
 }
 
 void

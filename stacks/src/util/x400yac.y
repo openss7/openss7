@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x400yac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $
+ @(#) $RCSfile: x400yac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/18 03:53:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400yac.y,v $
+ Revision 0.9.2.2  2007/08/19 11:57:41  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.1  2007/08/18 03:53:15  brian
  - working up configuration files
 
@@ -59,9 +62,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: x400yac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $"
+#ident "@(#) $RCSfile: x400yac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $"
 
-static char const ident[] = "$RCSfile: x400yac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $";
+static char const ident[] = "$RCSfile: x400yac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -1132,7 +1135,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
 }
 
 void

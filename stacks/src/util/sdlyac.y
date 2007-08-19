@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $
+ @(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/18 03:53:15 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlyac.y,v $
+ Revision 0.9.2.2  2007/08/19 11:57:40  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.1  2007/08/18 03:53:15  brian
  - working up configuration files
 
@@ -59,9 +62,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $"
+#ident "@(#) $RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $"
 
-static char const ident[] = "$RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $";
+static char const ident[] = "$RCSfile: sdlyac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:40 $";
 
 #include <stropts.h>
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sdt-pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:20:04 $
+ @(#) $RCSfile: test-sdt-pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 11:57:18 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:20:04 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sdt-pmod.c,v $
+ Revision 0.9.2.3  2007/08/19 11:57:18  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.2  2007/08/14 12:20:04  brian
  - GPLv3 header updates
 
@@ -81,9 +84,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sdt-pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:20:04 $"
+#ident "@(#) $RCSfile: test-sdt-pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 11:57:18 $"
 
-static char const ident[] = "$RCSfile: test-sdt-pmod.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 12:20:04 $";
+static char const ident[] = "$RCSfile: test-sdt-pmod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 11:57:18 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -2780,7 +2783,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", "test-sdt-pmod", PACKAGE, VERSION, "$Revision$ $Date$");
+", "test-sdt-pmod", PACKAGE, VERSION, "$Revision: 0.9.2.3 $ $Date: 2007/08/19 11:57:18 $");
 }
 
 void

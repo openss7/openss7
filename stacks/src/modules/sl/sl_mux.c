@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:55:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:20:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:55:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 0.9.2.26  2007/08/19 11:55:54  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.25  2007/08/15 05:20:18  brian
  - GPLv3 updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $"
+#ident "@(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:55:54 $"
 
 static char const ident[] =
-    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $";
+    "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:55:54 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -112,7 +115,7 @@ static char const ident[] =
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.25 $) $Date: 2007/08/15 05:20:18 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 0.9.2.26 $) $Date: 2007/08/19 11:55:54 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corportation.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

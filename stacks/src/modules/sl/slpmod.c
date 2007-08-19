@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $
+ @(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:20:19 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:55:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: slpmod.c,v $
+ Revision 0.9.2.9  2007/08/19 11:55:54  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.8  2007/08/15 05:20:19  brian
  - GPLv3 updates
 
@@ -76,10 +79,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $"
+#ident "@(#) $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $"
 
 static char const ident[] =
-    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $";
+    "$RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $";
 
 /*
  *  This is SLPMOD, an SL module that is pushed over a pipe end to form an internal
@@ -106,7 +109,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define SL_DESCRIP	"Signalling Link (SL) Pipe Module (SLPMOD) STREAMS MODULE."
-#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.8 $) $Date: 2007/08/15 05:20:19 $"
+#define SL_REVISION	"OpenSS7 $RCSfile: slpmod.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:55:54 $"
 #define SL_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

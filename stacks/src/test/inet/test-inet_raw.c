@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:19:06 $
+ @(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:56:07 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:19:06 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:56:07 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_raw.c,v $
+ Revision 0.9.2.14  2007/08/19 11:56:07  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.13  2007/08/14 12:19:06  brian
  - GPLv3 header updates
 
@@ -117,9 +120,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:19:06 $"
+#ident "@(#) $RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:56:07 $"
 
-static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/14 12:19:06 $";
+static char const ident[] = "$RCSfile: test-inet_raw.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:56:07 $";
 
 /*
  *  Simple test program for INET streams.
@@ -42757,7 +42760,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.14 $ $Date: 2007/08/19 11:56:07 $");
 }
 
 void

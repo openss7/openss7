@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:44 $
+ @(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/19 11:57:30 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 16:20:44 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:57:30 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p.c,v $
+ Revision 0.9.2.21  2007/08/19 11:57:30  brian
+ - move stdbool.h, obviate need for YFLAGS, general workup
+
  Revision 0.9.2.20  2007/08/12 16:20:44  brian
  - new PPA handling
 
@@ -117,9 +120,9 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:44 $"
+#ident "@(#) $RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/19 11:57:30 $"
 
-static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/12 16:20:44 $";
+static char const ident[] = "$RCSfile: test-x400p.c,v $ $Name:  $($Revision: 0.9.2.21 $) $Date: 2007/08/19 11:57:30 $";
 
 #define TEST_M2PA   0
 #define TEST_X400   1
@@ -21021,7 +21024,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.21 $ $Date: 2007/08/19 11:57:30 $");
 }
 
 void
