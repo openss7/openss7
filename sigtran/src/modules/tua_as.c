@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:48:37 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:14:12 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.6  2007/08/19 11:48:37  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.5  2007/08/15 05:14:12  brian
  - GPLv3 updates
 
@@ -67,10 +70,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:48:37 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:48:37 $";
 
 /*
  *  This is the AS side of TUA implemented as a pushable module that pushes over an SCTP NPI
@@ -92,7 +95,7 @@ static char const ident[] =
 #include <sys/tpi_tcap.h>
 
 #define TUA_AS_DESCRIP		"TUA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.5 $) $Date: 2007/08/15 05:14:12 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/19 11:48:37 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

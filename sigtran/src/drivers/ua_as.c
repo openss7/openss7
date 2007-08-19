@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 05:14:06 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:48:31 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:14:06 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:31 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 0.9.2.14  2007/08/19 11:48:31  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.13  2007/08/15 05:14:06  brian
  - GPLv3 updates
 
@@ -91,10 +94,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 05:14:06 $"
+#ident "@(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:48:31 $"
 
 static char const ident[] =
-    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/15 05:14:06 $";
+    "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:48:31 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -192,7 +195,7 @@ static char const ident[] =
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.13 $) $Date: 2007/08/15 05:14:06 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 0.9.2.14 $) $Date: 2007/08/19 11:48:31 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

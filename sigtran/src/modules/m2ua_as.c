@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:14:11 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/19 11:48:36 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:14:11 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 0.9.2.13  2007/08/19 11:48:36  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.12  2007/08/15 05:14:11  brian
  - GPLv3 updates
 
@@ -88,10 +91,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:14:11 $"
+#ident "@(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/19 11:48:36 $"
 
 static char const ident[] =
-    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:14:11 $";
+    "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/19 11:48:36 $";
 
 /*
  *  This is the AS side of M2UA implemented as a pushable module that pushes over an SCTP NPI
@@ -159,7 +162,7 @@ static char const ident[] =
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/15 05:14:11 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/19 11:48:36 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

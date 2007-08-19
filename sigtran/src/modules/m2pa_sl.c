@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:14:10 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/19 11:48:34 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:14:10 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 0.9.2.20  2007/08/19 11:48:34  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.19  2007/08/15 05:14:10  brian
  - GPLv3 updates
 
@@ -103,10 +106,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:14:10 $"
+#ident "@(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/19 11:48:34 $"
 
 static char const ident[] =
-    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:14:10 $";
+    "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/19 11:48:34 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -137,7 +140,7 @@ static char const ident[] =
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.19 $) $Date: 2007/08/15 05:14:10 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 0.9.2.20 $) $Date: 2007/08/19 11:48:34 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

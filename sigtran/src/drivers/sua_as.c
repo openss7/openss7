@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:53 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:22 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:13:53 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:22 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 0.9.2.12  2007/08/19 11:48:22  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.11  2007/08/15 05:13:53  brian
  - GPLv3 updates
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:53 $"
+#ident "@(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:22 $"
 
 static char const ident[] =
-    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:53 $";
+    "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:22 $";
 
 /*
  *  This is an SUA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -186,7 +189,7 @@ static char const ident[] =
 /* ============================== */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP AS SCCP STREAMS MULTIPLEXING DRIVER."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:53 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:22 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
