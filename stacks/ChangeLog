@@ -1,3 +1,71 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: tell program its own name
+	* lib32/Makefile.am: tell program its own name
+	* scripts/.cvsignore: ignore ylwrap
+	* src/modules/m2pa/m2pa_sl.c: move stdbool, version updates
+	* src/modules/mtp/mtp_min.c: move stdbool, version updates
+	* src/modules/sdt/sdt_pmod.c: move stdbool, version updates
+	* src/modules/sl/sl_mux.c: move stdbool, version updates
+	* src/modules/sl/slpmod.c: move stdbool, version updates
+	* src/modules/tcap/tcap.c: move stdbool, version updates
+	* src/modules/x400p-ss7/sl_x400p.c: move stdbool, version updates
+	* src/test/perftest.c: move stdbool, version updates
+	* src/test/inet/test-inet_raw.c: move stdbool, version updates
+	* src/test/inet/test-inet_sctp.c: move stdbool, version updates
+	* src/test/inet/test-inet_tcp.c: move stdbool, version updates
+	* src/test/inet/test-inet_udp.c: move stdbool, version updates
+	* src/test/inet/test-sctp.c: move stdbool, version updates
+	* src/test/inet/test-sctp_n.c: move stdbool, version updates
+	* src/test/inet/test-sctp_nc.c: move stdbool, version updates
+	* src/test/inet/test-sctp_ns.c: move stdbool, version updates
+	* src/test/inet/test-sctp_t.c: move stdbool, version updates
+	* src/test/inet/test-tcpc.c: move stdbool, version updates
+	* src/test/inet/test-tcps.c: move stdbool, version updates
+	* src/test/inet/test-udpc.c: move stdbool, version updates
+	* src/test/inet/test-udps.c: move stdbool, version updates
+	* src/test/isup/test-q784.c: move stdbool, version updates
+	* src/test/m2pa/test-m2pa.c: move stdbool, version updates
+	* src/test/sctp/test-etsi_n.c: move stdbool, version updates
+	* src/test/sctp/test-etsi_t.c: move stdbool, version updates
+	* src/test/sctp/test-interop.c: move stdbool, version updates
+	* src/test/sctp/test-sctp.c: move stdbool, version updates
+	* src/test/sctp/test-sctp_n.c: move stdbool, version updates
+	* src/test/sctp/test-sctp_n2.c: move stdbool, version updates
+	* src/test/sctp/test-sctp_nc.c: move stdbool, version updates
+	* src/test/sctp/test-sctp_ns.c: move stdbool, version updates
+	* src/test/sctp/test-sctp_t.c: move stdbool, version updates
+	* src/test/sdl/test-sdl-pmod.c: move stdbool, version updates
+	* src/test/sdt/test-sdt-pmod.c: move stdbool, version updates
+	* src/test/sl/test-q781-pipe.c: move stdbool, version updates
+	* src/test/sl/test-q781.c: move stdbool, version updates
+	* src/test/sl/test-sl-pmod.c: move stdbool, version updates
+	* src/test/tli/test-timod.c: move stdbool, version updates
+	* src/test/tli/test-tirdwr.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x100p.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-cap.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-cap2.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-hsl.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-perf.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-sdl.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-sdt.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-sdt2.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p-sl.c: move stdbool, version updates
+	* src/test/x400p-ss7/test-x400p.c: move stdbool, version updates
+	* src/test/xnet/test-xnet.c: move stdbool, version updates
+	* src/util/mtpconf_yac.y: add flags here
+	* src/util/sdlyac.y: add flags here
+	* src/util/x400yac.y: add flags here
+	* src/util/sdlconf.c: more workup
+	* src/util/slconf.c: more workup
+	* src/util/slconfd.c: more workup
+	* src/util/slmon.c: more workup
+	* src/util/slstatsd.c: more workup
+	* src/util/ss7capd.c: more workup
+	* src/util/ss7statsd.c: more workup
+	* src/util/x400config.c: more workup
+	* src/util/x400pconf.c: more workup
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* NEWS: GPLv3 updates

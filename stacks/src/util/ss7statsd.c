@@ -57,7 +57,8 @@
 
 #ident "@(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $"
 
-static char const ident[] = "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $";
+static char const ident[] =
+    "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $";
 
 /*
  * This is ss7statsd(8).  The purpose of the daemon is to spawn a daemon process to collect
@@ -92,20 +93,21 @@ static char const ident[] = "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.
 int verbose = 1;
 int debug = 0;
 int nomead = 1;
+int useconfig = 0;
 
 long interval = 300000;			/* 5 minutes in milliseconds. */
 
 #ifndef SS7STATSD_DEFAULT_OUTPDIR
-#define SS7STATSD_DEFAULT_OUTPDIR "/var/log/ss7"
+#define SS7STATSD_DEFAULT_OUTPDIR "/var/log" "/" PACKAGE
 #endif				/* SS7STATSD_DEFAULT_OUTPDIR */
 #ifndef SS7STATSD_DEFAULT_OUTFILE
-#define SS7STATSD_DEFAULT_OUTFILE "ss7statsd.out"
+#define SS7STATSD_DEFAULT_OUTFILE NAME ".out"
 #endif				/* SS7STATSD_DEFAULT_OUTFILE */
 #ifndef SS7STATSD_DEFAULT_ERRFILE
-#define SS7STATSD_DEFAULT_ERRFILE "ss7statsd.err"
+#define SS7STATSD_DEFAULT_ERRFILE NAME ".err"
 #endif				/* SS7STATSD_DEFAULT_ERRFILE */
 #ifndef SS7STATSD_DEFAULT_CFGFILE
-#define SS7STATSD_DEFAULT_CFGFILE "/etc/sysconfig/ss7statsd.conf"
+#define SS7STATSD_DEFAULT_CFGFILE PACKAGE_CONFIGDIR "/" NAME ".conf"
 #endif				/* SS7STATSD_DEFAULT_CFGFILE */
 #ifndef SS7STATSD_DEFAULT_DEVNAME
 #define SS7STATSD_DEFAULT_DEVNAME "/dev/ss7-stats"
@@ -125,41 +127,44 @@ copying(const char *name)
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-Copyright (c) 2001-2007  OpenSS7 Corporation  <http://www.openss7.com/>\n\
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+\n\
+Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>\n\
+Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
 All Rights Reserved.\n\
 \n\
-This program is free software: you can redistribute it and/or modify it under\n\
-the terms of the GNU General Public License as published by the Free Software\n\
-Foundation, version 3 of the license.\n\
+This program is  free  software:  you can redistribute it and/or modify it under\n\
+the terms of the  GNU General Public License Version 3  as published by the Free\n\
+Software Foundation, found in the distributed information file  \"COPYING\",  with\n\
+the Section 7 conditions found in the file \"CONDITIONS\".\n\
 \n\
-This program is distributed in the hope that it will be useful, but WITHOUT\n\
-ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS\n\
-FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more\n\
-details.\n\
+This program is distributed in the hope that it will be useful, but  WITHOUT ANY\n\
+WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A\n\
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.\n\
 \n\
-You should have received a copy of the GNU General Public License along with\n\
-this program.  If not, see <http://www.gnu.org/licenses/>, or write to the\n\
-Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
+You  should  have received a copy of the  GNU General Public License  along with\n\
+this program.   If not, see <http://www.gnu.org/licenses/>, or write to the Free\n\
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
 \n\
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on\n\
-behalf of the U.S. Government (\"Government\"), the following provisions apply\n\
-to you.  If the Software is supplied by the Department of Defense (\"DoD\"), it\n\
-is classified as \"Commercial Computer Software\" under paragraph 252.227-7014\n\
-of the DoD Supplement to the Federal Acquisition Regulations (\"DFARS\") (or any\n\
-successor regulations) and the Government is acquiring only the license rights\n\
-granted herein (the license rights customarily provided to non-Government\n\
-users).  If the Software is supplied to any unit or agency of the Government\n\
-other than DoD, it is classified as \"Restricted Computer Software\" and the\n\
-Government's rights in the Software are defined in paragraph 52.227-19 of the\n\
-Federal Acquisition Regulations (\"FAR\") (or any successor regulations) or, in\n\
-the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR\n\
-(or any successor regulations).\n\
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
+of the  U.S. Government  (\"Government\"),  the following provisions apply to you.\n\
+If the Software is  supplied by the Department of Defense (\"DoD\"), it is classi-\n\
+fied as  \"Commercial Computer Software\"  under paragraph 252.227-7014 of the DoD\n\
+Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
+regulations) and the  Government  is acquiring  only the license rights  granted\n\
+herein (the license  rights customarily  provided to non-Government  users).  If\n\
+the Software is supplied to any unit or agency of the Government other than DoD,\n\
+it is classified as  \"Restricted Computer Software\" and the  Government's rights\n\
+in the  Software are defined in  paragraph 52.227-19 of the Federal  Acquisition\n\
+Regulations  (\"FAR\") (or any successor regulations) or, in the cases of NASA, in\n\
+paragraph  18.52.227-86 of the  NASA Supplement  to the  FAR (or  any  successor\n\
+regulations).\n\
 \n\
-Commercial licensing and support of this software is available from OpenSS7\n\
+Commercial licensing and  support  of  this  software is available from  OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
-");
+\n\
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
 }
 
 void
@@ -169,7 +174,6 @@ version(const char *name)
 		return;
 	fprintf(stdout, "\
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
-Written by Brian Bidulock.\n\
 \n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock\n\
@@ -177,8 +181,10 @@ This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
-incorporated here by reference.  See `%1$s --copying' for copying permission.\n\
-", "ss7statsd", PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
+with conditions, incorporated herein by reference.\n\
+\n\
+See `%1$s --copying' for copying permission.\n\
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
 }
 
 void
@@ -188,9 +194,9 @@ usage(const char *name)
 \n\
 Usage:\n\
     %1$s [{-i,--interval=}INTERVAL] [{-n,--nodaemon}] [{-O,--outpdir=}DIRECTORY]\n\
-	 [{-o,--outfile=}OUTFILE] [{-l,--logfile=}LOGFILE]\n\
-	 [{-f,--cfgfile=}CFGFILE] [{-e,--devname=}DEVNAME]\n\
-	 [{-q,--quiet}] [{-d,--debug[=]}[LEVEL]] [{-v,--verbose[=]}[LEVEL]]\n\
+         [{-o,--outfile=}OUTFILE] [{-l,--logfile=}LOGFILE]\n\
+         [{-f,--cfgfile[=]}[CFGFILE]] [{-e,--devname=}DEVNAME]\n\
+         [{-q,--quiet}] [{-d,--debug[=]}[LEVEL]] [{-v,--verbose[=]}[LEVEL]]\n\
     %1$s {-h, -?, --?, --help}\n\
     %1$s {-V, --version}\n\
     %1$s {-C, --copying}\n\
@@ -215,7 +221,9 @@ Usage:\n\
 \n\
 Arguments (non-option):\n\
     (none)\n\
+\n\
 Options:\n\
+\n\
   Command Options:\n\
     {-n, --nodaemon}\n\
         run the stats daemon in the foreground\n\
@@ -225,37 +233,40 @@ Options:\n\
         print version information and exit\n\
     {-C, --copying}\n\
         print copying permissions and exit\n\
+\n\
   Daemon Options:\n\
-    {-i, --interval=}INTERVAL			    (default: %4$ld)\n\
-	statistics collection interval in milliseconds\n\
-    {-O, --outpdir=}DIRECTORY			    (default: %5$s)\n\
-	specify directory for output files\n\
-    {-o, --outfile=}FILENAME			    (default: %6$s)\n\
-	specify output filename\n\
-    {-l, --logfile=}FILENAME			    (default: %7$s)\n\
-	specify error log filename\n\
-    {-f, --cfgfile=}FILENAME			    (default: %8$s)\n\
-	specify configuration filename\n\
-    {-e, --devname=}DEVNAME			    (default: %9$s)\n\
-	specify device name\n\
+    {-i, --interval=}INTERVAL                       (default: %4$ld)\n\
+        statistics collection interval milliseconds\n\
+    {-O, --outpdir=}DIRECTORY                       (default: %5$s)\n\
+        specify directory for output files\n\
+    {-o, --outfile=}FILENAME                        (default: %6$s)\n\
+        specify output filename\n\
+    {-l, --logfile=}FILENAME                        (default: %7$s)\n\
+        specify error log filename\n\
+    {-f, --cfgfile[=]}[FILENAME]                    (default: %8$s)\n\
+        specify configuration file and name\n\
+    {-e, --devname=}DEVNAME                         (default: %9$s)\n\
+        specify device name\n\
+\n\
   General Options:\n\
     {-q, --quiet}\n\
         suppress normal output\n\
-    {-d, --debug[=]}[LEVEL]			    (default: %2$d)\n\
+    {-d, --debug[=]}[LEVEL]                         (default: %2$d)\n\
         increase or set debugging output level\n\
-    {-v, --verbose[=]}[LEVEL]			    (default: %3$d)\n\
+    {-v, --verbose[=]}[LEVEL]                       (default: %3$d)\n\
         increase or set output verbosity level\n\
 \n\
-", name, debug, verbose, interval, SS7STATSD_DEFAULT_OUTPDIR, SS7STATSD_DEFAULT_OUTFILE, SS7STATSD_DEFAULT_ERRFILE, SS7STATSD_DEFAULT_CFGFILE, SS7STATSD_DEFAULT_DEVNAME);
+", NAME, debug, verbose, interval, SS7STATSD_DEFAULT_OUTPDIR, SS7STATSD_DEFAULT_OUTFILE, SS7STATSD_DEFAULT_ERRFILE, SS7STATSD_DEFAULT_CFGFILE, SS7STATSD_DEFAULT_DEVNAME);
 }
 
 void
 option_error(int argc, char *argv[], int optind, const char *str, int retval)
 {
-	fprintf(stderr, "%s --", str);
+	fprintf(stderr, "ERROR: %s: %s --", str, basename(argv[0]));
 	while (optind < argc)
 		fprintf(stderr, " %s", argv[optind++]);
 	fprintf(stderr, "\n");
+	usage(basename(argv[0]));
 	exit(retval);
 }
 
@@ -276,7 +287,7 @@ main(int argc, char *argv[])
 			{"outpdir",	required_argument,	NULL, 'O'},
 			{"outfile",	required_argument,	NULL, 'o'},
 			{"logfile",	required_argument,	NULL, 'l'},
-			{"cfgfile",	required_argument,	NULL, 'f'},
+			{"cfgfile",	optional_argument,	NULL, 'f'},
 			{"device",	required_argument,	NULL, 'e'},
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"debug",	optional_argument,	NULL, 'd'},
@@ -296,7 +307,7 @@ main(int argc, char *argv[])
 		switch (c) {
 		case 'i':	/* -i, --interval INTERVAL */
 			if (optarg == NULL)
-				option_error(argc, argv, optind - 1, "missing argument", 2);
+				option_error(argc, argv, optind - 1, "required argument", 2);
 			val = strtol(optarg, &optstr, 0);
 			if (optstr == optarg || optstr[0] != '\0' || val < 1000)
 				option_error(argc, argv, optind - 1, "illegal argument", 2);
@@ -307,7 +318,7 @@ main(int argc, char *argv[])
 			break;
 		case 'O':	/* -O, --outpdir DIRECTORY */
 			if (optarg == NULL)
-				option_error(argc, argv, optind - 1, "missing argument", 2);
+				option_error(argc, argv, optind - 1, "required argument", 2);
 			if (stat(optarg, &st) == -1)
 				option_error(argc, argv, optind - 1, strerror(errno), 2);
 			if (!S_ISDIR(st.st_mode))
@@ -316,7 +327,7 @@ main(int argc, char *argv[])
 			break;
 		case 'o':	/* -o, --outfile OUTFILE */
 			if (optarg == NULL)
-				option_error(argc, argv, optind - 1, "missing argument", 2);
+				option_error(argc, argv, optind - 1, "required argument", 2);
 			if (optarg[0] != '/') {
 				strncpy(outfile, optarg, sizeof(outfile));
 				break;
@@ -325,25 +336,25 @@ main(int argc, char *argv[])
 			break;
 		case 'l':	/* -l, --logfile LOGFILE */
 			if (optarg == NULL)
-				option_error(argc, argv, optind - 1, "missing argument", 2);
+				option_error(argc, argv, optind - 1, "required argument", 2);
 			if (optarg[0] != '/') {
 				strncpy(errfile, optarg, sizeof(errfile));
 				break;
 			}
 			strncpy(errpath, optarg, sizeof(errpath));
 			break;
-		case 'f':	/* -f, --cfgfile CFGFILE */
-			if (optarg == NULL)
-				option_error(argc, argv, optind - 1, "missing argument", 2);
-			strncpy(cfgfile, optarg, sizeof(cfgfile));
+		case 'f':	/* -f, --cfgfile [CFGFILE] */
+			if (optarg != NULL)
+				strncpy(cfgfile, optarg, sizeof(cfgfile));
+			useconfig = 1;
 			break;
 		case 'e':	/* -e, --device DEVNAME */
 			if (optarg == NULL)
-				option_error(argc, argv, optind - 1, "missing argument", 2);
+				option_error(argc, argv, optind - 1, "required argument", 2);
 			strncpy(devname, optarg, sizeof(devname));
 			break;
 		case 'q':	/* -q, --quiet */
-		        verbose -= verbose > 1 ? 1 : verbose;
+			verbose -= verbose > 1 ? 1 : verbose;
 			break;
 		case 'd':	/* -d, --debug [LEVEL] */
 			if (optarg != NULL) {
@@ -364,16 +375,16 @@ main(int argc, char *argv[])
 			verbose++;
 			break;
 		case 'h':	/* -h, --help */
-			help(argv[0]);
+			help(basename(argv[0]));
 			exit(0);
 		case 'V':	/* -V, --version */
-			version(argv[0]);
+			version(basename(argv[0]));
 			exit(0);
 		case 'C':	/* -C, --copying */
-			copying(argv[0]);
+			copying(basename(argv[0]));
 			exit(0);
-		case ':':	/* missing required argument */
-			option_error(argc, argv, optind - 1, "missing argument", 2);
+		case ':':	/* required argument */
+			option_error(argc, argv, optind - 1, "required argument", 2);
 		case '0':
 		case '?':	/* unrecognized option */
 			option_error(argc, argv, optind - 1, "unrecognized option", 2);
@@ -382,6 +393,24 @@ main(int argc, char *argv[])
 		}
 	}
 	if (optind < argc)
-		option_error(argc, argv, optind, "trailing arguments", 2);
+		option_error(argc, argv, optind, "extra arguments", 2);
+	/* organize path names */
+	if (outpath[0] == '\0') {
+		if (outpdir[0] == '\0')
+			strncpy(outpdir, SS7STATSD_DEFAULT_OUTPDIR, sizeof(outpdir));
+		if (outfile[0] == '\0')
+			strncpy(outfile, SS7STATSD_DEFAULT_OUTFILE, sizeof(outfile));
+		snprintf(outpath, sizeof(outpath), "%s/%s", outpdir, outfile);
+	}
+	if (errpath[0] == '\0') {
+		if (outpdir[0] == '\0')
+			strncpy(outpdir, SS7STATSD_DEFAULT_OUTPDIR, sizeof(outpdir));
+		if (errfile[0] == '\0')
+			strncpy(errfile, SS7STATSD_DEFAULT_ERRFILE, sizeof(errfile));
+		snprintf(errpath, sizeof(errpath), "%s/%s", outpdir, errfile);
+	}
+	if (cfgfile[0] == '\0') {
+		strncpy(cfgfile, SS7STATSD_DEFAULT_CFGFILE, sizeof(cfgfile));
+	}
 	exit(0);
 }
