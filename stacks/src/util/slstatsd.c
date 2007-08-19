@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile$ $Name$($Revision$) $Date$
+ @(#) $RCSfile: slstatsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $
 
  -----------------------------------------------------------------------------
 
@@ -45,16 +45,19 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date$ by $Author$
+ Last Modified $Date: 2007/08/19 05:19:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
- $Log$
+ $Log: slstatsd.c,v $
+ Revision 0.9.2.1  2007/08/19 05:19:33  brian
+ - added more daemon files
+
  *****************************************************************************/
 
-#ident "@(#) $RCSfile$ $Name$($Revision$) $Date$"
+#ident "@(#) $RCSfile: slstatsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $"
 
-static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
+static char const ident[] = "$RCSfile: slstatsd.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/19 05:19:33 $";
 
 /*
  *  This is slstatsd(8).  The purpose of this program is to open a connection
@@ -150,17 +153,17 @@ version(const char *name)
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+Written by Brian Bidulock.\n\
 \n\
-%1$s:\n\
-    %2$s\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation\n\
+Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
-    Copyright (c) 2001-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-    Copyright (c) 1997-2000  Brian F. G. Bidulock  All Rights Reserved.\n\
-\n\
-    Distributed under GNU General Public License (GPL) Version 3, incorporated\n\
-    herein by reference.  See `%1$s --copying' for permissions.\n\
-\n\
-", name, ident);
+Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
+incorporated here by reference.  See `%1$s --copying' for copying permission.\n\
+", "slstatsd", PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
 }
 
 void
@@ -343,7 +346,7 @@ slstats_header(void)
 
 	ftimestamp();
 	fprint_time(stdout);
-	fprintf(stdout, " # SLSTATSD $Id$ Output Header\n");
+	fprintf(stdout, " # SLSTATSD $Id: slstatsd.c,v 0.9.2.1 2007/08/19 05:19:33 brian Exp $ Output Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
