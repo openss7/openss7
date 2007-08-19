@@ -63,6 +63,8 @@
 
 static char const ident[] = "$RCSfile: mtpconf_lex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:15 $";
 
+#include <unistd.h>
+
 #include "mtpconf_yac.h"
 
 #define ECHO fputs(yytext, yyout)

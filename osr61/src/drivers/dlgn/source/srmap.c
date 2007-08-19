@@ -1201,6 +1201,8 @@ generic driver loaded  not in protocol module like other drivers */
 int sr_checkbd(bdaddr, memlen)
 register UCHAR *bdaddr;
 
+#undef true
+
 #ifndef VME_SPAN
 USHORT memlen;
 #else
