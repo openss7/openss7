@@ -10151,13 +10151,17 @@ version(int argc, char *argv[])
 	if (!verbose)
 		return;
 	fprintf(stdout, "\
-%1$s:\n\
-    %2$s\n\
-    Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved.\n\
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+Written by Brian Bidulock\n\
 \n\
-    Distributed by OpenSS7 Corporation under GPL Version 3,\n\
-    incorporated here by reference.\n\
-", argv[0], ident);
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation.\n\
+Copyright (c) 1997, 1998, 1999, 2000  Brian F. G. Bidulock.\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+\n\
+Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
+incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
+", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
 }
 
 void

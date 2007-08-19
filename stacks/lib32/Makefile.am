@@ -71,13 +71,13 @@ if RPM_BUILD_USER
 test_timod_SOURCES		= $(top_srcdir)/src/test/tli/test-timod.c
 test_timod_LDADD		= libxnet.la
 test_timod_LDFLAGS		= $(MACHINE_FLAGS)
-test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_timod_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-timod\"
 test_timod_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_tirdwr_SOURCES		= $(top_srcdir)/src/test/tli/test-tirdwr.c
 test_tirdwr_LDADD		= libxnet.la
 test_tirdwr_LDFLAGS		= $(MACHINE_FLAGS)
-test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_tirdwr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-tirdwr\"
 test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 if WITH_TLI
@@ -101,13 +101,13 @@ libxnet_la_LIBADD		= $(STREAMS_LDADD32)
 test_xnet_SOURCES		= $(top_srcdir)/src/test/xnet/test-xnet.c
 test_xnet_LDADD			= libxnet.la
 test_xnet_LDFLAGS		= $(MACHINE_FLAGS)
-test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-xnet\"
 test_xnet_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_xnet_thr_SOURCES		= $(top_srcdir)/src/test/xnet/test-xnet.c
 test_xnet_thr_LDADD		= libxnet.la
 test_xnet_thr_LDFLAGS		= -lpthread $(MACHINE_FLAGS)
-test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_xnet_thr_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-xnet_thr\"
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 if WITH_XNET
@@ -123,25 +123,25 @@ endif
 test_inet_raw_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_raw.c
 test_inet_raw_LDADD		= $(STREAMS_LDADD32)
 test_inet_raw_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_raw_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-inet_raw\"
 test_inet_raw_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_inet_tcp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_tcp.c
 test_inet_tcp_LDADD		= $(STREAMS_LDADD32)
 test_inet_tcp_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_tcp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-inet_tcap\"
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_inet_udp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_udp.c
 test_inet_udp_LDADD		= $(STREAMS_LDADD32)
 test_inet_udp_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_udp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-inet_udp\"
 test_inet_udp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_inet_sctp_SOURCES		= $(top_srcdir)/src/test/inet/test-inet_sctp.c
 test_inet_sctp_LDADD		= $(STREAMS_LDADD32)
 test_inet_sctp_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_inet_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_inet_sctp_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-inet_sctp\"
 test_inet_sctp_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 if WITH_INET
@@ -161,43 +161,43 @@ endif
 test_sctp_n_SOURCES		= $(top_srcdir)/src/test/sctp/test-sctp_n.c
 test_sctp_n_LDADD		= $(STREAMS_LDADD32)
 test_sctp_n_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-sctp_n\"
 test_sctp_n_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_sctp_n2_SOURCES		= $(top_srcdir)/src/test/sctp/test-sctp_n2.c
 test_sctp_n2_LDADD		= $(STREAMS_LDADD32)
 test_sctp_n2_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_n2_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-sctp_n2\"
 test_sctp_n2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_sctp_t_SOURCES		= $(top_srcdir)/src/test/sctp/test-sctp_t.c
 test_sctp_t_LDADD		= $(STREAMS_LDADD32)
 test_sctp_t_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_sctp_t_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-sctp_t\"
 test_sctp_t_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_tcpc_SOURCES		= $(top_srcdir)/src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD32)
 test_tcpc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_tcpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-tcpc\"
 test_tcpc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_tcps_SOURCES		= $(top_srcdir)/src/test/inet/test-tcps.c
 test_tcps_LDADD			= $(STREAMS_LDADD32)
 test_tcps_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_tcps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-tcps\"
 test_tcps_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_udpc_SOURCES		= $(top_srcdir)/src/test/inet/test-udpc.c
 test_udpc_LDADD			= $(STREAMS_LDADD32)
 test_udpc_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_udpc_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-udpc\"
 test_udpc_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 test_udps_SOURCES		= $(top_srcdir)/src/test/inet/test-udps.c
 test_udps_LDADD			= $(STREAMS_LDADD32)
 test_udps_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_udps_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-udps\"
 test_udps_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 if WITH_SCTP
@@ -229,7 +229,7 @@ endif
 test_m2pa_SOURCES		= $(top_srcdir)/src/test/m2pa/test-m2pa.c
 test_m2pa_LDADD			= $(STREAMS_LDADD32)
 test_m2pa_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_m2pa_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-m2pa\"
 test_m2pa_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 if WITH_SIGTRAN
@@ -244,7 +244,7 @@ pkglibexec32_PROGRAMS		+= test-q781
 test_q781_SOURCES		= $(top_srcdir)/src/test/sl/test-q781.c
 test_q781_LDADD			= $(STREAMS_LDADD32)
 test_q781_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_q781_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_q781_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-q781\"
 test_q781_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x100p
@@ -252,7 +252,7 @@ pkglibexec32_PROGRAMS		+= test-x100p
 test_x100p_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x100p.c
 test_x100p_LDADD		= $(STREAMS_LDADD32)
 test_x100p_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x100p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x100p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x100p\"
 test_x100p_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p
@@ -260,7 +260,7 @@ pkglibexec32_PROGRAMS		+= test-x400p
 test_x400p_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p.c
 test_x400p_LDADD		= $(STREAMS_LDADD32)
 test_x400p_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p\"
 test_x400p_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 if PUBLIC_RELEASE
@@ -275,7 +275,7 @@ pkglibexec32_PROGRAMS		+= test-q781-pipe
 test_q781_pipe_SOURCES		= $(top_srcdir)/src/test/sl/test-q781-pipe.c
 test_q781_pipe_LDADD		= $(STREAMS_LDADD32)
 test_q781_pipe_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_q781_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_q781_pipe_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x781-pipe\"
 test_q781_pipe_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-q784
@@ -283,7 +283,7 @@ pkglibexec32_PROGRAMS		+= test-q784
 test_q784_SOURCES		= $(top_srcdir)/src/test/isup/test-q784.c
 test_q784_LDADD			= $(STREAMS_LDADD32)
 test_q784_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_q784_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_q784_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x784\"
 test_q784_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-cap2
@@ -291,7 +291,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-cap2
 test_x400p_cap2_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-cap2.c
 test_x400p_cap2_LDADD		= $(STREAMS_LDADD32)
 test_x400p_cap2_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_cap2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_cap2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-cap2\"
 test_x400p_cap2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-cap
@@ -299,7 +299,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-cap
 test_x400p_cap_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-cap.c
 test_x400p_cap_LDADD		= $(STREAMS_LDADD32)
 test_x400p_cap_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_cap_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_cap_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-cap\"
 test_x400p_cap_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-hsl
@@ -307,7 +307,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-hsl
 test_x400p_hsl_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-hsl.c
 test_x400p_hsl_LDADD		= $(STREAMS_LDADD32)
 test_x400p_hsl_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_hsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_hsl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-hsl\"
 test_x400p_hsl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-perf
@@ -315,7 +315,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-perf
 test_x400p_perf_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-perf.c
 test_x400p_perf_LDADD		= $(STREAMS_LDADD32)
 test_x400p_perf_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_perf_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_perf_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-perf\"
 test_x400p_perf_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-sdl
@@ -323,7 +323,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-sdl
 test_x400p_sdl_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-sdl.c
 test_x400p_sdl_LDADD		= $(STREAMS_LDADD32)
 test_x400p_sdl_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_sdl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sdl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sdl\"
 test_x400p_sdl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-sdt2
@@ -331,7 +331,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-sdt2
 test_x400p_sdt2_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-sdt2.c
 test_x400p_sdt2_LDADD		= $(STREAMS_LDADD32)
 test_x400p_sdt2_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_sdt2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sdt2_CPPFLAGS	= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sdt2\"
 test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-sdt
@@ -339,7 +339,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-sdt
 test_x400p_sdt_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-sdt.c
 test_x400p_sdt_LDADD		= $(STREAMS_LDADD32)
 test_x400p_sdt_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_sdt_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sdt_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sdt\"
 test_x400p_sdt_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 pkglibexec32_PROGRAMS		+= test-x400p-sl
@@ -347,7 +347,7 @@ pkglibexec32_PROGRAMS		+= test-x400p-sl
 test_x400p_sl_SOURCES		= $(top_srcdir)/src/test/x400p-ss7/test-x400p-sl.c
 test_x400p_sl_LDADD		= $(STREAMS_LDADD32)
 test_x400p_sl_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-test_x400p_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+test_x400p_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test-x400p-sl\"
 test_x400p_sl_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 ## ! PUBLIC_RELEASE
@@ -356,7 +356,7 @@ endif
 #perftest_SOURCES		= $(top_srcdir)/src/test/perftest.c
 #perftest_LDADD			= $(STREAMS_LDADD32)
 #perftest_LDFLAGS		= $(STREAMS_LDFLAGS32) $(MACHINE_FLAGS)
-#perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+#perftest_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"perftest\"
 #perftest_CFLAGS		= $(USER_CFLAGS) $(MACHINE_FLAGS)
 
 ## RPM_BUILD_USER

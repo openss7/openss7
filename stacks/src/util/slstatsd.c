@@ -162,7 +162,7 @@ This is free software; see the source for copying conditions.  There is NO\n\
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
-incorporated here by reference.  See `%1$s --copying' for copying permission.\n\
+incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
 ", "slstatsd", PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/08/19 05:19:33 $");
 }
 

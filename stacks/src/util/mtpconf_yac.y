@@ -94,7 +94,7 @@ typedef int YYLTYPE;
 #define YYENABLE_NLS 0
 #endif
 
-static char *prompt = "mtpconf";
+static char *prompt = NAME;
 static int interactive = 1;
 static int output = 1;
 
@@ -572,17 +572,17 @@ version(int argc, char *argv[])
 	if (!output)
 		return;
 	fprintf(stdout, "\
-    \n\
-    %1$s:\n\
-	%2$s\n\
-	Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
-    \n\
-	Distributed by OpenSS7 Corporation under GPL Version 3,\n\
-	incorporated here by reference.\n\
-    \n\
-	See `%1$s --copying' for copying permission.\n\
-    \n\
-", argv[0], ident);
+%1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
+Written by Brian Bidulock.\n\
+\n\
+Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007  OpenSS7 Corporation\n\
+Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock\n\
+This is free software; see the source for copying conditions.  There is NO\n\
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+\n\
+Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
+incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
+", NAME, PACKAGE, VERSION, "$Revision$ $Date$");
 }
 
 void
