@@ -325,6 +325,7 @@ sigtran/scripts/install-sh
 sigtran/scripts/ltmain.sh
 sigtran/scripts/missing
 sigtran/scripts/texinfo.tex
+sigtran/scripts/ylwrap
 stacks/ABOUT-NLS
 stacks/aclocal.m4
 stacks/AUTHORS
@@ -577,6 +578,7 @@ stacks/doc/manual/strss7.info
 stacks/doc/manual/strss7.info-1
 stacks/doc/manual/strss7.info-2
 stacks/doc/manual/strss7.info-3
+stacks/doc/manual/x400p.info
 stacks/doc/projects/cnam.info
 stacks/doc/projects/hlr.info
 stacks/doc/projects/lab.info
@@ -685,6 +687,7 @@ stacks/scripts/ltmain.sh
 stacks/scripts/missing
 stacks/scripts/mkinstalldirs
 stacks/scripts/texinfo.tex
+stacks/scripts/ylwrap
 stacks/src/include/Makefile.in
 stacks/src/Makefile.in
 stacks/tags
