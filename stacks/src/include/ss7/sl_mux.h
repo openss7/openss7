@@ -89,10 +89,10 @@ struct slmux_ppa_list {
 struct slmux_mon {
 	struct slmux_ppa mon_ppa;
 	int mon_dir;
-	uchar mon_msg_type;
-	uchar mon_msg_band;
-	ushort mon_msg_flags;
-	uchar mon_msg_data[0];
+	unsigned char mon_msg_type;
+	unsigned char mon_msg_band;
+	unsigned char mon_msg_flags;
+	unsigned char mon_msg_data[0];
 	/* followed by encapsulated control part */
 };
 

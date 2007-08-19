@@ -277,7 +277,7 @@ typedef struct sdl_statem {
  */
 
 typedef struct sdl_stats {
-	lmi_ulong header;
+	lmi_sta_t header;
 	sdl_ulong rx_octets;
 	sdl_ulong tx_octets;
 	sdl_ulong rx_overruns;
