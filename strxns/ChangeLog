@@ -1,3 +1,9 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/dl2.c: move stdbool.h to compat.h
+	* src/drivers/hdlc.c: move stdbool.h to compat.h
+	* src/drivers/llc.c: move stdbool.h to compat.h
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates

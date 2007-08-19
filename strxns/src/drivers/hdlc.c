@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:35:41 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/19 12:03:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:35:41 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 12:03:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 0.9.2.7  2007/08/19 12:03:19  brian
+ - move stdbool.h to compat.h
+
  Revision 0.9.2.6  2007/08/15 05:35:41  brian
  - GPLv3 updates
 
@@ -70,10 +73,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:35:41 $"
+#ident "@(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/19 12:03:19 $"
 
 static char const ident[] =
-    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:35:41 $";
+    "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/19 12:03:19 $";
 
 /*
  *  This is a multiplexing driver used to support linking CD HDLC streams.  When CD streams are
@@ -107,7 +110,7 @@ static char const ident[] =
 
 #define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
 #define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2007/08/15 05:35:41 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2007/08/19 12:03:19 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 1997-2006  OpenSS7 Corporation.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
