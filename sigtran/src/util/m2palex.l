@@ -63,6 +63,8 @@
 
 static char const ident[] = "$RCSfile: m2palex.l,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $";
 
+#include <unistd.h>
+
 #include "m2payac.h"
 
 #define ECHO fputs(yytext, yyout)
