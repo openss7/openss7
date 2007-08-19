@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 03:31:09 $
+ @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 12:03:19 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 03:31:09 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 12:03:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: llc.c,v $
+ Revision 0.9.2.3  2007/08/19 12:03:19  brian
+ - move stdbool.h to compat.h
+
  Revision 0.9.2.2  2007/08/14 03:31:09  brian
  - GPLv3 header update
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 03:31:09 $"
+#ident "@(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 12:03:19 $"
 
 static char const ident[] =
-    "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 03:31:09 $";
+    "$RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 12:03:19 $";
 
 /*
  * This is a DL driver for LLC1, LLC2 and LLC3 connections over 802.2.  It
@@ -79,7 +82,7 @@ static char const ident[] =
 #include <sys/dlpi.h>
 
 #define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/14 03:31:09 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/19 12:03:19 $"
 #define DL_COPYRIGHT	"Copyright (c) 1997-2007  OpenSS7 Corporation.  All Rights Reserved."
 #define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
