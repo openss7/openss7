@@ -1,3 +1,20 @@
+2007-08-19  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: do not need YFLAG
+	* scripts/.cvsignore: add ylwrap
+	* src/drivers/isua_as.c: move stdbool.h to compat.c
+	* src/drivers/m2ua_as.c: move stdbool.h to compat.c
+	* src/drivers/m3ua_as.c: move stdbool.h to compat.c
+	* src/drivers/sua_as.c: move stdbool.h to compat.c
+	* src/drivers/tua_as.c: move stdbool.h to compat.c
+	* src/drivers/ua_as.c: move stdbool.h to compat.c
+	* src/modules/m2pa_sl.c: move stdbool.h to compat.c
+	* src/modules/m2ua_as.c: move stdbool.h to compat.c
+	* src/modules/m3ua_as.c: move stdbool.h to compat.c
+	* src/modules/sua_as.c: move stdbool.h to compat.c
+	* src/modules/tua_as.c: move stdbool.h to compat.c
+	* src/util/m2payac.y: add YFLAG equivalents
+
 2007-08-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: GPLv3 updates

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:13:57 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 0.9.2.12  2007/08/19 11:48:27  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.11  2007/08/15 05:13:57  brian
  - GPLv3 updates
 
@@ -85,10 +88,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $"
+#ident "@(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:27 $"
 
 static char const ident[] =
-    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $";
+    "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:27 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -155,7 +158,7 @@ static char const ident[] =
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/15 05:13:57 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 0.9.2.12 $) $Date: 2007/08/19 11:48:27 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $
+ @(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:48:38 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/18 03:53:18 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2payac.y,v $
+ Revision 0.9.2.2  2007/08/19 11:48:38  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.1  2007/08/18 03:53:18  brian
  - working up configuration files
 
@@ -59,9 +62,9 @@
 
 %{
 
-#ident "@(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $"
+#ident "@(#) $RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:48:38 $"
 
-static char const ident[] = "$RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/08/18 03:53:18 $";
+static char const ident[] = "$RCSfile: m2payac.y,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:48:38 $";
 
 #include <stropts.h>
 #include <stdlib.h>

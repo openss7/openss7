@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $
+ @(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:13:37 $ by $Author: brian $
+ Last Modified $Date: 2007/08/19 11:48:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isua_as.c,v $
+ Revision 0.9.2.11  2007/08/19 11:48:05  brian
+ - move stdbool.h, bison changes
+
  Revision 0.9.2.10  2007/08/15 05:13:37  brian
  - GPLv3 updates
 
@@ -82,10 +85,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $"
+#ident "@(#) $RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $"
 
 static char const ident[] =
-    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $";
+    "$RCSfile: isua_as.c,v $ $Name:  $($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $";
 
 #define _LFS_SOURCE	1
 #define _SVR4_SOURCE	1
@@ -152,7 +155,7 @@ static char const ident[] =
 /* ============================== */
 
 #define ISUA_AS_DESCRIP	"ISUA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.10 $) $Date: 2007/08/15 05:13:37 $"
+#define ISUA_AS_REVISION	"OpenSS7 $RCSfile: isua_as.c,v $ $Name:  $ ($Revision: 0.9.2.11 $) $Date: 2007/08/19 11:48:05 $"
 #define ISUA_AS_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define ISUA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
