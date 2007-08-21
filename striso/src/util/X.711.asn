@@ -1,0 +1,602 @@
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+CMIP-A-ASSOCIATE-Information {joint-iso-itu-t ms(9) cmip(1) modules(0) aAssociateUserInfo(1)}
+DEFINITIONS ::= BEGIN
+FunctionalUnits ::= BIT STRING {
+	multipleObjectSelection (0),
+	filter (1),
+	multipleReply (2),
+	extendedService (3),
+	cancelGet (4)
+}
+-- Functional unit i is supported if and only if bit i is one
+-- Information carried in user-information parameter of A -ASSOCIATE
+CMIPUserInfo ::= SEQUENCE {
+	protocolVersion [0] IMPLICIT ProtocolVersion DEFAULT { version1 },
+	functionalUnits [1] IMPLICIT FunctionalUnits DEFAULT {},
+	accessControl [2] EXTERNAL OPTIONAL,
+	userInfo [3] EXTERNAL OPTIONAL
+}
+ProtocolVersion ::= BIT STRING {version1 (0), version2 (1)}
+END
+
+CMIP-A-ABORT-Information {joint-iso-itu-t ms(9) cmip(1) modules(0) aAbortUserInfo(2)} DEFINITIONS ::= BEGIN
+
+-- Information carried in user-information parameter of A -ABORT
+CMIPAbortInfo ::= SEQUENCE {abortSource [0] IMPLICIT CMIPAbortSource,
+
+userInfo [1] EXTERNAL OPTIONAL}
+
+CMIPAbortSource ::= ENUMERATED {cmiseServiceUser (0),
+
+cmiseServiceProvider (1)}
+
+END
+-- Common Management Information Protocol (CMIP)
+CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)} DEFINITIONS ::= BEGIN
+-- Remote Operations definitions
+IMPORTS OPERATION, ERROR FROM Remote-Operation-Notation {joint-iso-ccitt remote-operations(4) notation(0)}
+-- Remote Operations Service definitions
+InvokeIDType FROM Remote-Operations-APDUs {joint-iso-ccitt remote-operations(4) apdus(1)}
+-- Directory Service definitions
+-- This Recommendation | International Standard imports abstract syntax from CCI TT Rec. X.501 (1988) |
+-- ISO/IEC 9594-2:1990. Annex D to this Recommendation | International Standard provides an extract
+-- from CCITT Rec. X.501 (1988) | ISO/IEC 9594-2:1990, sufficient to meet the needs of CMIP.
+DistinguishedName, RDNSequenceFROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)}; 
+-- CMISE operations
+-- in the following operations, the argument type is mandatory in the corresponding ROSE APDU 
+-- Action operations (M-ACTION)
+m-Action OPERATIONARGUMENT ActionArgument ::= localValue : 6 m-Action-Confirmed OPERATIONARGUMENT ActionArgument RESULT ActionResult
+-- this result is conditional; for conditions see 8.3.3.2.9 of ITU-T Rec. X.710 |
+-- ISO/IEC 9595
+ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidScope,invalidArgumentValue, invalidFilter, noSuchAction, noSuchArgument, noSuchObjectClass,
+noSuchObjectInstance, processingFailure, syncNotSupported }
+LINKED { m-Linked-Reply } ::= localValue : 7 m-CancelGet OPERATIONARGUMENT
+getInvokeId InvokeIDTypeRESULT ERRORS { mistypedOperation, noSuchInvokeId, processingFailure }::= localValue : 10
+-- Create operation (M-CREATE)
+m-Create OPERATIONARGUMENT CreateArgument RESULT CreateResult
+-- this result is conditional; for conditions see 8.3.4.1.3 of ITU-T Rec.  X.710 |
+-- ISO/IEC 9595
+ERRORS { accessDenied, classInstanceConflict, duplicateManagedObjectInstance,invalidAttributeValue, invalidObjectInstance, missingAttributeValue, noSuchAttribute,
+noSuchObjectClass, noSuchObjectInstance, noSuchReferenceObject, processingFailure }::= localValue : 8
+-- Delete operation (M-DELETE)
+m-Delete OPERATIONArgument DeleteArgument RESULT DeleteResult
+-- this result is conditional; for conditions see 8.3.5.2.8 of ITU-T Rec.  X.710 |
+-- ISO/IEC 9595
+ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidFilter,InvalidScope, noSuchObjectClass, noSuchObjectInstance, processingFailure, syncNotSupported }
+LINKED { m-Linked-Reply }::= localValue : 9
+-- Event Reporting operations (M-EVENT-REPORT)
+m-EventReport OPERATIONARGUMENT EventReportArgument ::= localValue : 0 m-EventReport-Confirmed OPERATIONARGUMENT EventReportArgument
+RESULT EventReportResult
+-- optional
+ERRORS { invalidArgumentValue, noSuchArgument, noSuchEventType, noSuchObjectClass,
+noSuchObjectInstance, processingFailure }::= localValue : 1
+-- Get operation (M-GET)
+m-Get OPERATIONARGUMENT GetArgument
+RESULT GetResult
+-- this result is conditional; for conditions see 8.3.1.2.8 of ITU-T Rec.  X.710 |
+-- ISO/IEC 9595
+ERRORS { accessDenied, classInstanceConflict, complexityLimitation, getListError, invalidFilter, invalidScope,noSuchObjectClass, noSuchObjectInstance, operationCancelled, processingFailure, syncNotSupported
+}LINKED { m-Linked-Reply } ::= localValue : 3
+-- Linked operation to M-GET, M-SET (Confirmed), M-ACTION (Confirmed), and M-DELETE
+m-Linked-Reply OPERATIONARGUMENT LinkedReplyArgument ::= localValue : 2
+-- Set operations (M-SET)
+m-Set OPERATIONARGUMENT SetArgument ::= localValue : 4 m-Set-Confirmed OPERATIONARGUMENT SetArgument RESULT SetResult
+-- this result is conditional; for conditions see 8.3.2.2.9 of ITU-T Rec.  X.710 |
+-- ISO/IEC 9595
+ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidFilter, invalidScope,noSuchObjectClass, noSuchObjectInstance, processingFailure, setListError, syncNotSupported } LINKED { m-Linked-Reply }::= localValue : 5
+-- CMIS error definitions
+-- in the following errors, unless otherwise indicated, the parameter type is mandatory in the corresponding ROSE 
+-- APDU
+accessDenied ERROR::= localValue : 2
+classInstanceConflict ERRORPARAMETER BaseManagedObjectId ::= localValue : 19
+complexityLimitation ERRORPARAMETER ComplexityLimitation ::= localValue : 20
+-- optional
+duplicateManagedObjectInstance ERRORPARAMETER ObjectInstance ::= localValue : 11
+getListError ERRORPARAMETER GetListError ::= localValue : 7
+invalidArgumentValue ERRORPARAMETER InvalidArgumentValue ::= localValue : 15
+invalidAttributeValue ERRORPARAMETER Attribute ::= localValue : 6
+invalidFilter ERRORPARAMETER CMISFilter ::= localValue : 4
+invalidObjectInstance ERRORPARAMETER ObjectInstance ::= localValue : 17
+invalidScope ERRORPARAMETER Scope ::= localValue : 16
+missingAttributeValue ERRORPARAMETER SET OF AttributeId ::= localValue : 18
+mistypedOperation ERROR::= localValue : 21
+noSuchAction ERRORPARAMETER NoSuchAction ::= localValue : 9
+noSuchArgument ERRORPARAMETER NoSuchArgument ::= localValue : 14
+noSuchAttribute ERRORPARAMETER AttributeId ::= localValue : 5
+noSuchEventType ERRORPARAMETER NoSuchEventType ::= localValue : 13
+noSuchInvokeId ERRORPARAMETER InvokeIDType ::= localValue : 22
+noSuchObjectClass ERRORPARAMETER ObjectClass ::= localValue : 0
+noSuchObjectInstance ERRORPARAMETER ObjectInstance ::= localValue : 1
+noSuchReferenceObject ERRORPARAMETER ObjectInstance ::= localValue : 12
+operationCancelled ERROR::= localValue : 23
+processingFailure ERRORPARAMETER ProcessingFailure ::= localValue : 10
+-- optional
+setListError ERRORPARAMETER SetListError ::= localValue : 8
+syncNotSupported ERRORPARAMETER CMISSync ::= localValue : 3
+-- Supporting type definitions
+AccessControl ::= EXTERNAL ActionArgument ::= SEQUENCE {COMPONENTS OF BaseManagedObjectId, accessControl [5] AccessControl OPTIONAL,synchronization [6] IMPLICIT CMISSync DEFAULT bestEffort, scope [7] Scope DEFAULT namedNumbers : baseObject,filter CMISFilter DEFAULT and : {}, actionInfo [12] IMPLICIT ActionInfo}
+ActionError ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL, managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, actionErrorInfo [6] ActionErrorInfo}
+ActionErrorInfo ::= SEQUENCE {errorStatus ENUMERATED { accessDenied (2), noSuchAction (9),noSuchArgument (14), invalidArgumentValue (15) },errorInfo CHOICE { actionType ActionTypeId,actionArgument [0] NoSuchArgument, argumentValue [1] InvalidArgumentValue} }
+ActionInfo ::= SEQUENCE {actionType ActionTypeId, actionInfoArg [4] ANY DEFINED BY actionType OPTIONAL}
+ActionReply ::= SEQUENCE {actionType ActionTypeId, actionReplyInfo [4] ANY DEFINED BY actionType}
+ActionResult ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL, managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, actionReply [6] IMPLICIT ActionReply OPTIONAL}
+ActionTypeId ::= CHOICE {globalForm [2] IMPLICIT OBJECT IDENTIFIER, localForm [3] IMPLICIT INTEGER}
+-- This Recommendation | International Standard does not allocate any values for localForm. Where this alternative is
+-- used, the permissible values for the integers and their meanings shall be defined as part of the application context in 
+-- whichthey are used
+Attribute ::= SEQUENCE {attributeId AttributeId, attributeValue ANY DEFINED BY attributeId}
+AttributeError ::= SEQUENCE {errorStatus ENUMERATED { accessDenied (2), noSuchAttribute (5),invalidAttributeValue(6), invalidOperation (24),invalidOperator (25) }, modifyOperator [2] IMPLICIT ModifyOperator OPTIONAL,
+-- present for invalidOperator & invalidOperationattributeId
+AttributeId, attributeValue ANY DEFINED BY attributeId OPTIONAL
+-- absent for setToDefault
+}
+AttributeId ::= CHOICE {globalForm [0] IMPLICIT OBJECT IDENTIFIER, localForm [1] IMPLICIT INTEGER}
+-- This Recommendation | International Standard does not allocate any values for localForm. Where this alternative is
+--  used, the permissible values for the integers and their meanings shall be defined as part of the application context in
+-- which they are used
+AttributeIdError ::= SEQUENCE {errorStatus ENUMERATED { accessDenied (2), noSuchAttribute (5) },attributeId AttributeId } BaseManagedObjectId ::= SEQUENCE {baseManagedObjectClass ObjectClass, baseManagedObjectInstance ObjectInstance}
+CMISFilter ::= CHOICE {item [8] FilterItem, and [9] IMPLICIT SET OF CMISFilter,or [10] IMPLICIT SET OF CMISFilter, not [11] CMISFilter}
+CMISSync ::= ENUMERATED { bestEffort (0),atomic (1) } ComplexityLimitation ::= SET {scope [0] Scope OPTIONAL, filter [1] CMISFilter OPTIONAL,sync [2] CMISSync OPTIONAL } CreateArgument ::= SEQUENCE {managedObjectClass ObjectClass,
+managedOrSuperiorObjectInstance CHOICE {managedObjectInstance ObjectInstance, superiorObjectInstance [8] ObjectInstance } OPTIONAL,accessControl [5] AccessControl OPTIONAL, referenceObjectInstance [6] ObjectInstance OPTIONAL,attributeList [7] IMPLICIT SET OF Attribute OPTIONAL } CreateResult ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL,
+managedObjectInstance ObjectInstance OPTIONAL, 
+-- shall be returned if omitted from CreateArgument
+currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, attributeList [6] IMPLICIT SET OF Attribute OPTIONAL}
+DeleteArgument ::= SEQUENCE {COMPONENTS OF BaseManagedObjectId, accessControl [5] AccessControl OPTIONAL,synchronization [6] IMPLICIT CMISSync DEFAULT bestEffort, scope [7] Scope DEFAULT namedNumbers : baseObject,filter CMISFilter DEFAULT and : {} } DeleteError ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL, managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, deleteErrorInfo [6] ENUMERATED { accessDenied (2)} }
+DeleteResult ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL, managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL }
+EventReply ::= SEQUENCE {eventType EventTypeId, eventReplyInfo [8] ANY DEFINED BY eventType OPTIONAL}
+EventReportArgument ::= SEQUENCE {managedObjectClass ObjectClass, managedObjectInstance ObjectInstance,eventTime [5] IMPLICIT GeneralizedTime OPTIONAL, eventType EventTypeId,eventInfo [8] ANY DEFINED BY eventType OPTIONAL } EventReportResult ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL, managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, eventReply EventReply OPTIONAL}
+EventTypeId ::= CHOICE {globalForm [6] IMPLICIT OBJECT IDENTIFIER, localForm [7] IMPLICIT INTEGER}
+-- This Recommendation | International Standard does not allo cate any values for localForm. Where this alternative is
+-- used, the permissible values for the integers and their meanings shall be defined as part of the application context in
+-- which they are used
+FilterItem ::= CHOICE {equality [0] IMPLICIT Attribute, substrings [1] IMPLICIT SEQUENCE OF CHOICE {initialString [0] IMPLICIT SEQUENCE { attributeIdAttributeId,string ANY DEFINED BY attributeId }, anyString [1] IMPLICIT SEQUENCE {attributeIdAttributeId, string ANY DEFINED BY attributeId },finalString [2] IMPLICIT SEQUENCE { attributeIdAttributeId,string ANY DEFINED BY attributeId} },
+greaterOrEqual [2] IMPLICIT Attribute,
+-- asserted value >= attribute value
+lessOrEqual [3] IMPLICIT Attribute,
+-- asserted value >= attribute
+valuepresent [4] AttributeId,
+subsetOf [5] IMPLICIT Attribute,
+-- asserted value is a subset of attribute value
+supersetOf [6] IMPLICIT Attribute,
+-- asserted value is a superset of attribute value
+nonNullSetIntersection [7] IMPLICIT Attribute
+}
+GetArgument ::= SEQUENCE {
+	COMPONENTS OF BaseManagedObjectId,
+	accessControl [5] AccessControl OPTIONAL,
+	synchronization [6] IMPLICIT CMISSync DEFAULT bestEffort,
+	scope [7] Scope DEFAULT namedNumbers : baseObject,
+	filter CMISFilter DEFAULT and : {},
+	attributeIdList [12] IMPLICIT SET OF AttributeId OPTIONAL
+}
+GetInfoStatus ::= CHOICE {
+	attributeIdError [0] IMPLICIT AttributeIdError,
+	attribute [1] IMPLICIT Attribute
+}
+GetListError ::= SEQUENCE {
+	managedObjectClass ObjectClass OPTIONAL,
+	managedObjectInstance ObjectInstance OPTIONAL,
+	currentTime [5] IMPLICIT GeneralizedTime OPTIONAL,
+	getInfoList [6] IMPLICIT SET OF GetInfoStatus
+}
+GetResult ::= SEQUENCE {
+	managedObjectClass ObjectClass OPTIONAL,
+	managedObjectInstance ObjectInstance OPTIONAL,
+	currentTime [5] IMPLICIT GeneralizedTime OPTIONAL,
+	attributeList [6] IMPLICIT SET OF Attribute OPTIONAL
+}
+
+InvalidArgumentValue ::= CHOICE {
+	actionValue [0] IMPLICIT ActionInfo,
+	eventValue [1] IMPLICIT SEQUENCE {
+		eventType EventTypeId,
+		eventInfo [8] ANY DEFINED BY eventType OPTIONAL
+	}
+}
+LinkedReplyArgument ::= CHOICE {
+	getResult [0] IMPLICIT GetResult,
+	getListError [1] IMPLICIT GetListError,
+	setResult [2] IMPLICIT SetResult,
+	setListError [3] IMPLICIT SetListError,
+	actionResult [4] IMPLICIT ActionResult,
+	processingFailure [5] IMPLICIT ProcessingFailure,
+	deleteResult [6] IMPLICIT DeleteResult,
+	actionError [7] IMPLICIT ActionError,
+	deleteError [8] IMPLICIT DeleteError
+}
+ModifyOperator ::= INTEGER {
+	replace (0),
+	addValues (1),
+	removeValues (2),
+	setToDefault (3)
+}
+NoSuchAction ::= SEQUENCE {
+	managedObjectClass ObjectClass,
+	actionType ActionTypeId
+}
+NoSuchArgument ::= CHOICE {
+	actionId [0] IMPLICIT SEQUENCE {
+		managedObjectClass ObjectClass OPTIONAL,
+		actionType ActionTypeId
+	},
+	eventId [1] IMPLICIT SEQUENCE {
+		managedObjectClass ObjectClass OPTIONAL,
+		eventType EventTypeId
+	}
+}
+NoSuchEventType ::= SEQUENCE {
+	managedObjectClass ObjectClass,
+	eventType EventTypeId
+}
+ObjectClass ::= CHOICE {
+	globalForm [0] IMPLICIT OBJECT IDENTIFIER,
+	localForm [1] IMPLICIT INTEGER
+}
+-- This Recommendation | International Standard does not allocate any values for localForm. Where this alternative is
+-- used, the permissible values or the integers and their meanings shall be defined as part of the application context in
+-- which they are used
+ObjectInstance ::= CHOICE {
+	distinguishedName [2] IMPLICIT DistinguishedName,
+	nonSpecificForm [3] IMPLICIT OCTET STRING,
+	localDistinguishedName [4] IMPLICIT RDNSequence
+}
+-- localDistinguishedName is that portion of the distinguished name that is necessary to unambiguously identify the
+-- managed object within the context of communication between the open systems
+ProcessingFailure ::= SEQUENCE {
+	managedObjectClass ObjectClass,
+	managedObjectInstance ObjectInstance OPTIONAL,
+	specificErrorInfo [5] SpecificErrorInfo
+}
+Scope ::= CHOICE {
+	namedNumbers INTEGER {
+		baseObject (0),
+		firstLevelOnly (1),
+		wholeSubtree (2)
+	},
+	individualLevels [1] IMPLICIT INTEGER,
+	-- POSITIVE integer indicates the level to be selected
+	baseToNthLevel [2] IMPLICIT INTEGER
+}
+-- POSITIVE integer N indicates that the range of levels
+-- (0 - N) is to be selected
+-- with individualLevels and baseToNthLevel, a value of 0 has the same semantics as baseObject
+-- with individualLevels, a value of 1 has the same semantics as firstLevelOnly
+SetArgument ::= SEQUENCE {
+	COMPONENTS OF BaseManagedObjectId,
+	accessControl [5] AccessControl OPTIONAL,
+	synchronization [6] IMPLICIT CMISSync DEFAULT bestEffort,
+	scope [7] Scope DEFAULT namedNumbers : baseObject,
+	filter CMISFilter DEFAULT and : {},
+	modificationList [12] IMPLICIT SET OF SEQUENCE {
+		modifyOperator [2] IMPLICIT ModifyOperator DEFAULT replace,
+		attributeId AttributeId,attributeValue ANY DEFINED BY attributeId OPTIONAL
+		-- absent for setToDefault
+	}
+}
+SetInfoStatus ::= CHOICE {attributeError [0] IMPLICIT AttributeError,
+
+attribute [1] IMPLICIT Attribute}
+
+SetListError ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL,
+
+managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, setInfoList [6] IMPLICIT SET OF SetInfoStatus}
+
+SetResult ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL,
+
+managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, attributeList [6] IMPLICIT SET OF Attribute OPTIONAL}
+
+SpecificErrorInfo ::= SEQUENCE {errorId OBJECT IDENTIFIER,
+
+errorInfo ANY DEFINED BY errorId}
+
+END -- End of CMIP syntax definitions
+
+CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)} DEFINITIONS ::= BEGIN
+
+-- Remote Operations definitions IMPORTS OPERATION, ERROR FROM Remote-Operation-Notation {joint-iso-ccitt remote-operations(4) notation(0)}
+
+-- Directory Service definitions DistinguishedName, RDNSequenceFROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)};
+
+-- CMISE operations ROSEapdus ::= CHOICE {roiv-apdu [1] IMPLICIT ROIVapdu,
+
+rors-apdu [2] IMPLICIT RORSapdu,roer-apdu [3] IMPLICIT ROERapdu, rorj-apdu [4] IMPLICIT RORJapdu}
+
+ROIVapdu ::= SEQUENCE {invokeID InvokeIDType,
+
+linked-ID [0] IMPLICIT InvokeIDType OPTIONAL,operation-value OPERATION, argument ANY DEFINED BY operation-value OPTIONAL}
+
+RORSapdu ::= SEQUENCE {invokeID InvokeIDType,
+
+SEQUENCE { operation-value OPERATION,result ANY DEFINED BY operation-value } OPTIONAL } ROERapdu ::= SEQUENCE {invokeID InvokeIDType,
+
+error-value ERROR,parameter ANY DEFINED BY error-value OPTIONAL } RORJapdu ::= SEQUENCE {invokeID CHOICE {InvokeIDType,
+
+NULL },problem CHOICE { [0] IMPLICIT GeneralProblem, [1] IMPLICIT InvokeProblem,[2] IMPLICIT ReturnResultProblem, [3] IMPLICIT ReturnErrorProblem }}
+
+InvokeIDType ::= INTEGER
+-- The use of the GeneralProblem, ReturnResultProblem, and ReturnErrorProblem codes are a local issue.
+GeneralProblem ::= INTEGER {unrecognisedAPDU (0),
+
+-- ROSE-provider detectedmistypedAPDU (1),
+
+badlyStructuredAPDU (2)}
+
+InvokeProblem::= INTEGER {duplicateInvocation (0),
+
+-- ROSE-user detectedunrecognisedOperation (1),
+
+mistypedArgument (2),resourceLimitation (3), initiatorReleasing (4),unrecognisedLinkedID (5), linkedResponseUnexpected (6),unexpectedChildOperation (7) } ReturnResultProblem ::= INTEGER {unrecognisedInvocation (0),
+
+-- ROSE-user detectedresultResponseUnexpected (1),
+
+mistypedResult (2)}
+
+ReturnErrorProblem ::= INTEGER {unrecognisedInvocation (0),  
+
+-- ROSE-user detectederrorResponseUnexpected (1),
+
+unrecognisedError (2),unexpectedError (3), mistypedParameter (4)}
+
+-- This part of the ASN.1 specification provides a definition of the InvokeProblem subtype used by CMIP. InvokeProblem-CMIPUser ::= InvokeProblem (duplicateInvocation |
+
+unrecognisedOperation |mistypedArgument | resourceLimitation)
+
+-- This part of the ASN.1 specification provides a definition of ROIVapdu and RORSapdu subtypes used by CMIP.
+-- The subtypes of the ROIVapdu define the allowed values of the operation-value and argument defined by that
+-- operation-value for all CMIP notifications and operations. The subtypes of the RORSapdu define the allowed
+-- values of the operation-value and result defined by that operation-value for all CMIP notifications and operations.
+
+m-Action OPERATION ::= localValue : 6 ROIV-m-Action ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Action), argument (INCLUDES ActionArgument) } ) m-Action-Confirmed OPERATION ::= localValue : 7 ROIV-m-Action-Confirmed ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Action-Confirmed), argument (INCLUDES ActionArgument) } ) RORS-m-Action-Confirmed ::= RORSapdu (WITH COMPONENTS {... ,
+
+invokeID PRESENT,
+-- result sequence -- (WITH COMPONENTS{ operation-value (m-Action-Confirmed), result (INCLUDES ActionResult) } )
+-- required only if there is a single reply to the ROIV-m-Action-Confirmed ROIVapdu and data is to be returned in
+-- the RORSapdu
+} )
+m-Cancel-Get OPERATION ::= localValue : 10 ROIV-m-Cancel-Get ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Cancel-Get), argument (INCLUDES InvokeIDType)} )
+
+RORS-m-Cancel-Get ::= RORSapdu (WITH COMPONENTS {invokeID PRESENT,
+
+-- There is no result sequence for RORS-m-Cancel-Get
+} )
+
+m-Create OPERATION ::= localValue : 8 ROIV-m-Create ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Create), argument (INCLUDES CreateArgument) } ) RORS-m-Create ::= RORSapdu (WITH COMPONENTS {... ,
+
+invokeID PRESENT,-- result sequence -- (WITH COMPONENTS { operation-value (m-Create),result (INCLUDES CreateResult) } ) } ) m-Delete OPERATION ::= localValue : 9 ROIV-m-Delete ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Delete), argument (INCLUDES DeleteArgument) } ) RORS-m-Delete ::= RORSapdu (WITH COMPONENTS {... ,
+
+invokeID PRESENT,-- result sequence -- (WITH COMPONENTS{ operation-value (m-Delete), result (INCLUDES DeleteResult) } )
+-- required only if there is a single reply to the ROIV-m-DeleteROIVapdu and data is to be returned in  the RORSapdu
+} )
+m-EventReport OPERATION ::= localValue : 0 ROIV-m-EventReport ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-EventReport), argument (INCLUDES EventReportArgument) } ) m-EventReport-Confirmed OPERATION ::= localValue : 1 ROIV-m-EventReport-Confirmed ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-EventReport-Confirmed), argument (INCLUDES EventReportArgument) } ) RORS-m-EventReport-Confirmed ::= RORSapdu (WITH COMPONENTS {... ,
+
+invokeID PRESENT,-- result sequence -- (WITH COMPONENTS { operation-value (m-EventReport-Confirmed),result (INCLUDES EventReportResult) } )
+-- required only if data is to be returned in the RORSapdu} )
+
+m-Get OPERATION ::= localValue : 3 ROIV-m-Get ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Get), argument (INCLUDES GetArgument) } ) RORS-m-Get ::= RORSapdu (WITH COMPONENTS {... ,
+
+invokeID PRESENT, -- result sequence -- (WITH COMPONENTS{ operation-value (m-Get),
+
+result (INCLUDES GetResult) } )
+-- required only if there is a single reply to the ROIV-m-Get ROIVapdu
+} )
+m-Linked-Reply OPERATION ::= localValue : 2 ROIV-m-Linked-Reply ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID PRESENT,operation-value (m-Linked-Reply), argument (INCLUDES LinkedReplyArgument) } )
+-- This part of the ASN.1 specification provides a definition of ROIV-m-Linked-Reply subtypes used by CMIP. The
+-- subtypes of the ROIV-m-Linked-Reply ROIVapdu define the allowed values of the argument defined by the
+-- operation-value for the specific CMIP linked reply operations.
+ROIV-m-Linked-Reply-Action ::= ROIV-m-Linked-Reply (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID PRESENT,operation-value (m-Linked-Reply), argument (INCLUDES LinkedReplyArgument (WITH COMPONENTS {getResult ABSENT,
+
+getListError ABSENT,setResult ABSENT, setListError ABSENT,actionResult PRESENT, processingFailure PRESENT,deleteResult  ABSENT, actionError PRESENT,deleteError ABSENT } ) ) } ) ROIV-m-Linked-Reply-Delete ::= ROIV-m-Linked-Reply (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID PRESENT,operation-value (m-Linked-Reply), argument (INCLUDES LinkedReplyArgument (WITH COMPONENTS {getResult ABSENT,
+
+getListError ABSENT,setResult ABSENT, setListError ABSENT,actionResult ABSENT, processingFailure PRESENT,deleteResult PRESENT, actionError ABSENT,deleteError PRESENT } ) ) } ) ROIV-m-Linked-Reply-Get ::= ROIV-m-Linked-Reply (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID PRESENT,operation-value (m-Linked-Reply), argument (INCLUDES LinkedReplyArgument (WITH COMPONENTS {getResult PRESENT,
+
+getListError PRESENT,setResult ABSENT, setListError ABSENT,
+
+ISO/IEC 9596-1 : 1998 (E) 30 ITU-T Rec. X.711 (1997 E)
+
+actionResult ABSENT,processingFailure PRESENT, deleteResult ABSENT,actionError ABSENT, deleteError ABSENT } )) } )
+
+ROIV-m-Linked-Reply-Set ::= ROIV-m-Linked-Reply (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID PRESENT,operation-value (m-Linked-Reply), argument (INCLUDES LinkedReplyArgument (WITH COMPONENTS {getResult ABSENT,
+
+getListError ABSENT,setResult PRESENT, setListError PRESENT,actionResult ABSENT, processingFailure PRESENT,deleteResult ABSENT, actionError ABSENT,deleteError ABSENT } ) ) } ) m-Set OPERATION ::= localValue : 4 ROIV-m-Set ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Set), argument (INCLUDES SetArgument) } ) m-Set-Confirmed OPERATION ::= localValue : 5 ROIV-m-Set-Confirmed ::= ROIVapdu (WITH COMPONENTS {invokeID PRESENT,
+
+linked-ID ABSENT,operation-value (m-Set-Confirmed), argument (INCLUDES SetArgument) } ) RORS-m-Set-Confirmed ::= RORSapdu (WITH COMPONENTS {... ,
+
+invokeID PRESENT, -- result sequence -- (WITH COMPONENTS{ operation-value (m-Set-Confirmed),
+
+result (INCLUDES SetResult) } )
+-- required only if there is a single reply to the ROIV-m-Set-Confirmed ROIVapdu and data is to be returned  in the
+-- RORSapdu
+} )
+
+-- This part of the ASN.1 specification provides a definition of ROERapdu subtypes used by CMIP. The subtypes of
+-- the ROERapdu define the allowed values of the error value and parameter defined by that error-value for all
+-- CMIP notifications and operations.
+accessDenied ERROR ::= localValue : 2 ROER-accessDenied::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (accessDenied) } )
+-- This ROERapdu may only be returned in response to the ROIV-m-Get, ROIV-m-Set-Co nfirmed,
+-- ROIV-m-Action-Confirmed, ROIV-m-Create and ROIV-m-Delete ROIVapdus
+
+classInstanceConflict ERROR ::= localValue : 19 ROER-classInstanceConflict ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (classInstanceConflict),parameter (INCLUDES BaseManagedObjectId) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Get, ROIV-m-Set-Confirmed,
+-- ROIV-m-Action-Confirmed, ROIV-m-Create and ROIV-m-Delete ROIVapdus
+
+complexityLimitation ERROR ::= localValue : 20 ROER-complexityLimitation ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (complexityLimitation),parameter (INCLUDES ComplexityLimitation) OPTIONAL } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Get, ROIV-m-Set-Confirmed,
+-- ROIV-m-Action-Confirmed and ROIV-m-Delete ROIVapdus
+duplicateManagedObjectInstance ERROR ::= localValue : 11 ROER-duplicateManagedObjectInstance::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (duplicateManagedObjectInstance),parameter (INCLUDES ObjectInstance) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Create ROIVapdu
+getListError ERROR ::= localValue : 7 ROER-getListError ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (getListError),parameter (INCLUDES GetListError) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Get ROIVapdu
+invalidArgumentValue ERROR ::= localValue : 15 ROER-invalidArgumentValue ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (invalidArgumentValue),parameter (INCLUDES InvalidArgumentValue) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-EventReport-Confirmed
+-- and ROIV-m-Action-Confirmed ROIVapdus
+invalidAttributeValue ERROR ::= localValue : 6 ROER-invalidAttributeValue ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (invalidAttributeValue),parameter (INCLUDES Attribute) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Create ROIVapdu
+invalidFilter ERROR ::= localValue : 4 ROER-invalidFilter ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT, error-value  (invalidFilter),parameter (INCLUDES CMISFilter) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Get, ROIV-m-Set-Confirmed,
+-- ROIV-m-Action-Confirmed and ROIV-m-Delete ROIVapdus
+invalidObjectInstance ERROR ::= localValue : 17 ROER-invalidObjectInstance ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT, error-value (invalidObjectInstance),parameter (INCLUDES ObjectInstance) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Create ROIVapdu
+invalidScope ERROR ::= localValue : 16 ROER-invalidScope ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT, error-value (invalidScope),parameter (INCLUDES Scope) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Get, ROIV-m-Set-Confirmed,
+-- ROIV-m-Action-Confirmed and ROIV-m-Delete ROIVapdus
+
+missingAttributeValue ERROR ::= localValue : 18 ROER-missingAttributeValue ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT, error-value (missingAttributeValue),parameter (INCLUDES SET OF AttributeId) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Create ROIVapdu
+mistypedOperation ERROR ::= localValue : 21 ROER-mistypedOperation ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT, error-value (mistypedOperation) } )
+-- This ROERapdu may only be returned in response to the ROIV-m-Cancel-Get ROIVapdu
+noSuchAction ERROR ::= localValue : 9 ROER-noSuchAction ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT, error-value (noSuchAction),parameter (INCLUDES NoSuchAction) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Action-Confirmed ROIVapdu noSuchArgument ERROR ::= localValue : 14 ROER-noSuchArgument ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchArgument),parameter (INCLUDES NoSuchArgument) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-EventReport-Confirmed and-- ROIV-m-Action-Confirmed ROIVapdus noSuchAttribute ERROR::= localValue : 5
+
+ROER-noSuchAttribute ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchAttribute),parameter (INCLUDES AttributeId) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Create ROIVapdu noSuchEventType ERROR ::= localValue : 13 ROER-noSuchEventType::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchEventType),parameter (INCLUDES NoSuchEventType) } )
+
+-- This ROERapdu may only be returned in response to  the ROIV-m-EventReport-Confirmed ROIVapdu noSuchInvokeId ERROR ::= localValue : 22 ROER-noSuchInvokeId ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchInvokeId),parameter (INCLUDES InvokeIDType) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Cancel-Get ROIVapdu noSuchObjectClass ERROR ::= localValue : 0 ROER-noSuchObjectClass ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchObjectClass ),parameter (INCLUDES ObjectClass) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-EventReport-Confirmed, ROIV-m-Get,-- ROIV-m-Set-Confirmed, ROIV-m-Action-Confirmed, ROIV-m-Create, and ROIV-m-Delete ROIVapdus
+
+ISO/IEC 9596-1 : 1998 (E)
+
+ITU-T Rec. X.711 (1997 E) 33 noSuchObjectInstance ERROR ::= localValue : 1 ROER-noSuchObjectInstance ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchObjectInstance),parameter (INCLUDES ObjectInstance) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-EventReport-Confirmed, ROIV-m-Get,-- ROIV-m-Set-Confirmed, ROIV-m-Action-Confirmed, ROIV-m-Create, and ROIV-m-Delete ROIVapdus noSuchReferenceObject ERROR ::= localValue : 12 ROER-noSuchReferenceObject ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (noSuchReferenceObject),parameter (INCLUDES ObjectInstance) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Create ROIVapdu operationCancelled ERROR ::= localValue : 23 ROER-operationCancelled ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (operationCancelled) } ) -- This ROERapdu may only be returned in response to the ROIV-m-Get ROIVapdu processingFailure ERROR ::= localValue : 10 ROER-processingFailure ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (processingFailure),parameter (INCLUDES ProcessingFailure) OPTIONAL } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-EventReport-Confirmed, ROIV-m-Get,-- ROIV-m-Set-Confirmed, ROIV-m-Action-Confirmed, ROIV-m-Create, and ROIV-m-Delete ROIVapdus setListError ERROR ::= localValue : 8 ROER-setListError ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (setListError),parameter (INCLUDES SetListError) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Set-Confirmed ROIVapdu syncNotSupported ERROR ::= localValue : 3 ROER-syncNotSupported ::= ROERapdu (WITH COMPONENTS {invokeID PRESENT,
+
+error-value (syncNotSupported),parameter (INCLUDES CMISSync) } )
+
+-- This ROERapdu may only be returned in response to the ROIV-m-Get , ROIV-m-Set-Confirmed,-- ROIV-m-Action-Confirmed and ROIV-m-Delete ROIVapdus -- To complete the abstract syntax specification provided in this annex, the definitions of the supporting types in 7.4-- are incorporated by reference END -- of CMIP syntax definitions

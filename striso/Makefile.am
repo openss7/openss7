@@ -82,9 +82,23 @@ if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
 EXTRA_PROGRAMS			+= \
-				  @PACKAGE_TARNAME@_mknod
+				  @PACKAGE_TARNAME@_mknod \
+				  asn
 
-pkglibexec_PROGRAMS		= 
+pkglibexec_PROGRAMS		= \
+				  gdmo
+
+asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l
+asn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+asn_LDADD			= 
+asn_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+asn_CFLAGS			= $(USER_CFLAGS)
+
+gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l
+gdmo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+gdmo_LDADD			= 
+gdmo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+gdmo_CFLAGS			= $(USER_CFLAGS)
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod
@@ -164,10 +178,22 @@ else
 if RPM_BUILD_USER
 ## RPM_BUILD_USER
 
-EXTRA_PROGRAMS			+= 
+EXTRA_PROGRAMS			+= asn
 
-pkglibexec_PROGRAMS		= 
+pkglibexec_PROGRAMS		= \
+				  gdmo
 
+asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l
+asn_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+asn_LDADD			= 
+asn_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+asn_CFLAGS			= $(USER_CFLAGS)
+
+gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l
+gdmo_DEPENDENCIES		= $(CONFIG_HEADER) $(STRCONF_CONFIG)
+gdmo_LDADD			= 
+gdmo_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+gdmo_CFLAGS			= $(USER_CFLAGS)
 
 sbin_PROGRAMS			= \
 				  @PACKAGE_TARNAME@_mknod

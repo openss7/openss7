@@ -1,0 +1,116 @@
+The following are conditions under Section 7 of the GPL Version 3.  Under no
+circumstances shall any of these terms be deemed "further restrictions", and
+these conditions may not be removed from Covered Work.
+
+ Contributor reserves the right to revise The Program for any reason,
+ including but not limited to, conformity with standards promulgated by
+ various agencies, utilization of advances in the state of the technical arts,
+ or the reflection of changes in the design of any techniques, or procedures
+ embodied, described, or referred to herein.  Contributor is under no
+ obligation to provide any feature listed herein.
+
+ The Program is licensed "as is" without warranty as to its performance,
+ merchantability, or fitness for a particular purpose.  The entire risk as to
+ the results and performance of The Program is assumed by You.  Should The
+ Program prove defective, You shall assume the entire cost of all necessary
+ servicing, repair, or correction.
+
+ THE PROGRAM IS PROVIDED UNDER THIS LICENSE ON AN "AS IS" BASIS WITHOUT
+ WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, WITHOUT
+ LIMITATION, WARRANTIES THAT THE COVERED CODE IS FREE OF DEFECTS,
+ MERCHANTABLE, FIT FOR A PARTICULAR PURPOSE OR NON-INFRINGING.  THE ENTIRE
+ RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD
+ ANY OF THIS SOFTWARE OR DOCUMENTATION PROVE DEFECTIVE IN ANY RESPECT, YOU
+ (NOT THE CONTRIBUTOR) ASSUMES THE COST OF ANY NECESSARY SERVICING, REPAIR OR
+ CORRECTION.  THIS DISCLAIMER OF WARRANTY CONSTITUTES AN ESSENTIAL PART OF
+ THIS LICENSE.  NO USE OF THIS SOFTWARE OR DOCUMENTATION IS AUTHORIZED
+ HEREUNDER EXCEPT UNDER THIS DISCLAIMER.
+
+ Contributor shall not be liable to You or to any other person for direct,
+ indirect, special, incidental, consequential, or punitive damages, even if
+ Contributor has been advised of the possibility of such damages.  You hereby
+ indemnify Contributor against any such liability.
+
+ UNDER NO CIRCUMSTANCES AND UNDER NO LEGAL THEORY, WHETHER TORT (INCLUDING
+ NEGLIGENCE), CONTRACT, OR OTHERWISE, SHALL YOU, ANY CONTRIBUTOR, OR ANY
+ DISTRIBUTOR OF COVERED WORK, OR ANY SUPPLIER OF ANY OF SUCH PARTIES, BE
+ LIABLE TO ANY PERSON FOR ANY INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+ DAMAGES OF ANY CHARACTER INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF
+ GOODWILL, WORK STOPPAGE, COMPUTER FAILURE OR MALFUNCTION, OR ANY AND ALL
+ OTHER COMMERCIAL DAMAGES OR LOSSES, EVEN IF SUCH PARTY SHALL HAVE BEEN
+ INFORMED OF THE POSSIBILITY OF SUCH DAMAGES.  THIS LIMITATION OF LIABILITY
+ SHALL NOT APPLY TO LIABILITY FOR DEATH OR PERSONAL INJURY RESULTING FROM SUCH
+ PARTY'S NEGLIGENCE TO THE EXTENT APPLICABLE LAW PROHIBITS SUCH LIMITATION.
+ SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF INCIDENTAL OR
+ CONSEQUENTIAL DAMAGES, SO THIS EXCLUSION AND LIMITATION MAY NOT APPLY TO YOU.
+
+ You acknowledge that Covered Work is neither designed nor intended for use in
+ the design, construction, operation or maintenance of any hazardous, life
+ threatening, or life supporting service or facility.  You indemnify the
+ Contributor against any and all liability for any such use.  Failure to do so
+ will immediately, and without notice, terminate Your license.
+
+ You acknowledge that the mechanisms implemented by The Program have inherent
+ limitations, and You must determine that the software and programs
+ sufficiently meet your requirements.  You are solely liable for all costs and
+ expenses incurred in connection with the distribution of Covered Work, and
+ the Contributor shall have no liability, obligation or responsibility
+ therefor.  Contributor shall have no obligation to provide maintenance,
+ support, upgrades or new releases to You.
+
+ No assurances are provided by Contributor that Covered Work does not infringe
+ the intellectual property rights of any third party.  Contributor disclaims
+ liability to You for claims brought by any third party based on infringement
+ of intellectual property rights.  Contributor represents that, to its
+ knowledge, it has sufficient copyrights to allow You to use, modify and
+ distribute The Program as herein permitted.  You agree to notify Contributor
+ should you become aware of any potential or actual infringement of The
+ Program or any of Contributor's intellectual property rights in The Program
+ and associated documentation.  Contributor disclaims any liability to You for
+ claims brought by a third party based on infringement of intellectual
+ property rights, and You indemnify Contributor against all such claims.
+
+ You must reproduce and include OpenSS7 copyright notices on any copy of The
+ Program.  Covered Work must carry prominent notices stating that changes have
+ been made and the dates of any such changes.  You must reproduces without
+ alteration OpenSS7 copyright and other proprietary notices in The Program or
+ Covered Work.  The OpenSS7 copyright and other proprietary notices must
+ appear prominently in modification made by You and, in all cases, in the same
+ file as all your copyright and other proprietary notices.  Failure to do so
+ will immediately, and without notice, terminate Your license.
+
+ You many not use the name "OpenSS7," "The OpenSS7 Project," the names of the
+ authors, or any trademarks of OpenSS7 Corporation in any publication without
+ the explicit written consent of OpenSS7 Corporation.  Failure to do so will
+ immediately, and without notice, terminate Your license.
+
+ You are granted no rights in or to any "OpenSS7", "OpenSS7 Project"
+ trademarks now or hereinafter used or licensed by OpenSS7.  You agree not to
+ (i) challenge OpenSS7 Trademarks; (ii) attempt to register any OpenSS7
+ Trademarks, or any mark or logo substantially similar thereto; or (iii)
+ incorporate any OpenSS7 Trademarks into Your own trademarks, product names,
+ service marks, company names or domain names.  Any attempt to do so will
+ immediately, and without notice, terminate Your license.
+
+    a) Disclaiming warranty or limiting liability differently from the
+    terms of sections 15 and 16 of this License; or
+
+    b) Requiring preservation of specified reasonable legal notices or
+    author attributions in that material or in the Appropriate Legal
+    Notices displayed by works containing it; or
+
+    c) Prohibiting misrepresentation of the origin of that material, or
+    requiring that modified versions of such material be marked in
+    reasonable ways as different from the original version; or
+
+    d) Limiting the use for publicity purposes of names of licensors or
+    authors of the material; or
+
+    e) Declining to grant rights under trademark law for use of some
+    trade names, trademarks, or service marks; or
+
+    f) Requiring indemnification of licensors and authors of that
+    material by anyone who conveys the material (or modified versions of
+    it) with contractual assumptions of liability to the recipient, for
+    any liability that these contractual assumptions directly impose on
+    those licensors and authors.

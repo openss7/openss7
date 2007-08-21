@@ -63,6 +63,11 @@
 static char const ident[] =
     "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $";
 
+/* This file can be processed with doxygen(1). */
+
+/** @addtogroup ss7statsd SS7 Statistics Daemon
+  * @{ */
+
 /*
  * This is ss7statsd(8).  The purpose of the daemon is to spawn a daemon process to collect
  * statistics and log them to a statistics collection log.
@@ -193,6 +198,13 @@ struct pollfd pfd[] = {
 
 int pfd_num = 0;
 
+/** @brief Print copying permissions.
+  * @param name program name.
+  * @internal
+  *
+  * This function prints the copying information as a result of the -C,
+  * --copying options.  This is a standard OpenSS7 coding practice.
+  */
 void
 copying(const char *name)
 {
@@ -239,6 +251,15 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 ", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
 }
 
+/** @brief Print version.
+  * @param name program name.
+  * @internal
+  *
+  * This function prints the version information as a result of the -V,
+  * --version options.  This is stanard OpenSS7 coding practice.  This function
+  * also prints to the second blank line (first to paragraphs) in the same
+  * format as GNU projects.  The last two paragraphs are OpenSS7 practice.
+  */
 void
 version(const char *name)
 {
@@ -280,6 +301,14 @@ Usage:\n\
 ", name);
 }
 
+/** @brief Print help text.
+  * @param name program name.
+  * @internal
+  *
+  * This function prints help information as a results of the -h, --help
+  * options.  This is standard OpenSS7 coding practice.  The help text is
+  * formatted according to OpenSS7 practices.
+  */
 void
 help(const char *name)
 {
@@ -370,8 +399,16 @@ int stats_us1_signal = 0;
 int stats_us2_signal = 0;
 int stats_trm_signal = 0;
 
+/** @brief Signal handler.
+  * @param signum signal number.
+  * @internal
+  *
+  * This is the signal handler.  It simply marks the signal as received and
+  * returns.  The main poll loop in stats_wait_event() will wake as a result
+  * of the signal and examines these flags when it awakes.
+  */
 void
-sig_handler(int signum)
+stats_sig_handler(int signum)
 {
 	switch (signum) {
 	case SIGALRM:
@@ -393,6 +430,14 @@ sig_handler(int signum)
 	return;
 }
 
+/** @brief Register or unregister a signal.
+  * @param signum signal number.
+  * @param handler signal handler or NULL.
+  * @internal
+  *
+  * Registers (handler != NULL) or unregisters (handler == NULL) a signal
+  * handler against a signal number.
+  */
 int
 stats_sig_register(int signum, void (*handler) (int))
 {
@@ -411,16 +456,26 @@ stats_sig_register(int signum, void (*handler) (int))
 	return (0);
 }
 
+/** @brief Catch signals.
+  * @internal
+  *
+  * Register for all signals of interest.
+  */
 void
 stats_catch(void)
 {
-	stats_sig_register(SIGALRM, sig_handler);
-	stats_sig_register(SIGHUP, sig_handler);
-	stats_sig_register(SIGUSR1, sig_handler);
-	stats_sig_register(SIGUSR2, sig_handler);
-	stats_sig_register(SIGTERM, sig_handler);
+	stats_sig_register(SIGALRM, stats_sig_handler);
+	stats_sig_register(SIGHUP, stats_sig_handler);
+	stats_sig_register(SIGUSR1, stats_sig_handler);
+	stats_sig_register(SIGUSR2, stats_sig_handler);
+	stats_sig_register(SIGTERM, stats_sig_handler);
 }
 
+/** @brief Block signals.
+  * @internal
+  *
+  * Unregister from all signals of interest.
+  */
 void
 stats_block(void)
 {
@@ -431,6 +486,12 @@ stats_block(void)
 	stats_sig_register(SIGTERM, NULL);
 }
 
+/** @brief Start interval timer.
+  * @param duration duration of timer.
+  * @internal
+  *
+  * Start the interval timer.
+  */
 int
 stats_timer_start(long duration)
 {
@@ -439,7 +500,7 @@ stats_timer_start(long duration)
 		{duration / 1000, (duration % 1000) * 1000}
 	};
 
-	if (stats_sig_register(SIGALRM, sig_handler))
+	if (stats_sig_register(SIGALRM, stats_sig_handler))
 		return (-1);
 	if (setitimer(ITIMER_REAL, &setting, NULL))
 		return (-1);
@@ -447,6 +508,11 @@ stats_timer_start(long duration)
 	return (0);
 }
 
+/** @brief Stop interval timer.
+  * @internal
+  *
+  * Stop the interval timer.
+  */
 int
 stats_timer_stop(void)
 {
@@ -457,6 +523,12 @@ void stats_exit(int retval);
 
 static struct timeval tv;
 
+/** @brief Output a timestamp.
+  * @param stream output stream to write to.
+  * @internal
+  *
+  * Outputs the last generated timestamp to an output stream.
+  */
 void
 fprintf_time(FILE * stream)
 {
@@ -467,6 +539,11 @@ fprintf_time(FILE * stream)
 	fprintf(stream, "%012ld.%06ld", tv.tv_sec, tv.tv_usec);
 }
 
+/** @brief Take a time stamp.
+  * @internal
+  *
+  * Generates a timestamp.
+  */
 int
 ftimestamp(void)
 {
@@ -479,7 +556,12 @@ ftimestamp(void)
 	return (0);
 }
 
-/* generate output header */
+/** @brief Generate output file header.
+  * @internal
+  *
+  * Generates a header for the output file.  This header is generated for each
+  * output file opened and also generated when output files are rotated.
+  */
 void
 stats_header(void)
 {
@@ -685,6 +767,15 @@ stats_slmx_print_one_sdl(int fd, struct slmux_ppa *slm, bool collect)
 	fprintf(stdout, "}\n\n");
 }
 
+/** @brief Collect or report stats for one signalling link.
+  * @param fd signalling link multiplexer file descriptor.
+  * @param slm signalling link multiplexer ppa structure for link.
+  * @param collect collect (true) or report (false)
+  * @internal
+  *
+  * Collects or reports signalling link statistics for one signalling link at
+  * the SL, SDT and SDL sub-levels.
+  */
 void
 stats_slmx_print_one(int fd, struct slmux_ppa *slm, bool collect)
 {
@@ -693,6 +784,17 @@ stats_slmx_print_one(int fd, struct slmux_ppa *slm, bool collect)
 	stats_slmx_print_one_sdl(fd, slm, collect);
 }
 
+/** @brief Collect SL-MUX statistics.
+  * @internal
+  *
+  * Collect statistics for each signalling link known to the signalling link
+  * multiplexing driver.  The statistics device is opened and closed on each
+  * collection.  This uses the SLM_IOCLPPA input-output control on the
+  * signallin link multiplexer to list all of the signalling links known to
+  * the multiplexer and then uses the SL_IOCCPASS, SDT_IOCCPASS, and
+  * SDL_IOCCPASS input-output controls to request statistics collection from
+  * each of the signalling links linked beneath the SL-MUX driver.
+  */
 void
 stats_slmx_collect(void)
 {
@@ -812,6 +914,13 @@ stats_isup_collect(void)
 	close(fd);
 }
 
+/** @brief Collect statistics.
+  * @internal
+  *
+  * Collect statistics for each of the SL-MUX, MTP, SCCP, TCAP and ISUP
+  * protocol components.  Collection differes from reporting in that
+  * collection clears the counts as they are retrieved.
+  */
 void
 stats_collect(void)
 {
@@ -822,6 +931,17 @@ stats_collect(void)
 	stats_isup_collect();
 }
 
+/** @brief Report SL-MUX statistics.
+  * @internal
+  *
+  * Report statistics for each signalling link known to the signalling link
+  * multiplexing driver.  The statistics device is opened and closed on each
+  * reporting.  This uses the SLM_IOCLPPA input-output control on the
+  * signallin link multiplexer to list all of the signalling links known to
+  * the multiplexer and then uses the SL_IOCCPASS, SDT_IOCCPASS, and
+  * SDL_IOCCPASS input-output controls to request statistics reporting from
+  * each of the signalling links linked beneath the SL-MUX driver.
+  */
 void
 stats_slmx_report(void)
 {
@@ -941,6 +1061,13 @@ stats_isup_report(void)
 	close(fd);
 }
 
+/** @brief Report statistics.
+  * @internal
+  *
+  * Report statistics for each of the SL-MUX, MTP, SCCP, TCAP and ISUP
+  * protocol components.  Reporting differs from collection in that
+  * reporting does not clear the counts as they are retrieved.
+  */
 void
 stats_report(void)
 {
@@ -951,7 +1078,13 @@ stats_report(void)
 	stats_isup_report();
 }
 
-/* ultimate signal actions */
+/** @brief SIGTERM signal action.
+  * @internal
+  *
+  * SIGTERM results from the process being killed, normally by the init
+  * script.  This action permits the daemon to flush its output and close
+  * output and log files gracefully.
+  */
 void
 stats_trm_action(void)
 {
@@ -959,6 +1092,16 @@ stats_trm_action(void)
 	stats_exit(0);
 }
 
+/** @brief SIGHUP signal action.
+  * @internal
+  *
+  * SIGHUP is expected to be sent by an external process that wishes to rotate
+  * the output and log files generated by the program.  This action,
+  * therefore, closes and reopens each of the output and log files.  This
+  * permits logotate(8) to move the corresponding files, and then issue a
+  * SIGHUP to the daemon to gracefully close and reopen files using the
+  * original name.
+  */
 void
 stats_hup_action(void)
 {
@@ -987,6 +1130,14 @@ stats_hup_action(void)
 	}
 }
 
+/** @brief SIGALRM signal action.
+  * @internal
+  *
+  * SIGARLM results from the expiry of the interval timer.  The interval timer
+  * is used to implement the collection interval, so each time that the timer
+  * expires, a collections needs to be performed and the timer needs to be
+  * reset for the next collection interval.
+  */
 void
 stats_alm_action(void)
 {
@@ -994,12 +1145,28 @@ stats_alm_action(void)
 	stats_collect();
 }
 
+/** @brief SIGUSR1 signal action.
+  * @internal
+  *
+  * SIGUSR1 is expected to be generated by an external process that requests
+  * that statistics be collected immediately.  The different between reporting
+  * and collection is that reporting does not reset counts where as collection
+  * does.
+  */
 void
 stats_us1_action(void)
 {
 	stats_collect();
 }
 
+/** @brief SIGUSR2 signal action.
+  * @internal
+  *
+  * SIGUSR2 is expected to be generated by an external process that requests
+  * that statistics be reported immediately.  The different between reporting
+  * and collection is that reporting does not reset counts where as collection
+  * does.
+  */
 void
 stats_us2_action(void)
 {
@@ -1497,3 +1664,7 @@ main(int argc, char *argv[])
 	}
 	exit(0);
 }
+
+/** @} */
+
+// vim: com=sr0\:/**,mb\:*,ex\:*/,sr0\:/*,mb\:*,ex\:*/,b\:TRANS

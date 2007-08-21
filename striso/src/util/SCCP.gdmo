@@ -1,0 +1,1533 @@
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+concernedArea MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		concernedAreaPackage PACKAGE
+			BEHAVIOUR
+				concernedAreaBhv BEHAVIOUR
+					DEFINED AS "A concernedArea contains a list of remote SCCP's (mtpAccessPoints) to be
+						informed of local (primary broadcast) or remote (secondary broadcast) sccp
+						subsystem status changes, or to be informed of the SCCP status after completion
+						of SCCP Restart.";;
+			ATTRIBUTES
+				concernedAreaId GET SET-BY-CREATE,
+				remoteSCCPList GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992 ' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992 ' is supported by an instance of this class",
+		concernedAreaNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 1 };
+--NOTE - The local distribution of the status changes among different subsystems is not related to the concernedArea  and is application specific.
+
+endNodeEntitySetWithoutSSN MANAGED OBJECT CLASS
+	DERIVED FROM
+		sccpEntitySet;
+	CHARACTERIZED BY
+		endNodeEntitySetWithoutSSNPackage PACKAGE
+			BEHAVIOUR
+				endNodeEntitySetWithoutSSNBhv BEHAVIOUR
+					DEFINED AS "This managed object class is an sccpEntitySet that identifies SCCP end
+						nodes. Because of this, the entitySetSapPointer attribute is only allowed to
+						refer to instances of the sccpLinkage class. A subsystem number is not specified
+						by this entity set, but routing is on SSN. ";;;;
+REGISTERED AS	{ sccpObjectClass 2 };
+
+endNodeEntitySetWithSSN MANAGED OBJECT CLASS
+	DERIVED FROM
+		sccpEntitySet;
+	CHARACTERIZED BY
+		endNodeEntitySetWithSSNPackage PACKAGE
+			BEHAVIOUR
+				endNodeEntitySetWithSSNBhv BEHAVIOUR
+					DEFINED AS "This managed object class is an sccpEntitySet that identifies SCCP Access
+						Points. Because of this, the SAP pointer attribute is only allowed to refer to
+						instances of the sccpAccessPoint class.";;;;
+REGISTERED AS	{ sccpObjectClass 3 };
+
+gtConversionRule MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		gtConversionRulePackage PACKAGE
+			BEHAVIOUR
+				gtConversionRuleBhv BEHAVIOUR
+					DEFINED AS "This managed object class defines the rules that can be used to change the
+						global title in a called party address. The conversion can replace all parts of
+						the global title with a new value. If the addressInfoConversionRulePackage is
+						present, it specifies how address elements can be inserted, replaced, passed
+						transparently, or deleted from the (old) GTAI into a new GTAI. The procedures
+						for Global Title Conversion are described in 7.3/Q.715. Only those parts of the
+						GT information are modified that have a corresponding new value identified by
+						instances of this class. In case an attribute representing GT information is
+						present but is not to be used for converting Global Titles, it has value NULL.
+						As a result, the particular part of the Global Title will not be overwritten.";;
+			ATTRIBUTES
+				gtConversionRuleId GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		addressInfoConversionRulePackage
+			PRESENT IF "an instance supports it",
+		newEncodingSchemePackage
+			PRESENT IF "an instance supports it",
+		newNatureOfAddressPackage
+			PRESENT IF "an instance supports it",
+		newNumberingPlanPackage
+			PRESENT IF "an instance supports it",
+		newTranslationTypePackage
+			PRESENT IF "an instance supports it",
+		gtConversionRuleNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 4 };
+--NOTE 1 - The application of gtConversionRule to calling party addresses conversions is for further study.
+--NOTE 2 - The translationType managed object also offers a mechanism to modify global title translation types. That mechanism should not be used in parallel with the gtConversionRule managed object.
+
+gtRule MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		gtRulePackage PACKAGE
+			BEHAVIOUR
+				gtRuleBhv BEHAVIOUR
+					DEFINED AS "A Global Title Rule is selected based on the (matching) Global Title Address
+						Information and possibly the Encoding Scheme. If there is no matching
+						Translation Rule for a given Global Title, then a Routing Failure notification
+						with the reason 'no translation for an address of this nature' is emitted by the
+						SCRC. The Global Title Rule points to the Entity Set resulting from the Global
+						Title Translation. The Global Title Conversion Rule pointer refers to an
+						optional Global Title Conversion Rule that may modify the Global Title. The new
+						Routing Indicator is implicitly set according the sccpEntitySet pointed to. The
+						administrativeState attribute can have the following states: locked and
+						unlocked.";;
+			ATTRIBUTES
+				gtRuleId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
+				gtAddressInformation GET SET-BY-CREATE,
+				gtConvRulePointer GET-REPLACE,
+				gtEncodingScheme GET SET-BY-CREATE,
+				sccpEntitySetPointer GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		gtRuleNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 5 };
+--NOTE - The new Routing Indicator is implicitly set according the sccpEntitySet pointed to.
+
+gtTranslator MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		gtTranslatorPackage PACKAGE
+			BEHAVIOUR
+				gtTranslatorBhv BEHAVIOUR
+					DEFINED AS "The Global Title Translator is selected on a combination of the values of
+						the Nature of Address, the Translation Type, and the Numbering Plan (if
+						available). As a consequence, the Global Title Translator is modelled as a class
+						with three characteristic attributes: Nature of Address, Translation Type, and
+						Numbering Plan. If an Global Title address field is not used, it has value NULL.
+						The gtIndicator attribute is read-only and is derived from the combination of
+						Nature of Address, the Translation Type, and Numbering Plan used. If for a given
+						combination no Global Title Translator exists, a Routing Failure notification
+						with the reason' no translation for an address of this nature' is emitted by the
+						SCRC. The administrativeState attribute can have the following states: locked
+						and unlocked.";;
+			ATTRIBUTES
+				gtTranslatorId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
+				gtIndicator GET,
+				gtNatureOfAddress GET SET-BY-CREATE,
+				gtNumberingPlan GET SET-BY-CREATE,
+				gtTranslationType GET SET-BY-CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		gtTranslatorNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 6 };
+
+relayNodeEntitySet MANAGED OBJECT CLASS
+	DERIVED FROM
+		sccpEntitySet;
+	CHARACTERIZED BY
+		relayNodeEntitySetPackage PACKAGE
+			BEHAVIOUR
+				relayNodeEntitySetBhv BEHAVIOUR
+					DEFINED AS "This managed object class is an sccpEntitySet that identifies SCCP relay
+						nodes, i.e. MTP Access Points. Because of this, the entitySetSapPointer
+						attribute is only allowed to refer to instances of the sccpLinkage class. The
+						ssn attribute allows to optionally set the subsystem number as a result of a
+						Global Title Translation, if routing is done on Global title and DPC to a relay
+						node";;;;
+	CONDITIONAL PACKAGES
+		ssnPackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 7 };
+
+sccp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":networkEntity;
+	CHARACTERIZED BY
+		sccpMOCPackage PACKAGE
+			BEHAVIOUR
+				sccpMOCPackageBhv BEHAVIOUR
+					DEFINED AS "The sccp managed object class is the placeholder for all SCCP related
+						managed objects. No specific management aspects have been identified. The
+						communicationsEntiyId is used for naming. The localSapNames attribute contains a
+						set of distinguished names of SCCP SAPs at which services are provided to the
+						entity. The systemTypes attribute is a set-valued attribute with possible
+						values: End System (ES) indicates an SCCP destination node, Intermediate System
+						indicates an SCCP relay node. The networkEntityTitles attribute unambiguously
+						identifies the name of the SCCP in an end or intermediate node. The value may be
+						entered by a system management operation or it may be derived by some local
+						means, for example by auto configuration. The communicationsAlarm can have the
+						following probable causes: Probable Cause = LocalSccpUnavailable which
+						represents measurements Q.752/8.1 - measurement Q.752/8.3 (SpecificProblems =
+						Failure, Maintenance, Congestion) (PerceivedSeverity = Major/Minor/Warning) and
+						measurement Q.752/8.4 (PerceivedSeverity = Cleared), Probable Cause =
+						SubsystemOoSgranted which represents measurement Q.752/8.6, and Probable Cause =
+						SubsystemOoSdenied which represents measurement Q.752/8.7.";;
+			ATTRIBUTES
+				sccpVersion GET,
+				lUDTandLUDTSSupported GET,
+				coordChangeTimer GET-REPLACE,
+				ingnoreSSTTimer GET-REPLACE,
+				maxStatInfoTimer GET-REPLACE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":communicationsAlarm,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF " an instance supports it",
+		sccpNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 8 };
+
+sccpAccessPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":nSAP;
+	CHARACTERIZED BY
+		sccpAccessPointPkg PACKAGE
+			BEHAVIOUR
+				sccpAccessPointBhv BEHAVIOUR
+					DEFINED AS "The sap2Address attribute contains the address of the sccpAccessPoint. The
+						address contains the SubSystem Number (SSN). The sap2Address is of type SET OF
+						OCTETSTRING. For sccpAccessPoints, the set size is 1. The sapId attribute is
+						used in naming instances of the sccpAccessPoint managed object class. The
+						userEntityNames attribute contains the distinguished names of the managed
+						objects that represent the user entities that are using the sccpAccessPoint,
+						i.e. instances of the SCCP subsystem. The providerEntityNames attribute contains
+						the distinguished names of the managed objects that represent the provider
+						entities that are supporting the sccpAccessPoint, i.e. the instance of the SCCP.
+						The status of the sccpAccessPoint is represented by the availability status
+						attribute. A subsystem can have the status: - allowed, the sccpAccessPoint is
+						reachable and is functioning normally (availability status = available) -
+						prohibited, the sccpAccessPoint not reachable (availability status =
+						unavailable) - congested (availability status = degraded) The optional (national
+						network provider option) ssAvailableAfterSpRestart attribute holds the default
+						subsystem status as described in the procedure of 5.2.3/Q.714. The
+						concernedAreaPointer specifies the concerned area to be used by SCCP Management
+						for primary broadcast in case this access point is local. In case of a remote
+						access point, the pointed concerned area will be used by SCCP Management for the
+						secondary broadcast. The concernedAreaPointer has value 'NULL' if no concerned
+						area is pointed at. The sccpLinkagePointer specifies the sccpLinkage that is
+						associated with remote sccpAccessPoints only. In case of a local
+						sccpAccessPoint, the sccpLinkagePointer has value NULL. A remote sccpAccessPoint
+						cannot be created without a valid pointer to an sccpLinkage. The
+						qualityofServiceAlarm can have the following probable cause: ProbableCause =
+						TooLargeForSegmentation which represents measurement Q.752/7.14
+						(PerceivedSeverity = Major/Minor/Warning). ProbableCause = subsystemProhibited
+						which represents measurement Q.752/8.11 and Q.752/8.12 (PerceivedSeverity =
+						Major/Minor/Warning/Cleared). The communicationsAlarm can have the following
+						probable causes: ProbableCause = sccpCongested which represents measurement
+						Q.752/8.8 (PerceivedSeverity = Major/Minor/Warning). The congestion level is
+						given as a parameter of the notification. ProbableCause =
+						localSubsystemProhibited which represents measurements Q.752/8.9 and Q.752/8.10
+						(PerceivedSeverity = Major/Minor/Warning/Cleared)";;
+			ATTRIBUTES
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
+				concernedAreaPointer GET-REPLACE,
+				sccpLinkagePointer GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":communicationsAlarmcongestionLevel,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		ssAvailableAfterSpRestartPackage
+			PRESENT IF "The national network provider option as described in 5.2.3/Q.714 is
+				supported",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF " an instance supports it",
+		sccpAccessPointNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 9 };
+
+sccpEntitySet MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		sccpEntitySetPackage PACKAGE
+			BEHAVIOUR
+				sccpEntitySetBhv BEHAVIOUR
+					DEFINED AS "This managed object class identifies the set of access points that result
+						from a global title translation. This set may contain one or two access points.
+						The distribution of SCCP traffic over the entities in the set depends on the
+						value of the sharingmode attribute: In case of value 'solitary', there can only
+						be one access point in the set. In case of value 'dupliDominant', the second
+						entity is a backup for the first entity, according to the procedure described in
+						clause 5/Q.714. In case of value 'dupliReplacement', the second entity is
+						standby for backup for the first entity, but after change over, the primary and
+						backup roles are swapped according to the procedure described in clause 5/Q.714.
+						In this case, also the value of the entitySetSapPointer changes. If the
+						sccpEntitySetLoadsharingPackage is present, sharing mode can also take the value
+						'dupliLoadshared'. In this case, the load is shared over the entities in the set
+						according to the algorithm referred to by the loadSharingAlgPointer attribute.
+						This managed object class is not instantiable, it is only a superclass for the
+						instantiable subclasses endNodeEntitySetWithoutSSN, endNodeEntitySetWithSSN and
+						relayNodeEntitySet.";;
+			ATTRIBUTES
+				sccpEntitySetId GET SET-BY-CREATE,
+				entitySetSapPointer GET-REPLACE ADD-REMOVE,
+				sharingMode GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		sccpEntitySetLoadsharingPackage
+			PRESENT IF "an instance supports it",
+		entitySetNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 10 };
+--NOTE 1 - The sharing mode value 'duplicatedReplacement' was defined for the 1993 version of SCCP but removed in  the 1996 version.
+--NOTE 2 - The availability of an sccpEntitySet can be derived from the availability of the individual entities in the set.  It is assumed that this is done at the network management level.
+
+sccpLinkage MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		sccpLinkagePackage PACKAGE
+			BEHAVIOUR
+				sccpLinkageBhv BEHAVIOUR
+					DEFINED AS "This managed object class stores data about the specific capabilities of the
+						underlying MTP access point. It is analogue to the generic managed object class
+						linkage that is described in Recommendation X.283. For this managed object class
+						subclasses may be specified for vendor-specific additions. The sN-SAP attribute
+						indicates a relationship to the underlying MTP access point. The
+						operationalProtocols attribute indicates the protocol classes actually supported
+						by this MTP network. The 'versions' field of the attribute is always 'empty'.
+						The concernedAreaPointer specifies the concerned area to be used for
+						broadcasting the SCCP status after completion of SCCP Restart. It has value
+						'NULL' if no concerned area is pointed at.";;
+			ATTRIBUTES
+				sccpLinkageId GET SET-BY-CREATE,
+				"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":operationalProtocols GET,
+				"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":sN-SAP GET;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		congestionPackage
+			PRESENT IF "an instance supports it and only if the access point is local",
+		localSccpLinkagePackage
+			PRESENT IF "an instance represents a local sccpLinkage",
+		sccpLinkageNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 11 };
+
+sclc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":cLNS;
+	CHARACTERIZED BY
+		sclcPackage PACKAGE
+			BEHAVIOUR
+				sclcPackageBhv BEHAVIOUR
+					DEFINED AS "This managed object class contains the management information concerning the
+						SCCP connectionless services. The managed object class is derived from ISO/IEC
+						10733 cLNS. The following states of the administrative state are appropriate:
+						locked and unlocked. The operationalSystemType attribute is an attribute with
+						possible values: End System (ES) indicates an SCCP destination node,
+						Intermediate System indicates an SCCP relay node. If the operationalSystemType
+						equals 'Destination Node' it indicates that the system shall perform no
+						forwarding operations upon non-local SCCP messages. A value of 'Intermediate
+						Node' indicates that the system is permitted to perform forwarding operations,
+						but the decision to forward individual SCCP messages or not to forward them,
+						shall be taken on the basis of the available routing information. If the managed
+						object is created by management operation, the initial value of the
+						operationalSystemType shall be specified in the CMIP create. Otherwise, the
+						value shall be determined in an implementation specific manner. The value shall
+						be one of those present in the systemTypes attribute of the superior SCCP
+						managed object. The set of connectionless network protocols supported by this
+						instance of the sclc protocol machine is represented by the supportedProtocols
+						attribute. For the connectionless protocol, it can be either class 0 or 1, or
+						both. The qualityofServiceAlarm can have the following probable causes:
+						ProbableCause = ReassemblyTimeOut which represents measurement Q.752/7.10
+						(PerceivedSeverity = Major/Minor/Warning), ProbableCause = SegmentOutOfOrder
+						which represents measurement Q.752/7.11 (PerceivedSeverity =
+						Major/Minor/Warning), ProbableCause = NoReassemblySpace which represents
+						measurement Q.752/7.12 (PerceivedSeverity = Major/Minor/Warning), ProbableCause
+						= NoSegmentationSupport which represents measurement Q.752/7.19
+						(PerceivedSeverity = Major/Minor/Warning), ProbableCause = SegmentationFailure
+						which represents measurement Q.752/7.20 (PerceivedSeverity =
+						Major/Minor/Warning), and ProbableCause = ReassemblyFailure which represents
+						measurement Q.752/7.21 (PerceivedSeverity = Major/Minor/Warning).";;
+			ATTRIBUTES
+				initialValueReassTimer GET-REPLACE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992 ' is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF " an instance supports it",
+		sclcNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 12 };
+
+scoc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":cONS;
+	CHARACTERIZED BY
+		scocPackage PACKAGE
+			BEHAVIOUR
+				scocPackageBhv BEHAVIOUR
+					DEFINED AS "The following states of the administrative state are appropriate: locked and
+						unlocked. The operationalSystemType attribute is an attribute with possible
+						values: End System (ES) indicates an SCCP destination node, Intermediate System
+						indicates an SCCP relay node. The operationalSystemType indicates the system
+						role in which this instance is operating. A value of 'Destination Node'
+						indicates that the system shall perform no forwarding operations upon non-local
+						SCCP messages. A value of Intermediate Node indicates that the system is
+						permitted to perform forwarding operations, but the decision to forward
+						individual SCCP messages or not to forward them, shall be taken on the basis of
+						the available routing information. If the MO is created by management operation,
+						the initial value of the operationalSystemType shall be specified in the CMIP
+						create. Otherwise, the value shall be determined in an implementation specific
+						manner. The value shall be one of those present in the systemTypes attribute of
+						the superior SCCP managed object. The set of connection-oriented network
+						protocols supported by this instance of the scoc protocol machine is represented
+						by the supportedProtocols attribute. For the connectionoriented protocol, it can
+						be either class 2 or 3, or both.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":supportedProtocols GET;;;
+	CONDITIONAL PACKAGES
+		scocNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 13 };
+
+scrc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		scrcPackage PACKAGE
+			BEHAVIOUR
+				scrcPackageBhv BEHAVIOUR
+					DEFINED AS "The scrc managed object class contains the management information concerning
+						the SCCP routing control. The qualityofServiceAlarm can have the following
+						probable causes: ProbableCause = NoTranslatorForAddress which represents
+						measurement Q.752/7.1 (PerceivedSeverity = Major/Minor/Warning), ProbableCause =
+						NoRuleForAddress which represents measurement Q.752/7.2 (PerceivedSeverity =
+						Major/Minor/Warning), ProbableCause = PointCodeNotAvailable which represents
+						measurement Q.752/7.31 (PerceivedSeverity = Major/Minor/Warning), ProbableCause
+						= PointCodeCongested which represents measurement Q.752/7.4 (PerceivedSeverity =
+						Major/Minor/Warning), ProbableCause = SubsystemUnavailable which represents
+						measurement Q.752/7.5 (PerceivedSeverity = Major/Minor/Warning), ProbableCause =
+						SubsystemCongested which represents measurement Q.752/7.6 (PerceivedSeverity =
+						Major/Minor/Warning), ProbableCause = UnequipedSubsystem which represents
+						measurement Q.752/7.7 (PerceivedSeverity = Major/Minor/Warning), ProbableCause =
+						SyntaxErrorDetected which represents measurement Q.752/7.8 (PerceivedSeverity =
+						Major/Minor/Warning), ProbableCause = RoutingFailureNoReasonOrUnqualified which
+						represents measurement Q.752/7.9 (PerceivedSeverity = Major/Minor/Warning), and
+						ProbableCause = HopCounterViolation which represents measurement Q.752/7.13
+						(PerceivedSeverity = Major/Minor/Warning).";;
+			ATTRIBUTES
+				scrcId GET SET-BY-CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF " an instance supports it",
+		scrcNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 14 };
+
+srvt MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		srvtPackage PACKAGE
+			BEHAVIOUR
+				srvtBhv BEHAVIOUR
+					DEFINED AS "This managed object represents the management information of the SCCP
+						Routing Verification Test. This test is described in Recommendation Q.753. The
+						SCCP Routing Verification Test (srvt) is used to test the Global Title
+						Translation service of the SCCP.";;
+			ATTRIBUTES
+				sccpRouteTestId GET SET-BY-CREATE,
+				dSRVT GET,
+				nSRVT GET-REPLACE;
+			ACTIONS	startSccpRouteTest
+				;
+			NOTIFICATIONS
+				sccpRouteTestResult;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1995)":createDeleteNotificationsPackage
+			PRESENT IF "the objectCreation and objectDeletion notifications defined in 'ITU-T Rec.
+				X.721 (1992) | ISO/IEC 10165-2 : 1992' are supported by an instance of this
+				class",
+		"ITU-T Rec. M.3100 (1995)":attributeValueChangeNotificationPackage
+			PRESENT IF "the attributeValueChange notification defined in 'ITU-T Rec. X.721 (1992) |
+				ISO/IEC 10165-2 : 1992' is supported by an instance of this class",
+		srvtNamePackage
+			PRESENT IF "an instance supports it";
+REGISTERED AS	{ sccpObjectClass 15 };
+
+concernedAreaNamePackage PACKAGE
+	ATTRIBUTES
+		concernedAreaName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 1 };
+
+congestionPackage PACKAGE
+	ATTRIBUTES
+		attackTimerValue GET-REPLACE,
+		decayTimerValue GET-REPLACE,
+		nrOfRestrictionLevels DEFAULT VALUESCCPDefinedTypesModule.nrOfRestrictionLevelsDefault GET-REPLACE,
+		nrOfSubLevels DEFAULT VALUESCCPDefinedTypesModule.nrOfSubLevelsDefault GET-REPLACE,
+		cLS DEFAULT VALUESCCPDefinedTypesModule.cLSDefault GET-REPLACE,
+		congestionTimerValue GET-REPLACE,
+		p DEFAULT VALUESCCPDefinedTypesModule.pDefault GET SET-BY-CREATE,
+		importanceLevel-CR GET-REPLACE,
+		importanceLevel-CC GET-REPLACE,
+		importanceLevel-CREF GET-REPLACE,
+		importanceLevel-DT1 GET-REPLACE,
+		importanceLevel-DT2 GET-REPLACE,
+		importanceLevel-AK GET-REPLACE,
+		importanceLevel-IT GET-REPLACE,
+		importanceLevel-ED GET-REPLACE,
+		importanceLevel-EA GET-REPLACE,
+		importanceLevel-RSR GET-REPLACE,
+		importanceLevel-RSC GET-REPLACE,
+		importanceLevel-ERR GET-REPLACE,
+		importanceLevel-RLC GET-REPLACE,
+		importanceLevel-RLSD GET-REPLACE,
+		importanceLevel-UDT GET-REPLACE,
+		importanceLevel-UDTS GET-REPLACE,
+		importanceLevel-XUDT GET-REPLACE,
+		importanceLevel-XUDTS GET-REPLACE,
+		importanceLevel-LUDT GET-REPLACE,
+		importanceLevel-LUDTS GET-REPLACE,
+		rLM GET-REPLACE,
+		rSLM GET-REPLACE;
+REGISTERED AS	{ sccpPackage 2 };
+--NOTE 1 - For recommended values of the importanceLevel attributes, see 2.6.2/Q.714.
+--NOTE 2 - Caution should be taken when modifying the importance levels. Co-ordination within and in between  different networks might be required.
+
+addressInfoConversionRulePackage PACKAGE
+	ATTRIBUTES
+		addressInfoConversionRule GET-REPLACE;
+REGISTERED AS	{ sccpPackage 3 };
+
+entitySetNamePackage PACKAGE
+	ATTRIBUTES
+		entitySetName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 4 };
+
+gtConversionRuleNamePackage PACKAGE
+	ATTRIBUTES
+		gtConversionRuleName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 5 };
+
+gtRuleNamePackage PACKAGE
+	ATTRIBUTES
+		gtRuleName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 6 };
+
+gtTranslatorNamePackage PACKAGE
+	ATTRIBUTES
+		gtTranslatorName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 7 };
+
+localSccpLinkagePackage PACKAGE
+	ATTRIBUTES
+		concernedAreaPointer GET-REPLACE,
+		lowerLimitForSegmentation GET-REPLACE,
+		upperLimitForSegmentation GET-REPLACE;
+REGISTERED AS	{ sccpPackage 8 };
+
+newEncodingSchemePackage PACKAGE
+	ATTRIBUTES
+		newEncodingScheme GET-REPLACE;
+REGISTERED AS	{ sccpPackage 9 };
+
+newNatureOfAddressPackage PACKAGE
+	ATTRIBUTES
+		newNatureOfAddress GET-REPLACE;
+REGISTERED AS	{ sccpPackage 10 };
+
+newNumberingPlanPackage PACKAGE
+	ATTRIBUTES
+		newNumberingPlan GET-REPLACE;
+REGISTERED AS	{ sccpPackage 11 };
+
+newTranslationTypePackage PACKAGE
+	ATTRIBUTES
+		newTranslationType GET-REPLACE;
+REGISTERED AS	{ sccpPackage 12 };
+
+sccpAccessPointNamePackage PACKAGE
+	ATTRIBUTES
+		sccpAccessPointName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 13 };
+
+sccpEntitySetLoadsharingPackage PACKAGE
+	ATTRIBUTES
+		loadSharingAlgPointer GET-REPLACE;
+REGISTERED AS	{ sccpPackage 14 };
+
+sccpLinkageNamePackage PACKAGE
+	ATTRIBUTES
+		sccpLinkageName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 15 };
+
+sccpNamePackage PACKAGE
+	ATTRIBUTES
+		sccpName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 16 };
+
+sclcNamePackage PACKAGE
+	ATTRIBUTES
+		sclcName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 17 };
+
+scocNamePackage PACKAGE
+	ATTRIBUTES
+		scocName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 18 };
+
+scrcNamePackage PACKAGE
+	ATTRIBUTES
+		scrcName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 19 };
+
+srvtNamePackage PACKAGE
+	ATTRIBUTES
+		srvtName GET-REPLACE;
+REGISTERED AS	{ sccpPackage 20 };
+
+ssAvailableAfterSpRestartPackage PACKAGE
+	ATTRIBUTES
+		ssAvailableAfterSpRestart DEFAULT VALUESCCPDefinedTypesModule.ssAvailableAfterSpRestartDefault GET-REPLACE;
+REGISTERED AS	{ sccpPackage 21 };
+
+ssnPackage PACKAGE
+	ATTRIBUTES
+		ssn GET-REPLACE;
+REGISTERED AS	{ sccpPackage 22 };
+
+congestionLevel PARAMETER
+	CONTEXT	EVENT-INFO;
+	WITH SYNTAX	SCCPDefinedTypesModule.CongestionLevel;
+REGISTERED AS	{ sccpParameter 1 };
+
+addressInfoConversionRule ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AddressInfoConversionRule;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		addressInfoConversionRuleBhv BEHAVIOUR
+			DEFINED AS "This attribute specifies how address elements can be inserted, replaced,
+				passed transparently, or deleted from the (old) GTAI into a new GTAI.";;
+REGISTERED AS	{ sccpAttribute 1 };
+
+attackTimerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AttackTimerValue;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		attackTimerValueBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter Ta, as described in
+				5.2.4/Q.714.";;
+REGISTERED AS	{ sccpAttribute 2 };
+
+cLS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.CLS;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		cLSBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter CLS, as described in
+				5.2.7/Q.714.";;
+REGISTERED AS	{ sccpAttribute 3 };
+
+concernedAreaId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		concernedAreaIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 4 };
+
+concernedAreaName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 5 };
+
+concernedAreaPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.PointerOrNull;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		concernedAreaPointerBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for referring to instances of concernedArea. It has
+				value 'NULL' if no concerned area is pointed at.";;
+REGISTERED AS	{ sccpAttribute 6 };
+
+congestionTimerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.CongestionTimerValue;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		congestionTimerValueBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter Tcon, as described in
+				5.2.7/Q.714.";;
+REGISTERED AS	{ sccpAttribute 7 };
+
+coordChangeTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.TcoordChg;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		coordChangeTimerBhv BEHAVIOUR
+			DEFINED AS "This attribute represents the initial value of timer tCoordChg: waiting for
+				grant for subsystem to go out of service, as defined in 5.3.5.2/Q.714.";;
+REGISTERED AS	{ sccpAttribute 8 };
+
+decayTimerValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.DecayTimerValue;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		decayTimerValueBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter Td, as described in
+				5.2.4/Q.714.";;
+REGISTERED AS	{ sccpAttribute 9 };
+
+dSRVT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.DSRVT;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		dSRVTBhv BEHAVIOUR
+			DEFINED AS "The estimated maximum delay between relay points DSRVT as described in
+				3.2.2.5/Q.753. This value is needed for the calculation of the SRVT Guard Timer
+				T2.";;
+REGISTERED AS	{ sccpAttribute 10 };
+
+entitySetName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 11 };
+
+entitySetSapPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.EntitySetSapPointer;
+	MATCHES FOR
+		EQUALITY,
+		SET-COMPARISON,
+		SET-INTERSECTION;
+	BEHAVIOUR
+		entitySetSapPointerBhv BEHAVIOUR
+			DEFINED AS "The entitySetSapPointer attribute refers to the access point(s) contained in
+				the SCCP entity set. For the mtp access points, this is to be done by refering
+				to sccpLinkage's.";;
+REGISTERED AS	{ sccpAttribute 12 };
+
+gtAddressInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtAddressInformation;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtAddressInformationBhv BEHAVIOUR
+			DEFINED AS "The globalTitleAddressInformation attribute contains the value of the Global
+				Title address information, as indicated in 3.4.2/Q.713.";;
+REGISTERED AS	{ sccpAttribute 13 };
+
+gtConversionRuleId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtConversionRuleIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 14 };
+
+gtConversionRuleName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 15 };
+
+gtConvRulePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.PointerOrNull;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtConvRulePointerBhv BEHAVIOUR
+			DEFINED AS "This attribute refers to a Global Title conversion rule.";;
+REGISTERED AS	{ sccpAttribute 16 };
+
+gtEncodingScheme ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtEncodingScheme;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtEncodingSchemeBhv BEHAVIOUR
+			DEFINED AS "The encoding scheme is a part of the Global Title that identifies the
+				encoding scheme of the Global Title Address Information. For example, BCD with
+				an odd number of digits or BCD with an even number of digits.";;
+REGISTERED AS	{ sccpAttribute 17 };
+
+gtIndicator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtIndicator;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtIndicatorBhv BEHAVIOUR
+			DEFINED AS "The global title indicator indicates what type of global title is used
+				(3.4/Q.713).";;
+REGISTERED AS	{ sccpAttribute 18 };
+
+gtNatureOfAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtNatureOfAddress;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtNatureOfAddressBhv BEHAVIOUR
+			DEFINED AS "The nature of address attribute is single valued. The nature of address
+				includes values for 'international number', 'subscriber number', etcetera
+				(3.4.2.3/Q.713).";;
+REGISTERED AS	{ sccpAttribute 19 };
+
+gtNumberingPlan ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtNumberingPlan;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtNumberingPlanBhv BEHAVIOUR
+			DEFINED AS "The numbering plan attribute is single valued. The numbering plan indicates
+				how the global title address information is constructed from different parts
+				(e.g. country codes, subscriber number or national significant number) according
+				to the syntax and semantic defined for that particular numbering plan (see
+				2.4.2.1/Q.714).";;
+REGISTERED AS	{ sccpAttribute 20 };
+
+gtRuleId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtRuleIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 21 };
+
+gtRuleName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 22 };
+
+gtTranslationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtTranslationType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtTranslationTypeBhv BEHAVIOUR
+			DEFINED AS "The translation type attribute is single valued. ";;
+REGISTERED AS	{ sccpAttribute 23 };
+
+gtTranslatorId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		gtTranslatorIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 24 };
+
+gtTranslatorName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 25 };
+
+importanceLevel-AK ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 26 };
+
+importanceLevel-CC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 27 };
+
+importanceLevel-CR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 28 };
+
+importanceLevel-CREF ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 29 };
+
+importanceLevel-DT1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 30 };
+
+importanceLevel-DT2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 31 };
+
+importanceLevel-EA ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 32 };
+
+importanceLevel-ED ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 33 };
+
+importanceLevel-ERR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 34 };
+
+importanceLevel-IT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 35 };
+
+importanceLevel-LUDT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 36 };
+
+importanceLevel-LUDTS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 37 };
+
+importanceLevel-RLC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 38 };
+
+importanceLevel-RLSD ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 39 };
+
+importanceLevel-RSC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 40 };
+
+importanceLevel-RSR ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 41 };
+
+importanceLevel-UDT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 42 };
+
+importanceLevel-UDTS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 43 };
+
+importanceLevel-XUDT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 44 };
+
+importanceLevel-XUDTS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.ImportanceLevel;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 45 };
+
+ingnoreSSTTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.TignoreSST;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		ingnoreSSTTimerBhv BEHAVIOUR
+			DEFINED AS "This attribute represents the initial value of timer TignoreSST: delay for
+				sub-system between receiving grant to go out of service and actually going out
+				of service, as defined in 5.3.5.2/Q.714.";;
+REGISTERED AS	{ sccpAttribute 46 };
+
+initialValueReassTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.InitialValueReassTimer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		initialValueReassTimerBhv BEHAVIOUR
+			DEFINED AS "This attribute represents the initial value of Reassembly Timers, when they
+				are created.";;
+REGISTERED AS	{ sccpAttribute 47 };
+
+loadSharingAlgPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		loadSharingAlgPointerBhv BEHAVIOUR
+			DEFINED AS "The loadSharingAlgPointer attribute refers to the load sharing algorithm
+				that must be applied if the sharing mode of an entity set is
+				duplicated-loadshared. ";;
+REGISTERED AS	{ sccpAttribute 48 };
+
+lowerLimitForSegmentation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.LowerLimitForSegmentation;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		lowerLimitForSegmentationBhv BEHAVIOUR
+			DEFINED AS "This attribute represents a number of octets. If the length of the user data
+				exceeds this length then it depends on the status of the network whether the
+				message is segmented or not. The attribute corresponds to the parameter Z as
+				described in 4.1.1.1.1/Q.714. The value of this attribute shall obey the
+				relation 150 <= lowerLimitForSegmentation <= upperLimitForSegmentation, as
+				described in 4.1.1.1.1/Q.714.";;
+REGISTERED AS	{ sccpAttribute 49 };
+
+lUDTandLUDTSSupported ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.LUDTandLUDTSSupported;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		lUDTandLUDTSSupportedBhv BEHAVIOUR
+			DEFINED AS "This attribute indicates whether the implementation supports LUDT(S)
+				messages.";;
+REGISTERED AS	{ sccpAttribute 50 };
+
+maxStatInfoTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.MaxStatInfoTimer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		maxStatInfoTimerBhv BEHAVIOUR
+			DEFINED AS "This attribute represents the maximum value of timer TstatInfo: delay
+				between requests for subsystem status information, as defined in 5.3.4.2/Q.714.";;
+REGISTERED AS	{ sccpAttribute 51 };
+
+newEncodingScheme ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtEncodingScheme;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		newEncodingSchemeBhv BEHAVIOUR
+			DEFINED AS "This attribute specifies the new ES.";;
+REGISTERED AS	{ sccpAttribute 52 };
+
+newNatureOfAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtNatureOfAddress;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		newNatureOfAddressBhv BEHAVIOUR
+			DEFINED AS "This attribute specifies the new NAI.";;
+REGISTERED AS	{ sccpAttribute 53 };
+
+newNumberingPlan ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtNumberingPlan;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		newNumberingPlanBhv BEHAVIOUR
+			DEFINED AS "This attribute specifies the new NP.";;
+REGISTERED AS	{ sccpAttribute 54 };
+
+newTranslationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.GtTranslationType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		newTranslationtypeBhv BEHAVIOUR
+			DEFINED AS "This attribute specifies the new TT.";;
+REGISTERED AS	{ sccpAttribute 55 };
+
+nrOfRestrictionLevels ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.NrOfRestrictionLevels;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		nrOfRestrictionLevelsBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter N, as described in
+				5.2.7/Q.714.";;
+REGISTERED AS	{ sccpAttribute 56 };
+
+nrOfSubLevels ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.NrOfSubLevels;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		nrOfSubLevelsBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter M, as described in
+				5.2.7/Q.714.";;
+REGISTERED AS	{ sccpAttribute 57 };
+
+nSRVT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.NSRVT;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		nSRVTBhv BEHAVIOUR
+			DEFINED AS "This attribute equals to the value of NSRVT as described in 3.2.2.5/Q.753.";;
+REGISTERED AS	{ sccpAttribute 58 };
+
+p ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.P;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		pBhv BEHAVIOUR
+			DEFINED AS "This attribute models the congestion control parameter P, as described in
+				5.2.7/Q.714.";;
+REGISTERED AS	{ sccpAttribute 59 };
+
+remoteSCCPList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.RemoteSCCPList;
+	MATCHES FOR
+		EQUALITY,
+		SET-COMPARISON,
+		SET-INTERSECTION;
+	BEHAVIOUR
+		remoteSCCPListBhv BEHAVIOUR
+			DEFINED AS "This attribute models a list of remote MTP Access Points all belonging to
+				the same MTP network.";;
+REGISTERED AS	{ sccpAttribute 60 };
+
+rLM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.RLM;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		rLMBhv BEHAVIOUR
+			DEFINED AS "This attribute models the restriction level parameter RLm as defined in
+				5.2.4/Q.714.";;
+REGISTERED AS	{ sccpAttribute 61 };
+
+rSLM ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.RSLM;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		rSLMBhv BEHAVIOUR
+			DEFINED AS "This attribute models the restriction sub-level parameter RSLm as defined in
+				5.2.4/Q.714.";;
+REGISTERED AS	{ sccpAttribute 62 };
+
+sccpAccessPointName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 63 };
+
+sccpEntitySetId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		sccpEntitySetIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 64 };
+
+sccpEntitySetPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		sccpEntitySetPointerBhv BEHAVIOUR
+			DEFINED AS "The sccpEntitySetPointer attribute refers to the SCCP entity set resulting
+				from the global title translation.";;
+REGISTERED AS	{ sccpAttribute 65 };
+
+sccpLinkageId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		sccpLinkageIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 66 };
+
+sccpLinkageName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 67 };
+
+sccpLinkagePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 68 };
+
+sccpName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 69 };
+
+sccpRouteTestId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		sccpRouteTestIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 70 };
+
+sccpVersion ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SccpVersion;
+	MATCHES FOR
+		EQUALITY,
+		SUBSTRINGS;
+	BEHAVIOUR
+		sccpVersionBhv BEHAVIOUR
+			DEFINED AS "This attribute is single-valued. It refers to the recommendation on which
+				the SCCP implementation is based.";;
+REGISTERED AS	{ sccpAttribute 71 };
+
+sclcName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 72 };
+
+scocName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 73 };
+
+scrcId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		scrcIdBhv BEHAVIOUR
+			DEFINED AS "This attribute is used for naming instances.";;
+REGISTERED AS	{ sccpAttribute 74 };
+
+scrcName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 75 };
+
+sharingMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SharingMode;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		sharingModeBhv BEHAVIOUR
+			DEFINED AS "This attribute models the sharing mode of the SCCP Entity Set. Possible
+				values are: solitary, duplicated-replacement, duplicated-dominant, and
+				duplicated-loadshared.";;
+REGISTERED AS	{ sccpAttribute 76 };
+
+srvtName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 77 };
+
+ssAvailableAfterSpRestart ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SsAvailableAfterSpRestart;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS	{ sccpAttribute 78 };
+
+ssn ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.SSN;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		ssnBhv BEHAVIOUR
+			DEFINED AS "The ssn attribute represents the subsystem number.";;
+REGISTERED AS	{ sccpAttribute 79 };
+
+upperLimitForSegmentation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX	SCCPDefinedTypesModule.UpperLimitForSegmentation;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		upperLimitForSegmentationBhv BEHAVIOUR
+			DEFINED AS "This attribute represents a number of octets. If the length of the user data
+				exceeds this length then the message is always segmented. The attribute
+				corresponds to the parameter Y as described in 4.1.1.1.1/Q.714. The value of
+				this attribute shall obey the relation lowerLimitForSegmentation <=
+				upperLimitForSegmentation <= 3952, as described in 4.1.1.1.1/Q.714.";;
+REGISTERED AS	{ sccpAttribute 80 };
+
+startSccpRouteTest ACTION
+	WITH INFORMATION SYNTAX	SCCPDefinedTypesModule.ConfirmedAction;
+	WITH REPLY SYNTAX	SCCPDefinedTypesModule.ConfirmedAction;
+REGISTERED AS	{ sccpAction 1 };
+
+sccpRouteTestResult NOTIFICATION
+	BEHAVIOUR
+		mtpRouteTestResultBhv BEHAVIOUR
+			DEFINED AS "This notification carries the result of an SCCP route verification test, as
+				described in 3.2/Q.753.";;
+	WITH INFORMATION SYNTAX	SCCPDefinedTypesModule.EventReport;
+REGISTERED AS	{ sccpNotification 1 };
+
+gtTranslator-gtRule NAME BINDING
+	SUBORDINATE OBJECT CLASS	gtRule AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	gtTranslator AND SUBCLASSES;
+	WITH ATTRIBUTE	gtRuleId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 1 };
+
+managedElement-managedSwitchingElement NAME BINDING
+	SUBORDINATE OBJECT CLASS	"ITU-T Recommendation Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	"ITU-T Rec. M.3100 (1995)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE	"ITU-T Rec. M.3100 (1995)":managedElementId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 2 };
+--NOTE 1 - As an alternative to using this name binding, one could consider global (location transparent) naming. It is left to the users of this model to define additional name bindings that accomplish this.
+
+managedSwitchingElement-sccp NAME BINDING
+	SUBORDINATE OBJECT CLASS	sccp AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	"ITU-T Recommendation Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	WITH ATTRIBUTE	"ITU-T Rec. X.723 (1993)":communicationsEntityId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 3 };
+
+sccp-sclc NAME BINDING
+	SUBORDINATE OBJECT CLASS	sclc AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	sccp AND SUBCLASSES;
+	WITH ATTRIBUTE	"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":clProtocolMachineId;
+	BEHAVIOUR
+		sccp-sclc-B BEHAVIOUR
+			DEFINED AS "This name binding shall be used when the sclc MO is created automatically by
+				the operation of the system and when the sclc MO is created by management
+				operations.";;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 4 };
+
+sccp-scoc NAME BINDING
+	SUBORDINATE OBJECT CLASS	scoc AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	sccp AND SUBCLASSES;
+	WITH ATTRIBUTE	"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":coProtocolMachineId;
+	BEHAVIOUR
+		sccp-scoc-B BEHAVIOUR
+			DEFINED AS "This name binding shall be used when the scoc MO is created automatically by
+				the operation of the system and when the scoc MO is created by management
+				operations.";;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 5 };
+
+sccp-scrc NAME BINDING
+	SUBORDINATE OBJECT CLASS	scrc AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	sccp AND SUBCLASSES;
+	WITH ATTRIBUTE	scrcId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 6 };
+
+sccp-srvt NAME BINDING
+	SUBORDINATE OBJECT CLASS	srvt AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	sccp AND SUBCLASSES;
+	WITH ATTRIBUTE	sccpRouteTestId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 7 };
+
+scrc-concernedArea NAME BINDING
+	SUBORDINATE OBJECT CLASS	concernedArea AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	scrc AND SUBCLASSES;
+	WITH ATTRIBUTE	concernedAreaId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 8 };
+--NOTE 2 - The number of concernedArea instances is implementation-dependent.
+
+scrc-gtConversionRule NAME BINDING
+	SUBORDINATE OBJECT CLASS	gtConversionRule AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	scrc AND SUBCLASSES;
+	WITH ATTRIBUTE	gtConversionRuleId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 9 };
+
+scrc-gtTranslator NAME BINDING
+	SUBORDINATE OBJECT CLASS	gtTranslator AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	scrc AND SUBCLASSES;
+	WITH ATTRIBUTE	gtTranslatorId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 10 };
+
+scrc-sccpAccessPoint NAME BINDING
+	SUBORDINATE OBJECT CLASS	sccpAccessPoint AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	scrc AND SUBCLASSES;
+	WITH ATTRIBUTE	"ITU-T Rec. X.723 (1993)":sapId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 11 };
+
+scrc-sccpEntitySet NAME BINDING
+	SUBORDINATE OBJECT CLASS	sccpEntitySet AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	scrc AND SUBCLASSES;
+	WITH ATTRIBUTE	sccpEntitySetId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 12 };
+
+scrc-sccpLinkage NAME BINDING
+	SUBORDINATE OBJECT CLASS	sccpLinkage AND SUBCLASSES;
+	NAMED BY	
+	SUPERIOR OBJECT CLASS	scrc AND SUBCLASSES;
+	WITH ATTRIBUTE	sccpLinkageId;
+	CREATE	;
+	DELETE	;
+REGISTERED AS	{ sccpNameBinding 13 };
+
