@@ -1375,6 +1375,7 @@ striso/scripts/ltmain.sh
 striso/scripts/missing
 striso/scripts/mkinstalldirs
 striso/scripts/texinfo.tex
+striso/scripts/ylwrap
 striso/src/include/Makefile.in
 striso/src/Makefile.in
 striso/tests/Makefile.in
