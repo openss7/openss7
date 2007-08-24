@@ -1,0 +1,3195 @@
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- =============================================================================
+
+--< GDMO.Document "ITU-T Rec. Q.751.1 (1995)" >--
+--< GDMO.Alias "ITU-T Rec. Q.751.1 (1995)"
+--  "ITU-T Recommendation Q.751.1 (1995)" >--
+--< GDMO.Version 1.3 >--
+
+lsTimersProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		lsTimersProfilePackage PACKAGE
+			BEHAVIOUR
+				lsTimersProfileBehaviour BEHAVIOUR
+					DEFINED AS
+						"A signalling link set timer profile is a set of Q.704 timers which are related to the
+						characteristics of signalling links sets. The managed object class lsTimersProfile is a support
+						managed object class which can be instantiated in order to define a particular profile. At creation
+						time of a signLinkSetTp one of the lsTimersProfiles is referenced.";;
+			ATTRIBUTES
+				lsTimersProfileId GET SET BY CREATE,
+				q704-t6 GET SET BY CREATE,
+				q704-t8 GET SET BY CREATE,
+				q704-t10 GET SET BY CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		lsTimersProfileNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass1 };
+
+
+managedSwitchingElement MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. M.3100 (1992)":managedElement;
+	CHARACTERIZED BY
+		managedSwitchingElementPackage PACKAGE
+			BEHAVIOUR
+				managedSwitchingElementBehaviour BEHAVIOUR
+					DEFINED AS
+						"The Managed Switching Element represents, for management purposes, an exchange, i.e. the aggregate
+						of traffic carrying devices, switching stages, controlling and signalling means at a network node
+						that enables subscriber lines to be interconnected and packets to be forwarded as required by
+						individual users.";;
+			ATTRIBUTES
+				"ITU-T Rec. M.3100 (1992)":vendorName GET SET BY CREATE;;;
+	CONDITIONAL PACKAGES
+		managedSwitchingElementNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass2 };
+
+
+mtpAccessPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992":nSAP;
+	CHARACTERIZED BY
+		mtpAccessPointPkg PACKAGE
+			BEHAVIOUR
+				mtpAccessPointBehaviour BEHAVIOUR
+					DEFINED AS
+						"The sap2Address attribute contains the address of the mtpAccessPoint. It contains the Signalling
+						Point Code (SPC), Service Indicator (SI) and MTP Network Identity (NI). The sapId attribute is used
+						in naming instances of the mtpAccessPoint managed object class. The userEntityNames attribute
+						contains the distinguished names of the managed objects that represent the user entities that are
+						using the mtpAccessPoint, e.g. the SCCP instance. The providerEntityNames attribute contains the
+						distinguished names of the managed objects that represent the provider entities that are supporting
+						the mtpAccessPoint, i.e., the instance of the MTP. A mtpAccessPoint can have the MTP status:
+						allowed, this means that the mtpAccessPoint is accessible and is functioning normally congested,
+						this means that the mtpAccessPoint is accessible but the path to it is heavily loaded prohibited,
+						this means that the mtpAccessPoint not accessible. If the ss7OnOccEventPackage is present, event
+						notification with the following probable causes can apply: Probable Cause = 001
+						(localUserPartUnavailable)";;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it and ss7OnOccEventPackage is present",
+		mtpAccessPointNamePackage
+			PRESENT IF
+				"an instance supports it",
+		ss7OnOccEventPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass3 };
+
+
+mtpL2ProtocolProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		mtpL2ProtocolProfilePkg PACKAGE
+			BEHAVIOUR
+				mtpL2ProtocolProfileBehaviour BEHAVIOUR
+					DEFINED AS
+						"An MTP level 2 protocol profile is a set of Q.703 parameters which defines the layer 2
+						characteristics of Signalling Links. The managed object class mtpL2ProtocolProfile is a support
+						managed object class which can be instantiated in order to define a particular profile. At creation
+						time of a signLinkTp one of the mtpL2ProtocolProfiles is referenced.";;
+			ATTRIBUTES
+				mtpL2ProtocolProfileId GET SET BY CREATE,
+				errorCorrectionMethod GET SET BY CREATE,
+				transmissionRate GET SET BY CREATE,
+				l2TimerT1 GET SET BY CREATE,
+				l2TimerT2 GET SET BY CREATE,
+				l2TimerT3 GET SET BY CREATE,
+				l2TimerT4N GET SET BY CREATE,
+				l2TimerT4E GET SET BY CREATE,
+				l2TimerT5 GET SET BY CREATE,
+				l2TimerT6 GET SET BY CREATE,
+				l2TimerT7 GET SET BY CREATE,
+				transmissionCongestionThresholdOnsetLevel1 GET SET BY CREATE,
+				transmissionCongestionThresholdAbatementLevel1 GET SET BY CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		bufferMechanismPackage
+			PRESENT IF
+				"an instance supports it",
+		congestionHandlingPackage
+			PRESENT IF
+				"an instance supports it",
+		loopDelayPackage
+			PRESENT IF
+				"an instance supports it",
+		mtpL2ProtocolProfileNamePackage
+			PRESENT IF
+				"an instance supports it",
+		multipleTransmissionCongestionLevelsPackage
+			PRESENT IF
+				"an instance supports it",
+		multipleTransmissionCongestionStatesPackage
+			PRESENT IF
+				"an instance supports it",
+		pCRPackage
+			PRESENT IF
+				"an instance supports it",
+		receiveCongestionLevelsPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass4 };
+
+
+mtpLevel3 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		mtpLevel3Package PACKAGE
+			BEHAVIOUR
+				mtpLevel3Behaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object class models MTP Level 3 functionality. If the aITU-T Rec. X.721 (1992) |
+						ISO/IEC 10165-2 : 1992i:communicationsAlarm notification is used, the following probable causes can
+						apply: Probable Cause = 501 (AdjacentPCInaccessible), with the inaccessible adjacent pointcode as a
+						parameter, which represents measurement Q.752/5.1 (PerceivedSeverity=Maj/Min/War) and measurement
+						Q.752/5.4 (PerceivedSeverity=Cleared). If the ss7OnOccEventPackage is included, event notifications
+						with the following probable causes can apply: Probable Cause = 405 (LinkSetFailure), with the
+						inaccessible adjacent pointcode as a parameter, which represents measurement Q.752/4.5
+						(PerceivedSeverity=Maj/Min/War) and measurement Q.752/4.6 (PerceivedSeverity=Cleared). Probable
+						Cause = 413 (LinkSetChange), with the involved link sets as parameter, which represents measurement
+						Q.752/4.13.";;
+			ATTRIBUTES
+				mtpLevel3Id GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it and the (communicationsAlarmPackage or ss7OnOccEventPackage) is present",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		communicationsAlarmPackage
+			PRESENT IF
+				"an instance supports it",
+		mtpLevel3NamePackage
+			PRESENT IF
+				"an instance supports it",
+		ss7OnOccEventPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass5 };
+
+
+mtpSignPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		mtpSignPointPackage PACKAGE
+			BEHAVIOUR
+				mtpSignPointBehaviour BEHAVIOUR
+					DEFINED AS
+						"A signalling point is a node in the signalling network. It is part of a managed switching element
+						(exchange). The MTP permits three types of node: SEP: the signalling end point, this type of SP
+						contains MTP and ISUP (and or other MTP Users), but cannot act as an intermediate MTP transfer node
+						in the SS No.7 network. (It can act as an SCCP Relay Node.) STP: the MTP signalling transfer point,
+						this type of SP acts as an intermediate node between SEPs to transfer messages through the SS
+						No.7-network, it only contains MTP. (In case of an STP, OMAP, and hence also TC and SCCP may be
+						present.) STEP: MTP signalling transfer and end point, the type combines the previous mentioned
+						types, thus acting both as a SEP and as a STP. A mtpSignPoint can have the MTP status: allowed,
+						this means that the mtpSignPoint is accessible and is functioning normally (operational state =
+						enabled, availability status = Æ) congested, this means that the mtpSignPoint is accessible but is
+						heavily loaded (operational state = enabled, availability status = { degraded }) prohibited, this
+						means that the mtpSignPoint not accessible (operational state = disabled). During MTP restart, the
+						proceduralStatus is {initializing} until the restart is finished.";;
+			ATTRIBUTES
+				mtpSignPointId GET SET BY CREATE,
+				pointCode GET SET BY CREATE,
+				spType GET SET BY CREATE,
+				-- In some implementations the spType attribute might additionally be writable.
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
+				"ITU-T Rec. M.3100 (1992)":version GET SET BY CREATE,
+				networkIndicator GET SET BY CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange,
+				mtpRestarting;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		mtpSignPointNamePackage
+			PRESENT IF
+				"an instance supports it",
+		spTimersPackage
+			PRESENT IF
+				"the instance does not support the spTimersProfilePointerPackage",
+		spTimersProfilePointerPackage
+			PRESENT IF
+				"the instance does not support the spTimersPackage";
+REGISTERED AS { mtpObjectClass6 };
+
+
+signDataLinkTp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		signDataLinkTpPackage PACKAGE
+			BEHAVIOUR
+				signDataLinkTpBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object represents the termination of the signalling data link within the SP as defined
+						in Q.702. The operational state is enabled in normal operation. In case of failure of the part of
+						the signalling data link that is within control of the managed switching element, this state will
+						be kdisabled .";;
+			-- Note that for a complete view of the status of a signalling data link a network view is required.
+			ATTRIBUTES
+				signDataLinkTpId GET SET BY CREATE,
+				adjPc GET SET BY CREATE,
+				transmissionRate GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				equipmentPointer GET SET BY CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		clCPackage
+			PRESENT IF
+				"an instance supports it",
+		signDataLinkTpNamePackage
+			PRESENT IF
+				"an instance supports it",
+		stmChannelPackage
+			PRESENT IF
+				"an instance supports it or the signalling point supports the automatic allocation of signalling
+				datalinks";
+REGISTERED AS { mtpObjectClass7 };
+
+
+signLinkSetTp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		signLinkSetTpPackage PACKAGE
+			BEHAVIOUR
+				signLinkSetTpBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object class represents the SS No. 7 signalling link set termination point. Link sets
+						are defined in Recommendation Q.704. The states are directly related to the set of link termination
+						points states, except for the optional administrativeState. General principles on state
+						information: The states of the managed object linkset are only readable, except for the optional
+						administrativeState. Activation and deactivation of a linkset may be done via operations on the
+						links (e.g. by using scoping functions) or the optional administrativeState can be used for this.
+						Based on these principles the states of a linkset are defined as follows: operational state
+						(read-only for the OS). The operational state is enabled whenever one link of the linkset is
+						enabled, i.e. neither FAILED nor DEACTIVATED nor LOCAL BLOCKED nor REMOTE BLOCKED. usage state
+						(read-only for the OS). The usage state reflects the usage of the belonging links. It is ACTIVE if
+						at least one of the belonging links is ACTIVE and no link is BUSY. It contains BUSY if one of the
+						belonging links is BUSY. It is IDLE if all links are UNAVAILABLE. availability status (read-only
+						for the OS). The availability status indicates unavailability or reduced availability of the
+						belonging links. It contains DEPENDENCY if all the belonging links are unavailable for user
+						traffic. It contains DEGRADED if at least one belonging link is not available for user traffic. For
+						the different reasons of unavailability (failed, deactivated, local blocked, remote blocked, local
+						inhibited and remote inhibited) see 3.2.1/Q.704. If the 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2
+						: 1992':communicationsAlarm notification is used, the following probable causes can apply: Probable
+						Cause=403 (LinkSetFailure), which represents measurements Q.752/4.3 (PerceivedSeverity=Maj/Min/War)
+						and Q.752/4.4 (PerceivedSeverity=Cleared). State change notifications are emitted for all state and
+						status changes.";;
+			ATTRIBUTES
+				signLinkSetTpId GET SET BY CREATE,
+				adjPc GET SET BY CREATE,
+				maxCapacityLS GET SET BY CREATE,
+				-- In some implementations, the maxCapacityLS attribute might be additionally writable.
+				currentCapacityLS GET,
+				congestionControlMethod GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
+				periodicLinkTestFlag DEFAULT VALUE MTPDefinedTypesModule.periodicTestFlagDefault GET REPLACE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		administrativeStatePackage
+			PRESENT IF
+				"an instance supports it",
+		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it and the communicationsAlarmPackage is present",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		communicationsAlarmPackage
+			PRESENT IF
+				"an instance supports it",
+		inLsLoadShareAlgorithmPackage
+			PRESENT IF
+				"an instance supports it",
+		lsTimersProfilePointerPackage
+			PRESENT IF
+				"the instance of superior class mtpSignPoint does not support the conditional spTimersPackage",
+		noBasicLinkAllocationPackage
+			PRESENT IF
+				"Basic link allocation is not done",
+		signLinkSetTpNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass8 };
+
+
+signLinkTp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		signLinkTpPackage PACKAGE
+			BEHAVIOUR
+				signLinkTpBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object represents the termination of the signalling link within the signalling point
+						as defined in Recommendation Q.703. The signLinkTp object class represents that part of a
+						signalling link which is located in one NE. The following state and status attributes are
+						supported: administrative state: locked: it is administratively not permitted to transport traffic
+						on the link termination point. unlocked: it is administratively permitted to transport user part
+						traffic or test traffic on the link termination point. operational state: enabled: the link
+						termination point is operationally able to transport user part traffic or test traffic. disabled:
+						the link termination point is operationally unable to transport user part traffic or test traffic.
+						The operational state is disabled whenever the link termination point status contains Failed,
+						Deactivated, Local Blocked, Remote Blocked, or the procedural status is Initializing. usage state:
+						idle: the link termination point carries no user part traffic (test traffic may be present).
+						'active': the link termination point is not congested. Currently the link termination point carries
+						user part traffic. busy: the link termination point is congested due to user part traffic. The
+						usage state is idle whenever the link termination point status is not empty i.e. the usage state
+						immediately reflects the availability of the signLinkTp for user traffic. For national MTP options
+						applying several congestion levels an additional attribute indicating these levels may be added.
+						procedural status: The procedural status initializing is valid during initial alignment procedure.
+						The procedural status not initalized applies when the link termination point is not aligned and the
+						initial alignment procedure has not been started. Link termination point status. This is a
+						set-valued attribute. The following statusses can exist alone or in combinations with each other.
+						The exact definition for each of the following SS7-functional states is to be gained from Q.704
+						local blocked remote blocked local inhibited remote inhibited failed deactivated. If the 'ITU-T
+						Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992':communicationsAlarm notification is used, the following
+						probable causes can apply: Probable Cause = 102 (slFailure) which represents measurement Q.752/1.2
+						measurement Q.752/1.6 (SpecificProblems=003 abnormalFIBRorBSNR, 004 excessiveAckDelay, 005
+						excessiveErrorRate, 006 excessiveCongDuration) and Q.752/1.12.(PerceivedSeverity=cleared) If the
+						ss7OnOccEventPackage is present, the event notifications with the following probable causes can
+						apply: Probable Cause = 110 (localChangeOver) which represents measurement Q.752/1.10
+						(PerceivedSeverity=Maj/Min/War) and measurement Q.752/1.11 (PerceivedSeverity=Cleared). Probable
+						Cause = 210 (remoteProcOutage) which represents measurements Q.752/2.10
+						(PerceivedSeverity=Maj/Min/War) and Q.752/2.11 (PerceivedSeverity=Cleared). Probable Cause = 216
+						(start of local inhibition) which represents measurement Q.752/2.16 (PerceivedSeverity=Maj/Min/War)
+						and Q.752/2.17 (PerceivedSeverity=Cleared). Probable Cause = 218 (start of remote inhibition) which
+						represents measurement Q.752/2.18 (PerceivedSeverity=Maj/Min/War) and Q.752/2.19
+						(PerceivedSeverity=Cleared). A create or set request is rejected, if i) a pointer would reference
+						an instance, which does not belong to the appropriate object class OR ii) a pointer would reference
+						an instance which is not existing OR iii) a signDataLinkTpPointer would reference a signDataLinkTp
+						which is not in the same mtpSignPoint OR iv) a signDataLinkTpPointer would reference a
+						signDataLinkTp which has a different value of adjPc than the superior signLinkSetTp OR v) the link
+						would reference a datalink and a mtpL2ProtocolProfile whose transmissionRates is not the same OR
+						vi) the link would reference a mtpL2ProtocolProfile where the appropriate packages for the
+						congestionControlMethod of the superior signLinkSetTp are not present (see B.1.2.9.2) OR vii) the
+						spTimersProfilePackage is present in the superior mtpSignPoint AND the link would reference a
+						mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the q704-t17 of the spTimersProfile
+						referenced by the mtpSignPoint OR viii) the spTimersPackage is present in the superior mtpSignPoint
+						AND the link would reference a mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the q704-t17
+						of the mtpSignPoint. The rejection also takes place if only a single pointer within the
+						signDataLinkList or the signTermList (if present) is wrong. A delete request is rejected, if the
+						linkTpStatus does not contain the value deactivated,";;
+			ATTRIBUTES
+				slCode GET SET BY CREATE,
+				slsCodeCurrentList GET,
+				maxCapacitySL GET,
+				currentCapacitySL GET,
+				linkTpStatus GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET,
+				mtpL2ProtocolProfilePointer GET REPLACE,
+				signTermPointer GET SET BY CREATE,
+				signDataLinkTpPointer GET REPLACE;
+			ACTIONS
+				localInhibitlocalUninhibit;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it and the (communicationsAlarmPackage or ss7OnOccEventPackage) is present",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		communicationsAlarmPackage
+			PRESENT IF
+				"an instance supports it",
+		linkCongestionLevelPackage
+			PRESENT IF
+				"the exchange support the operation, management and administration of multiple transmission
+				congestion levels (national option)",
+		relatedLinkGroupNumberPackage
+			PRESENT IF
+				"an instance supports it",
+		signDataLinkTpListPackage
+			PRESENT IF
+				"an instance supports it",
+		signLinkTestPackage
+			PRESENT IF
+				"the on-demand signalling link test as described in Q.707 is supported",
+		signLinkTpNamePackage
+			PRESENT IF
+				"an instance supports it",
+		signTermListPackage
+			PRESENT IF
+				"an instance supports it or an instance supports the signDataLinkTpListPackage",
+		slsCodeNormalListPackage
+			PRESENT IF
+				"an instance supports it",
+		slTimersProfilePointerPackage
+			PRESENT IF
+				"the instance of superior class mtpSignPoint does not support the conditional spTimersPackage",
+		ss7OnOccEventPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass9 };
+
+
+slTimersProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		slTimersProfilePackage PACKAGE
+			BEHAVIOUR
+				slTimersProfileBehaviour BEHAVIOUR
+					DEFINED AS
+						"A signalling link timer profile is a set of Q.704 timers which are related to the characteristics
+						of Signalling Links. The managed object class slTimersProfile is a support managed object class
+						which can be instantiated in order to define a particular profile. At creation time of a signLinkTp
+						one of the slTimersProfiles may be referenced..";;
+			ATTRIBUTES
+				slTimersProfileId GET SET BY CREATE,
+				q704-t1 GET SET BY CREATE,
+				q704-t3 GET SET BY CREATE,
+				q704-t17 GET SET BY CREATE,
+				q704-t24 GET SET BY CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		slTimersProfileNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass10 };
+
+
+spTimersProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		spTimersProfilePackage PACKAGE
+			BEHAVIOUR
+				spTimersProfileBehaviour BEHAVIOUR
+					DEFINED AS
+						"A signalling link set timer profile is set of Q.704 and Q.707 timers which are related to the
+						characteristics of signalling points. The managed object class spTimersProfile is a support managed
+						object class which can be instantiated in order to define a particular profile. At creation time of
+						a signPoint one of the spTimersProfiles is referenced.";;
+			ATTRIBUTES
+				spTimersProfileId GET SET BY CREATE,
+				q704-t2 GET SET BY CREATE,
+				q704-t4 GET SET BY CREATE,
+				q704-t5 GET SET BY CREATE,
+				q704-t7 GET SET BY CREATE,
+				q704-t11 GET SET BY CREATE,
+				q704-t12 GET SET BY CREATE,
+				q704-t13 GET SET BY CREATE,
+				q704-t14 GET SET BY CREATE,
+				q704-t15 GET SET BY CREATE,
+				q704-t16 GET SET BY CREATE,
+				q704-t18 GET SET BY CREATE,
+				q704-t19 GET SET BY CREATE,
+				q704-t20 GET SET BY CREATE,
+				q704-t21 GET SET BY CREATE,
+				q704-t22 GET SET BY CREATE,
+				q704-t23 GET SET BY CREATE,
+				q707-t1 GET SET BY CREATE,
+				q707-t2 GET SET BY CREATE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		spTimersProfileNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass11 };
+
+
+signRouteNePart MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		signRouteNePartPackage PACKAGE
+			BEHAVIOUR
+				signRouteNePartBehaviour BEHAVIOUR
+					DEFINED AS
+						"A signalling route (A,C,B)i is defined as an ordered sequence of the near end signalling point A
+						(i.e. the network element), an adjacent SP C and the destination SP B. The adjacent SP C may be
+						identical with the destination B, or it may or may not be directly interconnected to the
+						destination SP. The adjacent SP C must be directly connected to the near end SP by at least one
+						linkset which is intended to convey MSUs sent from A to B (hence the use of the term adjacent). Two
+						signalling routes (A,C,B)i and (A,CB,B)j are distinct if the adjacent SP is different. The
+						signRouteNePart Managed Object class defines the management capabilities of the resources which
+						define a specific route segment (Link Set to be traversed) and its priority within the routeset as
+						seen from the own SP. A particular signRouteNePart is related to one or more Signalling Routes on
+						the network level. The priority in which the network Signalling Routes are used, is defined by
+						means of assigning priorities to all involved route segments. If from a particular SP two or more
+						route segments are used with the same priority, loadsharing between Signalling Routes may occur. A
+						Combined Link Set is a set of Link Sets used with the same priority by message routing. The
+						signLinkSetTp used for routing is allocated at creation time and cannot be changed during the
+						existence of a particular signRouteNePart. The administrativeState attribute describes whether it
+						is administratively permitted to route messages towards the respective destination point via the
+						referenced signLinkSetTp. The operationalState attribute is enabledi if both the referenced
+						signLinkSetTp is in the operational state eenabledl and no TFP message concerning the respective
+						destinations has been received from the adjPC of the respective signLinkSetTp. The optional
+						usageState attribute is used to cover restriction of a route. Its value is set to gbusyt, if the
+						route is restricted (transfer restricted is a national option). The availabilityStatus attribute
+						gives additional information about the availability of the signRouteNePart instance. It is
+						furthermore needed to map some of the MTP functional states (prohibited: availabilityStatus =
+						{dependency}, restricted: availabilityStatus={degraded}) and is used for the case that the route is
+						locked not by the OS, but e.g. by a local administrator (administrativeState=unlocked and
+						availabilityStatus={off line}).";;
+			ATTRIBUTES
+				signRouteNePartId GET SET BY CREATE,
+				signLinkSetTPPointer GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		clsLoadsharingInformationPackage
+			PRESENT IF
+				"an instance supports it",
+		fixedRouteNePartPriorityPackage
+			PRESENT IF
+				"the instance does not use the flexibleRouteNePartPriorityPackage",
+		flexibleRouteNePartPriorityPackage
+			PRESENT IF
+				"the instance does not use the fixedRouteNePartPriorityPackage",
+		loadsharingInformationRouteNePartPackage
+			PRESENT IF
+				"the instance supports it",
+		mtpLoadsharingObjectForRouteNePartPointerPackage
+			PRESENT IF
+				"the instance supports it",
+		signRouteNePartNamePackage
+			PRESENT IF
+				"an instance supports it",
+		slsListPackage
+			PRESENT IF
+				"the instance supports it",
+		usageStatePackage
+			PRESENT IF
+				"the instance supports ,transfer restricted";
+REGISTERED AS { mtpObjectClass12 };
+
+
+signRouteSetNePart MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		signRouteSetNePartPackage PACKAGE
+			BEHAVIOUR
+				signRouteSetNePartBehaviour BEHAVIOUR
+					DEFINED AS
+						"A Signalling Route Set is a complete set of routes that can be used to carry traffic toward a
+						specific destination signalling point. The signRouteSetNePart Managed Object class defines the
+						management capabilities of the resources which represent a specific destination SP and its
+						accessibility as seen from the own SP. This SP may be the originating SP of the MTP messages or an
+						STP. A particular signRouteSetNePart may be related to one or more Signalling Route Sets on network
+						level. The administrativeState attribute describes whether it is administratively permitted to
+						route SS No. 7 MSUs towards the respective destination point. Before the administrative state of a
+						signRouteSetNePart can be set to Sunlocked, there must be at least one signRouteNePart contained
+						within the signRouteSetNePart. The operationalState attribute describes whether the respective
+						destination signalling point is accessible - (nenabledp) or not (cdisabled). If the operational
+						states of all signRouteNePart instances contained in the signRouteSetNePart are disabledd, then the
+						operational state of the signRouteSetNePart is tdisabledo, in any other case it is denabledt. The
+						usageState attribute is used to reflect route set congestion. The value is busyu in case of route
+						set congestion. If the iITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992:communicationsAlarm
+						notification is present, it indicates at least the following probable causes: Probable Cause =
+						411(RouteSetUnavailable), which represents measurements Q.752/4.11 (PerceivedSeverity=Maj/Min/War)
+						and Q.751/4.12 (PerceivedSeverity=Cleared). If the ss7OnOccEventPackage is present, event
+						notifications with the following probable cause can apply: Probable Cause = 002
+						(remoteUserPartUnavailable), with the involved user part as parameter. Possible values for
+						SpecificProblems are: 007 unknown, 008 unequipped and 009 inaccessibleRemoteUserb. An activation or
+						deactivation of a signRouteSetNePart must lead to the activation respectively deactivation of all
+						contained signRouteNeParts.";;
+			ATTRIBUTES
+				signRouteSetNePartId GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"an instance supports it and the (communicationsAlarmPackage or ss7OnOccEventPackage) is present",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		communicationsAlarmPackage
+			PRESENT IF
+				"an instance supports it",
+		congestedStatePackage
+			PRESENT IF
+				"the instance does not use the congestionLevelPackage",
+		congestionLevelPackage
+			PRESENT IF
+				"the instance does not use the congestedStatePackage",
+		loadsharingInformationRouteSetNePartPackage
+			PRESENT IF
+				"the instance supports it",
+		mtpLoadsharingObjectForRouteSetNePartPointerPackage
+			PRESENT IF
+				"the instance supports it",
+		remoteExchangeLabelPackage
+			PRESENT IF
+				"the instance supports it",
+		signRouteSetNePartNamePackage
+			PRESENT IF
+				"the instance supports it",
+		ss7OnOccEventPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass13 };
+
+
+signTerm MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		signTermPackage PACKAGE
+			BEHAVIOUR
+				signTermBehaviour BEHAVIOUR
+					DEFINED AS
+						"The signTerm MOC defines the management capabilities for the signalling terminal. The signalling
+						terminal is defined in ITU-T Rec. Q.703.";;
+			ATTRIBUTES
+				signTermId GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
+				-- the application of the following state is f.f.s.
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
+				-- the application of the following state is f.f.s.
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET,
+				-- the application of the following state is f.f.s.
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
+				equipmentPointer GET SET BY CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		signTermNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass14 };
+
+
+stpScreeningTable MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		stpScreeningTablePkg PACKAGE
+			BEHAVIOUR
+				stpScreeningTableBehaviour BEHAVIOUR
+					DEFINED AS
+						"The stpScreeningTable object class is the base for STP screening. Together with its subordinate
+						stpScreeningTableLines it contains all the information which are necessary for an STP to identify
+						and to handle unauthorized SS No. 7 messages as defined in 8.2/Q.705 and 8.3/Q.705.";;
+			ATTRIBUTES
+				stpScreeningTableId GET SET BY CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState INITIAL VALUE MTPDefinedTypesModule.administrativeStateLocked GET REPLACE,
+				treatmentOfOutsideRanges GET REPLACE,
+				stpScreeningTableListMode GET REPLACE,
+				screeningByLinkSetOrByDPCOpc GET SET BY CREATE;
+			NOTIFICATIONS
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class",
+		getScreenedOpcsOrLinkSetsByDpcActionPackage
+			PRESENT IF
+				"an instance supports it",
+		stpScreeningTableNamePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { mtpObjectClass15 };
+
+
+stpScreeningTableLine MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		stpScreeningTableLinePkg PACKAGE
+			BEHAVIOUR
+				stpScreeningTableLineBehaviour BEHAVIOUR
+					DEFINED AS
+						"The stpScreeningTableLine together with its superior stpScreeningTable contains all the information
+						which are necessary for an STP to identify and to handle unauthorized SS No. 7 messages as defined
+						in 8.2/Q.705 and 8.3/Q.705. The total number of screened DPCs across all stpScreeningTableLine
+						instances contained by a stpScreeningTable must be less or equal to maxNoOfScreenedDpcs.";;
+			ATTRIBUTES
+				stpScreeningTableLineId GET SET BY CREATE,
+				stpScreeningTableLineContent GET REPLACE ADD REMOVE;;;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992C
+				is supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992 are supported by an instance of this class";
+REGISTERED AS { mtpObjectClass16 };
+
+
+administrativeStatePackage PACKAGE
+	BEHAVIOUR
+		administrativeStatePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package can be used for activiated and deactivated link sets. Possible values of the
+				administrativeState attribute are: locked and unlocked. If transition takes place from locked to
+				unlocked, this will result in activiation of all links in the set that are unlocked. If transition
+				takes place from unlocked to locked, this will result in deactiviation of all links in the set.
+				This has no effect on the administrative states of the links themselves";;
+	ATTRIBUTES
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE;
+REGISTERED AS { mtpPackage1 };
+
+
+bufferMechanismPackage PACKAGE
+	ATTRIBUTES
+		numberOfThresholdLevels GET SET BY CREATE;
+REGISTERED AS { mtpPackage2 };
+
+
+clCPackage PACKAGE
+	ATTRIBUTES
+		clC GET SET BY CREATE;
+REGISTERED AS { mtpPackage3 };
+
+
+clsLoadsharingInformationPackage PACKAGE
+	ATTRIBUTES
+		inClsLoadsharingAlgorithm GET REPLACE;
+REGISTERED AS { mtpPackage4 };
+
+
+communicationsAlarmPackage PACKAGE
+	NOTIFICATIONS
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":communicationsAlarminaccessibleSp;
+REGISTERED AS { mtpPackage5 };
+
+
+congestedStatePackage PACKAGE
+	BEHAVIOUR
+		congestedStatePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package supplies an attribute for the simple congestion method used e.g. in the international
+				network.";;
+	ATTRIBUTES
+		congestedState GET;
+	NOTIFICATIONS
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChange;
+REGISTERED AS { mtpPackage6 };
+
+
+congestionHandlingPackage PACKAGE
+	ATTRIBUTES
+		congestionCounting GET SET BY CREATE,
+		congestionReportingBaseObject GET SET BY CREATE;
+REGISTERED AS { mtpPackage7 };
+
+
+congestionLevelPackage PACKAGE
+	BEHAVIOUR
+		congestionLevelPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package supplies an attribute to allow for several congestion levels for the
+				signRouteSetNePart.";;
+	ATTRIBUTES
+		congestionLevel GET;
+REGISTERED AS { mtpPackage8 };
+
+
+getScreenedOpcsOrLinkSetsByDpcActionPackage PACKAGE
+	ACTIONS
+		getScreenedOpcsOrLinkSetsByDpc;
+REGISTERED AS { mtpPackage9 };
+
+
+fixedRouteNePartPriorityPackage PACKAGE
+	ATTRIBUTES
+		fixedPriority GET SET BY CREATE;
+REGISTERED AS { mtpPackage10 };
+
+
+flexibleRouteNePartPriorityPackage PACKAGE
+	ATTRIBUTES
+		flexiblePriority GET REPLACE,
+		priorityMode GET REPLACE;
+	NOTIFICATIONS
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChange;
+REGISTERED AS { mtpPackage11 };
+
+
+inLsLoadShareAlgorithmPackage PACKAGE
+	ATTRIBUTES
+		inLsLoadShareAlgorithm GET;
+	-- in some implementations the inLsLoadShareAlgorithm attribute might be additionally writable
+	REGISTERED AS { mtpPackage12 };
+
+
+linkCongestionLevelPackage PACKAGE
+	ATTRIBUTES
+		linkCongestionLevel GET SET BY CREATE;
+REGISTERED AS { mtpPackage13 };
+
+
+loadsharingInformationRouteNePartPackage PACKAGE
+	ATTRIBUTES
+		loadsharingInformationRouteNePart GET REPLACE;
+REGISTERED AS { mtpPackage14 };
+
+
+loadsharingInformationRouteSetNePartPackage PACKAGE
+	ATTRIBUTES
+		loadsharingInformationRouteSetNePart GET REPLACE;
+REGISTERED AS { mtpPackage15 };
+
+
+loopDelayPackage PACKAGE
+	ATTRIBUTES
+		loopDelay GET SET BY CREATE;
+REGISTERED AS { mtpPackage16 };
+
+
+lsTimersProfileNamePackage PACKAGE
+	ATTRIBUTES
+		lsTimersProfileName GET REPLACE;
+REGISTERED AS { mtpPackage17 };
+
+
+lsTimersProfilePointerPackage PACKAGE
+	ATTRIBUTES
+		lsTimersProfilePointer GET REPLACE;
+REGISTERED AS { mtpPackage18 };
+
+
+managedSwitchingElementNamePackage PACKAGE
+	ATTRIBUTES
+		managedSwitchingElementName GET REPLACE;
+REGISTERED AS { mtpPackage19 };
+
+
+mtpAccessPointNamePackage PACKAGE
+	ATTRIBUTES
+		mtpAccessPointName GET REPLACE;
+REGISTERED AS { mtpPackage20 };
+
+
+mtpL2ProtocolProfileNamePackage PACKAGE
+	ATTRIBUTES
+		mtpL2ProtocolProfileName GET REPLACE;
+REGISTERED AS { mtpPackage21 };
+
+
+mtpLevel3NamePackage PACKAGE
+	ATTRIBUTES
+		mtpLevel3Name GET REPLACE;
+REGISTERED AS { mtpPackage22 };
+
+
+mtpLoadsharingObjectForRouteNePartPointerPackage PACKAGE
+	ATTRIBUTES
+		mtpLoadsharingObjectForRouteNePartPointer GET REPLACE;
+REGISTERED AS { mtpPackage23 };
+
+
+mtpLoadsharingObjectForRouteSetNePartPointerPackage PACKAGE
+	ATTRIBUTES
+		mtpLoadsharingObjectForRouteSetNePartPointer GET REPLACE;
+REGISTERED AS { mtpPackage24 };
+
+
+mtpSignPointNamePackage PACKAGE
+	ATTRIBUTES
+		mtpSignPointName GET REPLACE;
+REGISTERED AS { mtpPackage25 };
+
+
+multipleTransmissionCongestionLevelsPackage PACKAGE
+	BEHAVIOUR
+		multipleTransmissionCongestionLevelsPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the second and third levels of transmission congestion. The values of the
+				thresholds belonging to congestion level 2 have to be bigger than the respective ones of congestion
+				level 1. The values of the thresholds belonging to congestion level 3 have to be bigger than the
+				respective ones of congestion level 2.";;
+	ATTRIBUTES
+		transmissionCongestionThresholdDiscardLevel1 GET SET BY CREATE,
+		transmissionCongestionThresholdOnsetLevel2 GET SET BY CREATE,
+		transmissionCongestionThresholdAbatementLevel2 GET SET BY CREATE,
+		transmissionCongestionThresholdDiscardLevel2 GET SET BY CREATE,
+		transmissionCongestionThresholdOnsetLevel3 GET SET BY CREATE,
+		transmissionCongestionThresholdAbatementLevel3 GET SET BY CREATE,
+		transmissionCongestionThresholdDiscardLevel3 GET SET BY CREATE;
+REGISTERED AS { mtpPackage26 };
+
+
+multipleTransmissionCongestionStatesPackage PACKAGE
+	BEHAVIOUR
+		multipleTransmissionCongestionStatesPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the attributes related to the management of multiple link congestion states
+				without congestion priorityt method. This method is described in 3.8.2.3/Q.704. See also B.1.2.9.2.
+				The range of initialLevelOfCongestion is [1,numberOfCongestionStates].";;
+	ATTRIBUTES
+		timerTx GET SET BY CREATE,
+		timerTy GET SET BY CREATE,
+		numberOfCongestionStates GET SET BY CREATE,
+		initialLevelOfCongestion GET SET BY CREATE;
+REGISTERED AS { mtpPackage27 };
+
+
+noBasicLinkAllocationPackage PACKAGE
+	ATTRIBUTES
+		numberOfNormallyActiveSignLinksTps GET REPLACE;
+REGISTERED AS { mtpPackage28 };
+
+
+pCRPackage PACKAGE
+	BEHAVIOUR
+		pCRPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains signLinkTp attributes for the PCR method";;
+	ATTRIBUTES
+		maxMSUsRetransN1 GET SET BY CREATE,
+		maxOctRetransN2 GET SET BY CREATE;
+REGISTERED AS { mtpPackage29 };
+
+
+receiveCongestionLevelsPackage PACKAGE
+	BEHAVIOUR
+		receiveCongestionLevelsPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the levels of receive congestions";;
+	ATTRIBUTES
+		receiveCongestionThresholdOnset GET SET BY CREATE,
+		receiveCongestionThresholdAbatement GET SET BY CREATE;
+REGISTERED AS { mtpPackage30 };
+
+
+relatedLinkGroupNumberPackage PACKAGE
+	ATTRIBUTES
+		relatedLinkGroupNumber GET REPLACE;
+REGISTERED AS { mtpPackage31 };
+
+
+remoteExchangeLabelPackage PACKAGE
+	BEHAVIOUR
+		remoteExchangeLabelPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package supplies the possibility to have textual information about the remote exchange that
+				contains the destination signalling point.";;
+	ATTRIBUTES
+		remoteExchangeLabel GET REPLACE;
+REGISTERED AS { mtpPackage32 };
+
+
+signDataLinkTpListPackage PACKAGE
+	ATTRIBUTES
+		signDataLinkTpList GET;
+REGISTERED AS { mtpPackage33 };
+
+
+signDataLinkTpNamePackage PACKAGE
+	ATTRIBUTES
+		signDataLinkTpName GET REPLACE;
+REGISTERED AS { mtpPackage34 };
+
+
+signLinkSetTpNamePackage PACKAGE
+	ATTRIBUTES
+		signLinkSetTpName GET REPLACE;
+REGISTERED AS { mtpPackage35 };
+
+
+signLinkTestPackage PACKAGE
+	ACTIONS
+		signLinkTest;
+REGISTERED AS { mtpPackage36 };
+
+
+signLinkTpNamePackage PACKAGE
+	ATTRIBUTES
+		signLinkTpName GET REPLACE;
+REGISTERED AS { mtpPackage37 };
+
+
+signRouteNePartNamePackage PACKAGE
+	ATTRIBUTES
+		signRouteNePartName GET REPLACE;
+REGISTERED AS { mtpPackage38 };
+
+
+signRouteSetNePartNamePackage PACKAGE
+	ATTRIBUTES
+		signRouteSetNePartName GET REPLACE;
+REGISTERED AS { mtpPackage39 };
+
+
+signTermListPackage PACKAGE
+	ATTRIBUTES
+		signTermList GET;
+REGISTERED AS { mtpPackage40 };
+
+
+signTermNamePackage PACKAGE
+	ATTRIBUTES
+		signTermName GET REPLACE;
+REGISTERED AS { mtpPackage41 };
+
+
+slsCodeNormalListPackage PACKAGE
+	ATTRIBUTES
+		slsCodeNormalList GET SET BY CREATE;
+	-- in some implementations this attribute might additionally be writable
+	REGISTERED AS { mtpPackage42 };
+
+
+slsListPackage PACKAGE
+	ATTRIBUTES
+		slsList GET SET BY CREATE;
+REGISTERED AS { mtpPackage43 };
+
+
+slTimersProfileNamePackage PACKAGE
+	ATTRIBUTES
+		slTimersProfileName GET REPLACE;
+REGISTERED AS { mtpPackage44 };
+
+
+slTimersProfilePointerPackage PACKAGE
+	ATTRIBUTES
+		slTimersProfilePointer GET REPLACE;
+REGISTERED AS { mtpPackage45 };
+
+
+spTimersPackage PACKAGE
+	BEHAVIOUR
+		spTimersPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the values of the Q.704 and Q.707 timers.";;
+	ATTRIBUTES
+		q704-t1 GET SET BY CREATE,
+		q704-t2 GET SET BY CREATE,
+		q704-t3 GET SET BY CREATE,
+		q704-t4 GET SET BY CREATE,
+		q704-t5 GET SET BY CREATE,
+		q704-t6 GET SET BY CREATE,
+		q704-t7 GET SET BY CREATE,
+		q704-t8 GET SET BY CREATE,
+		q704-t10 GET SET BY CREATE,
+		q704-t11 GET SET BY CREATE,
+		q704-t12 GET SET BY CREATE,
+		q704-t13 GET SET BY CREATE,
+		q704-t14 GET SET BY CREATE,
+		q704-t15 GET SET BY CREATE,
+		q704-t16 GET SET BY CREATE,
+		q704-t17 GET SET BY CREATE,
+		q704-t18 GET SET BY CREATE,
+		q704-t19 GET SET BY CREATE,
+		q704-t20 GET SET BY CREATE,
+		q704-t21 GET SET BY CREATE,
+		q704-t22 GET SET BY CREATE,
+		q704-t23 GET SET BY CREATE,
+		q704-t24 GET SET BY CREATE,
+		q707-t1 GET SET BY CREATE,
+		q707-t2 GET SET BY CREATE;
+REGISTERED AS { mtpPackage46 };
+
+
+spTimersProfileNamePackage PACKAGE
+	ATTRIBUTES
+		spTimersProfileName GET REPLACE;
+REGISTERED AS { mtpPackage47 };
+
+
+spTimersProfilePointerPackage PACKAGE
+	ATTRIBUTES
+		spTimersProfilePointer GET REPLACE;
+REGISTERED AS { mtpPackage48 };
+
+
+ss7OnOccEventPackage PACKAGE
+	NOTIFICATIONS
+		ss7OnOccEvent,
+		changeInLsToAdjSp,
+		inaccessibleSp,
+		remoteUserPartUnavailable;
+REGISTERED AS { mtpPackage49 };
+
+
+stmChannelPackage PACKAGE
+	ATTRIBUTES
+		stmChannel GET;
+REGISTERED AS { mtpPackage50 };
+
+
+stpScreeningTableNamePackage PACKAGE
+	ATTRIBUTES
+		stpScreeningTableName GET REPLACE;
+REGISTERED AS { mtpPackage51 };
+
+
+usageStatePackage PACKAGE
+	BEHAVIOUR
+		usageStatePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package supplies a possibility to cover transfer restricted for a route.";;
+	ATTRIBUTES
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET;
+REGISTERED AS { mtpPackage52 };
+
+
+changeInLsToAdjSp PARAMETER
+	CONTEXT EVENT INFO;
+	WITH SYNTAX MTPDefinedTypesModule.ChangeInLsToAdjSpInfo;
+REGISTERED AS { mtpParameter1 };
+
+
+inaccessibleSp PARAMETER
+	CONTEXT EVENT INFO;
+	WITH SYNTAX MTPDefinedTypesModule.InaccessibleSpInfo;
+REGISTERED AS { mtpParameter2 };
+
+
+remoteUserPartUnavailable PARAMETER
+	CONTEXT EVENT INFO;
+	WITH SYNTAX MTPDefinedTypesModule.UserPart;
+REGISTERED AS { mtpParameter3 };
+
+
+adjPc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PointCode;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		adjPcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the pointcode of an adjacent SP.";;
+REGISTERED AS { mtpAttribute1 };
+
+
+cIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Cic;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		cicBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reference the SS No. 7 trunk used by the datalink. Its value has to be
+				unique within the SPss connected by the trunk.";;
+REGISTERED AS { mtpAttribute2 };
+
+
+congestedState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CongestedState;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		congestedStateBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reflect route set congestion, if no multiple congestion levels are used.
+				Its value is ccongested in case of route set congestion. Its value can change from system inside.";;
+REGISTERED AS { mtpAttribute3 };
+
+
+congestionControlMethod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CongestionControlMethod;
+	BEHAVIOUR
+		congestionControlMethodBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute reflects the congestion control method used within a signalling point.";;
+REGISTERED AS { mtpAttribute4 };
+
+
+congestionCounting ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CongestionCounting;
+	BEHAVIOUR
+		congestionCountingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether congestion counting is message based or octet based.";;
+REGISTERED AS { mtpAttribute5 };
+
+
+congestionLevel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CongestionLevel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		congestionLevelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reflect route set congestion, if multiple congestion levels are used. Its
+				value in case of no congestion is enoner. Its value can change from system inside.";;
+REGISTERED AS { mtpAttribute6 };
+
+
+congestionReportingBaseObject ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CongestionReportingBaseObject;
+	BEHAVIOUR
+		congestionReportingBaseObjectBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates on what object congestion counting is based.";;
+REGISTERED AS { mtpAttribute7 };
+
+
+currentCapacityLS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CapacityLS;
+	BEHAVIOUR
+		currentCapacityLSBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the current capacity of a signalling link set.";;
+REGISTERED AS { mtpAttribute8 };
+
+
+currentCapacitySL ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CapacityLink;
+	BEHAVIOUR
+		currentCapacitySLBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the current capacity of a signalling link.";;
+REGISTERED AS { mtpAttribute9 };
+
+
+dpc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PointCode;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		dpcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents a destination pointcode.";;
+REGISTERED AS { mtpAttribute10 };
+
+
+equipmentPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		equipmentPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reference physical equipment.";;
+REGISTERED AS { mtpAttribute11 };
+
+
+errorCorrectionMethod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.ErrorCorrectionMethod;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		errorCorrectionMethodBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to specify the type of error-correction the signalling link is using.";;
+REGISTERED AS { mtpAttribute12 };
+
+
+fixedPriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.FixedPriority;
+	BEHAVIOUR
+		fixedPriorityBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute determines, if the signRouteNePart is used as current route. The signRouteNePart
+				instances with operational state = ienableds contained in the same signRouteSetNePart are chosen in
+				ascending order as current routes (The lower the value, the higher the priority). There are
+				different behaviours for the handling of priority gaps possible: i) priorityGapAllowedBEHAVIOUR ii)
+				priorityGapNotAllowedBehaviour: In the latter case it is not possible, to have a priority value, if
+				there is a lower value, which is not used in one of the routes of the route set. E.g. in case of
+				deleting a signRouteNePart instance whose priority value is not equal to the priority of at least
+				one of the remaining signRouteNeParts contained in the same signRouteSetNePart, the priority values
+				of the remaining instances have to be decremented by one (see also example in table below). What
+				kind of priority gap behaviour is performed by the switch is to be derived from the combination of
+				the values of the attributes vendorName and version of the managedSwitchingElement.";;
+REGISTERED AS { mtpAttribute13 };
+
+
+flexiblePriority ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.FlexiblePriority;
+	BEHAVIOUR
+		flexiblePriorityBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute determines, if the signRouteNePart is used as current route. The signRouteNePart
+				instances with operational state = ienableds contained in the same signRouteSetNePart are chosen in
+				ascending order as current routes (The lower the value, the higher the priority). There are
+				different behaviours for the handling of priority gaps possible: i) priorityGapAllowedBEHAVIOUR ii)
+				priorityGapNotAllowedBehaviour: In the latter case it is not possible, to have a priority value. If
+				there is a lower value, which is not used in one of the routes of the route set. E.g. in case of
+				deleting a signRouteNePart instance whose priority value is not equal to the priority of at least
+				one of the remaining signRouteNeParts contained in the same signRouteSetNePart, the priority values
+				of the remaining instances have to be decremented by one (see also example in table below). What
+				kind of priority gap behaviour is performed by the switch is to be derived from the combination of
+				the values of the attributes vendorName and version of the managedSwitchingElement. This attribute
+				is writable only together with the attribute priorityMode.";;
+REGISTERED AS { mtpAttribute14 };
+
+
+inClsLoadsharingAlgorithm ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.InClsLoadsharingAlgorithm;
+	BEHAVIOUR
+		inClsLoadsharingAlgorithmBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the over- and in-link set loadsharing algorithm within a combined link
+				set.";;
+REGISTERED AS { mtpAttribute15 };
+
+
+initialLevelOfCongestion ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.InitialLevelOfCongestion;
+	BEHAVIOUR
+		initialLevelOfCongestionBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the initial level of congestion.";;
+REGISTERED AS { mtpAttribute16 };
+
+
+inLsLoadShareAlgorithm ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.InLsLoadShareAlgorithm;
+	BEHAVIOUR
+		inLsLoadShareAlgorithmBehaviour BEHAVIOUR
+			DEFINED AS
+				"The inLsLoadShareAlgorithm specifies a registered, vendor-specific within-linkset loadsharing
+				algorithm.";;
+REGISTERED AS { mtpAttribute17 };
+
+
+l2TimerT1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT1;
+	BEHAVIOUR
+		l2TimerT1Behaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Alignment ready. The unit for the INTEGER range is milliseconds.";;
+REGISTERED AS { mtpAttribute18 };
+
+
+l2TimerT2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT2;
+	BEHAVIOUR
+		l2TimerT2Behaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Not aligned. The unit for the INTEGER range is milliseconds.";;
+REGISTERED AS { mtpAttribute19 };
+
+
+l2TimerT3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT3;
+	BEHAVIOUR
+		l2TimerT3Behaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Aligned. The unit for the INTEGER range is milliseconds.";;
+REGISTERED AS { mtpAttribute20 };
+
+
+l2TimerT4E ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT4E;
+	BEHAVIOUR
+		l2TimerT4eBehaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Proving period timer emergency. The unit for the INTEGER range is
+				milliseconds.";;
+REGISTERED AS { mtpAttribute21 };
+
+
+l2TimerT4N ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT4N;
+	BEHAVIOUR
+		l2TimerT4nBehaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Proving period timer normal. The unit for the INTEGER range is milliseconds.";;
+REGISTERED AS { mtpAttribute22 };
+
+
+l2TimerT5 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT5;
+	BEHAVIOUR
+		l2TimerT5Behaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Sending SIB. The unit for the INTEGER range is milliseconds.";;
+REGISTERED AS { mtpAttribute23 };
+
+
+l2TimerT6 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT6;
+	BEHAVIOUR
+		l2TimerT6Behaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Level 2 timer Remote congestion. The unit for the INTEGER range is milliseconds.";;
+REGISTERED AS { mtpAttribute24 };
+
+
+l2TimerT7 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.L2TimerT7;
+	BEHAVIOUR
+		l2TimerT7Behaviour BEHAVIOUR
+			DEFINED AS
+				"Q.703: Delay to avoid message mis-sequence on changeover. The unit for the INTEGER range is
+				milliseconds.";;
+REGISTERED AS { mtpAttribute25 };
+
+
+linkCongestionLevel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CongestionLevel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		linkCongestionLevelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reflect link congestion, if multiple congestion levels are used. Its
+				value in case of no congestion is dnones. Its value can change from system inside.";;
+REGISTERED AS { mtpAttribute26 };
+
+
+linkTPStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.LinkTPStatus;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		linkTpStatusBehaviour BEHAVIOUR
+			DEFINED AS
+				"The linkTpStatus contains the SS No. 7 functional statuses as described in Recommendation Q.704.
+				Possible states indicated are local blocked, remote blocked, local inhibited, remote inhibited,
+				failed and deactivated.";;
+REGISTERED AS { mtpAttribute27 };
+
+
+loadsharingInformationRouteNePart ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.LoadsharingInformationRouteNePart;
+	BEHAVIOUR
+		loadsharingInformationRouteNePartBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains specific information for target specific loadsharing via the current routes
+				working on a route basis. This information can be used by e.g. the referenced
+				mtpLoadsharingObjectFor-Route to execute the target specific loadsharing.";;
+REGISTERED AS { mtpAttribute28 };
+
+
+loadsharingInformationRouteSetNePart ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.LoadsharingInformationRouteSetNePart;
+	BEHAVIOUR
+		loadsharingInformationRouteSetNePartBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute contains specific information for target specific loadsharing via the current routes
+				working on a routeset basis via the current routes. This information can be used by e.g. the
+				referenced mtpLoadsharingObjectFor-RouteSet to execute the target specific loadsharing.";;
+REGISTERED AS { mtpAttribute29 };
+
+
+loopDelay ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.LoopDelay;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		loopDelayBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute models loop delay.";;
+REGISTERED AS { mtpAttribute30 };
+
+
+lsTimersProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		lsTimersProfileIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute31 };
+
+
+lsTimersProfileName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		lsTimersProfileNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the lsTimersProfile managed object class.";;
+REGISTERED AS { mtpAttribute32 };
+
+
+lsTimersProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		lsTimersProfilePointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute to the instance of the class lsTimersProfile, containing the Q.704 timers for the
+				signalling link set.";;
+REGISTERED AS { mtpAttribute33 };
+
+
+managedSwitchingElementName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		managedSwitchingElementNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the managedSwitchingElement managed object
+				class.";;
+REGISTERED AS { mtpAttribute34 };
+
+
+maxCapacityLS ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CapacityLS;
+REGISTERED AS { mtpAttribute35 };
+
+
+maxCapacitySL ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.CapacityLink;
+REGISTERED AS { mtpAttribute36 };
+
+
+maxMSUsRetransN1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.MaxMSUsRetransN1;
+	BEHAVIOUR
+		maxMSUsRetransN1Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum number of MSUs which are available for retransmission (name in
+				Q.703:N1).";;
+REGISTERED AS { mtpAttribute37 };
+
+
+maxOctRetransN2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.MaxOctRetransN2;
+	BEHAVIOUR
+		maxOctRetransN2Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum number of octets, which are available for retransmission
+				(Q.703: N2).";;
+REGISTERED AS { mtpAttribute38 };
+
+
+mtpAccessPointName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpAccessPointNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the mtpAccessPoint managed object class.";;
+REGISTERED AS { mtpAttribute39 };
+
+
+mtpL2ProtocolProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpL2ProtocolProfileIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"Identifies a mtpL2ProtocolProfile instance within the managedSwitching-element; this is an
+				attribute type whose distinguished value can be used as an RDN when naming an instance of the
+				mtpL2ProtocolProfile object class.";;
+REGISTERED AS { mtpAttribute40 };
+
+
+mtpL2ProtocolProfileName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpL2ProtocolProfileNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the mtpL2ProtocolProfile managed object
+				class.";;
+REGISTERED AS { mtpAttribute41 };
+
+
+mtpL2ProtocolProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpL2ProtocolProfilePointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"Identifies an mtpL2ProtocolProfile instance.";;
+REGISTERED AS { mtpAttribute42 };
+
+
+mtpLevel3Id ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpLevel3IdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute43 };
+
+
+mtpLevel3Name ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpLevel3NameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the mtpLevel3 managed object class.";;
+REGISTERED AS { mtpAttribute44 };
+
+
+mtpLoadsharingObjectForRouteNePartPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpLoadsharingObjectForRouteNePartPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reference implementation dependent loadsharing object class instances
+				needed to model implementation dependent mechanisms for loadsharing over linksets working on a
+				route basis.";;
+REGISTERED AS { mtpAttribute45 };
+
+
+mtpLoadsharingObjectForRouteSetNePartPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpLoadsharingObjectForRouteSetNePartPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to reference implementation dependent loadsharing object class instances
+				needed to model implementation dependent mechanisms for loadsharing over linksets working on a
+				routeset basis.";;
+REGISTERED AS { mtpAttribute46 };
+
+
+mtpSignPointId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpSignPointIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute47 };
+
+
+mtpSignPointName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpSignPointNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the mtpSignPoint managed object class.";;
+REGISTERED AS { mtpAttribute48 };
+
+
+networkIndicator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NetworkIndicator;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		networkIndicatorBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute models the network indicator of the network the signalling point belongs to.";;
+REGISTERED AS { mtpAttribute49 };
+
+
+numberOfCongestionStates ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NumCongStates;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		numberOfCongestionStatesBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the number of congestion states used in the multiple link congestion
+				states without congestion priorityt mechanism as described in 3.8.2.3/Q.704.";;
+REGISTERED AS { mtpAttribute50 };
+
+
+numberOfNormallyActiveSignLinksTps ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NumberOfNormallyActiveSignLinksTps;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		numberOfNormallyActiveSignLinksTpsBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the number of normally active signalling links in a link set, as defined
+				in clause 12/Q.704.";;
+REGISTERED AS { mtpAttribute51 };
+
+
+numberOfThresholdLevels ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NumberOfThresholdLevels;
+	BEHAVIOUR
+		numberOfThresholdsLevelsBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute equals the number of threshold levels that are used for congestion control.";;
+REGISTERED AS { mtpAttribute52 };
+
+
+opc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PointCode;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		opcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the pointcode of an SP from which a certain message has been originated.";;
+REGISTERED AS { mtpAttribute53 };
+
+
+periodicLinkTestFlag ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PeriodicLinkTestFlag;
+	BEHAVIOUR
+		periodicLinkTestFlagBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the periodical signalling link test procedure of Recommendation
+				Q.707 is applied to a link set.";;
+REGISTERED AS { mtpAttribute54 };
+
+
+pointCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PointCode;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		pointCodeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the pointcode of a certain SP.";;
+REGISTERED AS { mtpAttribute55 };
+
+
+priorityMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PriorityMode;
+	BEHAVIOUR
+		priorityModeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is necessary in case of creating a signRouteNePart instance or modifiying its
+				priority attribute. It describes the influence of the management action on the priority attributes
+				of other signRouteNePart instances contained in the same signRouteSetNePart. This attribute is only
+				writable, and this only together with the writing of attribute flexiblePriority. The meanings of
+				the attribute values are: EQUAL: If by modifying the priority with priorityMode EQUAL a priority
+				gap would come into existence, then for the priorities of all created signRouteNePart instances
+				from the same signRouteSetNePart with priorities lower than the agap priorityr the priority value
+				has to be decremented by one. INSERT: Priority values of all created signRouteNePart instances from
+				the same signRouteSetNePart with equal or lower priorities are incremented by one. EXCHANGE_SINGLE:
+				The priority values of all created signRouteNePart instances from the same signRouteSetNePart which
+				have the specified target priority value, are exchanged for the last ( starting ) priority value of
+				the specified signRouteNePart instance. EXCHANGE_GROUP: The priority values of all created
+				signRouteNePart instances from the same signRouteSetNePart which have the specified target priority
+				value, are exchanged for the last ( starting ) priority value of the specified signRouteNePart
+				instance. Additionally the priority values of all created signRouteNePart instances from the same
+				signRouteSetNePart, which have the same value as the sstartingr priority value of the specified
+				signRouteNePart instance, are changed to the targett value.";;
+REGISTERED AS { mtpAttribute56 };
+
+
+q704-t1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t1Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T1 Delay to avoid message mis-sequencing on
+				changeover from this linkq defined in Recommendation Q.704. The value range is from 500 to 1200 ms.
+				For routes with long propagation delays a minimum value of 800 ms is used.The same value applies
+				for all links associated with an instance of the procedure.";;
+REGISTERED AS { mtpAttribute57 };
+
+
+q704-t2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t2Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T2 Waiting for changeover acknowledgemente
+				defined in Recommendation Q.704. The value range is from 700 to 2000 ms. For routes with long
+				propagation delays a minimum value of 1400 ms is used.";;
+REGISTERED AS { mtpAttribute58 };
+
+
+q704-t3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t3Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T3 Time controlled diversion-delay to avoid
+				mis-sequencing on changeback from this link- defined in Recommendation Q.704. The value range is
+				from 500 to 1200 ms. For routes with long propagation delays a minimum value of 800 ms is used. The
+				value of this attribute is network implementation dependent.";;
+REGISTERED AS { mtpAttribute59 };
+
+
+q704-t4 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t4Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T4 Waiting for changeback acknowledgement
+				(first attempt)v defined in Recommendation Q.704. The value range is from 500 to 1200 ms. For
+				routes with long propagation delays a minimum value of 800 ms is used.";;
+REGISTERED AS { mtpAttribute60 };
+
+
+q704-t5 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t5Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T5 Waiting for changeback acknowledgement
+				(second attempt)c defined in Recommendation Q.704. The value range is from 500 to 1200 ms. For
+				routes with long propagation delays a minimum value of 800 ms is used.";;
+REGISTERED AS { mtpAttribute61 };
+
+
+q704-t6 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t6Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T6 Delay to avoid message mis-sequencing on
+				controlled reroutingi defined in Recommendation Q.704. The value range is from 500 to 1200 ms. For
+				routes with long propagation delays a minimum value of 800 ms is used.";;
+REGISTERED AS { mtpAttribute62 };
+
+
+q704-t7 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t7Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T7 Waiting for signalling data link
+				connection acknowledgement defined in Recommendation Q.704. The value range is from 1 to 2 seconds.";;
+REGISTERED AS { mtpAttribute63 };
+
+
+q704-t8 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t8Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T8 Transfer prohibited inhibition timer
+				(transient solution)o defined in Recommendation Q.704. The value range is from 800 to 1200 ms.";;
+REGISTERED AS { mtpAttribute64 };
+
+
+q704-t10 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t10Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T10 Waiting to repeat signalling route set
+				test messagea defined in Recommendation Q.704. The value range is from 30 to 60 seconds. The
+				maximum value may be extended at the discretion of the management function in certain situations,
+				e.g. many signalling points being unavailable or signalling points of known long term
+				unavailability.";;
+REGISTERED AS { mtpAttribute65 };
+
+
+q704-t11 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t11Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T11 Transfer restricted timerd defined in
+				Recommendation Q.704. The value range is from 30 to 90 seconds. This is one way of implementing the
+				function described in 13.4/Q.704 and mainly intended to simplify STPs.";;
+REGISTERED AS { mtpAttribute66 };
+
+
+q704-t12 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t12Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T12 Waiting for uninhibit acknowledgementh
+				defined in Recommendation Q.704. The value range is from 800 to 1500 ms.";;
+REGISTERED AS { mtpAttribute67 };
+
+
+q704-t13 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t13Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T13 Waiting for force uninhibitr defined in
+				Recommendation Q.704. The value range is from 800 to 1500 ms.";;
+REGISTERED AS { mtpAttribute68 };
+
+
+q704-t14 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t14Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T14 Waiting for inhibition acknowledgemente
+				defined in Recommendation Q.704. The value range is from 2 to 3 seconds.";;
+REGISTERED AS { mtpAttribute69 };
+
+
+q704-t15 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t15Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T15 Waiting to start signalling route set
+				congestion testt defined in Recommendation Q.704. The value range is from 2 to 3 seconds.";;
+REGISTERED AS { mtpAttribute70 };
+
+
+q704-t16 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t16Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T16 Waiting for route set congestion status
+				updatei defined in Recommendation Q.704. The value range is from 1.4 to 2 seconds.";;
+REGISTERED AS { mtpAttribute71 };
+
+
+q704-t17 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t17Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T17 Delay to avoid oscillation of initial
+				alignment failure and link restarto defined in Recommendation Q.704. The value range is from 800 to
+				1500 ms. The value should be less than the corresponding timer 2 in 12.2.1.2/Q.703.";;
+REGISTERED AS { mtpAttribute72 };
+
+
+q704-t18 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t18Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T18 defined in Recommendation Q.704. T18 is
+				the Timer within a signalling point whose MTP restarts, for supervising link and linkset activation
+				as well as the receipt of routing information. The value is implementation and network dependent.
+				Criteria to choose T18 are given in 9.2/Q.704.";;
+REGISTERED AS { mtpAttribute73 };
+
+
+q704-t19 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t19Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T19 Supervision timer during MTP restart to
+				avoid possible ping-pong of TFP, TFR and TRA messages. defined in Recommendation Q.704. The value
+				range is from 67 to 69 seconds.";;
+REGISTERED AS { mtpAttribute74 };
+
+
+q704-t20 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t20Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T20 Overall MTP restart timer at the
+				signalling point whose MTP restarts. defined in Recommendation Q.704. The value range is from 59 to
+				61 seconds.";;
+REGISTERED AS { mtpAttribute75 };
+
+
+q704-t21 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t21Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T21 Overall MTP restart timer at a
+				signalling point adjacent to one whose MTP restarts.i defined in Recommendation Q.704. The value
+				range is from 63 to 65 seconds.";;
+REGISTERED AS { mtpAttribute76 };
+
+
+q704-t22 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t22Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T22 Local inhibit test timeri defined in
+				Recommendation Q.704. The value range is from 3 to 6 minutes (provisional value).";;
+REGISTERED AS { mtpAttribute77 };
+
+
+q704-t23 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t23Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T23 Remote inhibit test timeri defined in
+				Recommendation Q.704. The value range is from 3 to 6 minutes (provisional value).";;
+REGISTERED AS { mtpAttribute78 };
+
+
+q704-t24 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q704-t24Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the initial timer value of timer T24 Stabilising timer after removal of
+				local processor outage, used in LPO latching to RPO (national option) defined in Recommendation
+				Q.704. The value is 500 ms (provisional value).";;
+REGISTERED AS { mtpAttribute79 };
+
+
+q707-t1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q707-t1Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines a timer value of timer T1 which is defined in Recommendation Q.707.";;
+REGISTERED AS { mtpAttribute80 };
+
+
+q707-t2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		q707-t2Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines a timer value of timer T2 which is defined in Recommendation Q.707.";;
+REGISTERED AS { mtpAttribute81 };
+
+
+receiveCongestionThresholdAbatement ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.ReceiveCongestionThresholdAbatement;
+	BEHAVIOUR
+		receiveCongestionThresholdAbatementBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the reception buffer gets smaller than this number, Level 2 flow control
+				measures end. The value has to be smaller than the respective congestion onset threshold.";;
+REGISTERED AS { mtpAttribute82 };
+
+
+receiveCongestionThresholdOnset ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.ReceiveCongestionThresholdOnset;
+	BEHAVIOUR
+		receiveCongestionThresholdOnsetBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the reception buffer gets bigger than this value, Level 2 flow control
+				measures begin. MSUs are still accepted.";;
+REGISTERED AS { mtpAttribute83 };
+
+
+relatedLinkGroupNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.RelatedLinkGroupNumber;
+	BEHAVIOUR
+		relatedLinkGroupNumberBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the link group which the signalling link belongs to.";;
+REGISTERED AS { mtpAttribute84 };
+
+
+remoteExchangeLabel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.RemoteExchangeLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		remoteExchangeLabelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the remote exchange which contains the mtpSignPoint with the point code
+				equal to the signRouteSetNePartId.";;
+REGISTERED AS { mtpAttribute85 };
+
+
+screeningByLinkSetOrByOpc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.ScreeningByLinkSetOrByOpc;
+	BEHAVIOUR
+		screeningByLinkSetOrByOpcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines which of the different options of 8.2/Q.705 are used for identifying
+				unauthorized SS No. 7 messages.";;
+REGISTERED AS { mtpAttribute86 };
+
+
+signDataLinkTpId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signDataLinkTpIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute87 };
+
+
+signDataLinkTpList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PointerList;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signDataLinkTpListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the signDataLink instances that can be used for dynamical allocation to the
+				signLinkTp.";;
+REGISTERED AS { mtpAttribute88 };
+
+
+signDataLinkTpName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signDataLinkTpNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the signDataLinkTp managed object class.";;
+REGISTERED AS { mtpAttribute89 };
+
+
+signDataLinkTpPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signDataLinkTpPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute references a particular signDataLinkTp instance. The following restriction applies
+				to this attribute: modification is only allowed if the administrative state of the instance that
+				contains this attribute is dlockede.";;
+REGISTERED AS { mtpAttribute90 };
+
+
+signLinkSetTpId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signLinkSetTpIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute91 };
+
+
+signLinkSetTpName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signLinkSetTpNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the signLinkSetTp managed object class.";;
+REGISTERED AS { mtpAttribute92 };
+
+
+signLinkSetTpPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signLinkSetTpPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"References the signLinkSetTp which is intended to be used as first segment of the succession of
+				linksets, which form the signalling route on the network level. If during creation of a
+				signRouteNePart instance the value of this attribute is referencing a signLinkSetTp instance, which
+				is not created or is already referenced by a signRouteNePart of the same signRouteSetNePart, then
+				the creation of the signRouteNePart is rejected and not carried out. It is not allowed to reference
+				a signLinksetTp, which is not contained in the same mtpSignPoint as the signRouteSetNePart where
+				the signRouteNePart is contained in.";;
+REGISTERED AS { mtpAttribute93 };
+
+
+signLinkTpName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signLinkTpNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the signLinkTp managed object class.";;
+REGISTERED AS { mtpAttribute94 };
+
+
+signLinkTpPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signLinkTpPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the signalling link termination point that uses this particular
+				signalling data link.";;
+REGISTERED AS { mtpAttribute95 };
+
+
+signRouteNePartId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signRouteNePartIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is the naming attribute of signRouteNePart. It identifies a signRouteNePart instance within
+				the signRouteSetNePart.";;
+REGISTERED AS { mtpAttribute96 };
+
+
+signRouteNePartName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signRouteNePartNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the signRouteNePart managed object class.";;
+REGISTERED AS { mtpAttribute97 };
+
+
+signRouteSetNePartId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signRouteSetNePartIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This is the naming attribute of signRouteSetNePart. It identifies a signRouteSetNePart instance
+				within the mtpSignPoint and equals the signalling point code of the respective destination
+				signalling point.";;
+REGISTERED AS { mtpAttribute98 };
+
+
+signRouteSetNePartName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signRouteSetNePartNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"Identifies a signRouteSetNePart instance within the managed object class; its value is unique
+				within the signRouteSetNePart object class. In this attribute implementation or administration
+				dependent information - like used for naming schemes - can be stored. If at creation time the value
+				of this attribute given for the instance to be created already exists in another signRouteNePart
+				instance, then the creation is rejected and not carried out.";;
+REGISTERED AS { mtpAttribute99 };
+
+
+signTermId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signTermIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute100 };
+
+
+signTermList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.PointerList;
+	BEHAVIOUR
+		signTermListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the signTerm instances that can be used for dynamical allocation to the
+				signLinkTp.";;
+REGISTERED AS { mtpAttribute101 };
+
+
+signTermName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signTermNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the signTerm managed object class.";;
+REGISTERED AS { mtpAttribute102 };
+
+
+signTermPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signTermPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies a particular signTerm instance.";;
+REGISTERED AS { mtpAttribute103 };
+
+
+slCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SlCode;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		slCodeBehaviour BEHAVIOUR
+			DEFINED AS
+				"If one SLC has been assigned, it should be checked that this SLC will not be assigned again.";;
+REGISTERED AS { mtpAttribute104 };
+
+
+slsCodeCurrentList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SLSCodeCurrentList;
+	MATCHES FOR
+		SET INTERSECTION;
+	BEHAVIOUR
+		slsCodeCurrentListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates, which SLSs are currently assigned to this signLinkTp. It has to be
+				ensured, that all SLSs are covered and no SLS exists more than one time within the
+				slsCodeCurrentList attributes of the signLinkTp instances contained within one signLinkSetTp. The
+				content of this attribute can be different from that of the attribute slsCodeNormalList. This
+				attribute can be changed from system inside.";;
+REGISTERED AS { mtpAttribute105 };
+
+
+slsCodeNormalList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SlsCodeNormalList;
+	MATCHES FOR
+		SET INTERSECTION;
+	BEHAVIOUR
+		slsCodeNormalListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates, which SLSs are administratively assigned to this signLinkTp for the case
+				of normal operation.";;
+REGISTERED AS { mtpAttribute106 };
+
+
+slsList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SlsCodeList;
+	BEHAVIOUR
+		slsListBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute has to be used if loadsharing over link sets toward a specific destination is done.
+				It indicates which SLSs are assigned to this signRouteNePart, in case it is a current route (i.e.
+				the messages with these SLSs are sent over the allocated link set). It has to be ensured that all
+				SLSs are covered and no SLS exists more than one time within the slsList attributes of the current
+				routes. The attribute can be written from system inside.";;
+REGISTERED AS { mtpAttribute107 };
+
+
+slTimersProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		slTimersProfileIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute108 };
+
+
+slTimersProfileName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		slTimersProfileNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the slTimersProfile managed object class.";;
+REGISTERED AS { mtpAttribute109 };
+
+
+slTimersProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		slTimersProfilePointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute points to the instance of the class slTimersProfile, containing the Q.704 timers for
+				the signalling link.";;
+REGISTERED AS { mtpAttribute110 };
+
+
+spTimersProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		spTimersProfileIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances.";;
+REGISTERED AS { mtpAttribute111 };
+
+
+spTimersProfileName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		spTimersProfileNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the spTimersProfile managed object class.";;
+REGISTERED AS { mtpAttribute112 };
+
+
+spTimersProfilePointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Pointer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		spTimersProfilePointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute points to the instance of the class spTimersProfile, containing the Q.704 and Q.707
+				timers for the signalling point.";;
+REGISTERED AS { mtpAttribute113 };
+
+
+spType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SpType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		spTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the SP-type: SEP, STEP or STP.";;
+REGISTERED AS { mtpAttribute114 };
+
+
+stmChannel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.StmChannel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		stmChannelBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute denotes the STM channel which defines the signalling datalink on the PCM
+				transmission system.";;
+REGISTERED AS { mtpAttribute115 };
+
+
+stpScreeningTableListMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.StpScreeningTableListMode;
+	BEHAVIOUR
+		stpScreeningTableListModeBehaviour BEHAVIOUR
+			DEFINED AS
+				"The stpScreeningTableListMode attribute indicates whether the STP access is allowed or not by the
+				designated combinations contained in the subordinate stpScreeningTableLines (see 8.2/Q.705). TRUE:
+				STP access allowed FALSE: STP access inhibited.";;
+REGISTERED AS { mtpAttribute116 };
+
+
+stpScreeningTableId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		stpScreeningTableIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The STP Screening Table Id is an attribute used for naming purposes.";;
+REGISTERED AS { mtpAttribute117 };
+
+
+stpScreeningTableLineContent ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.StpScreeningTableLineContent;
+	BEHAVIOUR
+		stpScreeningTableLineContentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The stpScreeningTableLineContent attribute represents the content of one line of the STP
+				ScreeningTable. The content consists of elements indicating the designated DPCs which are to be
+				screened in combination with the OPC or linkset given by the stpScreeningTableLineId and an
+				indication how a message fulfilling such a combination is to be treated.";;
+REGISTERED AS { mtpAttribute118 };
+
+
+stpScreeningTableLineId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.StpScreeningTableLineId;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		stpScreeningTableLineIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The stpScreeningTableLineId is an attribute used for naming purposes. Depending on the value of
+				attribute screeningByLinkSetOrByDpc of the superior stpScreeningTable instance it represents the
+				OPC or linkset which is designated to be screened for STP traffic.";;
+REGISTERED AS { mtpAttribute119 };
+
+
+stpScreeningTableLineName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		stpScreeningTableLineNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the stpScreeningTableLine managed object
+				class.";;
+REGISTERED AS { mtpAttribute120 };
+
+
+stpScreeningTableName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		stpScreeningTableNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is an additional name for instances of the stpScreeningTable managed object class.";;
+REGISTERED AS { mtpAttribute121 };
+
+
+timerTx ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		timerTxBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Tx timer value for the multiple link congestion states without
+				congestion priorityt mechanism as described in 3.8.2.3/Q.704.";;
+REGISTERED AS { mtpAttribute122 };
+
+
+timerTy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TimerValue;
+	BEHAVIOUR
+		timerTyBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Ty timer value for the multiple link congestion states without
+				congestion priorityt mechanism as described in 3.8.2.3/Q.704.";;
+REGISTERED AS { mtpAttribute123 };
+
+
+transmissionCongestionThresholdAbatementLevel1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdAbatementLevel1;
+	BEHAVIOUR
+		transmissionCongestionThresholdAbatementLevel1Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transmission / retransmission buffer gets smaller than this number,
+				Level 2 flow control measures end. The value has to be smaller than the respective congestion onset
+				threshold.";;
+REGISTERED AS { mtpAttribute124 };
+
+
+transmissionCongestionThresholdAbatementLevel2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdAbatementLevel2;
+	BEHAVIOUR
+		transmissionCongestionThresholdAbatementLevel2Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transm./retransm. buffer of a link in the congestionLevel 2 gets
+				smaller than this number, the resp. link is not any more in congestionLevel 2. CongestionLevel 2
+				measures end. The value has to be smaller than the respective congestion onset threshold.";;
+REGISTERED AS { mtpAttribute125 };
+
+
+transmissionCongestionThresholdAbatementLevel3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdAbatementLevel3;
+	BEHAVIOUR
+		transmissionCongestionThresholdAbatementLevel3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transm./retransm. buffer of a link in the congestionLevel 3 gets
+				smaller than this number, the resp. link is not any more in congestionLevel 3. CongestionLevel 3
+				measures end. The value has to be smaller than the respective congestion onset threshold.";;
+REGISTERED AS { mtpAttribute126 };
+
+
+transmissionCongestionThresholdDiscardLevel1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdDiscardLevel1;
+	BEHAVIOUR
+		transmissionCongestionThresholdDiscardLevel1Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transmission / retransmission buffer of a link in the congestion level
+				1 gets bigger than this number, MSUs are discarded (this threshold equals the respective buffer
+				size). The value has to be bigger than the respective congestion onset threshold.";;
+REGISTERED AS { mtpAttribute127 };
+
+
+transmissionCongestionThresholdDiscardLevel2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdDiscardLevel2;
+	BEHAVIOUR
+		transmissionCongestionThresholdDiscardLevel2Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transm./retransm. buffer of a link in the congestion level 2 gets
+				bigger than this number, MSUs are discarded (this threshold equals the respective buffer size). The
+				value has to be bigger than the respective congestion onset threshold.";;
+REGISTERED AS { mtpAttribute128 };
+
+
+transmissionCongestionThresholdDiscardLevel3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdDiscardLevel3;
+	BEHAVIOUR
+		transmissionCongestionThresholdDiscardLevel3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transmission / retransmission buffer of a link in the congestion level
+				3 gets bigger than this number, MSUs are discarded (this threshold equals the respective buffer
+				size). The value has to be bigger than the respective congestion onset threshold.";;
+REGISTERED AS { mtpAttribute129 };
+
+
+transmissionCongestionThresholdOnsetLevel1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdOnsetLevel1;
+	BEHAVIOUR
+		transmissionCongestionThresholdOnsetLevel1Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transmission / retransmission buffer gets bigger than this value, the
+				respective link is congested in congestionLevel 1. CongestionLevel 1 measures start.";;
+REGISTERED AS { mtpAttribute130 };
+
+
+transmissionCongestionThresholdOnsetLevel2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdOnsetLevel2;
+	BEHAVIOUR
+		transmissionCongestionThresholdOnsetLevel2Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transmission / retransmission buffer gets bigger than this value, the
+				respective link is congested in congestionLevel 2. CongestionLevel 2 measures start.";;
+REGISTERED AS { mtpAttribute131 };
+
+
+transmissionCongestionThresholdOnsetLevel3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionCongestionThresholdOnsetLevel3;
+	BEHAVIOUR
+		transmissionCongestionThresholdOnsetLevel3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of MSUs in the transmission / retransmission buffer gets bigger than this value, the
+				respective link is congested in congestionLevel 3. CongestionLevel 3 measures start.";;
+REGISTERED AS { mtpAttribute132 };
+
+
+transmissionRate ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TransmissionRate;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		transmissionRateBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the transmissionRate and implies the transmissionType (i.e. 56 and 64
+				kbits imply digital, 4.8 kbits implies analog transmission).";;
+REGISTERED AS { mtpAttribute133 };
+
+
+treatmentOfOutsideRanges ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.TreatmentOf;
+	BEHAVIOUR
+		treatmentOfOutsideRangesBehaviour BEHAVIOUR
+			DEFINED AS
+				"The treatmentOfOutsideRanges attribute specifies the treatment of the messages outside the
+				designated ranges given the stpScreeningTable managed object (see 8.3/Q.705, part two). normal :
+				allow all STP messages outside the designated ranges discard : discard all STP messages outside the
+				designated ranges.";;
+REGISTERED AS { mtpAttribute134 };
+
+
+getScreenedOpcsOrLinkSetsByDpc ACTION
+	BEHAVIOUR
+		getScreenedOpcsOrLinkSetsByDpcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action gets all OPCs or linksets (depending on the value of the screeningByLinkSetOrByOPC
+				attribute) together with their respective messageTreatments which are screened in combination with
+				a specific DPC within all the stpScreeningTableLineContents of all stpScreeningTableLines contained
+				in the stpScreeningTable. The resulting list in the reply is empty, if no OPC or Linkset within all
+				the stpScreeningTableLine (Contents of all stpScreeningTableLine s contained in the
+				stpScreeningTable is screened in combination with the DPC - given in the information syntax), or if
+				no stpScreeningTableLine contained in the stpScreeningTable does exist.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX MTPDefinedTypesModule.SpecificDpc;
+	WITH REPLY SYNTAX MTPDefinedTypesModule.ScreenedOpcsOrLinkSetsList;
+REGISTERED AS { mtpAction1 };
+
+
+localInhibit ACTION
+	BEHAVIOUR
+		localInhibitBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action inhibits the signalling link termination point. If the inhibition procedure completes
+				successfully the linkTpStatus contains localInhibit. This action is not performed if the
+				linkTpStatus contains localInhibit.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX MTPDefinedTypesModule.ResultOfAction;
+REGISTERED AS { mtpAction2 };
+
+
+localUninhibit ACTION
+	BEHAVIOUR
+		localUninhibitBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action uninhibits the signalling link termination point. If the uninhibition procedure
+				completes successfully the localInhibit is removed from linkTpStatus. This action is not performed
+				if the linkTpStatus does not contain localInhibit.";;
+	MODE CONFIRMED;
+	WITH REPLY SYNTAX MTPDefinedTypesModule.ResultOfAction;
+REGISTERED AS { mtpAction3 };
+
+
+replaceSignTerm ACTION
+	BEHAVIOUR
+		replaceSignTermBehaviour BEHAVIOUR
+			DEFINED AS
+				"This action replaces the signalling terminal in a signalling link termination point. This action is
+				not performed if: i) the signTermPointer does not reference a signTerm or ii) the new signTerm does
+				not exist or iii) the signTerm is already referenced by the link or iv) the linkTpStatus does not
+				contain the values ndeactivated or failed. If the action has been successful, the signTermPointer
+				has the value of the signTermId given in the information syntax; otherwise the pointer value
+				remains unchanged.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX MTPDefinedTypesModule.Pointer;
+	WITH REPLY SYNTAX MTPDefinedTypesModule.ResultOfAction;
+REGISTERED AS { mtpAction4 };
+
+
+signLinkTest ACTION
+	BEHAVIOUR
+		signLinkTestBehaviour BEHAVIOUR
+			DEFINED AS
+				"This test is performed to analyse the signalling link.";;
+	WITH REPLY SYNTAX MTPDefinedTypesModule.ResultOfAction;
+REGISTERED AS { mtpAction5 };
+
+
+mtpRestarting NOTIFICATION
+	WITH INFORMATION SYNTAX MTPDefinedTypesModule.MtpRestarting;
+REGISTERED AS { mtpNotification1 };
+
+
+ss7OnOccEvent NOTIFICATION
+	BEHAVIOUR
+		ss7OnOccEventBhv BEHAVIOUR
+			DEFINED AS
+				"This notification is used to report the Q.752 on-occurrence measurement results and other MTP
+				events, which are not reported as a communication alarm.";;
+	WITH INFORMATION SYNTAX MTPDefinedTypesModule.SS7OnOccEventInfo;
+REGISTERED AS { mtpNotification2 };
+
+
+managedSwitchingElement-mtpSignPoint NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		mtpSignPoint;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		managedSwitchingElement;
+	WITH ATTRIBUTE
+		mtpSignPointId;
+	BEHAVIOUR
+		managedSwitchingElement-mtpSignPointBehaviour BEHAVIOUR
+			DEFINED AS
+				"An mtpSignPoint can be created by an operator or automatically. In case the spTimersProfilePackage
+				is used, a create or set request is rejected, if i) the spTimersProfilePointer does not reference
+				an spTimersProfile OR ii) the spTimersProfilePointer would reference an instance which does not
+				exist If the name package is supported: a create request with a value for the name attribute that
+				is already used by another instance of the same object class will be rejected. An mtpSignPoint can
+				be deleted if and only if it does not contain any other managed object class instances, except for
+				contained measurements.";;
+	CREATE;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
+REGISTERED AS { mtpNameBinding1 };
+
+
+mtpSignPoint-signRouteSetNePart NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		signRouteSetNePart;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		mtpSignPoint;
+	WITH ATTRIBUTE
+		signRouteSetNePartId;
+	BEHAVIOUR
+		mtpSignPoint-signRouteSetNePartBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. A delete request is
+				rejected, if the administrativeState of the signRouteSetNePart does not equal locked.";;
+	CREATE;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
+REGISTERED AS { mtpNameBinding2 };
+
+
+signRouteSetNePart-signRouteNePart NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		signRouteNePart;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		signRouteSetNePart;
+	WITH ATTRIBUTE
+		signRouteNePartId;
+	BEHAVIOUR
+		signRouteSetNePart-signRouteNePartBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected, if the signlinkSetTpPointer would reference an instance, which i)
+				does not belong to the signLinkSetTp object class OR ii) does not exist OR iii) is not contained in
+				the same mtpSignPoint as the signRouteNePart OR iv) is already referenced by a signRouteNePart
+				contained within the same signRouteSetNePart A delete request is rejected if its
+				administrativeState does not equal locked. If the name package is supported: a create request with
+				a value for the name attribute that is already used by another instance of the same object class
+				will be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding3 };
+
+
+signLinkSetTp-signLinkTp NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		signLinkTp AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		signLinkSetTp;
+	WITH ATTRIBUTE
+		slCode;
+	BEHAVIOUR
+		signLinkSetTp-signLinkTpBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding4 };
+
+
+mtpSignPoint-mtpAccessPoint NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		mtpAccessPoint;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		mtpSignPoint;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sapId;
+	BEHAVIOUR
+		mtpSignPoint-mtpAccessPointBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding5 };
+
+
+mtpSignPoint-mtpLevel3 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		mtpLevel3;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		mtpSignPoint;
+	WITH ATTRIBUTE
+		mtpLevel3Id;
+	BEHAVIOUR
+		mtpSignPoint-mtpLevel3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected.";;
+	CREATE;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
+REGISTERED AS { mtpNameBinding6 };
+
+
+mtpSignPoint-signDataLinkTp NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		signDataLinkTp;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		mtpSignPoint;
+	WITH ATTRIBUTE
+		signDataLinkTpld;
+	BEHAVIOUR
+		mtpSignPoint-signDataLinkTpBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected if the equipmentPointer would reference equipment that does not exist.
+				If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected.";;
+	CREATE;
+	DELETE;
+	-- WITH ATTRIBUTE signDataLinkId;
+	REGISTERED AS { mtpNameBinding7 };
+
+
+mtpSignPoint-signLinkSetTp NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		signLinkSetTp;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		mtpSignPoint;
+	WITH ATTRIBUTE
+		signLinkSetId;
+	BEHAVIOUR
+		mtpSignPoint-signLinkSetTpBehaviour BEHAVIOUR
+			DEFINED AS
+				"A creation request is only successful if a signRouteSetNePart exists within the mtpSignPoint for
+				the value of attribute adjPC In case the lsTimersProfilePackage is used, create or set request is
+				rejected, if i) the lsTimersProfilePointer does not reference an lsTimersProfile OR ii) the
+				lsTimersProfilePointer would reference an instance which does not exist If the name package is
+				supported: a create request with a value for the name attribute that is already used by another
+				instance of the same object class will be rejected. If it is tried to delete a signLinkSetTp, which
+				is referenced by at least one signRouteNePart, the deletion of the signLinkSetTp is rejected and
+				not carried out.";;
+	CREATE;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
+REGISTERED AS { mtpNameBinding8 };
+
+
+managedSwitchingElement-signTerm NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		signTerm;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		managedSwitchingElement;
+	WITH ATTRIBUTE
+		signTermId;
+	BEHAVIOUR
+		managedSwitchingElement-signTermBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected if the equipmentPointer would reference equipment that does not exist.
+				If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding9 };
+
+
+mtpSignPoint-stpScreeningTable NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		stpScreeningTable;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		mtpSignPoint;
+	WITH ATTRIBUTE
+		stpScreeningTableId;
+	BEHAVIOUR
+		mtpSignPoint-stpScreeningTableBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. It is only allowed to
+				delete an instance of this object class if its administrative state equals lockedt.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding10 };
+
+
+managedSwitchingElement-lsTimersProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		lsTimersProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		managedSwitchingElement;
+	WITH ATTRIBUTE
+		lsTimersProfileId;
+	BEHAVIOUR
+		managedSwitchingElement-lsTimersProfileBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. If an attempt is made
+				to delete an lsTimersProfile which is still referenced by a signLinkSetTp the delete request will
+				be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding11 };
+
+
+managedSwitchingElement-mtpL2ProtocolProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		mtpL2ProtocolProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		managedSwitchingElement;
+	WITH ATTRIBUTE
+		mtpL2ProtocolProfileId;
+	BEHAVIOUR
+		managedSwitchingElement-mtpL2ProtocolProfileBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. If an attempt is made
+				to delete an mtpL2ProtocolProfile which is still referenced by a signLinkTP the delete request will
+				be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding12 };
+
+
+managedSwitchingElement-slTimersProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		slTimersProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		managedSwitchingElement;
+	WITH ATTRIBUTE
+		slTimersProfileId;
+	BEHAVIOUR
+		managedSwitchingElement-slTimersProfileBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. If an attempt is made
+				to delete an slTimersProfile which is still referenced by a signLinkTp the delete request will be
+				rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding13 };
+
+
+managedSwitchingElement-spTimersProfile NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		spTimersProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		managedSwitchingElement;
+	WITH ATTRIBUTE
+		spTimersProfileId;
+	BEHAVIOUR
+		managedSwitchingElement-spTimersProfileBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. If an attempt is made
+				to delete an spTimersProfile which is still referenced by an mtpSignPoint the delete request will
+				be rejected.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding14 };
+
+
+stpScreeningTable-stpScreeningTableLine NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		stpScreeningTableLine;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		stpScreeningTable;
+	WITH ATTRIBUTE
+		stpScreeningTableLineId;
+	BEHAVIOUR
+		stpScreeningTable-stpScreeningTableLineBehaviour BEHAVIOUR
+			DEFINED AS
+				"If the name package is supported: a create request with a value for the name attribute that is
+				already used by another instance of the same object class will be rejected. The total number of
+				screened DPCes across all stpScreeningTableLine instances contained by an stpScreeningTable must be
+				less or equal to maxNoOfScreenedDpcs. A respectively unallowed create request is rejected. If one
+				tries to create an instance with an stpScreeningTableLineId which would represent a linkset which
+				is not contained within the same signPoint as the stpScreeningTable, the create request is
+				rejected. Instances of this object class can be deleted automatically if the superior
+				stpScreeningTable is deleted.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpNameBinding15 };
+
+--< GDMO.EndDocument "ITU-T Rec. Q.751.1 (1995)" >--
+
+-- =============================================================================
+--
+-- $Log$
+-- =============================================================================

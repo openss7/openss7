@@ -104,7 +104,9 @@ char outpfile[256] = "";
 
 int gdmo_level = 0;
 int gdmo_column = 0;
+int gdmo_incomment = 0;
 
+void gdmo_checkcomment(FILE *);
 void gdmo_newline(FILE *);
 void gdmo_fprintwrap(FILE *, const char *, int, int);
 
@@ -180,12 +182,14 @@ char *currentfile = NULL;
 %token TOK_MODE_CONFIRMED
 %token TOK_NAMED_BY
 %token TOK_SUPERIOR_OBJECT_CLASS
+%token TOK_NO_MODIFY
 %token TOK_NOTIFICATIONS
 %token TOK_ONLY_IF_NO_CONTAINED_OBJECTS
 %token TOK_ORDERING
 %token TOK_PARAMETERS
 %token TOK_PERMITTED_VALUES
 %token TOK_PRESENT_IF
+%token TOK_PRESENT_ONLY_IF  /* X.722 Corrigendum 1. */
 %token TOK_REGISTERED_AS
 %token TOK_REMOVE
 %token TOK_REPLACE_WITH_DEFAULT
@@ -215,12 +219,12 @@ char *currentfile = NULL;
 %token TOK_ELIPSIS
 %token TOK_PERIOD
 %token TOK_DOUBLEQUOTE
-%token TOK_LBRACE
-%token TOK_RBRACE
-%token TOK_LPAREN
-%token TOK_RPAREN
-%token TOK_LANGLE
-%token TOK_RANGLE
+%left TOK_LBRACE
+%right TOK_RBRACE
+%left TOK_LPAREN
+%right TOK_RPAREN
+%left TOK_LANGLE
+%right TOK_RANGLE
 %token TOK_XMLOPEN
 %token TOK_XMLCLOSE
 %token TOK_XMLCOPEN
@@ -338,7 +342,7 @@ char *currentfile = NULL;
 %%
 
 file:
-	gdmo { gdmo_newline(yyout); } asn1
+	gdmo { gdmo_newline(yyout); } /* asn1 */
 	;
 
 
@@ -500,6 +504,7 @@ template:
 	| action_template
 	| notification_template
 
+/*
 comstring:
 	TOK_COMSTRING { gdmo_column += fprintf(yyout, "--%.*s", yyleng, yytext); gdmo_newline(yyout); }
 	;
@@ -508,28 +513,19 @@ comment:
 	| comstring
 	| comment comstring
 	;
-
-label:
-	optional_document_identifier
-	label_string
-	;
-
-optional_document_identifier:
-	| document_identifier
-	;
+*/
 
 document_identifier:
 	TOK_DOCID { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
-	colon
 	;
 
 label_string:
 	TOK_LABEL { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
-reference:
-	label_string
-	| TOK_ID { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
+label:
+	document_identifier
+	| label_string
 	;
 
 identifier:
@@ -537,12 +533,12 @@ identifier:
 	| TOK_ID { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
-field_name:
-	label
+reference:
+	identifier
 	;
 
-typereference:
-	reference
+field_name:
+	label
 	;
 
 value_reference:
@@ -550,13 +546,15 @@ value_reference:
 	;
 
 semicolon:
-	TOK_SEMICOLON { gdmo_level--; gdmo_column += fprintf(yyout, "%c", ';'); }
+	TOK_SEMICOLON { gdmo_level--; gdmo_checkcomment(yyout); gdmo_column += fprintf(yyout, "%c", ';');
+	}
 	;
 
 comma:
-	TOK_COMMA { gdmo_column += fprintf(yyout, "%c", ',');  gdmo_newline(yyout); }
+	TOK_COMMA { gdmo_checkcomment(yyout); gdmo_column += fprintf(yyout, "%c", ',');  gdmo_newline(yyout); }
 	;
 
+/*
 colon:
 	TOK_COLON { gdmo_column += fprintf(yyout, "%c", ':'); }
 	;
@@ -568,15 +566,17 @@ period:
 doublequote:
 	TOK_DOUBLEQUOTE { gdmo_column += fprintf(yyout, "%c", '"'); }
 	;
+*/
 
 lbrace:
-	TOK_LBRACE { gdmo_column += fprintf(yyout, "{ "); }
+	TOK_LBRACE { gdmo_checkcomment(yyout); gdmo_column += fprintf(yyout, "{ "); }
 	;
 
 rbrace:
-	TOK_RBRACE { gdmo_column += fprintf(yyout, " }"); }
+	TOK_RBRACE { gdmo_checkcomment(yyout); gdmo_column += fprintf(yyout, " }"); }
 	;
 
+/*
 lbracket:
 	TOK_LBRACKET { gdmo_column += fprintf(yyout, "["); }
 	;
@@ -632,6 +632,7 @@ xmlcopen:
 xmlend:
 	rangle
 	;
+*/
 
 class_template:
 	class optional_registration semicolon
@@ -654,12 +655,13 @@ class_label:
 	;
 
 optional_derivation:
-	| derivation semicolon
+	| derivation
 	;
 
 derivation:
 	TOK_DERIVED_FROM { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	class_label_sequence
+	semicolon
 	;
 
 class_label_sequence:
@@ -667,12 +669,13 @@ class_label_sequence:
 	;
 
 optional_characterization:
-	| characterization semicolon
+	| characterization
 	;
 
 characterization:
 	TOK_CHARACTERIZED_BY { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	package_label_sequence
+	semicolon
 	;
 
 package_label_sequence:
@@ -680,12 +683,13 @@ package_label_sequence:
 	;
 
 optional_conditional_packages:
-	| conditional_packages semicolon
+	| conditional_packages
 	;
 
 conditional_packages:
 	TOK_CONDITIONAL_PACKAGES { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	package_condition_sequence
+	semicolon
 	;
 
 package_condition_sequence:
@@ -694,8 +698,21 @@ package_condition_sequence:
 
 package_condition:
 	package_label
-	TOK_PRESENT_IF { gdmo_level++; gdmo_newline(yyout); gdmo_column += fprintf(yyout, "PRESENT IF"); gdmo_level++; }
+	package_condition_or_exclusion
 	conditional_definition { gdmo_level -= 2; }
+	;
+
+package_condition_or_exclusion:
+	package_conditional
+	| package_exclusion
+	;
+
+package_conditional:
+	TOK_PRESENT_IF { gdmo_level++; gdmo_newline(yyout); gdmo_column += fprintf(yyout, "PRESENT IF"); gdmo_level++; }
+	;
+
+package_exclusion:
+	TOK_PRESENT_ONLY_IF { gdmo_level++; gdmo_newline(yyout); gdmo_column += fprintf(yyout, "PRESENT ONLY IF"); gdmo_level++; }
 	;
 
 conditional_definition:
@@ -725,14 +742,13 @@ object_identifier:
 	ObjectIdentifierValue
 	;
 
-/*
 ObjectIdentifierValue:
 	lbrace DefinedValueObjIdComponentList rbrace
 	;
 
 DefinedValueObjIdComponentList:
 	ObjIdComponentList
-	| DefinedValue { gdmo_column += fprintf(yyout, " "); } ObjIdComponentList
+	/* | DefinedValue { gdmo_column += fprintf(yyout, " "); } ObjIdComponentList */
 	;
 
 ObjIdComponentList:
@@ -743,49 +759,53 @@ ObjIdComponentList:
 ObjIdComponent:
 	NameForm
 	| NumberForm
+	| NameAndNumberForm
 	;
 
 NameForm:
-	identifier OptionalNumberForm
+	identifier
+	/* | DefinedValue */
 	;
 
 NumberForm:
 	number
-	| DefinedValue
 	;
 
-OptionalNumberForm:
-	| lparen NumberForm rparen
+NameAndNumberForm:
+	TOK_NAME_AND_NUMBER { gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); }
 	;
-*/
 
 number:
 	TOK_NUMBER { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
+/*
 realnumber:
 	TOK_REALNUMBER
 	| number
 	;
+*/
 
+/*
 DefinedValue:
-	ExternalValueReference
-	| valuereference
-	/* | ParameterizedValue */
-	;
-
-valuereference:
 	value_reference
+	*//* | ExternalValueReference */
+	/* | ParameterizedValue *//*
 	;
+*/
 
+/*
 ExternalValueReference:
 	modulereference
-	valuereference
+	value_reference
 	;
+*/
 
+/*
 modulereference:
 	reference
 	;
+*/
 
 package_template:
 	package optional_registration semicolon
@@ -810,7 +830,7 @@ package_label:
 	;
 
 optional_behaviour_reference:
-	| behaviour_reference semicolon
+	| behaviour_reference
 	;
 
 /*
@@ -830,6 +850,7 @@ optional_behaviour_reference:
 behaviour_reference:
 	TOK_BEHAVIOUR { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	behaviour_label_sequence
+	semicolon
 	;
 
 behaviour_label_sequence:
@@ -838,12 +859,13 @@ behaviour_label_sequence:
 	;
 
 optional_attributes:
-	| attributes semicolon
+	| attributes
 	;
 
 attributes:
 	TOK_ATTRIBUTES { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	attributes_sequence
+	semicolon
 	;
 
 attributes_sequence:
@@ -852,64 +874,91 @@ attributes_sequence:
 	;
 
 attribute_property:
-	attribute_label propertylist optional_parameter_label_list
+	attribute_label { gdmo_column += fprintf(yyout, " "); }
+	propertylist { gdmo_column += fprintf(yyout, " "); } optional_parameter_label_list
 	;
 
 propertylist:
+	property | propertylist { gdmo_column += fprintf(yyout, " "); } property
+
+property:
 	replace_with_default
-	default_value
-	initial_value
-	permitted_values
-	required_values
-	get_replace
-	add_remove
-	set_by_create
+	| default_value
+	| initial_value
+	| permitted_values
+	| required_values
+	| get_property
+	| replace_property
+	| get_replace
+	| add_property
+	| remove_property
+	| add_remove
+	| set_by_create
+	| no_modify
 	;
 
 replace_with_default:
-	| TOK_REPLACE_WITH_DEFAULT { gdmo_column += fprintf(yyout, " %.*s ", yyleng, yytext); }
+	TOK_REPLACE_WITH_DEFAULT { gdmo_column += fprintf(yyout, "%.*s ", yyleng, yytext); }
 	;
 
 default_value:
-	| TOK_DEFAULT_VALUE { gdmo_column += fprintf(yyout, " %.*s ", yyleng, yytext); }
+	TOK_DEFAULT_VALUE { gdmo_column += fprintf(yyout, "%.*s ", yyleng, yytext); }
 	value_specifier
 	;
 
 initial_value:
-	| TOK_INITIAL_VALUE { gdmo_column += fprintf(yyout, " %.*s ", yyleng, yytext); }
+	TOK_INITIAL_VALUE { gdmo_column += fprintf(yyout, "%.*s ", yyleng, yytext); }
 	value_specifier
 	;
 
 permitted_values:
-	| TOK_PERMITTED_VALUES { gdmo_column += fprintf(yyout, " %.*s ", yyleng, yytext); }
+	TOK_PERMITTED_VALUES { gdmo_column += fprintf(yyout, "%.*s ", yyleng, yytext); }
 	context_keyword
 	;
 
 required_values:
-	| TOK_REQUIRED_VALUES { gdmo_column += fprintf(yyout, " %.*s ", yyleng, yytext); }
+	TOK_REQUIRED_VALUES { gdmo_column += fprintf(yyout, "%.*s ", yyleng, yytext); }
 	context_keyword
 	;
 
+get_property:
+	TOK_GET	{ gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
+	;
+
+replace_property:
+	TOK_REPLACE   { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
+	;
+
 get_replace:
-	| TOK_GET	{ gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
-	| TOK_REPLACE   { gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
-	| TOK_GET_REPLACE	{ gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
+	TOK_GET_REPLACE	{ gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
+	;
+
+add_property:
+	TOK_ADD { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
+	;
+
+remove_property:
+	TOK_REMOVE { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
 add_remove:
-	| TOK_ADD { gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
-	| TOK_REMOVE { gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
-	| TOK_ADD_REMOVE { gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
+	TOK_ADD_REMOVE { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
+/* Added by X.722 Ammendment 1. */
 set_by_create:
-	| TOK_SET_BY_CREATE { gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
+	TOK_SET_BY_CREATE { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
+	;
+
+/* Added by X.722 Ammendment 2. */
+no_modify:
+	TOK_NO_MODIFY { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
 value_specifier:
 	value_reference
 	| TOK_EXTERNREF { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
-	| TOK_DERIVATION_RULE { gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); }
+	| TOK_DERIVATION_RULE { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	behaviour_label
 	;
 
@@ -922,12 +971,13 @@ parameter_label_list:
 	;
 
 optional_attribute_groups:
-	| attribute_groups semicolon
+	| attribute_groups
 	;
 
 attribute_groups:
 	TOK_ATTRIBUTE_GROUPS { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	attribute_group_sequence
+	semicolon
 	;
 
 attribute_group_sequence:
@@ -948,29 +998,37 @@ attribute_label_list:
 	;
 
 optional_actions:
-	| actions semicolon
+	| actions
 	;
 
 actions:
 	TOK_ACTIONS { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
-	action_parameter_list
+	action_parameter_sequence
+	semicolon
 	;
 
-action_parameter_list:
-	action_parameter { gdmo_newline(yyout); } | action_parameter_list { gdmo_column += fprintf(yyout, " "); } action_parameter { gdmo_newline(yyout); }
+action_parameter_sequence:
+	action_parameter
+	| action_parameter_sequence comma action_parameter
 	;
 
 action_parameter:
-	action_label optional_parameter_label_list
+	action_label { gdmo_column += fprintf(yyout, " "); }
+	optional_action_parameter_label_list
+	;
+
+optional_action_parameter_label_list:
+	| parameter_label_list
 	;
 
 optional_notifications:
-	| notifications semicolon
+	| notifications
 	;
 
 notifications:
 	TOK_NOTIFICATIONS { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	notification_parameter_sequence
+	semicolon
 	;
 
 notification_parameter_sequence:
@@ -979,7 +1037,11 @@ notification_parameter_sequence:
 	;
 
 notification_parameter:
-	notification_label optional_parameter_label_list
+	notification_label optional_notification_parameter_label_list
+	;
+
+optional_notification_parameter_label_list:
+	| parameter_label_list
 	;
 
 parameter_template:
@@ -989,8 +1051,8 @@ parameter_template:
 parameter:
 	parameter_label_definition { gdmo_column += fprintf(yyout, " "); }
 	TOK_PARAMETER { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; }
-	context semicolon
-	syntax_or_attribute_choice semicolon
+	context
+	syntax_or_attribute_choice
 	optional_behaviour_reference
 	;
 
@@ -1005,6 +1067,7 @@ parameter_label:
 context:
 	TOK_CONTEXT { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
 	context_type
+	semicolon
 	;
 
 context_type:
@@ -1086,6 +1149,7 @@ syntax_or_attribute_choice:
 with_syntax:
 	TOK_WITH_SYNTAX { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
 	context_keyword
+	semicolon
 	;
 
 /*
@@ -1095,6 +1159,7 @@ with_syntax:
 attribute_reference:
 	TOK_ATTRIBUTE { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
 	attribute_label
+	semicolon
 	;
 
 
@@ -1117,9 +1182,11 @@ name_binding_label_definition:
 	TOK_NAME_BINDING_LABEL { fprintf(yyout, "%.*s", (int) strcspn(yytext, " \t\n"), yytext); }
 	;
 
+/*
 name_binding_label:
 	label | name_binding_template
 	;
+*/
 
 /*
  * This defines a managed object class whose instances may be named by instances of the object class
@@ -1187,7 +1254,7 @@ optional_create:
 
 create:
 	TOK_CREATE { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
-	create_modifier_sequence optional_parameter_label_list
+	create_modifier_sequence optional_create_parameter_label_list
 	;
 
 create_modifier_sequence:
@@ -1218,13 +1285,17 @@ with_automatic_instance_naming:
 	TOK_WITH_AUTOMATIC_INSTANCE_NAMING { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
+optional_create_parameter_label_list:
+	| parameter_label_list
+	;
+
 optional_delete:
 	| delete semicolon
 	;
 
 delete:
 	TOK_DELETE { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
-	optional_delete_modifier optional_parameter_label_list
+	optional_delete_modifier optional_delete_parameter_label_list
 	;
 
 /*
@@ -1279,6 +1350,10 @@ deletes_contained_objects:
 	TOK_DELETES_CONTAINED_OBJECTS { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
+optional_delete_parameter_label_list:
+	| parameter_label_list
+	;
+
 attribute_template:
 	attribute optional_registration semicolon
 	;
@@ -1286,7 +1361,7 @@ attribute_template:
 attribute:
 	attribute_label_definition { gdmo_column += fprintf(yyout, " "); }
 	TOK_ATTRIBUTE { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); gdmo_level++; }
-	derived_or_with_syntax_choice semicolon
+	derived_or_with_syntax_choice
 	optional_matches
 	optional_behaviour_reference
 	optional_parameters
@@ -1358,11 +1433,13 @@ derived_or_with_syntax_choice:
 derived_from:
 	TOK_DERIVED_FROM { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
 	attribute_label
+	semicolon
 	;
 
 with_attribute_syntax:
 	TOK_WITH_ATTRIBUTE_SYNTAX { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
 	context_keyword
+	semicolon
 	;
 
 attribute_group_template:
@@ -1473,7 +1550,7 @@ mode_confirmed:
 	;
 
 optional_with_information_syntax:
-	| with_information_syntax semicolon
+	| with_information_syntax
 	;
 
 /*
@@ -1484,6 +1561,7 @@ optional_with_information_syntax:
 with_information_syntax:
 	TOK_WITH_INFORMATION_SYNTAX { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
 	context_keyword
+	semicolon
 	;
 
 optional_with_reply_syntax:
@@ -1522,24 +1600,33 @@ notification_label:
 	;
 
 optional_with_information_syntax_and_attribute_ids:
-	| with_information_syntax_and_attribute_ids semicolon
+	| with_information_syntax_and_attribute_ids
 	;
 
 with_information_syntax_and_attribute_ids:
-	with_information_syntax optional_and_attribute_ids
+	with_information_syntax2
+	optional_and_attribute_ids
+	;
+
+with_information_syntax2:
+	TOK_WITH_INFORMATION_SYNTAX { gdmo_newline(yyout); gdmo_column += fprintf(yyout, "%.*s\t", yyleng, yytext); gdmo_level++; }
+	context_keyword
 	;
 
 optional_and_attribute_ids:
+	semicolon
 	| and_attribute_ids
 	;
 
 and_attribute_ids:
 	TOK_AND_ATTRIBUTE_IDS { gdmo_newline(yyout); gdmo_column += fprintf(yyout, " %.*s", yyleng, yytext); gdmo_level++; gdmo_newline(yyout); }
 	field_attribute_sequence { gdmo_level--; }
+	semicolon
 	;
 
 field_attribute_sequence:
-	field_attribute | field_attribute_sequence comma field_attribute
+	field_attribute
+	| field_attribute_sequence comma field_attribute
 	;
 
 field_attribute:
@@ -1550,6 +1637,7 @@ field_attribute:
  *  ASN.1 (X.208) GRAMAR RULES
  */
 
+/*
 asn1:
 	| ModuleDefinition
 	;
@@ -1611,11 +1699,13 @@ EXTENSIBILITY_IMPLIED:
 	TOK_IMPLIED { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 
+*/
 /*
 REFERENCE:
 	TOK_REFERENCE { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
 	;
 */
+/*
 
 EXPORTS:
 	TOK_EXPORTS { gdmo_column += fprintf(yyout, "%.*s", yyleng, yytext); }
@@ -1783,11 +1873,13 @@ modulereference:
 	reference
 	;
 
+*/
 /*
 reference:
 	REFERENCE
 	;
 */
+/*
 
 AssignedIdentifier:
 	| ObjectIdentifierValue
@@ -1835,15 +1927,15 @@ SymbolList:
 
 Symbol:
 	Reference
-	/* | ParameterizedReference */
+	*//* | ParameterizedReference *//*
 	;
 
 Reference:
 	typereference
 	| valuereference
-	/* | objectclassreference */
+	*//* | objectclassreference */
 	/* | objectreference */
-	/* | objectsetreference */
+	/* | objectsetreference *//*
 	;
 
 AssignmentList:
@@ -1856,10 +1948,10 @@ Assignment:
 	| ValueAssignment
 	| XMLValueAssignment
 	| ValueSetTypeAssignment
-	/* | ObjectClassAssignment */
+	*//* | ObjectClassAssignment */
 	/* | ObjectAssignment */
 	/* | ObjectSetAssignment */
-	/* | ParameterizedAssignment */
+	/* | ParameterizedAssignment *//*
 	;
 
 TypeAssignment:
@@ -1919,8 +2011,8 @@ ComponentId:
 DefinedType:
 	ExternalTypeReference
 	| typereference
-	/* | ParameterizedType */
-	/* | ParameterizedValueSetType */
+	*//* | ParameterizedType */
+	/* | ParameterizedValueSetType *//*
 	;
 
 DefinedValue:
@@ -1958,10 +2050,10 @@ BuiltinType:
 	| EmbeddedPDVType
 	| EnumeratedType
 	| ExternalType
-	/* | InstanceOfType */
+	*//* | InstanceOfType *//*
 	| IntegerType
 	| NullType
-	/* | ObjectClassFieldType */
+	*//* | ObjectClassFieldType *//*
 	| ObjectIdentifierType
 	| OctetStringType
 	| RealType
@@ -1977,8 +2069,8 @@ ReferencedType:
 	DefinedType
 	| UsefulType
 	| SelectionType
-	/* | TypeFromObject */
-	/* | ValueSetFromObjects */
+	*//* | TypeFromObject */
+	/* | ValueSetFromObjects *//*
 	;
 
 NamedType:
@@ -1990,12 +2082,12 @@ NamedType:
 Value:
 	BuiltinValue
 	| ReferencedValue
-	/* | ObjectClassFieldValue */
+	*//* | ObjectClassFieldValue *//*
 	;
 
 XMLValue:
 	XMLBuiltinValue
-	/* | XMLObjectClassFieldValue */
+	*//* | XMLObjectClassFieldValue *//*
 	;
 
 BuiltinValue:
@@ -2007,7 +2099,7 @@ BuiltinValue:
 	| EmbeddedPDVValue
 	| EnumeratedValue
 	| ExternalValue
-	/* | InstanceOfValue */
+	*//* | InstanceOfValue *//*
 	| IntegerValue
 	| NullValue
 	| ObjectIdentifierValue
@@ -2030,7 +2122,7 @@ XMLBuiltinValue:
 	| XMLEmbeddedPDVValue
 	| XMLEnumeratedValue
 	| XMLExternalValue
-	/* | XMLInstanceOfValue */
+	*//* | XMLInstanceOfValue *//*
 	| XMLIntegerValue
 	| XMLNullValue
 	| XMLObjectIdentifierValue
@@ -2046,7 +2138,7 @@ XMLBuiltinValue:
 
 ReferencedValue:
 	DefinedValue
-	/* | ValueFromObject */
+	*//* | ValueFromObject *//*
 	;
 
 NamedValue:
@@ -2417,7 +2509,7 @@ XMLValueOrEmpty:
 
 XMLSpaceSeparatedList:
 	XMLValueOrEmpty
-	| XMLValueOrEmpty /* TOK_SPACE */ XMLSpaceSeparatedList
+	| XMLValueOrEmpty *//* TOK_SPACE *//* XMLSpaceSeparatedList
 	;
 
 XMLDelimitedItemList:
@@ -2593,7 +2685,7 @@ OptionalNumberForm:
 
 NumberForm:
 	number
-	/* | DefinedValue */
+	*//* | DefinedValue *//*
 	;
 
 NameAndNumberForm:
@@ -2819,7 +2911,7 @@ Constraint:
 
 ConstraintSpec:
 	SubtypeConstraint
-	/* | GeneralConstraint */
+	*//* | GeneralConstraint *//*
 	;
 
 SubtypeConstraint:
@@ -2889,7 +2981,7 @@ IntersectionMark:
 
 Elements:
 	SubtypeElements
-	/* | ObjectSetElements */
+	*//* | ObjectSetElements *//*
 	| lparen ElementSetSpec rparen
 	;
 
@@ -3057,7 +3149,7 @@ ExceptionIdentification:
 	| DefinedValue
 	| Type colon Value
 	;
-
+*/
 /* ADDITIONAL C CODE */
 
 %%
@@ -3089,10 +3181,18 @@ gdmo_newline(FILE * output)
 
 	fprintf(output, "\n");
 	gdmo_column = 0;
+	gdmo_incomment = 0;
 	for (i = 0; i < gdmo_level; i++) {
 		fprintf(output, "\t");
 		gdmo_column += 8;
 	}
+}
+
+void
+gdmo_checkcomment(FILE *output)
+{
+	if (gdmo_incomment)
+		gdmo_newline(output);
 }
 
 void

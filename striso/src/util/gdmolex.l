@@ -75,6 +75,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 extern void gdmo_newline(FILE *);
 extern int gdmo_level;
 extern int gdmo_column;
+extern int gdmo_incomment;
 
 
 %}
@@ -144,10 +145,11 @@ COMMENT		{COMPAIR}{COMSTRING}{COMEND}
  * in the document in which the notation is used.
  *
  * To accomplish these we need to enter a delimited_string condition when any of
- * the following are encountered: TOK_PRESENT_IF, TOK_DESCRIPTION,
- * TOK_DEFINED_AS.  In the TOK_DESCRIPTION and TOK_DEFINED_AS cases, the
- * condition can be exited upon encountering a `;'.  In the TOK_PRESENT_IF case,
- * the condition can be exited upon encountering a ',' or ';'.
+ * the following are encountered: TOK_PRESENT_IF, TOK_PRESENT_ONLY_IF,
+ * TOK_DESCRIPTION, TOK_DEFINED_AS.  In the TOK_DESCRIPTION and TOK_DEFINED_AS
+ * cases, the condition can be exited upon encountering a `;'.  In the
+ * TOK_PRESENT_IF and TOK_PRESENT_ONLY_IF case, the condition can be exited upon
+ * encountering a ',' or ';'.
  */
 
 D1 [\!](([^\!])|([\!][\!]))*[\!]
@@ -186,7 +188,7 @@ COMMA		","
 COLON		":"
 PERIOD		"."
 DOUBLEQUOTE	["]
-DOCID		["][^"]*["]
+DOCID		["][^"]*["][ \t\n]*":"[ \t\n]*[a-zA-Z][a-zA-Z0-9\/\-]*
 LBRACE		"{"
 RBRACE		"}"
 LPAREN		"("
@@ -196,6 +198,7 @@ RDBRACKET	"]]"
 LBRACKET	"["
 RBRACKET	"]"
 NUMBER		[0-9]+
+NAMEANDNUMBER	[a-zA-Z][a-zA-Z0-9\/\-]*"("(([0-9]+)|([a-z][a-zA-Z0-9\/\-]*))")"
 HYPHEN		"-"
 LANGLE		"<"
 RANGLE		">"
@@ -230,15 +233,15 @@ DEFAULT		.
 
 %%
 
-{LABEL}[ \t\n]+{CLASS}[ \t\n]		{ yyless(strcspn(yytext, " \t\n")); return TOK_MANAGED_OBJECT_CLASS_LABEL	; }
-{LABEL}[ \t\n]+{PACKAGE}[ \t\n]		{ yyless(strcspn(yytext, " \t\n")); return TOK_PACKAGE_LABEL			; }
-{LABEL}[ \t\n]+{PARAMETER}[ \t\n]	{ yyless(strcspn(yytext, " \t\n")); return TOK_PARAMETER_LABEL			; }
-{LABEL}[ \t\n]+{BINDING}[ \t\n]		{ yyless(strcspn(yytext, " \t\n")); return TOK_NAME_BINDING_LABEL		; }
-{LABEL}[ \t\n]+{ATTRIBUTE}[ \t\n]	{ yyless(strcspn(yytext, " \t\n")); return TOK_ATTRIBUTE_LABEL			; }
-{LABEL}[ \t\n]+{GROUP}[ \t\n]		{ yyless(strcspn(yytext, " \t\n")); return TOK_ATTRIBUTE_GROUP_LABEL		; }
-{LABEL}[ \t\n]+{BEHAVIOUR}[ \t\n]	{ yyless(strcspn(yytext, " \t\n")); return TOK_BEHAVIOUR_LABEL			; }
-{LABEL}[ \t\n]+{ACTION}[ \t\n]		{ yyless(strcspn(yytext, " \t\n")); return TOK_ACTION_LABEL			; }
-{LABEL}[ \t\n]+{NOTIFICATION}[ \t\n]	{ yyless(strcspn(yytext, " \t\n")); return TOK_NOTIFICATION_LABEL		; }
+{LABEL}[ \t\n]+{CLASS}			{ yyless(strcspn(yytext, " \t\n")); return TOK_MANAGED_OBJECT_CLASS_LABEL	; }
+{LABEL}[ \t\n]+{PACKAGE}		{ yyless(strcspn(yytext, " \t\n")); return TOK_PACKAGE_LABEL			; }
+{LABEL}[ \t\n]+{PARAMETER}		{ yyless(strcspn(yytext, " \t\n")); return TOK_PARAMETER_LABEL			; }
+{LABEL}[ \t\n]+{BINDING}		{ yyless(strcspn(yytext, " \t\n")); return TOK_NAME_BINDING_LABEL		; }
+{LABEL}[ \t\n]+{ATTRIBUTE}		{ yyless(strcspn(yytext, " \t\n")); return TOK_ATTRIBUTE_LABEL			; }
+{LABEL}[ \t\n]+{GROUP}			{ yyless(strcspn(yytext, " \t\n")); return TOK_ATTRIBUTE_GROUP_LABEL		; }
+{LABEL}[ \t\n]+{BEHAVIOUR}		{ yyless(strcspn(yytext, " \t\n")); return TOK_BEHAVIOUR_LABEL			; }
+{LABEL}[ \t\n]+{ACTION}			{ yyless(strcspn(yytext, " \t\n")); return TOK_ACTION_LABEL			; }
+{LABEL}[ \t\n]+{NOTIFICATION}		{ yyless(strcspn(yytext, " \t\n")); return TOK_NOTIFICATION_LABEL		; }
 
 ACTION[- ]INFO				{ return TOK_ACTION_INFO			; }
 ACTION[- ]REPLY				{ return TOK_ACTION_REPLY			; }
@@ -269,15 +272,17 @@ GET					{ return TOK_GET				; }
 GROUP[- ]ELEMENTS			{ return TOK_GROUP_ELEMENTS			; }
 INITIAL[- ]VALUE			{ return TOK_INITIAL_VALUE			; }
 MATCHES[- ]FOR				{ return TOK_MATCHES_FOR			; }
-MODE[- ]CONFIRMED			{ return TOK_MODE_CONFIRMED			; }
+MODE([-]|[ \t\n]+)CONFIRMED		{ return TOK_MODE_CONFIRMED			; }
 NAMED[- ]BY				{ return TOK_NAMED_BY				; }
 SUPERIOR[- ]OBJECT[- ]CLASS		{ return TOK_SUPERIOR_OBJECT_CLASS		; }
+NO[- ]MODIFY				{ return TOK_NO_MODIFY				; }
 NOTIFICATIONS				{ return TOK_NOTIFICATIONS			; }
 ONLY[- ]IF[- ]NO[- ]CONTAINED[- ]OBJECTS { return TOK_ONLY_IF_NO_CONTAINED_OBJECTS	; }
 ORDERING				{ return TOK_ORDERING				; }
 PARAMETERS				{ return TOK_PARAMETERS				; }
 PERMITTED[- ]VALUES			{ return TOK_PERMITTED_VALUES			; }
 PRESENT[- ]IF[ \t\n]*			{ yy_push_state(ds2); return TOK_PRESENT_IF	; }
+PRESENT[- ]ONLY[- ]IF[ \t\n]*		{ yy_push_state(ds2); return TOK_PRESENT_ONLY_IF; }
 REGISTERED[- ]AS			{ return TOK_REGISTERED_AS			; }
 REMOVE					{ return TOK_REMOVE				; }
 REPLACE[- ]WITH[- ]DEFAULT		{ return TOK_REPLACE_WITH_DEFAULT		; }
@@ -426,30 +431,30 @@ WITH[- ]SYNTAX				{ return TOK_WITH_SYNTAX			; }
 <asn>{SLASH}				{ return TOK_SLASH				; }
 <INITIAL,asn>{DOCID}			{ return TOK_DOCID				; }
 <INTIIAL,asn>{EXTERNREF}		{ return TOK_EXTERNREF				; }
-<INITIAL,asn>{LABEL}"("{NUMBER}")"	{ return TOK_NAME_AND_NUMBER			; }
+<INITIAL,asn>{NAMEANDNUMBER}		{ return TOK_NAME_AND_NUMBER			; }
 <INTIIAL,asn>{IDLABEL}			{ return TOK_ID					; }
 <INITIAL,asn>{LABEL}			{ return TOK_LABEL; goto find_rule		; }
 <INITIAL,asn>{NUMBER}			{ return TOK_NUMBER				; }
 
 <INITIAL,asn>[a-z]			{ yy_push_state(label); yymore();		; }
-<label>([a-zA-Z0-9]|"/"|"-")*"."([a-zA-Z0-9]|"/"|"-")+		{ yy_pop_state(); return TOK_EXTERNREF;		; }
+<label>([a-zA-Z0-9]|"/"|"-")*[ \t\n]*"."[ \t\n]*([a-zA-Z0-9]|"/"|"-")+		{ yy_pop_state(); return TOK_EXTERNREF;		; }
 <label>([a-zA-Z0-9]|"/"|"-")*		{ yy_pop_state(); return TOK_LABEL;		; }
 
 <INITIAL,asn>[A-Z]			{ yy_push_state(id); yymore();			; }
-<id>([a-zA-Z0-9]|"/"|"-")*"."([a-zA-Z0-9]|"/"|"-")+		{ yy_pop_state(); return TOK_EXTERNREF;		; }
+<id>([a-zA-Z0-9]|"/"|"-")*[ \t\n]*"."[ \t\n]*([a-zA-Z0-9]|"/"|"-")+		{ yy_pop_state(); return TOK_EXTERNREF;		; }
 <id>([a-zA-Z0-9]|"/"|"-")*		{ yy_pop_state(); return TOK_ID;		; }
 
 <INITIAL,asn>{COMPAIR}			{ yymore(); yy_push_state(com)			; }
-<com>{COMPAIR}				{ ECHO; yy_pop_state()				; }
+<com>{COMPAIR}				{ ECHO; yy_pop_state(); gdmo_incomment = 1	; }
 <com>[^\n]+				{ yymore()					; }
 <com>{EOL}				{
-						if (gdmo_column && gdmo_column != 8 * gdmo_level) {
-							gdmo_newline(yyout);
+						// if (gdmo_column && gdmo_column != 8 * gdmo_level) {
+						// 	gdmo_newline(yyout);
+						// 	gdmo_column += fprintf(yyout, "%.*s", yyleng - 1, yytext);
+						// } else {
 							gdmo_column += fprintf(yyout, "%.*s", yyleng - 1, yytext);
-						} else {
-							gdmo_column += fprintf(yyout, "%.*s", yyleng - 1, yytext);
 							gdmo_newline(yyout);
-						}
+						// }
 						yy_pop_state();
 					}
 
