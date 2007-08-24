@@ -1,0 +1,646 @@
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under
+-- the terms of the GNU General Public License as published by the Free Software
+-- Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+-- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+-- details.
+--
+-- You should have received a copy of the GNU General Public License along with
+-- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+-- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- =============================================================================
+--< GDMO.Document "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" >--
+--< GDMO.Alias "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
+--  "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
+--  "ITU-T Rec. X.723 (1993)",
+--  "CCITT Rec. X.723 (1993)" >--
+--< GDMO.Version 1.3 >--
+
+applicationProcess MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		applicationProcessP1 PACKAGE
+			BEHAVIOUR
+				applicationProcessB1 BEHAVIOUR
+					DEFINED AS
+						!An application process supports the disabled and enabled values of the operationalState attribute
+						as described in CCITT Rec. X.731 (1992) | ISO/IEC 10164-2:1992 as follows: - an application process
+						is disabled if it is inoperable or a resource on which it depends is inoperable, - an application
+						process is enabled if it is operable.!;;
+			ATTRIBUTES
+				applicationProcessId GET,
+				applicationProcessTitle GET,
+				supportEntityNames GET,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET;;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) applicationProcess(8) };
+
+
+communicationsEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		communicationsEntityP1 PACKAGE
+			BEHAVIOUR
+				communicationsEntityB1 BEHAVIOUR
+					DEFINED AS
+						!A communications entity supports the disabled and enabled values of the operationalState attribute
+						as described in CCITT Rec. X.731 (1992) | ISO/IEC 10164-2:1992 as follows: - an entity is disabled
+						if it is inoperable or a resource on which it depends is inoperable, - an entity is enabled if it
+						is operable.!;;
+			ATTRIBUTES
+				communicationsEntityId GET,
+				localSapNames GET,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET;;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) communicationsEntity(0) };
+
+
+communicationsInformationRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+	CHARACTERIZED BY
+		communicationsInformationRecordP1 PACKAGE
+			BEHAVIOUR
+				communicationsInformationRecordB1 BEHAVIOUR
+					DEFINED AS
+						!Log record class for communicationsInformation events.!;;
+			ATTRIBUTES
+				informationType GET;;;
+	CONDITIONAL PACKAGES
+		informationDataPackage PACKAGE
+			ATTRIBUTES
+				informationData GET;
+		REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) package(4) informationDataPackage(0) };
+			PRESENT IF
+				!The informationData parameter is present in the communicationsInformation event report
+				corresponding to the instance of communicationsInformationRecord.!;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) informationData(1) };
+
+
+clProtocolMachine MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		clProtocolMachineP1 PACKAGE
+			BEHAVIOUR
+				clProtocolMachineB1 BEHAVIOUR
+					DEFINED AS
+						!A protocol machine which performs connectionless-mode communications functions.!;;
+			ATTRIBUTES
+				clProtocolMachineId GET,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET;;;
+	CONDITIONAL PACKAGES
+		clProtocolMachineP2 PACKAGE
+			ATTRIBUTES
+				totalRemoteSAPs GET;
+		REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) package(4) clProtocolMachineP2(1) };
+			PRESENT IF
+				!there is a requirement to keep statistics concerning remote connectionless protocol machines that
+				this protocol machine communicates with!;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) clProtocolMachine(2) };
+
+
+coProtocolMachine MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		coProtocolMachineP1 PACKAGE
+			BEHAVIOUR
+				coProtocolMachineB1 BEHAVIOUR
+					DEFINED AS
+						!A protocol machine which performs connection-mode communications functions.!;;
+			ATTRIBUTES
+				coProtocolMachineId GET,
+				"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET;;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) coProtocolMachine(3) };
+
+
+sap1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		sap1P1 PACKAGE
+			BEHAVIOUR
+				sap1B1 BEHAVIOUR
+					DEFINED AS
+						!This managed object represents the point at which an entity provides services to the user entity.
+						Refer to the Basic Reference Model for the definition of (N)-SAP.!;;
+			ATTRIBUTES
+				sapId GET,
+				sap1Address GET,
+				userEntityNames GET;;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) sap1(4) };
+
+
+sap2 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		sap2P1 PACKAGE
+			BEHAVIOUR
+				sap2B1 BEHAVIOUR
+					DEFINED AS
+						!A service access point, the address of which is independent of the SAP address of the underlying
+						layer.!;;
+			ATTRIBUTES
+				sapId GET,
+				sap2Address GET,
+				userEntityNames GET,
+				providerEntityNames GET;;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) sap2(5) };
+
+
+singlePeerConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		singlePeerConnectionP1 PACKAGE
+			BEHAVIOUR
+				singlePeerConnectionB1 BEHAVIOUR
+					DEFINED AS
+						!This managed object class represents a view of a single peer connection between a pair of entities.!;;
+			ATTRIBUTES
+				connectionId GET,
+				underlyingConnectionNames GET;;;
+	CONDITIONAL PACKAGES
+		singlePeerConnectionP2 PACKAGE
+			ATTRIBUTES
+				supportedConnectionNames GET;
+		REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) package(4) spcP2(2) };
+			PRESENT IF
+				!The names of the connections supported by this connection can be provided!;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) singlePeerConnection(6) };
+
+
+subsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		subsystemP1 PACKAGE
+			BEHAVIOUR
+				subsystemB1 BEHAVIOUR
+					DEFINED AS
+						!This managed object class represents a portion of a system where components are named independently
+						of the components of other subsystems.!;;
+			ATTRIBUTES
+				subsystemId GET;;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) managedObjectClass(3) subsystem(7) };
+
+
+applicationProcess-system NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		applicationProcess AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		applicationProcessId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) ap-s(7) };
+
+
+clProtocolMachine-entity NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		clProtocolMachine AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		communicationsEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		clProtocolMachineId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) clpm-e(0) };
+
+
+communicationsEntity-subsystem NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		communicationsEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		subsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		communicationsEntityId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) ce-s(1) };
+
+
+coProtocolMachine-entity NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		coProtocolMachine AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		communicationsEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		coProtocolMachineId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) copm-e(2) };
+
+
+sap1-communicationsEntity NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		sap1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		communicationsEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sapId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) s1-ce(3) };
+
+
+sap2-subsystem NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		sap2 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		subsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		sapId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) s2-s(4) };
+
+
+singlePeerConnection-coProtocolMachine NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		singlePeerConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		coProtocolMachine AND SUBCLASSES;
+	WITH ATTRIBUTE
+		connectionId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) spc-copm(5) };
+
+
+subsystem-system NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		subsystem AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		subsystemId;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) nameBinding(6) su-s(6) };
+
+
+applicationProcessId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.ApplicationProcessId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) applicationProcessId(16) };
+
+
+applicationProcessTitle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.ApplicationProcessTitle;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) applicationProcessTitle(17) };
+
+
+communicationsEntityId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.CommunicationsEntityId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) communicationsEntityId(0) };
+
+
+connectionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.ConnectionId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) connectionId(1) };
+
+
+clProtocolMachineId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.ProtocolMachineId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) clProtocolMachineId(2) };
+
+
+coProtocolMachineId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.ProtocolMachineId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) coProtocolMachineId(3) };
+
+
+genericNonWrappingCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GenericCounter;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		genericNonWrappingCounterB BEHAVIOUR
+			DEFINED AS
+				!The counter shall have a mandatory initial value of zero and places an upper bound on the attribute
+				value. The value of the counter shall be incremented by an amount as specified in other behaviour
+				definitions associated with this attribute definition. When the counter value reaches the upper
+				bound, its value is held at the value of the upper bound. This does not require the system to
+				maintain a counter large enough to accommodate this maximum value if the characteristics of the
+				implementation are such that all achievable count values are less than this maximum value.!;;;
+-- NOTE  Since this attribute is never instantiated, there is no REGISTERED AS construct.
+
+
+genericWrappingCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GenericCounter;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		genericWrappingCounterB BEHAVIOUR
+			DEFINED AS
+				!The counter shall have a mandatory initial value of zero and places an upper bound on the attribute
+				value. The value of the counter shall be incremented by an amount as specified in other behaviour
+				definitions associated with this attribute definition. When the counter value reaches the upper
+				bound, a further increment causes the counter value to wrap. This does not require the system to
+				maintain a counter large enough to accommodate this maximum value if the characteristics of the
+				implementation are such that all achievable count values are less than this maximum value.!;;;
+-- NOTE  Since this attribute is never instantiated, there is no REGISTERED AS construct.
+
+
+informationData ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.InformationData;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) informationData(4) };
+
+
+informationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.InformationType;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) informationType(5) };
+
+
+localSapNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GroupObjects;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) localSapNames(6) };
+
+
+nonWrapping64BitCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.Generic64BitCounter;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		genericNonWrappingCounterB;;
+-- As this attribute is never instantiated, there is no REGISTERED AS construct. Instantiable attribute
+-- definitions derived from this definition shall specify the circumstances under which the attribute value is
+-- incremented.
+
+
+providerEntityNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GroupObjects;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+	BEHAVIOUR
+		providerEntityNamesB BEHAVIOUR
+			DEFINED AS
+				!The distinguished names of the (N-1) layer entities which provide services to this SAP.!;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) providerEntityNames(7) };
+
+
+sap1Address ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.Sap1Address;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) sap1Address(8) };
+
+
+sap2Address ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.Sap2Address;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+	BEHAVIOUR
+		sap2AddressB BEHAVIOUR
+			DEFINED AS
+				!The set of addresses associated with an (N) SAP!;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) sap2Address(9) };
+
+
+sapId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.SapId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) sapId(10) };
+
+
+subsystemId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.SubsystemId;
+	MATCHES FOR
+		EQUALITY;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) subsystemId(11) };
+
+
+supportedConnectionNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GroupObjects;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+	BEHAVIOUR
+		supportedConnectionNamesB BEHAVIOUR
+			DEFINED AS
+				!This attribute contains the distinguished names of managed objects that represent connections that
+				are supported by the connection that has this attribute.!;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) supportedConnectionNames(12) };
+
+
+supportEntityNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GroupObjects;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) supportEntityNames(18) };
+
+
+timer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.Timer;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		timerB BEHAVIOUR
+			DEFINED AS
+				!A timer whose value may be set and read to the precision implied by the syntax definition, but
+				whose effect on the precision with which the protocol events controlled by this timer are generated
+				is determined by the implementation. The details of this precision shall be stated in the MOCS. The
+				value of the timer consists of two integer values, exponent and mantissa, and shall be interpreted
+				as representing the value mantissa*10^exponent.!;;;
+-- Since this attribute is never instantiated, there is no REGISTERED AS construct. Timers derived from this definition
+-- shall specify the units of time that the timer value represents.
+
+
+totalRemoteSAPs ATTRIBUTE
+	DERIVED FROM
+		wrapping64BitCounter;
+	BEHAVIOUR
+		totalRemoteSAPsB BEHAVIOUR
+			DEFINED AS
+				!Counts the number of remote (N) SAPs that the containing clProtocolMachine has communicated with.
+				Incremented by 1 every time communication with a remote (N) SAP is achieved.!;;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) totalRemoteSAPs(13) };
+
+
+underlyingConnectionNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GroupObjects;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) underlyingConnectionNames(14) };
+
+
+userEntityNames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.GroupObjects;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attribute(7) userEntityNames(15) };
+
+
+wrapping64BitCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GMI-AttributeModule.Generic64BitCounter;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		genericWrappingCounterB;;
+-- As this attribute is never instantiated, there is no REGISTERED AS construct. Instantiable attribute definitions
+-- derived from this definition shall specify the circumstances under which the attribute value is incremented.
+
+
+counters ATTRIBUTE GROUP
+	DESCRIPTION
+		!The group of all counter attributes.!;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) attributeGroup(8) counters(0) };
+
+
+activate ACTION
+	BEHAVIOUR
+		activateB BEHAVIOUR
+			DEFINED AS
+				!The activate action initializes the resource represented by the managed object so that it can
+				perform its normal functions. Managed objects that support this action cannot always be created in
+				the enabled state. Although the generic behaviour of the activate action is described with the
+				CCITT Rec. X.721 (1992) | ISO/IEC 10164-2:1992 (State management function) attributes Operational
+				state and Procedural status, this does not imply that either attribute need be made visible to
+				management. This initialization procedure is needed to enable the managed object if the Procedural
+				status attribute contains the value Initialization Required and the Operational state is Disabled.
+				The activate action initiates a procedure that causes the resource to enter its normal functioning
+				mode. If the resource is or can be enabled, the activate action completes successfully; if the
+				resource cannot be enabled, the activate action returns a processingFailure error. While the
+				initialization procedure is in progress, the Procedural status attribute contains the value
+				Initializing. The Initialization Required condition is absent. If the initialization procedure
+				completes successfully and the resource is operable and available for use, the Initializing
+				condition is removed from the Procedural status attribute and the Operational state is Enabled. If
+				the initialization procedure does not complete successfully, the Initializing condition is removed
+				from the Procedural status attribute and the Initialization Required condition added. The
+				Operational state is Disabled.!;;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX GMI-AttributeModule.ActionInfo;
+	WITH REPLY SYNTAX GMI-AttributeModule.ActionReply;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) action(9) activate(0) };
+
+
+deactivate ACTION
+	BEHAVIOUR
+		deactivateB BEHAVIOUR
+			DEFINED AS
+				!The deactivate action permits the normal operation of the resource to be terminated by the manager.
+				Although the generic behaviour of the deactivate action is described with the CCITT Rec. X.721
+				(1992) | ISO/IEC 10164-2:1992 (State management function) attributes Operational state and
+				Procedural status, this does not imply that either attribute be visible to management. The
+				deactivate action initiates a procedure that causes the resource to cease its normal functioning
+				mode. If the resource is or can be disabled, the deactivate action completes successfully; if the
+				resource cannot be disabled, the deactivate action returns a processingFailure error. While the
+				termination procedure is in progress, the Procedural status attribute contains the value
+				Terminating and the Operational state is Disabled. The Terminating condition is removed when the
+				procedure completes.!;;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX GMI-AttributeModule.ActionInfo;
+	WITH REPLY SYNTAX GMI-AttributeModule.ActionReply;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) action(9) deactivate(1) };
+
+
+deactivateWhenNoUsers ACTION
+	BEHAVIOUR
+		deactivateWhenNoUsersB BEHAVIOUR
+			DEFINED AS
+				!The deactivateWhenNoUsers action permits the normal operation of the resource represented by the
+				managed object to be terminated by the manager when the number of instances of use of the resource
+				is zero. Although the generic behaviour of the deactivate action is described with the CCITT Rec.
+				X.721 (1992) | ISO/IEC 10164-2:1992 (State management function) attributes Operational state and
+				Procedural status, this does not imply that either attribute be visible to management. The
+				deactivateWhenNoUsers action initiates a procedure that causes the resource to cease its normal
+				functioning mode when the number of instances of use is zero. If at the time the resource has no
+				existing users, or when, subsequently, the number of users drops to zero, the termination procedure
+				is initiated and the Procedural status attribute is set to Terminating. If the resource is or can
+				be disabled, the deactivateWhenNoUsers action completes successfully; if the resource cannot be
+				disabled, the deactivateWhenNoUsers action returns a processingFailure error. While the termination
+				procedure is in progress, the Procedural status attribute contains the value Terminating. When the
+				number of users drops to zero, the Operational state is Disabled. The Terminating condition is
+				removed when the procedure completes.!;;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX GMI-AttributeModule.ActionInfo;
+	WITH REPLY SYNTAX GMI-AttributeModule.ActionReply;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) action(9) deactivateWhenNoUsers(2) };
+
+
+communicationsInformation NOTIFICATION
+	BEHAVIOUR
+		communicationsInformationB BEHAVIOUR
+			DEFINED AS
+				!This notification may be used to report the occurrence of events pertaining to the normal operation
+				of a managed object. These are informational events; important enough to report, but not requiring
+				any further action by a manager. Faults and abnormal conditions (which may require manager action)
+				shall be reported using the event types defined in CCITT Rec. X.733 (1992) | ISO/IEC 10164-4:1992.!;;
+	WITH INFORMATION SYNTAX GMI-AttributeModule.CommunicationsInformation
+		AND ATTRIBUTE IDS
+			informationType
+				informationType,
+			informationData
+				informationData;
+REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) notification(10) comsinfo(0) };
+-- =============================================================================
+--
+-- $Log$
+-- =============================================================================

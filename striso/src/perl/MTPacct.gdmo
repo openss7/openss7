@@ -1,0 +1,493 @@
+
+ss7AccountingAndVerificationControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.742 (1996)":usageMeteringControlObject;
+	CHARACTERIZED BY
+		ss7AccountingAndVerificationControlPackage;
+REGISTERED AS { ss7AccountingAndVerificationControl-OOi };
+
+
+controlPointerPackage PACKAGE
+	BEHAVIOUR
+		controlPointerPackageBehaviour BEHAVIOUR
+			DEFINED AS "This package provides an attribute to assign the account instance at
+				creation time to an ss7AcccountingAndVerificationControl instance.";;
+	ATTRIBUTES
+		controlPointer GET SET BY CREATE;
+REGISTERED AS { controlPointerPackage-POi };
+
+
+measurementControlStatusPackage PACKAGE
+	BEHAVIOUR
+		measurementControlStatusBehaviour BEHAVIOUR
+			DEFINED AS "This package allows to read the status of the accounting/verification
+				measurements.";;
+	ATTRIBUTES
+		measurementControlStatus PERMITTED VALUES AccountingDefinedTypesModule.MeasurementControlStatus GET SET BY CREATE;
+REGISTERED AS { measurementControlStatusPackage-POi };
+
+
+ss7AccountingAndVerificationControlPackage PACKAGE
+	BEHAVIOUR
+		ss7AccountingAndVerificationControlPackageBehaviour BEHAVIOUR
+			DEFINED AS "The ss7AccountingAndVerificationControl managed object is derived from
+				X.742:usageMeteringControlObject. The reportingTriggers attribute contains the
+				timePeriod after which the periodic SS7 Accounting notifications are generated
+				(periodic is the only allowed reporting trigger event). For ss7 Accounting the
+				time period recommended in ITU-T Rec. Q.752 is 30 minutes. The
+				accountableObjectsReferenceList is an empty set. The dataObjectsReferenceList is
+				updated automatically on creation of an mtpAccount or sccpAccount instance
+				respectively.";;
+REGISTERED AS { ss7AccountingAndVerificationControlPackage-POi };
+
+
+controlPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccountingDefinedTypesModule.PointerOrNull;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		controlPointerBehaviour BEHAVIOUR
+			DEFINED AS "The controlPointer attribute points to an
+				ss7AccountingAndVerificationControl instance. It is used to assign an instance
+				at creation time to an ss7AccountingAndVerificationControl. The referencing
+				instance shall automatically be added to the dataObjectList of the referenced
+				ss7AccountingAndVerificationControl instance. The value of this attribute shall
+				be set to NULL if an action suspendMetering for the instance was performed
+				successfully.";;
+REGISTERED AS { controlPointer-AOi };
+
+
+endOfMeasurementTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccountingDefinedTypesModule.EndOfMeasurementTime;
+	BEHAVIOUR
+		endOfMeasurementTimeBehaviour BEHAVIOUR
+			DEFINED AS "The endOfMeasurementTime attribute specifies time at the end of the
+				accounting or verification measurement.";;
+REGISTERED AS { endOfMeasurementTime-AOi };
+
+
+measurementControlStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccountingDefinedTypesModule.ControlStatus;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		measurementControlStatusBehaviour BEHAVIOUR
+			DEFINED AS "The measurementControlStatus attribute indicates, whether the
+				accounting/verification measurement is suspended (value: {suspended(3)} or not
+				(value: { }, i.e. empty set). The other possible values of X.721 ASN.1 type
+				ControlStatus are not used.";;
+REGISTERED AS { measurementControlStatus-AOi };
+
+
+operatorName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccountingDefinedTypesModule.AdditionalName;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		operatorNameBehaviour BEHAVIOUR
+			DEFINED AS "The operatorName attribute indicates the operator for which accounting
+				and/or verification is done in the account.";;
+REGISTERED AS { operatorName-AOi };
+
+
+selectionGroupSetForAccounting ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccountingDefinedTypesModule.SelectionGroupSet;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		selectionGroupSetForAccountingBehaviour BEHAVIOUR
+			DEFINED AS "The selectionGroupSetForAccounting attribute refers to set of groups of
+				object instances that are representing the items against which incoming SS7
+				traffic should be registered.";;
+REGISTERED AS { selectionGroupSetForAccounting-AOi };
+
+
+ss7AccountingAndVerificationControl-managedElement NAME BINDING
+	-- this name binding is optional
+	SUBORDINATE OBJECT CLASS
+		ss7AccountingAndVerificationControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. M.3100 (1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.742 (1996)":controljectId;
+	BEHAVIOUR
+		ss7AccountingAndVerificationControl-managedElementBehaviour BEHAVIOUR
+			DEFINED AS "This name binding is used when the ss7AccountAndVerificationControl MO is
+				created by management operations.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { ss7AccountingAndVerificationControl-managedElement-NBOI };
+-- "ITU-T Rec. Q.751.1 (1995)":
+
+
+ss7AccountingAndVerificationControl-managedSwitchingElement NAME BINDING
+	-- this name binding is optional
+	SUBORDINATE OBJECT CLASS
+		ss7AccountingAndVerificationControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.742 (1996)":controlObjectId;
+	BEHAVIOUR
+		ss7AccountingAndVerificationControl-managedSwitchingElement-Behaviour BEHAVIOUR
+			DEFINED AS "This name binding is used when the ss7AccountAndVerificationControl MO is
+				created by management operations.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { ss7AccountingAndVerificationControl-managedSwitchingElement-NBOI };
+
+
+dpcGroup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		dpcGroupPackage,
+		"ITU-T Rec. M.3100 (1995)":objectManagementNotificationsPackage;
+REGISTERED AS { dpcGroup-OOi };
+
+
+mtpAccount MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		"ITU-T Rec. M.3100 (1995)":objectManagementNotificationsPackage,
+		mtpAccountPackage;
+	CONDITIONAL PACKAGES
+		controlPointerPackage
+			PRESENT IF "the instance supports it (To avoid redundancies it should not be used if the
+				startMetering and/or controlMetering package/s is/are supported by the
+				corresponding ss7AcccountingAndVerificationControl instance)",
+		measurementControlStatusPackage
+			PRESENT IF
+				"the instance supports it";
+REGISTERED AS { mtpAccount-OOi };
+
+
+mtpAccountingLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.735 (1991)":eventLogRecord;
+	CHARACTERIZED BY
+		mtpAccountingLogRecordPackage;
+REGISTERED AS { mtpAccountingLogRecord-OOi };
+
+
+siGroup MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+	CHARACTERIZED BY
+		siGroupPackage,
+		"ITU-T Rec. M.3100 (1995)":objectManagementNotificationsPackage;
+REGISTERED AS { siGroup-OOi };
+
+
+dpcGroupPackage PACKAGE
+	BEHAVIOUR
+		dpcGroupBehaviour BEHAVIOUR
+			DEFINED AS "The dpcGroup lists at least one or more point codes of signRouteSetNeParts
+				within the same mtpSignPoint as the dpcGroup for which shall be accounted
+				collectively. An instance of this class represents the destination information
+				item involved in accounting or verification.";;
+	ATTRIBUTES
+		dpcGroupId GET SET BY CREATE,
+		pointCodeSet GET ADD REMOVE SET BY CREATE;
+REGISTERED AS { dpcGroupPackage-POi };
+
+
+mtpAccountPackage PACKAGE
+	BEHAVIOUR
+		mtpAccountPackageBehaviour BEHAVIOUR
+			DEFINED AS "The mtpAccount managed object allows by means of the signLinkSetTpSet
+				attribute to define a set (at least one) of signLinkSetTps which are leading to
+				an adjacent operator and therefore their MSU traffic can be accounted/verified
+				collectively. One signLinkSetTp must not be assigned to more than one
+				mtpAccountPackage instance within one mtpSignPoint. All signLinkSetTpSets of
+				mtpAccounts with the same operatorName value must be disjunct. The selectionItem
+				in each of the entries of selectionGroupSet refers each to one instance of
+				dpcGroup, the optionalSelectionItem can be used to refer one instance of
+				siGroup. Each selectionGroup entry shall be unique in this attribute. For each
+				selectionGroup it is counted separately. Each counter information contains the
+				number of MSUs, the number of octets and an eventual data problem. The counters
+				are not readable but only available in the notification data. If all counters
+				for verification or accounting should still be zero at the end of the
+				measurement, the corresponding notification should be generated regardless of
+				that in order to provide a measure against notification loss. Two different
+				notifications, one for accounting, one for accounting verification containing
+				the measurement results might be generated by this one object. If a
+				selectionGroupSet is empty, then this means, that accounting resp. verification
+				is not performed for the adjacent operator. In this case there is no
+				notification for accounting resp. verification.";;
+	ATTRIBUTES
+		mtpAccountId GET SET BY CREATE,
+		signLinkSetTpSet GET ADD REMOVE SET BY CREATE,
+		operatorName GET SET BY CREATE,
+		controlPointer GET SET BY CREATE,
+		selectionGroupSetForAccounting GET REPLACE ADD REMOVE,
+		selectionGroupSetForVerification GET REPLACE ADD REMOVE;
+	NOTIFICATIONS
+		mtpAccounting,
+		mtpAccountingVerification;
+REGISTERED AS { mtpAccountPackage-POi };
+
+
+mtpAccountingLogRecordPackage PACKAGE
+	BEHAVIOUR
+		mtpAccountingLogRecordPackageBehaviour BEHAVIOUR
+			DEFINED AS "The mtpAccountingLogRecord managed object is used to represent logged
+				information that resulted from the mtpAccounting or mtpAccountingVerification
+				notifications.";;
+	ATTRIBUTES
+		endOfMeasurementTime GET,
+		networkIndicator GET,
+		signLinkSetTpIdSet GET,
+		mtpAccCounterDataSequence GET;
+REGISTERED AS { mtpAccountingLogRecordPackage-POi };
+
+
+siGroupPackage PACKAGE
+	BEHAVIOUR
+		siGroupBehaviour BEHAVIOUR
+			DEFINED AS "The siGroup instances contain a set (at least one) of service indicators
+				with the same account class. The account class is identified by the siGroupId.
+				An instance of this class represents the service indicator information item
+				involved in accounting or accounting verification.";;
+	ATTRIBUTES
+		siGroupId GET,
+		siSet GET SET BY CREATE;
+REGISTERED AS { siGroupPackage-POi };
+
+
+dpcGroupId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		dpcGroupIdBehaviour BEHAVIOUR
+			DEFINED AS "The dpcGroupId is the naming attribute of the dpcGroup managed object. ";;
+REGISTERED AS { dpcGroupId-AOi };
+
+
+mtpAccCounterDataSequence ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.MtpAccCounterDataSequence;
+	BEHAVIOUR
+		mtpAccCounterDataSequenceBehaviour BEHAVIOUR
+			DEFINED AS "This attribute defines the counter values of MTP accounting or accounting
+				verification and optionally the list of point codes or set of service indicators
+				to which the counter values refer.";;
+REGISTERED AS { mtpAccCounterDataSequence-AOi };
+
+
+mtpAccountId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		mtpAccountIdBehaviour BEHAVIOUR
+			DEFINED AS "The mtpAccountId is the naming attribute of the mtpAccountGroup managed
+				object.";;
+REGISTERED AS { mtpAccountId-AOi };
+
+
+pointCodeSet ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.PointCodeSet;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+	BEHAVIOUR
+		pointCodeSetBehaviour BEHAVIOUR
+			DEFINED AS "The pointCodeSet lists signalling point codes of signalling points for which
+				shall be accounted collectively. A set request is rejected if for at least one
+				of the point codes in the attribute no signRouteSetNePart with the same
+				pointCode is existing within the superior mtpSignPoint.";;
+REGISTERED AS { pointCodeSet-AOi };
+
+
+signLinkSetTpIdSet ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.SignLinkSetTpIdSet;
+	BEHAVIOUR
+		signLinkSetTpIdSetBehaviour BEHAVIOUR
+			DEFINED AS "This attribute defines a list of the identifiers of the linksets which are
+				combined in one mtpAccount and are contained in the superior mtpSignPoint of the
+				mtpAccount. The CHOICE in the SimpleName type used for the identifiers shall be
+				restricted to INTEGER.";;
+REGISTERED AS { signLinkSetTpIdSet-AOi };
+
+
+signLinkSetTpSet ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.SignLinkSetTpSet;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+	BEHAVIOUR
+		signLinkSetTpSetBehaviour BEHAVIOUR
+			DEFINED AS "The signLinkSetTpSet refers to a set (at least one) of signLinkSetTps, for
+				which MTP accounting or verification shall be done collectively. E.g. for
+				signLinkSetTps, which lead to the same adjacent operator. A set request is
+				rejected if at least one of the pointers would reference an instance of another
+				object class than signLinkSetTp or a signLinkSetTp instance which is not
+				existing or contained in another mtpSignPoint instance than the mtpAccount.";;
+REGISTERED AS { signLinkSetTpSet-AOi };
+
+
+siGroupId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.SimpleNameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		siGroupIdBehaviour BEHAVIOUR
+			DEFINED AS "The siGroupId is the naming attribute of the siGroup managed object.";;
+REGISTERED AS { siGroupId-AOi };
+
+
+siSet ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MtpAccountingDefinedTypesModule.SiSet;
+	MATCHES FOR
+		EQUALITY,
+		SET COMPARISON,
+		SET INTERSECTION;
+	BEHAVIOUR
+		siSetBehaviour BEHAVIOUR
+			DEFINED AS "The siSet lists service indicators for which shall be accounted
+				collectively.";;
+REGISTERED AS { siSet-AOi };
+
+
+mtpSignPoint NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		dpcGroup AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. Q.751.1 (1995)":mtpSignPoint AND SUBCLASSES;
+	WITH ATTRIBUTE
+		dpcGroupId;
+	BEHAVIOUR
+		dpcGroup-mtpSignPointBehaviour BEHAVIOUR
+			DEFINED AS "This name binding is used when the dpcGroup instance is created by
+				management operations. A create request is rejected if for at least one of the
+				point codes in the attribute pointCodeSet no signRouteSetNePart with the same
+				pointCode is existing within the superior mtpSignPoint. A delete request is
+				rejected if the instance is still referenced by an instance of object class
+				mtpAccount via attribute selectionGroupSet.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { dpcGroup-mtpSignPoint-NBOI };
+
+
+mtpAccount-mtpSignPoint NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		mtpAccount AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. Q.751.1 (1995)":mtpSignPoint AND SUBCLASSES;
+	WITH ATTRIBUTE
+		mtpAccountId;
+	BEHAVIOUR
+		mtpAccount-mtpSignPointBehaviour BEHAVIOUR
+			DEFINED AS "This name binding is used when the mtpAccount instance is created by
+				management operations. A create request is rejected if at least one of the
+				pointers in attribute signLinkSetTpSet would reference an instance of another
+				object class than signLinkSetTp or a signLinkSetTp instance which is not
+				existing or contained in another mtpSignPoint instance than the mtpAccount or a
+				signLinkSetTp instance which is already referenced by another mtpAccount OR at
+				least one of the instances which would be referenced by the attribute
+				selectionGroupSetForAccounting or -ForVerification is not existing or is of
+				another object class than dpcGroup or siGroup OR at least one of the dpcGroup
+				instances which would be referenced by the attribute
+				selectionGroupSetForAccounting or -ForVerification is contained in another
+				mtpSignPoint.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpAccount-mtpSignPoint-NBOI };
+
+
+siGroup-managedElement NAME BINDING
+	-- this name binding is optional
+	SUBORDINATE OBJECT CLASS
+		siGroup AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. M.3100 (1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		siGroupId;
+	BEHAVIOUR
+		siGroupBehaviour-managedElement BEHAVIOUR
+			DEFINED AS "This name binding is used when the siGroup instance is created by management
+				operations. A delete request is rejected if the instance is still referenced by
+				an instance of object class mtpAccount via attribute selectionGroupSet.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { siGroup-managedElement-NBOI };
+
+
+siGroup-managedSwitchingElement NAME BINDING
+	-- this name binding is optional
+	SUBORDINATE OBJECT CLASS
+		siGroup AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		siGroupId;
+	BEHAVIOUR
+		siGroupBehaviour-managedSwitchingElement BEHAVIOUR
+			DEFINED AS "This name binding is used when the siGroup instance is created by management
+				operations. A delete request is rejected if the instance is still referenced by
+				an instance of object class mtpAccount via attribute selectionGroupSet.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { siGroup-managedSwitchingElement-NBOI };
+
+
+mtpAccounting NOTIFICATION
+	BEHAVIOUR
+		mtpAccountingBehaviour BEHAVIOUR
+			DEFINED AS "This notification is generated on occurrence of the event specified in the
+				reporting triggers attribute of the ss7AccountingAndVerificationControl object
+				controlling the mtpAccount, except if the attribute
+				selectionGroupSetForAccounting of the instance has size zero. The notification
+				shall also be sent, if all counters have the value zero. If accounting is done
+				for all accounts in the same way, then it is possible to include the
+				pointCodeSet only in one notification (e.g. the first) of the interval and omit
+				it in all others. In this case the sequence of the given counters must be
+				identical, i.e. refer to the same DPCs, for all notifications of the interval.";;
+	WITH INFORMATION SYNTAX AccountingDefinedTypesModule.MtpAccountingNotificationData
+		AND ATTRIBUTE IDS
+			endOfMeasurementTime
+				endOfMeasurementTime,
+			networkIndicator
+				networkIndicator,
+			signLinkSetTpIdSet
+				signLinkSetTpIdSet,
+			mtpAccCounterDataSequence
+				mtpAccCounterDataSequence;
+REGISTERED AS { mtpAccounting-NOI };
+
+
+mtpAccountingVerification NOTIFICATION
+	BEHAVIOUR
+		mtpAccountingVerificationBehaviour BEHAVIOUR
+			DEFINED AS "This notification is generated on occurrence of the event specified in the
+				reporting triggers attribute of the ss7AccountingAndVerificationControl object
+				controlling the mtpAccount, except if the attribute
+				selectionGroupSetForVerification of the instance has size zero. The notification
+				shall also be sent, if all counters have the value zero. If verification is done
+				for all accounts in the same way, then it is possible to include the
+				pointCodeSet only in one notification (e.g. the first) of the interval and omit
+				it in all others. In this case the sequence of the given counters must be
+				identical, i.e. refer to the same DPCs, for all notifications of the interval.";;
+	WITH INFORMATION SYNTAX AccountingDefinedTypesModule.MtpAccountingNotificationData
+		AND ATTRIBUTE IDS
+			endOfMeasurementTime
+				endOfMeasurementTime,
+			networkIndicator
+				networkIndicator,
+			signLinkSetTpIdSet
+				signLinkSetTpIdSet,
+			mtpAccCounterDataSequence
+				mtpAccCounterDataSequence;
+REGISTERED AS { mtpAccountingVerification-NOI };
+
+

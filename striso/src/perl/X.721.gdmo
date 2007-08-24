@@ -47,10 +47,21 @@
 --
 -- Last Modified $Date$ by $Author$
 --
--- -----------------------------------------------------------------------------
---
--- $Log$
 -- =============================================================================
+
+--< GDMO.Document "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" >--
+--< GDMO.Alias "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
+--  "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992",
+--  "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
+--  "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
+--  "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992",
+--  "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992",
+--  "ITU-T Rec. X.721 (1992)",
+--  "CCITT Rec. X.721 (1992)",
+--  "Recommendation X.721 : 1992",
+--  "Recommendation X.721:1992",
+--  "Recommendation X.721: 1992" >--
+--< GDMO.Version 1.3 >--
 
 alarmRecord MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -62,8 +73,9 @@ alarmRecord MANAGED OBJECT CLASS
 		alarmRecordPackage PACKAGE
 			BEHAVIOUR
 				alarmRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from alarm notifications or event reports";;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from alarm notifications
+						or event reports";;
 			ATTRIBUTES
 				probableCause GET,
 				perceivedSeverity GET;;;
@@ -72,50 +84,57 @@ alarmRecord MANAGED OBJECT CLASS
 			ATTRIBUTES
 				specificProblems GET;
 		REGISTERED AS { smi2Package1 };
-			PRESENT IF "the Specific problems parameter is present in the alarm notification or
-				event report corresponding to the instance of alarm record",
+			PRESENT IF
+				"the Specific problems parameter is present in the alarm notification or event report corresponding
+				to the instance of alarm record",
 		backedUpStatusPackage PACKAGE
 			ATTRIBUTES
 				backedUpStatus GET;
 		REGISTERED AS { smi2Package2 };
-			PRESENT IF "the backedUpStatus attribute has a value TRUE and the Backed up status
-				parameter is present in the alarm notification or event report corresponding to
-				the instance of alarm record",
+			PRESENT IF
+				"the backedUpStatus attribute has a value TRUE and the Backed up status parameter is present in the
+				alarm notification or event report corresponding to the instance of alarm record",
 		backUpObjectPackage PACKAGE
 			ATTRIBUTES
 				backUpObject GET;
 		REGISTERED AS { smi2Package3 };
-			PRESENT IF "Backup object parameter is present in the alarm notification or event report
-				corresponding to the instance of alarm record",
+			PRESENT IF
+				"Backup object parameter is present in the alarm notification or event report corresponding to the
+				instance of alarm record",
 		trendIndicationPackage PACKAGE
 			ATTRIBUTES
 				trendIndication GET;
 		REGISTERED AS { smi2Package4 };
-			PRESENT IF "the Trend indication parameter is present in the alarm notification or event
-				report corresponding to the instance of alarm record",
+			PRESENT IF
+				"the Trend indication parameter is present in the alarm notification or event report corresponding
+				to the instance of alarm record",
 		thresholdInfoPackage PACKAGE
 			ATTRIBUTES
 				thresholdInfo GET;
 		REGISTERED AS { smi2Package5 };
-			PRESENT IF "the value for probableCause attribute is thresholdCrossed",
+			PRESENT IF
+				"the value for probableCause attribute is thresholdCrossed",
 		stateChangeDefinitionPackage PACKAGE
 			ATTRIBUTES
 				stateChangeDefinition GET;
 		REGISTERED AS { smi2Package6 };
-			PRESENT IF "there is a state transition for the states defined in State Management
-				Function, corresponding to the alarm type specified in the alarm record",
+			PRESENT IF
+				"there is a state transition for the states defined in State Management Function, corresponding to
+				the alarm type specified in the alarm record",
 		monitoredAttributesPackage PACKAGE
 			ATTRIBUTES
 				monitoredAttributes GET;
 		REGISTERED AS { smi2Package7 };
-			PRESENT IF "the monitoredAttributes parameter is present in the alarm notification or
-				event report corresponding to the instance of alarm record",
+			PRESENT IF
+				"the monitoredAttributes parameter is present in the alarm notification or event report
+				corresponding to the instance of alarm record",
 		proposedRepairActionsPackage PACKAGE
 			ATTRIBUTES
 				proposedRepairActions GET;
 		REGISTERED AS { smi2Package8 };
-			PRESENT IF "the proposedRepairActions parameter is present in the alarm notification or
-				event report corresponding to the instance of alarm record";
+			PRESENT IF
+				"the proposedRepairActions parameter is present in the alarm notification or event report
+				corresponding to the instance of alarm record";
 REGISTERED AS { smi2MObjectClass1 };
 
 
@@ -128,19 +147,20 @@ attributeValueChangeRecord MANAGED OBJECT CLASS
 		attributeValueChangeRecordPackage PACKAGE
 			BEHAVIOUR
 				attributeValueChangeRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from attribute value change notifications or event reports";;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from attribute value
+						change notifications or event reports";;
 			ATTRIBUTES
 				attributeValueChangeDefinition GET;;;
 	CONDITIONAL PACKAGES
 		sourceIndicatorPackage
-			PRESENT IF "the sourceIndicator parameter is present in the attributeValueChange
-				notification or event report corresponding to the instance of attribute value
-				change record",
+			PRESENT IF
+				"the sourceIndicator parameter is present in the attributeValueChange notification or event report
+				corresponding to the instance of attribute value change record",
 		attributeIdentifierListPackage
-			PRESENT IF "the attributeIdentifierList parameter is present in the attributeValueChange
-				notification or event report corresponding to the instance of attribute value
-				change record";
+			PRESENT IF
+				"the attributeIdentifierList parameter is present in the attributeValueChange notification or event
+				report corresponding to the instance of attribute value change record";
 REGISTERED AS { smi2MObjectClass2 };
 
 
@@ -151,8 +171,8 @@ discriminator MANAGED OBJECT CLASS
 		discriminatorPackage PACKAGE
 			BEHAVIOUR
 				discriminatorBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent the criteria for controlling
-						management services.";;
+					DEFINED AS
+						"This managed object is used to represent the criteria for controlling management services.";;
 			ATTRIBUTES
 				discriminatorId GET,
 				discriminatorConstruct REPLACE WITH DEFAULT DEFAULT VALUE Attribute-ASN1Module.defaultDiscriminatorConstruct GET REPLACE,
@@ -166,22 +186,26 @@ discriminator MANAGED OBJECT CLASS
 	-- the above events are defined in CCITT Rec. X.731 | ISO/IEC10164- 2, CCITT Rec. X.730 | ISO/IEC10164-1
 	CONDITIONAL PACKAGES
 		availabilityStatusPackage
-			PRESENT IF "any of the scheduling packages, (duration, weekly scheduling, external) are
-				present",
+			PRESENT IF
+				"any of the scheduling packages, (duration, weekly scheduling, external) are present",
 		duration
-			PRESENT IF "the discriminator function is scheduled to start at a specified time and
-				stop at either a specified time or function continuously ",
+			PRESENT IF
+				"the discriminator function is scheduled to start at a specified time and stop at either a specified
+				time or function continuously",
 		dailyScheduling
-			PRESENT IF "both the weekly scheduling package and external scheduler packages are not
-				present in an instance and daily scheduling is supported by that instance",
+			PRESENT IF
+				"both the weekly scheduling package and external scheduler packages are not present in an instance
+				and daily scheduling is supported by that instance",
 		weeklyScheduling
-			PRESENT IF "both the daily scheduling package and external scheduler packages are not
-				present in an instance and weekly scheduling is supported by that instance",
+			PRESENT IF
+				"both the daily scheduling package and external scheduler packages are not present in an instance
+				and weekly scheduling is supported by that instance",
 		externalScheduler
-			PRESENT IF "both the daily scheduling package and weekly scheduling packages are not
-				present in an instance and external scheduling is supported by that instance";
+			PRESENT IF
+				"both the daily scheduling package and weekly scheduling packages are not present in an instance and
+				external scheduling is supported by that instance";
 	-- see CCITT Rec. X.734 | ISO/IEC 10164-5 for the description of this managed object class.
-REGISTERED AS { smi2MObjectClass3 };
+	REGISTERED AS { smi2MObjectClass3 };
 
 
 eventForwardingDiscriminator MANAGED OBJECT CLASS
@@ -192,9 +216,9 @@ eventForwardingDiscriminator MANAGED OBJECT CLASS
 		efdPackage PACKAGE
 			BEHAVIOUR
 				eventForwardingDiscriminatorBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent the criteria that shall be
-						satisfied by potential event reports before the event report is forwarded to a
-						particular destination.";;
+					DEFINED AS
+						"This managed object is used to represent the criteria that shall be satisfied by potential event
+						reports before the event report is forwarded to a particular destination.";;
 			ATTRIBUTES
 				destination GET REPLACE;;;
 	-- discriminatorConstruct attribute is defined using the attributes of a potential event report object
@@ -205,14 +229,15 @@ eventForwardingDiscriminator MANAGED OBJECT CLASS
 				activeDestination GET,
 				backUpDestinationList GET REPLACE;
 		REGISTERED AS { smi2Package9 };
-			PRESENT IF "the event forwarding discriminator is required to provide a backup for the
-				destination",
+			PRESENT IF
+				"the event forwarding discriminator is required to provide a backup for the destination",
 		modePackage PACKAGE
 			ATTRIBUTES
 				confirmedMode GET;
 		REGISTERED AS { smi2Package10 };
-			PRESENT IF "the event forwarding discriminator permits mode for reporting events to be
-				specified by the managing system";
+			PRESENT IF
+				"the event forwarding discriminator permits mode for reporting events to be specified by the
+				managing system";
 REGISTERED AS { smi2MObjectClass4 };
 
 
@@ -223,8 +248,9 @@ eventLogRecord MANAGED OBJECT CLASS
 		eventLogRecordPackage PACKAGE
 			BEHAVIOUR
 				eventLogRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object represents the information stored in the log as a result
-						of receiving notifications or incoming event reports.";;
+					DEFINED AS
+						"This managed object represents the information stored in the log as a result of receiving
+						notifications or incoming event reports.";;
 			ATTRIBUTES
 				managedObjectClass GET,
 				managedObjectInstance GET,
@@ -234,22 +260,24 @@ eventLogRecord MANAGED OBJECT CLASS
 			ATTRIBUTES
 				eventTime GET;
 		REGISTERED AS { smi2Package11 };
-			PRESENT IF "the event time parameter was present in the received event report",
+			PRESENT IF
+				"the event time parameter was present in the received event report",
 		notificationIdentifierPackage
-			PRESENT IF "the notification Identifier parameter is present in the notification or
-				event report corresponding to the instance of an event record or an instance of
-				its subclasses",
+			PRESENT IF
+				"the notification Identifier parameter is present in the notification or event report corresponding
+				to the instance of an event record or an instance of its subclasses",
 		correlatedNotificationsPackage
-			PRESENT IF "the correlatedNotifications parameter is present in the notification or
-				event report corresponding to the instance of an event record or an instance of
-				its subclasses",
+			PRESENT IF
+				"the correlatedNotifications parameter is present in the notification or event report corresponding
+				to the instance of an event record or an instance of its subclasses",
 		additionalTextPackage
-			PRESENT IF "the Additional text parameter is present in the notification or report
-				corresponding to the instance of event record or an instance of its subclasses",
+			PRESENT IF
+				"the Additional text parameter is present in the notification or report corresponding to the
+				instance of event record or an instance of its subclasses",
 		additionalInformationPackage
-			PRESENT IF "the Additional information parameter is present in the notification or
-				report corresponding to the instance of event record or an instance of its
-				subclasses";
+			PRESENT IF
+				"the Additional information parameter is present in the notification or report corresponding to the
+				instance of event record or an instance of its subclasses";
 REGISTERED AS { smi2MObjectClass5 };
 
 
@@ -261,9 +289,9 @@ log MANAGED OBJECT CLASS
 		logPackage PACKAGE
 			BEHAVIOUR
 				logBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to store incoming event reports and local system
-						notifications. Additional details are defined in CCITT Rec. X. 735 | ISO/IEC
-						10164-6. ";;
+					DEFINED AS
+						"This managed object is used to store incoming event reports and local system notifications.
+						Additional details are defined in CCITT Rec. X. 735 | ISO/IEC 10164-6.";;
 			ATTRIBUTES
 				logId GET,
 				discriminatorConstruct GET REPLACE,
@@ -284,29 +312,34 @@ log MANAGED OBJECT CLASS
 				currentLogSize GET,
 				numberOfRecords GET;
 		REGISTERED AS { smi2Package12 };
-			PRESENT IF "an instance supports it",
+			PRESENT IF
+				"an instance supports it",
 		logAlarmPackage PACKAGE
 			ATTRIBUTES
 				capacityAlarmThreshold GET REPLACE ADD REMOVE;
 		REGISTERED AS { smi2Package13 };
-			PRESENT IF "a log is of finite size and halts logging when the availability status has
-				the log full value.",
+			PRESENT IF
+				"a log is of finite size and halts logging when the availability status has the log full value.",
 		availabilityStatusPackage
-			PRESENT IF "any of the scheduling packages, (duration, weekly scheduling, external) are
-				present. The presence of this package makes available the off-duty value of the
-				available status attribute to the object.",
+			PRESENT IF
+				"any of the scheduling packages, (duration, weekly scheduling, external) are present. The presence
+				of this package makes available the off-duty value of the available status attribute to the object.",
 		duration
-			PRESENT IF "the logging function is scheduled to start at a specified time and stop at
-				either a specified time or function continuously.",
+			PRESENT IF
+				"the logging function is scheduled to start at a specified time and stop at either a specified time
+				or function continuously.",
 		dailyScheduling
-			PRESENT IF "both the weekly scheduling package and external scheduler packages are not
-				present in an instance and daily scheduling is supported by that instance.",
+			PRESENT IF
+				"both the weekly scheduling package and external scheduler packages are not present in an instance
+				and daily scheduling is supported by that instance.",
 		weeklyScheduling
-			PRESENT IF "both the daily scheduling package and external scheduler packages are not
-				present in an instance and weekly scheduling is supported by that instance.",
+			PRESENT IF
+				"both the daily scheduling package and external scheduler packages are not present in an instance
+				and weekly scheduling is supported by that instance.",
 		externalScheduler
-			PRESENT IF "both the daily scheduling package and weekly scheduling packages are not
-				present in an instance and external scheduling is supported by that instance.";
+			PRESENT IF
+				"both the daily scheduling package and weekly scheduling packages are not present in an instance and
+				external scheduling is supported by that instance.";
 REGISTERED AS { smi2MObjectClass6 };
 
 
@@ -317,7 +350,8 @@ logRecord MANAGED OBJECT CLASS
 		logRecordPackage PACKAGE
 			BEHAVIOUR
 				logRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object represents the information stored in the logs";;
+					DEFINED AS
+						"This managed object represents the information stored in the logs";;
 			ATTRIBUTES
 				logRecordId GET,
 				loggingTime GET;;;
@@ -333,15 +367,18 @@ objectCreationRecord MANAGED OBJECT CLASS
 		objectCreationRecordPackage PACKAGE
 			BEHAVIOUR
 				objectCreationRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from object creation notifications or event reports";;;;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from object creation
+						notifications or event reports";;;;
 	CONDITIONAL PACKAGES
 		sourceIndicatorPackage
-			PRESENT IF "the sourceIndicator parameter is present in the object creation notification
-				or event report corresponding to the instance of object creation record",
+			PRESENT IF
+				"the sourceIndicator parameter is present in the object creation notification or event report
+				corresponding to the instance of object creation record",
 		attributeListPackage
-			PRESENT IF "the attributeList parameter is present in the object creation notification
-				or event report corresponding to the instance of object creation record";
+			PRESENT IF
+				"the attributeList parameter is present in the object creation notification or event report
+				corresponding to the instance of object creation record";
 REGISTERED AS { smi2MObjectClass8 };
 
 
@@ -354,15 +391,18 @@ objectDeletionRecord MANAGED OBJECT CLASS
 		objectDeletionRecordPackage PACKAGE
 			BEHAVIOUR
 				objectDeletionRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from object deletion notifications or event reports";;;;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from object deletion
+						notifications or event reports";;;;
 	CONDITIONAL PACKAGES
 		sourceIndicatorPackage
-			PRESENT IF "the sourceIndicator parameter is present in the object deletion notification
-				or event report corresponding to the instance of object deletion record",
+			PRESENT IF
+				"the sourceIndicator parameter is present in the object deletion notification or event report
+				corresponding to the instance of object deletion record",
 		attributeListPackage
-			PRESENT IF "the attributeList parameter is present in the object deletion notification
-				or event report corresponding to the instance of object deletion record";
+			PRESENT IF
+				"the attributeList parameter is present in the object deletion notification or event report
+				corresponding to the instance of object deletion record";
 REGISTERED AS { smi2MObjectClass9 };
 
 
@@ -375,19 +415,20 @@ relationshipChangeRecord MANAGED OBJECT CLASS
 		relationshipChangeRecordPackage PACKAGE
 			BEHAVIOUR
 				relationshipChangeRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from relationship change notifications or event reports";;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from relationship change
+						notifications or event reports";;
 			ATTRIBUTES
 				relationshipChangeDefinition GET;;;
 	CONDITIONAL PACKAGES
 		sourceIndicatorPackage
-			PRESENT IF "the Source indicator parameter is present in the relationshipChange
-				notification or event report corresponding to the instance of relationship
-				change record",
+			PRESENT IF
+				"the Source indicator parameter is present in the relationshipChange notification or event report
+				corresponding to the instance of relationship change record",
 		attributeIdentifierListPackage
-			PRESENT IF "the Attribute identifier list parameter is present in the relationshipChange
-				notification or event report corresponding to the instance of relationship
-				change record";
+			PRESENT IF
+				"the Attribute identifier list parameter is present in the relationshipChange notification or event
+				report corresponding to the instance of relationship change record";
 REGISTERED AS { smi2MObjectClass10 };
 
 
@@ -401,8 +442,9 @@ securityAlarmReportRecord MANAGED OBJECT CLASS
 		securityAlarmRecordPackage PACKAGE
 			BEHAVIOUR
 				securityAlarmReportRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from security alarm notifications or event reports";;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from security alarm
+						notifications or event reports";;
 			ATTRIBUTES
 				securityAlarmCause GET,
 				securityAlarmSeverity GET,
@@ -421,18 +463,20 @@ stateChangeRecord MANAGED OBJECT CLASS
 		stateChangeRecordPackage PACKAGE
 			BEHAVIOUR
 				stateChangeRecordBehaviour BEHAVIOUR
-					DEFINED AS "This managed object is used to represent logged information that resulted
-						from state change notifications or event reports";;
+					DEFINED AS
+						"This managed object is used to represent logged information that resulted from state change
+						notifications or event reports";;
 			ATTRIBUTES
 				stateChangeDefinition GET;;;
 	CONDITIONAL PACKAGES
 		sourceIndicatorPackage
-			PRESENT IF "the Source indicator parameter is present in the stateChange notification or
-				event report corresponding to the instance of state change record",
+			PRESENT IF
+				"the Source indicator parameter is present in the stateChange notification or event report
+				corresponding to the instance of state change record",
 		attributeIdentifierListPackage
-			PRESENT IF "the Attribute identifierList parameter is present in the stateChange
-				notification or event report corresponding to the instance of state change
-				record";
+			PRESENT IF
+				"the Attribute identifierList parameter is present in the stateChange notification or event report
+				corresponding to the instance of state change record";
 REGISTERED AS { smi2MObjectClass12 };
 
 
@@ -451,12 +495,14 @@ system MANAGED OBJECT CLASS
 			ATTRIBUTES
 				administrativeState GET REPLACE;
 		REGISTERED AS { smi2Package14 };
-			PRESENT IF "an instance supports it.",
+			PRESENT IF
+				"an instance supports it.",
 		supportedFeaturesPackage PACKAGE
 			ATTRIBUTES
 				supportedFeatures GET REPLACE ADD REMOVE;
 		REGISTERED AS { smi2Package15 };
-			PRESENT IF "an instance supports it.";
+			PRESENT IF
+				"an instance supports it.";
 REGISTERED AS { smi2MObjectClass13 };
 
 
@@ -473,21 +519,24 @@ top MANAGED OBJECT CLASS
 			ATTRIBUTES
 				packages GET;
 		REGISTERED AS { smi2Package16 };
-			PRESENT IF "any registered package, other than this package has been instantiated",
+			PRESENT IF
+				"any registered package, other than this package has been instantiated",
 		allomorphicPackage PACKAGE
 			ATTRIBUTES
 				allomorphs GET;
 		REGISTERED AS { smi2Package17 };
-			PRESENT IF " if an object supports allomorphism";
+			PRESENT IF
+				"if an object supports allomorphism";
 REGISTERED AS { smi2MObjectClass14 };
 
 
 topBehaviour BEHAVIOUR
-	DEFINED AS "This is the top level of managed object class hierarchy and every other
-		managed object class is a specialization of either this generic class (top) or a
-		specialization of subclass of top. The parameter miscellaneousError is to be
-		used when a processing failure has occurred and the error condition encountered
-		does not match any of objectus defined specific error types.";
+	DEFINED AS
+		"This is the top level of managed object class hierarchy and every other managed object class is a
+		specialization of either this generic class (top) or a specialization of subclass of top. The
+		parameter miscellaneousError is to be used when a processing failure has occurred and the error
+		condition encountered does not match any of objectus defined specific error types.";
+
 
 discriminator-system NAME BINDING
 	SUBORDINATE OBJECT CLASS
@@ -497,8 +546,8 @@ discriminator-system NAME BINDING
 		system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		discriminatorId;
-	CREATE	WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
-	DELETE	ONLY-IF-NO-CONTAINED-OBJECTS;
+	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
 REGISTERED AS { smi2NameBinding1 };
 
 
@@ -510,8 +559,8 @@ log-system NAME BINDING
 		system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		logId;
-	CREATE	WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
-	DELETE	ONLY-IF-NO-CONTAINED-OBJECTS;
+	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
 REGISTERED AS { smi2NameBinding2 };
 
 
@@ -523,7 +572,7 @@ logRecord-log NAME BINDING
 		log AND SUBCLASSES;
 	WITH ATTRIBUTE
 		logRecordId;
-	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+	DELETE ONLY IF NO CONTAINED OBJECTS;
 REGISTERED AS { smi2NameBinding3 };
 
 
@@ -554,9 +603,9 @@ REGISTERED AS { smi2Package21 };
 availabilityStatusPackage PACKAGE
 	BEHAVIOUR
 		availabilityStatusBehaviour BEHAVIOUR
-			DEFINED AS " This package is described in CCITT Rec. X.734,X.735 | ISO/IEC 10164-5,
-				10164-6. It is used to indicate the availability of the resource according to a
-				predetermined time schedule.";;
+			DEFINED AS
+				"This package is described in CCITT Rec. X.734,X.735 | ISO/IEC 10164-5, 10164-6. It is used to
+				indicate the availability of the resource according to a predetermined time schedule.";;
 	ATTRIBUTES
 		availabilityStatus REQUIRED VALUES Attribute-ASN1Module.SchedulingAvailability GET;
 REGISTERED AS { smi2Package22 };
@@ -611,26 +660,31 @@ counter ATTRIBUTE
 		EQUALITY,
 		ORDERING;;
 
+
 gauge ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.ObservedValue;
 	MATCHES FOR
 		EQUALITY,
 		ORDERING;;
 
+
 counter-Threshold ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.CounterThreshold;
 	MATCHES FOR
 		EQUALITY;;
+
 
 gauge-Threshold ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.GaugeThreshold;
 	MATCHES FOR
 		EQUALITY;;
 
+
 tideMark ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.TideMarkInfo;
 	MATCHES FOR
 		EQUALITY;;
+
 
 discriminatorId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.SimpleNameType;
@@ -644,9 +698,10 @@ REGISTERED AS { smi2AttributeID1 };
 
 
 rDNIdBehaviour BEHAVIOUR
-	DEFINED AS " If the string choice for the syntax is used matching on the substrings is
-		permitted . If the number choice for the syntax is used then matching on
-		ordering is permitted.";
+	DEFINED AS
+		"If the string choice for the syntax is used matching on the substrings is permitted . If the number
+		choice for the syntax is used then matching on ordering is permitted.";
+
 
 logId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.SimpleNameType;
@@ -684,7 +739,8 @@ additionalInformation ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AdditionalInformation;
 	BEHAVIOUR
 		additionalInformationBehaviour BEHAVIOUR
-			DEFINED AS "This attribute is used to supply additional information in notifications.";;
+			DEFINED AS
+				"This attribute is used to supply additional information in notifications.";;
 REGISTERED AS { smi2AttributeID6 };
 
 
@@ -695,8 +751,8 @@ additionalText ATTRIBUTE
 		SUBSTRINGS;
 	BEHAVIOUR
 		additionalTextBehaviour BEHAVIOUR
-			DEFINED AS "This attribute is used to specify additional textual information in
-				notifications ";;
+			DEFINED AS
+				"This attribute is used to specify additional textual information in notifications";;
 REGISTERED AS { smi2AttributeID7 };
 
 
@@ -708,7 +764,8 @@ attributeIdentifierList ATTRIBUTE
 		SET INTERSECTION;
 	BEHAVIOUR
 		attributeIdentifierListBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a list of attribute identifiers.";;
+			DEFINED AS
+				"This attribute contains a list of attribute identifiers.";;
 REGISTERED AS { smi2AttributeID8 };
 
 
@@ -720,7 +777,8 @@ attributeList ATTRIBUTE
 		SET INTERSECTION;
 	BEHAVIOUR
 		attributeListBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a list of attribute identifiers and their values.";;
+			DEFINED AS
+				"This attribute contains a list of attribute identifiers and their values.";;
 REGISTERED AS { smi2AttributeID9 };
 
 
@@ -728,8 +786,8 @@ attributeValueChangeDefinition ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AttributeValueChangeDefinition;
 	BEHAVIOUR
 		attributeValueChangeDefinitionBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a set of attribute identifiers and their old and new
-				values.";;
+			DEFINED AS
+				"This attribute contains a set of attribute identifiers and their old and new values.";;
 REGISTERED AS { smi2AttributeID10 };
 
 
@@ -744,9 +802,10 @@ correlatedNotifications ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.CorrelatedNotifications;
 	BEHAVIOUR
 		correlatedNotificationsBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a set of notification identifiers and, if necessary,
-				their associated managed object instance names, for the notifications that are
-				considered to be correlated to this notification.";;
+			DEFINED AS
+				"This attribute contains a set of notification identifiers and, if necessary, their associated
+				managed object instance names, for the notifications that are considered to be correlated to this
+				notification.";;
 REGISTERED AS { smi2AttributeID12 };
 
 
@@ -761,12 +820,13 @@ REGISTERED AS { smi2AttributeID13 };
 
 
 timeOrdering BEHAVIOUR
-	DEFINED AS "The year, month, day, hour, minute and seconds field are compared in order
-		to determine whether the specified value is greater or less than the value of
-		the attribute. The values for the year, month,day, hour,minute and seconds are
-		determined from the character string representation and the year value is first
-		compared. If equal the month value is compared and this process is continued if
+	DEFINED AS
+		"The year, month, day, hour, minute and seconds field are compared in order to determine whether the
+		specified value is greater or less than the value of the attribute. The values for the year,
+		month,day, hour,minute and seconds are determined from the character string representation and the
+		year value is first compared. If equal the month value is compared and this process is continued if
 		the compared fields are equal";
+
 
 eventType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.EventTypeId;
@@ -786,8 +846,9 @@ notificationIdentifier ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		notificationIdentifierBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a unique identifier for the notification, which may
-				be present in the correlated notifications attribute of other notifications.";;
+			DEFINED AS
+				"This attribute contains a unique identifier for the notification, which may be present in the
+				correlated notifications attribute of other notifications.";;
 REGISTERED AS { smi2AttributeID16 };
 
 
@@ -818,8 +879,8 @@ relationshipChangeDefinition ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AttributeValueChangeDefinition;
 	BEHAVIOUR
 		relationshipChangeDefinitionBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a set of relationship attribute identifiers and
-				their old and new values.";;
+			DEFINED AS
+				"This attribute contains a set of relationship attribute identifiers and their old and new values.";;
 REGISTERED AS { smi2AttributeID20 };
 
 
@@ -829,7 +890,8 @@ securityAlarmCause ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		securityAlarmCauseBehaviour BEHAVIOUR
-			DEFINED AS "This attribute specifies the cause of the security alarm";;
+			DEFINED AS
+				"This attribute specifies the cause of the security alarm";;
 REGISTERED AS { smi2AttributeID21 };
 
 
@@ -839,7 +901,8 @@ securityAlarmDetector ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		securityAlarmDetectorBehaviour BEHAVIOUR
-			DEFINED AS "This attribute identifies the entity that detected the security alarm";;
+			DEFINED AS
+				"This attribute identifies the entity that detected the security alarm";;
 REGISTERED AS { smi2AttributeID22 };
 
 
@@ -849,7 +912,8 @@ securityAlarmSeverity ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		securityAlarmSeverityBehaviour BEHAVIOUR
-			DEFINED AS "This attribute indicates the severity of the security alarm";;
+			DEFINED AS
+				"This attribute indicates the severity of the security alarm";;
 REGISTERED AS { smi2AttributeID23 };
 
 
@@ -859,8 +923,9 @@ serviceProvider ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		serviceProviderBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains information about the service provider associated
-				with the service request that caused the security alarm";;
+			DEFINED AS
+				"This attribute contains information about the service provider associated with the service request
+				that caused the security alarm";;
 REGISTERED AS { smi2AttributeID24 };
 
 
@@ -870,8 +935,9 @@ serviceUser ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		serviceUserBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains information about the service user associated with
-				the service request that caused the security alarm";;
+			DEFINED AS
+				"This attribute contains information about the service user associated with the service request that
+				caused the security alarm";;
 REGISTERED AS { smi2AttributeID25 };
 
 
@@ -881,8 +947,9 @@ sourceIndicator ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		sourceIndicatorBehaviour BEHAVIOUR
-			DEFINED AS "This attribute is used in notifications to indicate the source of the
-				operation that resulted in generating the notification ";;
+			DEFINED AS
+				"This attribute is used in notifications to indicate the source of the operation that resulted in
+				generating the notification";;
 REGISTERED AS { smi2AttributeID26 };
 
 
@@ -899,8 +966,8 @@ stateChangeDefinition ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AttributeValueChangeDefinition;
 	BEHAVIOUR
 		stateChangeDefinitionBehaviour BEHAVIOUR
-			DEFINED AS "This attribute contains a set of state attribute identifiers and their old
-				and new values.";;
+			DEFINED AS
+				"This attribute contains a set of state attribute identifiers and their old and new values.";;
 REGISTERED AS { smi2AttributeID28 };
 
 
@@ -988,10 +1055,10 @@ REGISTERED AS { smi2AttributeID39 };
 
 
 state ATTRIBUTE GROUP
-	DESCRIPTION " This is defined as an empty attribute group. The elements of this group
-		are composed of state attributes in the managed object. The state attributes may
-		include those specified in CCITT Rec. X.731|ISO/IEC 10164-2 and others that are
-		specific to the managed object class.";
+	DESCRIPTION
+		"This is defined as an empty attribute group. The elements of this group are composed of state
+		attributes in the managed object. The state attributes may include those specified in CCITT Rec.
+		X.731|ISO/IEC 10164-2 and others that are specific to the managed object class.";
 REGISTERED AS { smi2AttributeGroup1 };
 
 
@@ -1045,10 +1112,11 @@ REGISTERED AS { smi2AttributeID46 };
 
 
 relationships ATTRIBUTE GROUP
-	DESCRIPTION " This is defined as an empty attribute group. The elements of this group
-		are composed of relationship attributes in the managed object. The relatioship
-		attributes may include those specified in CCITT Rec. X.732 | ISO/IEC 10164-3 and
-		others that are specific to the managed object class.";
+	DESCRIPTION
+		"This is defined as an empty attribute group. The elements of this group are composed of
+		relationship attributes in the managed object. The relatioship attributes may include those
+		specified in CCITT Rec. X.732 | ISO/IEC 10164-3 and others that are specific to the managed object
+		class.";
 REGISTERED AS { smi2AttributeGroup2 };
 
 
@@ -1164,8 +1232,9 @@ maxLogSize ATTRIBUTE
 		ORDERING;
 	BEHAVIOUR
 		maxSizeOrderingBehaviour BEHAVIOUR
-			DEFINED AS " The ordering is the same as for sequentially increasing postive integers
-				except that a value of zero is largest and denotes infinite size.";;
+			DEFINED AS
+				"The ordering is the same as for sequentially increasing postive integers except that a value of
+				zero is largest and denotes infinite size.";;
 REGISTERED AS { smi2AttributeID62 };
 
 
@@ -1235,10 +1304,10 @@ supportedFeatures ATTRIBUTE
 		EQUALITY;
 	BEHAVIOUR
 		supportedFeaturesBehaviour BEHAVIOUR
-			DEFINED AS "This attribute is used to identify features within the system that are
-				capable of being managed. The registration of each feature is performed by the
-				development authority for the feature and will typically identify a
-				specification in which the details of what can be managed are provided";;
+			DEFINED AS
+				"This attribute is used to identify features within the system that are capable of being managed.
+				The registration of each feature is performed by the development authority for the feature and will
+				typically identify a specification in which the details of what can be managed are provided";;
 REGISTERED AS { smi2AttributeID70 };
 
 
@@ -1254,9 +1323,9 @@ miscellaneousError PARAMETER
 	WITH SYNTAX Parameter-ASN1Module.MiscellaneousError;
 	BEHAVIOUR
 		miscellaneousErrorBehaviour BEHAVIOUR
-			DEFINED AS " When a processing error failure has occurred and the error condition
-				encountered does not match any of the objectcs defined specific error types,
-				this value is used.";;
+			DEFINED AS
+				"When a processing error failure has occurred and the error condition encountered does not match any
+				of the objectcs defined specific error types, this value is used.";;
 REGISTERED AS { smi2Parameter1 };
 
 
@@ -1276,10 +1345,11 @@ REGISTERED AS { smi2Notification1 };
 
 
 attributeValueChangeBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report changes to the attribute such as
-		addition or deletion of members to one or more set valued attributes,
-		replacement of the value of one or more attributes and setting attribute values
-		to their defaults.";
+	DEFINED AS
+		"This notification type is used to report changes to the attribute such as addition or deletion of
+		members to one or more set valued attributes, replacement of the value of one or more attributes
+		and setting attribute values to their defaults.";
+
 
 communicationsAlarm NOTIFICATION
 	BEHAVIOUR
@@ -1304,8 +1374,9 @@ REGISTERED AS { smi2Notification2 };
 
 
 communicationsAlarmBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report when the object detects a
-		communications error.";
+	DEFINED AS
+		"This notification type is used to report when the object detects a communications error.";
+
 
 environmentalAlarm NOTIFICATION
 	BEHAVIOUR
@@ -1330,7 +1401,9 @@ REGISTERED AS { smi2Notification3 };
 
 
 environmentalAlarmBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report a problem in the environment.";
+	DEFINED AS
+		"This notification type is used to report a problem in the environment.";
+
 
 equipmentAlarm NOTIFICATION
 	BEHAVIOUR
@@ -1355,7 +1428,9 @@ REGISTERED AS { smi2Notification4 };
 
 
 equipmentAlarmBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report a failure in the equipment.";
+	DEFINED AS
+		"This notification type is used to report a failure in the equipment.";
+
 
 integrityViolation NOTIFICATION
 	BEHAVIOUR
@@ -1375,9 +1450,10 @@ REGISTERED AS { smi2Notification5 };
 
 
 integrityViolationBehaviour BEHAVIOUR
-	DEFINED AS "This notification is used to report that a potential interruption in
-		information flow has occurred such that information may have been illegally
-		modified, inserted or deleted.";
+	DEFINED AS
+		"This notification is used to report that a potential interruption in information flow has occurred
+		such that information may have been illegally modified, inserted or deleted.";
+
 
 objectCreation NOTIFICATION
 	BEHAVIOUR
@@ -1394,8 +1470,9 @@ REGISTERED AS { smi2Notification6 };
 
 
 objectCreationBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report the creation of a managed object to
-		another open system.";
+	DEFINED AS
+		"This notification type is used to report the creation of a managed object to another open system.";
+
 
 objectDeletion NOTIFICATION
 	BEHAVIOUR
@@ -1412,8 +1489,9 @@ REGISTERED AS { smi2Notification7 };
 
 
 objectDeletionBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report the deletion of a managed object to
-		another open system.";
+	DEFINED AS
+		"This notification type is used to report the deletion of a managed object to another open system.";
+
 
 operationalViolation NOTIFICATION
 	BEHAVIOUR
@@ -1433,9 +1511,10 @@ REGISTERED AS { smi2Notification8 };
 
 
 operationalViolationBehaviour BEHAVIOUR
-	DEFINED AS "This notification is used to report that the provision of the requested
-		service was not possible due to the unavailability, malfunction or incorrect
-		invocation of the service.";
+	DEFINED AS
+		"This notification is used to report that the provision of the requested service was not possible
+		due to the unavailability, malfunction or incorrect invocation of the service.";
+
 
 physicalViolation NOTIFICATION
 	BEHAVIOUR
@@ -1455,8 +1534,10 @@ REGISTERED AS { smi2Notification9 };
 
 
 physicalViolationBehaviour BEHAVIOUR
-	DEFINED AS "This notification is used to report that a physical resource has been
-		violated in a way that indicates a potential security attack.";
+	DEFINED AS
+		"This notification is used to report that a physical resource has been violated in a way that
+		indicates a potential security attack.";
+
 
 processingErrorAlarm NOTIFICATION
 	BEHAVIOUR
@@ -1481,8 +1562,9 @@ REGISTERED AS { smi2Notification10 };
 
 
 processingErrorAlarmBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report processing failure in a managed
-		object.";
+	DEFINED AS
+		"This notification type is used to report processing failure in a managed object.";
+
 
 qualityofServiceAlarm NOTIFICATION
 	BEHAVIOUR
@@ -1507,8 +1589,9 @@ REGISTERED AS { smi2Notification11 };
 
 
 qualityofServiceAlarmBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report a failure in the quality of service
-		of the managed object.";
+	DEFINED AS
+		"This notification type is used to report a failure in the quality of service of the managed object.";
+
 
 relationshipChange NOTIFICATION
 	BEHAVIOUR
@@ -1526,9 +1609,11 @@ REGISTERED AS { smi2Notification12 };
 
 
 relationshipChangeBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report the change in the value of one or
-		more relationship attributes of a managed object, that result through either
-		internal operation of the managed object or via management operation.";
+	DEFINED AS
+		"This notification type is used to report the change in the value of one or more relationship
+		attributes of a managed object, that result through either internal operation of the managed object
+		or via management operation.";
+
 
 securityServiceOrMechanismViolation NOTIFICATION
 	BEHAVIOUR
@@ -1548,8 +1633,10 @@ REGISTERED AS { smi2Notification13 };
 
 
 securityServiceOrMechanismViolationBehaviour BEHAVIOUR
-	DEFINED AS "This notification is used to report that a security attack has been detected
-		by a security service or mechanism.";
+	DEFINED AS
+		"This notification is used to report that a security attack has been detected by a security service
+		or mechanism.";
+
 
 stateChange NOTIFICATION
 	BEHAVIOUR
@@ -1567,9 +1654,11 @@ REGISTERED AS { smi2Notification14 };
 
 
 stateChangeBehaviour BEHAVIOUR
-	DEFINED AS "This notification type is used to report the change in the the value of one
-		or more state attributes of a managed object, that result through either
-		internal operation of the managed object or via management operation.";
+	DEFINED AS
+		"This notification type is used to report the change in the the value of one or more state
+		attributes of a managed object, that result through either internal operation of the managed object
+		or via management operation.";
+
 
 timeDomainViolation NOTIFICATION
 	BEHAVIOUR
@@ -1589,6 +1678,12 @@ REGISTERED AS { smi2Notification15 };
 
 
 timeDomainViolationBehaviour BEHAVIOUR
-	DEFINED AS "This notification is used to report that an event has occurred at an
-		unexpected or prohibited time.";
+	DEFINED AS
+		"This notification is used to report that an event has occurred at an unexpected or prohibited time.";
 
+--< GDMO.EndDocument "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" >--
+
+-- =============================================================================
+--
+-- $Log$
+-- =============================================================================

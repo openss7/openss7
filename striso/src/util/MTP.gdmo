@@ -361,8 +361,7 @@ signLinkSetTp MANAGED OBJECT CLASS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
-				periodicLinkTestFlag DEFAULT VALUEMTPDefinedTypesModule,
-				periodicTestFlagDefault GET-REPLACE;
+				periodicLinkTestFlag DEFAULT VALUE MTPDefinedTypesModule.periodicTestFlagDefault GET-REPLACE;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
 	CONDITIONAL PACKAGES
@@ -776,8 +775,7 @@ stpScreeningTable MANAGED OBJECT CLASS
 						messages as defined in 8.2/Q.705 and 8.3/Q.705. ";;
 			ATTRIBUTES
 				stpScreeningTableId GET SET BY CREATE,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState INITIAL VALUEMTPDefinedTypesModule,
-				administrativeStateLocked GET-REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState INITIAL VALUEMTPDefinedTypesModule.administrativeStateLocked GET-REPLACE,
 				treatmentOfOutsideRanges GET-REPLACE,
 				stpScreeningTableListMode GET-REPLACE,
 				screeningByLinkSetOrByDPCOpc GET SET BY CREATE;
