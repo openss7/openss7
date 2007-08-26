@@ -349,8 +349,7 @@ AttributeValueChangeDefinition,   SourceIndicator,
 AttributeIdentifierList,   AttributeList,   ServiceUser,
 ServiceProvider
 FROM Attribute-ASN1Module
-     ObjectClass,AttributeId,ObjectInstance FROM CMIP-1 {joint-iso-
-ccitt ms(9) cmip(1) version1 (1) protocol(3)} ;
+     ObjectClass,AttributeId,ObjectInstance FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) version1 (1) protocol(3)} ;
 
 --EXPORTS everything
 smi2Notification OBJECT IDENTIFIER ::= { joint-iso-ccitt ms (9)

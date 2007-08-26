@@ -1,3 +1,6 @@
+--< GDMO.Document "ITU-T Rec. M.3100 (1992)" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
 -- =============================================================================
 -- 
 -- @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -48,6 +51,7 @@
 -- Last Modified $Date$ by $Author$
 --
 -- =============================================================================
+-- >--
 
 --< ASN1.Version 1.2 >--
 ASN1DefinedTypesModule { ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2)asn1DefinedTypesModule(0) }
@@ -321,7 +325,9 @@ VendorName ::= GraphicString
 Version ::= GraphicString
 END -- end of ASN1 DefinedTypesModule
 
--- =============================================================================
---
--- $Log$
--- =============================================================================
+--< GDMO.ChangeLog
+--  =============================================================================
+-- 
+--  $Log$
+--  =============================================================================
+--  >--

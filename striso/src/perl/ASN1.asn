@@ -6,3 +6,103 @@ REAL ::= SEQUENCE {
 	-- The associated mathematical real number is "mantissa"
 	-- multiplied by "base" raised to the power "exponent"
 }
+
+EMBEDDED PDV ::= SEQUENCE {
+	identification CHOICE {
+		syntaxes SEQUENCE {
+			abstract OBJECT IDENTIFIER,
+			transfer OBJECT IDENTIFIER },
+			-- Abstract and transfer syntax object identifiers
+		syntax OBJECT IDENTIFIER,
+		-- A single object identifier for identification of the abstract
+		-- and transfer syntaxes
+		presentation-context-id INTEGER,
+		-- (Applicable only to OSI environments)
+		-- The negotiated OSI presentation context identifies the
+		-- abstract and transfer syntaxess
+		context-negotiation SEQUENCE {
+			presentation-context-id INTEGER,
+			transfer-syntax OBJECT IDENTIFIER},
+		-- (Applicable only to OSI environments)
+		-- Context-negotiation in progress, presentation-context-id
+		-- identifies only the abstract syntax
+		-- so the tranfer syntax shall be specified.
+		transfer-syntax OBJECT IDENTIFIER,
+		-- The type of the value (for example, sepcification that it is
+		-- the value of an ASN.1 type)
+		-- is fixed by the application designer (and hence known to both
+		-- sender and receiver).  This
+		-- case is provided primarily to support
+		-- selective-field-encryption (or other encoding
+		-- transformations) of an ASN.1 type
+		fixed NULL },
+		-- The data value is the value of a fixed ASN.1 type (and hence
+		-- known to both sender
+		-- and receiver
+	data-value-descriptor ObjectDescriptor OPTIONAL,
+	-- This provides human-readable identification of the class of the value
+	data-value OCTET STRING }
+( WITH COMPONENTS {
+		... ,
+		data-value-descriptor ABSENT } )
+
+EXTERNAL ::= SEQUENCE {
+	identification CHOICE {
+		syntaxes SEQUENCE {
+			abstract OBJECT IDENTIFIER,
+			transfer OBJECT IDENTIFIER },
+			-- Abstract and transfer syntax object identifiers
+		syntax OBJECT IDENTIFIER,
+		-- A single object identifier for identification of the abstract
+		-- and transfer syntaxes
+		presentation-context-id INTEGER,
+		-- (Applicable only to OSI environments)
+		-- The negotiated OSI presentation context identifies the
+		-- abstract and transfer syntaxess
+		context-negotiation SEQUENCE {
+			presentation-context-id INTEGER,
+			transfer-syntax OBJECT IDENTIFIER},
+		-- (Applicable only to OSI environments)
+		-- Context-negotiation in progress, presentation-context-id
+		-- identifies only the abstract syntax
+		-- so the tranfer syntax shall be specified.
+		transfer-syntax OBJECT IDENTIFIER,
+		-- The type of the value (for example, sepcification that it is
+		-- the value of an ASN.1 type)
+		-- is fixed by the application designer (and hence known to both
+		-- sender and receiver).  This
+		-- case is provided primarily to support
+		-- selective-field-encryption (or other encoding
+		-- transformations) of an ASN.1 type
+		fixed NULL },
+		-- The data value is the value of a fixed ASN.1 type (and hence
+		-- known to both sender
+		-- and receiver
+	data-value-descriptor ObjectDescriptor OPTIONAL,
+	-- This provides human-readable identification of the class of the value
+	data-value OCTET STRING }
+( WITH COMPONENTS {
+		... ,
+		identification (WITH COMPONENTS {
+			... ,
+			syntaxes ABSENT,
+			transfer-syntax ABSENT,
+			fixed ABSENT } ) } )
+}
+
+UTF8String ::= [UNIVERSAL 12] UTF8String
+NumericString ::= [UNIVERSAL 18] NumericString
+PrintableString ::= [UNIVERSAL 19] PrintableString
+TeletexString ::= [UNIVERSAL 20] TeletexString
+VideotexString ::= [UNIVERSAL 21] VideotexString
+IA5String ::= [UNIVERSAL 22] IA5String
+GraphicString ::= [UNIVERSAL 25] GraphicString
+VisibleString ::= [UNIVERSAL 26] VisibleString
+ISO646String ::= [UNIVERSAL 26] ISO646String
+GeneralString ::= [UNIVERSAL 27] GeneralString
+UniversalString ::= [UNIVERSAL 28] UniversalString
+BMPString ::= [UNIVERSAL 30] BMPString
+
+GeneralizedTime ::= [UNIVERSAL 24] IMPLICIT VisibleString
+UTCTime ::= [UNIVERSAL 23] IMPLICIT VisibleString
+ObjectDescriptor ::= [UNIVERSAL 7] IMPLICIT GraphicString
