@@ -62,6 +62,7 @@ $debug	    = 0;
 $trace	    = 0;
 $verbose    = 0;
 $crossref   = 0;
+@infiles    = ();
 
 while ($ARGV[0]=~/^-/) {
 	$_ = shift;
@@ -71,14 +72,15 @@ while ($ARGV[0]=~/^-/) {
 	if (/^-t/) { $trace	= 1; next; }
 	if (/^-v/) { $verbose	= 1; next; }
 	if (/^-x/) { $crossref	= 1; next; }
-	if (/^-f(.*)/) { if ($1) { $infile  = $1; } else { $infile  = shift; } next; }
+	if (/^-f(.*)/) { if ($1) { push @infiles, $1; } else { push @infiles, shift; } next; }
 	if (/^-o(.*)/) { if ($1) { $outfile = $1; } else { $outfile = shift; } next; }
 	usage();
 	die "I don't recognize this switch: $_\\n";
 }
 
-if ($_=shift) { $infile  = $_; }
-if ($_=shift) { $outfile = $_; }
+foreach $infile (@ARGV) {
+	push @infiles, $infile;
+}
 
 sub usage {
 	print STDERR "$0 Usage:\n";
@@ -97,21 +99,30 @@ $\ = "\n";	# add new-line to print
 $* = 0;		# do signleline matching
 undef $/;	# read entire file
 
-if ($infile) {
-	open (INFILEH,"<$infile") || die "can't open $infile for input";
-	$ifh = \*INFILEH;
-} else {
-	$ifh = \*STDIN;
+$file = '';
+
+sub readfile {
+	my $fh = shift;
+	$file .= <$ifh>; # read entire file
+	chomp $file;
+	# strip leading whitespace
+	$file=~s/^(?:\s|\n)*//s;
+	# strip trailing whitespace
+	$file=~s/(?:\s|\n)*$//s;
+	# put an EOL on end in case file ends with comment
+	$file .= "\n";
 }
 
-$file = <$ifh>; # read entire file
-chomp $file;
-# strip leading whitespace
-$file=~s/^(?:\s|\n)*//s;
-# strip trailing whitespace
-$file=~s/(?:\s|\n)*$//s;
-# put an EOL on end in case file ends with comment
-$file .= "\n";
+if (scalar @infiles > 0) {
+	foreach $infile (@infiles) {
+		open (INFILEH,"<$infile") || die "can't open $infile for input";
+		$ifh = \*INFILEH;
+		readfile($ifh);
+	}
+} else {
+	$ifh = \*STDIN;
+	readfile($ifh);
+}
 
 if ($outfile) {
 	open (OUTFILEH,">$outfile") || die "can't open $outfile for output";
@@ -137,9 +148,9 @@ sub parse {
 				# $self->indent($::depth);
 				# printf "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv\n";
 			}
-			#$self->indent($::depth);
-			#printf "<$type> ... ";
-			#printf "\`".substr($_[0],0,index($_[0],"\n"))."'\n";
+			$self->indent($::depth);
+			printf "<$type> ... ";
+			printf "\`".substr($_[0],0,index($_[0],"\n"))."'\n";
 		}
 	}
 	$self->{line} = $_[0];
@@ -298,7 +309,7 @@ sub readitem {
 	my $type = shift;
 	my $line = $_[0];
 	my $gdmo = $_[1];
-	my $asn1 = $_[1];
+	my $asn1 = $_[2];
 	TEST: {
 		my ($s);
 		last TEST unless (($s = $type->parse($line,$gdmo,$asn1)));
@@ -325,11 +336,204 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my ($s);
-		$::indent.="\t";
+		#$::indent.="\t";
 		foreach $s (@{$self->{items}}) {
 			$s->gdmo();
 		}
-		$::indent=~s/^.//s;
+		#$::indent=~s/^.//s;
+	}
+}
+
+# -------------------------------------
+package MandatoryBraced;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+#
+sub readinterior {
+	my $self = shift;
+	my $type = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^{//s);
+		$self->{comments1} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{interior} = $type->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^}//s);
+		$self->{comments2} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref $self;
+	#printf STDERR "Reading type $type.";
+	unless ($type=~s/Braced$//) {
+		$type.='Lists';
+	}
+	return $self->readinterior($type,@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s);
+		if (!$::first) { printf ' '; }
+		printf '{'; $::first = 0;
+		{
+			$::indent.="\t";
+			if (($s = $self->{comments1})) { $s->gdmo(); }
+			$self->{interior}->gdmo();
+			$::indent=~s/^.//s;
+		}
+		if (!$::first) { printf ' '; }
+		printf '}'; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package OptionalBraced;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+#
+sub readinterior {
+	my $self = shift;
+	my $type = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^{//s);
+		$self->{comments1} = Comments->parse($line,$gdmo);
+		$self->{interior} = $type->parse($line,$gdmo,$asn1);
+		last TEST unless ($line=~s/^}//s);
+		$self->{comments2} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref $self;
+	#printf STDERR "Reading type $type.";
+	unless ($type=~s/Braced$//) {
+		$type.='Lists';
+	}
+	return $self->readinterior($type,@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s);
+		if (!$::first) { printf ' '; }
+		printf '{'; $::first = 0;
+		{
+			$::indent.="\t";
+			if (($s = $self->{comments1})) { $s->gdmo(); }
+			if (($s = $self->{interior})) { $s->gdmo(); }
+			$::indent=~s/^.//s;
+		}
+		if (!$::first) { printf ' '; }
+		printf '}'; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package SimpleToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub readtoken {
+	my $self = shift;
+	my $token = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		my $substitute;
+		$self->{token} = $token;
+		$substitute = $token;
+		$substitute=~s/[ \t]+/\\s\*/g;
+		# print STDERR "Substituting '$substitute'.";
+		last TEST unless ($line=~s/^$substitute//s);
+		# $self->{token} = $&;
+		# print STDERR "Got '$self->{token}'.";
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref $self;
+	$type=~s/Token$//;
+	return $self->readtoken($type,@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf ' '; }
+		printf "$self->{token}"; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package DashedToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub readtoken {
+	my $self = shift;
+	my $token = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		my $substitute;
+		$self->{token} = $token;
+		$substitute = $token;
+		$substitute=~s/-/ /g;
+		$substitute=~s/[ \t]+/\\s\*-?\\s\*/g;
+		# print STDERR "Substituting '$substitute'.";
+		last TEST unless ($line=~s/^$substitute//s);
+		# $self->{token} = $&;
+		# print STDERR "Got '$self->{token}'.";
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref $self;
+	$type=~s/Token$//;
+	return $self->readtoken($type,@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf ' '; }
+		printf "$self->{token}"; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -359,9 +563,7 @@ sub read {
 	my $line = $_[0];
 	my $s;
 	$::error = '';
-	while (($s = GdmoModule->parse($line))) {
-		push @{$self->{modules}}, $s;
-	}
+	$self->{modules} = GdmoModuleList->parse($line);
 	if (length($line)) {
 		print '<'.ref($::errob).">:\nSYNTAX ERROR (LINE $::lineno, LENGTH ".length($line).") NEAR(LENGTH ".length($::error)."):\n";
 		$self->printem($::error);
@@ -396,24 +598,424 @@ sub gdmo {
 	print "--@@ Special File: <$file\.specials>";
 	print "--@@ Date: ".$date;
 	print '--@@ ';
-	my $s;
+	my ($s,$i);
 	$::first = 1;
-	foreach $s (@{$self->{modules}}) { $s->gdmo(); }
+	if (($s = $self->{modules})) { $s->gdmo(); }
 	if (!$::first) { printf "\n"; $::first = 1; }
 	print '--@@ ';
-	print '--@@ end of gdmo';
+	print '--@@ end of gdmos';
 	print '--@@ ';
 	my ($id,$n,$s);
-	foreach $id (sort keys %{$::root->{gdmos}}) {
-		if (($s = $::root->{gdmos}->{$id}->{defn})) {
-			printf "--@@ This module defines \"$id\"\n";
+	if (1) {
+		$i = 0;
+		foreach $id (sort keys %{$::root->{gdmos}}) {
+			unless (($s = $::root->{gdmos}->{$id}->{defn})) {
+				if (($n = $::root->{gdmos}->{$id}->{refs}) > 0) {
+					unless ($i) { print "--@@"; }
+					printf "--@@ These modules reference \"$id\" $n times.\n";
+					$i++;
+				}
+			}
+		}
+		if ($i) { print "--@@"; }
+	}
+	if ($i) {
+		$i = 0;
+		foreach $id (sort keys %{$::root->{gdmos}}) {
+			if (($s = $::root->{gdmos}->{$id}->{defn})) {
+				unless ($i) { print "--@@"; }
+				printf "--@@ These modules define \"$id\"\n";
+				$i++;
+			}
+		}
+		if ($i) { print "--@@"; }
+	}
+	if (0) {
+		my ($g,$l);
+		foreach $g (@{$::root->{modules}}) {
+			$i = 0;
+			foreach $l (sort keys %{$g->{objects}}) {
+				if ($g->{objects}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines MANAGED OBJECT CLASS $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no MANAGED OBJECT CLASS."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{objects}}) {
+				if (!$g->{objects}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{objects}->{$l}->{docs}}) {
+						print "--@@ This module references MANAGED OBJECT CLASS $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no MANAGED OBJECT CLASS."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{packages}}) {
+				if ($g->{packages}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines PACKAGE $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no PACKAGE."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{packages}}) {
+				if (!$g->{packages}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{packages}->{$l}->{docs}}) {
+						print "--@@ This module references PACKAGE $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no PACKAGE."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{parameters}}) {
+				if ($g->{parameters}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines PARAMETER $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no PARAMETER."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{parameters}}) {
+				if (!$g->{parameters}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{parameters}->{$l}->{docs}}) {
+						print "--@@ This module references PARAMETER $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no PARAMETER."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{bindings}}) {
+				if ($g->{bindings}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines NAME BINDING $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no NAME BINDING."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{bindings}}) {
+				if (!$g->{bindings}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{bindings}->{$l}->{docs}}) {
+						print "--@@ This module references NAME BINDING $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no NAME BINDING."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{attributes}}) {
+				if ($g->{attributes}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines ATTRIBUTE $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no ATTRIBUTE."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{attributes}}) {
+				if (!$g->{attributes}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{attributes}->{$l}->{docs}}) {
+						print "--@@ This module references ATTRIBUTE $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no ATTRIBUTE."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{groups}}) {
+				if ($g->{groups}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines ATTRIBUTE GROUP $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no ATTRIBUTE GROUP."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{groups}}) {
+				if (!$g->{groups}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{groups}->{$l}->{docs}}) {
+						print "--@@ This module references ATTRIBUTE GROUP $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no ATTRIBUTE GROUP."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{behaviours}}) {
+				if ($g->{behaviours}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines BEHAVIOUR $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no BEHAVIOUR."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{behaviours}}) {
+				if (!$g->{behaviours}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{behaviours}->{$l}->{docs}}) {
+						print "--@@ This module references BEHAVIOUR $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no BEHAVIOUR."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{actions}}) {
+				if ($g->{actions}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines ACTION $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no ACTION."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{actions}}) {
+				if (!$g->{actions}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{actions}->{$l}->{docs}}) {
+						print "--@@ This module references ACTION $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no ACTION."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{notifications}}) {
+				if ($g->{notifications}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines NOTIFICATION $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no NOTIFICATION."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{notifications}}) {
+				if (!$g->{notifications}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{notifications}->{$l}->{docs}}) {
+						print "--@@ This module references NOTIFICATION $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module references no NOTIFICATION."; }
 		}
 	}
-	print '--@@ ';
-	foreach $id (sort keys %{$::root->{gdmos}}) {
-		unless (($s = $::root->{gdmos}->{$id}->{defn})) {
-			if (($n = $::root->{gdmos}->{$id}->{refs}) > 0) {
-				printf "--@@ This module references \"$id\" $n times.\n";
+	if (1) {
+		my ($g,$l);
+		$g = $::root;
+		if (1) {
+			$i = 0;
+			foreach $l (sort keys %{$g->{objects}}) {
+				if (!$g->{objects}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{objects}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference MANAGED OBJECT CLASS $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no MANAGED OBJECT CLASS."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{objects}}) {
+					if ($g->{objects}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define MANAGED OBJECT CLASS $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no MANAGED OBJECT CLASS."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{packages}}) {
+				if (!$g->{packages}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{packages}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference PACKAGE $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no PACKAGE."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{packages}}) {
+					if ($g->{packages}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define PACKAGE $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no PACKAGE."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{parameters}}) {
+				if (!$g->{parameters}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{parameters}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference PARAMETER $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no PARAMETER."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{parameters}}) {
+					if ($g->{parameters}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define PARAMETER $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no PARAMETER."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{bindings}}) {
+				if (!$g->{bindings}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{bindings}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference NAME BINDING $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no NAME BINDING."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{bindings}}) {
+					if ($g->{bindings}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define NAME BINDING $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no NAME BINDING."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{attributes}}) {
+				if (!$g->{attributes}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{attributes}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference ATTRIBUTE $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no ATTRIBUTE."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{attributes}}) {
+					if ($g->{attributes}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define ATTRIBUTE $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no ATTRIBUTE."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{groups}}) {
+				if (!$g->{groups}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{groups}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference ATTRIBUTE GROUP $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no ATTRIBUTE GROUP."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{groups}}) {
+					if ($g->{groups}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define ATTRIBUTE GROUP $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no ATTRIBUTE GROUP."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{behaviours}}) {
+				if (!$g->{behaviours}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{behaviours}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference BEHAVIOUR $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no BEHAVIOUR."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{behaviours}}) {
+					if ($g->{behaviours}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define BEHAVIOUR $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no BEHAVIOUR."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{actions}}) {
+				if (!$g->{actions}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{actions}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference ACTION $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no ACTION."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{actions}}) {
+					if ($g->{actions}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define ACTION $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no ACTION."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{notifications}}) {
+				if (!$g->{notifications}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{notifications}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference NOTIFICATION $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no NOTIFICATION."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{notifications}}) {
+					if ($g->{notifications}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define NOTIFICATION $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no NOTIFICATION."; }
 			}
 		}
 	}
@@ -445,7 +1047,13 @@ sub gdmo {
 	}
 }
 
-
+# -------------------------------------
+package GdmoModuleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
+#
 # -------------------------------------
 package GdmoModule;
 use strict;
@@ -465,12 +1073,12 @@ sub read {
 			$self->{preamble} = $s;
 			$e++;
 		}
-		while (($s = Template->parse($line,$self))) {
-			push @{$self->{templates}}, $s;
+		if (($s = TemplateList->parse($line,$self))) {
+			$self->{templates} = $s;
 			$e++;
 		}
-		while (($s = Asn1Module->parse($line,$self))) {
-			push @{$self->{asn1modules}}, $s;
+		if (($s = Asn1ModuleList->parse($line,$self))) {
+			$self->{asn1modules} = $s;
 			$e++;
 		}
 		if (($s = Postamble->parse($line,$self))) {
@@ -478,6 +1086,7 @@ sub read {
 			$e++;
 		}
 		last TEST unless ($e != 0);
+		push @{$::root->{modules}}, $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -488,13 +1097,20 @@ sub gdmo {
 	PRINT: {
 		my $s;
 		if (($s = $self->{preamble})) { $s->gdmo(); }
-		foreach $s (@{$self->{templates}}) {
-			$s->gdmo();
-		}
-		foreach $s (@{$self->{asn1modules}}) {
-			$s->gdmo();
-		}
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		if (($s = $self->{templates})) { $s->gdmo(); }
+		if (($s = $self->{asn1modules})) { $s->gdmo(); }
 		if (($s = $self->{postamble})) { $s->gdmo(); }
+		if (0) {
+			my ($d,$i);
+			if (!$::first) { printf "\n$::indent"; $::first = 1; }
+			foreach $d (sort keys %{$self->{aliases}}) {
+				unless ($i) { print "--@@"; }
+				print "--@@ This module defines \"$d\".";
+				$i++;
+			}
+			if ($i) { print "--@@"; }
+		}
 	}
 }
 
@@ -541,7 +1157,7 @@ sub read {
 				$e++;
 			}
 		} while ($s);
-		last TEST unless ($e > 0);
+		last TEST unless ($e > 0 && $self->{document});
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -589,6 +1205,7 @@ sub gdmo {
 			printf '--< GDMO.Copyright Copyright (c) 1997-2007 OpenSS7 Corporation. >--'; $::first = 0;
 		}
 		foreach $s (@{$self->{comments}}) {
+			if (!$::first) { printf "\n$::indent"; $::first = 1; }
 			$s->gdmo();
 		}
 	}
@@ -619,6 +1236,7 @@ sub read {
 				if (($s = GdmoEndDocumentDirective->parse($directive,$gdmo))) {
 					$self->{enddocument} = $s;
 					$e++;
+					goto DONE;
 				} elsif (($s = GdmoChangeLogDirective->parse($directive,$gdmo))) {
 					$self->{changelog} = $s;
 					$e++;
@@ -628,6 +1246,7 @@ sub read {
 				$e++;
 			}
 		} while ($s);
+	DONE:
 		last TEST unless ($e > 0);
 		$_[0] = $line; return $self;
 	}
@@ -663,6 +1282,13 @@ sub gdmo {
 }
 
 # -------------------------------------
+package Asn1ModuleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
+
+# -------------------------------------
 package Asn1Module;
 use strict;
 use vars qw(@ISA);
@@ -694,11 +1320,11 @@ sub read {
 			}
 		} while ($s);
 		last TEST unless (($self->{name} = ModuleIdentifier->parse($line,$gdmo,$self)));
-		last TEST unless (($self->{oid} = ObjectIdentifier->parse($line,$gdmo,$self)));
+		last TEST unless (($self->{oid} = ObjectIdentifierValue->parse($line,$gdmo,$self)));
 		last TEST unless (($self->{definitions} = Asn1Definitions->parse($line,$gdmo,$self)));
 		$self->{tagdefault} = TagDefault->parse($line,$gdmo,$self);
 		$self->{extdefault} = ExtensionDefault->parse($line,$gdmo,$self);
-		last TEST unless (($self->{assignment} = Assignment->parse($line,$gdmo,$self)));
+		last TEST unless (($self->{assign} = Assign->parse($line,$gdmo,$self)));
 		last TEST unless (($self->{begin} = Begin->parse($line,$gdmo,$self)));
 		$self->{body} = ModuleBody->parse($line,$gdmo,$self);
 		last TEST unless (($self->{end} = End->parse($line,$gdmo,$self)));
@@ -724,7 +1350,7 @@ sub gdmo {
 		$self->{definitions}->gdmo();
 		if (($s = $self->{tagdefault})) { $s->gdmo(); }
 		if (($s = $self->{extdefault})) { $s->gdmo(); }
-		$self->{assignment}->gdmo();
+		$self->{assign}->gdmo();
 		$self->{begin}->gdmo();
 		if (($s = $self->{body})) { $s->gdmo(); }
 		$self->{end}->gdmo();
@@ -735,28 +1361,12 @@ sub gdmo {
 package Asn1Definitions;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^DEFINITIONS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'DEFINITIONS'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('DEFINITIONS',@_);
 }
 
 # -------------------------------------
@@ -793,200 +1403,84 @@ sub gdmo {
 package ExplicitTags;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^EXPLICIT\s*TAGS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'EXPLICIT TAGS'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-		$self->{tags}->gdmo();
-	}
+	return $self->readtoken('EXPLICIT TAGS',@_);
 }
 
 # -------------------------------------
 package ImplicitTags;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^IMPLICIT\s*TAGS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'IMPLICIT TAGS'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('IMPLICIT TAGS',@_);
 }
 
 # -------------------------------------
 package AutomaticTags;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^AUTOMATIC\s*TAGS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'AUTOMATIC TAGS'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-		$self->{tags}->gdmo();
-	}
+	return $self->readtoken('AUTOMATIC TAGS',@_);
 }
 
 # -------------------------------------
 package ExtensionDefault;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^EXTENSIBILITY\s*IMPLIED//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'EXTENSIBILITY IMPLIED'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-		$self->{tags}->gdmo();
-	}
+	return $self->readtoken('EXTENSIBILITY IMPLIED',@_);
 }
 
 # -------------------------------------
-package Assignment;
+package Assign;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^::=//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf '::='; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('::=',@_);
 }
 
 # -------------------------------------
 package Begin;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^BEGIN//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'BEGIN'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('BEGIN',@_);
 }
 
 # -------------------------------------
 package End;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^END//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'END'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('END',@_);
 }
 
 # -------------------------------------
@@ -1038,12 +1532,14 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
+		last TEST unless ($line=~s/^EXPORTS//s);
+		$self->{comments1} = Comments->parse($line,$gdmo);
 		last TEST unless (
 			($self->{exports} = ExportsAll->parse($line,$gdmo,$asn1)) ||
-			($self->{exports} = ExportsList->parse($line,$gdmo,$asn1))
+			($self->{exports} = ExportedSymbols->parse($line,$gdmo,$asn1))
 		);
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1052,10 +1548,13 @@ sub read {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my ($s);
+		my $s;
+		if (!$::first) { printf ' '; }
+		printf 'EXPORTS'; $::first = 0;
+		if (($s = $self->{comments1})) { $s->gdmo(); }
 		$self->{exports}->gdmo();
-		if (($s = $self->{comments})) { $s->gdmo(); }
 		printf ';'; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -1063,57 +1562,12 @@ sub gdmo {
 package ExportsAll;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^EXPORTS\s*ALL//s);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'EXPORTS ALL'; $::first = 0;
-	}
-}
-
-# -------------------------------------
-package ExportsList;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^EXPORTS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		last TEST unless (($self->{list} = ExportedSymbols->parse($line,$gdmo,$asn1)));
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'EXPORTS'; $::first = 0;
-		$self->{list}->gdmo();
-	}
+	return $self->readtoken('ALL',@_);
 }
 
 # -------------------------------------
@@ -1144,9 +1598,7 @@ sub read {
 		my ($s);
 		last TEST unless ($line=~s/^IMPORTS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		while (($s = SymbolsFromModule->parse($line,$gdmo,$asn1))) {
-			push @{$self->{imports}}, $s;
-		}
+		$self->{imports} = SymbolsFromModuleList->parse($line,$gdmo,$asn1);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -1161,11 +1613,18 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'IMPORTS'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
-		foreach $s (@{$self->{imports}}) { $s->gdmo(); }
+		if (($s = $self->{imports})) { $s->gdmo(); }
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package SymbolsFromModuleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
 
 # -------------------------------------
 package SymbolsFromModule;
@@ -1184,7 +1643,10 @@ sub read {
 		last TEST unless (($self->{symbols} = ImportedSymbols->parse($line,$gdmo,$asn1)));
 		last TEST unless ($line=~s/^FROM//s);
 		$self->{comments} = Comments->parse($line,$gdmo);
-		last TEST unless (($self->{module} = GlobalModuleReference->parse($line,$gdmo,$asn1)));
+		last TEST unless (
+			($self->{module} = GlobalModuleReference->parse($line,$gdmo,$asn1)) ||
+			($self->{module} = ModuleReference->parse($line,$gdmo,$asn1))
+		);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1194,6 +1656,7 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my ($s);
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		$self->{symbols}->gdmo();
 		if (!$::first) { printf "\n$::indent\t"; } else { printf "\t"; $::first = 0; }
 		printf 'FROM'; $::first = 0;
@@ -1229,7 +1692,7 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless (($self->{module} = ModuleReference->parse($line,$gdmo,$asn1)));
-		last TEST unless (($self->{object} = ObjectReference->parse($line,$gdmo,$asn1)));
+		last TEST unless (($self->{object} = ObjectIdentifierValue->parse($line,$gdmo,$asn1)));
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1247,38 +1710,11 @@ sub gdmo {
 package AssignmentList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleList);
 # -------------------------------------
 
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my $s;
-		last TEST;
-		while (($s = Asn1Assignment($line,$gdmo,$asn1))) {
-			push @{$self->{assignments}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		foreach $s (@{$self->{assignments}}) {
-			$s->gdmo();
-		}
-	}
-}
-
 # -------------------------------------
-package Asn1Assignment;
+package Assignment;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
@@ -1293,12 +1729,12 @@ sub read {
 		last TEST unless (
 			($self->{assignment} = TypeAssignment->parse($line,$gdmo,$asn1)) ||
 			($self->{assignment} = ValueAssignment->parse($line,$gdmo,$asn1)) ||
-			($self->{assignment} = XMLValueAssignment->parse($line,$gdmo,$asn1)) ||
-			($self->{assignment} = ValueSetTypeAssignment->parse($line,$gdmo,$asn1)) ||
-			($self->{assignment} = ObjectClassAssignment->parse($line,$gdmo,$asn1)) ||
-			($self->{assignment} = ObjectAssignment->parse($line,$gdmo,$asn1)) ||
-			($self->{assignment} = ObjectSetAssignment->parse($line,$gdmo,$asn1)) ||
-			($self->{assignment} = ParameterizedAssignment->parse($line,$gdmo,$asn1))
+#			($self->{assignment} = XMLValueAssignment->parse($line,$gdmo,$asn1)) ||
+			($self->{assignment} = ValueSetTypeAssignment->parse($line,$gdmo,$asn1))
+#			|| ($self->{assignment} = ObjectClassAssignment->parse($line,$gdmo,$asn1))
+#			|| ($self->{assignment} = ObjectAssignment->parse($line,$gdmo,$asn1))
+#			|| ($self->{assignment} = ObjectSetAssignment->parse($line,$gdmo,$asn1))
+#			|| ($self->{assignment} = ParameterizedAssignment->parse($line,$gdmo,$asn1))
 		);
 		$_[0] = $line; return $self;
 	}
@@ -1327,7 +1763,7 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless (($self->{reference} = TypeReference->parse($line,$gdmo,$asn1)));
-		last TEST unless (($self->{assignment} = Assignment->parse($line,$gdmo,$asn1)));
+		last TEST unless (($self->{assign} = Assign->parse($line,$gdmo,$asn1)));
 		last TEST unless (($self->{type} = Type->parse($line,$gdmo,$asn1)));
 		$_[0] = $line; return $self;
 	}
@@ -1338,7 +1774,7 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		$self->{reference}->gdmo();
-		$self->{assignment}->gdmo();
+		$self->{assign}->gdmo();
 		$self->{type}->gdmo();
 	}
 }
@@ -1357,7 +1793,8 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless (($self->{reference} = ValueReference->parse($line,$gdmo,$asn1)));
-		last TEST unless (($self->{assignment} = Assignment->parse($line,$gdmo,$asn1)));
+		last TEST unless (($self->{type} = Type->parse($line,$gdmo,$asn1)));
+		last TEST unless (($self->{assign} = Assign->parse($line,$gdmo,$asn1)));
 		last TEST unless (($self->{value} = Value->parse($line,$gdmo,$asn1)));
 		$_[0] = $line; return $self;
 	}
@@ -1368,7 +1805,8 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		$self->{reference}->gdmo();
-		$self->{assignment}->gdmo();
+		$self->{type}->gdmo();
+		$self->{assign}->gdmo();
 		$self->{value}->gdmo();
 	}
 }
@@ -1386,13 +1824,11 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my $s;
 		last TEST unless (
-			($s = BuiltinValue->parse($line,$gdmo,$asn1)) ||
-			($s = ReferencedValue->parse($line,$gdmo,$asn1)) ||
-			($s = ObjectClassFieldName->parse($line,$gdmo,$asn1))
+			($self->{value} = BuiltinValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = ReferencedValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = ObjectClassFieldName->parse($line,$gdmo,$asn1))
 		);
-		$self->{value} = $s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1418,29 +1854,27 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my $s;
 		last TEST unless (
-			($s = BitStringValue->parse($line,$gdmo,$asn1)) ||
-			($s = BooleanValue->parse($line,$gdmo,$asn1)) ||
-			($s = CharacterStringValue->parse($line,$gdmo,$asn1)) ||
-			($s = ChoiceValue->parse($line,$gdmo,$asn1)) ||
-			($s = EmbededPDVValue->parse($line,$gdmo,$asn1)) ||
-			($s = EnumeratedValue->parse($line,$gdmo,$asn1)) ||
-			($s = ExternalValue->parse($line,$gdmo,$asn1)) ||
-			($s = InstanceOfValue->parse($line,$gdmo,$asn1)) ||
-			($s = IntegerValue->parse($line,$gdmo,$asn1)) ||
-			($s = NullValue->parse($line,$gdmo,$asn1)) ||
-			($s = ObjectIdentifierValue->parse($line,$gdmo,$asn1)) ||
-			($s = OctetStringValue->parse($line,$gdmo,$asn1)) ||
-			($s = RealValue->parse($line,$gdmo,$asn1)) ||
-			($s = RelativeOIDValue->parse($line,$gdmo,$asn1)) ||
-			($s = SequenceValue->parse($line,$gdmo,$asn1)) ||
-			($s = SequenceOfValue->parse($line,$gdmo,$asn1)) ||
-			($s = SetValue->parse($line,$gdmo,$asn1)) ||
-			($s = SetOfValue->parse($line,$gdmo,$asn1)) ||
-			($s = TaggedValue->parse($line,$gdmo,$asn1))
+			($self->{value} = BitStringValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = BooleanValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = CharacterStringValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = ChoiceValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = EmbeddedPDVValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = EnumeratedValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = ExternalValue->parse($line,$gdmo,$asn1)) ||
+#			($self->{value} = InstanceOfValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = IntegerValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = NullValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = ObjectIdentifierValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = OctetStringValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = RealValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = RelativeOIDValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = SequenceValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = SequenceOfValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = SetValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = SetOfValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = TaggedValue->parse($line,$gdmo,$asn1))
 		);
-		$self->{value} = $s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1466,12 +1900,10 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my $s;
 		last TEST unless (
-			($s = DefinedValue->parse($line,$gdmo,$asn1)) ||
-			($s = ValueFromObject->parse($line,$gdmo,$asn1))
+			($self->{value} = DefinedValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = ValueFromObject->parse($line,$gdmo,$asn1))
 		);
-		$self->{value} = $s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1513,6 +1945,36 @@ sub gdmo {
 }
 
 # -------------------------------------
+package Identifier;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
+		$self->{identifier} = $&;
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf ' '; }
+		printf "$self->{identifier}"; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
 package XMLValueAssignment;
 use strict;
 use vars qw(@ISA);
@@ -1526,7 +1988,7 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless (($self->{reference} = ValueReference->parse($line,$gdmo,$asn1)));
-		last TEST unless (($self->{assignment} = Assignment->parse($line,$gdmo,$asn1)));
+		last TEST unless (($self->{assign} = Assign->parse($line,$gdmo,$asn1)));
 		last TEST unless (($self->{value} = XMLTypedValue->parse($line,$gdmo,$asn1)));
 		$_[0] = $line; return $self;
 	}
@@ -1537,7 +1999,7 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		$self->{reference}->gdmo();
-		$self->{assignment}->gdmo();
+		$self->{assign}->gdmo();
 		$self->{value}->gdmo();
 	}
 }
@@ -1581,7 +2043,7 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless (($self->{reference} = TypeReference->parse($line,$gdmo,$asn1)));
-		last TEST unless (($self->{assigment} = Assignment->parse($line,$gdmo,$asn1)));
+		last TEST unless (($self->{assign} = Assign->parse($line,$gdmo,$asn1)));
 		last TEST unless (($self->{valueset} = ValueSet->parse($line,$gdmo,$asn1)));
 		$_[0] = $line; return $self;
 	}
@@ -1592,7 +2054,7 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		$self->{reference}->gdmo();
-		$self->{assignment}->gdmo();
+		$self->{assign}->gdmo();
 		$self->{valueset}->gdmo();
 	}
 }
@@ -1601,42 +2063,10 @@ sub gdmo {
 package ValueSet;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(MandatoryBraced);
 # -------------------------------------
 
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my $s;
-		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		last Test unless (($self->{elements} = ElementSetSpecs->parse($line,$gdmo,$asn1)));
-		last TEST unless ($line=~s/^}//s);
-		$self->{comments2} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf '{'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			$self->{elements}->gdmo();
-			$::indent=~s/^.//s;
-		}
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
-	}
-}
+sub read { my $self = shift; return $self->readinterior('ElementSetSpecs',@_); }
 
 # -------------------------------------
 package Type;
@@ -1651,14 +2081,12 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my $s;
 		last TEST unless (
-			($s = BuildinType->parse($line,$gdmo,$asn1)) ||
-			($s = ReferencedType->parse($line,$gdmo,$asn1)) ||
-			($s = ConstrainedType->parse($line,$gdmo,$asn1))
+			($self->{type} = BuiltinType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ReferencedType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ConstrainedType->parse($line,$gdmo,$asn1))
 
 		);
-		$s->{type} = $s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1684,30 +2112,28 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my $s;
 		last TEST unless (
-			($s = BitStringType->parse($line,$gdmo,$asn1)) ||
-			($s = BooleanType->parse($line,$gdmo,$asn1)) ||
-			($s = CharacterStringType->parse($line,$gdmo,$asn1)) ||
-			($s = ChoiceType->parse($line,$gdmo,$asn1)) ||
-			($s = EmbeddedPDVType->parse($line,$gdmo,$asn1)) ||
-			($s = EnumeratedType->parse($line,$gdmo,$asn1)) ||
-			($s = ExternalType->parse($line,$gdmo,$asn1)) ||
-			($s = InstanceOfType->parse($line,$gdmo,$asn1)) ||
-			($s = IntegerType->parse($line,$gdmo,$asn1)) ||
-			($s = NullType->parse($line,$gdmo,$asn1)) ||
-			($s = ObjectClassFieldType->parse($line,$gdmo,$asn1)) ||
-			($s = ObjectIdentifierType->parse($line,$gdmo,$asn1)) ||
-			($s = OctetStringType->parse($line,$gdmo,$asn1)) ||
-			($s = RealType->parse($line,$gdmo,$asn1)) ||
-			($s = RelativeOIDType->parse($line,$gdmo,$asn1)) ||
-			($s = SequenceType->parse($line,$gdmo,$asn1)) ||
-			($s = SequenceOfType->parse($line,$gdmo,$asn1)) ||
-			($s = SetType->parse($line,$gdmo,$asn1)) ||
-			($s = SetOfType->parse($line,$gdmo,$asn1)) ||
-			($s = TaggedType->parse($line,$gdmo,$asn1))
+			($self->{type} = BitStringType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = BooleanType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = CharacterStringType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ChoiceType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = EmbeddedPDVType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = EnumeratedType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ExternalType->parse($line,$gdmo,$asn1)) ||
+#			($self->{type} = InstanceOfType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = IntegerType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = NullType->parse($line,$gdmo,$asn1)) ||
+#			($self->{type} = ObjectClassFieldType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ObjectIdentifierType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = OctetStringType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = RealType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = RelativeOIDType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = SequenceType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = SequenceOfType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = SetType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = SetOfType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = TaggedType->parse($line,$gdmo,$asn1))
 		);
-		$self->{type} = $s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1716,6 +2142,7 @@ sub read {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
+		$self->{type}->gdmo();
 	}
 }
 
@@ -1723,30 +2150,12 @@ sub gdmo {
 package BooleanType;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^BOOLEAN//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'BOOLEAN'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('BOOLEAN',@_);
 }
 
 # -------------------------------------
@@ -1764,6 +2173,7 @@ sub read {
 	TEST: {
 		last TEST unless (($line=~s/^(TRUE|FALSE)//s));
 		$self->{value} = $1;
+		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1774,6 +2184,7 @@ sub gdmo {
 	PRINT: {
 		if (!$::first) { printf ' '; }
 		printf "$self->{value}"; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -1791,13 +2202,8 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless ($line=~s/^INTEGER//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		if ($line=~s/^{//s) {
-			$self->{comments2} = Comments->parse($line,$gdmo);
-			last TEST unless (($self->{list} = NamedNumberList->parse($line,$gdmo,$asn1)));
-			last TEST unless ($line=~s/^}//s);
-			$self->{comments3} = Comments->parse($line,$gdmo);
-		}
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{list} = NamedNumberListBraced->parse($line,$gdmo,$asn1);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1809,18 +2215,17 @@ sub gdmo {
 		my ($s);
 		if (!$::first) { printf ' '; }
 		printf 'INTEGER'; $::first = 0;
-		if (($s = $self->{comments1})) { $s->gdmo(); }
-		printf '{'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments2})) { $s->gdmo(); }
-			$self->{list}->gdmo();
-			$::indent=~s/^.//s;
-		}
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (($s = $self->{list})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package NamedNumberListBraced;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
 
 # -------------------------------------
 package NamedNumberList;
@@ -1882,8 +2287,9 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		last TEST unless ($line=~s/^0|-?[1-9][0-9]*//s);
-		$self->{number} = $&;
+		last TEST unless ($line=~s/^(0|-?[1-9][0-9]*)//s);
+		$self->{number} = $1;
+		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1894,6 +2300,7 @@ sub gdmo {
 	PRINT: {
 		if (!$::first) { printf ' '; }
 		printf "$self->{number}"; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gmdo(); }
 	}
 }
 
@@ -1910,8 +2317,9 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		last TEST unless ($line=~s/^0|[1-9][0-9]*//s);
-		$self->{number} = $&;
+		last TEST unless ($line=~s/^(0|[1-9][0-9]*)//s);
+		$self->{number} = $1;
+		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1922,6 +2330,7 @@ sub gdmo {
 	PRINT: {
 		if (!$::first) { printf ' '; }
 		printf "$self->{number}"; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -2021,9 +2430,10 @@ sub read {
 		if ($line=~s/^\,//s) {
 			$self->{comments1} = Comments->parse($line,$gdmo);
 			last TEST unless ($line=~s/^\.\.\.//s);
+			$self->{comments2} = Comments->parse($line,$gdmo);
 			last TEST unless (($self->{exceptionspec} = ExceptionSpec->parse($line,$gdmo,$asn1)));
 			if ($line=~s/^\,//s) {
-				$self->{comments2} = Comments->parse($line,$gdmo);
+				$self->{comments3} = Comments->parse($line,$gdmo);
 				last TEST unless (($self->{additional} = AdditionalEnumeration->parse($line,$gdmo,$asn1)));
 			}
 		}
@@ -2042,10 +2452,11 @@ sub gdmo {
 			if (($s = $self->{comments1})) { $s->gdmo(); }
 			if (!$::first) { printf "\n$::indent"; $::first = 1; }
 			printf '...'; $::first = 0;
+			if (($s = $self->{comments2})) { $s->gdmo(); }
 			$s->gdmo();
 			if (($s = $self->{additional})) {
 				printf ','; $::first = 0;
-				if (($s = $self->{comments2})) { $s->gdmo(); }
+				if (($s = $self->{comments3})) { $s->gdmo(); }
 				if (!$::first) { printf "\n$::indent"; $::first = 1; }
 				$s->gdmo();
 
@@ -2173,27 +2584,12 @@ sub gdmo {
 package RealType;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^REAL//s);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::frist) { printf ' '; }
-		printf 'REAL'; $::first = 0;
-	}
+	return $self->readtoken('REAL',@_);
 }
 
 # -------------------------------------
@@ -2332,13 +2728,8 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless ($line=~s/^BIT\s*STRING//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		if ($line=~s/^{//s) {
-			$self->{comments2} = Comments->parse($line,$gdmo);
-			last TEST unless (($self->{namedbitlist} = NamedBitList->parse($line,$gdmo,$asn1)));
-			last TEST unless ($line=~s/^}//s);
-			$self->{comments3} = Comments->parse($line,$gdmo);
-		}
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{list} = NamedBitListBraced->parse($line,$gdmo,$asn1);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2350,19 +2741,17 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf ' '; }
 		printf 'BIT STRING';
-		if (($s = $self->{comments1})) { $s->gdmo(); }
-		if (($s = $self->{namedbitlist})) {
-			if (!$::first) { printf ' '; }
-			printf '{'; $::first = 0;
-			$::indent.="\t";
-			$s->gdmo();
-			$::indent=~s/^.//s;
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '}'; $::first = 0;
-		}
-
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (($s = $self->{list})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package NamedBitListBraced;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
 
 # -------------------------------------
 package NamedBitList;
@@ -2506,42 +2895,10 @@ sub gdmo {
 package BitStringValueList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(OptionalBraced);
 # -------------------------------------
 
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		$self->{list} = IdentifierList->parse($line,$gdmo,$asn1);
-		last TEST unless ($line=~s/^}//s);
-		$self->{comments2} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf '{'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			if (($s = $self->{list})) { $s->gdmo(); }
-			$::indent=~s/^.//s;
-		}
-		if (!$::first) { printf ' '; }
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
-	}
-}
+sub read { my $self = shift; return $self->readinterior('IdentifierList',@_); }
 
 # -------------------------------------
 package IdentifierList;
@@ -2585,29 +2942,12 @@ sub gdmo {
 package OctetStringType;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^OCTET\s*STRING//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'OCTET STRING';
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('OCTET STRING',@_);
 }
 
 # -------------------------------------
@@ -2644,58 +2984,24 @@ sub gdmo {
 package NullType;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^NULL//s);
-		$self->{comments} = Comments->parse($line,$gdmo,$asn1);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'NULL'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('NULL',@_);
 }
 
 # -------------------------------------
 package NullValue;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(SimpleToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^NULL//s);
-		$self->{comments} = Comments->parse($line,$gdmo,$asn1);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		if (!$::first) { printf ' '; }
-		printf 'NULL'; $::first = 0;
-		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('NULL',@_);
 }
 
 # -------------------------------------
@@ -2712,12 +3018,8 @@ sub read {
 	my $asn1 = $_[2];
 	TEST: {
 		last TEST unless ($line=~s/^SEQUENCE(?!\s*OF)//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		last TEST unless ($line=~s/^{//s);
-		$self->{comments2} = Comments->parse($line,$gdmo);
-		$self->{list} = SequenceTypeList->parse($line,$gdmo,$asn1);
-		last TEST unless ($line=~s/^}//s);
-		$self->{comments3} = Comments->parse($line,$gdmo);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{list} = ExtensionOrComponentTypeListBraced->parse($line,$gdmo,$asn1);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2729,24 +3031,20 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf ' '; }
 		printf 'SEQUENCE'; $::first = 0;
-		if (($s = $self->{comments1})) { $s->gdmo(); }
-		if (!$::first) { printf ' '; }
-		printf '{'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments2})) { $s->gdmo(); }
-			if (($s = $self->{list})) { $s->gdmo(); }
-			$::indent=~s/^.//s;
-		}
-		if (!$::first) { printf ' '; }
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments3})) { $s->gdmo(); }
-
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (($s = $self->{list})) { $s->gdmo(); }
 	}
 }
 
 # -------------------------------------
-package SequenceTypeList;
+package ExtensionOrComponentTypeListBraced;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(OptionalBraced);
+# -------------------------------------
+
+# -------------------------------------
+package ExtensionOrComponentTypeList;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
@@ -3092,7 +3390,7 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		if (($self->{namedtype} = NameType->parse($line,$gdmo,$asn1))) {
+		if (($self->{namedtype} = NamedType->parse($line,$gdmo,$asn1))) {
 			if ($line=~s/^OPTIONAL//s) {
 				$self->{optional} = 'OPTIONAL';
 				$self->{comments} = Comments->parse($line,$gdmo);
@@ -3141,38 +3439,10 @@ sub gdmo {
 package SequenceValue;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(OptionalBraced);
 # -------------------------------------
 
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		$self->{list} = ComponentValueList->parse($line,$gdmo,$asn1);
-		last TEST unless ($line=~s/^}//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf '{'; $::first = 0;
-		if (($s = $self->{comments1})) { $s->gdmo(); }
-		if (($s = $self->{list})) { $s->gdmo(); }
-		if (!$::first) { printf ' '; }
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
-	}
-}
+sub read { my $self = shift; return $self->readinterior('ComponentValueList',@_); }
 
 # -------------------------------------
 package ComponentValueList;
@@ -3219,6 +3489,1400 @@ sub gdmo {
 		$self->{type}->gdmo();
 	}
 }
+
+# -------------------------------------
+package SequenceOfValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(OptionalBraced);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readinterior('ValueListOrNameValueList',@_); }
+
+# -------------------------------------
+package ValueListOrNameValueList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{list} = ValueList->parse($line,$gdmo,$asn1)) ||
+			($self->{list} = NamedValueList->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{list}->gdmo();
+	}
+}
+
+# -------------------------------------
+package ValueList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+# -------------------------------------
+package NamedValueList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+# -------------------------------------
+package SetType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^SET(?!\s*OF)//s);
+		$self->{comments} = Comments->pcase($line,$gdmo);
+		$self->{list} = ExtensionOrComponentTypeListBraced->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (!$::first) { printf ' '; }
+		printf 'SET'; $::first = 0;
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (($s = $self->{list})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package SetValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(OptionalBraced);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readinterior('ComponentValueList',@_);
+}
+
+# -------------------------------------
+package SetOfType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^SET\s*OF//s);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		last TEST unless (
+			($self->{type} = Type->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = NamedType->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf ' '; }
+		printf 'SET OF'; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+		$self->{type}->gdmo();
+	}
+}
+
+# -------------------------------------
+package SetOfValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(OptionalBraced);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readinterior('ValueListOrNamedValueList',@_);
+}
+
+# -------------------------------------
+package ChoiceType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^CHOICE//s);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{alternatives} = AlternativeTypeListsBraced->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (!$::first) { printf ' '; }
+		printf 'CHOICE'; $::first = 0;
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		$self->{alternatives}->gdmo();
+	}
+}
+
+# -------------------------------------
+package AlternativeTypeListsBraced;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
+
+# -------------------------------------
+package AlternativeTypeLists;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{root} = RootAlternativeTypeList->parse($line,$gdmo,$asn1)));
+		if ($line=~s/^,//s) {
+			$self->{comments} = Comments->parse($line,$gdmo);
+			last TEST unless (($self->{exception} = ExtensionAndException->parse($line,$gdmo,$asn1)));
+			$self->{additions} = ExtensionAdditionAlternatives->parse($line,$gdmo,$asn1);
+			$self->{marker} = ExtensionMarker->parse($line,$gdmo,$asn1);
+		}
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		$self->{root}->gdmo();
+		if (($s = $self->{exception})) {
+			if (!$::first) { printf ' '; }
+			printf ','; $::first = 0;
+			if (($s = $self->{comments})) { $s->gdmo(); }
+			$self->{exception}->gdmo();
+			if (($s = $self->{additions})) { $s->gdmo(); }
+			if (($s = $self->{marker})) { $s->gdmo(); }
+		}
+	}
+}
+
+# -------------------------------------
+package RootAlternativeTypeList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{list} = AlternativeTypeList->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{list}->gdmo();
+	}
+}
+
+# -------------------------------------
+package ExtensionAdditionAlternatives;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^,//s);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{list} = ExtensionAdditionAlternativesList->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		printf ','; $::first = 0;
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		$self->{list}->gdmo();
+	}
+}
+
+
+# -------------------------------------
+package ExtensionAdditionAlternativesList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readinterior('ExtensionAdditionAlternative',@_); }
+
+# -------------------------------------
+package ExtensionAdditionAlternative;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{alternative} = ExtensionAdditionAlternativesGroup->parse($line,$gdmo,$asn1)) ||
+			($self->{alternative} = NamedType->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{alternative}->gdmo();
+	}
+}
+
+# -------------------------------------
+package ExtensionAdditionAlternativesGroup;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^\[\[//s);
+		$self->{comments1} = Comments->parse($line,$gdmo);
+		$self->{version} = VersionNumber->parse($line,$gdmo,$asn1);
+		last TEST unless (($self->{list} = AlternativeTypeList->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^\]\]//s);
+		$self->{comments2} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (!$::first) { printf ' '; }
+		printf '[['; $::first = 0;
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		if (($s = $self->{version})) { $s->gdmo(); }
+		$self->{list}->gdmo();
+		if (!$::first) { printf ' '; }
+		printf ']]'; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package AlternativeTypeList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readitem('NamedType',@_); }
+
+# -------------------------------------
+package ChoiceValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{identifier} = Identifier->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^://s);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{value} = Value->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{identifier}->gdmo();
+		print ':'; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package SelectionType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{identifier} = Identifier->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^\<//s);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{type} = Type->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{identifier}->gdmo();
+		printf '<'; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+		$self->{type}->gdmo();
+	}
+}
+
+# -------------------------------------
+package TaggedType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{tag} = Tag->parse($line,$gdmo,$asn1)));
+		if ($line=~s/^IMPLICIT//s) {
+			$self->{implicit} = 'IMPLICIT';
+			$self->{comments} = Comments->parse($line,$gdmo);
+		} elsif ($line=~s/^EXPLICIT//s) {
+			$self->{explicit} = 'EXPLICIT';
+			$self->{comments} = Comments->parse($line,$gdmo);
+		}
+		last TEST unless (($self->{type} = Type->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		$self->{tag}->gdmo();
+		if (($s = $self->{implicit})) {
+			if (!$::first) { printf ' '; }
+			printf 'IMPLICIT'; $::first = 0;
+			if (($s = $self->{comments})) { $s->gdmo(); }
+		}
+		if (($s = $self->{explicit})) {
+			if (!$::first) { printf ' '; }
+			printf 'EXPLICIT'; $::first = 0;
+			if (($s = $self->{comments})) { $s->gdmo(); }
+		}
+		$self->{type}->gdmo();
+	}
+}
+
+# -------------------------------------
+package Tag;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless ($line=~s/^\[//);
+		$self->{comments1} = Comments->parse($line,$gdmo);
+		$self->{class} = Class->parse($line,$gdmo,$asn1);
+		last TEST unless (($self->{number} = ClassNumber->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^\]//);
+		$self->{comments2} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (!$::first) { printf ' '; }
+		printf '['; $::first = 0;
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$::first = 1;
+		if (($s = $self->{class})) {
+			$s->gdmo();
+			$self->{number}->gdmo();
+		} else {
+			$::first = 1;
+			$self->{number}->gdmo();
+		}
+		printf ']'; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package Class;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{class} = ClassUniversal->parse($line,$gdmo,$asn1)) ||
+			($self->{class} = ClassApplication->parse($line,$gdmo,$asn1)) ||
+			($self->{class} = ClassPrivate->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{class}->gdmo();
+	}
+}
+
+# -------------------------------------
+package ClassUniversal;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('UNIVERSAL',@_);
+}
+
+# -------------------------------------
+package ClassApplication;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('APPLICATION',@_);
+}
+
+# -------------------------------------
+package ClassPrivate;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('PRIVATE',@_);
+}
+
+# -------------------------------------
+package ClassNumber;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{value} = Number->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = DefinedValue->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package ObjectIdentifierType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('OBJECT IDENTIFIER',@_);
+}
+
+# -------------------------------------
+package ObjectIdentifierValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readinterior('ObjIdComponentsList',@_);
+}
+
+# -------------------------------------
+package ObjIdComponentsList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
+
+# -------------------------------------
+package ObjIdComponents;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{component} = NameAndNumberForm->parse($line,$gdmo,$asn1)) ||
+			($self->{component} = NumberForm->parse($line,$gdmo,$asn1)) ||
+			($self->{component} = NameForm->parse($line,$gdmo,$asn1)) ||
+			($self->{component} = DefinedValue->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{component}->gdmo();
+	}
+}
+
+# -------------------------------------
+package NameForm;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{identifier} = Identifier->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{identifier}->gdmo();
+	}
+}
+
+# -------------------------------------
+package NumberForm;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{number} = Number->parse($line,$gdmo,$asn1)) ||
+			($self->{number} = DefinedValue->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{number}->gdmo();
+	}
+}
+
+# -------------------------------------
+package NameAndNumberForm;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{identifier} = Identifier->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^\(//s);
+		$self->{comments1} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{number}  = NumberForm->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^\)//s);
+		$self->{comments2} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		$self->{identifier}->gdmo();
+		printf '('; $::first = 0;
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$::first = 1;
+		$self->{number}->gdmo();
+		printf ')'; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package RelativeOIDType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('RELATIVE-OID',@_);
+}
+
+# -------------------------------------
+package RelativeOIDValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readinterior('RelativeOIDComponentsList');
+}
+
+# -------------------------------------
+package RelativeOIDComponentsList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
+
+# -------------------------------------
+package RelativeOIDComponents;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{component} = NameAndNumberForm->parse($line,$gdmo,$asn1)) ||
+			($self->{component} = NumberForm->parse($line,$gdmo,$asn1)) ||
+			($self->{component} = DefinedValue->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{component}->gdmo();
+	}
+}
+
+# -------------------------------------
+package EmbeddedPDVType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('EMBEDDED PDV',@_);
+}
+
+# -------------------------------------
+package EmbeddedPDVValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{value} = SequenceValue->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package ExternalType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('EXTERNAL',@_);
+}
+
+# -------------------------------------
+package ExternalValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{value} = SequenceValue->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package CharacterStringType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{type} = RestrictedCharacterStringType->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = UnrestrictedCharacterStringType->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{type}->gdmo();
+	}
+}
+
+# -------------------------------------
+package CharacterStringValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{value} = RestrictedCharacterStringValue->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = UnrestrictedCharacterStringValue->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package RestrictedCharacterStringType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{type} = BMPStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = GeneralStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = GraphicStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = IA5StringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ISO646StringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = NumericStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = PrintableStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = TeletexStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = T61StringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = UniversalStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = UTF8StringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = VideotexStringToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = VisibleStringToken->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{type}->gdmo();
+	}
+}
+
+# -------------------------------------
+package BMPStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package GeneralStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package GraphicStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package IA5StringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package ISO646StringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package NumericStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package PrintableStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package TeletexStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package T61StringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package UniversalStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package UTF8StringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package VideotexStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package VisibleStringToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package RestrictedCharacterStringValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{value} = CString->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = CharacterStringList->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = Quadruple->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = Tuple->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package CharacterStringList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readinterior('CharSyms',@_); }
+
+# -------------------------------------
+package CharSyms;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readitem('CharsDefn',@_); }
+
+# -------------------------------------
+package CharsDefn;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{value} = CString->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = CharacterStringList->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = Quadruple->parse($line,$gdmo,$asn1)) ||
+			($self->{value} = Tuple->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package Quadruple;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readinterior('QuadrupleList',@_); }
+
+# -------------------------------------
+package QuadrupleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{group} = Number->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^,//s);
+		$self->{comments1} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{plane} = Number->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^,//s);
+		$self->{comments2} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{row} = Number->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^,//s);
+		$self->{comments3} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{cell} = Number->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		$self->{group}->gdmo();
+		printf ','; $::first = 0;
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{plane}->gdmo();
+		printf ','; $::first = 0;
+		if (($s = $self->{comments2})) { $s->gdmo(); }
+		$self->{row}->gdmo();
+		printf ','; $::first = 0;
+		if (($s = $self->{comments3})) { $s->gdmo(); }
+		$self->{cell}->gdmo();
+	}
+}
+
+# -------------------------------------
+package Tuple;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(MandatoryBraced);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readinterior('TupleList',@_); }
+
+# -------------------------------------
+package TupleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{column} = Number->parse($line,$gdmo,$asn1)));
+		last TEST unless ($line=~s/^,//s);
+		$self->{comments} = Comments->parse($line,$gdmo);
+		last TEST unless (($self->{row} = Number->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{column}->gdmo();
+		printf ','; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+		$self->{row}->gdmo();
+	}
+}
+
+# -------------------------------------
+package CString;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		my $string;
+		last TEST unless ($line=~s/^\"((?:[^"]|\"\s*\")*)\"//s);
+		$string = $1;
+		$string=~s/\"\s+\"//gs;
+		$string=~s/\"\"/\"/gs;
+		$self->{string} = $string;
+		$self->{comments} = Comments->parse($line,$gdmo);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($string,$s);
+		$string = $self->{string};
+		$string=~s/\"/\"\"/g;
+		if (!$::first) { printf ' '; }
+		printf "\"$string\""; $::first = 0;
+		if (($s = $self->{comments})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package UnrestrictedCharacterStringType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readtoken('CHARACTER STRING',@_); }
+
+# -------------------------------------
+package UnrestrictedCharacterStringValue;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (($self->{value} = SequenceValue->parse($line,$gdmo,$asn1)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{value}->gdmo();
+	}
+}
+
+# -------------------------------------
+package UsefulType;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[2];
+	TEST: {
+		last TEST unless (
+			($self->{type} = GeneralizedTimeToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = UTCTimeToken->parse($line,$gdmo,$asn1)) ||
+			($self->{type} = ObjectDescriptorToken->parse($line,$gdmo,$asn1))
+		);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{type}->gdmo();
+	}
+}
+
+# -------------------------------------
+package GeneralizedTimeToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package UTCTimeToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
+
+# -------------------------------------
+package ObjectDescriptorToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+# -------------------------------------
 
 # -------------------------------------
 package ReferencedType;
@@ -3675,7 +5339,7 @@ sub read {
 	TEST: {
 		last TEST unless (
 			($self->{specifier} = DocumentReference->parse($line,$gdmo)) ||
-			($self->{specifier} = ObjectReference->parse($line,$gdmo))
+			($self->{specifier} = ObjectIdentifierValue->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -3706,9 +5370,9 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^GDMO\s*\.\s*Document\s*//s);
 		$self->{documentstring} = DocumentIdentifier->parse($line,$gdmo);
-		$self->{documentoid} = ObjectIdentifier->parse($line,$gdmo,$gdmo);
+		$self->{documentoid} = ObjectIdentifierValue->parse($line,$gdmo,$gdmo);
 		last TEST unless ($self->{documentstring} || $self->{documentoid});
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3722,7 +5386,6 @@ sub gdmo {
 		printf 'GDMO.Document'; $::first = 0;
 		if (($s = $self->{documentstring})) { $s->gdmo(); }
 		if (($s = $self->{documentoid})) { $s->gdmo(); }
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -3740,8 +5403,8 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^GDMO\s*\.\s*EndDocument\s*//s);
 		$self->{documentstring} = DocumentReference->parse($line,$gdmo);
-		$self->{documentoid} = ObjectReference->parse($line,$gdmo);
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{documentoid} = ObjectIdentifierValue->parse($line,$gdmo);
+		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3755,7 +5418,6 @@ sub gdmo {
 		printf 'GDMO.EndDocument'; $::first = 0;
 		if (($s = $self->{documentstring})) { $s->gdmo(); }
 		if (($s = $self->{documentoid})) { $s->gdmo(); }
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -3773,7 +5435,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^GDMO\s*\.\s*Version\s*//s);
 		$self->{version} = Version->parse($line,$gdmo);
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3786,7 +5448,6 @@ sub gdmo {
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
 		printf 'GDMO.Version'; $::first = 0;
 		if (($s = $self->{version})) { $s->gdmo(); }
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -3902,7 +5563,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^ASN1\s*\.\s*Version\s*//s);
 		$self->{version} = Version->parse($line,$gdmo);
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3914,7 +5575,6 @@ sub gdmo {
 		my $s;
 		printf 'ASN1.Version '; $::first = 0;
 		if (($s = $self->{version})) { $s->gdmo(); }
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -3932,7 +5592,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^[0-9]+(?:\.[0-9]+)*//s);
 		$self->{version} = $&;
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3944,7 +5604,6 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf ' '; }
 		printf "$self->{version}"; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -4044,6 +5703,13 @@ sub gdmo {
 }
 
 # ----------------------------------------
+package TemplateList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# ----------------------------------------
+
+# ----------------------------------------
 package Template;
 use strict;
 use vars qw(@ISA);
@@ -4107,6 +5773,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{objects}->{$self->{label}}->{defn} = $self;
+		$::root->{objects}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4155,6 +5823,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{packages}->{$self->{label}}->{defn} = $self;
+		$::root->{packages}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4206,6 +5876,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{parameters}->{$self->{label}}->{defn} = $self;
+		$::root->{parameters}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4255,6 +5927,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{bindings}->{$self->{label}}->{defn} = $self;
+		$::root->{bindings}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4308,6 +5982,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{attributes}->{$self->{label}}->{defn} = $self;
+		$::root->{attributes}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4355,6 +6031,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{groups}->{$self->{label}}->{defn} = $self;
+		$::root->{groups}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4398,6 +6076,8 @@ sub read {
 		$self->{definedas} = DefinedAs->parse($line,$gdmo);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{behaviours}->{$self->{label}}->{defn} = $self;
+		$::root->{behaviours}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4443,6 +6123,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{actions}->{$self->{label}}->{defn} = $self;
+		$::root->{actions}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4492,6 +6174,8 @@ sub read {
 		$self->{registration} = RegisteredAs->parse($line,$gdmo,$self);
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
+		$gdmo->{notifications}->{$self->{label}}->{defn} = $self;
+		$::root->{notifications}->{$self->{label}}->{defn} = $self;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4533,8 +6217,9 @@ sub read {
 		last TEST unless ($line=~s/^(?:"([^"]*)")//s);
 		$self->{documentid} = $1;
 		last TEST if ($::root->{gdmos}->{$self->{documentid}}->{defn});
-		$::root->{gdmos}->{$self->{documentid}}->{defn} = $self;
+		$::root->{gdmos}->{$self->{documentid}}->{defn} = $gdmo;
 		$gdmo->{documentid} = $self->{documentid};
+		$gdmo->{aliases}->{$self->{documentid}}++;
 		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
@@ -4667,6 +6352,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{objects}->{$l}->{refs}++;
+			$::root->{objects}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{objects}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{objects}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4700,6 +6395,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{packages}->{$l}->{refs}++;
+			$::root->{packages}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{packages}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{packages}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4733,6 +6438,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{parameters}->{$l}->{refs}++;
+			$::root->{parameters}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{parameters}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{parameters}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4766,6 +6481,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{bindings}->{$l}->{refs}++;
+			$::root->{bindings}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{bindings}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{bindings}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4799,6 +6524,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{attributes}->{$l}->{refs}++;
+			$::root->{attributes}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{attributes}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{attributes}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4832,6 +6567,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{groups}->{$l}->{refs}++;
+			$::root->{groups}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{groups}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{groups}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4865,6 +6610,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{behaviours}->{$l}->{refs}++;
+			$::root->{behaviours}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{behaviours}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{behaviours}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4898,6 +6653,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{actions}->{$l}->{refs}++;
+			$::root->{actions}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{actions}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{actions}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4931,6 +6696,16 @@ sub read {
 			($self->{reference} = Reference->parse($line,$gdmo))
 		);
 		$self->{comments} = Comments->parse($line,$gdmo);
+		my ($r,$d,$l);
+		if (($r = $self->{reference})) {
+			$l = $r->{label}->{label};
+			$gdmo->{notifications}->{$l}->{refs}++;
+			$::root->{notifications}->{$l}->{refs}++;
+			if (($d = $r->{documentid})) {
+				$gdmo->{notifications}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+				$::root->{notifications}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
+			}
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -5294,13 +7069,7 @@ sub read {
 	my $gdmo = $_[1];
 	TEST: {
 		last TEST unless (($self->{attribute} = AttributeReference->parse($line,$gdmo)));
-		my $s;
-#		last TEST unless (($s = Property->parse($line,$gdmo)));
-#		push @{$self->{properties}}, $s;
-		while (($s = Property->parse($line,$gdmo))) {
-			push @{$self->{properties}}, $s;
-		}
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{properties} = PropertyList->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -5313,12 +7082,18 @@ sub gdmo {
 		if (($s = $self->{attribute})) { $s->gdmo(); }
 		{
 			$::indent.="\t";
-			foreach $s (@{$self->{properties}}) { $s->gdmo(); }
-			$::indent=~s/.$//s;
+			$self->{properties}->gdmo();
+			$::indent=~s/^.//s;
 		}
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package PropertyList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
 
 # -------------------------------------
 package Property;
@@ -5366,29 +7141,12 @@ sub gdmo {
 package ReplaceWithDefault;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^REPLACE(?:\s|\n)*((-)?)(?:\s|\n)*WITH(?:\s|\n)*((-)?)(?:\s|\n)*DEFAULT//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf "REPLACE WITH DEFAULT"; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('REPLACE-WITH-DEFAULT',@_);
 }
 
 # -------------------------------------
@@ -5519,232 +7277,96 @@ sub gdmo {
 package GetReplace;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^GET(?:\s|\n)*((-)?)(?:\s|\n)*REPLACE//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'GET-REPLACE'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('GET-REPLACE',@_);
 }
 
 # -------------------------------------
 package Get;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^GET//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'GET'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('GET',@_);
 }
 
 # -------------------------------------
 package Replace;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^REPLACE//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'REPLACE'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('REPLACE',@_);
 }
 
 # -------------------------------------
 package AddRemove;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^ADD(?:\s|\n)*((-)?)(?:\s|\n)*REMOVE//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'ADD-REMOVE'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('ADD-REMOVE',@_);
 }
 
 # -------------------------------------
 package Add;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^ADD//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'ADD'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('ADD',@_);
 }
 
 # -------------------------------------
 package Remove;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^REMOVE//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'REMOVE'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('REMOVE',@_);
 }
 
 # -------------------------------------
 package SetByCreate;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^SET(?:\s|\n)*((-)?)(?:\s|\n)*BY(?:\s|\n)*((-)?)(?:\s|\n)*CREATE//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'SET-BY-CREATE'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('SET-BY-CREATE',@_);
 }
 
 # -------------------------------------
 package NoModify;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^NO(?:\s|\n)*((-)?)(?:\s|\n)*MODIFY//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf 'NO-MODIFY'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('NO-MODIFY',@_);
 }
 
 # -------------------------------------
@@ -5803,7 +7425,6 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (!$::first) { printf ' '; }
 		if (($s = $self->{modulereference})) { $s->gdmo(); printf '.'; $::first = 0; }
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		$::first = 1; # fool typereference into concatenating
@@ -5836,9 +7457,9 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (!$::first) { printf ' '; }
 		if (($s = $self->{modulereference})) { $s->gdmo(); printf '.'; }
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		$::first = 1; # fool it
 		if (($s = $self->{valuename})) { $s->gdmo(); }
 	}
 }
@@ -6029,6 +7650,7 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
+		if (!$::first) { printf ' '; }
 		printf "$self->{name}"; $::first = 0;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
@@ -6120,10 +7742,7 @@ sub read {
 	my $gdmo = $_[1];
 	TEST: {
 		last TEST unless (($self->{group} = AttributeGroupReference->parse($line,$gdmo)));
-		my $s;
-		while (($s = AttributeReference->parse($line,$gdmo))) {
-			push @{$self->{attributes}}, $s;
-		}
+		$self->{attributes} = AttributeReferenceSimpleList->parse($line,$gdmo);
 		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
@@ -6138,14 +7757,21 @@ sub gdmo {
 		if (($s = $self->{group})) { $s->gdmo(); }
 		{
 			$::indent.="\t";
-			foreach $s (@{$self->{attributes}}) {
-				$s->gdmo();
-			}
+			if (($s = $self->{attributes})) { $s->gdmo(); }
 			$::indent=~s/.$//s;
 		}
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package AttributeReferenceSimpleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readitem('AttributeReference',@_); }
 
 # -------------------------------------
 package Actions;
@@ -6202,11 +7828,7 @@ sub read {
 	my $gdmo = $_[1];
 	TEST: {
 		last TEST unless (($self->{action} = ActionReference->parse($line,$gdmo)));
-		my $s;
-		while (($s = ParameterReference->parse($line,$gdmo))) {
-			push @{$self->{parameters}}, $s;
-		}
-		$self->{comments} = Comments->parse($line,$gdmo);
+		$self->{parameters} = ParameterReferenceSimpleList->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -6220,14 +7842,20 @@ sub gdmo {
 		$self->{action}->gdmo();
 		{
 			$::indent.="\t";
-			foreach $s (@{$self->{parameters}}) {
-				$s->gdmo();
-			}
+			if (($s = $self->{parameters})) { $s->gdmo(); }
 			$::indent=~s/.$//s;
 		}
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package ParameterReferenceSimpleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readitem('ParameterReference',@_); }
 
 # -------------------------------------
 package Notifications;
@@ -6284,10 +7912,7 @@ sub read {
 	my $gdmo = $_[1];
 	TEST: {
 		last TEST unless (($self->{notification} = NotificationReference->parse($line,$gdmo)));
-		my $s;
-		while (($s = ParameterReference->parse($line,$gdmo))) {
-			push @{$self->{parameters}}, $s;
-		}
+		$self->{parameters} = ParameterReferenceSimpleList->parse($line,$gdmo);
 		$self->{comments} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
@@ -6302,9 +7927,7 @@ sub gdmo {
 		$self->{notification}->gdmo();
 		{
 			$::indent.="\t";
-			foreach $s (@{$self->{parameters}}) {
-				$s->gdmo();
-			}
+			if (($s = $self->{parameters})) { $s->gdmo(); }
 			$::indent=~s/.$//s;
 		}
 		if (($s = $self->{comments})) { $s->gdmo(); }
@@ -6327,7 +7950,7 @@ sub read {
 		last TEST unless
 		($line=~s/^REGISTERED(?:\s|\n)*((-)?)(?:\s|\n)*AS//s);
 		$self->{comments} = Comments->parse($line,$gdmo);
-		last TEST unless (($self->{objectid} = ObjectIdentifier->parse($line,$gdmo,$tmpl)));
+		last TEST unless (($self->{objectid} = ObjectIdentifierValue->parse($line,$gdmo,$tmpl)));
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -6342,203 +7965,6 @@ sub gdmo {
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		if (($s = $self->{objectid})) { $s->gdmo(); }
 	}
-}
-
-# -------------------------------------
-package ObjectIdentifier;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $objt = $_[2]; # could be gdmo, asn1 or tmpl
-	TEST: {
-		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		my $s;
-		last TEST unless (($s = ObjectComponent->parse($line,$gdmo,1)));
-		push @{$self->{components}}, $s;
-		while (($s = ObjectComponent->parse($line,$gdmo))) {
-			push @{$self->{components}}, $s;
-		}
-		last TEST unless ($line=~s/^}//s);
-		$self->{comments2} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf '{'; $::first = 0;
-		if (($s = $self->{comments1})) { $s->gdmo(); }
-		foreach $s (@{$self->{components}}) { $s->gdmo(); }
-		if (!$::first) { printf ' '; }
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
-	}
-}
-
-sub oid {
-	my $self = shift;
-	my ($s);
-	my $string = '';
-	for $s (@{$self->{components}}) {
-		if ($string) { $string = $string.".".$s->oid(); } else { $string = $s->oid(); }
-	}
-	return $string;
-}
-
-# -------------------------------------
-package ObjectReference;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line,$gdmo);
-		my $s;
-		last TEST unless (($s = ObjectComponent->parse($line,$gdmo,1)));
-		push @{$self->{components}}, $s;
-		while (($s = ObjectComponent->parse($line,$gdmo))) {
-			push @{$self->{components}}, $s;
-		}
-		last TEST unless ($line=~s/^}//s);
-		$self->{comments2} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf '{'; $::first = 0;
-		if (($s = $self->{comments1})) { $s->gdmo(); }
-		foreach $s (@{$self->{components}}) { $s->gdmo(); }
-		if (!$::first) { printf ' '; }
-		printf '}'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
-	}
-}
-
-sub oid {
-	my $self = shift;
-	my ($s);
-	my $string = '';
-	for $s (@{$self->{components}}) {
-		if ($string) { $string = $string.".".$s->oid(); } else { $string = $s->oid(); }
-	}
-	return $string;
-}
-
-# -------------------------------------
-package ObjectComponent;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $frst = $_[2];
-	TEST: {
-		last TEST unless (
-			(($self->{component} = NameOrNumberForm->parse($line,$gdmo,$frst))) ||
-			($frst && ($self->{component} = DefinedValue->parse($line,$gdmo)))
-		);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (($s = $self->{component})) { $s->gdmo(); }
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
-}
-
-sub oid {
-	my $self = shift;
-	return $self->{component}->oid();
-}
-
-# -------------------------------------
-package NameOrNumberForm;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $frst = $_[2];
-	TEST: {
-		if ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*\((?:\s|\n)*((?:0|[1-9][0-9]*))(?:\s|\n)*\)//s) {
-			$self->{name} = $1;
-			$self->{number} = $2;
-		} elsif ($frst && $line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))//s) {
-			$self->{name} = $1;
-		} elsif ($line=~s/^((?:0|[1-9][0-9]*))//s) {
-			$self->{number} = $1;
-		} else {
-			last TEST;
-		}
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		if (defined $self->{name} && defined $self->{number}) {
-			printf "$self->{name}($self->{number})";
-		} elsif (defined $self->{name}) {
-			printf "$self->{name}";
-		} elsif (defined $self->{number}) {
-			printf "$self->{number}";
-		}
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
-}
-
-sub oid {
-	my $self = shift;
-	if (defined $self->{number}) {
-		if ($self->{number}) {
-			return "$self->{number}";
-		} else {
-			return "0";
-		}
-	}
-	return "$self->{name}";
 }
 
 # -------------------------------------
@@ -6986,29 +8412,12 @@ sub gdmo {
 package AndSubclasses;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^AND(?:\s|\n)*((-)?)(?:\s|\n)*SUBCLASSES//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'AND SUBCLASSES'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('AND SUBCLASSES',@_);
 }
 
 # -------------------------------------
@@ -7066,9 +8475,7 @@ sub read {
 		last TEST unless ($line=~s/^CREATE//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
 		$self->{modifiers} = CreateModifierList->parse($line,$gdmo);
-		while (($s = ParameterReference->parse($line,$gdmo))) {
-			push @{$self->{parameters}}, $s;
-		}
+		$self->{parameters} = ParameterReferenceSimpleList->parse($line,$gdmo);
 		last TEST unless ($line=~s/^;//s); 
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -7084,9 +8491,7 @@ sub gdmo {
 		printf 'CREATE'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
 		if (($s = $self->{modifiers})) { $s->gdmo(); }
-		foreach $s (@{$self->{parameters}}) {
-			$s->gdmo();
-		}
+		if (($s = $self->{parameters})) { $s->gdmo(); }
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
@@ -7134,58 +8539,24 @@ sub gdmo {
 package WithReferenceObject;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*REFERENCE(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'WITH-REFERENCE-OBJECT'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('WITH-REFERENCE-OBJECT',@_);
 }
 
 # -------------------------------------
 package WithAutomaticInstanceNaming;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*AUTOMATIC(?:\s|\n)*((-)?)(?:\s|\n)*INSTANCE(?:\s|\n)*((-)?)(?:\s|\n)*NAMING//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'WITH-AUTOMATIC-INSTANCE-NAMING'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('WITH-AUTOMATIC-INSTANCE-NAMING',@_);
 }
 
 # -------------------------------------
@@ -7204,9 +8575,7 @@ sub read {
 		last TEST unless ($line=~s/^DELETE//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
 		$self->{modifiers} = DeleteModifierList->parse($line,$gdmo);
-		while (($s = ParameterReference->parse($line,$gdmo))) {
-			push @{$self->{parameters}}, $s;
-		}
+		$self->{parameters} = ParameterReferenceSimpleList->parse($line,$gdmo);
 		last TEST unless ($line=~s/^;//s); 
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -7222,9 +8591,7 @@ sub gdmo {
 		printf 'DELETE'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
 		if (($s = $self->{modifiers})) { $s->gdmo(); }
-		foreach $s (@{$self->{parameters}}) {
-			$s->gdmo();
-		}
+		if (($s = $self->{parameters})) { $s->gdmo(); }
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
@@ -7272,58 +8639,24 @@ sub gdmo {
 package OnlyIfNoContainedObjects;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^ONLY(?:\s|\n)*((-)?)(?:\s|\n)*IF(?:\s|\n)*((-)?)(?:\s|\n)*NO(?:\s|\n)*((-)?)(?:\s|\n)*CONTAINED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECTS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'ONLY-IF-NO-CONTAINED-OBJECTS'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('ONLY-IF-NO-CONTAINED-OBJECTS',@_);
 }
 
 # -------------------------------------
 package DeletesContainedObjects;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^DELETES(?:\s|\n)*((-)?)(?:\s|\n)*CONTAINED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECTS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'DELETES-CONTAINED-OBJECTS'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('DELETES-CONTAINED-OBJECTS',@_);
 }
 
 # -------------------------------------
@@ -7485,145 +8818,60 @@ sub gdmo {
 package Equality;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^EQUALITY//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'EQUALITY'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('EQUALITY',@_);
 }
 
 # -------------------------------------
 package Ordering;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^ORDERING//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'ORDERING'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('ORDERING',@_);
 }
 
 # -------------------------------------
 package Substrings;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^SUBSTRINGS//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'SUBSTRINGS'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('SUBSTRINGS',@_);
 }
 
 # -------------------------------------
 package SetComparison;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^SET(?:\s|\n)*((-)?)(?:\s|\n)*COMPARISON//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'SET COMPARISON'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('SET-COMPARISON',@_);
 }
 
 # -------------------------------------
 package SetIntersection;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^SET(?:\s|\n)*((-)?)(?:\s|\n)*INTERSECTION//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'SET INTERSECTION'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('SET-INTERSECTION',@_);
 }
 
 # -------------------------------------
@@ -7867,58 +9115,24 @@ sub gdmo {
 package Confirmed;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^CONFIRMED//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'CONFIRMED'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('CONFIRMED',@_);
 }
 
 # -------------------------------------
 package Unconfirmed;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^UNCONFIRMED//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'UNCONFIRMED'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('UNCONFIRMED',@_);
 }
 
 # -------------------------------------
@@ -8221,145 +9435,60 @@ sub gdmo {
 package ActionInfo;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^ACTION(?:\s|\n)*((-)?)(?:\s|\n)*INFO//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'ACTION INFO';
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('ACTION-INFO',@_);
 }
 
 # -------------------------------------
 package ActionReply;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^ACTION(?:\s|\n)*((-)?)(?:\s|\n)*REPLY//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'ACTION REPLY';
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('ACTION-REPLY',@_);
 }
 
 # -------------------------------------
 package EventInfo;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^EVENT(?:\s|\n)*((-)?)(?:\s|\n)*INFO//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'EVENT INFO';
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('EVENT-INFO',@_);
 }
 
 # -------------------------------------
 package EventReply;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^EVENT(?:\s|\n)*((-)?)(?:\s|\n)*REPLY//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'EVENT REPLY';
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('EVENT-REPLY',@_);
 }
 
 # -------------------------------------
 package SpecificError;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	TEST: {
-		last TEST unless ($line=~s/^SPECIFIC(?:\s|\n)*((-)?)(?:\s|\n)*ERROR//s);
-		$self->{comments} = Comments->parse($line,$gdmo);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf ' '; }
-		printf 'SPECIFIC ERROR';
-		if (($s = $self->{comments})) { $s->gdmo(); }
-	}
+	return $self->readtoken('SPECIFIC-ERROR',@_);
 }
 
 # -------------------------------------
@@ -8392,56 +9521,6 @@ sub gdmo {
 package main;
 use strict;
 # -------------------------------------
-
-sub getline {
-	my $type = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $type = $_[2];
-
-	my $i;
-	if ($::endoffile) {
-		unless ($line) { $::done = 1; $_[0] = $line; return 1; }
-	} else {
-
-#		until ($line=~/\n[^\n]/) {
-#		LINE: until (length($line) > 8192) {
-		LINE: while (1) {
-			$::lineno++;
-			my $second;
-			if (eof($::ifh)) {
-				$::endoffile = 1;
-				last LINE;
-			}
-			if (($second = <$::ifh>)) {
-				chomp $second;
-				# print "--@@ Readline: $second";
-				$line.="\n".$second;
-#			if ($line) { $line .= "\n".$second; } else { $line = $second; }
-			} else {
-				unless ($line) { $::done = 1; $_[0] = $line; return 1; }
-				last LINE;
-			}
-		}
-
-	}
-
-#	until ($line=~/[^\n]$/) {
-#		$::lineno++;
-#		$line = <$::ifh>;
-#		unless ($line) { $::done = 1; return 1; }
-#		chomp $line;
-#		if ($::lineno != 1) { $line = "\n".$line; }
-#	}
-	if ($::debug) {
-		unless ($type=~/^Comment/) {
-			printf "\<".$type."\> searching: line length ".length($line)."\n";
-			printf "\`".substr($line,0,index($line,"\n"))."'\n";
-		}
-	}
-	$_[0] = $line;
-	return 0;
-}
 
 no strict;
 

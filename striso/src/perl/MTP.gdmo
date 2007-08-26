@@ -1,35 +1,37 @@
 --< GDMO.Document "ITU-T Rec. Q.751.1 (1995)" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Alias "ITU-T Rec. Q.751.1 (1995)" "CCITT Rec. Q.751.1 (1995)",
--- "ITU-T Recommendation Q.751.1 (1995)",
--- "CCITT Recommendation Q.751.1 (1995)" >--
+--  "Rec. Q.751.1 (1995)",
+--  "ITU-T Recommendation Q.751.1 (1995)",
+--  "CCITT Recommendation Q.751.1 (1995)",
+--  "Recommendation Q.751.1 (1995)" >--
 --< GDMO.Copyright
 --  =============================================================================
 --  
 --  @(#) $RCSfile$ $Name$($Revision$) $Date$
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
--- 
+--  
 --  All Rights Reserved.
--- 
+--  
 --  This program is free software; you can redistribute it and/or modify it under
 --  the terms of the GNU General Public License as published by the Free Software
 --  Foundation; version 3 of the License.
--- 
+--  
 --  This program is distributed in the hope that it will be useful, but WITHOUT
 --  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 --  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 --  details.
--- 
+--  
 --  You should have received a copy of the GNU General Public License along with
 --  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
 --  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 --  behalf of the U.S. Government ("Government"), the following provisions apply
 --  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
@@ -43,16 +45,16 @@
 --  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 --  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 --  (or any successor regulations).
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Last Modified $Date$ by $Author$
--- 
+--  
 --  =============================================================================
 --  >--
 
@@ -69,10 +71,10 @@ lsTimersProfile MANAGED OBJECT CLASS
 						managed object class which can be instantiated in order to define a particular profile. At creation
 						time of a signLinkSetTp one of the lsTimersProfiles is referenced.";;
 			ATTRIBUTES
-				lsTimersProfileId GET SET BY CREATE,
-				q704-t6 GET SET BY CREATE,
-				q704-t8 GET SET BY CREATE,
-				q704-t10 GET SET BY CREATE;;;
+				lsTimersProfileId GET SET-BY-CREATE,
+				q704-t6 GET SET-BY-CREATE,
+				q704-t8 GET SET-BY-CREATE,
+				q704-t10 GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
@@ -101,7 +103,7 @@ managedSwitchingElement MANAGED OBJECT CLASS
 						that enables subscriber lines to be interconnected and packets to be forwarded as required by
 						individual users.";;
 			ATTRIBUTES
-				"ITU-T Rec. M.3100 (1992)":vendorName GET SET BY CREATE;;;
+				"ITU-T Rec. M.3100 (1992)":vendorName GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		managedSwitchingElementNamePackage
 			PRESENT IF
@@ -155,19 +157,19 @@ mtpL2ProtocolProfile MANAGED OBJECT CLASS
 						managed object class which can be instantiated in order to define a particular profile. At creation
 						time of a signLinkTp one of the mtpL2ProtocolProfiles is referenced.";;
 			ATTRIBUTES
-				mtpL2ProtocolProfileId GET SET BY CREATE,
-				errorCorrectionMethod GET SET BY CREATE,
-				transmissionRate GET SET BY CREATE,
-				l2TimerT1 GET SET BY CREATE,
-				l2TimerT2 GET SET BY CREATE,
-				l2TimerT3 GET SET BY CREATE,
-				l2TimerT4N GET SET BY CREATE,
-				l2TimerT4E GET SET BY CREATE,
-				l2TimerT5 GET SET BY CREATE,
-				l2TimerT6 GET SET BY CREATE,
-				l2TimerT7 GET SET BY CREATE,
-				transmissionCongestionThresholdOnsetLevel1 GET SET BY CREATE,
-				transmissionCongestionThresholdAbatementLevel1 GET SET BY CREATE;;;
+				mtpL2ProtocolProfileId GET SET-BY-CREATE,
+				errorCorrectionMethod GET SET-BY-CREATE,
+				transmissionRate GET SET-BY-CREATE,
+				l2TimerT1 GET SET-BY-CREATE,
+				l2TimerT2 GET SET-BY-CREATE,
+				l2TimerT3 GET SET-BY-CREATE,
+				l2TimerT4N GET SET-BY-CREATE,
+				l2TimerT4E GET SET-BY-CREATE,
+				l2TimerT5 GET SET-BY-CREATE,
+				l2TimerT6 GET SET-BY-CREATE,
+				l2TimerT7 GET SET-BY-CREATE,
+				transmissionCongestionThresholdOnsetLevel1 GET SET-BY-CREATE,
+				transmissionCongestionThresholdAbatementLevel1 GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
@@ -223,8 +225,8 @@ mtpLevel3 MANAGED OBJECT CLASS
 						Cause = 413 (LinkSetChange), with the involved link sets as parameter, which represents measurement
 						Q.752/4.13.";;
 			ATTRIBUTES
-				mtpLevel3Id GET SET BY CREATE,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				mtpLevel3Id GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET;
@@ -276,15 +278,15 @@ mtpSignPoint MANAGED OBJECT CLASS
 						means that the mtpSignPoint not accessible (operational state = disabled). During MTP restart, the
 						proceduralStatus is {initializing} until the restart is finished.";;
 			ATTRIBUTES
-				mtpSignPointId GET SET BY CREATE,
-				pointCode GET SET BY CREATE,
-				spType GET SET BY CREATE,
+				mtpSignPointId GET SET-BY-CREATE,
+				pointCode GET SET-BY-CREATE,
+				spType GET SET-BY-CREATE,
 				-- In some implementations the spType attribute might additionally be writable.
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
-				"ITU-T Rec. M.3100 (1992)":version GET SET BY CREATE,
-				networkIndicator GET SET BY CREATE;
+				"ITU-T Rec. M.3100 (1992)":version GET SET-BY-CREATE,
+				networkIndicator GET SET-BY-CREATE;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange,
 				mtpRestarting;;;
@@ -323,11 +325,11 @@ signDataLinkTp MANAGED OBJECT CLASS
 						be kdisabled .";;
 			-- Note that for a complete view of the status of a signalling data link a network view is required.
 			ATTRIBUTES
-				signDataLinkTpId GET SET BY CREATE,
-				adjPc GET SET BY CREATE,
-				transmissionRate GET SET BY CREATE,
+				signDataLinkTpId GET SET-BY-CREATE,
+				adjPc GET SET-BY-CREATE,
+				transmissionRate GET SET-BY-CREATE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
-				equipmentPointer GET SET BY CREATE;
+				equipmentPointer GET SET-BY-CREATE;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
 	CONDITIONAL PACKAGES
@@ -382,16 +384,17 @@ signLinkSetTp MANAGED OBJECT CLASS
 						and Q.752/4.4 (PerceivedSeverity=Cleared). State change notifications are emitted for all state and
 						status changes.";;
 			ATTRIBUTES
-				signLinkSetTpId GET SET BY CREATE,
-				adjPc GET SET BY CREATE,
-				maxCapacityLS GET SET BY CREATE,
+				signLinkSetTpId GET SET-BY-CREATE,
+				adjPc GET SET-BY-CREATE,
+				maxCapacityLS GET SET-BY-CREATE,
 				-- In some implementations, the maxCapacityLS attribute might be additionally writable.
 				currentCapacityLS GET,
-				congestionControlMethod GET SET BY CREATE,
+				congestionControlMethod GET SET-BY-CREATE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
-				periodicLinkTestFlag DEFAULT VALUE MTPDefinedTypesModule.periodicTestFlagDefault GET REPLACE;
+				periodicLinkTestFlag
+					DEFAULT VALUE MTPDefinedTypesModule.periodicTestFlagDefault GET-REPLACE;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
 	CONDITIONAL PACKAGES
@@ -485,18 +488,18 @@ signLinkTp MANAGED OBJECT CLASS
 						signDataLinkList or the signTermList (if present) is wrong. A delete request is rejected, if the
 						linkTpStatus does not contain the value deactivated,";;
 			ATTRIBUTES
-				slCode GET SET BY CREATE,
+				slCode GET SET-BY-CREATE,
 				slsCodeCurrentList GET,
 				maxCapacitySL GET,
 				currentCapacitySL GET,
 				linkTpStatus GET,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET,
-				mtpL2ProtocolProfilePointer GET REPLACE,
-				signTermPointer GET SET BY CREATE,
-				signDataLinkTpPointer GET REPLACE;
+				mtpL2ProtocolProfilePointer GET-REPLACE,
+				signTermPointer GET SET-BY-CREATE,
+				signDataLinkTpPointer GET-REPLACE;
 			ACTIONS
 				localInhibitlocalUninhibit;
 			NOTIFICATIONS
@@ -560,11 +563,11 @@ slTimersProfile MANAGED OBJECT CLASS
 						which can be instantiated in order to define a particular profile. At creation time of a signLinkTp
 						one of the slTimersProfiles may be referenced..";;
 			ATTRIBUTES
-				slTimersProfileId GET SET BY CREATE,
-				q704-t1 GET SET BY CREATE,
-				q704-t3 GET SET BY CREATE,
-				q704-t17 GET SET BY CREATE,
-				q704-t24 GET SET BY CREATE;;;
+				slTimersProfileId GET SET-BY-CREATE,
+				q704-t1 GET SET-BY-CREATE,
+				q704-t3 GET SET-BY-CREATE,
+				q704-t17 GET SET-BY-CREATE,
+				q704-t24 GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
@@ -593,25 +596,25 @@ spTimersProfile MANAGED OBJECT CLASS
 						object class which can be instantiated in order to define a particular profile. At creation time of
 						a signPoint one of the spTimersProfiles is referenced.";;
 			ATTRIBUTES
-				spTimersProfileId GET SET BY CREATE,
-				q704-t2 GET SET BY CREATE,
-				q704-t4 GET SET BY CREATE,
-				q704-t5 GET SET BY CREATE,
-				q704-t7 GET SET BY CREATE,
-				q704-t11 GET SET BY CREATE,
-				q704-t12 GET SET BY CREATE,
-				q704-t13 GET SET BY CREATE,
-				q704-t14 GET SET BY CREATE,
-				q704-t15 GET SET BY CREATE,
-				q704-t16 GET SET BY CREATE,
-				q704-t18 GET SET BY CREATE,
-				q704-t19 GET SET BY CREATE,
-				q704-t20 GET SET BY CREATE,
-				q704-t21 GET SET BY CREATE,
-				q704-t22 GET SET BY CREATE,
-				q704-t23 GET SET BY CREATE,
-				q707-t1 GET SET BY CREATE,
-				q707-t2 GET SET BY CREATE;;;
+				spTimersProfileId GET SET-BY-CREATE,
+				q704-t2 GET SET-BY-CREATE,
+				q704-t4 GET SET-BY-CREATE,
+				q704-t5 GET SET-BY-CREATE,
+				q704-t7 GET SET-BY-CREATE,
+				q704-t11 GET SET-BY-CREATE,
+				q704-t12 GET SET-BY-CREATE,
+				q704-t13 GET SET-BY-CREATE,
+				q704-t14 GET SET-BY-CREATE,
+				q704-t15 GET SET-BY-CREATE,
+				q704-t16 GET SET-BY-CREATE,
+				q704-t18 GET SET-BY-CREATE,
+				q704-t19 GET SET-BY-CREATE,
+				q704-t20 GET SET-BY-CREATE,
+				q704-t21 GET SET-BY-CREATE,
+				q704-t22 GET SET-BY-CREATE,
+				q704-t23 GET SET-BY-CREATE,
+				q707-t1 GET SET-BY-CREATE,
+				q707-t2 GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
@@ -662,9 +665,9 @@ signRouteNePart MANAGED OBJECT CLASS
 						locked not by the OS, but e.g. by a local administrator (administrativeState=unlocked and
 						availabilityStatus={off line}).";;
 			ATTRIBUTES
-				signRouteNePartId GET SET BY CREATE,
-				signLinkSetTPPointer GET SET BY CREATE,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				signRouteNePartId GET SET-BY-CREATE,
+				signLinkSetTPPointer GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET;
 			NOTIFICATIONS
@@ -736,8 +739,8 @@ signRouteSetNePart MANAGED OBJECT CLASS
 						deactivation of a signRouteSetNePart must lead to the activation respectively deactivation of all
 						contained signRouteNeParts.";;
 			ATTRIBUTES
-				signRouteSetNePartId GET SET BY CREATE,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				signRouteSetNePartId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
@@ -791,8 +794,8 @@ signTerm MANAGED OBJECT CLASS
 						"The signTerm MOC defines the management capabilities for the signalling terminal. The signalling
 						terminal is defined in ITU-T Rec. Q.703.";;
 			ATTRIBUTES
-				signTermId GET SET BY CREATE,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE,
+				signTermId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				-- the application of the following state is f.f.s.
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET,
@@ -800,7 +803,7 @@ signTerm MANAGED OBJECT CLASS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":proceduralStatus GET,
 				-- the application of the following state is f.f.s.
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET,
-				equipmentPointer GET SET BY CREATE;
+				equipmentPointer GET SET-BY-CREATE;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992":stateChange;;;
 	CONDITIONAL PACKAGES
@@ -830,11 +833,12 @@ stpScreeningTable MANAGED OBJECT CLASS
 						stpScreeningTableLines it contains all the information which are necessary for an STP to identify
 						and to handle unauthorized SS No. 7 messages as defined in 8.2/Q.705 and 8.3/Q.705.";;
 			ATTRIBUTES
-				stpScreeningTableId GET SET BY CREATE,
-				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState INITIAL VALUE MTPDefinedTypesModule.administrativeStateLocked GET REPLACE,
-				treatmentOfOutsideRanges GET REPLACE,
-				stpScreeningTableListMode GET REPLACE,
-				screeningByLinkSetOrByDPCOpc GET SET BY CREATE;
+				stpScreeningTableId GET SET-BY-CREATE,
+				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState
+					INITIAL VALUE MTPDefinedTypesModule.administrativeStateLocked GET-REPLACE,
+				treatmentOfOutsideRanges GET-REPLACE,
+				stpScreeningTableListMode GET-REPLACE,
+				screeningByLinkSetOrByDPCOpc GET SET-BY-CREATE;
 			NOTIFICATIONS
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChange;;;
 	CONDITIONAL PACKAGES
@@ -868,8 +872,8 @@ stpScreeningTableLine MANAGED OBJECT CLASS
 						in 8.2/Q.705 and 8.3/Q.705. The total number of screened DPCs across all stpScreeningTableLine
 						instances contained by a stpScreeningTable must be less or equal to maxNoOfScreenedDpcs.";;
 			ATTRIBUTES
-				stpScreeningTableLineId GET SET BY CREATE,
-				stpScreeningTableLineContent GET REPLACE ADD REMOVE;;;
+				stpScreeningTableLineId GET SET-BY-CREATE,
+				stpScreeningTableLineContent GET-REPLACE ADD-REMOVE;;;
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
@@ -892,25 +896,25 @@ administrativeStatePackage PACKAGE
 				takes place from unlocked to locked, this will result in deactiviation of all links in the set.
 				This has no effect on the administrative states of the links themselves";;
 	ATTRIBUTES
-		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET REPLACE;
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE;
 REGISTERED AS { mtpPackage1 };
 
 
 bufferMechanismPackage PACKAGE
 	ATTRIBUTES
-		numberOfThresholdLevels GET SET BY CREATE;
+		numberOfThresholdLevels GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage2 };
 
 
 clCPackage PACKAGE
 	ATTRIBUTES
-		clC GET SET BY CREATE;
+		clC GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage3 };
 
 
 clsLoadsharingInformationPackage PACKAGE
 	ATTRIBUTES
-		inClsLoadsharingAlgorithm GET REPLACE;
+		inClsLoadsharingAlgorithm GET-REPLACE;
 REGISTERED AS { mtpPackage4 };
 
 
@@ -935,8 +939,8 @@ REGISTERED AS { mtpPackage6 };
 
 congestionHandlingPackage PACKAGE
 	ATTRIBUTES
-		congestionCounting GET SET BY CREATE,
-		congestionReportingBaseObject GET SET BY CREATE;
+		congestionCounting GET SET-BY-CREATE,
+		congestionReportingBaseObject GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage7 };
 
 
@@ -959,14 +963,14 @@ REGISTERED AS { mtpPackage9 };
 
 fixedRouteNePartPriorityPackage PACKAGE
 	ATTRIBUTES
-		fixedPriority GET SET BY CREATE;
+		fixedPriority GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage10 };
 
 
 flexibleRouteNePartPriorityPackage PACKAGE
 	ATTRIBUTES
-		flexiblePriority GET REPLACE,
-		priorityMode GET REPLACE;
+		flexiblePriority GET-REPLACE,
+		priorityMode GET-REPLACE;
 	NOTIFICATIONS
 		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChange;
 REGISTERED AS { mtpPackage11 };
@@ -981,79 +985,79 @@ inLsLoadShareAlgorithmPackage PACKAGE
 
 linkCongestionLevelPackage PACKAGE
 	ATTRIBUTES
-		linkCongestionLevel GET SET BY CREATE;
+		linkCongestionLevel GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage13 };
 
 
 loadsharingInformationRouteNePartPackage PACKAGE
 	ATTRIBUTES
-		loadsharingInformationRouteNePart GET REPLACE;
+		loadsharingInformationRouteNePart GET-REPLACE;
 REGISTERED AS { mtpPackage14 };
 
 
 loadsharingInformationRouteSetNePartPackage PACKAGE
 	ATTRIBUTES
-		loadsharingInformationRouteSetNePart GET REPLACE;
+		loadsharingInformationRouteSetNePart GET-REPLACE;
 REGISTERED AS { mtpPackage15 };
 
 
 loopDelayPackage PACKAGE
 	ATTRIBUTES
-		loopDelay GET SET BY CREATE;
+		loopDelay GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage16 };
 
 
 lsTimersProfileNamePackage PACKAGE
 	ATTRIBUTES
-		lsTimersProfileName GET REPLACE;
+		lsTimersProfileName GET-REPLACE;
 REGISTERED AS { mtpPackage17 };
 
 
 lsTimersProfilePointerPackage PACKAGE
 	ATTRIBUTES
-		lsTimersProfilePointer GET REPLACE;
+		lsTimersProfilePointer GET-REPLACE;
 REGISTERED AS { mtpPackage18 };
 
 
 managedSwitchingElementNamePackage PACKAGE
 	ATTRIBUTES
-		managedSwitchingElementName GET REPLACE;
+		managedSwitchingElementName GET-REPLACE;
 REGISTERED AS { mtpPackage19 };
 
 
 mtpAccessPointNamePackage PACKAGE
 	ATTRIBUTES
-		mtpAccessPointName GET REPLACE;
+		mtpAccessPointName GET-REPLACE;
 REGISTERED AS { mtpPackage20 };
 
 
 mtpL2ProtocolProfileNamePackage PACKAGE
 	ATTRIBUTES
-		mtpL2ProtocolProfileName GET REPLACE;
+		mtpL2ProtocolProfileName GET-REPLACE;
 REGISTERED AS { mtpPackage21 };
 
 
 mtpLevel3NamePackage PACKAGE
 	ATTRIBUTES
-		mtpLevel3Name GET REPLACE;
+		mtpLevel3Name GET-REPLACE;
 REGISTERED AS { mtpPackage22 };
 
 
 mtpLoadsharingObjectForRouteNePartPointerPackage PACKAGE
 	ATTRIBUTES
-		mtpLoadsharingObjectForRouteNePartPointer GET REPLACE;
+		mtpLoadsharingObjectForRouteNePartPointer GET-REPLACE;
 REGISTERED AS { mtpPackage23 };
 
 
 mtpLoadsharingObjectForRouteSetNePartPointerPackage PACKAGE
 	ATTRIBUTES
-		mtpLoadsharingObjectForRouteSetNePartPointer GET REPLACE;
+		mtpLoadsharingObjectForRouteSetNePartPointer GET-REPLACE;
 REGISTERED AS { mtpPackage24 };
 
 
 mtpSignPointNamePackage PACKAGE
 	ATTRIBUTES
-		mtpSignPointName GET REPLACE;
+		mtpSignPointName GET-REPLACE;
 REGISTERED AS { mtpPackage25 };
 
 
@@ -1066,13 +1070,13 @@ multipleTransmissionCongestionLevelsPackage PACKAGE
 				level 1. The values of the thresholds belonging to congestion level 3 have to be bigger than the
 				respective ones of congestion level 2.";;
 	ATTRIBUTES
-		transmissionCongestionThresholdDiscardLevel1 GET SET BY CREATE,
-		transmissionCongestionThresholdOnsetLevel2 GET SET BY CREATE,
-		transmissionCongestionThresholdAbatementLevel2 GET SET BY CREATE,
-		transmissionCongestionThresholdDiscardLevel2 GET SET BY CREATE,
-		transmissionCongestionThresholdOnsetLevel3 GET SET BY CREATE,
-		transmissionCongestionThresholdAbatementLevel3 GET SET BY CREATE,
-		transmissionCongestionThresholdDiscardLevel3 GET SET BY CREATE;
+		transmissionCongestionThresholdDiscardLevel1 GET SET-BY-CREATE,
+		transmissionCongestionThresholdOnsetLevel2 GET SET-BY-CREATE,
+		transmissionCongestionThresholdAbatementLevel2 GET SET-BY-CREATE,
+		transmissionCongestionThresholdDiscardLevel2 GET SET-BY-CREATE,
+		transmissionCongestionThresholdOnsetLevel3 GET SET-BY-CREATE,
+		transmissionCongestionThresholdAbatementLevel3 GET SET-BY-CREATE,
+		transmissionCongestionThresholdDiscardLevel3 GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage26 };
 
 
@@ -1084,16 +1088,16 @@ multipleTransmissionCongestionStatesPackage PACKAGE
 				without congestion priorityt method. This method is described in 3.8.2.3/Q.704. See also B.1.2.9.2.
 				The range of initialLevelOfCongestion is [1,numberOfCongestionStates].";;
 	ATTRIBUTES
-		timerTx GET SET BY CREATE,
-		timerTy GET SET BY CREATE,
-		numberOfCongestionStates GET SET BY CREATE,
-		initialLevelOfCongestion GET SET BY CREATE;
+		timerTx GET SET-BY-CREATE,
+		timerTy GET SET-BY-CREATE,
+		numberOfCongestionStates GET SET-BY-CREATE,
+		initialLevelOfCongestion GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage27 };
 
 
 noBasicLinkAllocationPackage PACKAGE
 	ATTRIBUTES
-		numberOfNormallyActiveSignLinksTps GET REPLACE;
+		numberOfNormallyActiveSignLinksTps GET-REPLACE;
 REGISTERED AS { mtpPackage28 };
 
 
@@ -1103,8 +1107,8 @@ pCRPackage PACKAGE
 			DEFINED AS
 				"This package contains signLinkTp attributes for the PCR method";;
 	ATTRIBUTES
-		maxMSUsRetransN1 GET SET BY CREATE,
-		maxOctRetransN2 GET SET BY CREATE;
+		maxMSUsRetransN1 GET SET-BY-CREATE,
+		maxOctRetransN2 GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage29 };
 
 
@@ -1114,14 +1118,14 @@ receiveCongestionLevelsPackage PACKAGE
 			DEFINED AS
 				"This package contains the levels of receive congestions";;
 	ATTRIBUTES
-		receiveCongestionThresholdOnset GET SET BY CREATE,
-		receiveCongestionThresholdAbatement GET SET BY CREATE;
+		receiveCongestionThresholdOnset GET SET-BY-CREATE,
+		receiveCongestionThresholdAbatement GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage30 };
 
 
 relatedLinkGroupNumberPackage PACKAGE
 	ATTRIBUTES
-		relatedLinkGroupNumber GET REPLACE;
+		relatedLinkGroupNumber GET-REPLACE;
 REGISTERED AS { mtpPackage31 };
 
 
@@ -1132,7 +1136,7 @@ remoteExchangeLabelPackage PACKAGE
 				"This package supplies the possibility to have textual information about the remote exchange that
 				contains the destination signalling point.";;
 	ATTRIBUTES
-		remoteExchangeLabel GET REPLACE;
+		remoteExchangeLabel GET-REPLACE;
 REGISTERED AS { mtpPackage32 };
 
 
@@ -1144,13 +1148,13 @@ REGISTERED AS { mtpPackage33 };
 
 signDataLinkTpNamePackage PACKAGE
 	ATTRIBUTES
-		signDataLinkTpName GET REPLACE;
+		signDataLinkTpName GET-REPLACE;
 REGISTERED AS { mtpPackage34 };
 
 
 signLinkSetTpNamePackage PACKAGE
 	ATTRIBUTES
-		signLinkSetTpName GET REPLACE;
+		signLinkSetTpName GET-REPLACE;
 REGISTERED AS { mtpPackage35 };
 
 
@@ -1162,19 +1166,19 @@ REGISTERED AS { mtpPackage36 };
 
 signLinkTpNamePackage PACKAGE
 	ATTRIBUTES
-		signLinkTpName GET REPLACE;
+		signLinkTpName GET-REPLACE;
 REGISTERED AS { mtpPackage37 };
 
 
 signRouteNePartNamePackage PACKAGE
 	ATTRIBUTES
-		signRouteNePartName GET REPLACE;
+		signRouteNePartName GET-REPLACE;
 REGISTERED AS { mtpPackage38 };
 
 
 signRouteSetNePartNamePackage PACKAGE
 	ATTRIBUTES
-		signRouteSetNePartName GET REPLACE;
+		signRouteSetNePartName GET-REPLACE;
 REGISTERED AS { mtpPackage39 };
 
 
@@ -1186,32 +1190,32 @@ REGISTERED AS { mtpPackage40 };
 
 signTermNamePackage PACKAGE
 	ATTRIBUTES
-		signTermName GET REPLACE;
+		signTermName GET-REPLACE;
 REGISTERED AS { mtpPackage41 };
 
 
 slsCodeNormalListPackage PACKAGE
 	ATTRIBUTES
-		slsCodeNormalList GET SET BY CREATE;
+		slsCodeNormalList GET SET-BY-CREATE;
 	-- in some implementations this attribute might additionally be writable
 	REGISTERED AS { mtpPackage42 };
 
 
 slsListPackage PACKAGE
 	ATTRIBUTES
-		slsList GET SET BY CREATE;
+		slsList GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage43 };
 
 
 slTimersProfileNamePackage PACKAGE
 	ATTRIBUTES
-		slTimersProfileName GET REPLACE;
+		slTimersProfileName GET-REPLACE;
 REGISTERED AS { mtpPackage44 };
 
 
 slTimersProfilePointerPackage PACKAGE
 	ATTRIBUTES
-		slTimersProfilePointer GET REPLACE;
+		slTimersProfilePointer GET-REPLACE;
 REGISTERED AS { mtpPackage45 };
 
 
@@ -1221,43 +1225,43 @@ spTimersPackage PACKAGE
 			DEFINED AS
 				"This package contains the values of the Q.704 and Q.707 timers.";;
 	ATTRIBUTES
-		q704-t1 GET SET BY CREATE,
-		q704-t2 GET SET BY CREATE,
-		q704-t3 GET SET BY CREATE,
-		q704-t4 GET SET BY CREATE,
-		q704-t5 GET SET BY CREATE,
-		q704-t6 GET SET BY CREATE,
-		q704-t7 GET SET BY CREATE,
-		q704-t8 GET SET BY CREATE,
-		q704-t10 GET SET BY CREATE,
-		q704-t11 GET SET BY CREATE,
-		q704-t12 GET SET BY CREATE,
-		q704-t13 GET SET BY CREATE,
-		q704-t14 GET SET BY CREATE,
-		q704-t15 GET SET BY CREATE,
-		q704-t16 GET SET BY CREATE,
-		q704-t17 GET SET BY CREATE,
-		q704-t18 GET SET BY CREATE,
-		q704-t19 GET SET BY CREATE,
-		q704-t20 GET SET BY CREATE,
-		q704-t21 GET SET BY CREATE,
-		q704-t22 GET SET BY CREATE,
-		q704-t23 GET SET BY CREATE,
-		q704-t24 GET SET BY CREATE,
-		q707-t1 GET SET BY CREATE,
-		q707-t2 GET SET BY CREATE;
+		q704-t1 GET SET-BY-CREATE,
+		q704-t2 GET SET-BY-CREATE,
+		q704-t3 GET SET-BY-CREATE,
+		q704-t4 GET SET-BY-CREATE,
+		q704-t5 GET SET-BY-CREATE,
+		q704-t6 GET SET-BY-CREATE,
+		q704-t7 GET SET-BY-CREATE,
+		q704-t8 GET SET-BY-CREATE,
+		q704-t10 GET SET-BY-CREATE,
+		q704-t11 GET SET-BY-CREATE,
+		q704-t12 GET SET-BY-CREATE,
+		q704-t13 GET SET-BY-CREATE,
+		q704-t14 GET SET-BY-CREATE,
+		q704-t15 GET SET-BY-CREATE,
+		q704-t16 GET SET-BY-CREATE,
+		q704-t17 GET SET-BY-CREATE,
+		q704-t18 GET SET-BY-CREATE,
+		q704-t19 GET SET-BY-CREATE,
+		q704-t20 GET SET-BY-CREATE,
+		q704-t21 GET SET-BY-CREATE,
+		q704-t22 GET SET-BY-CREATE,
+		q704-t23 GET SET-BY-CREATE,
+		q704-t24 GET SET-BY-CREATE,
+		q707-t1 GET SET-BY-CREATE,
+		q707-t2 GET SET-BY-CREATE;
 REGISTERED AS { mtpPackage46 };
 
 
 spTimersProfileNamePackage PACKAGE
 	ATTRIBUTES
-		spTimersProfileName GET REPLACE;
+		spTimersProfileName GET-REPLACE;
 REGISTERED AS { mtpPackage47 };
 
 
 spTimersProfilePointerPackage PACKAGE
 	ATTRIBUTES
-		spTimersProfilePointer GET REPLACE;
+		spTimersProfilePointer GET-REPLACE;
 REGISTERED AS { mtpPackage48 };
 
 
@@ -1278,7 +1282,7 @@ REGISTERED AS { mtpPackage50 };
 
 stpScreeningTableNamePackage PACKAGE
 	ATTRIBUTES
-		stpScreeningTableName GET REPLACE;
+		stpScreeningTableName GET-REPLACE;
 REGISTERED AS { mtpPackage51 };
 
 
@@ -1293,19 +1297,19 @@ REGISTERED AS { mtpPackage52 };
 
 
 changeInLsToAdjSp PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX MTPDefinedTypesModule.ChangeInLsToAdjSpInfo;
 REGISTERED AS { mtpParameter1 };
 
 
 inaccessibleSp PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX MTPDefinedTypesModule.InaccessibleSpInfo;
 REGISTERED AS { mtpParameter2 };
 
 
 remoteUserPartUnavailable PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX MTPDefinedTypesModule.UserPart;
 REGISTERED AS { mtpParameter3 };
 
@@ -2464,7 +2468,7 @@ REGISTERED AS { mtpAttribute104 };
 slsCodeCurrentList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SLSCodeCurrentList;
 	MATCHES FOR
-		SET INTERSECTION;
+		SET-INTERSECTION;
 	BEHAVIOUR
 		slsCodeCurrentListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2479,7 +2483,7 @@ REGISTERED AS { mtpAttribute105 };
 slsCodeNormalList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SlsCodeNormalList;
 	MATCHES FOR
-		SET INTERSECTION;
+		SET-INTERSECTION;
 	BEHAVIOUR
 		slsCodeNormalListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2904,7 +2908,7 @@ managedSwitchingElement-mtpSignPoint NAME BINDING
 				be deleted if and only if it does not contain any other managed object class instances, except for
 				contained measurements.";;
 	CREATE;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { mtpNameBinding1 };
 
 
@@ -2923,7 +2927,7 @@ mtpSignPoint-signRouteSetNePart NAME BINDING
 				already used by another instance of the same object class will be rejected. A delete request is
 				rejected, if the administrativeState of the signRouteSetNePart does not equal locked.";;
 	CREATE;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { mtpNameBinding2 };
 
 
@@ -3000,7 +3004,7 @@ mtpSignPoint-mtpLevel3 NAME BINDING
 				"If the name package is supported: a create request with a value for the name attribute that is
 				already used by another instance of the same object class will be rejected.";;
 	CREATE;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { mtpNameBinding6 };
 
 
@@ -3044,7 +3048,7 @@ mtpSignPoint-signLinkSetTp NAME BINDING
 				is referenced by at least one signRouteNePart, the deletion of the signLinkSetTp is rejected and
 				not carried out.";;
 	CREATE;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { mtpNameBinding8 };
 
 
@@ -3191,7 +3195,7 @@ REGISTERED AS { mtpNameBinding15 };
 
 --< GDMO.ChangeLog
 --  =============================================================================
--- 
+--  
 --  $Log$
 --  =============================================================================
 --  >--

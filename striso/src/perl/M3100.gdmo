@@ -1,3 +1,10 @@
+--< GDMO.Document "ITU-T Rec. M.3100 (1992)" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Alias "ITU-T Rec. M.3100 (1992)"
+--  "ITU-T Rec. M.3100:1995",
+--  "Recommendation M.3100",
+--  "CCITT Rec. M.3100 (1992)",
+--  "ITU-T Rec. M.3100 (1995)" >--
 --< GDMO.Copyright
 --  =============================================================================
 --  
@@ -50,11 +57,6 @@
 -- 
 --  =============================================================================
 --  >--
---< GDMO.Document "ITU-T Rec. M.3100 (1992)" >--
---< GDMO.Alias "ITU-T Rec. M.3100 (1992)"
---  "CCITT Rec. M.3100 (1992)",
---  "ITU-T Rec. M.3100 (1995)" >--
---< GDMO.Version 1.3 >--
 
 network MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -307,22 +309,22 @@ managedElementR1 MANAGED OBJECT CLASS
 	CHARACTERIZED BY
 		managedElementR1Package PACKAGE
 			NOTIFICATIONS
-				"Recommendation X.721: 1992":environmentalAlarm,
-				"Recommendation Q.821:1992":logRecordIdParameter,
-				"Recommendation Q.821:1992":correlatedRecordNameParameter
+				"Recommendation X.721: 1992":environmentalAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
 					"Recommendation Q.821:1992":suspectObjectListParameter,
-				"Recommendation X.721: 1992":equipmentAlarm,
-				"Recommendation Q.821:1992":logRecordIdParameter,
-				"Recommendation Q.821:1992":correlatedRecordNameParameter,
-				"Recommendation Q.821:1992":suspectObjectListParameter,
-				"Recommendation X.721: 1992":communicationsAlarm,
-				"Recommendation Q.821:1992":logRecordIdParameter,
-				"Recommendation Q.821:1992":correlatedRecordNameParameter,
-				"Recommendation Q.821:1992":suspectObjectListParameter,
-				"Recommendation X.721: 1992":processingErrorAlarm,
-				"Recommendation Q.821:1992":logRecordIdParameter,
-				"Recommendation Q.821:1992":correlatedRecordNameParameter,
-				"Recommendation Q.821:1992":suspectObjectListParameter;;;
+				"Recommendation X.721: 1992":equipmentAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter,
+				"Recommendation X.721: 1992":communicationsAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter,
+				"Recommendation X.721: 1992":processingErrorAlarm
+					"Recommendation Q.821:1992":logRecordIdParameter
+					"Recommendation Q.821:1992":correlatedRecordNameParameter
+					"Recommendation Q.821:1992":suspectObjectListParameter;;;
 	CONDITIONAL PACKAGES
 		alarmSeverityAssignmentPointerPackage
 			PRESENT IF
@@ -1098,16 +1100,16 @@ REGISTERED AS { m3100Package 14 };
 
 environmentalAlarmR1Package PACKAGE
 	NOTIFICATIONS
-		"Recommendation X.721:1992":environmentalAlarm,
-		"Recommendation Q.821:1992":logRecordIdParameter,
-		"Recommendation Q.821:1992":correlatedRecordNameParameter,
-		"Recommendation Q.821:1992":suspectObjectListParameter;
+		"Recommendation X.721:1992":environmentalAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
 REGISTERED AS { m3100Package 36 };
 
 
 equipmentAlarmEffectOnServicePackage PACKAGE
 	NOTIFICATIONS
-		"Recommendation X.721:1992":equipmentAlarmalarmEffectOnServiceParameter;
+		"Recommendation X.721:1992":equipmentAlarm alarmEffectOnServiceParameter;
 REGISTERED AS { m3100Package 38 };
 
 
@@ -1123,10 +1125,10 @@ equipmentsEquipmentAlarmR1Package PACKAGE
 	ATTRIBUTES
 		alarmStatus GET;
 	NOTIFICATIONS
-		"Recommendation X.721:1992":equipmentAlarm,
-		"Recommendation Q.821:1992":logRecordIdParameter,
-		"Recommendation Q.821:1992":correlatedRecordNameParameter,
-		"Recommendation Q.821:1992":suspectObjectListParameter;
+		"Recommendation X.721:1992":equipmentAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
 REGISTERED AS { m3100Package 37 };
 
 
@@ -1216,10 +1218,10 @@ softwareProcessingErrorAlarmR1Package PACKAGE
 	ATTRIBUTES
 		alarmStatus GET;
 	NOTIFICATIONS
-		"Recommendation X.721:1992":processingErrorAlarm,
-		"Recommendation Q.821:1992":logRecordIdParameter,
-		"Recommendation Q.821:1992":correlatedRecordNameParameter,
-		"Recommendation Q.821:1992":suspectObjectListParameter;
+		"Recommendation X.721:1992":processingErrorAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
 REGISTERED AS { m3100Package 40 };
 
 
@@ -1256,10 +1258,10 @@ tmnCommunicationsAlarmInformationPackage PACKAGE
 		alarmStatus GET,
 		currentProblemList GET;
 	NOTIFICATIONS
-		"Recommendation X.721:1992":communicationsAlarm,
-		"Recommendation Q.821:1992":logRecordIdParameter,
-		"Recommendation Q.821:1992":correlatedRecordNameParameter,
-		"Recommendation Q.821:1992":suspectObjectListParameter;
+		"Recommendation X.721:1992":communicationsAlarm
+			"Recommendation Q.821:1992":logRecordIdParameter
+			"Recommendation Q.821:1992":correlatedRecordNameParameter
+			"Recommendation Q.821:1992":suspectObjectListParameter;
 REGISTERED AS { m3100Package 30 };
 
 
@@ -2875,3 +2877,4 @@ REGISTERED AS { m3100Parameter 2 };
 --  $Log$
 --  =============================================================================
 --  >--
+--< GDMO.EndDocument "ITU-T Rec. M.3100 (1992)" >--

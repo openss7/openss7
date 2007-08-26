@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. Q.821 (2000)" >--
+--< GDMO.Alias "ITU-T Rec. Q.821 (2000)" "Recommendation Q.821:1992" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
 --  =============================================================================
@@ -511,4 +512,4 @@ REGISTERED AS { q821Parameter 10 };
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. Q.821 (2000)" >--

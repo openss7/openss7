@@ -2,8 +2,14 @@
 --< GDMO.Version 1.3 >--
 --< GDMO.Alias "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993"
 --  "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
+--  "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
+--  "ITU-T Rec. X.723 | ISO/IEC 10165-5",
+--  "CCITT Rec. X.723 | ISO/IEC 10165-5",
+--  "Rec. X.723 | ISO/IEC 10165-5",
 --  "ITU-T Rec. X.723 (1993)",
---  "CCITT Rec. X.723 (1993)" >--
+--  "CCITT Rec. X.723 (1993)",
+--  "Rec. X.723 (1993)",
+--  "GMI" >--
 --< GDMO.Copyright
 --  =============================================================================
 --  
@@ -649,4 +655,4 @@ REGISTERED AS { joint-iso-ccittms(9) smi(3) part5(5) notification(10) comsinfo(0
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" >--
