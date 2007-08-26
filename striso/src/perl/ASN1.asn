@@ -1,0 +1,8 @@
+
+REAL ::= SEQUENCE {
+	manissa		INTEGER,
+	base		INTEGER (2|10),
+	exponent	INTEGER
+	-- The associated mathematical real number is "mantissa"
+	-- multiplied by "base" raised to the power "exponent"
+}
