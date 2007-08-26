@@ -128,6 +128,7 @@ use strict;
 sub parse {
 	my $type = shift;
 	my $self = {};
+	# print STDERR "Type is $type.";
 	bless $self, $type;
 	if ($::debug) {
 		unless ($type=~/^Comment/) {
@@ -229,6 +230,108 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(Parser Generator);
 # -------------------------------------
+
+
+# -------------------------------------
+package CommaList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub readitem {
+	my $self = shift;
+	my $type = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[1];
+	TEST: {
+		my ($s);
+		last TEST unless (($s = $type->parse($line,$gdmo,$asn1)));
+		push @{$self->{items}}, $s;
+		while ($line=~s/^,//s) {
+			$s->{commentplus} = Comments->parse($line,$gdmo);
+			last TEST unless (($s = $type->parse($line,$gdmo,$asn1)));
+			push @{$self->{items}}, $s;
+		}
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref $self;
+	#printf STDERR "Reading type $type.";
+	unless ($type=~s/List$//) {
+		$type.='Item';
+	}
+	return $self->readitem($type,@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s,$c,$i);
+		$::indent.="\t";
+		foreach $s (@{$self->{items}}) {
+			if ($i) {
+				printf ','; $::first = 0;
+				if ($c) { $c->gdmo(); }
+			} else { $i = 1; }
+			$s->gdmo();
+			$c = $s->{commentplus};
+		}
+		$::indent=~s/^.//s;
+	}
+}
+
+# -------------------------------------
+package SimpleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub readitem {
+	my $self = shift;
+	my $type = shift;
+	my $line = $_[0];
+	my $gdmo = $_[1];
+	my $asn1 = $_[1];
+	TEST: {
+		my ($s);
+		last TEST unless (($s = $type->parse($line,$gdmo,$asn1)));
+		push @{$self->{items}}, $s;
+		while (($s = $type->parse($line,$gdmo,$asn1))) {
+			push @{$self->{items}}, $s;
+		}
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref $self;
+	#printf STDERR "Reading type $type.";
+	unless ($type=~s/List$//) {
+		$type.='Item';
+	}
+	return $self->readitem($type,@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s);
+		$::indent.="\t";
+		foreach $s (@{$self->{items}}) {
+			$s->gdmo();
+		}
+		$::indent=~s/^.//s;
+	}
+}
 
 
 # =====================================
@@ -996,18 +1099,9 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my ($s,$c);
 		last TEST unless ($line=~s/^EXPORTS//s);
 		$self->{comments} = Comments->parse($line,$gdmo);
-		last TEST unless (($s = TypeReference->parse($line,$gdmo,$asn1)));
-		push @{$self->{typenames}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = TypeReference->parse($line,$gdmo,$asn1)));
-			push @{$self->{typenames}}, $s;
-		}
+		last TEST unless (($self->{list} = ExportedSymbols->parse($line,$gdmo,$asn1)));
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1016,21 +1110,22 @@ sub read {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my ($s,$c,$i);
 		if (!$::first) { printf ' '; }
 		printf 'EXPORTS'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
-		$i = 0;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		foreach $s (@{$self->{typenames}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
+		$self->{list}->gdmo();
 	}
+}
+
+# -------------------------------------
+package ExportedSymbols;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readitem('TypeReference',@_);
 }
 
 # -------------------------------------
@@ -1085,16 +1180,8 @@ sub read {
 	my $gdmo = $_[1];
 	my $asn1 = $_[2];
 	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = TypeReference->parse($line,$gdmo,$asn1)));
-		push @{$self->{typenames}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = TypeReference->parse($line,$gdmo,$asn1)));
-			push @{$self->{typenames}}, $s;
-		}
+		my ($s);
+		last TEST unless (($self->{symbols} = ImportedSymbols->parse($line,$gdmo,$asn1)));
 		last TEST unless ($line=~s/^FROM//s);
 		$self->{comments} = Comments->parse($line,$gdmo);
 		last TEST unless (($self->{module} = GlobalModuleReference->parse($line,$gdmo,$asn1)));
@@ -1106,23 +1193,27 @@ sub read {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my ($s,$c,$i);
-		$i = 0;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		foreach $s (@{$self->{typenames}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
+		my ($s);
+		$self->{symbols}->gdmo();
 		if (!$::first) { printf "\n$::indent\t"; } else { printf "\t"; $::first = 0; }
 		printf 'FROM'; $::first = 0;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		$self->{module}->gdmo();
 	}
 }
+
+# -------------------------------------
+package ImportedSymbols;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	return $self->readitem('TypeReference',@_);
+}
+
 
 # -------------------------------------
 package GlobalModuleReference;
@@ -1703,16 +1794,7 @@ sub read {
 		$self->{comments1} = Comments->parse($line,$gdmo);
 		if ($line=~s/^{//s) {
 			$self->{comments2} = Comments->parse($line,$gdmo);
-			my ($s,$c);
-			last TEST unless (($s = NamedNumber->parse($line,$gdmo,$asn1)));
-			push @{$self->{namednumbers}}, $s;
-			while ($line=~s/^,//s) {
-				if (($c = Comments->parse($line,$gdmo))) {
-					$s->{commentplus} = $c;
-				}
-				last TEST unless (($s = NamedNumber->parse($line,$gdmo,$asn1)));
-				push @{$self->{namednumbers}}, $s;
-			}
+			last TEST unless (($self->{list} = NamedNumberList->parse($line,$gdmo,$asn1)));
 			last TEST unless ($line=~s/^}//s);
 			$self->{comments3} = Comments->parse($line,$gdmo);
 		}
@@ -1724,29 +1806,28 @@ sub read {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my ($s,$c,$i);
+		my ($s);
 		if (!$::first) { printf ' '; }
 		printf 'INTEGER'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
 		printf '{'; $::first = 0;
-		$i = 0;
 		{
 			$::indent.="\t";
 			if (($s = $self->{comments2})) { $s->gdmo(); }
-			foreach $s (@{$self->{namednumbers}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indetn=~s/^.//s;
+			$self->{list}->gdmo();
+			$::indent=~s/^.//s;
 		}
 		printf '}'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package NamedNumberList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package NamedNumber;
@@ -2029,45 +2110,8 @@ sub gdmo {
 package Enumeration;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(CommaList);
 # -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = EnumerationItem->parse($line,$gdmo,$asn1)));
-		push @{$self->{items}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = EnumerationItem->parse($line,$gdmo,$asn1)));
-			push @{$self->{items}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my ($s,$c,$i);
-		foreach $s (@{$self->{items}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
-	}
-}
 
 # -------------------------------------
 package EnumerationItem;
@@ -2324,45 +2368,8 @@ sub gdmo {
 package NamedBitList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(CommaList);
 # -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = NamedBit->parse($line,$gdmo,$asn1)));
-		push @{$self->{namedbits}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = NamedBit->parse($line,$gdmo,$asn1)));
-			push @{$self->{namedbits}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my ($s,$c,$i);
-		foreach $s (@{$self->{namedbits}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
-	}
-}
 
 # -------------------------------------
 package NamedBit;
@@ -2540,45 +2547,8 @@ sub gdmo {
 package IdentifierList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(CommaList);
 # -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = Identifier->parse($line,$gdmo,$asn1)));
-		push @{$self->{identifiers}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = Identifier->parse($line,$gdmo,$asn1)));
-			push @{$self->{identifiers}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my ($s,$c,$i);
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		foreach $s (@{$self->{identifiers}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
-	}
-}
 
 # -------------------------------------
 package ContainingValue;
@@ -3001,46 +2971,8 @@ sub gdmo {
 package ExtensionAdditionList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(CommaList);
 # -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = ExtensionAddition->parse($line,$gdmo,$asn1)));
-		push @{$self->{additions}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = ExtensionAddition->parse($line,$gdmo,$asn1)));
-			push @{$self->{additions}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my ($s,$c,$i);
-		$::indent.="\t";
-		foreach $s (@{$self->{additions}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; };
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
-		$::indent=~s/^.//s;
-	}
-}
 
 # -------------------------------------
 package ExtensionAddition;
@@ -3144,46 +3076,8 @@ sub gdmo {
 package ComponentTypeList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(CommaList);
 # -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = ComponentType->parse($line,$gdmo,$asn1)));
-		push @{$self->{types}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = ComponentType->parse($line,$gdmo,$asn1)));
-			push @{$self->{types}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my ($s,$c,$i);
-		$::indent.="\t";
-		foreach $s (@{$self->{types}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
-		$::indent=~s/^.//s;
-	}
-}
 
 # -------------------------------------
 package ComponentType;
@@ -3284,45 +3178,12 @@ sub gdmo {
 package ComponentValueList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
+@ISA = qw(CommaList);
 # -------------------------------------
 
 sub read {
 	my $self = shift;
-	my $line = $_[0];
-	my $gdmo = $_[1];
-	my $asn1 = $_[2];
-	TEST: {
-		my ($s,$c);
-		last TEST unless (($s = NamedValue->parse($line,$gdmo,$asn1)));
-		push @{$self->{vals}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = NamedValue->parse($line,$gdmo,$asn1)));
-			push @{$self->{vals}}, $s;
-		}
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my ($s,$c,$i);
-		$::indent.="\t";
-		foreach $s (@{$self->{vals}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
-		$::indent=~s/^.//s;
-	}
+	return $self->readitem('NamedValue',@_);
 }
 
 # -------------------------------------
@@ -5099,16 +4960,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^DERIVED(?:\s|\n)*((-)?)(?:\s|\n)*FROM//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = ClassReference->parse($line,$gdmo)));
-		push @{$self->{classes}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = ClassReference->parse($line,$gdmo)));
-			push @{$self->{classes}}, $s;
-		}
+		last TEST unless (($self->{classes} = ClassReferenceList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -5122,25 +4974,19 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		my $s;
 		printf "DERIVED FROM"; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{classes}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{classes}->gdmo();
 		printf ";"; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package ClassReferenceList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package Characterization;
@@ -5156,16 +5002,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^CHARACTERIZED(?:\s|\n)*((-)?)(?:\s|\n)*BY//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = PackageReference->parse($line,$gdmo)));
-		push @{$self->{packages}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = PackageReference->parse($line,$gdmo)));
-			push @{$self->{packages}}, $s;
-		}
+		last TEST unless (($self->{packages} = PackageReferenceList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -5179,25 +5016,19 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		my $s;
 		printf "CHARACTERIZED BY"; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{packages}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{packages}->gdmo();
 		printf ";"; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package PackageReferenceList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package ConditionalPackages;
@@ -5213,16 +5044,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^CONDITIONAL(?:\s|\n)*((-)?)(?:\s|\n)*PACKAGES//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = PackageCondition->parse($line,$gdmo)));
-		push @{$self->{packageconditions}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = PackageCondition->parse($line,$gdmo)));
-			push @{$self->{packageconditions}}, $s;
-		}
+		last TEST unless (($self->{conditions} = PackageConditionList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -5236,25 +5058,19 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		my $s;
 		printf "CONDITIONAL PACKAGES"; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{packageconditions}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{conditions}->gdmo();
 		printf ";"; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package PackageConditionList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package PackageCondition;
@@ -5437,16 +5253,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^ATTRIBUTES//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = AttributeProperty->parse($line,$gdmo)));
-		push @{$self->{attributeproperties}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = AttributeProperty->parse($line,$gdmo)));
-			push @{$self->{attributeproperties}}, $s;
-		}
+		last TEST unless (($self->{attributes} = AttributePropertyList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -5460,25 +5267,19 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		my $s;
 		printf "ATTRIBUTES"; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{attributeproperties}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{attributes}->gdmo();
 		printf ";"; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package AttributePropertyList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package AttributeProperty;
@@ -6278,16 +6079,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUPS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = AttributeGroupAttributes->parse($line,$gdmo)));
-		push @{$self->{attributegroupattributes}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = AttributeGroupAttributes->parse($line,$gdmo)));
-			push @{$self->{attributegroupattributes}}, $s;
-		}
+		last TEST unless (($self->{groups} = AttributeGroupAttributesList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -6301,25 +6093,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'ATTRIBUTE GROUPS'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{attributegroupattributes}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{groups}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package AttributeGroupAttributesList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package AttributeGroupAttributes;
@@ -6375,16 +6161,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^ACTIONS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = ActionParameter->parse($line,$gdmo)));
-		push @{$self->{actionparameters}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = ActionParameter->parse($line,$gdmo)));
-			push @{$self->{actionparameters}}, $s;
-		}
+		last TEST unless (($self->{actions} = ActionParameterList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -6398,25 +6175,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'ACTIONS'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{actionparameters}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{actions}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package ActionParameterList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package ActionParameter;
@@ -6472,16 +6243,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^NOTIFICATIONS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = NotificationParameter->parse($line,$gdmo)));
-		push @{$self->{notificationparameters}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = NotificationParameter->parse($line,$gdmo)));
-			push @{$self->{notificationparameters}}, $s;
-		}
+		last TEST unless (($self->{notifications} = NotificationParameterList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -6495,25 +6257,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'NOTIFICATIONS'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{notificationparameters}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{notifications}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package NotificationParameterList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package NotificationParameter;
@@ -7033,16 +6789,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^BEHAVIOUR//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = BehaviourReference->parse($line,$gdmo)));
-		push @{$self->{behaviour}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = BehaviourReference->parse($line,$gdmo)));
-			push @{$self->{behaviour}}, $s;
-		}
+		last TEST unless (($self->{behaviour} = BehaviourReferenceList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -7056,25 +6803,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'BEHAVIOUR'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{behaviour}}) {
-				if ($i) {
-					printf ','; $::fiest = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{behaviour}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package BehaviourReferenceList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package Action;
@@ -7324,16 +7065,7 @@ sub read {
 		my ($s,$c);
 		last TEST unless ($line=~s/^CREATE//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		if (($s = CreateModifier->parse($line,$gdmo))) {
-			push @{$self->{modifiers}}, $s;
-			while ($line=~s/^,//s) {
-				if (($c = Comments->parse($line,$gdmo))) {
-					$s->{commentplus} = $c;
-				}
-				last TEST unless (($s = CreateModifier->parse($line,$gdmo)));
-				push @{$self->{modifiers}}, $s;
-			}
-		}
+		$self->{modifiers} = CreateModifierList->parse($line,$gdmo);
 		while (($s = ParameterReference->parse($line,$gdmo))) {
 			push @{$self->{parameters}}, $s;
 		}
@@ -7351,16 +7083,7 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'CREATE'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
-		my $i = 0;
-		my $c;
-		foreach $s (@{$self->{modifiers}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
+		if (($s = $self->{modifiers})) { $s->gdmo(); }
 		foreach $s (@{$self->{parameters}}) {
 			$s->gdmo();
 		}
@@ -7368,6 +7091,13 @@ sub gdmo {
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package CreateModifierList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package CreateModifier;
@@ -7473,16 +7203,7 @@ sub read {
 		my ($s,$c);
 		last TEST unless ($line=~s/^DELETE//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		if (($s = DeleteModifier->parse($line,$gdmo))) {
-			push @{$self->{modifiers}}, $s;
-			while ($line=~s/^,//s) {
-				if (($c = Comments->parse($line,$gdmo))) {
-					$s->{commentplus} = $c;
-				}
-				last TEST unless (($s = DeleteModifier->parse($line,$gdmo)));
-				push @{$self->{modifiers}}, $s;
-			}
-		}
+		$self->{modifiers} = DeleteModifierList->parse($line,$gdmo);
 		while (($s = ParameterReference->parse($line,$gdmo))) {
 			push @{$self->{parameters}}, $s;
 		}
@@ -7500,16 +7221,7 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'DELETE'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
-		my $i = 0;
-		my $c;
-		foreach $s (@{$self->{modifiers}}) {
-			if ($i) {
-				printf ','; $::first = 0;
-				if ($c) { $c->gdmo(); }
-			} else { $i = 1; }
-			$s->gdmo();
-			$c = $s->{commentplus};
-		}
+		if (($s = $self->{modifiers})) { $s->gdmo(); }
 		foreach $s (@{$self->{parameters}}) {
 			$s->gdmo();
 		}
@@ -7517,6 +7229,13 @@ sub gdmo {
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package DeleteModifierList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package DeleteModifier;
@@ -7699,16 +7418,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^MATCHES(?:\s|\n)*((-)?)(?:\s|\n)*FOR//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = MatchQualifier->parse($line,$gdmo)));
-		push @{$self->{qualifiers}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = MatchQualifier->parse($line,$gdmo)));
-			push @{$self->{qualifiers}}, $s;
-		}
+		last TEST unless (($self->{matches} = MatchQualifierList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -7722,25 +7432,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'MATCHES FOR'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{qualifiers}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{matches}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package MatchQualifierList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package MatchQualifier;
@@ -7936,16 +7640,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^PARAMETERS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = ParameterReference->parse($line,$gdmo)));
-		push @{$self->{parameters}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = ParameterReference->parse($line,$gdmo)));
-			push @{$self->{parameters}}, $s;
-		}
+		last TEST unless (($self->{parameters} = ParameterReferenceList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -7959,25 +7654,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'PARAMETERS'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{parameters}}) { 
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{parameters}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package ParameterReferenceList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package GroupElements;
@@ -7993,16 +7682,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^GROUP(?:\s|\n)*((-)?)(?:\s|\n)*ELEMENTS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = AttributeReference->parse($line,$gdmo)));
-		push @{$self->{attributes}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = AttributeReference->parse($line,$gdmo)));
-			push @{$self->{attributes}}, $s;
-		}
+		last TEST unless (($self->{elements} = AttributeReferenceList->parse($line,$gdmo)));
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
@@ -8016,25 +7696,19 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'GROUP ELEMENTS'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{attributes}}) {
-				if ($i) {
-					printf ','; $::first = 0;
-					if ($c) { $c->gdmo(); }
-				} else { $i = 1; }
-				$s->gdmo();
-				$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{elements}->gdmo();
 		printf ';'; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package AttributeReferenceList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package Fixed;
@@ -8380,16 +8054,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^AND(?:\s|\n)*((-)?)(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*IDS//s);
 		$self->{comments1} = Comments->parse($line,$gdmo);
-		my ($s,$c);
-		last TEST unless (($s = FieldAttribute->parse($line,$gdmo)));
-		push @{$self->{fieldattributes}}, $s;
-		while ($line=~s/^,//s) {
-			if (($c = Comments->parse($line,$gdmo))) {
-				$s->{commentplus} = $c;
-			}
-			last TEST unless (($s = FieldAttribute->parse($line,$gdmo)));
-			push @{$self->{fieldattributes}}, $s;
-		}
+		last TEST unless (($self->{ids} = FieldAttributeList->parse($line,$gdmo)));
 		$self->{comments2} = Comments->parse($line,$gdmo);
 		$_[0] = $line; return $self;
 	}
@@ -8402,24 +8067,18 @@ sub gdmo {
 		my $s;
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'AND ATTRIBUTE IDS'; $::first = 0;
-		{
-			$::indent.="\t";
-			if (($s = $self->{comments1})) { $s->gdmo(); }
-			my $i = 0;
-			my $c;
-			foreach $s (@{$self->{fieldattributes}}) {
-					if ($i) {
-						printf ','; $::first = 0;
-						if ($c) { $c->gdmo(); }
-					} else { $i = 1; }
-					$s->gdmo();
-					$c = $s->{commentplus};
-			}
-			$::indent=~s/.$//s;
-		}
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		$self->{ids}->gdmo();
 		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
+
+# -------------------------------------
+package FieldAttributeList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
 
 # -------------------------------------
 package FieldAttribute;
