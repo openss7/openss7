@@ -1,0 +1,514 @@
+--< GDMO.Document "ITU-T Rec. Q.821 (2000)" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date$ by $Author$
+--  
+--  =============================================================================
+--  >--
+
+currentAlarmSummaryControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721:1992":top;
+	CHARACTERIZED BY
+		currentAlarmSummaryControlPkg PACKAGE
+			BEHAVIOUR
+				currentAlarmSummaryControlBeh BEHAVIOUR
+					DEFINED AS
+						"-- see 5.2.2.1 --";;
+			ATTRIBUTES
+				currentAlarmSummaryControlId GET,
+				alarmStatusList GET REPLACE ADD REMOVE,
+				objectList GET REPLACE ADD REMOVE,
+				perceivedSeverityList GET REPLACE ADD REMOVE,
+				probableCauseList GET REPLACE ADD REMOVE;
+			ACTIONS
+				retrieveCurrentAlarmSummary;
+			NOTIFICATIONS
+				currentAlarmSummaryReport;;;
+REGISTERED AS { q821ObjectClass 1 };
+
+
+managementOperationsSchedule MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721:1992":top;
+	CHARACTERIZED BY
+		managementOperationsSchedulePkg PACKAGE
+			BEHAVIOUR
+				managementOperationsScheduleBeh BEHAVIOUR
+					DEFINED AS
+						"-- see 5.2.2.2 --";;
+			ATTRIBUTES
+				"Recommendation X.721:1992":administrativeState GET REPLACE,
+				affectedObjectClass GET REPLACE,
+				affectedObjectInstances GET REPLACE,
+				beginTime GET REPLACE,
+				-- first activation at begin time, if
+				-- present, or else when schedule is created
+				destinationAddress GET,
+				-- As this attribute is 'GET' only, the way to set the Q.821 destinationAddress is to
+				-- re-create an instance of managementOperationsSchedule with the new
+				-- destinationAddress(es).
+				endTime DEFAULT VALUE Q821-ASN1Module.managementOperationsScheduleEndTimeDefault GET REPLACE,
+				interval GET REPLACE,
+				scheduIeId GET;;;
+	CONDITIONAL PACKAGES
+		managementOperationsScheduleOperationalStatePkg PACKAGE
+			ATTRIBUTES
+				"Recommendation X.721:1992":operationalState GET;
+		REGISTERED AS { q821Package 1 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { q821ObjectClass 2 };
+
+
+enhancedCurrentAlarmSummaryControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		enhancedCurrentAlarmSummaryControlPkg PACKAGE
+			BEHAVIOUR
+				enhancedCurrentAlarmSummaryControlBeh BEHAVIOUR
+					DEFINED AS
+						"-- see 6.2.2.1, enhancedCurrentAlarmSummaryControl on model --";;
+			ATTRIBUTES
+				enhancedCurrentAlarmSummaryControlId GET SET BY CREATE;
+			ACTIONS
+				alarmSynchronization
+					logRecordIdActionParameter
+					correlatedRecordNameActionParameter
+					invalidBaseManagedObjectErrorParameter
+					invalidObjectInstanceErrorParameter
+					suspectObjectListActionParameter
+					cancelledAlarmSynchronizationParameter;;;
+	CONDITIONAL PACKAGES
+		cancelAlarmSynchronizationPackage
+			PRESENT IF
+				"supported by the agent";
+REGISTERED AS { q821ObjectClass 3 };
+
+
+cancelAlarmSynchronizationPackage PACKAGE
+	BEHAVIOUR
+		cancelAlarmSynchronizationPackageBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.2.1, enhancedCurrentAlarmSummaryControl on model --";;
+	ACTIONS
+		cancelAlarmSynchronization
+			noSuchInvokeIdErrorParameter;
+REGISTERED AS { q821Package 1 };
+
+
+affectedObjectClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.AffectedObjectClass;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		affectedObjectClassBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 b) --";;
+REGISTERED AS { q821Attribute 1 };
+
+
+affectedObjectInstances ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.ObjectList;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		affectedObjectInstancesBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 c) --";;
+REGISTERED AS { q821Attribute 2 };
+
+
+alarmStatusList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.AlarmStatusList;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		alarmStatusListBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.1 b) --";;
+REGISTERED AS { q821Attribute 3 };
+
+
+beginTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.StartTime;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		beginTimeBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 d) --";;
+REGISTERED AS { q821Attribute 4 };
+
+
+currentAlarmSummaryControlId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		currentAlarmSummaryControlIdBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.1 a) --";;
+REGISTERED AS { q821Attribute 5 };
+
+
+destinationAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.DestinationAddress;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		destinationAddressBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 e) --";;
+REGISTERED AS { q821Attribute 6 };
+
+
+endTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.StopTime;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		endTimeBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 f) --";;
+REGISTERED AS { q821Attribute 7 };
+
+
+interval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.Interval;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		intervalBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 g) --";;
+REGISTERED AS { q821Attribute 8 };
+
+
+objectList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.ObjectList;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		objectListBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.1 c) --";;
+REGISTERED AS { q821Attribute 9 };
+
+
+perceivedSeverityList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.PerceivedSeverityList;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		perceivedSeverityListBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.1 d) --";;
+REGISTERED AS { q821Attribute 10 };
+
+
+probableCauseList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.ProbableCauseList;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		probableCauseListBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.1 e) --";;
+REGISTERED AS { q821Attribute 11 };
+
+
+scheduleId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		scheduleIdBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.2.2.2 i) --";;
+REGISTERED AS { q821Attribute 12 };
+
+
+enhancedCurrentAlarmSummaryControlId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		"Recommendation X.721":rDNIdBehaviour,
+		enhancedCurrentAlarmSummaryControlIdBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.5.1, enhancedCurrentAlarmSummaryControlld on model --";;
+REGISTERED AS { q821Attribute 13 };
+
+
+currAlarmSumControl-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		currentAlarmSummaryControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. M.3100:1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		currentAlarmSummaryControlId;
+	CREATE;
+	DELETE DELETES CONTAINED OBJECTS;
+REGISTERED AS { q821NameBinding 1 };
+
+
+managementOperationsSchedule-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		managementOperationsSchedule AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"ITU-T Rec. M.3100:1995":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		scheduleId;
+	CREATE;
+	DELETE DELETES CONTAINED OBJECTS;
+REGISTERED AS { q821NameBinding 2 };
+
+
+enhancedCurrentAlarmSummaryControl-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"Recommendation M.3100":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		enhancedCurrentAlarmSummaryControlId;
+	BEHAVIOUR
+		enhancedCurrentAlarmSummaryControl-managedElementBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.4, Name Binding Strategies on model --";;
+REGISTERED AS { q821NameBinding 3 };
+
+
+enhancedCurrentAlarmSummaryControl-managedElementComplex NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"Recommendation M.3100":managedElementComplex AND SUBCLASSES;
+	WITH ATTRIBUTE
+		enhancedCurrentAlarmSummaryControlId;
+	BEHAVIOUR
+		enhancedCurrentAlarmSummaryControl-managedElementComplexBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.4, Name Binding Strategies on model --";;
+REGISTERED AS { q821NameBinding 4 };
+
+
+enhancedCurrentAlarmSummaryControl-network NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		"Recommendation M.3100":network AND SUBCLASSES;
+	WITH ATTRIBUTE
+		enhancedCurrentAlarmSummaryControlId;
+	BEHAVIOUR
+		enhancedCurrentAlarmSummaryControl-networkBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.4, Name Binding Strategies on model --";;
+REGISTERED AS { q821NameBinding 5 };
+
+
+currentAlarmSummaryReport NOTIFICATION
+	BEHAVIOUR
+		currentAlarmSummaryReportBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.3.6.1 --";;
+	WITH INFORMATION SYNTAX Q821-ASN1Module.AlarmSummaryData;
+REGISTERED AS { q821Notification 1 };
+
+
+retrieveCurrentAlarmSummary ACTION
+	BEHAVIOUR
+		retrieveCurrentAlarmSummaryBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.3.10.1 --";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX Q821-ASN1Module.SummaryContents;
+	WITH REPLY SYNTAX Q821-ASN1Module.AlarmSummaryData;
+REGISTERED AS { q821Action 1 };
+
+
+resetAudibleAlarm ACTION
+	BEHAVIOUR
+		resetAudibleAlarmBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.3.12.3 --";;
+REGISTERED AS { q821Action 2 };
+
+
+alarmSynchronization ACTION
+	BEHAVIOUR
+		alarmSynchronizationBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.6.1, alarmSynchronization on model --";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX Q821-ASN1Module.AlarmSynchronizationInfo;
+	WITH REPLY SYNTAX Q821-ASN1Module.AlarmSynchronizationData;
+REGISTERED AS { q821Action 3 };
+
+
+cancelAlarmSynchronization ACTION
+	BEHAVIOUR
+		cancelAlarmSynchronizationBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.6.2, cancelAlarmSynchronization on model --";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX Q821-ASN1Module.CancelAlarmSynchronization;
+REGISTERED AS { q821Action 4 };
+
+
+logRecordIdParameter PARAMETER
+	CONTEXT EVENT INFO;
+	WITH SYNTAX Q821-ASN1Module.LogRecordId;
+	BEHAVIOUR
+		logRecordIdBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.3.1.1 --";;
+REGISTERED AS { q821Parameter 1 };
+
+
+correlatedRecordNameParameter PARAMETER
+	CONTEXT EVENT INFO;
+	WITH SYNTAX Q821-ASN1Module.CorrelatedRecordName;
+	BEHAVIOUR
+		correlatedRecordNameBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.3.1.1 --";;
+REGISTERED AS { q821Parameter 2 };
+
+
+suspectObjectListParameter PARAMETER
+	CONTEXT EVENT INFO;
+	WITH SYNTAX Q821-ASN1Module.SuspectObjectList;
+	BEHAVIOUR
+		suspectObjectListBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 5.3.1.1 --";;
+REGISTERED AS { q821Parameter 3 };
+
+
+canceledAlarmSynchronizationParameter PARAMETER
+	CONTEXT SPECIFIC ERROR;
+	WITH SYNTAX Q821-ASN1Module.CancelledAlarmSynchronization;
+	BEHAVIOUR
+		cancelledAlarmSynchronizationBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.7.2, cancelledAlarmSynchronizationParameter on model --";;
+REGISTERED AS { q821Parameter 4 };
+
+
+correlatedRecordNameActionParameter PARAMETER
+	CONTEXT ACTION REPLY;
+	WITH SYNTAX Q821-ASN1Module.CorrelatedRecordName;
+	BEHAVIOUR
+		correlatedRecordNameBeh;
+REGISTERED AS { q821Parameter 5 };
+
+
+invalidBaseManagedObjectErrorParameter PARAMETER
+	CONTEXT SPECIFIC ERROR;
+	WITH SYNTAX Q821-ASN1Module.InvalidBaseManagedObjectError;
+	BEHAVIOUR
+		invalidBaseManagedObjectErrorBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.7.4, invalidBaseManagedObjectErrorParameter on model --";;
+REGISTERED AS { q821Parameter 6 };
+
+
+invalidObjectInstanceErrorParameter PARAMETER
+	CONTEXT SPECIFIC ERROR;
+	WITH SYNTAX Q821-ASN1Module.InvalidObjectInstanceError;
+	BEHAVIOUR
+		invalidObjectInstanceErrorBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.7.5, invalidObjectInstanceErrorParameter on model --";;
+REGISTERED AS { q821Parameter 7 };
+
+
+logRecordIdActionParameter PARAMETER
+	CONTEXT ACTION REPLY;
+	WITH SYNTAX Q821-ASN1Module.LogRecordId;
+	BEHAVIOUR
+		logRecordIdBeh;
+REGISTERED AS { q821Parameter 8 };
+
+
+noSuchInvokeIdErrorParameter PARAMETER
+	CONTEXT SPECIFIC ERROR;
+	WITH SYNTAX Q821-ASN1Module.NoSuchInvokeIdError;
+	BEHAVIOUR
+		noSuchInvokeIdErrorBeh BEHAVIOUR
+			DEFINED AS
+				"-- see 6.2.7.7, noSuchInvokeIdErrorParameter on model --";;
+REGISTERED AS { q821Parameter 9 };
+
+
+suspectObjectListActionParameter PARAMETER
+	CONTEXT ACTION REPLY;
+	WITH SYNTAX Q821-ASN1Module.SuspectObjectList;
+	BEHAVIOUR
+		suspectObjectListBeh;
+REGISTERED AS { q821Parameter 10 };
+
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log$
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument >--
