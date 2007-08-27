@@ -1,0 +1,5754 @@
+--< GDMO.Document "ITU-T Rec. G.774" >--
+--< GDMO.Alias "ITU-T Rec. G.774"
+--  "Recommendation G.774 : 1992",
+--  "Recommendation G.774" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date$ by $Author$
+--  
+--  =============================================================================
+--  >--
+--6 Object classes 
+--This  clause  provides  replacement  managed  object  class  definitions  for  the  existing 
+--Recommendation G.774 (1992). Any  managed object class replaced  by the one  in this clause  is 
+--considered to be deprecated. The reasons  for the replacement of a  managed object class are as 
+--follows: 
+--a)  The replaced managed object class is faulty and must be fixed. 
+--b)  The replaced managed object class includes an attribute, package, notification or action that 
+--has been re-registered in this Recommendation. 
+--c)  The replaced  managed object class  inherits  from a  managed object class that has  been 
+--re-registered in this Recommendation. 
+--In each case where a class is replaced, the new class will be registered within this Recommendation. 
+--The textual label for the class will be revised to include the text "R1". For example, in the revision of 
+--the G.774 (1992) "au4CTPSink"  managed  object class, the revised  label  will  become 
+--"au4CTPSinkR1". 
+--Below  is a table of classes deprecated  from Recommendation  G.774 (1992) and the  new G.774 
+--classes that replace them: 
+--  Deprecated G.774 (1992) Classes  Replacement G.774 Classes 
+--au3CTPSink au3CTPSinkR1
+--au3CTPBidirectional au3CTPBidirectionalR1
+--au4CTPSink au4CTPSinkR1
+--au4CTPBidirectional au4CTPBidirectionalR1
+--tu11CTPSink tu11CTPSinkR1
+--tu11CTPBidirectional tu11CTPBidirectionalR1
+--tu12CTPSink tu12CTPSinkR1
+--tu12CTPBidirectional tu12CTPBidirectionalR1
+--tu2CTPSink tu2CTPSinkR1
+--tu2CTPBidirectional tu2CTPBidirectionalR1
+--tu3CTPSink tu3CTPSinkR1
+--tu3CTPBidirectional tu3CTPBidirectionalR1
+--vc11TTPBidirectional vc11TTPBidirectionalR1
+--vc11TTPSink vc11TTPSinkR1
+--vc12TTPBidirectional vc12TTPBidirectionalR1
+--vc12TTPSink vc12TTPSinkR1
+--vc2TTPBidirectional vc2TTPBidirectionalR1
+--vc2TTPSink vc2TTPSinkR1
+--vc3TTPBidirectional vc3TTPBidirectionalR1
+--vc3TTPSink vc3TTPSinkR1
+--vc3TTPSource vc3TTPSourceR1
+--vc4TTPBidirectional vc4TTPBidirectionalR1
+--vc4TTPSink vc4TTPSinkR1
+--vc4TTPSource vc4TTPSourceR1
+--New Object Classes to support trail trace management at regenerator section level: 
+--rsTTPTrailTraceTrailTraceBidirectional
+--rsTTPTrailTraceSink
+--rsTTPTrailTraceSource
+--6.1  Administrative Unit 3 Object Classes 
+
+au3CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		au3CTPSinkR1,
+		au3CTPSource;
+REGISTERED AS { g774ObjectClass 83 };
+
+
+au3CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		au3CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				au3CTPSinkR1PkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class represents a termination point where an AU-3 Connection is terminated. The AU-3
+						consists of a VC-3 plus an AU pointer which indicates the phase alignment of the VC-3 with respect
+						to the STM-N frame. A communicationsAlarm notification shall be issued if a loss of AU pointer is
+						detected. The probableCause parameter of the notification shall indicate LOP (Loss Of Pointer). A
+						communicationsAlarm notification shall be issued if an AU path alarm indication signal is detected.
+						The probableCause parameter of the notification shall indicate AIS (Alarm Indication Signal). A
+						change in the operational state shall cause a state change notification*;;
+			ATTRIBUTES
+				au3CTPId GET,
+				pointerSinkType GET;;;
+REGISTERED AS { g774ObjectClass 84 };
+
+
+au3CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		au3CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				au3CTPSourcePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class represents a termination point where an AU-3 Connection is originated. The AU-3
+						consists of a VC-3 plus an AU pointer which indicates the phase alignment of the VC-3 with respect
+						to the STM-N frame.*;;
+			ATTRIBUTES
+				au3CTPId GET,
+				pointerSourceType GET;;;
+REGISTERED AS { g774ObjectClass 3 };
+--6.2  Administrative Unit 4 Object Classes 
+
+
+au4CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		au4CTPSinkR1,
+		au4CTPSource;
+REGISTERED AS { g774ObjectClass 85 };
+
+
+au4CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		au4CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				au4CTPSinkR1PkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class represents a termination point where an AU-4 Connection is terminated. The AU-4
+						consists of a VC-4 plus an AU pointer which indicates the phase alignment of the VC-4 with respect
+						to the STM-N frame. A communicationsAlarm notification shall be issued if a loss of AU pointer is
+						detected. The probableCause parameter of the notification shall indicate LOP (Loss Of Pointer). A
+						communicationsAlarm notification shall be issued if an AU path alarm indication signal is detected.
+						The probableCause parameter of the notification shall indicate AIS (Alarm Indication Signal). A
+						change in the operational state shall cause a state change notification*;;
+			ATTRIBUTES
+				au4CTPId GET,
+				pointerSinkType GET;;;
+REGISTERED AS { g774ObjectClass 86 };
+
+
+au4CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		au4CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				au4CTPSourcePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class represents a termination point where an AU-4 Connection is originated. The AU-4
+						consists of a VC-4 plus an AU pointer which indicates the phase alignment of the VC-4 with respect
+						to the STM-N frame.*;;
+			ATTRIBUTES
+				au4CTPId GET,
+				pointerSourceType GET;;;
+REGISTERED AS { g774ObjectClass 6 };
+--6.3  Administrative Unit Group Object Classes 
+
+
+augBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorBidirectional,
+		augSink,
+		augSource;
+REGISTERED AS { g774ObjectClass 7 };
+
+
+augSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSink;
+	CHARACTERIZED BY
+		augSinkPkg PACKAGE
+			BEHAVIOUR
+				augSinkPkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class is instantiated if AU-n Connection(s) are being terminated. An AUG consists of a
+						homogeneous, byte interleaved, assembly of either three AU-3s or one AU-4. This object class
+						represents the point at which the AU-3/4 pointer is derived, based on the phase of the VC-3/4 POH
+						relative to the STM-N SOH. Also, the STM-N payload is byte-demultiplexed into its component AU
+						Groups (AUGs).*;;
+			ATTRIBUTES
+				augId GET,
+				"Recommendation M.3100":supportableClientList GET;;;
+REGISTERED AS { g774ObjectClass 8 };
+
+
+augSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSource;
+	CHARACTERIZED BY
+		augSourcePkg PACKAGE
+			BEHAVIOUR
+				augSourcePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class is instantiated if AU-n Connection(s) are being originated. An AUG consists of a
+						homogeneous, byte interleaved, assembly of either three AU-3s or one AU-4. This object class
+						represents the point at which the AU-3/4 pointer is generated to indicate the phase of the VC-3/4
+						POH relative to the STM-N SOH. Also, the AU Groups (AUGs) are byte-multiplexed to construct the
+						complete STM-N frame.*;;
+			ATTRIBUTES
+				augId GET,
+				"Recommendation M.3100":supportableClientList GET;;;
+REGISTERED AS { g774ObjectClass 9 };
+--6.4  Electrical SPI trail termination point object classes 
+
+
+electricalSPITTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		electricalSPITTPSink,
+		electricalSPITTPSource;
+REGISTERED AS { g774ObjectClass 10 };
+
+
+electricalSPITTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		electricalSPIPackage,
+		electricalSPITTPSinkPkg PACKAGE
+			BEHAVIOUR
+				electricalSPITTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the point where the incoming electrical interface signal is converted
+						into an internal logic level and the timing is recovered from the line signal. A
+						communicationsAlarm notification shall be issued if a loss of signal is detected. The probableCause
+						parameter of the notification shall indicate LOS (Loss Of signal). The upstream connectivity
+						pointer is NULL for an instance of this class when the upstream termination point is not contained
+						within the same network element.*;;;;
+REGISTERED AS { g774ObjectClass 11 };
+
+
+electricalSPITTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		electricalSPIPackage,
+		electricalSPITTPSourcePkg PACKAGE
+			BEHAVIOUR
+				electricalSPITTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the point at which an outgoing internal logic level STM-N signal is
+						converted into a STM-N in station electrical interface signal. The downstream connectivity pointer
+						is NULL for an instance of this class when the downstream termination point is not contained within
+						the same network element.*;;;;
+REGISTERED AS { g774ObjectClass 12 };
+--6.5  Indirect Adaptor Object Classes 
+
+
+indirectAdaptorBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSink,
+		indirectAdaptorSource;
+REGISTERED AS { g774ObjectClass 13 };
+
+
+indirectAdaptorSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		indirectAdaptorSinkPkg PACKAGE
+			BEHAVIOUR
+				indirectAdaptorSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class provides a naming mechanism which describes the multiplexing hierarchy of the SDH
+						signal.*;;;;
+REGISTERED AS { g774ObjectClass 14 };
+
+
+indirectAdaptorSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation X.721":top;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		indirectAdaptorSourcePkg PACKAGE
+			BEHAVIOUR
+				indirectAdaptorSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class provides a naming mechanism which describes the multiplexing hierarchy of the SDH
+						signal.*;;;;
+REGISTERED AS { g774ObjectClass 15 };
+--6.6  Multiplex Section Connection Termination Point Object Classes 
+
+
+msCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		msCTPSink,
+		msCTPSource;
+REGISTERED AS { g774ObjectClass 16 };
+
+
+msCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		msCTPPackage,
+		msCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				msCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a multiplex section connection.*;;;;
+REGISTERED AS { g774ObjectClass 17 };
+
+
+msCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		msCTPPackage,
+		msCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				msCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a multiplex section connection.*;;;;
+REGISTERED AS { g774ObjectClass 18 };
+--6.7  Multiplex Section Data Communications Channel Object Classes 
+
+
+msDatacomCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		msDatacomCTPSink,
+		msDatacomCTPSource;
+REGISTERED AS { g774ObjectClass 19 };
+
+
+msDatacomCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		msDatacomCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				msDatacomCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates the D4-D12 bytes in the MSOH.*;;
+			ATTRIBUTES
+				msDatacomCTPId GET;;;
+REGISTERED AS { g774ObjectClass 20 };
+
+
+msDatacomCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		msDatacomCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				msDatacomCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates the D4-D12 bytes in the MSOH.*;;
+			ATTRIBUTES
+				msDatacomCTPIdGET;;;
+REGISTERED AS { g774ObjectClass 21 };
+--6.8  Multiplex Section Orderwire Object Classes 
+
+
+msOrderwireCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		msOrderwireCTPSink,
+		msOrderwireCTPSource;
+REGISTERED AS { g774ObjectClass 22 };
+
+
+msOrderwireCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		msOrderwireCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				msOrderwireCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents a termination point where the E2 byte orderwire channel is terminated.*;;
+			ATTRIBUTES
+				msOrderwireCTPId GET;;;
+REGISTERED AS { g774ObjectClass 23 };
+
+
+msOrderwireCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		msOrderwireCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				msOrderwireCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents a termination point where the E2 byte orderwire channel is originated.*;;
+			ATTRIBUTES
+				msOrderwireCTPId GET;;;
+REGISTERED AS { g774ObjectClass 24 };
+--6.9  Multiplex Section Trail Termination Point Object Classes 
+
+
+msTTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		msTTPSink,
+		msTTPSource;
+	CHARACTERIZED BY
+		msTTPBidirectionalPkg PACKAGE
+			BEHAVIOUR
+				msTTPBidirectionalBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*When the excessiveBERMtceInhibit attribute is set to TRUE, MS-FERF is not inserted upstream upon
+						detection of excessive BER. A communicationsAlarm notification shall be issued if a far end receive
+						failure is detected. The probableCause parameter of the notification shall indicate FERF (Far End
+						Receive Failure).*;;;;
+REGISTERED AS { g774ObjectClass 25 };
+
+
+msTTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		msTTPPackage,
+		msTTPSinkPkg PACKAGE
+			BEHAVIOUR
+				msTTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a multiplex section trail, i.e. the processing and removal of the
+						multiplex section overhead from the incoming signal. When the excessiveBERMtceInhibit attribute is
+						set to TRUE, AIS is not inserted downstream upon detection of excessive BER. A communicationsAlarm
+						notification shall be issued if an excessive bit error rate is detected. The probableCause
+						parameter of the notification shall indicate excessive BER. A communicationsAlarm notification
+						shall be issued if a degraded signal is detected. The probableCause parameter of the notification
+						shall indicate signal degrade. A communicationsAlarm notification shall be issued if an MS alarm
+						indication signal is detected. The probableCause parameter of the notification shall indicate AIS
+						(Alarm Indication Signal).*;;
+			ATTRIBUTES
+				excessiveBERMtceInhibit GET-REPLACE,
+				signalDegradeThreshold GET-REPLACE;;;
+REGISTERED AS { g774ObjectClass 26 };
+
+
+msTTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		msTTPPackage,
+		msTTPSourcePkg PACKAGE
+			BEHAVIOUR
+				msTTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a multiplex section trail, i.e. the generation and addition of the
+						multiplex section overhead to the outgoing signal.*;;;;
+REGISTERED AS { g774ObjectClass 27 };
+--6.10  Optical SDH Physical Interface Trail Termination Point Object Classes 
+
+
+opticalSPITTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		opticalSPITTPSink,
+		opticalSPITTPSource;
+REGISTERED AS { g774ObjectClass 28 };
+
+
+opticalSPITTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		opticalSPIPackage,
+		opticalSPITTPSinkPkg PACKAGE
+			BEHAVIOUR
+				opticalSPITTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the point where the incoming optical interface signal is converted
+						into an internal logic level and the timing is recovered from the line signal. A
+						communicationsAlarm notification shall be issued if a loss of signal is detected. The probableCause
+						parameter of the notification shall indicate LOS (Loss Of signal). The upstream connectivity
+						pointer is NULL for an instance of this class when the upstream termination point is not contained
+						within the same network element.*;;;;
+REGISTERED AS { g774ObjectClass 29 };
+
+
+opticalSPITTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		opticalSPIPackage,
+		opticalSPITTPSourcePkg PACKAGE
+			BEHAVIOUR
+				opticalSPITTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the point at which an outgoing internal logic level STM-N signal is
+						converted into a STM-N in-station or interstation optical interface signal. A communicationsAlarm
+						notification shall be issued if the transmit laser fails. The probableCause parameter of the
+						notification shall indicate TransmitFail. The downstream connectivity pointer is NULL for an
+						instance of this class when the downstream termination point is not contained within the same
+						network element.*;;;;
+REGISTERED AS { g774ObjectClass 30 };
+--6.11  Regenerator Section Connection Termination Point Object Classes 
+
+
+rsCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		rsCTPSink,
+		rsCTPSource;
+REGISTERED AS { g774ObjectClass 31 };
+
+
+rsCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsCTPPackage,
+		rsCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				rsCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates an regenerator section connection.*;;;;
+REGISTERED AS { g774ObjectClass 32 };
+
+
+rsCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsCTPPackage,
+		rsCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				rsCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a regenerator section connection.*;;;;
+REGISTERED AS { g774ObjectClass 33 };
+--6.12  Regenerator Section Data Communications Channel Object Classes 
+
+
+rsDatacomCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		rsDatacomCTPSink,
+		rsDatacomCTPSource;
+REGISTERED AS { g774ObjectClass 34 };
+
+
+rsDatacomCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsDatacomCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				rsDatacomCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates the D1-D3 bytes in the RSOH.*;;
+			ATTRIBUTES
+				rsDatacomCTPId GET;;;
+REGISTERED AS { g774ObjectClass 35 };
+
+
+rsDatacomCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsDatacomCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				rsDatacomCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates the D1-D3 bytes in the RSOH.*;;
+			ATTRIBUTES
+				rsDatacomCTPId GET;;;
+REGISTERED AS { g774ObjectClass 36 };
+--6.13  Regenerator Section Orderwire Object Classes 
+
+
+rsOrderwireCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		rsOrderwireCTPSink,
+		rsOrderwireCTPSource;
+REGISTERED AS { g774ObjectClass 37 };
+
+
+rsOrderwireCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsOrderwireCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				rsOrderwireCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the point where the E1 byte orderwire channel is terminated.*;;
+			ATTRIBUTES
+				rsOrderwireCTPId GET;;;
+REGISTERED AS { g774ObjectClass 38 };
+
+
+rsOrderwireCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsOrderwireCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				rsOrderwireCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the point where the E1 byte orderwire channel is originated.*;;
+			ATTRIBUTES
+				rsOrderwireCTPId GET;;;
+REGISTERED AS { g774ObjectClass 39 };
+--6.14  Regenerator Section Trail Termination Point Object Classes 
+
+
+rsTTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		rsTTPSink,
+		rsTTPSource;
+REGISTERED AS { g774ObjectClass 40 };
+
+
+rsTTPTrailTraceBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		rsTTPBidirectional,-- This derivation is necessary for name binding purposes
+		rsTTPTrailTraceSink,
+		rsTTPTrailTraceSource;
+REGISTERED AS { g774ObjectClass 107 };
+
+
+rsTTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		rsTTPPackage,
+		rsTTPSinkPkg PACKAGE
+			BEHAVIOUR
+				rsTTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the termination of the regenerator section trail, i.e. the processing
+						and removal of the regenerator section overhead from the incoming signal and the descrambling of
+						that signal. A communicationsAlarm notification shall be issued if a loss of frame is detected. The
+						probableCause parameter of the notification shall indicate LOF (Loss of Frame).*;;;;
+REGISTERED AS { g774ObjectClass 41 };
+
+
+rsTTPTrailTraceSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		rsTTPSink;
+	CHARACTERIZED BY
+		trailTraceSinkPackage,
+		rsTTPTrailTraceSinkPkg PACKAGE
+			BEHAVIOUR
+				rsTTPTrailTraceSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the termination of the regenerator section trail and supports trail
+						trace management.*;;;;
+REGISTERED AS { g774ObjectClass 108 };
+
+
+rsTTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		rsTTPPackage,
+		rsTTPSourcePkg PACKAGE
+			BEHAVIOUR
+				rsTTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the origination of the regenerator section trail, i.e. generates the
+						regenerator section overhead for the outgoing signal, and scrambles that signal.*;;;;
+REGISTERED AS { g774ObjectClass 42 };
+
+
+rsTTPTrailTraceSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		rsTTPSource;
+	CHARACTERIZED BY
+		trailTraceSourcePackage,
+		rsTTPTrailTraceSourcePkg PACKAGE
+			BEHAVIOUR
+				rsTTPTrailTraceSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents the origination of the regenerator section trail and supports trail
+						trace management.*;;;;
+REGISTERED AS { g774ObjectClass 109 };
+--6.15  Regenerator Section User Channel Object Classes 
+
+
+rsUserChannelCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		rsUserChannelCTPSink,
+		rsUserChannelCTPSource;
+REGISTERED AS { g774ObjectClass 43 };
+
+
+rsUserChannelCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsUserChannelCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				rsUserChannelCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents a class of objects that terminates the F1 byte user channel.*;;
+			ATTRIBUTES
+				rsUserChannelCTPId GET;;;
+REGISTERED AS { g774ObjectClass 44 };
+
+
+rsUserChannelCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		rsUserChannelCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				rsUserChannelCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class represents a class of objects that originates the F1 byte user channel.*;;
+			ATTRIBUTES
+				rsUserChannelCTPId GET;;;
+REGISTERED AS { g774ObjectClass 45 };
+--6.16  SDH Network Element Object Class 
+
+
+sdhNE MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":managedElement;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		sdhNEPackage PACKAGE
+			BEHAVIOUR
+				sdhNEBehaviour BEHAVIOUR
+					DEFINED AS
+						*An SDH network element is a system which has no internal opensystem interfaces.*;;;;
+REGISTERED AS { g774ObjectClass 46 };
+--6.17  Tributary Unit 11 Object Classes 
+
+
+tu11CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		tu11CTPSinkR1,
+		tu11CTPSource;
+REGISTERED AS { g774ObjectClass 87 };
+
+
+tu11CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		tu-nSinkPackage,
+		tu11CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				tu11CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a tu-11 connection. A change in the operational state shall cause a
+						state change notification*;;
+			ATTRIBUTES
+				tu11CTPId GET;;;
+REGISTERED AS { g774ObjectClass 88 };
+
+
+tu11CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		tu11CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				tu11CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a tu-11 connection.*;;
+			ATTRIBUTES
+				tu11CTPId GET,
+				pointerSourceType GET;;;
+REGISTERED AS { g774ObjectClass 49 };
+--6.18  Tributary Unit 12 Object Classes 
+
+
+tu12CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		tu12CTPSinkR1,
+		tu12CTPSource;
+REGISTERED AS { g774ObjectClass 89 };
+
+
+tu12CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		tu-nSinkPackage,
+		tu12CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				tu12CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a tu-12 connection. A change in the operational state shall cause a
+						state change notification*;;
+			ATTRIBUTES
+				tu12CTPId GET;;;
+REGISTERED AS { g774ObjectClass 90 };
+
+
+tu12CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		tu12CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				tu12CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a tu-12 connection.*;;
+			ATTRIBUTES
+				tu12CTPId GET,
+				pointerSourceType GET;;;
+REGISTERED AS { g774ObjectClass 52 };
+--6.19  Tributary Unit 2 Object Classes 
+
+
+tu2CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		tu2CTPSinkR1,
+		tu2CTPSource;
+REGISTERED AS { g774ObjectClass 91 };
+
+
+tu2CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		tu-nSinkPackage,
+		tu2CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				tu2CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a tu-2 connection. A change in the operational state shall cause a
+						state change notification.*;;
+			ATTRIBUTES
+				tu2CTPId GET;;;
+REGISTERED AS { g774ObjectClass 92 };
+
+
+tu2CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		tu2CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				tu2CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a tu-2 connection.*;;
+			ATTRIBUTES
+				tu2CTPId GET,
+				pointerSourceType GET;;;
+REGISTERED AS { g774ObjectClass 55 };
+--6.20  Tributary Unit 3 Object Classes 
+
+
+tu3CTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		tu3CTPSinkR1,
+		tu3CTPSource;
+REGISTERED AS { g774ObjectClass 93 };
+
+
+tu3CTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":operationalStatePackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		tu-nSinkPackage,
+		tu3CTPSinkR1Pkg PACKAGE
+			BEHAVIOUR
+				tu3CTPSinkR1BehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a tu-3 connection. A change in the operational state shall cause a
+						state change notification.*;;
+			ATTRIBUTES
+				tu3CTPId GET;;;
+REGISTERED AS { g774ObjectClass 94 };
+
+
+tu3CTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		tu3CTPSourcePkg PACKAGE
+			BEHAVIOUR
+				tu3CTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates a tu-3 connection.*;;
+			ATTRIBUTES
+				tu3CTPId GET,
+				pointerSourceType GET;;;
+REGISTERED AS { g774ObjectClass 58 };
+--6.21  Tributary Unit Group 2 Object Classes 
+
+
+tug2Bidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorBidirectional,
+		tug2Sink,
+		tug2Source;
+REGISTERED AS { g774ObjectClass 59 };
+
+
+tug2Sink MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSink;
+	CHARACTERIZED BY
+		tug2SinkPkg PACKAGE
+			BEHAVIOUR
+				tug2SinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class is instantiated if TU-11, TU-12, TU-2 connection(s) are being terminated or
+						originated. A TUG-2 consists of a homogeneous or heterogeneous, assembly of four TU-11s, three
+						TU-12s or one TU-2. This object class represents the point at which the TU pointer is derived,
+						based on the phase of the VC 11/12/2 POH relative to the VC-3/4 POH and the VC-3/4 signal is
+						disassembled.*;;
+			ATTRIBUTES
+				tug2Id GET,
+				"Recommendation M.3100":supportableClientList GET;;;
+REGISTERED AS { g774ObjectClass 60 };
+
+
+tug2Source MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSource;
+	CHARACTERIZED BY
+		tug2SourcePkg PACKAGE
+			BEHAVIOUR
+				tug2SourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class is instantiated if TU-11, TU-12, TU-2 connection(s) are being terminated or
+						originated. A TUG-2 consists of a homogeneous or heterogeneous, assembly of four TU-11s, three
+						TU-12s or one TU-2. This object class represents the point at which the TU pointer is processed to
+						indicate the phase of the VC 11/12/2 POH relative to the VC-3/4 POH and assembles the complete
+						VC-3/4.*;;
+			ATTRIBUTES
+				tug2Id GET,
+				"Recommendation M.3100":supportableClientList GET;;;
+REGISTERED AS { g774ObjectClass 61 };
+--6.22  Tributary Unit Group 3 Object Classes 
+
+
+tug3Bidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorBidirectional,
+		tug3Sink,
+		tug3Source;
+REGISTERED AS { g774ObjectClass 62 };
+
+
+tug3Sink MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSink;
+	CHARACTERIZED BY
+		tug3SinkPkg PACKAGE
+			BEHAVIOUR
+				tug3SinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class is instantiated if TU-3 connection(s) are being terminated. Or if TU-11s, TU-12s,
+						or TU-2s are being terminated from a VC-4. A TUG-3 consists of a homogeneous assembly of seven
+						TUG-2s or one TU-3.*;;
+			ATTRIBUTES
+				tug3Id GET,
+				"Recommendation M.3100":supportableClientList GET;;;
+REGISTERED AS { g774ObjectClass 63 };
+
+
+tug3Source MANAGED OBJECT CLASS
+	DERIVED FROM
+		indirectAdaptorSource;
+	CHARACTERIZED BY
+		tug3SourcePkg PACKAGE
+			BEHAVIOUR
+				tug3SourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class is instantiated if TU-3 connection(s) are being originated. Or TU-11s, TU-12s, or
+						TU-2s are being combined to form a VC-4. A TUG-3 consists of a homogeneous assembly of seven TUG-2s
+						or one TU-3.*;;
+			ATTRIBUTES
+				tug3Id GET,
+				"Recommendation M.3100":supportableClientList GET;;;
+REGISTERED AS { g774ObjectClass 64 };
+--6.23  Virtual Container 11 Object Classes 
+
+
+vc11TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		vc11TTPSinkR1,
+		vc11TTPSource;
+	CHARACTERIZED BY
+		vc11-2BidirectionalPackageR1;
+REGISTERED AS { g774ObjectClass 95 };
+
+
+vc11TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		vc11-2SinkPackageR1,
+		vc11TTPSinkPkgR1 PACKAGE
+			BEHAVIOUR
+				vc11TTPSinkPkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a vc11 trail, i.e. the point at which the VC11-POH is extracted from
+						the STM-N frame.*;;
+			ATTRIBUTES
+				vc11TTPId GET;;;
+REGISTERED AS { g774ObjectClass 96 };
+
+
+vc11TTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		vc11TTPSourcePkg PACKAGE
+			BEHAVIOUR
+				vc11TTPSourcePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class originates a vc11 trail, i.e. the point at which the VC11-POH is added to the
+						STM-N frame.*;;
+			ATTRIBUTES
+				vc11TTPId GET,
+				v5SignalLabelSend GET;;;
+REGISTERED AS { g774ObjectClass 67 };
+--6.24  Virtual Container 12 Object Classes 
+
+
+vc12TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		vc12TTPSinkR1,
+		vc12TTPSource;
+	CHARACTERIZED BY
+		vc11-2BidirectionalPackageR1;
+REGISTERED AS { g774ObjectClass 97 };
+
+
+vc12TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		vc11-2SinkPackageR1,
+		vc12TTPSinkPkgR1 PACKAGE
+			BEHAVIOUR
+				vc12TTPSinkPkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a vc12 trail, i.e. the point at which the VC12-POH is extracted from
+						the STM-N frame.*;;
+			ATTRIBUTES
+				vc12TTPId GET;;;
+REGISTERED AS { g774ObjectClass 98 };
+
+
+vc12TTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		vc12TTPSourcePkg PACKAGE
+			BEHAVIOUR
+				vc12TTPSourcePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class originates a vc12 trail, i.e. the point at which the VC12-POH is added to the
+						STM-N frame.*;;
+			ATTRIBUTES
+				vc12TTPId GET,
+				v5SignalLabelSend GET;;;
+REGISTERED AS { g774ObjectClass 70 };
+--6.25  Virtual Container 2 Object Classes 
+
+
+vc2TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		vc2TTPSinkR1,
+		vc2TTPSource;
+	CHARACTERIZED BY
+		vc11-2BidirectionalPackageR1;
+REGISTERED AS { g774ObjectClass 99 };
+
+
+vc2TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		vc11-2SinkPackageR1,
+		vc2TTPSinkPkgR1 PACKAGE
+			BEHAVIOUR
+				vc2TTPSinkPkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a vc2 trail, i.e. the point at which the VC2-POH is extracted from the
+						STM-N frame.*;;
+			ATTRIBUTES
+				vc2TTPId GET;;;
+REGISTERED AS { g774ObjectClass 100 };
+
+
+vc2TTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		vc2TTPSourcePkg PACKAGE
+			BEHAVIOUR
+				vc2TTPSourcePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						*This object class originates a vc2 trail, i.e. the point at which the VC2-POH is added to the STM-N
+						frame.*;;
+			ATTRIBUTES
+				vc2TTPId GET,
+				v5SignalLabelSend GET;;;
+REGISTERED AS { g774ObjectClass 73 };
+--6.26  Virtual Container 3 Object Classes 
+
+
+vc3TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		vc3TTPSinkR1,
+		vc3TTPSourceR1;
+	CHARACTERIZED BY
+		vc3-4BidirectionalPackageR1;
+REGISTERED AS { g774ObjectClass 101 };
+
+
+vc3TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		vc3-4SinkPackageR1,
+		vc3TTPSinkPkgR1 PACKAGE
+			BEHAVIOUR
+				vc3TTPSinkPkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a vc3 trail, i.e. the point at which the SDH VC-3 is terminated.*;;
+			ATTRIBUTES
+				vc3TTPId GET;;;
+REGISTERED AS { g774ObjectClass 102 };
+
+
+vc3TTPSourceR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		vc3-4SourcePackageR1,
+		vc3TTPSourcePkgR1 PACKAGE
+			BEHAVIOUR
+				vc3TTPSourcePkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class originates a vc3 trail, i.e. the point at which the SDH VC-3 is originated.*;;
+			ATTRIBUTES
+				vc3TTPId GET;;;
+REGISTERED AS { g774ObjectClass 103 };
+--6.27  Virtual Container 4 Object Classes 
+
+
+vc4TTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointBidirectional,
+		vc4TTPSinkR1,
+		vc4TTPSourceR1;
+	CHARACTERIZED BY
+		vc3-4BidirectionalPackageR1;
+REGISTERED AS { g774ObjectClass 104 };
+
+
+vc4TTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		"Recommendation M.3100":tmnCommunicationsAlarmInformationPackage,
+		vc3-4SinkPackageR1,
+		vc4TTPSinkPkgR1 PACKAGE
+			BEHAVIOUR
+				vc4TTPSinkPkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class terminates a vc4 trail, i.e. the point at which the SDH VC-4 is terminated.*;;
+			ATTRIBUTES
+				vc4TTPId GET;;;
+REGISTERED AS { g774ObjectClass 105 };
+
+
+vc4TTPSourceR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":trailTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation X.721":administrativeStatePackage,
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		"Recommendation M.3100":stateChangeNotificationPackage,
+		vc3-4SourcePackageR1,
+		vc4TTPSourcePkgR1 PACKAGE
+			BEHAVIOUR
+				vc3-4TTPSourcePkgR1Behaviour BEHAVIOUR
+					DEFINED AS
+						*This object class originates a vc4 trail, i.e. the point at which the SDH VC-4 is originated.*;;
+			ATTRIBUTES
+				vc4TTPId GET;;;
+REGISTERED AS { g774ObjectClass 106 };
+--6.28  VC-n User Channel Object Classes 
+
+
+vcnUserChannelCTPBidirectional MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointBidirectional,
+		vcnUserChannelCTPSink,
+		vcnUserChannelCTPSource;
+REGISTERED AS { g774ObjectClass 80 };
+
+
+vcnUserChannelCTPSink MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSink;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		vcnUserChannelCTPSinkPkg PACKAGE
+			BEHAVIOUR
+				vcnUserChannelCTPSinkBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class terminates the F2 byte user channel.*;;
+			ATTRIBUTES
+				vcnUserChannelCTPId GET;;;
+REGISTERED AS { g774ObjectClass 81 };
+
+
+vcnUserChannelCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":connectionTerminationPointSource;
+	CHARACTERIZED BY
+		"Recommendation M.3100":createDeleteNotificationsPackage,
+		vcnUserChannelCTPSourcePkg PACKAGE
+			BEHAVIOUR
+				vcnUserChannelCTPSourceBehaviourPkg BEHAVIOUR
+					DEFINED AS
+						*This object class originates the F2 byte user channel.*;;
+			ATTRIBUTES
+				vcnUserChannelCTPId GET;;;
+REGISTERED AS { g774ObjectClass 82 };
+--7 Packages 
+--This  clause provides replacement package definitions  for the existing Recommendation G.774 
+--(1992). Any package replaced by one in this clause is considered to be deprecated. The reasons for 
+--the replacement of a package are as follows: 
+--1)  The replaced package is faulty and must be fixed. 
+--2)  The replaced package  includes an  attribute, package, notification or action which has been 
+--re-registered in this Recommendation. 
+--In each case where  a package  is replaced, the new package will  be registered within this 
+--Recommendation. The textual  label  for the package will  be revised to include the text "R1". For 
+--example, in the revision of the G.774 (1992) package "vc3-4SourcePackage", the revised label will 
+--become "vc3-4SourcePackageR1". 
+--Below  is a table of packages deprecated from Recommendation G.774 (1992) and the G.774 
+--packages which replace them: 
+--  Deprecated G.774 (1992) Packages  Replacement G.774 Packages 
+--vc11-2BidirectionalPackage vc11-2BidirectionalPackageR1
+--vc11-2SinkPackage vc11-2SinkPackageR1
+--vc3-4BidirectionalPackage vc3-4BidirectionalPackageR1
+--vc3-4SinkPackage vc3-4SinkPackageR1
+--vc3-4SourcePackage vc3-4SourcePackageR1
+--New Packages to support trail trace management at regenerator section level: 
+--trailTraceSinkPackage
+--trailTraceSourcePackage
+--7.1 electricalSPIPackage 
+
+
+electricalSPIPackage PACKAGE
+	ATTRIBUTES
+		electricalSPITTPId GET,
+		stmLevel GET;;
+--7.2 msCTPPackage 
+
+
+msCTPPackage PACKAGE
+	ATTRIBUTES
+		msCTPId GET,
+		stmLevel GET;;
+--7.3 msTTPPackage 
+
+
+msTTPPackage PACKAGE
+	ATTRIBUTES
+		msTTPId GET,
+		stmLevel GET;;
+--7.4 opticalSPIPackage 
+
+
+opticalSPIPackage PACKAGE
+	ATTRIBUTES
+		opticalSPITTPId GET,
+		opticalReach GET,
+		opticalWavelength GET,
+		stmLevel GET;;
+--7.5 rsCTPPackage 
+
+
+rsCTPPackage PACKAGE
+	ATTRIBUTES
+		rsCTPId GET,
+		stmLevel GET;;
+--7.6 rsTTPPackage 
+
+
+rsTTPPackage PACKAGE
+	ATTRIBUTES
+		rsTTPId GET,
+		stmLevel GET;;
+--7.7 trailTraceSinkPackage 
+
+
+trailTraceSinkPackage PACKAGE
+	BEHAVIOUR
+		trailTraceSinkPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				*This Package supports trail trace management at the termination sink.*;;
+	ATTRIBUTES
+		trailTraceExpected REPLACE-WITH-DEFAULT
+			DEFAULT VALUE SDH.defaultNull GET-REPLACE,
+		trailTraceReceive GET;;
+--7.8  trailTraceSourcePackage 
+
+
+trailTraceSourcePackage PACKAGE
+	BEHAVIOUR
+		trailTraceSourcePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				*This Package supports trail trace management at the termination source.*;;
+	ATTRIBUTES
+		trailTraceSend GET-REPLACE;;
+--7.9  tu-nSinkPackage 
+
+
+tu-nSinkPackage PACKAGE
+	BEHAVIOUR
+		tu-nSinkPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				*A communicationsAlarm notification shall be issued if a loss of TU pointer is detected. The
+				probableCause parameter of the notification shall indicate LOP (Loss of Pointer). A
+				communicationsAlarm notification shall be issued if an TU path alarm indication signal is detected.
+				The probableCause parameter of the notification shall indicate AIS (Alarm Indication Signal).*;;
+	ATTRIBUTES
+		pointerSinkType GET;;
+--7.10 vc11-2BidirectionalPackageR1 
+
+
+vc11-2BidirectionalPackageR1 PACKAGE
+	BEHAVIOUR
+		vc11-2BidirectionalPackageR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*A communicationsAlarm notification shall be issued if a far end receive failure (V5 byte) is
+				detected. The probableCause parameter of the notification shall indicate FERF (Far End Receive
+				Failure).*;;;
+--7.11 vc11-2SinkPackageR1 
+
+
+vc11-2SinkPackageR1 PACKAGE
+	BEHAVIOUR
+		vc11-2SinkPackageR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*A communicationsAlarm notification shall be issued if the signal label received (V5 Byte) does not
+				match the signal label expected. The probableCause parameter of the notification shall indicate
+				signal label mismatch.*;;
+	ATTRIBUTES
+		v5SignalLabelExpected GET,
+		v5SignalLabelReceive GET;;
+--7.12 vc3-4BidirectionalPackageR1 
+
+
+vc3-4BidirectionalPackageR1 PACKAGE
+	BEHAVIOUR
+		vc3-4BidirectionalPackageR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*A communicationsAlarm notification shall be issued if a far end receive failure (G1 byte) is
+				detected. The probableCause parameter of the notification shall indicate FERF (Far End Receive
+				Failure).*;;;
+--7.13 vc3-4SinkPackageR1 
+
+
+vc3-4SinkPackageR1 PACKAGE
+	BEHAVIOUR
+		vc3-4SinkPackageR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*A communicationsAlarm notification shall be issued if the signal label received (C2 Byte) does not
+				match the signal label expected. The probableCause parameter of the notification shall indicate
+				signal label mismatch. A communicationsAlarm notification shall be issued if the path trace
+				received (J1 Byte) does not match the path trace expected. The probableCause parameter of the
+				notification shall indicate path trace mismatch. A communicationsAlarm notification shall be issued
+				if a loss of TU multiframe indicator (H4 Byte) is detected. The probableCause parameter of the
+				notification shall indicate loss of TU multiframe. This communicationsAlarm notification is only
+				required for high order paths with payloads that require use of the multiframe indicator. When 16
+				bytes are supported, the 16 bytes of the path trace shall be conveyed at the management interface
+				in both ways. This is a local issue whether the NE recompute the CRC-7 under a replace operation.*;;
+	ATTRIBUTES
+		j1PathTraceExpected REPLACE-WITH-DEFAULT
+			DEFAULT VALUE SDH.defaultNull GET-REPLACE,
+		"Recommendation G.774.05":j1PathTraceReceive GET,
+		c2SignalLabelExpected GET,
+		c2SignalLabelReceive GET;;
+--7.14 vc3-4SourcePackageR1 
+
+
+vc3-4SourcePackageR1 PACKAGE
+	BEHAVIOUR
+		vc3-4SourcePackageR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*When 16 bytes are supported, the 16 bytes of the path trace shall be conveyed at the management
+				interface.*;;
+	ATTRIBUTES
+		"Recommendation G.774.5":j1PathTraceSend GET-REPLACE,
+		c2SignalLabelSend GET;;
+--8  Attributes 
+--This clause provides replacement attribute definitions  for the existing Recommendation  G.774 
+--(1992). Any attribute replaced by one in this clause is considered to be deprecated. The reasons for 
+--the replacement of an attribute are as follows: 
+--1)  The replaced attribute is faulty and must be fixed. 
+--Below is a table of attributes deprecated from Recommendation G.774 (1992): 
+--Deprecated G.774 (1992) Attributes 
+--ferfState
+--New Attributes to support trail trace management at regenerator section level: 
+--trailTraceExpected
+--trailTraceReceive
+--trailTraceSend
+--8.1 AU-3 Identification 
+
+
+au3CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		au3CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The au3CTPId attribute is an attribute type whose distinguished value can be used as an RDN when
+				naming an instance of the AU3CTPBidirectional, AU3CTPSink, and AU3CTPSource managed object classes.
+				This attribute specifies the timeslot of the au3CTP within its server TTP or IA. The value shall be
+				the integer which represents the position of the timeslot in temporal order. The first timeslot
+				shall be numbered one.*;;
+REGISTERED AS { g774Attribute 1 };
+--8.2 AU-4 Identification 
+
+
+au4CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		au4CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The au4CTPId attribute is an attribute type whose distinguished value can be used as an RDN when
+				naming an instance of the AU4CTPBidirectional, AU4CTPSink, and AU4CTPSource managed object classes.
+				This attribute specifies the timeslot of the au4CTP within its server TTP or IA. The value shall be
+				the integer which represents the position of the timeslot in temporal order. The first timeslot
+				shall be numbered one.*;;
+REGISTERED AS { g774Attribute 2 };
+--8.3 AUG Identification 
+
+
+augId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		augIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The augId attribute is an attribute type whose distinguished value can be used as an RDN when
+				naming an instance of the AUG managed object class. This attribute specifies the timeslot of the
+				aug within its server TTP or IA. The value shall be the integer which represents the position of
+				the timeslot in temporal order. The first timeslot shall be numbered one.*;;
+REGISTERED AS { g774Attribute 3 };
+--8.4  C2 Signal Label Expected 
+
+
+c2SignalLabelExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.C2SignalLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		c2SignalLabelExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the expected C2 VC Signal Label for an incoming VC-n. See Recommendation
+				G.707/Y.1322 for a list of valid values.*;;
+REGISTERED AS { g774Attribute 4 };
+--8.5  C2 Signal Label Receive 
+
+
+c2SignalLabelReceive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.C2SignalLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		c2SignalLabelReceiveBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the C2 VC Signal Label for an incoming VC-n. See Recommendation
+				G.707/Y.1322 for a list of valid values.*;;
+REGISTERED AS { g774Attribute 5 };
+--8.6  C2 Signal Label Send 
+
+
+c2SignalLabelSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.C2SignalLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		c2SignalLabelSendBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the C2 VC Signal Label for an outgoing VC-n. See Recommendation
+				G.707/Y.1322 for a list of valid values.*;;
+REGISTERED AS { g774Attribute 6 };
+--8.7  Electrical SDH Physical Interface Trail Termination Point Identification 
+
+
+electricalSPITTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		electricalSPITTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the electricalSPITTP object classes. If
+				the string choice of the syntax is used then matching on substrings is permitted. If the number
+				choice for the syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 7 };
+--8.8  Excessive Bit Error Ratio Maintenance Inhibit 
+
+
+excessiveBERMtceInhibit ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.Boolean;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		excessiveBERMtceInhibitBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is set to TRUE to cause the inhibition of consequent maintenance signalling upon the
+				detection of excessive bit error ratio.*;;
+REGISTERED AS { g774Attribute 8 };
+--8.9  J1 Path Trace Expected 
+
+
+j1PathTraceExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		j1PathTraceExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to specify the value of the expected J1 Byte VC Path Trace byte message for
+				instances of the VC-n. If the value of this attribute is set to NULL then any Received Path Trace
+				shall be considered to match.*;;
+REGISTERED AS { g774Attribute 10 };
+--8.10  J1 Path Trace Receive 
+
+
+j1PathTraceReceive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		j1PathTraceReceiveBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the incoming J1 Byte VC Path Trace byte message for
+				instances of the VC-n.*;;
+REGISTERED AS { g774Attribute 11 };
+--8.11  J1 Path Trace Send 
+
+
+j1PathTraceSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		j1PathTraceSendBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the outgoing J1 VC Path Trace byte message for
+				instances of the VC-n. The NULL choice is not supported.*;;
+REGISTERED AS { g774Attribute 12 };
+--8.12  Multiplex Section Connection Termination Point Identification 
+
+
+msCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		msCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the msCTP object class. This attribute
+				represents the first and only timeslot of this type. The value of this attribute shall be integer
+				one.*;;
+REGISTERED AS { g774Attribute 13 };
+--8.13  MS Data Communications Channel CTP Identification 
+
+
+msDatacomCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		msDatacomCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The msDatacomCTPId attribute is an attribute type whose distinguished value can be used as an RDN
+				when naming an instance of the msDatacomCTPBidirectional, msDatacomCTPSink, and msDatacomCTPSource
+				managed object classes. This attribute represents the first and only timeslot of this type. The
+				value of this attribute shall be integer one.*;;
+REGISTERED AS { g774Attribute 14 };
+--8.14  Multiplex Section Orderwire Identification 
+
+
+msOrderwireCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		msOrderwireCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the Multiplex Section Orderwire Channel
+				object class. This attribute represents the first and only timeslot of this type. The value of this
+				attribute shall be integer one.*;;
+REGISTERED AS { g774Attribute 15 };
+--8.15  Multiplex Section Trail Termination Point Identification 
+
+
+msTTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		msTTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the msTTP object class. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 16 };
+--8.16 Optical Reach 
+
+
+opticalReach ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.OpticalReach;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		opticalReachBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute indicates the length the optical signal may travel before requiring termination or
+				regeneration.*;;
+REGISTERED AS { g774Attribute 17 };
+--8.17  Optical SDH Physical Interface Trail Termination Point Identification 
+
+
+opticalSPITTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		opticalSPITTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the opticalSPITTP object class. If the
+				string choice of the syntax is used then matching on substrings is permitted. If the number choice
+				for the syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 18 };
+--8.18  Optical WaveLength 
+
+
+opticalWavelength ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.OpticalWavelength;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		opticalWavelengthBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the optical wavelength used by an opticalSPITTP object instance.*;;
+REGISTERED AS { g774Attribute 19 };
+--8.19  Pointer Sink Type 
+
+
+pointerSinkType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.PointerSinkType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		pointerSinkTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute indicates the status of the incoming Pointer of a sink or bidirectional CTP.*;;
+REGISTERED AS { g774Attribute 20 };
+--8.20  Pointer Source Type 
+
+
+pointerSourceType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.PointerSourceType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		pointerSourceTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute indicates the status of the outgoing Pointer of a source or bidirectional CTP.*;;
+REGISTERED AS { g774Attribute 21 };
+--8.21  Regenerator Section Connection Termination Point Identification 
+
+
+rsCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		rsCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the rsCTP object classes. This attribute
+				represents the first and only timeslot of this type. The value of this attribute shall be integer
+				one.*;;
+REGISTERED AS { g774Attribute 22 };
+--8.22  Regenerator Section Data Communications Channel CTP Identification 
+
+
+rsDatacomCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		rsDatacomCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The rsDatacomCTPId attribute is an attribute type whose distinguished value can be used as an RDN
+				when naming an instance of the rsDatacomCTPBidirectional, rsDatacomCTPSink, and rsDatacomCTPSource
+				managed object classes. This attribute represents the first and only timeslot of this type. The
+				value of this attribute shall be integer one.*;;
+REGISTERED AS { g774Attribute 23 };
+--8.23  Regenerator Section Orderwire Identification 
+
+
+rsOrderwireCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		rsOrderwireCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the Regenerator Section Orderwire Channel
+				object classes. This attribute represents the first and only timeslot of this type. The value of
+				this attribute shall be integer one.*;;
+REGISTERED AS { g774Attribute 24 };
+--8.24  Regenerator Section Trail Termination Point Identification 
+
+
+rsTTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		rsTTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the rsTTP object classes. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 25 };
+--8.25  Regenerator Section User Channel Identification 
+
+
+rsUserChannelCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		rsUserChannelCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the rsUserChannel object classes. This
+				attribute represents the first and only timeslot of this type. The value of this attribute shall be
+				integer one.*;;
+REGISTERED AS { g774Attribute 26 };
+--8.26  Signal Degrade Threshold 
+
+
+signalDegradeThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.Integer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		signalDegradeThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the specific BER used to define the signal degrade threshold. The specific
+				BER used is an equipment issue. This attribute represents the negative power of 10. So, for
+				instance, if this attribute had a value of 5, then the BER threshold is 10 raised to the power of
+				5.*;;
+REGISTERED AS { g774Attribute 27 };
+--8.27  STM Level 
+
+
+stmLevel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.Integer;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		stmLevelBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the level, n, of the STM-n signal being received, transmitted, or received
+				and transmitted for termination point object instance.*;;
+REGISTERED AS { g774Attribute 28 };
+--8.28  Trail Trace Expected 
+
+
+trailTraceExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		trailTraceExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to specify the value of the expected Trail Trace information. If the value
+				of this attribute is set to NULL then any Trail Trace shall be considered to match.*;;
+REGISTERED AS { g774Attribute 44 };
+--8.29  Trail Trace Receive 
+
+
+trailTraceReceive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.TrailTraceReceiveSend;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		trailTraceReceiveBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the incoming Trail Trace information.*;;
+REGISTERED AS { g774Attribute 45 };
+--8.30  Trail Trace Send 
+
+
+trailTraceSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.TrailTraceReceiveSend;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		trailTraceSendBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the outgoing Trail Trace information.*;;
+REGISTERED AS { g774Attribute 46 };
+--8.31  Tributary Unit 11 Connection Termination Point Identification 
+
+
+tu11CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		tu11CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the tu11CTP object classes. This attribute
+				specifies the timeslot of the TU-11 CTP within its server TTP or IA. The value shall be the integer
+				which represents the position of the timeslot in temporal order. The first timeslot shall be
+				numbered one.*;;
+REGISTERED AS { g774Attribute 29 };
+--8.32  Tributary Unit 12 Connection Termination Point Identification 
+
+
+tu12CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		tu12CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the tu12CTP object classes. This attribute
+				specifies the timeslot of the TU-12 CTP within its server TTP or IA. The value shall be the integer
+				which represents the position of the timeslot in temporal order. The first timeslot shall be
+				numbered one.*;;
+REGISTERED AS { g774Attribute 30 };
+--8.33  Tributary Unit 2 Connection Termination Point Identification 
+
+
+tu2CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		tu2CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the tu2CTP object classes. This attribute
+				specifies the timeslot of the TU-2 CTP within its server TTP or IA. The value shall be the integer
+				which represents the position of the timeslot in temporal order. The first timeslot shall be
+				numbered one.*;;
+REGISTERED AS { g774Attribute 31 };
+--8.34  Tributary Unit 3 Connection Termination Point Identification 
+
+
+tu3CTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		tu3CTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the tu3CTP object classes. This attribute
+				specifies the timeslot of the TU-3 CTP within its server TTP or IA. The value shall be the integer
+				which represents the position of the timeslot in temporal order. The first timeslot shall be
+				numbered one.*;;
+REGISTERED AS { g774Attribute 32 };
+--8.35  TUG-2 Identification 
+
+
+tug2Id ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		tug2IdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The tug2Id attribute is an attribute type whose distinguished value can be used as an RDN when
+				naming an instance of the TUG-2 managed object class. This attribute specifies the timeslot of the
+				TUG2 within its server TTP or IA. The value shall be the integer which represents the position of
+				the timeslot in temporal order. The first timeslot shall be numbered one.*;;
+REGISTERED AS { g774Attribute 33 };
+--8.36  TUG-3 Identification 
+
+
+tug3Id ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING;
+	BEHAVIOUR
+		tug3IdBehaviour BEHAVIOUR
+			DEFINED AS
+				*The tug3Id attribute is an attribute type whose distinguished value can be used as an RDN when
+				naming an instance of the TUG-3 managed object class. This attribute specifies the timeslot of the
+				TUG3 within its server TTP or IA. The value shall be the integer which represents the position of
+				the timeslot in temporal order. The first timeslot shall be numbered one.*;;
+REGISTERED AS { g774Attribute 34 };
+--8.37  V5 Signal Label Expected 
+
+
+v5SignalLabelExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.V5SignalLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		v5SignalLabelExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the expected V5 VC Signal Label for an incoming VC-n. See Recommendation
+				G.707/Y.1322 for a list of valid values.*;;
+REGISTERED AS { g774Attribute 35 };
+--8.38  V5 Signal Label Receive 
+
+
+v5SignalLabelReceive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.V5SignalLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		v5SignalLabelReceiveBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the V5 VC Signal Label for an incoming VC-n. See Recommendation
+				G.707/Y.1322 for a list of valid values.*;;
+REGISTERED AS { g774Attribute 36 };
+--8.39  V5 Signal Label Send 
+
+
+v5SignalLabelSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.V5SignalLabel;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		v5SignalLabelSendBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute specifies the V5 VC Signal Label for an outgoing VC-n. See Recommendation
+				G.707/Y.1322 for a list of valid values.*;;
+REGISTERED AS { g774Attribute 37 };
+--8.40  Virtual Container 11 Trail Termination Point Identification 
+
+
+vc11TTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		vc11TTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the vc11TTP object classes. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 38 };
+--8.41  Virtual Container 12 Trail Termination Point Identification 
+
+
+vc12TTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		vc12TTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the vc12TTP object classes. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 39 };
+--8.42  Virtual Container 2 Trail Termination Point Identification 
+
+
+vc2TTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		vc2TTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the vc2TTP object classes. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 40 };
+--8.43  Virtual Container 3 Trail Termination Point Identification 
+
+
+vc3TTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		vc3TTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the vc3TTP object classes. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 41 };
+--8.44  Virtual Container 4 Trail Termination Point Identification 
+
+
+vc4TTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY,
+		ORDERING,
+		SUBSTRINGS;
+	BEHAVIOUR
+		vc4TTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the vc4TTP object classes. If the string
+				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
+				syntax is used then matching on ordering is permitted.*;;
+REGISTERED AS { g774Attribute 42 };
+--8.45  VC-n User Channel Identification 
+
+
+vcnUserChannelCTPId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDH.NameType;
+	MATCHES FOR
+		EQUALITY;
+	BEHAVIOUR
+		vcnUserChannelCTPIdBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used as an RDN for naming instances of the vcnUserChannel object classes. This
+				attribute represents the first and only timeslot of this type. The value of this attribute shall be
+				integer one.*;;
+REGISTERED AS { g774Attribute 43 };
+--9  Name Bindings 
+--This clause provides replacement namebinding definitions  for the existing Recommendation G.774 
+--(1992). Any namebinding replaced by one in this clause is considered to be deprecated. The reasons 
+--for the replacement of a namebinding are as follows: 
+--1)  The replaced namebinding is faulty and must be fixed. 
+--2)  The replaced namebinding refers to a superior  managed object class which  has been 
+--re-registered in this Recommendation. 
+--3)  The replaced  namebinding refers to a subordinate managed object class which  has  been 
+--re-registered in this Recommendation. 
+--4)  The replaced namebinding refers to a naming attribute which has been re-registered in this 
+--Recommendation. 
+--In each case where a namebinding is replaced, the new namebinding will  be registered within this 
+--Recommendation. The textual label for the namebinding will be revised to include the text "R1". For 
+--example,  in the revision of the G.774 (1992) namebinding  "vcnUserChannelCTPSource-
+--vc4TTPSource",  the revised  label will  become "vcnUserChannelCTPSource-vc4TTPSourceR1" or 
+--in the case of the "vc4TTPSink-sdhNE" namebinding, the revised  label  becomes 
+--"vc4TTPSinkR1-sdhNE". Note  the "R1"  is placed  immediately  following the revised  class which 
+--impacts the namebinding. 
+--Below  is a table of  namebindings deprecated from Recommendation G.774 (1992) and  the G.774 
+--namebindings which replace them: 
+--Deprecated G.774 (1992) Namebindings 
+--vcnUserChannelCTPBidirectional-vc3TTPBidirectional
+--vcnUserChannelCTPSink-vc3TTPBidirectional
+--vcnUserChannelCTPSink-vc3TTPSink
+--vcnUserChannelCTPSource-vc3TTPBidirectional
+--vcnUserChannelCTPSource-vc3TTPSource
+--vcnUserChannelCTPBidirectional-vc4TTPBidirectional
+--vcnUserChannelCTPSink-vc4TTPBidirectional
+--vcnUserChannelCTPSink-vc4TTPSink
+--vcnUserChannelCTPSource-vc4TTPBidirectional
+--vcnUserChannelCTPSource-vc4TTPSource
+--au3CTPBidirectional-augBidirectional
+--au3CTPSink-augBidirectional
+--au3CTPSink-augSink
+--au4CTPBidirectional-augBidirectional
+--au4CTPSink-augBidirectional
+--au4CTPSink-augSink
+--tu11CTPBidirectional-tug2Bidirectional
+--tu11CTPSink-tug2Bidirectional
+--tu11CTPSink-tug2Sink
+--tu12CTPBidirectional-tug2Bidirectional
+--tu12CTPSink-tug2Bidirectional
+--tu12CTPSink-tug2Sink
+--tu2CTPBidirectional-tug2Bidirectional
+--tu2CTPSink-tug2Bidirectional
+--tu2CTPSink-tug2Sink
+--tu3CTPBidirectional-tug3Bidirectional
+--tu3CTPSink-tug3Bidirectional
+--tu3CTPSink-tug3Sink
+--tug2Bidirectional-vc3TTPBidirectional
+--tug2Sink-vc3TTPSink
+--tug2Source-vc3TTPSource
+--tug3Bidirectional-vc4TTPBidirectional
+--tug3Sink-vc4TTPSink
+--tug3Source-vc4TTPSource
+--vc11TTPBidirectional-sdhNE
+--vc11TTPSink-sdhNE
+--vc12TTPBidirectional-sdhNE
+--vc12TTPSink-sdhNE
+--vc2TTPBidirectional-sdhNE
+--vc2TTPSink-sdhNE
+--vc3TTPBidirectional-sdhNE
+--vc3TTPSink-sdhNE
+--vc3TTPSource-sdhNE
+--vc4TTPBidirectional-sdhNE
+--vc4TTPSink-sdhNE
+--vc4TTPSource-sdhNE
+--Replacement G.774 Namebindings 
+--vcnUserChannelCTPBidirectional-vc3TTPBidirectionalR1
+--vcnUserChannelCTPSink-vc3TTPBidirectionalR1
+--vcnUserChannelCTPSink-vc3TTPSinkR1
+--vcnUserChannelCTPSource-vc3TTPBidirectionalR1
+--vcnUserChannelCTPSource-vc3TTPSourceR1
+--vcnUserChannelCTPBidirectional-vc4TTPBidirectionalR1
+--vcnUserChannelCTPSink-vc4TTPBidirectionalR1
+--vcnUserChannelCTPSink-vc4TTPSinkR1
+--vcnUserChannelCTPSource-vc4TTPBidirectionalR1
+--vcnUserChannelCTPSource-vc4TTPSourceR1
+--au3CTPBidirectionalR1-augBidirectional
+--au3CTPSinkR1-augBidirectional
+--au3CTPSinkR1-augSink
+--au4CTPBidirectionalR1-augBidirectional
+--au4CTPSink-augBidirectional
+--au4CTPSinkR1-augSink
+--tu11CTPBidirectionalR1-tug2Bidirectional
+--tu11CTPSinkR1-tug2Bidirectional
+--tu11CTPSinkR1-tug2Sink
+--tu12CTPBidirectionalR1-tug2Bidirectional
+--tu12CTPSinkR1-tug2Bidirectional
+--tu12CTPSinkR1-tug2Sink
+--tu2CTPBidirectionalR1-tug2Bidirectional
+--tu2CTPSinkR1-tug2Bidirectional
+--tu2CTPSinkR1-tug2Sink
+--tu3CTPBidirectionalR1-tug3Bidirectional
+--tu3CTPSinkR1-tug3Bidirectional
+--tu3CTPSinkR1-tug3Sink
+--tug2Bidirectional-vc3TTPBidirectionalR1
+--tug2Sink-vc3TTPSinkR1
+--tug2Source-vc3TTPSourceR1
+--tug3Bidirectional-vc4TTPBidirectionalR1
+--tug3Sink-vc4TTPSinkR1
+--tug3Source-vc4TTPSourceR1
+--vc11TTPBidirectionalR1-sdhNE
+--vc11TTPSinkR1-sdhNE
+--vc12TTPBidirectionalR1-sdhNE
+--vc12TTPSinkR1-sdhNE
+--vc2TTPBidirectionalR1-sdhNE
+--vc2TTPSinkR1-sdhNE
+--vc3TTPBidirectionalR1-sdhNE
+--vc3TTPSinkR1-sdhNE
+--vc3TTPSourceR1-sdhNE
+--vc4TTPBidirectionalR1-sdhNE
+--vc4TTPSinkR1-sdhNE
+--vc4TTPSourceR1-sdhNE
+--9.1  au3CTP 
+
+
+au3CTPBidirectionalR1-augBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au3CTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	WITH ATTRIBUTE
+		au3CTPId;
+	BEHAVIOUR
+		au3CTPBidirectionalR1-augBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 121 };
+
+
+au3CTPSinkR1-augBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au3CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	WITH ATTRIBUTE
+		au3CTPId;
+	BEHAVIOUR
+		au3CTPSinkR1-augBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 122 };
+
+
+au3CTPSinkR1-augSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au3CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augSink;
+	WITH ATTRIBUTE
+		au3CTPId;
+	BEHAVIOUR
+		au3CTPSinkR1-augSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 123 };
+
+
+au3CTPSource-augBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au3CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	WITH ATTRIBUTE
+		au3CTPId;
+	BEHAVIOUR
+		au3CTPSource-augBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 4 };
+
+
+au3CTPSource-augSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au3CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augSource;
+	WITH ATTRIBUTE
+		au3CTPId;
+	BEHAVIOUR
+		au3CTPSource-augSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 5 };
+--9.2  au4CTP 
+
+
+au4CTPBidirectionalR1-augBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au4CTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	WITH ATTRIBUTE
+		au4CTPId;
+	BEHAVIOUR
+		au4CTPBidirectionalR1-augBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 124 };
+
+
+au4CTPSinkR1-augBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au4CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	WITH ATTRIBUTE
+		au4CTPId;
+	BEHAVIOUR
+		au4CTPSinkR1-augBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 125 };
+
+
+au4CTPSinkR1-augSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au4CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augSink;
+	WITH ATTRIBUTE
+		au4CTPId;
+	BEHAVIOUR
+		au4CTPSinkR1-augSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 126 };
+
+
+au4CTPSource-augBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au4CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	WITH ATTRIBUTE
+		au4CTPId;
+	BEHAVIOUR
+		au4CTPSource-augBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 9 };
+
+
+au4CTPSource-augSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		au4CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		augSource;
+	WITH ATTRIBUTE
+		au4CTPId;
+	BEHAVIOUR
+		au4CTPSource-augSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 10 };
+--9.3  aug 
+
+
+augBidirectional-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		augBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		augId;
+	BEHAVIOUR
+		augBidirectional-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 11 };
+
+
+augSink-msTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		augSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPSink;
+	WITH ATTRIBUTE
+		augId;
+	BEHAVIOUR
+		augSink-msTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 12 };
+
+
+augSource-msTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		augSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPSource;
+	WITH ATTRIBUTE
+		augId;
+	BEHAVIOUR
+		augSource-msTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 13 };
+--9.4 electricalSPITTP 
+
+
+electricalSPITTPBidirectional-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		electricalSPITTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		electricalSPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 14 };
+
+
+electricalSPITTPSink-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		electricalSPITTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		electricalSPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 15 };
+
+
+electricalSPITTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		electricalSPITTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		electricalSPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 16 };
+
+
+msCTPBidirectional-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msCTPBidirectional AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		msCTPId;
+	BEHAVIOUR
+		msCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 17 };
+--9.5 msCTP 
+
+
+msCTPSink-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		msCTPId;
+	BEHAVIOUR
+		msCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 18 };
+
+
+msCTPSink-rsTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		msCTPId;
+	BEHAVIOUR
+		msCTPSink-rsTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 19 };
+
+
+msCTPSource-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		msCTPId;
+	BEHAVIOUR
+		msCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 20 };
+
+
+msCTPSource-rsTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		msCTPId;
+	BEHAVIOUR
+		msCTPSource-rsTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 21 };
+--9.6 msDatacomCTP 
+
+
+msDatacomCTPBidirectional-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msDatacomCTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		msDatacomCTPId;
+	BEHAVIOUR
+		msDatacomCTPBidirectional-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 22 };
+
+
+msDatacomCTPSink-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msDatacomCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		msDatacomCTPId;
+	BEHAVIOUR
+		msDatacomCTPSink-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 23 };
+
+
+msDatacomCTPSink-msTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msDatacomCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPSink;
+	WITH ATTRIBUTE
+		msDatacomCTPId;
+	BEHAVIOUR
+		msDatacomCTPSink-msTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 24 };
+
+
+msDatacomCTPSource-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msDatacomCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		msDatacomCTPId;
+	BEHAVIOUR
+		msDatacomCTPSource-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 25 };
+
+
+msDatacomCTPSource-msTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msDatacomCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPSource;
+	WITH ATTRIBUTE
+		msDatacomCTPId;
+	BEHAVIOUR
+		msDatacomCTPSource-msTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 26 };
+--9.7  msOrderwireCTP 
+
+
+msOrderwireCTPBidirectional-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msOrderwireCTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		msOrderwireCTPId;
+	BEHAVIOUR
+		msOrderwireCTPBidirectional-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 27 };
+
+
+msOrderwireCTPSink-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msOrderwireCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		msOrderwireCTPId;
+	BEHAVIOUR
+		msOrderwireCTPSink-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 28 };
+
+
+msOrderwireCTPSink-msTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msOrderwireCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPSink;
+	WITH ATTRIBUTE
+		msOrderwireCTPId;
+	BEHAVIOUR
+		msOrderwireCTPSink-msTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 29 };
+
+
+msOrderwireCTPSource-msTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msOrderwireCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	WITH ATTRIBUTE
+		msOrderwireCTPId;
+	BEHAVIOUR
+		msOrderwireCTPSource-msTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 30 };
+
+
+msOrderwireCTPSource-msTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msOrderwireCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		msTTPSource;
+	WITH ATTRIBUTE
+		msOrderwireCTPId;
+	BEHAVIOUR
+		msOrderwireCTPSource-msTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 31 };
+--9.8 msTTP 
+
+
+msTTPBidirectional-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msTTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		msTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 32 };
+
+
+msTTPSink-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msTTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		msTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 33 };
+
+
+msTTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		msTTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		msTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 34 };
+--9.9 opticalSPITTP 
+
+
+opticalSPITTPBidirectional-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		opticalSPITTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		opticalSPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 35 };
+
+
+opticalSPITTPSink-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		opticalSPITTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		opticalSPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 36 };
+
+
+opticalSPITTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		opticalSPITTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		opticalSPITTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 37 };
+
+
+rsCTPBidirectional-electricalSPITTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPBidirectional;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPBidirectional-electricalSPITTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 38 };
+--9.10 rsCTP 
+
+
+rsCTPSink-electricalSPITTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPBidirectional;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSink-electricalSPITTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 39 };
+
+
+rsCTPSink-electricalSPITTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPSink;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSink-electricalSPITTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 40 };
+
+
+rsCTPSource-electricalSPITTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPBidirectional;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSource-electricalSPITTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 41 };
+
+
+rsCTPSource-electricalSPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPSource;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSource-electricalSPITTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 42 };
+
+
+rsCTPBidirectional-opticalSPITTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPBidirectional;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPBidirectional-opticalSPITTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 43 };
+
+
+rsCTPSink-opticalSPITTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPBidirectional;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSink-opticalSPITTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 44 };
+
+
+rsCTPSink-opticalSPITTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPSink;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSink-opticalSPITTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 45 };
+
+
+rsCTPSource-opticalSPITTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPBidirectional;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSource-opticalSPITTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 46 };
+
+
+rsCTPSource-opticalSPITTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPSource;
+	WITH ATTRIBUTE
+		rsCTPId;
+	BEHAVIOUR
+		rsCTPSource-opticalSPITTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 47 };
+--9.11 rsDatacomCTP 
+
+
+rsDatacomCTPBidirectional-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsDatacomCTPBidirectional AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsDatacomCTPId;
+	BEHAVIOUR
+		rsDatacomCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 48 };
+
+
+rsDatacomCTPSink-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsDatacomCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsDatacomCTPId;
+	BEHAVIOUR
+		rsDatacomCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 49 };
+
+
+rsDatacomCTPSink-rsTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsDatacomCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsDatacomCTPId;
+	BEHAVIOUR
+		rsDatacomCTPSink-rsTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 50 };
+
+
+rsDatacomCTPSource-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsDatacomCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsDatacomCTPId;
+	BEHAVIOUR
+		rsDatacomCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 51 };
+
+
+rsDatacomCTPSource-rsTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsDatacomCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsDatacomCTPId;
+	BEHAVIOUR
+		rsDatacomCTPSource-rsTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 52 };
+
+
+rsOrderwireCTPBidirectional-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsOrderwireCTPBidirectional AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsOrderwireCTPId;
+	BEHAVIOUR
+		rsOrderwireCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 53 };
+--9.12 rsOrderwireCTP 
+
+
+rsOrderwireCTPSink-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsOrderwireCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsOrderwireCTPId;
+	BEHAVIOUR
+		rsOrderwireCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 54 };
+
+
+rsOrderwireCTPSink-rsTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsOrderwireCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsOrderwireCTPId;
+	BEHAVIOUR
+		rsOrderwireCTPSink-rsTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 55 };
+
+
+rsOrderwireCTPSource-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsOrderwireCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsOrderwireCTPId;
+	BEHAVIOUR
+		rsOrderwireCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 56 };
+
+
+rsOrderwireCTPSource-rsTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsOrderwireCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsOrderwireCTPId;
+	BEHAVIOUR
+		rsOrderwireCTPSource-rsTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 57 };
+--9.13 rsTTP 
+
+
+rsTTPBidirectional-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		rsTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 58 };
+
+
+rsTTPSink-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		rsTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 59 };
+
+
+rsTTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		rsTTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 60 };
+--9.14 rsUserChannelCTP 
+
+
+rsUserChannelCTPBidirectional-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsUserChannelCTPBidirectional AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsUserChannelCTPId;
+	BEHAVIOUR
+		rsUserChannelCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 61 };
+
+
+rsUserChannelCTPSink-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsUserChannelCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsUserChannelCTPId;
+	BEHAVIOUR
+		rsUserChannelCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 62 };
+
+
+rsUserChannelCTPSink-rsTTPSink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsUserChannelCTPSink AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsUserChannelCTPId;
+	BEHAVIOUR
+		rsUserChannelCTPSink-rsTTPSinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 63 };
+
+
+rsUserChannelCTPSource-rsTTPBidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsUserChannelCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsUserChannelCTPId;
+	BEHAVIOUR
+		rsUserChannelCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 64 };
+
+
+rsUserChannelCTPSource-rsTTPSource NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		rsUserChannelCTPSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	WITH ATTRIBUTE
+		rsUserChannelCTPId;
+	BEHAVIOUR
+		rsUserChannelCTPSource-rsTTPSourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 65 };
+--9.15 tu11CTP 
+
+
+tu11CTPBidirectionalR1-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu11CTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu11CTPId;
+	BEHAVIOUR
+		tu11CTPBidirectionalR1-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 127 };
+
+
+tu11CTPSinkR1-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu11CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu11CTPId;
+	BEHAVIOUR
+		tu11CTPSinkR1-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 128 };
+
+
+tu11CTPSinkR1-tug2Sink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu11CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Sink;
+	WITH ATTRIBUTE
+		tu11CTPId;
+	BEHAVIOUR
+		tu11CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 129 };
+
+
+tu11CTPSource-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu11CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu11CTPId;
+	BEHAVIOUR
+		tu11CTPSource-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 69 };
+
+
+tu11CTPSource-tug2Source NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu11CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Source;
+	WITH ATTRIBUTE
+		tu11CTPId;
+	BEHAVIOUR
+		tu11CTPSource-tug2SourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 70 };
+--9.16 tu12CTP 
+
+
+tu12CTPBidirectionalR1-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu12CTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu12CTPId;
+	BEHAVIOUR
+		tu12CTPBidirectionalR1-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 130 };
+
+
+tu12CTPSinkR1-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu12CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu12CTPId;
+	BEHAVIOUR
+		tu12CTPSinkR1-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 131 };
+
+
+tu12CTPSinkR1-tug2Sink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu12CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Sink;
+	WITH ATTRIBUTE
+		tu12CTPId;
+	BEHAVIOUR
+		tu12CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 132 };
+
+
+tu12CTPSource-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu12CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu12CTPId;
+	BEHAVIOUR
+		tu12CTPSource-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 74 };
+
+
+tu12CTPSource-tug2Source NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu12CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Source;
+	WITH ATTRIBUTE
+		tu12CTPId;
+	BEHAVIOUR
+		tu12CTPSource-tug2SourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 75 };
+--9.17 tu2CTP 
+
+
+tu2CTPBidirectionalR1-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu2CTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu2CTPId;
+	BEHAVIOUR
+		tu2CTPBidirectionalR1-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 133 };
+
+
+tu2CTPSinkR1-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu2CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu2CTPId;
+	BEHAVIOUR
+		tu2CTPSinkR1-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 134 };
+
+
+tu2CTPSinkR1-tug2Sink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu2CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Sink;
+	WITH ATTRIBUTE
+		tu2CTPId;
+	BEHAVIOUR
+		tu2CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 135 };
+
+
+tu2CTPSource-tug2Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu2CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	WITH ATTRIBUTE
+		tu2CTPId;
+	BEHAVIOUR
+		tu2CTPSource-tug2BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 79 };
+
+
+tu2CTPSource-tug2Source NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu2CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug2Source;
+	WITH ATTRIBUTE
+		tu2CTPId;
+	BEHAVIOUR
+		tu2CTPSource-tug2SourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 80 };
+--9.18 tu3CTP 
+
+
+tu3CTPBidirectionalR1-tug3Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu3CTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Bidirectional;
+	WITH ATTRIBUTE
+		tu3CTPId;
+	BEHAVIOUR
+		tu3CTPBidirectionalR1-tug3BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 136 };
+
+
+tu3CTPSinkR1-tug3Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu3CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Bidirectional;
+	WITH ATTRIBUTE
+		tu3CTPId;
+	BEHAVIOUR
+		tu3CTPSinkR1-tug3BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 137 };
+
+
+tu3CTPSinkR1-tug3Sink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu3CTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Sink;
+	WITH ATTRIBUTE
+		tu3CTPId;
+	BEHAVIOUR
+		tu3CTPSinkR1-tug3SinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 138 };
+
+
+tu3CTPSource-tug3Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu3CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Bidirectional;
+	WITH ATTRIBUTE
+		tu3CTPId;
+	BEHAVIOUR
+		tu3CTPSource-tug3BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 84 };
+
+
+tu3CTPSource-tug3Source NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tu3CTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Source;
+	WITH ATTRIBUTE
+		tu3CTPId;
+	BEHAVIOUR
+		tu3CTPSource-tug3SourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 85 };
+--9.19 tug2 
+
+
+tug2Bidirectional-tug3Bidirectional NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug2Bidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Bidirectional;
+	WITH ATTRIBUTE
+		tug2Id;
+	BEHAVIOUR
+		tug2Bidirectional-tug3BidirectionalBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 86 };
+
+
+tug2Sink-tug3Sink NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug2Sink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Sink;
+	WITH ATTRIBUTE
+		tug2Id;
+	BEHAVIOUR
+		tug2Sink-tug3SinkBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 87 };
+
+
+tug2Source-tug3Source NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug2Source;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		tug3Source;
+	WITH ATTRIBUTE
+		tug2Id;
+	BEHAVIOUR
+		tug2Source-tug3SourceBehaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 88 };
+
+
+tug2Bidirectional-vc3TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug2Bidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		tug2Id;
+	BEHAVIOUR
+		tug2Bidirectional-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 139 };
+
+
+tug2Sink-vc3TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug2Sink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPSinkR1;
+	WITH ATTRIBUTE
+		tug2Id;
+	BEHAVIOUR
+		tug2Sink-vc3TTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 140 };
+
+
+tug2Source-vc3TTPSourceR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug2Source;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPSourceR1;
+	WITH ATTRIBUTE
+		tug2Id;
+	BEHAVIOUR
+		tug2Source-vc3TTPSourceR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 141 };
+--9.20 tug3 
+
+
+tug3Bidirectional-vc4TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug3Bidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		tug3Id;
+	BEHAVIOUR
+		tug3Bidirectional-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 142 };
+
+
+tug3Sink-vc4TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug3Sink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPSinkR1;
+	WITH ATTRIBUTE
+		tug3Id;
+	BEHAVIOUR
+		tug3Sink-vc4TTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 143 };
+
+
+tug3Source-vc4TTPSourceR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		tug3Source;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPSourceR1;
+	WITH ATTRIBUTE
+		tug3Id;
+	BEHAVIOUR
+		tug3Source-vc4TTPSourceR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed objects are automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 144 };
+--9.21 vc11TTP 
+
+
+vc11TTPBidirectionalR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc11TTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc11TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 145 };
+
+
+vc11TTPSinkR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc11TTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc11TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 146 };
+
+
+vc11TTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc11TTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc11TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 97 };
+--9.22 vc12TTP 
+
+
+vc12TTPBidirectionalR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc12TTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc12TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 147 };
+
+
+vc12TTPSinkR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc12TTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc12TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 148 };
+
+
+vc12TTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc12TTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc12TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 100 };
+--9.23 vc2TTP 
+
+
+vc2TTPBidirectionalR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc2TTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc2TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 149 };
+
+
+vc2TTPSinkR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc2TTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc2TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 150 };
+
+
+vc2TTPSource-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc2TTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc2TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 103 };
+
+
+vc3TTPBidirectionalR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc3TTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc3TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 151 };
+--9.24 vc3TTP 
+
+
+vc3TTPSinkR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc3TTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc3TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 152 };
+
+
+vc3TTPSourceR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc3TTPSourceR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc3TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 153 };
+--9.25 vc4TTP 
+
+
+vc4TTPBidirectionalR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc4TTPBidirectionalR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc4TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 154 };
+
+
+vc4TTPSinkR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc4TTPSinkR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc4TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 155 };
+
+
+vc4TTPSourceR1-sdhNE NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vc4TTPSourceR1;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	WITH ATTRIBUTE
+		vc4TTPId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774NameBinding 156 };
+--9.26  vcnUserChannelCTP 
+
+
+vcnUserChannelCTPBidirectional-vc3TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPBidirectional-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 157 };
+
+
+vcnUserChannelCTPSink-vc3TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSink-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 158 };
+
+
+vcnUserChannelCTPSink-vc3TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPSinkR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSink-vc3TTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 159 };
+
+
+vcnUserChannelCTPSource-vc3TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSource-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 160 };
+
+
+vcnUserChannelCTPSource-vc3TTPSourceR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc3TTPSourceR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSource-vc3TTPSourceR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 161 };
+
+
+vcnUserChannelCTPBidirectional-vc4TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPBidirectional;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPBidirectional-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 162 };
+
+
+vcnUserChannelCTPSink-vc4TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSink-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 163 };
+
+
+vcnUserChannelCTPSink-vc4TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSink;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPSinkR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSink-vc4TTPSinkR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 164 };
+
+
+vcnUserChannelCTPSource-vc4TTPBidirectionalR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPBidirectionalR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSource-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 165 };
+
+
+vcnUserChannelCTPSource-vc4TTPSourceR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		vcnUserChannelCTPSource;
+	NAMED BY
+	SUPERIOR OBJECT CLASS
+		vc4TTPSourceR1;
+	WITH ATTRIBUTE
+		vcnUserChannelCTPId;
+	BEHAVIOUR
+		vcnUserChannelCTPSource-vc4TTPSourceR1Behaviour BEHAVIOUR
+			DEFINED AS
+				*The subordinate managed object is automatically instantiated when the superior managed object is
+				instantiated, according to the make-up and mode of operation of the equipment.*;;
+REGISTERED AS { g774NameBinding 166 };
+--11 Object relations 
+--NOTE The  SUBORDINATION  RULE  and  CONSTRAINT  RULE  templates  are  used  in  this 
+--Recommendation  as  an  interim  specification  tool.  A  RELATIONSHIP  template  is  currently  under  study; 
+--when  it has been standardized, the rules specified in the SUBORDINATION RULE and CONSTRAINT 
+--RULE templates will be re-specified using the RELATIONSHIP template. 
+--11.1  Syntax 
+-- <subordination-rule-label> SUBORDINATION RULE
+--SUPERIOR OBJECT CLASS <class-label> ;
+--NAMES SUBORDINATES <class-list> ;
+--ACCORDING TO RULE <subordination-rule> ;
+--;
+-- <constraint-rule-label> CONSTRAINT RULE
+--OBJECT CLASS <class-label> [AND SUBCLASSES] ;
+--IS RELATED TO <class-list> ;
+--USING ATTRIBUTE <attribute-label> ;
+-- <constraint-rule-set> ;
+-- <constraint-rule-set> ::= <single-constraint-rule> | <named-type-constraintrules>
+-- <single-constraint-rule> ::= ACCORDING TO RULE <constraint-rule>
+-- <named-type-constraint-rule> ::= CASE { <named-type-constraint-rule-list> }
+-- <named-type-constraint-rule-list> ::= <named-type-constraint-rule-item> |
+-- <named-type-constraint-rule-item> , <named-type-constraint-rule-list>
+-- <named-type-constraint-rule-item> ::=
+-- <named-type> ACCORDING TO RULE <constraint-rule>
+-- <class-label> ::= label string as defined in ISO/IEC IS 10165-4
+-- <attribute-label> ::= label string as defined in ISO/IEC IS 10165-4
+-- <class-list> ::= <class-label> | <class-list> , <class-label>
+-- <subordination-rule> ::= SET { <subordination-members> }
+--| CHOICE { <subordination-members> }
+--| SET SIZE ( <ordinality> ) OF <subordination-term>
+-- <constraint-rule> ::= SET { <constraint-members> }
+--| SEQUENCE { <constraint-members> }
+--| CHOICE { <constraint-members> }
+--| SET SIZE ( <ordinality> ) OF <constraint-term>
+--| SEQUENCE SIZE ( <ordinality> ) OF <constraint-term>
+-- <subordination-members> ::= <subordination-term>
+--| <subordination-term> , <subordination-members>
+-- <constraint-members> ::= <constraint-term>
+--| <constraint-term> , <constraint-members>
+-- <subordination-term> ::= <class-label> | <subordination-rule>
+-- <constraint-term> ::= <class-label> | <constraint-rule>
+-- <ordinality> ::= <valueRange> | <valueList>
+-- <valueRange> ::= <lowerValue> .. <upperValue>
+-- <valueList> ::= <itemValue> | <itemValue> , <valueList>
+-- <itemValue> ::= INTEGER
+-- <lowerValue> ::= INTEGER
+-- <upperValue> ::= INTEGER | N
+--11.1.1  Subordination rule templates 
+--SUPERIOR OBJECT CLASS <class-label>;
+--indicates the class that is governing this subordination-rule. A class may govern through more than 
+--one subordination-rule several non-overlapping sets of subordinate classes in the NAMES 
+--SUBORDINATES clause. 
+--NAMES SUBORDINATES <class-list>;
+--indicates the set of classes of subordinates that are governed by this subordination-rule. Any classes 
+--that are not in this list are not governed by this subordination-rule. 
+--ACCORDING TO RULE <subordination-rule>
+--provides the rule 
+--SET { <subordination-members> }
+--indicates that *all* of the subordination-members must be present. 
+--CHOICE { <subordination-members> }
+--indicates that *any one* of the subordination-members must be present. 
+--SET SIZE <ordinality> OF <subordination-term>
+--indicates the number of <subordination-term> that must be present. 
+--11.1.2  Constraint rule templates 
+--OBJECT CLASS <class-label>;
+--indicates the class with this attribute that is governed by this constraint-rule. A class may be 
+--governed by more than one constraint-rule with non-overlapping sets of related classes in the 
+--RELATES TO OBJECT CLASSES clause. 
+--IS RELATED TO OBJECT CLASSES <class-list>;
+--indicates the set of classes of related instances that are governed by this constraint-rule. Any classes 
+--that are not in this list are not governed by this constraint-rule. 
+--USING ATTRIBUTE <attribute-label>;
+--indicates the attribute that represents a relationship by means of a pointer (DN) to the related object 
+--instances.  
+-- <constraint-rule-set>;
+--there can be either a single rule, or a set of rules one for each of a set of named choices. In the latter 
+--case the CASE { ... } structure is used. 
+--CASE { ... };
+--provides a distinct constraint-rule for each of the set of named choices in the attribute syntax. 
+--ACCORDING TO RULE <constraint-rule>
+--provides the rule 
+--SET { <constraint-members> }
+--indicates that *all* of the constraint-members must be present in any order. 
+--SEQUENCE { <constraint-members> }
+--indicates that *all* of the constraint-members must be present in sequence. 
+--CHOICE { <constraint-members> }
+--indicates that *any one* of the constraint-members must be present. 
+--SET SIZE <ordinality> OF <constraint-term>
+--indicates the number of <constraint-term> that must be present in any order. 
+--SEQUENCE SIZE <ordinality> OF <constraint-term>
+--indicates the number of <constraint-term> that must be present in sequence. 
+--11.2  Connectivity pointer constraints 
+--This clause defines the allowable  values for  the downstreamConnectivityPointer and 
+--upstreamConnectivityPointer attributes using the object classes defined in this Recommendation. 
+--This clause provides replacement constraint rule definitions for the existing Recommendation G.774 
+--(1992). Any  constraint rule replaced  by one  in this clause  is considered to be deprecated. The 
+--reasons for the replacement of a constraint rule are as follows: 
+--1)  The replaced constraint rule is faulty and must be fixed. 
+--2)  The replaced constraint rule refers to a managed object class which has been re-registered in 
+--this Recommendation. 
+--3)  The replaced constraint rule refers to an attribute which  has  been re-registered  in this 
+--Recommendation. 
+--In each case where a constraint is replaced, the new constraint will  be registered within this 
+--Recommendation. The textual  label  for the constraint will  be revised to include the text "R1". For 
+--example,  in the revision of the G.774 (1992) constraint "downstreamConnectivityPointer-
+--au3CTPSink", the revised  label will  become "downstreamConnectivityPointer-au3CTPSinkR1". 
+--Note the "R1" is placed immediately following the revised class which impacts the constraint. In the 
+--case where the class within the  label has not changed but the constraint  is  still  altered because the 
+--constraint refers to a class that  has changed, then the "R1"  is placed  immediately  following the 
+--"downstreamConnectivityPointer" text of the revised constraint label. For example, in the revision of 
+--the G.774 (1992) constraint "downstreamConnectivityPointer-au3CTPSource", the revised label will 
+--become "downstreamConnectivityPointerR1-au3CTPSource". 
+--Below is a table of constraint rules deprecated from Recommendation G.774 (1992) and the G.774 
+--constraint rules which replace them: 
+--Deprecated G.774 (1992) Constraint Rules 
+--downstreamConnectivityPointer-au3CTPSink
+--upstreamConnectivityPointer-au3CTPSource
+--downstreamConnectivityPointer-au4CTPSink
+--upstreamConnectivityPointer-au4CTPSource
+--downstreamConnectivityPointer-tu11CTPSink
+--upstreamConnectivityPointer-tu11CTPSource
+--downstreamConnectivityPointer-tu12CTPSink
+--upstreamConnectivityPointer-tu12CTPSource
+--downstreamConnectivityPointer-tu2CTPSink
+--upstreamConnectivityPointer-tu2CTPSource
+--downstreamConnectivityPointer-tu3CTPSink
+--upstreamConnectivityPointer-tu3CTPSource
+--upstreamConnectivityPointer-vc11TTPSink
+--downstreamConnectivityPointer-vc11TTPSource
+--upstreamConnectivityPointer-vc12TTPSink
+--downstreamConnectivityPointer-vc12TTPSource
+--upstreamConnectivityPointer-vc2TTPSink
+--downstreamConnectivityPointer-vc2TTPSource
+--upstreamConnectivityPointer-vc3TTPSink
+--downstreamConnectivityPointer-vc3TTPSource
+--upstreamConnectivityPointer-vc4TTPSink
+--downstreamConnectivityPointer-vc4TTPSource
+--Replacement G.774 Constraint Rules 
+--downstreamConnectivityPointer-au3CTPSinkR1
+--upstreamConnectivityPointerR1-au3CTPSource
+--downstreamConnectivityPointer-au4CTPSinkR1
+--upstreamConnectivityPointerR1-au4CTPSource
+--downstreamConnectivityPointer-tu11CTPSinkR1
+--upstreamConnectivityPointerR1-tu11CTPSource
+--downstreamConnectivityPointer-tu12CTPSinkR1
+--upstreamConnectivityPointerR1-tu12CTPSource
+--downstreamConnectivityPointer-tu2CTPSinkR1
+--upstreamConnectivityPointerR1-tu2CTPSource
+--downstreamConnectivityPointer-tu3CTPSinkR1
+--upstreamConnectivityPointerR1-tu3CTPSource
+--upstreamConnectivityPointer-vc11TTPSinkR1
+--downstreamConnectivityPointerR1-vc11TTPSource
+--upstreamConnectivityPointer-vc12TTPSinkR1
+--downstreamConnectivityPointerR1-vc12TTPSource
+--upstreamConnectivityPointer-vc2TTPSinkR1
+--downstreamConnectivityPointerR1-vc2TTPSource
+--upstreamConnectivityPointer-vc3TTPSinkR1
+--downstreamConnectivityPointer-vc3TTPSourceR1
+--upstreamConnectivityPointer-vc4TTPSinkR1
+--downstreamConnectivityPointer-vc4TTPSourceR1
+
+
+downstreamConnectivityPointer-au3CTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		au3CTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc3TTPSinkR1,
+		vc3TTPBidirectionalR1,
+		au3CTPSource,
+		au3CTPBidirectionalR1,
+		tu3CTPSource,
+		tu3CTPBidirectionalR1,
+		vc4TTPSinkR1,
+		vc4TTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc3TTPSinkR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSource,
+			au3CTPBidirectionalR1,
+			tu3CTPSource,
+			tu3CTPBidirectionalR1,
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			SET SIZE(1..N) OF
+			CHOICE {
+				vc3TTPSinkR1,
+				vc3TTPBidirectionalR1,
+				tu3CTPSource,
+				tu3CTPBidirectionalR1,
+				au3CTPSource,
+				au3CTPBidirectionalR1 },
+			SET SIZE(1..N) OF
+			CHOICE {
+				vc4TTPSinkR1,
+				vc4TTPBidirectionalR1 } } };
+;
+
+
+upstreamConnectivityPointerR1-au3CTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		au3CTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc3TTPSourceR1,
+		vc3TTPBidirectionalR1,
+		au3CTPSinkR1,
+		au3CTPBidirectionalR1,
+		tu3CTPSinkR1,
+		tu3CTPBidirectionalR1,
+		vc4TTPSourceR1,
+		vc4TTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc3TTPSourceR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSinkR1,
+			au3CTPBidirectionalR1,
+			tu3CTPSinkR1,
+			tu3CTPBidirectionalR1,
+			vc4TTPSourceR1,
+			vc4TTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-au4CTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		au4CTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		au4CTPSource,
+		au4CTPBidirectionalR1,
+		vc4TTPSinkR1,
+		vc4TTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSource,
+			au4CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSource,
+			au4CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointerR1-au4CTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		au4CTPSource AND SUBCLASSES;
+	IS RELATED TO
+		au4CTPSinkR1,
+		au4CTPBidirectionalR1,
+		vc4TTPSourceR1,
+		vc4TTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc4TTPSourceR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSinkR1,
+			au4CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-msCTPSink CONSTRAINT RULE
+	OBJECT CLASS
+		msCTPSink AND SUBCLASSES;
+	IS RELATED TO
+		msTTPSink,
+		msTTPBidirectional,
+		msCTPSource,
+		msCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			msTTPSink,
+			msTTPBidirectional,
+			msCTPSource,
+			msCTPBidirectional } };
+;
+
+
+upstreamConnectivityPointer-msCTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		msCTPSource AND SUBCLASSES;
+	IS RELATED TO
+		msTTPSource,
+		msTTPBidirectional,
+		msCTPSink,
+		msCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			msTTPSource,
+			msTTPBidirectional,
+			msCTPSink,
+			msCTPBidirectional } };
+;
+
+
+upstreamConnectivityPointer-msTTPSink CONSTRAINT RULE
+	OBJECT CLASS
+		msTTPSink AND SUBCLASSES;
+	IS RELATED TO
+		msCTPSink,
+		msCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			msCTPSink,
+			msCTPBidirectional } };
+;
+
+
+downstreamConnectivityPointer-msTTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		msTTPSource AND SUBCLASSES;
+	IS RELATED TO
+		msCTPSource,
+		msCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			msCTPSource,
+			msCTPBidirectional } };
+;
+
+
+downstreamConnectivityPointer-rsCTPSink CONSTRAINT RULE
+	OBJECT CLASS
+		rsCTPSink AND SUBCLASSES;
+	IS RELATED TO
+		rsTTPSink,
+		rsTTPBidirectional,
+		rsTTPTrailTraceSink,
+		rsTTPTrailTraceBidirectional,
+		rsCTPSource,
+		rsCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			rsTTPSink,
+			rsTTPBidirectional,
+			rsTTPTrailTraceSink,
+			rsTTPTrailTraceBidirectional,
+			rsCTPSource,
+			rsCTPBidirectional } };
+;
+
+
+upstreamConnectivityPointer-rsCTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		rsCTPSource AND SUBCLASSES;
+	IS RELATED TO
+		rsTTPSource,
+		rsTTPBidirectional,
+		rsTTPTrailTraceSource,
+		rsTTPTrailTraceBidirectional,
+		rsCTPSink,
+		rsCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			rsTTPSource,
+			rsTTPBidirectional,
+			rsTTPTrailTraceSource,
+			rsTTPTrailTraceBidirectional,
+			rsCTPSink,
+			rsCTPBidirectional } };
+;
+
+
+upstreamConnectivityPointer-rsTTPSink CONSTRAINT RULE
+	OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	IS RELATED TO
+		rsCTPSink,
+		rsCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			rsCTPSink,
+			rsCTPBidirectional } };
+;
+
+
+downstreamConnectivityPointer-rsTTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	IS RELATED TO
+		rsCTPSource,
+		rsCTPBidirectional;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			rsCTPSource,
+			rsCTPBidirectional } };
+;
+
+
+downstreamConnectivityPointer-tu11CTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		tu11CTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc11TTPSinkR1,
+		vc11TTPBidirectionalR1,
+		tu11CTPSource,
+		tu11CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc11TTPSinkR1,
+			vc11TTPBidirectionalR1,
+			tu11CTPSource,
+			tu11CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc11TTPSinkR1,
+			vc11TTPBidirectionalR1,
+			tu11CTPSource,
+			tu11CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointerR1-tu11CTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		tu11CTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc11TTPSource,
+		vc11TTPBidirectionalR1,
+		tu11CTPSinkR1,
+		tu11CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc11TTPSource,
+			vc11TTPBidirectionalR1,
+			tu11CTPSinkR1,
+			tu11CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-tu12CTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		tu12CTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc12TTPSinkR1,
+		vc12TTPBidirectionalR1,
+		tu12CTPSource,
+		tu12CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc12TTPSinkR1,
+			vc12TTPBidirectionalR1,
+			tu12CTPSource,
+			tu12CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc12TTPSinkR1,
+			vc12TTPBidirectionalR1,
+			tu12CTPSource,
+			tu12CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointerR1-tu12CTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		tu12CTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc12TTPSource,
+		vc12TTPBidirectionalR1,
+		tu12CTPSinkR1,
+		tu12CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc12TTPSource,
+			vc12TTPBidirectionalR1,
+			tu12CTPSinkR1,
+			tu12CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-tu2CTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		tu2CTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc2TTPSinkR1,
+		vc2TTPBidirectionalR1,
+		tu2CTPSource,
+		tu2CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc2TTPSinkR1,
+			vc2TTPBidirectionalR1,
+			tu2CTPSource,
+			tu2CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc2TTPSinkR1,
+			vc2TTPBidirectionalR1,
+			tu2CTPSource,
+			tu2CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointerR1-tu2CTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		tu2CTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc2TTPSource,
+		vc2TTPBidirectionalR1,
+		tu2CTPSinkR1,
+		tu2CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc2TTPSource,
+			vc2TTPBidirectionalR1,
+			tu2CTPSinkR1,
+			tu2CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-tu3CTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		tu3CTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc3TTPSinkR1,
+		vc3TTPBidirectionalR1,
+		au3CTPSource,
+		au3CTPBidirectionalR1,
+		tu3CTPSource,
+		tu3CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc3TTPSinkR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSource,
+			au3CTPBidirectionalR1,
+			tu3CTPSource,
+			tu3CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc3TTPSinkR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSource,
+			au3CTPBidirectionalR1,
+			tu3CTPSource,
+			tu3CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointerR1-tu3CTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		tu3CTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc3TTPSourceR1,
+		vc3TTPBidirectionalR1,
+		au3CTPSinkR1,
+		au3CTPBidirectionalR1,
+		tu3CTPSinkR1,
+		tu3CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc3TTPSourceR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSinkR1,
+			au3CTPBidirectionalR1,
+			tu3CTPSinkR1,
+			tu3CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointer-vc11TTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc11TTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc11TTPSource,
+		vc11TTPBidirectionalR1,
+		tu11CTPSinkR1,
+		tu11CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc11TTPSource,
+			vc11TTPBidirectionalR1,
+			tu11CTPSinkR1,
+			tu11CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointerR1-vc11TTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		vc11TTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc11TTPSinkR1,
+		vc11TTPBidirectionalR1,
+		tu11CTPSource,
+		tu11CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc11TTPSinkR1,
+			vc11TTPBidirectionalR1,
+			tu11CTPSource,
+			tu11CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc11TTPSinkR1,
+			vc11TTPBidirectionalR1,
+			tu11CTPSource,
+			tu11CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointer-vc12TTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc12TTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc12TTPSource,
+		vc12TTPBidirectionalR1,
+		tu12CTPSinkR1,
+		tu12CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc12TTPSource,
+			vc12TTPBidirectionalR1,
+			tu12CTPSinkR1,
+			tu12CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointerR1-vc12TTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		vc12TTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc12TTPSinkR1,
+		vc12TTPBidirectionalR1,
+		tu12CTPSource,
+		tu12CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc12TTPSinkR1,
+			vc12TTPBidirectionalR1,
+			tu12CTPSource,
+			tu12CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc12TTPSinkR1,
+			vc12TTPBidirectionalR1,
+			tu12CTPSource,
+			tu12CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointer-vc2TTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc2TTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc2TTPSource,
+		vc2TTPBidirectionalR1,
+		tu2CTPSinkR1,
+		tu2CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc2TTPSource,
+			vc2TTPBidirectionalR1,
+			tu2CTPSinkR1,
+			tu2CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointerR1-vc2TTPSource CONSTRAINT RULE
+	OBJECT CLASS
+		vc2TTPSource AND SUBCLASSES;
+	IS RELATED TO
+		vc2TTPSinkR1,
+		vc2TTPBidirectionalR1,
+		tu2CTPSource,
+		tu2CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc2TTPSinkR1,
+			vc2TTPBidirectionalR1,
+			tu2CTPSource,
+			tu2CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc2TTPSinkR1,
+			vc2TTPBidirectionalR1,
+			tu2CTPSource,
+			tu2CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointer-vc3TTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc3TTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc3TTPSourceR1,
+		vc3TTPBidirectionalR1,
+		au3CTPSinkR1,
+		au3CTPBidirectionalR1,
+		tu3CTPSinkR1,
+		tu3CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc3TTPSourceR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSinkR1,
+			au3CTPBidirectionalR1,
+			tu3CTPSinkR1,
+			tu3CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-vc3TTPSourceR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc3TTPSourceR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc3TTPSinkR1,
+		vc3TTPBidirectionalR1,
+		au3CTPSource,
+		au3CTPBidirectionalR1,
+		tu3CTPSource,
+		tu3CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc3TTPSinkR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSource,
+			au3CTPBidirectionalR1,
+			tu3CTPSource,
+			tu3CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc3TTPSinkR1,
+			vc3TTPBidirectionalR1,
+			au3CTPSource,
+			au3CTPBidirectionalR1,
+			tu3CTPSource,
+			tu3CTPBidirectionalR1 } };
+;
+
+
+upstreamConnectivityPointer-vc4TTPSinkR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc4TTPSinkR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc4TTPSourceR1,
+		vc4TTPBidirectionalR1,
+		au4CTPSinkR1,
+		au4CTPBidirectionalR1,
+		au3CTPSinkR1,
+		au3CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":upstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc4TTPSourceR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSinkR1,
+			au4CTPBidirectionalR1 },
+		concatenated ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			SEQUENCE SIZE(3) OF
+			au3CTPSinkR1,
+			SEQUENCE SIZE(3) OF
+			au3CTPBidirectionalR1 } };
+;
+
+
+downstreamConnectivityPointer-vc4TTPSourceR1 CONSTRAINT RULE
+	OBJECT CLASS
+		vc4TTPSourceR1 AND SUBCLASSES;
+	IS RELATED TO
+		vc4TTPSinkR1,
+		vc4TTPBidirectionalR1,
+		au4CTPSource,
+		au4CTPBidirectionalR1,
+		au3CTPSource,
+		au3CTPBidirectionalR1;
+	USING ATTRIBUTE
+		"Recommendation M.3100":downstreamConnectivityPointer;
+	CASE {
+		single ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSource,
+			au4CTPBidirectionalR1 },
+		broadcast ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			vc4TTPSinkR1,
+			vc4TTPBidirectionalR1,
+			au4CTPSource,
+			au4CTPBidirectionalR1 },
+		concatenated ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			SEQUENCE SIZE(3) OF
+			au3CTPSource,
+			SEQUENCE SIZE(3) OF
+			au3CTPBidirectionalR1 },
+		broadcastConcatenated ACCORDING TO RULE
+		SET SIZE(1..N) OF
+		CHOICE {
+			SEQUENCE SIZE(3) OF
+			au3CTPSource,
+			SEQUENCE SIZE(3) OF
+			au3CTPBidirectionalR1 } };
+;
+--11.3  Naming constraints 
+--This clause defines the allowable combinations  of subordinate object class  instances that may  be 
+--named  by a superior object class  instance, using the object classes contained  in this 
+--Recommendation. 
+--This  clause  provides  replacement  subordination  rule  definitions  for  the  existing 
+--Recommendation G.774 (1992). Any subordination rule replaced by one in this clause is considered 
+--to be deprecated. The reasons for the replacement of a subordination rule are as follows: 
+--1)  The replaced subordination rule is faulty and must be fixed. 
+--2)  The replaced subordination rule refers to a  managed object class which  has  been 
+--re-registered in this Recommendation. 
+--In each case where a subordination rule  is replaced, the  new subordination rule will  be registered 
+--within this Recommendation. The textual label for the subordination rule will be revised to include 
+--the text "R1". For example,  in the revision of the G.774 (1992) subordination rule 
+--"vc3TTPSinkSubordination", the revised  label will  become "vc3TTPSinkR1Subordination". Note 
+--the "R1"  is placed  immediately  following the revised class which  impacts the  subordination rule. 
+--In the case where the  class within the  label  has not changed  but the subordination rule  is  still 
+--altered because the subordination rule refers to a class that has changed, then the "R1"  is placed at 
+--the end of the revised subordination rule  label.  For example,  in the revision of the G.774 (1992) 
+--subordination rule "tug3BidirectionalSubordination", the revised  label will  become 
+--"tug3BidirectionalSubordinationR1". 
+--Below  is a table of subordination rules deprecated  from  Recommendation G.774 (1992) and the 
+--G.774 subordination rules which replace them. 
+--Deprecated G.774 (1992) Subordination Rules 
+--augSinkSubordination
+--augBidirectionalSubordination
+--sdhNESubordination
+--tug2SinkSubordination
+--tug2BidirectionalSubordination
+--tug3SinkSubordination
+--tug3BidirectionalSubordination
+--vc3TTPSinkSubordination
+--vc3TTPSourceSubordination
+--vc3TTPBidirectionalSubordination
+--vc4TTPSinkSubordination
+--vc4TTPSourceSubordination
+--vc4TTPBidirectionalSubordination
+--Replacement G.774 Subordination Rules 
+--augSinkSubordinationR1
+--augBidirectionalSubordinationR1
+--sdhNESubordinationR1
+--tug2SinkSubordinationR1
+--tug2BidirectionalSubordinationR1
+--tug3SinkSubordinationR1
+--tug3BidirectionalSubordinationR1
+--vc3TTPSinkR1Subordination
+--vc3TTPSourceSubordinationR1
+--vc3TTPBidirectionalR1Subordination
+--vc4TTPSinkR1Subordination
+--vc4TTPSourceR1Subordination
+--vc4TTPBidirectionalR1Subordination
+
+
+augSinkSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		augSink;
+	NAMES SUBORDINATES
+		au3CTPSinkR1,
+		au4CTPSinkR1;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			au4CTPSinkR1,
+			SET SIZE(3) OF
+			au3CTPSinkR1 };
+;
+
+
+augSourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		augSource;
+	NAMES SUBORDINATES
+		au3CTPSource,
+		au4CTPSource;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			au4CTPSource,
+			SET SIZE(3) OF
+			au3CTPSource };
+;
+
+
+augBidirectionalSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		augBidirectional;
+	NAMES SUBORDINATES
+		au3CTPSinkR1,
+		au3CTPSource,
+		au3CTPBidirectionalR1,
+		au4CTPSinkR1,
+		au4CTPSource,
+		au4CTPBidirectionalR1;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			CHOICE {
+				au4CTPSinkR1,
+				au4CTPSource,
+				au4CTPBidirectionalR1 },
+			SET SIZE(3) OF
+			CHOICE {
+				au3CTPSinkR1,
+				au3CTPSource,
+				au3CTPBidirectionalR1 } };
+;
+
+
+electricalSPITTPSinkSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPSink;
+	NAMES SUBORDINATES
+		rsCTPSink;
+	ACCORDING TO RULE
+		SET SIZE(1) OF
+		rsCTPSink;
+;
+
+
+electricalSPITTPSourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPSource;
+	NAMES SUBORDINATES
+		rsCTPSource;
+	ACCORDING TO RULE
+		SET SIZE(1) OF
+		rsCTPSource;
+;
+
+
+electricalSPITTPBidirectionalSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		electricalSPITTPBidirectional;
+	NAMES SUBORDINATES
+		rsCTPSink,
+		rsCTPSource,
+		rsCTPBidirectional;
+	ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			rsCTPSink,
+			rsCTPSource,
+			rsCTPBidirectional };
+;
+
+
+opticalSPITTPSinkSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPSink;
+	NAMES SUBORDINATES
+		rsCTPSink;
+	ACCORDING TO RULE
+		SET SIZE(1) OF
+		rsCTPSink;
+;
+
+
+opticalSPITTPSourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPSource;
+	NAMES SUBORDINATES
+		rsCTPSource;
+	ACCORDING TO RULE
+		SET SIZE(1) OF
+		rsCTPSource;
+;
+
+
+opticalSPITTPBidirectionalSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		opticalSPITTPBidirectional;
+	NAMES SUBORDINATES
+		rsCTPSink,
+		rsCTPSource,
+		rsCTPBidirectional;
+	ACCORDING TO RULE
+		SET SIZE(1) OF
+		CHOICE {
+			rsCTPSink,
+			rsCTPSource,
+			rsCTPBidirectional };
+;
+
+
+msTTPSinkSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		msTTPSink;
+	NAMES SUBORDINATES
+		augSink,
+		msDatacomCTPSink,
+		msOrderwireCTPSink;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(1, 4, 16) OF
+			augSink,
+			SET SIZE(0.. 1) OF
+			msDatacomCTPSink,
+			SET SIZE(0.. 1) OF
+			msOrderwireCTPSink };
+;
+
+
+msTTPSourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		msTTPSource;
+	NAMES SUBORDINATES
+		augSource,
+		msDatacomCTPSource,
+		msOrderwireCTPSource;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(1, 4, 16) OF
+			augSource,
+			SET SIZE(0.. 1) OF
+			msDatacomCTPSource,
+			SET SIZE(0.. 1) OF
+			msOrderwireCTPSource };
+;
+
+
+msTTPBidirectionalSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		msTTPBidirectional;
+	NAMES SUBORDINATES
+		augBidirectional,
+		msDatacomCTPSink,
+		msDatacomCTPSource,
+		msDatacomCTPBidirectional,
+		msOrderwireCTPSink,
+		msOrderwireCTPSource,
+		msOrderwireCTPBidirectional;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(1, 4, 16) OF
+			augBidirectional,
+			SET SIZE(0.. 1) OF
+			CHOICE {
+				msDatacomCTPSink,
+				msDatacomCTPSource,
+				msDatacomCTPBidirectional },
+			SET SIZE(0.. 1) OF
+			CHOICE {
+				msOrderwireCTPSink,
+				msOrderwireCTPSource,
+				msOrderwireCTPBidirectional } };
+;
+
+
+rsTTPSinkSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		rsTTPSink AND SUBCLASSES;
+	NAMES SUBORDINATES
+		msCTPSink,
+		rsDatacomCTPSink,
+		rsOrderwireCTPSink,
+		rsUserChannelCTPSink;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(1) OF
+			msCTPSink,
+			SET SIZE(0.. 1) OF
+			rsDatacomCTPSink,
+			SET SIZE(0.. 1) OF
+			rsOrderwireCTPSink,
+			SET SIZE(0.. 1) OF
+			rsUserChannelCTPSink };
+;
+
+
+rsTTPSourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		rsTTPSource AND SUBCLASSES;
+	NAMES SUBORDINATES
+		msCTPSource,
+		rsDatacomCTPSource,
+		rsOrderwireCTPSource,
+		rsUserChannelCTPSource;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(1) OF
+			msCTPSource,
+			SET SIZE(0.. 1) OF
+			rsDatacomCTPSource,
+			SET SIZE(0.. 1) OF
+			rsOrderwireCTPSource,
+			SET SIZE(0.. 1) OF
+			rsUserChannelCTPSource };
+;
+
+
+rsTTPBidirectionalSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		rsTTPBidirectional AND SUBCLASSES;
+	NAMES SUBORDINATES
+		msCTPSink,
+		msCTPSource,
+		msCTPBidirectional,
+		rsDatacomCTPSink,
+		rsDatacomCTPSource,
+		rsDatacomCTPBidirectional,
+		rsOrderwireCTPSink,
+		rsOrderwireCTPSource,
+		rsOrderwireCTPBidirectional,
+		rsUserChannelCTPSink,
+		rsUserChannelCTPSource,
+		rsUserChannelCTPBidirectional;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(1) OF
+			CHOICE {
+				msCTPSink,
+				msCTPSource,
+				msCTPBidirectional },
+			SET SIZE(0.. 1) OF
+			CHOICE {
+				rsDatacomCTPSink,
+				rsDatacomCTPSource,
+				rsDatacomCTPBidirectional },
+			SET SIZE(0.. 1) OF
+			CHOICE {
+				rsOrderwireCTPSink,
+				rsOrderwireCTPSource,
+				rsOrderwireCTPBidirectional },
+			SET SIZE(0.. 1) OF
+			CHOICE {
+				rsUserChannelCTPSink,
+				rsUserChannelCTPSource,
+				rsUserChannelCTPBidirectional } };
+;
+
+
+sdhNESubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		sdhNE;
+	NAMES SUBORDINATES
+		electricalSPITTPSink,
+		electricalSPITTPSource,
+		electricalSPITTPBidirectional,
+		msTTPSink,
+		msTTPSource,
+		msTTPBidirectional,
+		opticalSPITTPSink,
+		opticalSPITTPSource,
+		opticalSPITTPBidirectional,
+		rsTTPSink,
+		rsTTPSource,
+		rsTTPBidirectional,
+		rsTTPTrailTraceSink,
+		rsTTPTrailTraceSource,
+		rsTTPTrailTraceBidirectional,
+		vc11TTPSinkR1,
+		vc11TTPSource,
+		vc11TTPBidirectionalR1,
+		vc12TTPSinkR1,
+		vc12TTPSource,
+		vc12TTPBidirectionalR1,
+		vc2TTPSinkR1,
+		vc2TTPSource,
+		vc2TTPBidirectionalR1,
+		vc3TTPSinkR1,
+		vc3TTPSourceR1,
+		vc3TTPBidirectionalR1,
+		vc4TTPSinkR1,
+		vc4TTPSourceR1,
+		vc4TTPBidirectionalR1;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(0..N) OF
+			electricalSPITTPSink,
+			SET SIZE(0..N) OF
+			electricalSPITTPSource,
+			SET SIZE(0..N) OF
+			electricalSPITTPBidirectional,
+			SET SIZE(0..N) OF
+			msTTPSink,
+			SET SIZE(0..N) OF
+			msTTPSource,
+			SET SIZE(0..N) OF
+			msTTPBidirectional,
+			SET SIZE(0..N) OF
+			opticalSPITTPSink,
+			SET SIZE(0..N) OF
+			opticalSPITTPSource,
+			SET SIZE(0..N) OF
+			opticalSPITTPBidirectional,
+			SET SIZE(0..N) OF
+			rsTTPSink,
+			SET SIZE(0..N) OF
+			rsTTPSource,
+			SET SIZE(0..N) OF
+			rsTTPBidirectional,
+			SET SIZE(0..N) OF
+			rsTTPTrailTraceSink,
+			SET SIZE(0..N) OF
+			rsTTPTrailTraceSource,
+			SET SIZE(0..N) OF
+			rsTTPTrailTraceBidirectional,
+			SET SIZE(0..N) OF
+			vc11TTPSinkR1,
+			SET SIZE(0..N) OF
+			vc11TTPSource,
+			SET SIZE(0..N) OF
+			vc11TTPBidirectionalR1,
+			SET SIZE(0..N) OF
+			vc12TTPSinkR1,
+			SET SIZE(0..N) OF
+			vc12TTPSource,
+			SET SIZE(0..N) OF
+			vc12TTPBidirectionalR1,
+			SET SIZE(0..N) OF
+			vc2TTPSinkR1,
+			SET SIZE(0..N) OF
+			vc2TTPSource,
+			SET SIZE(0..N) OF
+			vc2TTPBidirectionalR1,
+			SET SIZE(0..N) OF
+			vc3TTPSinkR1,
+			SET SIZE(0..N) OF
+			vc3TTPSourceR1,
+			SET SIZE(0..N) OF
+			vc3TTPBidirectionalR1,
+			SET SIZE(0..N) OF
+			vc4TTPSinkR1,
+			SET SIZE(0..N) OF
+			vc4TTPSourceR1,
+			SET SIZE(0..N) OF
+			vc4TTPBidirectionalR1 };
+;
+
+
+tug2SinkSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		tug2Sink;
+	NAMES SUBORDINATES
+		tu11CTPSinkR1,
+		tu12CTPSinkR1,
+		tu2CTPSinkR1;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			tu2CTPSinkR1,
+			SET SIZE(3) OF
+			tu12CTPSinkR1,
+			SET SIZE(4) OF
+			tu11CTPSinkR1 };
+;
+
+
+tug2SourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		tug2Source;
+	NAMES SUBORDINATES
+		tu11CTPSource,
+		tu12CTPSource,
+		tu2CTPSource;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			tu2CTPSource,
+			SET SIZE(3) OF
+			tu12CTPSource,
+			SET SIZE(4) OF
+			tu11CTPSource };
+;
+
+
+tug2BidirectionalSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		tug2Bidirectional;
+	NAMES SUBORDINATES
+		tu11CTPSinkR1,
+		tu11CTPSource,
+		tu11CTPBidirectionalR1,
+		tu12CTPSinkR1,
+		tu12CTPSource,
+		tu12CTPBidirectionalR1,
+		tu2CTPSinkR1,
+		tu2CTPSource,
+		tu2CTPBidirectionalR1;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			CHOICE {
+				tu2CTPSinkR1,
+				tu2CTPSource,
+				tu2CTPBidirectionalR1 },
+			SET SIZE(3) OF
+			CHOICE {
+				tu12CTPSinkR1,
+				tu12CTPSource,
+				tu12CTPBidirectionalR1 },
+			SET SIZE(4) OF
+			CHOICE {
+				tu11CTPSinkR1,
+				tu11CTPSource,
+				tu11CTPBidirectionalR1 } };
+;
+
+
+tug3SinkSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		tug3Sink;
+	NAMES SUBORDINATES
+		tug2Sink,
+		tu3CTPSinkR1;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			tu3CTPSinkR1,
+			SET SIZE(7) OF
+			tug2Sink };
+;
+
+
+tug3SourceSubordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		tug3Source;
+	NAMES SUBORDINATES
+		tug2Source,
+		tu3CTPSource;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			tu3CTPSource,
+			SET SIZE(7) OF
+			tug2Source };
+;
+
+
+tug3BidirectionalSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		tug3Bidirectional;
+	NAMES SUBORDINATES
+		tug2Sink,
+		tug2Source,
+		tug2Bidirectional,
+		tu3CTPSinkR1,
+		tu3CTPSource,
+		tu3CTPBidirectionalR1;
+	ACCORDING TO RULE
+		CHOICE {
+			SET SIZE(1) OF
+			CHOICE {
+				tu3CTPSinkR1,
+				tu3CTPSource,
+				tu3CTPBidirectionalR1 },
+			SET SIZE(7) OF
+			CHOICE {
+				tug2Sink,
+				tug2Source,
+				tug2Bidirectional } };
+;
+
+
+vc3TTPSinkR1Subordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		vc3TTPSink;
+	NAMES SUBORDINATES
+		tug2Sink,
+		vcnUserChannelCTPSink;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(7) OF
+			tug2Sink,
+			SET SIZE(1) OF
+			vcnUserChannelCTPSink };
+;
+
+
+vc3TTPSourceSubordinationR1 SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		vc3TTPSourceR1;
+	NAMES SUBORDINATES
+		tug2Source,
+		vcnUserChannelCTPSource;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(7) OF
+			tug2Source,
+			SET SIZE(1) OF
+			vcnUserChannelCTPSource };
+;
+
+
+vc3TTPBidirectionalR1Subordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		vc3TTPBidirectionalR1;
+	NAMES SUBORDINATES
+		tug2Bidirectional,
+		vcnUserChannelCTPSink,
+		vcnUserChannelCTPSource,
+		vcnUserChannelCTPBidirectional;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(7) OF
+			tug2Bidirectional,
+			SET SIZE(1) OF
+			CHOICE {
+				vcnUserChannelCTPSink,
+				vcnUserChannelCTPSource,
+				vcnUserChannelCTPBidirectional } };
+;
+
+
+vc4TTPSinkR1Subordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		vc4TTPSinkR1;
+	NAMES SUBORDINATES
+		tug3Sink,
+		vcnUserChannelCTPSink;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(3) OF
+			tug3Sink,
+			SET SIZE(1) OF
+			vcnUserChannelCTPSink };
+;
+
+
+vc4TTPSourceR1Subordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		vc4TTPSourceR1;
+	NAMES SUBORDINATES
+		tug3Source,
+		vcnUserChannelCTPSource;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(3) OF
+			tug3Source,
+			SET SIZE(1) OF
+			vcnUserChannelCTPSource };
+;
+
+
+vc4TTPBidirectionalR1Subordination SUBORDINATION RULE
+	SUPERIOR OBJECT CLASS
+		vc4TTPBidirectionalR1;
+	NAMES SUBORDINATES
+		tug3Bidirectional,
+		vcnUserChannelCTPSink,
+		vcnUserChannelCTPSource,
+		vcnUserChannelCTPBidirectional;
+	ACCORDING TO RULE
+		SET {
+			SET SIZE(3) OF
+			tug3Bidirectional,
+			SET SIZE(1) OF
+			CHOICE {
+				vcnUserChannelCTPSink,
+				vcnUserChannelCTPSource,
+				vcnUserChannelCTPBidirectional } };
+;
+
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log$
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument >--
