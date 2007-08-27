@@ -1,4 +1,5 @@
 --< GDMO.Document "CCITT X.521" >--
+--< GDMO.Alias "CCITT X.521" "ITU-T Rec. X.521" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
 --  =============================================================================
@@ -52,6 +53,16 @@
 -- 
 --  =============================================================================
 --  >--
+
+organization MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+;
+
+organizationalUnit MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+;
 
 --< GDMO.ChangeLog
 --  =============================================================================

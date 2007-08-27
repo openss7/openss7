@@ -1,7 +1,6 @@
 --< GDMO.Document "ITU-T Rec. M.3100 (1992)" >--
 --< GDMO.Version 1.3 >--
---< GDMO.Alias "ITU-T Rec. M.3100 (1992)"
---  "ITU-T Rec. M.3100:1995",
+--< GDMO.Alias "ITU-T Rec. M.3100 (1992)" "ITU-T Rec. M.3100:1995",
 --  "Recommendation M.3100",
 --  "CCITT Rec. M.3100 (1992)",
 --  "ITU-T Rec. M.3100 (1995)" >--
@@ -9,29 +8,29 @@
 --  =============================================================================
 --  
 --  @(#) $RCSfile$ $Name$($Revision$) $Date$
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
--- 
+--  
 --  All Rights Reserved.
--- 
+--  
 --  This program is free software; you can redistribute it and/or modify it under
 --  the terms of the GNU General Public License as published by the Free Software
 --  Foundation; version 3 of the License.
--- 
+--  
 --  This program is distributed in the hope that it will be useful, but WITHOUT
 --  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 --  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 --  details.
--- 
+--  
 --  You should have received a copy of the GNU General Public License along with
 --  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
 --  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 --  behalf of the U.S. Government ("Government"), the following provisions apply
 --  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
@@ -45,16 +44,16 @@
 --  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 --  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 --  (or any successor regulations).
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Last Modified $Date$ by $Author$
--- 
+--  
 --  =============================================================================
 --  >--
 
@@ -80,7 +79,7 @@ networkR1 MANAGED OBJECT CLASS
 	CHARACTERIZED BY
 		networkR1Package PACKAGE
 			ATTRIBUTES
-				"Recommendation X.721:1992":systemTitle GET REPLACE;;;
+				"Recommendation X.721:1992":systemTitle GET-REPLACE;;;
 REGISTERED AS { m3100ObjectClass 33 };
 
 
@@ -99,8 +98,9 @@ circuitPack MANAGED OBJECT CLASS
 			BEHAVIOUR
 				circuitPackBehaviour;
 			ATTRIBUTES
-				circuitPackType GET SET BY CREATE,
-				"Recommendation X.721: 1992":availabilityStatus PERMITTED VALUES ASN-CONTDefinedTypesModule.CircuitPackAvailabilityStatus GET;;;
+				circuitPackType GET SET-BY-CREATE,
+				"Recommendation X.721: 1992":availabilityStatus
+					PERMITTED VALUES ASN-CONTDefinedTypesModule.CircuitPackAvailabilityStatus GET;;;
 REGISTERED AS { m3100ObjectClass 30 };
 
 
@@ -127,8 +127,8 @@ equipment MANAGED OBJECT CLASS
 						value of administrative state or operational state changes(when the administrativeOperationalStates
 						conditional package is present).";;
 			ATTRIBUTES
-				equipmentId GET SET BY CREATE,
-				replaceable GET SET BY CREATE;;;
+				equipmentId GET SET-BY-CREATE,
+				replaceable GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		createDeleteNotificationsPackage
 			PRESENT IF
@@ -190,8 +190,8 @@ equipmentHolder MANAGED OBJECT CLASS
 			BEHAVIOUR
 				equipmentHolderBehaviour;
 			ATTRIBUTES
-				equipmentHolderType GET SET BY CREATE,
-				equipmentHolderAddress GET SET BY CREATE;;;
+				equipmentHolderType GET SET-BY-CREATE,
+				equipmentHolderAddress GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		subordinateCircuitPackPackage
 			PRESENT IF
@@ -206,7 +206,7 @@ equipmentR1 MANAGED OBJECT CLASS
 		equipmentR1Package PACKAGE
 			ATTRIBUTES
 				serialNumber GET,
-				supportedByObjectList GET REPLACE ADD REMOVE;;;
+				supportedByObjectList GET-REPLACE ADD-REMOVE;;;
 	CONDITIONAL PACKAGES
 		alarmSeverityAssignmentPointerPackage
 			PRESENT IF
@@ -250,9 +250,9 @@ managedElement MANAGED OBJECT CLASS
 						shall be emitted if the value of administrative state or operational state or usage state changes.";;
 			ATTRIBUTES
 				managedElementId GET,
-				"Recommendation X.721: 1992":systemTitle GET REPLACE,
+				"Recommendation X.721: 1992":systemTitle GET-REPLACE,
 				alarmStatus GET,
-				"Recommendation X.721: 1992":administrativeState GET REPLACE,
+				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
 				"Recommendation X.721: 1992":operationalState GET,
 				"Recommendation X.721: 1992":usageState GET;
 			NOTIFICATIONS
@@ -345,7 +345,7 @@ managedElementComplex MANAGED OBJECT CLASS
 						represented by an instance of this object class.";;
 			ATTRIBUTES
 				managedElementComplexId GET,
-				"Recommendation X.721: 1992":systemTitle GET REPLACE;;;
+				"Recommendation X.721: 1992":systemTitle GET-REPLACE;;;
 	CONDITIONAL PACKAGES
 		createDeleteNotificationsPackage
 			PRESENT IF
@@ -374,7 +374,7 @@ software MANAGED OBJECT CLASS
 						shall be emitted if the value of administrative state or operational state changes (when
 						theadministrativeOperationalStates conditional package is present).";;
 			ATTRIBUTES
-				softwareId GET SET BY CREATE;;;
+				softwareId GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		createDeleteNotificationsPackage
 			PRESENT IF
@@ -448,9 +448,10 @@ connectionTerminationPointSink MANAGED OBJECT CLASS
 						Termination Point Bidirectional. The downstreamconnectivity pointer may identify one or more
 						objects depending on whether the signal is connected to one or more termination point objects.";;
 			ATTRIBUTES
-				downstreamConnectivityPointer PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
+				downstreamConnectivityPointer
+					PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
 					-- CTPDownstreamPointer
-					ASN-CONTDefinedTypesModule.CTPDownstreamPointer GET SET BY CREATE;;;
+					ASN-CONTDefinedTypesModule.CTPDownstreamPointer GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		ctpInstancePackage
 			PRESENT IF
@@ -476,9 +477,10 @@ connectionTerminationPointSource MANAGED OBJECT CLASS
 						Point Source, Trail Termination Point Bidirectional, Connection Termination Point Sink, Connection
 						Termination Point Bidirectional.";;
 			ATTRIBUTES
-				upstreamConnectivityPointer PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
+				upstreamConnectivityPointer
+					PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
 					-- CTPUpstreamPointer
-					ASN-CONTDefinedTypesModule.CTPUpstreamPointer GET SET BY CREATE;;;
+					ASN-CONTDefinedTypesModule.CTPUpstreamPointer GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		ctpInstancePackage
 			PRESENT IF
@@ -584,7 +586,7 @@ trailTerminationPointSink MANAGED OBJECT CLASS
 						ConnectionTermination Point Sink or Bidirectional (single or a concatenated sequence) or Trail
 						Termination Point Source or Bidirectional.";;
 			ATTRIBUTES
-				upstreamConnectivityPointer GET SET BY CREATE;;;
+				upstreamConnectivityPointer GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		"Recommendation X.721:1992":administrativeStatePackage
 			PRESENT IF
@@ -628,7 +630,7 @@ trailTerminationPointSource MANAGED OBJECT CLASS
 						connection termination point source objects) or Trail Termination Point Sink or
 						Bidirectional(single or a set if connected to more than one trail termination point sink objects).";;
 			ATTRIBUTES
-				downstreamConnectivityPointer GET SET BY CREATE;;;
+				downstreamConnectivityPointer GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		"Recommendation X.721: 1992":administrativeStatePackage
 			PRESENT IF
@@ -663,7 +665,7 @@ circuitEndPointSubgroup MANAGED OBJECT CLASS
 				informationTransferCapabilities GET,
 				circuitDirectionality GET,
 				transmissionCharacteristics GET,
-				userLabel GET REPLACE;
+				userLabel GET-REPLACE;
 			NOTIFICATIONS
 				"Recommendation X.721:1992":attributeValueChange,
 				"Recommendation X.721:1992":objectCreation,
@@ -684,7 +686,7 @@ connectionR1 MANAGED OBJECT CLASS
 						Several connections can be bundled into a higher rate trail. A sequence of one or more connections
 						are linkedtogether to form a trail. A connection may be either uni- or bi-directional.";;
 			ATTRIBUTES
-				connectionId GET SET BY CREATE;;;
+				connectionId GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		serverTrailListPackage
 			PRESENT IF
@@ -712,10 +714,10 @@ pipe MANAGED OBJECT CLASS
 						the sink TP. The operational state indicates the capability to carry a signal.";;
 			ATTRIBUTES
 				directionality GET,
-				"Recommendation X.721: 1992":administrativeState GET REPLACE,
+				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
 				"Recommendation X.721: 1992":operationalState GET,
-				a-TPInstance GET SET BY CREATE,
-				z-TPInstance GET SET BY CREATE;;;
+				a-TPInstance GET SET-BY-CREATE,
+				z-TPInstance GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		createDeleteNotificationsPackage
 			PRESENT IF
@@ -762,7 +764,7 @@ trailR1 MANAGED OBJECT CLASS
 						two Trail Termination Points and one or more connection and associated connection termination
 						points.";;
 			ATTRIBUTES
-				trailId GET SET BY CREATE;;;
+				trailId GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		serverConnectionListPackage
 			PRESENT IF
@@ -812,7 +814,7 @@ crossConnection MANAGED OBJECT CLASS
 						Disabled: The Cross-Connection is incapable of performing its normal cross-connection function.";;
 			ATTRIBUTES
 				crossConnectionId GET,
-				"Recommendation X.721 : 1992":administrativeState GET REPLACE,
+				"Recommendation X.721 : 1992":administrativeState GET-REPLACE,
 				"Recommendation X.721 : 1992":operationalState GET,
 				signalType GET,
 				fromTermination GET,
@@ -846,12 +848,12 @@ fabric MANAGED OBJECT CLASS
 						to re-arrange TP Pools. The Fabric remains available for service (i.e. its operational state is
 						enabled) while it isdegraded. - Empty SET.";;
 			ATTRIBUTES
-				fabricId GET SET BY CREATE,
-				"Recommendation X.721: 1992":administrativeState GET REPLACE,
+				fabricId GET SET-BY-CREATE,
+				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
 				"Recommendation X.721 : 1992":operationalState GET,
 				"Recommendation X.721 : 1992":availabilityStatus GET,
-				listOfCharacteristicInfo GET SET BY CREATE,
-				supportedByObjectList GET REPLACE ADD REMOVE;
+				listOfCharacteristicInfo GET SET-BY-CREATE,
+				supportedByObjectList GET-REPLACE ADD-REMOVE;
 			ACTIONS
 				addTpsToGTP
 					removeTpsFromGTP
@@ -940,7 +942,7 @@ mpCrossConnection MANAGED OBJECT CLASS
 						forservice (i.e. its operational state is enabled) while it is degraded. - Empty SET.";;
 			ATTRIBUTES
 				mpCrossConnectionId GET,
-				"Recommendation X.721 : 1992":administrativeState GET REPLACE,
+				"Recommendation X.721 : 1992":administrativeState GET-REPLACE,
 				"Recommendation X.721 : 1992":operationalState GET,
 				"Recommendation X.721 : 1992":availabilityStatus GET,
 				signalType GET,
@@ -996,8 +998,8 @@ alarmSeverityAssignmentProfile MANAGED OBJECT CLASS
 						specifies thealarm severity assignment for managed objects. Instances of this object are referenced
 						by the alarmSeverityAssignmentProfilePointer attribute in the managed objects.";;
 			ATTRIBUTES
-				alarmSeverityAssignmentProfileId GET SET BY CREATE,
-				alarmSeverityAssignmentList GET REPLACE ADD REMOVE;;;
+				alarmSeverityAssignmentProfileId GET SET-BY-CREATE,
+				alarmSeverityAssignmentList GET-REPLACE ADD-REMOVE;;;
 	CONDITIONAL PACKAGES
 		objectManagementNotificationsPackage
 			PRESENT IF
@@ -1007,7 +1009,7 @@ REGISTERED AS { m3100ObjectClass 22 };
 
 administrativeOperationalStatesPackage PACKAGE
 	ATTRIBUTES
-		"Recommendation X.721:1992":administrativeState GET REPLACE,
+		"Recommendation X.721:1992":administrativeState GET-REPLACE,
 		"Recommendation X.721:1992":operationalState GET;
 REGISTERED AS { m3100Package 1 };
 
@@ -1026,7 +1028,7 @@ alarmSeverityAssignmentPointerPackage PACKAGE
 				applies whenreporting alarms: a) agent assigns the severity; or b) the value 'indeterminate' is
 				used.";;
 	ATTRIBUTES
-		alarmSeverityAssignmentProfilePointer GET REPLACE;
+		alarmSeverityAssignmentProfilePointer GET-REPLACE;
 REGISTERED AS { m3100Package 3 };
 
 
@@ -1045,25 +1047,25 @@ REGISTERED AS { m3100Package 5 };
 
 channelNumberPackage PACKAGE
 	ATTRIBUTES
-		channelNumber GET SET BY CREATE;
+		channelNumber GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 6 };
 
 
 characteristicInformationPackage PACKAGE
 	ATTRIBUTES
-		characteristicInformation GET SET BY CREATE;
+		characteristicInformation GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 7 };
 
 
 clientConnectionListPackage PACKAGE
 	ATTRIBUTES
-		clientConnectionList GET SET BY CREATE;
+		clientConnectionList GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 35 };
 
 
 clientTrailPackage PACKAGE
 	ATTRIBUTES
-		clientTrail GET SET BY CREATE;
+		clientTrail GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 9 };
 
 
@@ -1082,7 +1084,7 @@ REGISTERED AS { m3100Package 11 };
 
 ctpInstancePackage PACKAGE
 	ATTRIBUTES
-		cTPId GET SET BY CREATE;
+		cTPId GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 12 };
 
 
@@ -1109,7 +1111,8 @@ REGISTERED AS { m3100Package 36 };
 
 equipmentAlarmEffectOnServicePackage PACKAGE
 	NOTIFICATIONS
-		"Recommendation X.721:1992":equipmentAlarm alarmEffectOnServiceParameter;
+		"Recommendation X.721:1992":equipmentAlarm
+			alarmEffectOnServiceParameter;
 REGISTERED AS { m3100Package 38 };
 
 
@@ -1134,20 +1137,20 @@ REGISTERED AS { m3100Package 37 };
 
 externalTimePackage PACKAGE
 	ATTRIBUTES
-		externalTime GET REPLACE;
+		externalTime GET-REPLACE;
 REGISTERED AS { m3100Package 16 };
 
 
 locationNamePackage PACKAGE
 	ATTRIBUTES
-		locationName GET REPLACE;
+		locationName GET-REPLACE;
 REGISTERED AS { m3100Package 17 };
 
 
 namedCrossConnectionPackage PACKAGE
 	ATTRIBUTES
-		redline GET REPLACE,
-		crossConnectionName GET REPLACE;;-- The above package is not registered because it is used as a mandatory package in this
+		redline GET-REPLACE,
+		crossConnectionName GET-REPLACE;;-- The above package is not registered because it is used as a mandatory package in this
 -- Recommendation.
 
 
@@ -1158,7 +1161,7 @@ networkLevelPackage PACKAGE
 				"The network level pointer identifies a network level object. The value of the network level pointer
 				shall only bemodified by the managing system.";;
 	ATTRIBUTES
-		networkLevelPointer GET REPLACE;
+		networkLevelPointer GET-REPLACE;
 REGISTERED AS { m3100Package 18 };
 
 
@@ -1184,7 +1187,7 @@ REGISTERED AS { m3100Package 21 };
 
 protectedPackage PACKAGE
 	ATTRIBUTES
-		protected GET SET BY CREATE;
+		protected GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 22 };
 
 
@@ -1196,13 +1199,13 @@ REGISTERED AS { m3100Package 23 };
 
 serverConnectionListPackage PACKAGE
 	ATTRIBUTES
-		serverConnectionList GET SET BY CREATE;
+		serverConnectionList GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 24 };
 
 
 serverTrailListPackage PACKAGE
 	ATTRIBUTES
-		serverTrailList GET SET BY CREATE;
+		serverTrailList GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 25 };
 
 
@@ -1227,15 +1230,15 @@ REGISTERED AS { m3100Package 40 };
 
 subordinateCircuitPackPackage PACKAGE
 	ATTRIBUTES
-		acceptableCircuitPackTypeList GET REPLACE ADD REMOVE,
+		acceptableCircuitPackTypeList GET-REPLACE ADD-REMOVE,
 		holderStatus GET,
-		subordinateCircuitPackSoftwareLoad GET REPLACE;
+		subordinateCircuitPackSoftwareLoad GET-REPLACE;
 REGISTERED AS { m3100Package 41 };
 
 
 supportableClientListPackage PACKAGE
 	ATTRIBUTES
-		supportableClientList GET SET BY CREATE;
+		supportableClientList GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 27 };
 
 
@@ -1247,7 +1250,7 @@ REGISTERED AS { m3100Package 28 };
 
 systemTimingSourcePackage PACKAGE
 	ATTRIBUTES
-		systemTimingSource GET REPLACE;
+		systemTimingSource GET-REPLACE;
 REGISTERED AS { m3100Package 29 };
 
 
@@ -1267,25 +1270,25 @@ REGISTERED AS { m3100Package 30 };
 
 ttpInstancePackage PACKAGE
 	ATTRIBUTES
-		tTPId GET SET BY CREATE;
+		tTPId GET SET-BY-CREATE;
 REGISTERED AS { m3100Package 31 };
 
 
 userLabelPackage PACKAGE
 	ATTRIBUTES
-		userLabel GET REPLACE;
+		userLabel GET-REPLACE;
 REGISTERED AS { m3100Package 32 };
 
 
 vendorNamePackage PACKAGE
 	ATTRIBUTES
-		vendorName GET REPLACE;
+		vendorName GET-REPLACE;
 REGISTERED AS { m3100Package 33 };
 
 
 versionPackage PACKAGE
 	ATTRIBUTES
-		version GET REPLACE;
+		version GET-REPLACE;
 REGISTERED AS { m3100Package 34 };
 
 
@@ -1305,8 +1308,8 @@ acceptableCircuitPackTypeList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.AcceptableCircuitPackTypeList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		acceptableCircuitPackTypeListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1319,8 +1322,8 @@ affectedObjectList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		affectedObjectListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1446,8 +1449,8 @@ clientConnectionList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		clientConnectionListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1577,8 +1580,8 @@ downstreamConnectivityPointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.DownstreamConnectivityPointer;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		downstreamConnectivityPointerBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1983,8 +1986,8 @@ supportableClientList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SupportableClientList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		supportableClientListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1998,8 +2001,8 @@ supportedByObjectList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		supportedByObjectListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2195,8 +2198,8 @@ alarmSeverityAssignment-managedElement NAME BINDING
 		managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		alarmSeverityAssignmentProfileId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 1 };
 
 
@@ -2223,9 +2226,9 @@ circuitPack-equipmentHolder-explicitlyCreated NAME BINDING
 		equipmentId;
 	BEHAVIOUR
 		circuitPack-equipmentHolder-explicitlyCreateBeh;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
 	createErrorParameter;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 33 };
 
 
@@ -2237,8 +2240,8 @@ connectionR1-network NAME BINDING
 		network;
 	WITH ATTRIBUTE
 		connectionId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 25 };
 
 
@@ -2252,8 +2255,8 @@ connectionTerminationPointSource-trailTerminationPointSource NAME BINDING
 		cTPId;
 	BEHAVIOUR
 		cTPSource-TTPBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 3 };
 
 
@@ -2267,8 +2270,8 @@ connectionTerminationPointSource-trailTerminationPointBidirectional NAME BINDING
 		cTPId;
 	BEHAVIOUR
 		cTPSource-TTPBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 4 };
 
 
@@ -2282,8 +2285,8 @@ connectionTerminationPointSink-trailTerminationPointSink NAME BINDING
 		cTPId;
 	BEHAVIOUR
 		cTPSink-TTPBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 5 };
 
 
@@ -2297,8 +2300,8 @@ connectionTerminationPointSink-trailTerminationPointBidirectional NAME BINDING
 		cTPId;
 	BEHAVIOUR
 		cTPSink-TTPBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 6 };
 
 
@@ -2321,7 +2324,7 @@ crossConnection-fabric NAME BINDING
 				objects (if applicable) shall be updated. The connectivityPointer attributesin the disconnected
 				termination points shall be set to NULL. Deleting a cross-connection object instance has no effect
 				on the composition of any GTP.";;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 7 };
 
 
@@ -2346,7 +2349,7 @@ crossConnection-mpCrossConnection NAME BINDING
 				cross-connection object instance has the effect of alsodeleting the multipoint cross-connect object
 				instance (and updating the appropriate pointers). Deleting a crossconnection object instance has no
 				effect on the composition of any GTP.";;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 8 };
 
 
@@ -2360,8 +2363,8 @@ equipment-managedElement NAME BINDING
 		equipmentId;
 	BEHAVIOUR
 		equipmentNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 9 };
 
 
@@ -2375,8 +2378,8 @@ equipment-equipment NAME BINDING
 		equipmentId;
 	BEHAVIOUR
 		equipmentNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 10 };
 
 
@@ -2390,9 +2393,9 @@ equipmentHolder-equipmentHolder NAME BINDING
 		equipmentId;
 	BEHAVIOUR
 		equipmentHolder-equipmentHolderBeh;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
 	createErrorParameter;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 31 };
 
 
@@ -2404,8 +2407,8 @@ eventForwardingDiscriminator-managedElement NAME BINDING
 		managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation X.721:1992":discriminatorId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 11 };
 
 
@@ -2417,8 +2420,8 @@ fabric-managedElement NAME BINDING
 		managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		fabricId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 12 };
 
 
@@ -2441,8 +2444,8 @@ log-managedElement NAME BINDING
 		managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation X.721:1992":logId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 14 };
 
 
@@ -2593,8 +2596,8 @@ software-equipment NAME BINDING
 		softwareId;
 	BEHAVIOUR
 		softwareNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 18 };
 
 
@@ -2608,8 +2611,8 @@ software-software NAME BINDING
 		softwareId;
 	BEHAVIOUR
 		softwareNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 19 };
 
 
@@ -2623,8 +2626,8 @@ software-managedElement NAME BINDING
 		softwareId;
 	BEHAVIOUR
 		softwareNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 20 };
 
 
@@ -2647,8 +2650,8 @@ trailR1-network NAME BINDING
 		network;
 	WITH ATTRIBUTE
 		trailId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 26 };
 
 
@@ -2662,8 +2665,8 @@ trailTerminationPointSource-managedElement NAME BINDING
 		tTPId;
 	BEHAVIOUR
 		trailTerminationPointNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 23 };
 
 
@@ -2677,8 +2680,8 @@ trailTerminationPointSink-managedElement NAME BINDING
 		tTPId;
 	BEHAVIOUR
 		trailTerminationPointNameBindingBehaviour;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { m3100NameBinding 24 };
 
 
@@ -2848,7 +2851,7 @@ REGISTERED AS { m3100Action 9 };
 
 
 alarmEffectOnServiceParameter PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX ASN1DefinedTypesModule.AlarmEffectOnServiceParameter;
 	BEHAVIOUR
 		alarmEffectOnServiceParameterBehaviour BEHAVIOUR
@@ -2860,7 +2863,7 @@ REGISTERED AS { m3100Parameter 1 };
 
 
 createErrorParameter PARAMETER
-	CONTEXT SPECIFIC ERROR;
+	CONTEXT SPECIFIC-ERROR;
 	WITH SYNTAX ASN1DefinedTypesModule.CreateError;
 	BEHAVIOUR
 		createErrorParameterBehaviour BEHAVIOUR
@@ -2873,7 +2876,7 @@ REGISTERED AS { m3100Parameter 2 };
 
 --< GDMO.ChangeLog
 --  =============================================================================
--- 
+--  
 --  $Log$
 --  =============================================================================
 --  >--

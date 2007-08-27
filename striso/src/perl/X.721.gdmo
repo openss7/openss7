@@ -1,10 +1,14 @@
 --< GDMO.Document "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" >--
 --< GDMO.Version 1.3 >--
---< GDMO.Alias "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992"
---  "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992",
+--< GDMO.Alias "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992",
+--  "Recommendation X.721 | ISO/IEC 10165-2 : 1992",
+--  " ITU-T X.721|ISO/IEC 10165-2:1992",
+--  "ITU-T X.721 | ISO/IEC 10165-2:1992",
+--  "ITU-T X.721|ISO/IEC 10165-2:1992",
 --  "Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992",
 --  "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
 --  "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
+--  "Recommendation X.721 | ISO/IEC 10165-2",
 --  "Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
 --  "ITU-T Rec. X.721 | ISO/IEC 10165-2 : 1992",
 --  "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992",
@@ -16,34 +20,39 @@
 --  "Recommendation X.721:1992",
 --  "Recommendation X.721: 1992",
 --  "Recommendation X.721",
+--  "CCITT Rec. X.721 | ISO/IEC 10165-2",
+--  "CCITT Rec. X.721 | ISO/IEC 10165-2:1992",
+--  "ITU-T Recommendation X.721:1992",
+--  "Rec. X.721 | ISO/IEC 10165-2",
+--  "Rec. X.721 | ISO/IEC 10165-2:1992",
 --  "DMI" >--
 --< GDMO.Copyright
 --  =============================================================================
 --  
 --  @(#) $RCSfile$ $Name$($Revision$) $Date$
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
 --  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
--- 
+--  
 --  All Rights Reserved.
--- 
+--  
 --  This program is free software; you can redistribute it and/or modify it under
 --  the terms of the GNU General Public License as published by the Free Software
 --  Foundation; version 3 of the License.
--- 
+--  
 --  This program is distributed in the hope that it will be useful, but WITHOUT
 --  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 --  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
 --  details.
--- 
+--  
 --  You should have received a copy of the GNU General Public License along with
 --  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
 --  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
 --  behalf of the U.S. Government ("Government"), the following provisions apply
 --  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
@@ -57,16 +66,16 @@
 --  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
 --  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
 --  (or any successor regulations).
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Commercial licensing and support of this software is available from OpenSS7
 --  Corporation at a fee.  See http://www.openss7.com/
--- 
+--  
 --  -----------------------------------------------------------------------------
--- 
+--  
 --  Last Modified $Date$ by $Author$
--- 
+--  
 --  =============================================================================
 --  >--
 
@@ -182,8 +191,9 @@ discriminator MANAGED OBJECT CLASS
 						"This managed object is used to represent the criteria for controlling management services.";;
 			ATTRIBUTES
 				discriminatorId GET,
-				discriminatorConstruct REPLACE WITH DEFAULT DEFAULT VALUE Attribute-ASN1Module.defaultDiscriminatorConstruct GET REPLACE,
-				administrativeState GET REPLACE,
+				discriminatorConstruct REPLACE-WITH-DEFAULT
+					DEFAULT VALUE Attribute-ASN1Module.defaultDiscriminatorConstruct GET-REPLACE,
+				administrativeState GET-REPLACE,
 				operationalState GET;
 			NOTIFICATIONS
 				stateChange,
@@ -227,14 +237,14 @@ eventForwardingDiscriminator MANAGED OBJECT CLASS
 						"This managed object is used to represent the criteria that shall be satisfied by potential event
 						reports before the event report is forwarded to a particular destination.";;
 			ATTRIBUTES
-				destination GET REPLACE;;;
+				destination GET-REPLACE;;;
 	-- discriminatorConstruct attribute is defined using the attributes of a potential event report object
 	-- described in CCITT Rec. X.734 | ISO/IEC 10164-5.
 	CONDITIONAL PACKAGES
 		backUpDestinationListPackage PACKAGE
 			ATTRIBUTES
 				activeDestination GET,
-				backUpDestinationList GET REPLACE;
+				backUpDestinationList GET-REPLACE;
 		REGISTERED AS { smi2Package9 };
 			PRESENT IF
 				"the event forwarding discriminator is required to provide a backup for the destination",
@@ -301,11 +311,13 @@ log MANAGED OBJECT CLASS
 						Additional details are defined in CCITT Rec. X. 735 | ISO/IEC 10164-6.";;
 			ATTRIBUTES
 				logId GET,
-				discriminatorConstruct GET REPLACE,
-				administrativeState GET REPLACE,
+				discriminatorConstruct GET-REPLACE,
+				administrativeState GET-REPLACE,
 				operationalState GET,
-				availabilityStatus PERMITTED VALUES Attribute-ASN1Module.LogAvailability REQUIRED VALUES Attribute-ASN1Module.UnscheduledLogAvailability GET,
-				logFullAction GET REPLACE;
+				availabilityStatus
+					PERMITTED VALUES Attribute-ASN1Module.LogAvailability
+					REQUIRED VALUES Attribute-ASN1Module.UnscheduledLogAvailability GET,
+				logFullAction GET-REPLACE;
 			NOTIFICATIONS
 				objectCreation,
 				objectDeletion,
@@ -315,7 +327,7 @@ log MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		finiteLogSizePackage PACKAGE
 			ATTRIBUTES
-				maxLogSize GET REPLACE,
+				maxLogSize GET-REPLACE,
 				currentLogSize GET,
 				numberOfRecords GET;
 		REGISTERED AS { smi2Package12 };
@@ -323,7 +335,7 @@ log MANAGED OBJECT CLASS
 				"an instance supports it",
 		logAlarmPackage PACKAGE
 			ATTRIBUTES
-				capacityAlarmThreshold GET REPLACE ADD REMOVE;
+				capacityAlarmThreshold GET-REPLACE ADD-REMOVE;
 		REGISTERED AS { smi2Package13 };
 			PRESENT IF
 				"a log is of finite size and halts logging when the availability status has the log full value.",
@@ -500,13 +512,13 @@ system MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		administrativeStatePackage PACKAGE
 			ATTRIBUTES
-				administrativeState GET REPLACE;
+				administrativeState GET-REPLACE;
 		REGISTERED AS { smi2Package14 };
 			PRESENT IF
 				"an instance supports it.",
 		supportedFeaturesPackage PACKAGE
 			ATTRIBUTES
-				supportedFeatures GET REPLACE ADD REMOVE;
+				supportedFeatures GET-REPLACE ADD-REMOVE;
 		REGISTERED AS { smi2Package15 };
 			PRESENT IF
 				"an instance supports it.";
@@ -553,8 +565,8 @@ discriminator-system NAME BINDING
 		system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		discriminatorId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { smi2NameBinding1 };
 
 
@@ -566,8 +578,8 @@ log-system NAME BINDING
 		system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		logId;
-	CREATE WITH REFERENCE OBJECT, WITH AUTOMATIC INSTANCE NAMING;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { smi2NameBinding2 };
 
 
@@ -579,7 +591,7 @@ logRecord-log NAME BINDING
 		log AND SUBCLASSES;
 	WITH ATTRIBUTE
 		logRecordId;
-	DELETE ONLY IF NO CONTAINED OBJECTS;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { smi2NameBinding3 };
 
 
@@ -614,7 +626,8 @@ availabilityStatusPackage PACKAGE
 				"This package is described in CCITT Rec. X.734,X.735 | ISO/IEC 10164-5, 10164-6. It is used to
 				indicate the availability of the resource according to a predetermined time schedule.";;
 	ATTRIBUTES
-		availabilityStatus REQUIRED VALUES Attribute-ASN1Module.SchedulingAvailability GET;
+		availabilityStatus
+			REQUIRED VALUES Attribute-ASN1Module.SchedulingAvailability GET;
 REGISTERED AS { smi2Package22 };
 
 
@@ -632,14 +645,16 @@ REGISTERED AS { smi2Package24 };
 
 dailyScheduling PACKAGE
 	ATTRIBUTES
-		intervalsOfDay REPLACE WITH DEFAULT DEFAULT VALUE Attribute-ASN1Module.defaultIntervalsOfDay GET REPLACE ADD REMOVE;
+		intervalsOfDay REPLACE-WITH-DEFAULT
+			DEFAULT VALUE Attribute-ASN1Module.defaultIntervalsOfDay GET-REPLACE ADD-REMOVE;
 REGISTERED AS { smi2Package25 };
 
 
 duration PACKAGE
 	ATTRIBUTES
-		startTime GET REPLACE,
-		stopTime REPLACE WITH DEFAULT DEFAULT VALUE Attribute-ASN1Module.defaultStopTime GET REPLACE;
+		startTime GET-REPLACE,
+		stopTime REPLACE-WITH-DEFAULT
+			DEFAULT VALUE Attribute-ASN1Module.defaultStopTime GET-REPLACE;
 REGISTERED AS { smi2Package26 };
 
 
@@ -657,7 +672,8 @@ REGISTERED AS { smi2Package28 };
 
 weeklyScheduling PACKAGE
 	ATTRIBUTES
-		weekMask REPLACE WITH DEFAULT DEFAULT VALUE Attribute-ASN1Module.defaultWeekMask GET REPLACE ADD REMOVE;
+		weekMask REPLACE-WITH-DEFAULT
+			DEFAULT VALUE Attribute-ASN1Module.defaultWeekMask GET-REPLACE ADD-REMOVE;
 REGISTERED AS { smi2Package29 };
 
 
@@ -767,8 +783,8 @@ attributeIdentifierList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AttributeIdentifierList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		attributeIdentifierListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -780,8 +796,8 @@ attributeList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AttributeList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 	BEHAVIOUR
 		attributeListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -877,8 +893,8 @@ proposedRepairActions ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.ProposedRepairActions;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID19 };
 
 
@@ -964,8 +980,8 @@ specificProblems ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.SpecificProblems;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID27 };
 
 
@@ -1001,8 +1017,8 @@ alarmStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AlarmStatus;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID32 };
 
 
@@ -1010,8 +1026,8 @@ availabilityStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.AvailabilityStatus;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID33 };
 
 
@@ -1019,8 +1035,8 @@ controlStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.ControlStatus;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID34 };
 
 
@@ -1035,8 +1051,8 @@ proceduralStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.ProceduralStatus;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID36 };
 
 
@@ -1087,8 +1103,8 @@ member ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.GroupObjects;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID42 };
 
 
@@ -1096,8 +1112,8 @@ owner ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.GroupObjects;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID43 };
 
 
@@ -1148,8 +1164,8 @@ allomorphs ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.Allomorphs;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID50 };
 
 
@@ -1157,8 +1173,8 @@ backUpDestinationList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.BackUpDestinationList;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID51 };
 
 
@@ -1166,8 +1182,8 @@ capacityAlarmThreshold ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.CapacityAlarmThreshold;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID52 };
 
 
@@ -1271,8 +1287,8 @@ packages ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.Packages;
 	MATCHES FOR
 		EQUALITY,
-		SET COMPARISON,
-		SET INTERSECTION;
+		SET-COMPARISON,
+		SET-INTERSECTION;
 REGISTERED AS { smi2AttributeID66 };
 
 
@@ -1306,8 +1322,8 @@ REGISTERED AS { smi2AttributeID69 };
 supportedFeatures ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Attribute-ASN1Module.SupportedFeatures;
 	MATCHES FOR
-		SET COMPARISON,
-		SET INTERSECTION,
+		SET-COMPARISON,
+		SET-INTERSECTION,
 		EQUALITY;
 	BEHAVIOUR
 		supportedFeaturesBehaviour BEHAVIOUR
@@ -1326,7 +1342,7 @@ REGISTERED AS { smi2AttributeID71 };
 
 
 miscellaneousError PARAMETER
-	CONTEXT SPECIFIC ERROR;
+	CONTEXT SPECIFIC-ERROR;
 	WITH SYNTAX Parameter-ASN1Module.MiscellaneousError;
 	BEHAVIOUR
 		miscellaneousErrorBehaviour BEHAVIOUR
@@ -1341,13 +1357,20 @@ attributeValueChange NOTIFICATION
 		attributeValueChangeBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.AttributeValueChangeInfo
 		AND ATTRIBUTE IDS
-			sourceIndicator sourceIndicator,
-			attributeIdentifierList attributeIdentifierList,
-			attributeValueChangeDefinition attributeValueChangeDefinition,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			sourceIndicator
+				sourceIndicator,
+			attributeIdentifierList
+				attributeIdentifierList,
+			attributeValueChangeDefinition
+				attributeValueChangeDefinition,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification1 };
 
 
@@ -1363,20 +1386,34 @@ communicationsAlarm NOTIFICATION
 		communicationsAlarmBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.AlarmInfo
 		AND ATTRIBUTE IDS
-			probableCause probableCause,
-			specificProblems specificProblems,
-			perceivedSeverity perceivedSeverity,
-			backedUpStatus backedUpStatus,
-			backUpObject backUpObject,
-			trendIndication trendIndication,
-			thresholdInfo thresholdInfo,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			stateChangeDefinition stateChangeDefinition,
-			monitoredAttributes monitoredAttributes,
-			proposedRepairActions proposedRepairActions,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			probableCause
+				probableCause,
+			specificProblems
+				specificProblems,
+			perceivedSeverity
+				perceivedSeverity,
+			backedUpStatus
+				backedUpStatus,
+			backUpObject
+				backUpObject,
+			trendIndication
+				trendIndication,
+			thresholdInfo
+				thresholdInfo,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			stateChangeDefinition
+				stateChangeDefinition,
+			monitoredAttributes
+				monitoredAttributes,
+			proposedRepairActions
+				proposedRepairActions,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification2 };
 
 
@@ -1390,20 +1427,34 @@ environmentalAlarm NOTIFICATION
 		environmentalAlarmBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.AlarmInfo
 		AND ATTRIBUTE IDS
-			probableCause probableCause,
-			specificProblems specificProblems,
-			perceivedSeverity perceivedSeverity,
-			backedUpStatus backedUpStatus,
-			backUpObject backUpObject,
-			trendIndication trendIndication,
-			thresholdInfo thresholdInfo,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			stateChangeDefinition stateChangeDefinition,
-			monitoredAttributes monitoredAttributes,
-			proposedRepairActions proposedRepairActions,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			probableCause
+				probableCause,
+			specificProblems
+				specificProblems,
+			perceivedSeverity
+				perceivedSeverity,
+			backedUpStatus
+				backedUpStatus,
+			backUpObject
+				backUpObject,
+			trendIndication
+				trendIndication,
+			thresholdInfo
+				thresholdInfo,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			stateChangeDefinition
+				stateChangeDefinition,
+			monitoredAttributes
+				monitoredAttributes,
+			proposedRepairActions
+				proposedRepairActions,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification3 };
 
 
@@ -1417,20 +1468,34 @@ equipmentAlarm NOTIFICATION
 		equipmentAlarmBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.AlarmInfo
 		AND ATTRIBUTE IDS
-			probableCause probableCause,
-			specificProblems specificProblems,
-			perceivedSeverity perceivedSeverity,
-			backedUpStatus backedUpStatus,
-			backUpObject backUpObject,
-			trendIndication trendIndication,
-			thresholdInfo thresholdInfo,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			stateChangeDefinition stateChangeDefinition,
-			monitoredAttributes monitoredAttributes,
-			proposedRepairActions proposedRepairActions,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			probableCause
+				probableCause,
+			specificProblems
+				specificProblems,
+			perceivedSeverity
+				perceivedSeverity,
+			backedUpStatus
+				backedUpStatus,
+			backUpObject
+				backUpObject,
+			trendIndication
+				trendIndication,
+			thresholdInfo
+				thresholdInfo,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			stateChangeDefinition
+				stateChangeDefinition,
+			monitoredAttributes
+				monitoredAttributes,
+			proposedRepairActions
+				proposedRepairActions,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification4 };
 
 
@@ -1444,15 +1509,24 @@ integrityViolation NOTIFICATION
 		integrityViolationBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.SecurityAlarmInfo
 		AND ATTRIBUTE IDS
-			securityAlarmCause securityAlarmCause,
-			securityAlarmSeverity securityAlarmSeverity,
-			securityAlarmDetector securityAlarmDetector,
-			serviceUser serviceUser,
-			serviceProvider serviceProvider,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			securityAlarmCause
+				securityAlarmCause,
+			securityAlarmSeverity
+				securityAlarmSeverity,
+			securityAlarmDetector
+				securityAlarmDetector,
+			serviceUser
+				serviceUser,
+			serviceProvider
+				serviceProvider,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification5 };
 
 
@@ -1467,12 +1541,18 @@ objectCreation NOTIFICATION
 		objectCreationBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.ObjectInfo
 		AND ATTRIBUTE IDS
-			sourceIndicator sourceIndicator,
-			attributeList attributeList,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			sourceIndicator
+				sourceIndicator,
+			attributeList
+				attributeList,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification6 };
 
 
@@ -1486,12 +1566,18 @@ objectDeletion NOTIFICATION
 		objectDeletionBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.ObjectInfo
 		AND ATTRIBUTE IDS
-			sourceIndicator sourceIndicator,
-			attributeList attributeList,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			sourceIndicator
+				sourceIndicator,
+			attributeList
+				attributeList,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification7 };
 
 
@@ -1505,15 +1591,24 @@ operationalViolation NOTIFICATION
 		operationalViolationBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.SecurityAlarmInfo
 		AND ATTRIBUTE IDS
-			securityAlarmCause securityAlarmCause,
-			securityAlarmSeverity securityAlarmSeverity,
-			securityAlarmDetector securityAlarmDetector,
-			serviceUser serviceUser,
-			serviceProvider serviceProvider,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			securityAlarmCause
+				securityAlarmCause,
+			securityAlarmSeverity
+				securityAlarmSeverity,
+			securityAlarmDetector
+				securityAlarmDetector,
+			serviceUser
+				serviceUser,
+			serviceProvider
+				serviceProvider,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification8 };
 
 
@@ -1528,15 +1623,24 @@ physicalViolation NOTIFICATION
 		physicalViolationBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.SecurityAlarmInfo
 		AND ATTRIBUTE IDS
-			securityAlarmCause securityAlarmCause,
-			securityAlarmSeverity securityAlarmSeverity,
-			securityAlarmDetector securityAlarmDetector,
-			serviceUser serviceUser,
-			serviceProvider serviceProvider,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			securityAlarmCause
+				securityAlarmCause,
+			securityAlarmSeverity
+				securityAlarmSeverity,
+			securityAlarmDetector
+				securityAlarmDetector,
+			serviceUser
+				serviceUser,
+			serviceProvider
+				serviceProvider,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification9 };
 
 
@@ -1551,20 +1655,34 @@ processingErrorAlarm NOTIFICATION
 		processingErrorAlarmBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.AlarmInfo
 		AND ATTRIBUTE IDS
-			probableCause probableCause,
-			specificProblems specificProblems,
-			perceivedSeverity perceivedSeverity,
-			backedUpStatus backedUpStatus,
-			backUpObject backUpObject,
-			trendIndication trendIndication,
-			thresholdInfo thresholdInfo,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			stateChangeDefinition stateChangeDefinition,
-			monitoredAttributes monitoredAttributes,
-			proposedRepairActions proposedRepairActions,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			probableCause
+				probableCause,
+			specificProblems
+				specificProblems,
+			perceivedSeverity
+				perceivedSeverity,
+			backedUpStatus
+				backedUpStatus,
+			backUpObject
+				backUpObject,
+			trendIndication
+				trendIndication,
+			thresholdInfo
+				thresholdInfo,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			stateChangeDefinition
+				stateChangeDefinition,
+			monitoredAttributes
+				monitoredAttributes,
+			proposedRepairActions
+				proposedRepairActions,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification10 };
 
 
@@ -1578,20 +1696,34 @@ qualityofServiceAlarm NOTIFICATION
 		qualityofServiceAlarmBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.AlarmInfo
 		AND ATTRIBUTE IDS
-			probableCause probableCause,
-			specificProblems specificProblems,
-			perceivedSeverity perceivedSeverity,
-			backedUpStatus backedUpStatus,
-			backUpObject backUpObject,
-			trendIndication trendIndication,
-			thresholdInfo thresholdInfo,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			stateChangeDefinition stateChangeDefinition,
-			monitoredAttributes monitoredAttributes,
-			proposedRepairActions proposedRepairActions,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			probableCause
+				probableCause,
+			specificProblems
+				specificProblems,
+			perceivedSeverity
+				perceivedSeverity,
+			backedUpStatus
+				backedUpStatus,
+			backUpObject
+				backUpObject,
+			trendIndication
+				trendIndication,
+			thresholdInfo
+				thresholdInfo,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			stateChangeDefinition
+				stateChangeDefinition,
+			monitoredAttributes
+				monitoredAttributes,
+			proposedRepairActions
+				proposedRepairActions,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification11 };
 
 
@@ -1605,13 +1737,20 @@ relationshipChange NOTIFICATION
 		relationshipChangeBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.RelationshipChangeInfo
 		AND ATTRIBUTE IDS
-			sourceIndicator sourceIndicator,
-			attributeIdentifierList attributeIdentifierList,
-			relationshipChangeDefinition relationshipChangeDefinition,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			sourceIndicator
+				sourceIndicator,
+			attributeIdentifierList
+				attributeIdentifierList,
+			relationshipChangeDefinition
+				relationshipChangeDefinition,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification12 };
 
 
@@ -1627,15 +1766,24 @@ securityServiceOrMechanismViolation NOTIFICATION
 		securityServiceOrMechanismViolationBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.SecurityAlarmInfo
 		AND ATTRIBUTE IDS
-			securityAlarmCause securityAlarmCause,
-			securityAlarmSeverity securityAlarmSeverity,
-			securityAlarmDetector securityAlarmDetector,
-			serviceUser serviceUser,
-			serviceProvider serviceProvider,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			securityAlarmCause
+				securityAlarmCause,
+			securityAlarmSeverity
+				securityAlarmSeverity,
+			securityAlarmDetector
+				securityAlarmDetector,
+			serviceUser
+				serviceUser,
+			serviceProvider
+				serviceProvider,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification13 };
 
 
@@ -1650,13 +1798,20 @@ stateChange NOTIFICATION
 		stateChangeBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.StateChangeInfo
 		AND ATTRIBUTE IDS
-			sourceIndicator sourceIndicator,
-			attributeIdentifierList attributeIdentifierList,
-			stateChangeDefinition stateChangeDefinition,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			sourceIndicator
+				sourceIndicator,
+			attributeIdentifierList
+				attributeIdentifierList,
+			stateChangeDefinition
+				stateChangeDefinition,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification14 };
 
 
@@ -1672,25 +1827,348 @@ timeDomainViolation NOTIFICATION
 		timeDomainViolationBehaviour;
 	WITH INFORMATION SYNTAX Notification-ASN1Module.SecurityAlarmInfo
 		AND ATTRIBUTE IDS
-			securityAlarmCause securityAlarmCause,
-			securityAlarmSeverity securityAlarmSeverity,
-			securityAlarmDetector securityAlarmDetector,
-			serviceUser serviceUser,
-			serviceProvider serviceProvider,
-			notificationIdentifier notificationIdentifier,
-			correlatedNotifications correlatedNotifications,
-			additionalText additionalText,
-			additionalInformation additionalInformation;
+			securityAlarmCause
+				securityAlarmCause,
+			securityAlarmSeverity
+				securityAlarmSeverity,
+			securityAlarmDetector
+				securityAlarmDetector,
+			serviceUser
+				serviceUser,
+			serviceProvider
+				serviceProvider,
+			notificationIdentifier
+				notificationIdentifier,
+			correlatedNotifications
+				correlatedNotifications,
+			additionalText
+				additionalText,
+			additionalInformation
+				additionalInformation;
 REGISTERED AS { smi2Notification15 };
 
 
 timeDomainViolationBehaviour BEHAVIOUR
 	DEFINED AS
 		"This notification is used to report that an event has occurred at an unexpected or prohibited time.";
+--A.1  Counter
+--This  Annex defines a number of counter types which are useful  for
+--importing in other standards.
+--A.1.1Corrupted PDUs received counter
+--The attribute type corruptedPDUsReceivedCounter specifies the total
+--number of corrupted PDUs received.
+
+
+corruptedPDUsReceivedCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 72 };
+--A.1.2Incoming connection reject error counter
+--The  attribute type IncomingConnectionRejectErrorCounter  specifies
+--the  total  number  of  incoming  connection  requests  which  were
+--received by the managed object but rejected due to protocol errors.
+
+
+incomingConnectionRejectErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 73 };
+--A.1.3Incoming connection requests counter
+--The  attribute type incomingConnectionRequestsCounter specifies the
+--total number of incoming connection requests.
+
+
+incomingConnectionRequestsCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 74 };
+--A.1.4Incoming disconnect counter
+--The  attribute type incomingDisconnectCounter specifies  the  total
+--number  of  incoming disconnect requests received  by  the  managed
+--object.
+
+
+incomingDisconnectCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 75 };
+--A.1.5Incoming disconnect error counter
+--The  attribute  type incomingDisconnectErrorCounter  specifies  the
+--total  number  of  incoming  disconnect requests  received  by  the
+--managed object due to protocol errors.
+
+
+incomingDisconnectErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 76 };
+--A.1.6Incoming protocol error counter
+--The attribute type incomingProtocolErrorCounter specifies the total
+--number  of  error report or reset PDUs which were received  by  the
+--managed object due to protocol errors.
+
+
+incomingProtocolErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 77 };
+--A.1.7Octets received counter
+--The attribute type octetsReceivedCounter specifies the total number
+--of user data octets received by the managed object.
+
+
+octetsReceivedCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 78 };
+--A.1.8Octets retransmitted error counter
+--The  attribute  type octetsRetransmittedErrorCounter specifies  the
+--total number of octets retransmitted by the managed object.
+
+
+octetsRetransmittedErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 79 };
+--A.1.9Octets sent counter
+--The attribute type octetsSentCounter specifies the total number  of
+--user data octets sent by the managed object.
+
+
+octetsSentCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 80 };
+--A.1.10  Outgoing connection reject error counter
+--The  attribute type outgoingConnectionRejectErrorCounter  specifies
+--the total number of outgoing connection requests which were sent by
+--the managed object but rejected due to protocol errors.
+
+
+outgoingConnectionRejectErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 81 };
+--A.1.11  Outgoing connection requests counter
+--The  attribute type outgoingConnectionRequestsCounter specifies the
+--total number of outgoing connection requests.
+
+
+outgoingConnectionRequestsCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 82 };
+--A.1.12  Outgoing disconnect counter
+--The  attribute type outgoingDisconnectCounter specifies  the  total
+--number  of  outgoing disconnect requests processed by  the  managed
+--object.
+
+
+outgoingDisconnectCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 83 };
+--A.1.13  Outgoing disconnect error counter
+--The  attribute  type outgoingDisconnectErrorCounter  specifies  the
+--total  number of outgoing disconnect requests sent by  the  managed
+--object due to protocol errors.
+
+
+outgoingDisconnectErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 84 };
+--A.1.14  Outgoing protocol error counter
+--The attribute type outgoingProtocolErrorCounter specifies the total
+--number of error report or reset PDUs which were sent by the managed
+--object due to protocol errors.
+
+
+outgoingProtocolErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 85 };
+--A.1.15  PDUs received counter
+--The  attribute type pdusReceivedCounter specifies the total  number
+--of PDUs received by the managed object.
+
+
+pdusReceivedCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 86 };
+--A.1.16  PDUs retransmitted error counter
+--The  attribute  type  pdusRetransmittedErrorCounter  specifies  the
+--total number of PDUs retransmitted by the managed object.
+
+
+pdusRetransmittedErrorCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 87 };
+--A.1.17  PDUs sent counter
+--The  attribute type specifies pdusSentCounter the total  number  of
+--PDUs sent by the managed object.
+
+
+pdusSentCounter ATTRIBUTE
+	DERIVED FROM
+		counter;
+REGISTERED AS { smi2AttributeID 88 };
+--A.2  Counter-threshold
+--A.2.1Corrupted PDUs received threshold
+--The  attribute  type  corruptedPDUsReceivedThreshold  specifies   a
+--counter-threshold which is associated with the PDUs Corrupted  PDUs
+--Received counter attribute type.
+
+
+corruptedPDUsReceivedThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 89 };
+--A.2.2Incoming connection reject error threshold
+--The attribute type incomingConnectionRejectErrorThreshold specifies
+--a   counter-threshold  which  is  associated  with   the   Incoming
+--ConnectionRejectError counter attribute type.
+
+
+incomingConnectionRejectErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 90 };
+--A.2.3Incoming connection requests threshold
+--The attribute type incomingConnectionRequestsThreshold specifies  a
+--counter-threshold which is associated with the Incoming  Connection
+--Requests counter attribute type.
+
+
+incomingConnectionRequestsThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 91 };
+--A.2.4Incoming disconnect error threshold
+--The  attribute  type incomingDisconnectErrorThreshold  specifies  a
+--counter-threshold which is associated with the Incoming  Disconnect
+--Error counter attribute type.
+
+
+incomingDisconnectErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 92 };
+--A.2.5Incoming protocol error threshold
+--The  attribute  type  incomingProtocolErrorThreshold  specifies   a
+--counter-threshold  which is associated with the  Incoming  Protocol
+--Error counter attribute type.
+
+
+incomingProtocolErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 93 };
+--A.2.6Octets received threshold
+--The  attribute  type octetsReceivedThreshold specifies  a  counter-
+--threshold  which  is  associated with the Octets  Received  counter
+--attribute type.
+
+
+octetsReceivedThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 94 };
+--A.2.7Octets retransmitted threshold
+--The attribute type octetsRetransmittedThreshold specifies a counter
+--threshold  which  can be associated with the octects  retransmitted
+--counter attribute type.
+
+
+octetsRetransmittedThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 95 };
+--A.2.8Octets sent threshold
+--The   attribute  type  octetsSentThreshold  specifies  a   counter-
+--threshold  which  is  associated  with  the  Octets  Sent   counter
+--attribute type.
+
+
+octetsSentThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 96 };
+--A.2.9Outgoing connection reject error threshold
+--The attribute type outgoingConnectionRejectErrorThreshold specifies
+--a   counter-threshold  which  is  associated  with   the   Outgoing
+--Connection Reject Error counter attribute type.
+
+
+outgoingConnectionRejectErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 97 };
+--A.2.10  Outgoing connection requests threshold
+--The attribute type outgoingConnectionRequestsThreshold specifies  a
+--counter-threshold which is associated with the Outgoing  Connection
+--Requests counter attribute type.
+
+
+outgoingConnectionRequestsThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 98 };
+--A.2.11  Outgoing disconnect error threshold
+--The  attribute  type outgoingDisconnectErrorThreshold  specifies  a
+--counter-threshold which is associated with the Outgoing  Disconnect
+--Error counter attribute type.
+
+
+outgoingDisconnectErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 99 };
+--A.2.12  Outgoing protocol error threshold
+--The  attribute  type  outgoingProtocolErrorThreshold  specifies   a
+--counter-threshold  which is associated with the  Outgoing  Protocol
+--Error counter attribute type.
+
+
+outgoingProtocolErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 100 };
+--A.2.13  PDUs received threshold
+--The  attribute  type  pdusReceivedThreshold  specifies  a  counter-
+--threshold  which  is  associated with  the  PDUs  Received  counter
+--attribute type.
+
+
+pdusReceivedThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 101 };
+--A.2.14  PDUs retransmitted error threshold
+--The  attribute  type  pdusRetransmittedErrorThreshold  specifies  a
+--counter-threshold  which is associated with the PDUs  Retransmitted
+--Error counter attribute type.
+
+
+pdusRetransmittedErrorThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 102 };
+--A.2.15  PDUs sent threshold
+--The  attribute type pdusSentThreshold specifies a counter-threshold
+--which is associated with the PDUs Sent counter attribute type.
+
+
+pdusSentThreshold ATTRIBUTE
+	DERIVED FROM
+		counter-Threshold;
+REGISTERED AS { smi2AttributeID 103 };
 
 --< GDMO.ChangeLog
 --  =============================================================================
--- 
+--  
 --  $Log$
 --  =============================================================================
 --  >--
