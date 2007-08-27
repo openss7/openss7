@@ -1,0 +1,48 @@
+
+--10  Supporting ASN.1 
+SDH {itu-t(0) recommendation(0) g(7) sdhm(774) informationModel(0) asn1Module(2)
+sdh(0)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+IMPORTS
+NameType -- Recommendation M.3100
+FROM ASN1DefinedTypesModule {itu-t(0) recommendation(0) m(13) gnm(3100)
+informationModel(0) asn1Modules(2) asn1DefinedTypeModule(0)}
+;
+g774 OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) g(7) sdhm(774)
+informationModel(0)}
+g774ObjectClass OBJECT IDENTIFIER ::= {g774 managedObjectClass(3)}
+g774Attribute OBJECT IDENTIFIER ::= {g774 attribute(7)}
+g774NameBinding OBJECT IDENTIFIER ::= {g774 nameBinding(6)}
+Boolean ::= BOOLEAN
+C2SignalLabel ::= INTEGER (0..255)
+defaultNull Null ::= NULL
+Null ::= NULL
+Integer ::= INTEGER
+OpticalReach ::= ENUMERATED {
+intraOffice(0),
+shortHaul(1),
+longHaul(2)
+}
+OpticalWavelength ::= ENUMERATED {
+wl1310(0),
+wl1550(1)
+}
+PathTrace ::= CHOICE {
+null NULL,
+pathtrace [1] GraphicString
+}
+-- Reffering to PointerSinkType. The ENUMERATED value of invalidPointer(2)
+-- should be used when a LOP condition exists or if the pointer value is unknown.
+PointerSinkType ::= ENUMERATED {
+normalPointer(0),
+concatenationIndication(1),
+invalidPointer(2)
+}
+PointerSourceType ::= ENUMERATED {
+normalPointer(0),
+concatenationIndication(1)
+}
+TrailTraceReceiveSend ::= GraphicString
+V5SignalLabel ::= INTEGER (0..7)
+END
