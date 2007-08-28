@@ -217,8 +217,7 @@ sub error {
 	unless ($::error) {
 		# $::error = $_[0];
 		$::errob = ref $self; }
-	undef $self;
-	return undef;
+	return 0;
 }
 
 # -------------------------------------
@@ -229,26 +228,94 @@ use strict;
 sub generate {
 	my $self = shift;
 	my $sub = shift;
+	#print STDERR "//generating ".ref($self)."(".$sub.")";
+	#print STDERR $self;
 	return $self->$sub(@_);
 }
 
-sub general {
+sub call {
 	my $self = shift;
 	if ($::trace) { printf "--!!".ref($self)."!!--"; }
-	my $s; foreach $s (@{$self->{children}}) {
-		$s->generate(@_);
-	}
+	#print STDERR "// calling ".ref($self)."(".$_[0].")";
+	#print STDERR $self;
+	#my $s; foreach $s (@{$self->{children}}) {
+	#	$s->generate(@_);
+	#}
 }
 
 sub xref {
 	my $self = shift;
-	return;
+	#print STDERR "// xref'ing ".ref($self)."(xref).";
+	#print STDERR $self;
+	$self->call('xref',@_);
 }
-
 sub gdmo {
 	my $self = shift;
-	return $self->general('gdmo',@_);
+	#print STDERR "// gdmo'ing ".ref($self)."(gdmo).";
+	$self->call('gdmo',@_);
 }
+sub head {
+	my $self = shift; return
+	#print STDERR "// head'ing ".ref($self)."(head).";
+	$self->call('head',@_);
+}
+sub code {
+	my $self = shift; return
+	#print STDERR "// code'ing ".ref($self)."(code).";
+	$self->call('code',@_);
+}
+
+sub labelxform {
+	my $self = shift;
+	my $prefix = shift;
+	my $label = shift;
+	my $suffix = shift;
+	$label=~s/-/_/g;
+	$label=~s/\./_/g;
+	$label=~s/\//_/g;
+	$label=~s/$suffix$//;
+	$label.=$suffix;
+	$label=$prefix.$label;
+	return $label;
+}
+
+sub decclass {
+	my $self = shift;
+	my $parent = shift;
+	my $label = $self->labelxform('',$self->{label},$parent);
+	printf "\n$::indent"."class $label";
+}
+
+sub begclass {
+	my $self = shift;
+	my $parent = shift;
+	$self->decclass($parent);
+	printf " : public $parent {";
+	$::indent.="\t";
+}
+
+sub endclass {
+	my $self = shift;
+	my $parent = shift;
+	my $label = $self->labelxform('',$self->{label},$parent);
+	$::indent=~s/^.//s;
+	printf "\n$::indent}";
+	if ($::indent=~/^$/) {
+		printf ";\t/* class $label */";
+	} else {
+		printf " $label;";
+	}
+	print '';
+}
+
+sub genclass {
+	my $self = shift;
+	my $parent = shift;
+	$self->begclass($parent);
+	$self->call('head',@_);
+	$self->endclass($parent);
+}
+
 
 # -------------------------------------
 package ParserGenerator;
@@ -256,7 +323,6 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(Parser Generator);
 # -------------------------------------
-
 
 # -------------------------------------
 package CommaList;
@@ -293,9 +359,9 @@ sub read {
 	return $self->readitem($type,@_);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my ($x); foreach $x (@{$self->{items}}) { $x->xref(@_); }
+	my ($x); foreach $x (@{$self->{items}}) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -348,9 +414,9 @@ sub read {
 	return $self->readitem($type,@_);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my ($x); foreach $x (@{$self->{items}}) { $x->xref(@_); }
+	my ($x); foreach $x (@{$self->{items}}) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -397,9 +463,9 @@ sub read {
 	return $self->readinterior($type,@_);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{interior}->xref(@_);
+	$self->{interior}->generate(@_);
 }
 
 sub gdmo {
@@ -452,9 +518,9 @@ sub read {
 	return $self->readinterior($type,@_);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{interior}->xref(@_);
+	$self->{interior}->generate(@_);
 }
 
 sub gdmo {
@@ -507,9 +573,9 @@ sub read {
 	return $self->readinterior($type,@_);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{interior}->xref(@_);
+	$self->{interior}->generate(@_);
 }
 
 sub gdmo {
@@ -563,11 +629,6 @@ sub read {
 	return $self->readtoken($type,@_);
 }
 
-sub xref {
-	my $self = shift;
-	return;
-}
-
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -609,11 +670,6 @@ sub read {
 	my $type = ref $self;
 	$type=~s/Token$//;
 	return $self->readtoken($type,@_);
-}
-
-sub xref {
-	my $self = shift;
-	return;
 }
 
 sub gdmo {
@@ -672,9 +728,70 @@ sub read {
 	return $self;
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{modules})) { $x->xref($self); }
+	my $x; if (($x = $self->{modules})) { $x->generate(@_); }
+}
+
+sub head {
+	my $self = shift;
+	my @names = (
+		'objects',
+		'objects',
+		'packages',
+		'parameters',
+		'bindings',
+		'attributes',
+		'groups',
+		'behaviours',
+		'actions',
+		'notifications',
+		'constraints',
+		'subordinates'
+	);
+	my @headers = (
+		'Managed Object Class Factory',
+		'Managed Object Class',
+		'Package',
+		'Parameter',
+		'Name Binding',
+		'Attribute',
+		'Attribute Group',
+		'Behaviour',
+		'Action',
+		'Notification',
+		'Constraint Rule',
+		'Subordination Rule'
+	);
+	my @suffixes = (
+		'ManagedObjectFactory',
+		'ManagedObject',
+		'Package',
+		'Parameter',
+		'NameBinding',
+		'Attribute',
+		'AttributeGroup',
+		'Behaviour',
+		'Action',
+		'Notification',
+		'ConstraintRule',
+		'SubordinationRule'
+	);
+	my ($x,$d,$i,$e);
+	for ($i=0;$i<scalar @names;$i++) {
+		# Generate declarations for all classes
+		printf "\n// $headers[$i] declarations\n";
+		foreach $x (sort keys %{$::root->{$names[$i]}}) {
+			if (($d = $::root->{$names[$i]}->{$x}->{defn})) {
+				my $label = $self->labelxform('',$d->{label},$suffixes[$i]);
+				printf "\nclass $label;";
+				$e++;
+			}
+		}
+		if ($e) { $e = 0; } else { printf "\n// No items\n"; }
+		printf "\n";
+	}
+	$self->call('head',@_);
 }
 
 sub gdmo {
@@ -1291,19 +1408,23 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 
-	push @{$::root->{modules}}, $self;
-
 	my $x;
-	if (($x = $self->{preamble})) { $x->xref(@_,$self); }
-	if (($x = $self->{module})) { $x->xref(@_,$self); }
-	if (($x = $self->{templates})) { $x->xref(@_,$self); }
-	if (($x = $self->{asn1modules})) { $x->xref(@_,$self); }
-	if (($x = $self->{end})) { $x->xref(@_,$self); }
-	if (($x = $self->{postamble})) { $x->xref(@_,$self); }
+	if (($x = $self->{preamble})) { $x->generate(@_,$self); }
+	if (($x = $self->{module})) { $x->generate(@_,$self); }
+	if (($x = $self->{templates})) { $x->generate(@_,$self); }
+	if (($x = $self->{asn1modules})) { $x->generate(@_,$self); }
+	if (($x = $self->{end})) { $x->generate(@_,$self); }
+	if (($x = $self->{postamble})) { $x->generate(@_,$self); }
 	return;
+}
+
+sub xref {
+	my $self = shift;
+	push @{$::root->{modules}}, $self;
+	return $self->call('xref',@_);
 }
 
 sub gdmo {
@@ -1351,11 +1472,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{documentstring})) { $x->xref(@_); }
-	if (($x = $self->{documentoid})) { $x->xref(@_); }
+	if (($x = $self->{documentstring})) { $x->generate(@_); }
+	if (($x = $self->{documentoid})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -1411,9 +1532,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{item}->xref(@_);
+	$self->{item}->generate(@_);
 }
 
 sub gdmo {
@@ -1450,9 +1571,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{item}->xref(@_);
+	$self->{item}->generate(@_);
 }
 
 sub gdmo {
@@ -1500,20 +1621,20 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
 
-	if (($x = $self->{directives})) { $x->xref(@_,$self); }
-	$self->{name}->xref(@_,$self);
-	$self->{oid}->xref(@_,$self);
-	# $self->{definitions}->xref(@_,$self);
-	if (($x = $self->{tagdefault})) { $x->xref(@_,$self); }
-	if (($x = $self->{extdefault})) { $x->xref(@_,$self); }
-	# $self->{assign}->xref(@_,$self);
-	# $self->{begin}->xref(@_,$self);
-	if (($x = $self->{body})) { $x->xref(@_,$self); }
-	# $self->{end}->xref(@_,$self);
+	if (($x = $self->{directives})) { $x->generate(@_,$self); }
+	$self->{name}->generate(@_,$self);
+	$self->{oid}->generate(@_,$self);
+	# $self->{definitions}->generate(@_,$self);
+	if (($x = $self->{tagdefault})) { $x->generate(@_,$self); }
+	if (($x = $self->{extdefault})) { $x->generate(@_,$self); }
+	# $self->{assign}->generate(@_,$self);
+	# $self->{begin}->generate(@_,$self);
+	if (($x = $self->{body})) { $x->generate(@_,$self); }
+	# $self->{end}->generate(@_,$self);
 	return;
 }
 
@@ -1680,12 +1801,12 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{exports})) { $x->xref(@_); }
-	if (($x = $self->{imports})) { $x->xref(@_); }
-	if (($x = $self->{assignmentlist})) { $x->xref(@_); }
+	if (($x = $self->{exports})) { $x->generate(@_); }
+	if (($x = $self->{imports})) { $x->generate(@_); }
+	if (($x = $self->{assignmentlist})) { $x->generate(@_); }
 	return;
 }
 
@@ -1726,9 +1847,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{exports}->xref(@_);
+	$self->{exports}->generate(@_);
 	return;
 }
 
@@ -1797,10 +1918,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{imports})) { $x->xref(@_); }
+	if (($x = $self->{imports})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -1845,6 +1966,13 @@ sub read {
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
+}
+
+sub call {
+	my $self = shift;
+	$self->{module}->generate(@_);
+	$self->{symbols}->generate(@_);
+	return;
 }
 
 sub xref {
@@ -1899,6 +2027,13 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	$self->{module}->generate(@_);
+	$self->{object}->generate(@_);
+	return;
+}
+
 sub xref {
 	my $self = shift;
 	$self->{module}->xref(@_);
@@ -1947,9 +2082,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{assignment}->xref(@_);
+	$self->{assignment}->generate(@_);
 }
 
 sub gdmo {
@@ -1979,11 +2114,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{reference}->xref(@_);
-	# $self->{assign}->xref(@_);
-	$self->{type}->xref(@_);
+	$self->{reference}->generate(@_);
+	# $self->{assign}->generate(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -2015,12 +2150,12 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{reference}->xref(@_);
-	$self->{type}->xref(@_);
-	# $self->{assign}->xref();
-	$self->{value}->xref(@_);
+	$self->{reference}->generate(@_);
+	$self->{type}->generate(@_);
+	# $self->{assign}->generate();
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2054,9 +2189,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2103,9 +2238,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2135,9 +2270,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2165,10 +2300,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{value}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2196,10 +2331,6 @@ sub read {
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
-}
-
-sub xref {
-	my $self = shift;
 }
 
 sub gdmo {
@@ -2230,11 +2361,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{reference}->xref(@_);
-	# $self->{assign}->xref(@_);
-	$self->{valueset}->xref(@_);
+	$self->{reference}->generate(@_);
+	# $self->{assign}->generate(@_);
+	$self->{valueset}->generate(@_);
 }
 
 sub gdmo {
@@ -2277,9 +2408,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -2327,9 +2458,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -2398,9 +2529,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{list})) { $x->xref(@_); }
+	my $x; if (($x = $self->{list})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -2453,10 +2584,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{number}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{number}->generate(@_);
 }
 
 sub gdmo {
@@ -2553,9 +2684,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2588,9 +2719,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{enumerations}->xref(@_);
+	$self->{enumerations}->generate(@_);
 }
 
 sub gdmo {
@@ -2640,14 +2771,14 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	$self->{root}->xref(@_);
+	$self->{root}->generate(@_);
 	if (($x = $self->{exceptionspec})) {
-		$x->xref(@_);
+		$x->generate(@_);
 		if (($x = $self->{additional})) {
-			$x->xref(@_);
+			$x->generate(@_);
 		}
 	}
 }
@@ -2692,9 +2823,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{enumeration}->xref(@_);
+	$self->{enumeration}->generate(@_);
 }
 
 sub gdmo {
@@ -2721,9 +2852,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{enumeration}->xref(@_);
+	$self->{enumeration}->generate(@_);
 }
 
 sub gdmo {
@@ -2760,9 +2891,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{item}->xref(@_);
+	$self->{item}->generate(@_);
 }
 
 sub gdmo {
@@ -2790,9 +2921,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2834,9 +2965,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2868,9 +2999,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -2957,9 +3088,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -3012,10 +3143,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{number}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{number}->generate(@_);
 }
 
 sub gdmo {
@@ -3053,9 +3184,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -3156,9 +3287,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -3204,9 +3335,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -3259,9 +3390,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{list})) { $x->xref(@_); }
+	my $x; if (($x = $self->{list})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3302,11 +3433,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{exception})) { $x->xref(@_); }
-	if (($x = $self->{component})) { $x->xref(@_); }
+	if (($x = $self->{exception})) { $x->generate(@_); }
+	if (($x = $self->{component})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3337,11 +3468,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	$self->{exception}->xref(@_);
-	if (($x = $self->{extension})) { $x->xref(@_); }
+	$self->{exception}->generate(@_);
+	if (($x = $self->{extension})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3372,10 +3503,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{exception})) { $x->xref(@_); }
+	if (($x = $self->{exception})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3452,15 +3583,15 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	$self->{root}->xref(@_);
-	if (($x = $self->{exception})) { $x->xref(@_); }
-	if (($x = $self->{addition})) { $x->xref(@_); }
-	# if (($x = $self->{endmarker})) { $x->xref(@_); }
-	if (($x = $self->{list})) { $x->xref(@_); }
-	if (($x = $self->{extension})) { $x->xref(@_); }
+	$self->{root}->generate(@_);
+	if (($x = $self->{exception})) { $x->generate(@_); }
+	if (($x = $self->{addition})) { $x->generate(@_); }
+	# if (($x = $self->{endmarker})) { $x->generate(@_); }
+	if (($x = $self->{list})) { $x->generate(@_); }
+	if (($x = $self->{extension})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3502,9 +3633,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -3533,9 +3664,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -3574,9 +3705,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{addition}->xref(@_);
+	$self->{addition}->generate(@_);
 }
 
 sub gdmo {
@@ -3608,11 +3739,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{version})) { $x->xref(@_); }
-	$self->{list}->xref(@_);
+	if (($x = $self->{version})) { $x->generate(@_); }
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -3649,9 +3780,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{number}->xref(@_);
+	$self->{number}->generate(@_);
 }
 
 sub gdmo {
@@ -3701,12 +3832,12 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{namedtype})) { $x->xref(@_); }
-	if (($x = $self->{value})) { $x->xref(@_); }
-	if (($x = $self->{type})) { $x->xref(@_); }
+	if (($x = $self->{namedtype})) { $x->generate(@_); }
+	if (($x = $self->{value})) { $x->generate(@_); }
+	if (($x = $self->{type})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3777,9 +3908,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -3821,9 +3952,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -3866,9 +3997,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{list})) { $x->xref(@_); }
+	my $x; if (($x = $self->{list})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -3916,9 +4047,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -3962,9 +4093,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{alternatives}->xref(@_);
+	$self->{alternatives}->generate(@_);
 }
 
 sub gdmo {
@@ -4008,12 +4139,12 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	$self->{exception}->xref(@_);
-	if (($x = $self->{addition})) { $x->xref(@_); }
-	if (($x = $self->{marker})) { $x->xref(@_); }
+	$self->{exception}->generate(@_);
+	if (($x = $self->{addition})) { $x->generate(@_); }
+	if (($x = $self->{marker})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -4048,9 +4179,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -4079,9 +4210,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -4124,9 +4255,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{alternative}->xref(@_);
+	$self->{alternative}->generate(@_);
 }
 
 sub gdmo {
@@ -4158,10 +4289,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{version})) { $x->xref(@_); }
-	$self->{list}->xref(@_);
+	my $x; if (($x = $self->{version})) { $x->generate(@_); }
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -4208,10 +4339,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{value}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -4244,10 +4375,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{type}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -4285,10 +4416,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{tag}->xref(@_);
-	$self->{type}->xref(@_);
+	$self->{tag}->generate(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -4332,10 +4463,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{class})) { $x->xref(@_); }
-	$self->{number}->xref(@_);
+	my $x; if (($x = $self->{class})) { $x->generate(@_); }
+	$self->{number}->generate(@_);
 }
 
 sub gdmo {
@@ -4379,9 +4510,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{class}->xref(@_);
+	$self->{class}->generate(@_);
 }
 
 sub gdmo {
@@ -4447,9 +4578,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -4512,9 +4643,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{component}->xref(@_);
+	$self->{component}->generate(@_);
 }
 
 sub gdmo {
@@ -4541,9 +4672,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
+	$self->{identifier}->generate(@_);
 }
 
 sub gdmo {
@@ -4573,9 +4704,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{number}->xref(@_);
+	$self->{number}->generate(@_);
 }
 
 sub gdmo {
@@ -4607,10 +4738,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{number}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{number}->generate(@_);
 }
 
 sub gdmo {
@@ -4679,9 +4810,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{component}->xref(@_);
+	$self->{component}->generate(@_);
 }
 
 sub gdmo {
@@ -4720,9 +4851,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -4761,9 +4892,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -4793,9 +4924,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -4825,9 +4956,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -4868,9 +4999,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -4993,9 +5124,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -5045,9 +5176,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -5092,12 +5223,12 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{group}->xref(@_);
-	$self->{plane}->xref(@_);
-	$self->{row}->xref(@_);
-	$self->{cell}->xref(@_);
+	$self->{group}->generate(@_);
+	$self->{plane}->generate(@_);
+	$self->{row}->generate(@_);
+	$self->{cell}->generate(@_);
 }
 
 sub gdmo {
@@ -5146,10 +5277,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{column}->xref(@_);
-	$self->{row}->xref(@_);
+	$self->{column}->generate(@_);
+	$self->{row}->generate(@_);
 }
 
 sub gdmo {
@@ -5223,9 +5354,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -5256,9 +5387,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -5314,9 +5445,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -5344,10 +5475,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{identifier}->xref(@_);
-	$self->{type}->xref(@_);
+	$self->{identifier}->generate(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -5472,9 +5603,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -5505,9 +5636,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -5603,7 +5734,7 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 }
 
@@ -5638,11 +5769,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{documentId}->xref(@_);
+	$self->{documentId}->generate(@_);
 	my $x; foreach $x (@{$self->{documentAliases}}) {
-		$x->xref(@_);
+		$x->generate(@_);
 	}
 }
 
@@ -5682,9 +5813,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{specifier}->xref(@_);
+	$self->{specifier}->generate(@_);
 }
 
 sub gdmo {
@@ -5716,11 +5847,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{documentstring})) { $x->xref(@_); }
-	if (($x = $self->{documentoid})) { $x->xref(@_); }
+	if (($x = $self->{documentstring})) { $x->generate(@_); }
+	if (($x = $self->{documentoid})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -5752,11 +5883,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{documentstring})) { $x->xref(@_); }
-	if (($x = $self->{documentoid})) { $x->xref(@_); }
+	if (($x = $self->{documentstring})) { $x->generate(@_); }
+	if (($x = $self->{documentoid})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -5787,9 +5918,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{version})) { $x->xref(@_); }
+	my $x; if (($x = $self->{version})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -5908,9 +6039,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{version}->xref(@_);
+	$self->{version}->generate(@_);
 }
 
 sub gdmo {
@@ -5990,10 +6121,10 @@ sub read {
 	return $self->readdirective($type,@_);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	foreach $x (@{$self->{directives}}) { $x->xref(@_); }
+	foreach $x (@{$self->{directives}}) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -6048,9 +6179,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{item}->xref(@_);
+	$self->{item}->generate(@_);
 }
 
 sub gdmo {
@@ -6194,9 +6325,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{template}->xref(@_);
+	$self->{template}->generate(@_);
 }
 
 sub gdmo {
@@ -6237,6 +6368,15 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x;
+	if (($x = $self->{derivedfrom})) { $x->generate(@_); }
+	if (($x = $self->{characterization})) { $x->generate(@_); }
+	if (($x = $self->{conditionalpackages})) { $x->generate(@_); }
+	if (($x = $self->{registration})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
@@ -6244,12 +6384,26 @@ sub xref {
 	$gdmo->{objects}->{$self->{label}}->{defn} = $self;
 	$::root->{objects}->{$self->{label}}->{defn} = $self;
 	$::root->{objects}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	if (($x = $self->{derivedfrom})) { $x->xref(@_); }
-	if (($x = $self->{characterization})) { $x->xref(@_); }
-	if (($x = $self->{conditionalpackages})) { $x->xref(@_); }
-	if (($x = $self->{registration})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{objects}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'ManagedObject');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('MangedObjectFactory');
+		$self->endclass('MangedObjectFactory');
+		if ($self->{derivedfrom}) {
+			$self->decclass('ManagedObject');
+		} else {
+			$self->begclass('ManagedObject');
+		}
+		$self->call('head',@_);
+		$self->endclass('ManagedObject');
+		$::root->{objects}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6299,21 +6453,37 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x;
+	if (($x = $self->{behaviour})) { $x->generate(@_); }
+	if (($x = $self->{attributes})) { $x->generate(@_); }
+	if (($x = $self->{attributegroups})) { $x->generate(@_); }
+	if (($x = $self->{actions})) { $x->generate(@_); }
+	if (($x = $self->{notifications})) { $x->generate(@_); }
+	if (($x = $self->{registration})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
-
 	$gdmo->{packages}->{$self->{label}}->{defn} = $self;
 	$::root->{packages}->{$self->{label}}->{defn} = $self;
 	$::root->{packages}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	if (($x = $self->{behaviour})) { $x->xref(@_); }
-	if (($x = $self->{attributes})) { $x->xref(@_); }
-	if (($x = $self->{attributegroups})) { $x->xref(@_); }
-	if (($x = $self->{actions})) { $x->xref(@_); }
-	if (($x = $self->{notifications})) { $x->xref(@_); }
-	if (($x = $self->{registration})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{packages}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Package');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Package');
+		$self->call('head',@_);
+		$self->endclass('Package');
+		$::root->{packages}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6366,19 +6536,35 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x;
+	$self->{context}->generate(@_);
+	$self->{syntax}->generate(@_);
+	if (($x = $self->{behaviour})) { $x->generate(@_); }
+	if (($x = $self->{registration})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
-
 	$gdmo->{parameters}->{$self->{label}}->{defn} = $self;
 	$::root->{parameters}->{$self->{label}}->{defn} = $self;
 	$::root->{parameters}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	$self->{context}->xref(@_);
-	$self->{syntax}->xref(@_);
-	if (($x = $self->{behaviour})) { $x->xref(@_); }
-	if (($x = $self->{registration})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{parameters}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Parameter');
+		$self->call('head',@_);
+		$self->endclass('Parameter');
+		$::root->{parameters}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6429,22 +6615,38 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x;
+	$self->{subordinate}->generate(@_);
+	$self->{superior}->generate(@_);
+	$self->{attribute}->generate(@_);
+	if (($x = $self->{behaviour})) { $x->generate(@_); }
+	if (($x = $self->{createit})) { $x->generate(@_); }
+	if (($x = $self->{deleteit})) { $x->generate(@_); }
+	if (($x = $self->{registration})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
-
 	$gdmo->{bindings}->{$self->{label}}->{defn} = $self;
 	$::root->{bindings}->{$self->{label}}->{defn} = $self;
 	$::root->{bindings}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	$self->{subordinate}->xref(@_);
-	$self->{superior}->xref(@_);
-	$self->{attribute}->xref(@_);
-	if (($x = $self->{behaviour})) { $x->xref(@_); }
-	if (($x = $self->{createit})) { $x->xref(@_); }
-	if (($x = $self->{deleteit})) { $x->xref(@_); }
-	if (($x = $self->{registration})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{bindings}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('NameBinding');
+		$self->call('head',@_);
+		$self->endclass('NameBinding');
+		$::root->{bindings}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6499,20 +6701,36 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x;
+	$self->{syntax}->generate(@_);
+	if (($x = $self->{matches})) { $x->generate(@_); }
+	if (($x = $self->{behaviour})) { $x->generate(@_); }
+	if (($x = $self->{parameters})) { $x->generate(@_); }
+	if (($x = $self->{registration})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
-
 	$gdmo->{attributes}->{$self->{label}}->{defn} = $self;
 	$::root->{attributes}->{$self->{label}}->{defn} = $self;
 	$::root->{attributes}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	$self->{syntax}->xref(@_);
-	if (($x = $self->{matches})) { $x->xref(@_); }
-	if (($x = $self->{behaviour})) { $x->xref(@_); }
-	if (($x = $self->{parameters})) { $x->xref(@_); }
-	if (($x = $self->{registration})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{attributes}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Attribute');
+		$self->call('head',@_);
+		$self->endclass('Attribute');
+		$::root->{attributes}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6561,19 +6779,35 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x;
+	if (($x = $self->{groupelements})) { $x->generate(@_); }
+	if (($x = $self->{fixed})) { $x->generate(@_); }
+	if (($x = $self->{description})) { $x->generate(@_); }
+	if (($x = $self->{registration})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
-
 	$gdmo->{groups}->{$self->{label}}->{defn} = $self;
 	$::root->{groups}->{$self->{label}}->{defn} = $self;
 	$::root->{groups}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	if (($x = $self->{groupelements})) { $x->xref(@_); }
-	if (($x = $self->{fixed})) { $x->xref(@_); }
-	if (($x = $self->{description})) { $x->xref(@_); }
-	if (($x = $self->{registration})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{groups}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('AttributeGroup');
+		$self->call('head',@_,$self);
+		$self->endclass('AttributeGroup');
+		$::root->{groups}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6618,6 +6852,11 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+	my $x; if (($x = $self->{definedas})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
@@ -6625,9 +6864,24 @@ sub xref {
 	$gdmo->{behaviours}->{$self->{label}}->{defn} = $self;
 	$::root->{behaviours}->{$self->{label}}->{defn} = $self;
 	$::root->{behaviours}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	if (($x = $self->{definedas})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{behaviours}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Behaviour');
+		printf "\n$::indent"."string $label;";
+	} else {
+		#$self->begclass('Behaviour');
+		#$self->call('head',@_);
+		#$self->endclass('Behaviour');
+		my $label = $self->labelxform('',$self->{label},'Behaviour');
+		printf "\n$::indent"."string $label = \"\\\n";
+		$self->call('head',@_);
+		printf "\";\n$::indent";
+		$::root->{behaviours}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6674,6 +6928,18 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	if (($x = $self->{behaviour})) { $x->generate(@_); }
+	if (($x = $self->{mode})) { $x->generate(@_); }
+	if (($x = $self->{parameters})) { $x->generate(@_); }
+	if (($x = $self->{infosyntax})) { $x->generate(@_); }
+	if (($x = $self->{replysyntax})) { $x->generate(@_); }
+	if (($x = $self->{registeredas})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
@@ -6681,14 +6947,20 @@ sub xref {
 	$gdmo->{actions}->{$self->{label}}->{defn} = $self;
 	$::root->{actions}->{$self->{label}}->{defn} = $self;
 	$::root->{actions}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	if (($x = $self->{behaviour})) { $x->xref(@_); }
-	if (($x = $self->{mode})) { $x->xref(@_); }
-	if (($x = $self->{parameters})) { $x->xref(@_); }
-	if (($x = $self->{infosyntax})) { $x->xref(@_); }
-	if (($x = $self->{replysyntax})) { $x->xref(@_); }
-	if (($x = $self->{registeredas})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{actions}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Action');
+		$self->call('head',@_);
+		$self->endclass('Action');
+		$::root->{actions}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6739,6 +7011,17 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	if (($x = $self->{behaviour})) { $x->generate(@_); }
+	if (($x = $self->{parameters})) { $x->generate(@_); }
+	if (($x = $self->{infosyntax})) { $x->generate(@_); }
+	if (($x = $self->{replysyntax})) { $x->generate(@_); }
+	if (($x = $self->{registeredas})) { $x->generate(@_); }
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
@@ -6746,13 +7029,20 @@ sub xref {
 	$gdmo->{notifications}->{$self->{label}}->{defn} = $self;
 	$::root->{notifications}->{$self->{label}}->{defn} = $self;
 	$::root->{notifications}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	if (($x = $self->{behaviour})) { $x->xref(@_); }
-	if (($x = $self->{parameters})) { $x->xref(@_); }
-	if (($x = $self->{infosyntax})) { $x->xref(@_); }
-	if (($x = $self->{replysyntax})) { $x->xref(@_); }
-	if (($x = $self->{registeredas})) { $x->xref(@_); }
+sub head {
+	my $self = shift;
+	if ($::root->{notifications}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Notification');
+		$self->call('head',@_);
+		$self->endclass('Notification');
+		$::root->{notifications}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6800,6 +7090,15 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{superiorclass}->generate(@_);
+	$self->{namessubs}->generate(@_);
+	$self->{accordingto}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
@@ -6807,11 +7106,20 @@ sub xref {
 	$gdmo->{subordinates}->{$self->{label}}->{defn} = $self;
 	$::root->{subordinates}->{$self->{label}}->{defn} = $self;
 	$::root->{subordinates}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	$self->{superiorclass}->xref(@_);
-	$self->{namessubs}->xref(@_);
-	$self->{accordingto}->xref(@_);
+sub head {
+	my $self = shift;
+	if ($::root->{subordinates}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Subordination');
+		$self->call('head',@_);
+		$self->endclass('Subordination');
+		$::root->{subordinates}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6831,48 +7139,6 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf ";"; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
-	}
-}
-
-# -------------------------------------
-package AccordingToRule;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	TEST: {
-		last TEST unless (($self->{accordingto} = AccordingToRuleToken->parse($line)));
-		last TEST unless (($self->{rule} = SubordinationRule->parse($line)));
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments} = Comments->parse($line);
-		$_[0] = $line; return $self;
-	}
-	return $self->error($line);
-}
-
-sub xref {
-	my $self = shift;
-	$self->{accordingto}->xref(@_);
-	$self->{rule}->xref(@_);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		$::indent.="\t";
-		$self->{accordingto}->gdmo();
-		{
-			$self->{rule}->gdmo();
-			$::indent=~s/^.//s;
-		}
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -6901,6 +7167,16 @@ sub read {
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{objectclass}->generate(@_);
+	$self->{isrelatedto}->generate(@_);
+	$self->{usingattribute}->generate(@_);
+	$self->{ruleset}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
@@ -6908,12 +7184,20 @@ sub xref {
 	$gdmo->{constraints}->{$self->{label}}->{defn} = $self;
 	$::root->{constraints}->{$self->{label}}->{defn} = $self;
 	$::root->{constraints}->{$self->{label}}->{modl} = $gdmo;
+	$self->call('xref',@_);
+}
 
-	my $x;
-	$self->{objectclass}->xref(@_);
-	$self->{isrelatedto}->xref(@_);
-	$self->{usingattribute}->xref(@_);
-	$self->{ruleset}->xref(@_);
+sub head {
+	my $self = shift;
+	if ($::root->{constraints}->{$self->{label}}->{intf}) {
+		my $label = $self->labelxform('',$self->{label},'Parameter');
+		printf "\n$::indent"."class $label $label;";
+	} else {
+		$self->begclass('Constraint');
+		$self->call('head',@_);
+		$self->endclass('Constraint');
+		$::root->{constraints}->{$self->{label}}->{intf} = $self;
+	}
 }
 
 sub gdmo {
@@ -6934,6 +7218,48 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf ";"; $::first = 0;
 		if (($s = $self->{comments2})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package AccordingToRule;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless (($self->{accordingto} = AccordingToRuleToken->parse($line)));
+		last TEST unless (($self->{rule} = SubordinationRule->parse($line)));
+		last TEST unless ($line=~s/^;//s);
+		$self->{comments} = Comments->parse($line);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub call {
+	my $self = shift;
+	$self->{accordingto}->generate(@_);
+	$self->{rule}->generate(@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		$::indent.="\t";
+		$self->{accordingto}->gdmo();
+		{
+			$self->{rule}->gdmo();
+			$::indent=~s/^.//s;
+		}
+		printf ';'; $::first = 0;
+		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
 
@@ -6959,10 +7285,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{class}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{class}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -7005,10 +7331,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{class}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{class}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -7050,9 +7376,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -7089,9 +7415,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{list}->xref(@_);
+	$self->{list}->generate(@_);
 }
 
 sub gdmo {
@@ -7132,10 +7458,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{reference}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{reference}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -7168,9 +7494,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attribute}->xref(@_);
+	$self->{attribute}->generate(@_);
 }
 
 sub gdmo {
@@ -7212,9 +7538,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{ruleset}->xref(@_);
+	$self->{ruleset}->generate(@_);
 }
 
 sub gdmo {
@@ -7247,9 +7573,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rule}->xref(@_);
+	$self->{rule}->generate(@_);
 }
 
 sub gdmo {
@@ -7282,9 +7608,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rules}->xref(@_);
+	$self->{rules}->generate(@_);
 }
 
 sub gdmo {
@@ -7333,11 +7659,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
-	$self->{accordingto}->xref(@_);
-	$self->{rule}->xref(@_);
+	$self->{type}->generate(@_);
+	$self->{accordingto}->generate(@_);
+	$self->{rule}->generate(@_);
 }
 
 sub gdmo {
@@ -7380,9 +7706,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rule}->xref(@_);
+	$self->{rule}->generate(@_);
 }
 
 sub gdmo {
@@ -7415,9 +7741,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rule}->xref(@_);
+	$self->{rule}->generate(@_);
 }
 
 sub gdmo {
@@ -7446,9 +7772,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rules}->xref(@_);
+	$self->{rules}->generate(@_);
 }
 
 sub gdmo {
@@ -7481,9 +7807,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rules}->xref(@_);
+	$self->{rules}->generate(@_);
 }
 
 sub gdmo {
@@ -7516,9 +7842,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rules}->xref(@_);
+	$self->{rules}->generate(@_);
 }
 
 sub gdmo {
@@ -7551,9 +7877,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rules}->xref(@_);
+	$self->{rules}->generate(@_);
 }
 
 sub gdmo {
@@ -7586,9 +7912,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{rules}->xref(@_);
+	$self->{rules}->generate(@_);
 }
 
 sub gdmo {
@@ -7624,10 +7950,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{ordinality}->xref(@_);
-	$self->{constraint}->xref(@_);
+	$self->{ordinality}->generate(@_);
+	$self->{constraint}->generate(@_);
 }
 
 sub gdmo {
@@ -7668,10 +7994,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{ordinality}->xref(@_);
-	$self->{constraint}->xref(@_);
+	$self->{ordinality}->generate(@_);
+	$self->{constraint}->generate(@_);
 }
 
 sub gdmo {
@@ -7712,10 +8038,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{ordinality}->xref(@_);
-	$self->{constraint}->xref(@_);
+	$self->{ordinality}->generate(@_);
+	$self->{constraint}->generate(@_);
 }
 
 sub gdmo {
@@ -7761,9 +8087,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{ordinality}->xref(@_);
+	$self->{ordinality}->generate(@_);
 }
 
 sub gdmo {
@@ -7798,10 +8124,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{lower}->xref(@_);
-	my $x; if (($x = $self->{upper})) { $x->xref(@_); }
+	$self->{lower}->generate(@_);
+	my $x; if (($x = $self->{upper})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -7857,10 +8183,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{term}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{term}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -7909,10 +8235,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{term}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{term}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -8019,10 +8345,6 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
-	my $self = shift;
-}
-
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -8054,11 +8376,12 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	my $x; if (($x = $self->{documentid})) { $x->xref(@_); }
-	# might want to also pass documentid
-	$self->{label}->xref(@_);
+	#print STDERR ref($self);
+	#print STDERR $_[0];
+	my $x; if (($x = $self->{documentid})) { $x->generate(@_); }
+	$self->{label}->generate(@_);
 }
 
 sub gdmo {
@@ -8087,43 +8410,49 @@ sub read {
 	my $line = $_[0];
 	my $gdmo = $_[1];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = ClassTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = ClassTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{objects}->{$l}->{refs}++;
-		$::root->{objects}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{objects}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{objects}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{objects}->{$self->{label}}->{refs}++;
+	$::root->{objects}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{objects}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{objects}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8139,43 +8468,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = PackageTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = PackageTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{packages}->{$l}->{refs}++;
-		$::root->{packages}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{packages}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{packages}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{packages}->{$self->{label}}->{refs}++;
+	$::root->{packages}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{packages}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{packages}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8191,43 +8526,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = ParameterTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = ParameterTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{parameters}->{$l}->{refs}++;
-		$::root->{parameters}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{parameters}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{parameters}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{parameters}->{$self->{label}}->{refs}++;
+	$::root->{parameters}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{parameters}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{parameters}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8243,43 +8584,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = NameBindingTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = NameBindingTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{bindings}->{$l}->{refs}++;
-		$::root->{bindings}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{bindings}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{bindings}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{bindings}->{$self->{label}}->{refs}++;
+	$::root->{bindings}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{bindings}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{bindings}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8295,43 +8642,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = AttributeTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = AttributeTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{attributes}->{$l}->{refs}++;
-		$::root->{attributes}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{attributes}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{attributes}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{attributes}->{$self->{label}}->{refs}++;
+	$::root->{attributes}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{attributes}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{attributes}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8347,43 +8700,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = AttributeGroupTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = AttributeGroupTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{groups}->{$l}->{refs}++;
-		$::root->{groups}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{groups}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{groups}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{groups}->{$self->{label}}->{refs}++;
+	$::root->{groups}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{groups}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{groups}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8399,43 +8758,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = BehaviourTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = BehaviourTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{behaviours}->{$l}->{refs}++;
-		$::root->{behaviours}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{behaviours}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{behaviours}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{behaviours}->{$self->{label}}->{refs}++;
+	$::root->{behaviours}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{behaviours}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{behaviours}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8451,43 +8816,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = ActionTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = ActionTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{actions}->{$l}->{refs}++;
-		$::root->{actions}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{actions}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{actions}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{actions}->{$self->{label}}->{refs}++;
+	$::root->{actions}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{actions}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{actions}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8503,43 +8874,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = NotificationTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = NotificationTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{notifications}->{$l}->{refs}++;
-		$::root->{notifications}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{notifications}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{notifications}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{notifications}->{$self->{label}}->{refs}++;
+	$::root->{notifications}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{notifications}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{notifications}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8555,43 +8932,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = SubordinationRuleTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = SubordinationRuleTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{subordinates}->{$l}->{refs}++;
-		$::root->{subordinates}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{subordinates}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{subordinates}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{subordinates}->{$self->{label}}->{refs}++;
+	$::root->{subordinates}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{subordinates}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{subordinates}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8607,43 +8990,49 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST
-		unless (
-			($self->{template} = ConstraintRuleTemplate->parse($line)) ||
-			($self->{reference} = Reference->parse($line))
-		);
+		if (($self->{reference} = ConstraintRuleTemplate->parse($line))) {
+			$self->{label} = $self->{reference}->{label};
+		} elsif (($self->{reference} = Reference->parse($line))) {
+			if ($self->{reference}->{documentid}) {
+				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
+			}
+			if ($self->{reference}->{label}) {
+				$self->{label} = $self->{reference}->{label}->{label};
+			}
+		} else {
+			last TEST;
+		}
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
 }
 
+sub call {
+	my $self = shift;
+
+	my $x;
+	$self->{reference}->generate(@_);
+}
+
 sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	my ($r,$d,$l);
-	if (($r = $self->{reference})) {
-		$l = $r->{label}->{label};
-		$gdmo->{constraints}->{$l}->{refs}++;
-		$::root->{constraints}->{$l}->{refs}++;
-		if (($d = $r->{documentid})) {
-			$gdmo->{constraints}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-			$::root->{constraints}->{$l}->{docs}->{$d->{documentid}}->{refs}++;
-		}
+	$gdmo->{constraints}->{$self->{label}}->{refs}++;
+	$::root->{constraints}->{$self->{label}}->{refs}++;
+	if ($self->{documentid}) {
+		$gdmo->{constraints}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
+		$::root->{constraints}->{$self->{label}}->{docs}->{$self->{documentid}}->{refs}++;
 	}
-
-	my $x;
-	if (($x = $self->{template}) ) { $x->xref(@_); }
-	if (($x = $self->{reference})) { $x->xref(@_); }
+	$self->call('xref',@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{template}) ) { $s->gdmo(); }
-		if (($s = $self->{reference})) { $s->gdmo(); }
+		$self->{reference}->gdmo();
 		if (($s = $self->{comments})) { $s->gdmo(); }
 	}
 }
@@ -8669,9 +9058,22 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{classes}->xref(@_);
+	$self->{classes}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	my ($i,$e);
+	printf ' : public ';
+	foreach $i (@{$self->{classes}->{items}}) {
+		if ($e) { printf ', '; } else { $e++; }
+		printf $self->labelxform('',$i->{reference}->{label},'ManagedOBject');
+	}
+	printf ' {';
+	$::indent.="\t";
+	return $self->call('head',@_);
 }
 
 sub gdmo {
@@ -8715,9 +9117,15 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{packages}->xref(@_);
+	$self->{packages}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	print "\n\n$::indent"."// Mandatory Packages";
+	$self->call('head',@_);
 }
 
 sub gdmo {
@@ -8761,9 +9169,16 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{conditions}->xref(@_);
+	$self->{conditions}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// Conditional Packages\n$::indent";
+	$self->call('head',@_);
+	printf "\n$::indent";
 }
 
 sub gdmo {
@@ -8808,10 +9223,20 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{package}->xref(@_);
-	$self->{condition}->xref(@_);
+	$self->{package}->generate(@_);
+	$self->{condition}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	#if (ref($self->{package}->{reference})=~/PackageTemplate/) {
+	#	$self->call('head',@_);
+	#} else {
+		my $label = $self->labelxform('',$self->{package}->{label},'Package');
+		printf "\n$::indent"."class $label *$label;";
+	#}
 }
 
 sub gdmo {
@@ -8845,9 +9270,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{delimited}->xref(@_);
+	$self->{delimited}->generate(@_);
 }
 
 sub gdmo {
@@ -8882,9 +9307,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{delimited}->xref(@_);
+	$self->{delimited}->generate(@_);
 }
 
 sub gdmo {
@@ -8929,17 +9354,24 @@ sub read {
 	return $self->error($line);
 }
 
-sub gdmo {
+sub head {
 	my $self = shift;
-	PRINT: {
-		my ($s,$col,$spc,$len);
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		printf "$self->{delimiter}";
-		$col = 0;
-		my @paras = ( split(/\n\n/s,$self->{string}) );
-		my $p; foreach $p (@paras) {
-			my @lines = ( split(/\n/s,$p) );
-			my $l; foreach $l (@lines) {
+	my ($s, $col, $spc, $len, $line, $d, $e);
+	$line = $self->{string};
+	$d = $self->{delimiter};
+	$d = '\\'.$d if ($d=~/[\$\*\?\\]/);
+	$line=~s/$d$d/$d/gs;
+	$line=~s/"/\"/gs;
+	$col = 0;
+	my @paras = ( split(/\n\n/s,$self->{string}) );
+	my $p; foreach $p (@paras) {
+		if ($e) {
+			if (!$::first) { printf "\\n\\\n"; $col = 0; $::first = 1; }
+		} else { $e++; }
+		my @lines = ( split(/\n/s,$p) );
+		my $l; foreach $l (@lines) {
+			$l=~s/^\t+//s;
+			if ($l=~/^[^ ]/) {
 				my @words = ( split(/\s+/s,$l) );
 				my $w; foreach $w (@words) {
 					if ($col == 0) { $spc = 0; } else { $spc = 1; }
@@ -8949,11 +9381,54 @@ sub gdmo {
 							if ($spc) { printf ' '; }
 							$col += $spc + $len;
 						} else {
-							printf "\n$::indent";
+							printf "\\n\\\n";
 							$col = $len;
 						}
 						printf "$w";
 					}
+				}
+			} else {
+				if (!$::first) { printf "\\n\\\n"; $::first = 1; }
+				printf "$l"; $::first = 0;
+				if (!$::first) { printf "\\n\\\n"; $::first = 1; }
+			}
+		}
+	}
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s,$col,$spc,$len,$e);
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		printf "$self->{delimiter}";
+		$col = 0;
+		my @paras = ( split(/\n\n/s,$self->{string}) );
+		my $p; foreach $p (@paras) {
+			if ($e) { printf "\n$::indent"; $col = 0; $::first = 1; } else { $e++; }
+			my @lines = ( split(/\n/s,$p) );
+			my $l; foreach $l (@lines) {
+				$l=~s/^\t+//s;
+				if ($l=~/^[^ ]/) {
+					my @words = ( split(/\s+/s,$l) );
+					my $w; foreach $w (@words) {
+						if ($col == 0) { $spc = 0; } else { $spc = 1; }
+						$len = length($w);
+						if ($len) {
+							if ($col + $spc + $len < $::colwidth) {
+								if ($spc) { printf ' '; }
+								$col += $spc + $len;
+							} else {
+								printf "\n$::indent";
+								$col = $len;
+							}
+							printf "$w";
+						}
+					}
+				} else {
+					if (!$::first) { printf "\n$::indent"; $::first = 1; }
+					printf "$l"; $::first = 0;
+					if (!$::first) { printf "\n$::indent"; $::first = 1; }
 				}
 			}
 		}
@@ -8986,9 +9461,16 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attributes}->xref(@_);
+	$self->{attributes}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// Attributes\n$::indent";
+	$self->call('head',@_);
+	printf "\n$::indent";
 }
 
 sub gdmo {
@@ -9030,11 +9512,21 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{properties})) { $x->xref(@_); }
-	if (($x = $self->{parameters})) { $x->xref(@_); }
+	if (($x = $self->{properties})) { $x->generate(@_); }
+	if (($x = $self->{parameters})) { $x->generate(@_); }
+}
+
+sub head {
+	my $self = shift;
+	if (ref($self->{attribute}->{reference})=~/AttributeTemplate/) {
+		$self->call('head',@_);
+	} else {
+		my $label = $self->labelxform('',$self->{attribute}->{label},'Attribute');
+		printf "\n$::indent"."class $label $label;";
+	}
 }
 
 sub gdmo {
@@ -9090,9 +9582,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{property}->xref(@_);
+	$self->{property}->generate(@_);
 }
 
 sub gdmo {
@@ -9135,9 +9627,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -9170,9 +9662,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -9205,9 +9697,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{typereference}->xref(@_);
+	$self->{typereference}->generate(@_);
 }
 
 sub gdmo {
@@ -9240,9 +9732,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{typereference}->xref(@_);
+	$self->{typereference}->generate(@_);
 }
 
 sub gdmo {
@@ -9373,9 +9865,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
+	$self->{value}->generate(@_);
 }
 
 sub gdmo {
@@ -9407,16 +9899,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{value}->xref(@_);
-}
-
-sub xref {
-	my $self = shift;
-	$self->{modulereference}->xref(@_);
+	$self->{modulereference}->generate(@_);
 	# FIXME: might want to pass modulereference to typename
-	$self->{typename}->xref(@_);
+	$self->{typename}->generate(@_);
 }
 
 sub gdmo {
@@ -9451,11 +9938,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{modulereference}->xref(@_);
+	$self->{modulereference}->generate(@_);
 	# FIXME: might want to pass modulereference to valuename
-	$self->{valuename}->xref(@_);
+	$self->{valuename}->generate(@_);
 }
 
 sub gdmo {
@@ -9514,11 +10001,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{modulereference}->xref(@_);
+	$self->{modulereference}->generate(@_);
 	# FIXME: might want to pass modulereference to typereferences
-	my $x; foreach $x (@{$self->{typereferences}}) { $x->xref(@_); }
+	my $x; foreach $x (@{$self->{typereferences}}) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -9565,9 +10052,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{behaviour}->xref(@_);
+	$self->{behaviour}->generate(@_);
 }
 
 sub gdmo {
@@ -9773,9 +10260,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{groups}->xref(@_);
+	$self->{groups}->generate(@_);
 }
 
 sub gdmo {
@@ -9817,10 +10304,17 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{group}->xref(@_);
-	my $x; if (($x = $self->{attributes})) { $x->xref(@_); }
+	$self->{group}->generate(@_);
+	my $x; if (($x = $self->{attributes})) { $x->generate(@_); }
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// Attribute Groups\n$::indent";
+	$self->call('head',@_);
+	printf "\n$::indent";
 }
 
 sub gdmo {
@@ -9868,9 +10362,16 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{actions}->xref(@_);
+	$self->{actions}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// Actions\n$::indent";
+	$self->call('head',@_);
+	printf "\n$::indent";
 }
 
 sub gdmo {
@@ -9911,10 +10412,20 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{action}->xref(@_);
-	my $x; if (($x = $self->{parameters})) { $x->xref(@_); }
+	$self->{action}->generate(@_);
+	my $x; if (($x = $self->{parameters})) { $x->generate(@_); }
+}
+
+sub head {
+	my $self = shift;
+	if (ref($self->{action}->{reference})=~/ActionTemplate/) {
+		$self->call('head',@_);
+	} else {
+		my $label = $self->labelxform('',$self->{action}->{label},'Action');
+		printf "\n$::indent"."void $label();";
+	}
 }
 
 sub gdmo {
@@ -9961,9 +10472,16 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{notifications}->xref(@_);
+	$self->{notifications}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// Notifications\n$::indent";
+	$self->call('head',@_);
+	printf "\n$::indent";
 }
 
 sub gdmo {
@@ -10005,10 +10523,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{notification}->xref(@_);
-	my $x; if (($x = $self->{parameters})) { $x->xref(@_); }
+	$self->{notification}->generate(@_);
+	my $x; if (($x = $self->{parameters})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -10046,9 +10564,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{objectid}->xref(@_);
+	$self->{objectid}->generate(@_);
 }
 
 sub gdmo {
@@ -10083,9 +10601,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{syntax}->xref(@_);
+	$self->{syntax}->generate(@_);
 }
 
 sub gdmo {
@@ -10126,9 +10644,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{package}->xref(@_);
+	$self->{package}->generate(@_);
 }
 
 sub gdmo {
@@ -10169,9 +10687,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{parameter}->xref(@_);
+	$self->{parameter}->generate(@_);
 }
 
 sub gdmo {
@@ -10211,9 +10729,9 @@ sub read {
 	}
 	return $self->error($line);
 }
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{namebinding}->xref(@_);
+	$self->{namebinding}->generate(@_);
 }
 
 sub gdmo {
@@ -10254,9 +10772,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attribute}->xref(@_);
+	$self->{attribute}->generate(@_);
 }
 
 sub gdmo {
@@ -10297,9 +10815,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attributegroup}->xref(@_);
+	$self->{attributegroup}->generate(@_);
 }
 
 sub gdmo {
@@ -10340,9 +10858,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{behaviour}->xref(@_);
+	$self->{behaviour}->generate(@_);
 }
 
 sub gdmo {
@@ -10386,9 +10904,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{action}->xref(@_);
+	$self->{action}->generate(@_);
 }
 
 sub gdmo {
@@ -10429,9 +10947,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{notification}->xref(@_);
+	$self->{notification}->generate(@_);
 }
 
 sub gdmo {
@@ -10473,10 +10991,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{class}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{class}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -10521,10 +11039,10 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{class}->xref(@_);
-	my $x; if (($x = $self->{subclasses})) { $x->xref(@_); }
+	$self->{class}->generate(@_);
+	my $x; if (($x = $self->{subclasses})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -10581,9 +11099,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attribute}->xref(@_);
+	$self->{attribute}->generate(@_);
 }
 
 sub gdmo {
@@ -10626,11 +11144,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{modifiers})) { $x->xref(@_); }
-	if (($x = $self->{parameters})) { $x->xref(@_); }
+	if (($x = $self->{modifiers})) { $x->generate(@_); }
+	if (($x = $self->{parameters})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -10675,9 +11193,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{modifier}->xref(@_);
+	$self->{modifier}->generate(@_);
 }
 
 sub gdmo {
@@ -10736,11 +11254,11 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{modifiers})) { $x->xref(@_); }
-	if (($x = $self->{parameters})) { $x->xref(@_); }
+	if (($x = $self->{modifiers})) { $x->generate(@_); }
+	if (($x = $self->{parameters})) { $x->generate(@_); }
 }
 
 sub gdmo {
@@ -10785,9 +11303,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{modifier}->xref(@_);
+	$self->{modifier}->generate(@_);
 }
 
 sub gdmo {
@@ -10844,9 +11362,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attribute}->xref(@_);
+	$self->{attribute}->generate(@_);
 }
 
 sub gdmo {
@@ -10887,9 +11405,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{syntax}->xref(@_);
+	$self->{syntax}->generate(@_);
 }
 
 sub gdmo {
@@ -10930,9 +11448,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{matches}->xref(@_);
+	$self->{matches}->generate(@_);
 }
 
 sub gdmo {
@@ -10979,9 +11497,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{qualifier}->xref(@_);
+	$self->{qualifier}->generate(@_);
 }
 
 sub gdmo {
@@ -11075,9 +11593,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{parameters}->xref(@_);
+	$self->{parameters}->generate(@_);
 }
 
 sub gdmo {
@@ -11121,9 +11639,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{elements}->xref(@_);
+	$self->{elements}->generate(@_);
 }
 
 sub gdmo {
@@ -11203,9 +11721,18 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{delimited}->xref(@_);
+	$self->{delimited}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	my $label = $self->labelxform('',$tmpl->{label},'Description');
+	printf "\n$::indent"."string $label = \"\\\n";
+	$self->call('head',@_);
+	printf "\";\n$::indent";
 }
 
 sub gdmo {
@@ -11244,9 +11771,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{delimited}->xref(@_);
+	$self->{delimited}->generate(@_);
 }
 
 sub gdmo {
@@ -11288,9 +11815,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{mode}->xref(@_);
+	$self->{mode}->generate(@_);
 }
 
 sub gdmo {
@@ -11355,9 +11882,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{syntax}->xref(@_);
+	$self->{syntax}->generate(@_);
 }
 
 sub gdmo {
@@ -11398,9 +11925,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{syntax}->xref(@_);
+	$self->{syntax}->generate(@_);
 }
 
 sub gdmo {
@@ -11442,9 +11969,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{syntax}->xref(@_);
+	$self->{syntax}->generate(@_);
 }
 
 sub gdmo {
@@ -11485,9 +12012,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{ids}->xref(@_);
+	$self->{ids}->generate(@_);
 }
 
 sub gdmo {
@@ -11529,9 +12056,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{attribute}->xref(@_);
+	$self->{attribute}->generate(@_);
 }
 
 sub gdmo {
@@ -11569,9 +12096,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -11616,9 +12143,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{type}->xref(@_);
+	$self->{type}->generate(@_);
 }
 
 sub gdmo {
@@ -11648,9 +12175,9 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
+sub call {
 	my $self = shift;
-	$self->{typereference}->xref(@_);
+	$self->{typereference}->generate(@_);
 }
 
 sub gdmo {
@@ -11739,10 +12266,6 @@ sub read {
 	return $self->error($line);
 }
 
-sub xref {
-	my $self = shift;
-}
-
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -11769,7 +12292,7 @@ $indent = '';
 $first = 0;
 $noref = 0;
 $depth = 0;
-$colwidth = 100; # width of delimited string reflow
+$colwidth = 80; # width of delimited string reflow
 $context = 50; # number of lines to report on error
 @objects = ();
 $root = {}; # root object
@@ -11781,7 +12304,12 @@ undef $/; # suck entire file
 
 if (($gdmo = Gdmo->parse($file))) {
 	$gdmo->generate('xref');
-	$gdmo->generate('gdmo');
+	if ($progname=~/check$/) {
+		$gdmo->generate('gdmo');
+	} elsif ($progname=~/gen$/) {
+		$gdmo->generate('head');
+		$gdmo->generate('code');
+	}
 } else {
 	print STDERR "PARSE FAILED!";
 }
