@@ -76,7 +76,7 @@ lsTimersProfile MANAGED OBJECT CLASS
 						"A signalling link set timer profile is a set of Q.704 timers which are related to the
 						characteristics of signalling links sets. The managed object class lsTimersProfile is a support
 						managed object class which can be instantiated in order to define a particular profile. At creation
-						time of a signLinkSetTp one of the lsTimersProfiles is referenced.";;
+						time of a signLinkSetTp one of the slTimersProfiles is referenced.";;
 			ATTRIBUTES
 				lsTimersProfileId GET SET-BY-CREATE,
 				q704-t6 GET SET-BY-CREATE,
@@ -85,12 +85,12 @@ lsTimersProfile MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		lsTimersProfileNamePackage
 			PRESENT IF
 				"an instance supports it";
@@ -134,11 +134,11 @@ mtpAccessPoint MANAGED OBJECT CLASS
 						contains the distinguished names of the managed objects that represent the user entities that are
 						using the mtpAccessPoint, e.g. the SCCP instance. The providerEntityNames attribute contains the
 						distinguished names of the managed objects that represent the provider entities that are supporting
-						the mtpAccessPoint, i.e., the instance of the MTP. A mtpAccessPoint can have the MTP status:
-						allowed, this means that the mtpAccessPoint is accessible and is functioning normally congested,
-						this means that the mtpAccessPoint is accessible but the path to it is heavily loaded prohibited,
+						the mtpAccessPoint, i.e. the instance of the MTP. A mtpAccessPoint can have the MTP status:
+						allowed, this means that the mtpAccessPoint is accessible and is functioning normally; congested,
+						this means that the mtpAccessPoint is accessible but the path to it is heavily loaded; prohibited,
 						this means that the mtpAccessPoint not accessible. If the ss7OnOccEventPackage is present, event
-						notification with the following probable causes can apply: Probable Cause = 001
+						notifications with the following probable causes can apply: Probable Cause = 001
 						(localUserPartUnavailable)";;;;
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
@@ -183,8 +183,8 @@ mtpL2ProtocolProfile MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
 				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
@@ -249,12 +249,12 @@ mtpLevel3 MANAGED OBJECT CLASS
 				"an instance supports it and the (communicationsAlarmPackage or ss7OnOccEventPackage) is present",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		communicationsAlarmPackage
 			PRESENT IF
 				"an instance supports it",
@@ -305,12 +305,12 @@ mtpSignPoint MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		mtpSignPointNamePackage
 			PRESENT IF
 				"an instance supports it",
@@ -333,9 +333,9 @@ signDataLinkTp MANAGED OBJECT CLASS
 				signDataLinkTpBehaviour BEHAVIOUR
 					DEFINED AS
 						"This managed object represents the termination of the signalling data link within the SP as defined
-						in Q.702. The operational state is enabled in normal operation. In case of failure of the part of
+						in Q.702. The operational state is 'enabled' in normal operation. In case of failure of the part of
 						the signalling data link that is within control of the managed switching element, this state will
-						be disabled.";;
+						be 'disabled'.";;
 			-- Note that for a complete view of the status of a signalling data link a network view is required.
 			ATTRIBUTES
 				signDataLinkTpId GET SET-BY-CREATE,
@@ -348,12 +348,12 @@ signDataLinkTp MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		clCPackage
 			PRESENT IF
 				"an instance supports it",
@@ -379,16 +379,16 @@ signLinkSetTp MANAGED OBJECT CLASS
 					DEFINED AS
 						"This managed object class represents the SS No. 7 signalling link set termination point. Link sets
 						are defined in Recommendation Q.704. The states are directly related to the set of link termination
-						points states, except for the optional administrativeState. General principles on state
+						point's states, except for the optional administrativeState. General principles on state
 						information: The states of the managed object linkset are only readable, except for the optional
 						administrativeState. Activation and deactivation of a linkset may be done via operations on the
 						links (e.g. by using scoping functions) or the optional administrativeState can be used for this.
 						Based on these principles the states of a linkset are defined as follows: operational state
 						(read-only for the OS). The operational state is enabled whenever one link of the linkset is
-						enabled, i.e. neither FAILED nor DEACTIVATED nor LOCAL BLOCKED nor REMOTE BLOCKED. usage state
+						enabled, i.e. neither FAILED nor DEACTIVATED nor LOCAL BLOCKED nor REMOTE BLOCKED. Usage state
 						(read-only for the OS). The usage state reflects the usage of the belonging links. It is ACTIVE if
 						at least one of the belonging links is ACTIVE and no link is BUSY. It contains BUSY if one of the
-						belonging links is BUSY. It is IDLE if all links are UNAVAILABLE. availability status (read-only
+						belonging links is BUSY. It is IDLE if all links are UNAVAILABLE. Availability status (read-only
 						for the OS). The availability status indicates unavailability or reduced availability of the
 						belonging links. It contains DEPENDENCY if all the belonging links are unavailable for user
 						traffic. It contains DEGRADED if at least one belonging link is not available for user traffic. For
@@ -421,12 +421,12 @@ signLinkSetTp MANAGED OBJECT CLASS
 				"an instance supports it and the communicationsAlarmPackage is present",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		communicationsAlarmPackage
 			PRESENT IF
 				"an instance supports it",
@@ -529,12 +529,12 @@ signLinkTp MANAGED OBJECT CLASS
 				"an instance supports it and the (communicationsAlarmPackage or ss7OnOccEventPackage) is present",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		communicationsAlarmPackage
 			PRESENT IF
 				"an instance supports it",
@@ -591,12 +591,12 @@ slTimersProfile MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		slTimersProfileNamePackage
 			PRESENT IF
 				"an instance supports it";
@@ -669,7 +669,7 @@ signRouteNePart MANAGED OBJECT CLASS
 						identical with the destination B, or it may or may not be directly interconnected to the
 						destination SP. The adjacent SP C must be directly connected to the near end SP by at least one
 						linkset which is intended to convey MSUs sent from A to B (hence the use of the term 'adjacent').
-						Two signalling routes (A,C,B)i and (A,CB,B)j are distinct if the adjacent SP is different. The
+						Two signalling routes (A,C,B)i and (A,C,B)j are distinct if the adjacent SP is different. The
 						signRouteNePart Managed Object class defines the management capabilities of the resources which
 						define a specific route segment (Link Set to be traversed) and its priority within the routeset as
 						seen from the own SP. A particular signRouteNePart is related to one or more Signalling Routes on
@@ -680,11 +680,11 @@ signRouteNePart MANAGED OBJECT CLASS
 						signLinkSetTp used for routing is allocated at creation time and cannot be changed during the
 						existence of a particular signRouteNePart. The administrativeState attribute describes whether it
 						is administratively permitted to route messages towards the respective destination point via the
-						referenced signLinkSetTp. The operationalState attribute is enabledi if both the referenced
-						signLinkSetTp is in the operational state eenabledl and no TFP message concerning the respective
-						destinations has been received from the adjPC of the respective signLinkSetTp. The optional
+						referenced signLinkSetTp. The operationalState attribute is 'enabled' if both the referenced
+						signLinkSetTp is in the operational state 'enabled' and no TFP message concerning the respective
+						destination has been received from the adjPC of the respective signLinkSetTp. The optional
 						usageState attribute is used to cover restriction of a route. Its value is set to 'busy', if the
-						route is restricted (transfer restricted is a national option). The availabilityStatus attribute
+						route is restricted ('transfer restricted' is a national option). The availabilityStatus attribute
 						gives additional information about the availability of the signRouteNePart instance. It is
 						furthermore needed to map some of the MTP functional states (prohibited: availabilityStatus =
 						{dependency}, restricted: availabilityStatus={degraded}) and is used for the case that the route is
@@ -692,7 +692,7 @@ signRouteNePart MANAGED OBJECT CLASS
 						availabilityStatus={off line}).";;
 			ATTRIBUTES
 				signRouteNePartId GET SET-BY-CREATE,
-				signLinkSetTPPointer GET SET-BY-CREATE,
+				signLinkSetTpPointer GET SET-BY-CREATE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":operationalState GET,
 				"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatus GET;
@@ -701,12 +701,12 @@ signRouteNePart MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		clsLoadsharingInformationPackage
 			PRESENT IF
 				"an instance supports it",
@@ -730,7 +730,7 @@ signRouteNePart MANAGED OBJECT CLASS
 				"the instance supports it",
 		usageStatePackage
 			PRESENT IF
-				"the instance supports ,transfer restricted";
+				"the instance supports 'transfer restricted'";
 REGISTERED AS { mtpObjectClass 12 };
 -- 7.1.13 Signalling Route Set Network Element Part
 
@@ -755,8 +755,8 @@ signRouteSetNePart MANAGED OBJECT CLASS
 						destination signalling point is accessible - ('enabled') or not ('disabled'). If the operational
 						states of all signRouteNePart instances contained in the signRouteSetNePart are 'disabled', then
 						the operational state of the signRouteSetNePart is 'disabled', in any other case it is 'enabled'.
-						The usageState attribute is used to reflect route set congestion. The value is busy in case of
-						route set congestion. If the iITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992:communicationsAlarm
+						The usageState attribute is used to reflect route set congestion. The value is 'busy' in case of
+						route set congestion. If the 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992':communicationsAlarm
 						notification is present, it indicates at least the following probable causes: Probable Cause =
 						411(RouteSetUnavailable), which represents measurements Q.752/4.11 (PerceivedSeverity=Maj/Min/War)
 						and Q.751/4.12 (PerceivedSeverity=Cleared). If the ss7OnOccEventPackage is present, event
@@ -777,12 +777,12 @@ signRouteSetNePart MANAGED OBJECT CLASS
 				"an instance supports it and the (communicationsAlarmPackage or ss7OnOccEventPackage) is present",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		communicationsAlarmPackage
 			PRESENT IF
 				"an instance supports it",
@@ -837,12 +837,12 @@ signTerm MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		signTermNamePackage
 			PRESENT IF
 				"an instance supports it";
@@ -873,12 +873,12 @@ stpScreeningTable MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class",
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class",
 		getScreenedOpcsOrLinkSetsByDpcActionPackage
 			PRESENT IF
 				"an instance supports it",
@@ -899,7 +899,7 @@ stpScreeningTableLine MANAGED OBJECT CLASS
 					DEFINED AS
 						"The stpScreeningTableLine together with its superior stpScreeningTable contains all the information
 						which are necessary for an STP to identify and to handle unauthorized SS No. 7 messages as defined
-						in 8.2/Q.705 and 8.3/Q.705. The total number of screened DPCs across all stpScreeningTableLine
+						in 8.2/Q.705 and 8.3/Q.705. The total number of screened DPC's across all stpScreeningTableLine
 						instances contained by a stpScreeningTable must be less or equal to maxNoOfScreenedDpcs.";;
 			ATTRIBUTES
 				stpScreeningTableLineId GET SET-BY-CREATE,
@@ -907,12 +907,12 @@ stpScreeningTableLine MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
 			PRESENT IF
-				"the attributeValueChangeNotification defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is
-				supported by an instance of this class",
+				"the attributeValueChangeNotification defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992'
+				is supported by an instance of this class",
 		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
 			PRESENT IF
-				"the objectCreation and objectDeletion notifications defined in ITU-T Rec. X.721 (1992) | ISO/IEC
-				10165-2 : 1992 are supported by an instance of this class";
+				"the objectCreation and objectDeletion notifications defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC
+				10165-2 : 1992' are supported by an instance of this class";
 REGISTERED AS { mtpObjectClass 16 };
 -- 7.2 Package definitions
 
@@ -921,11 +921,11 @@ administrativeStatePackage PACKAGE
 	BEHAVIOUR
 		administrativeStatePackageBehaviour BEHAVIOUR
 			DEFINED AS
-				"This package can be used for activiated and deactivated link sets. Possible values of the
+				"This package can be used for activation and deactivation of link sets. Possible values of the
 				administrativeState attribute are: locked and unlocked. If transition takes place from locked to
-				unlocked, this will result in activiation of all links in the set that are unlocked. If transition
-				takes place from unlocked to locked, this will result in deactiviation of all links in the set.
-				This has no effect on the administrative states of the links themselves";;
+				unlocked, this will result in activation of all links in the set that are unlocked. If transition
+				takes place from unlocked to locked, this will result in deactivation of all links in the set. This
+				has no effect on the administrative states of the links themselves";;
 	ATTRIBUTES
 		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":administrativeState GET-REPLACE;
 REGISTERED AS { mtpPackage 1 };
@@ -1322,7 +1322,7 @@ usageStatePackage PACKAGE
 	BEHAVIOUR
 		usageStatePackageBehaviour BEHAVIOUR
 			DEFINED AS
-				"This package supplies a possibility to cover transfer restricted for a route.";;
+				"This package supplies a possibility to cover 'transfer restricted' for a route.";;
 	ATTRIBUTES
 		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":usageState GET;
 REGISTERED AS { mtpPackage 52 };
@@ -1481,14 +1481,14 @@ fixedPriority ATTRIBUTE
 				"This attribute determines, if the signRouteNePart is used as current route. The signRouteNePart
 				instances with operational state = 'enabled' contained in the same signRouteSetNePart are chosen in
 				ascending order as current routes (The lower the value, the higher the priority). There are
-				different behaviours for the handling of priority gaps possible: i) priorityGapAllowedBEHAVIOUR ii)
-				priorityGapNotAllowedBehaviour: In the latter case it is not possible, to have a priority value, if
-				there is a lower value, which is not used in one of the routes of the route set. E.g. in case of
-				deleting a signRouteNePart instance whose priority value is not equal to the priority of at least
-				one of the remaining signRouteNeParts contained in the same signRouteSetNePart, the priority values
-				of the remaining instances have to be decremented by one (see also example in table below). What
-				kind of priority gap behaviour is performed by the switch is to be derived from the combination of
-				the values of the attributes vendorName and version of the managedSwitchingElement.";;
+				different behaviours for the handling of 'priority gaps' possible: i) priorityGapAllowedBehaviour
+				ii) priorityGapNotAllowedBehaviour: In the latter case it is not possible, to have a priority
+				value, if there is a lower value, which is not used in one of the routes of the route set. E.g. in
+				case of deleting a signRouteNePart instance whose priority value is not equal to the priority of at
+				least one of the remaining signRouteNeParts contained in the same signRouteSetNePart, the priority
+				values of the remaining instances have to be decremented by one (see also example in table below).
+				What kind of priority gap behaviour is performed by the switch is to be derived from the
+				combination of the values of the attributes vendorName and version of the managedSwitchingElement.";;
 REGISTERED AS { mtpAttribute 13 };
 
 
@@ -1500,15 +1500,15 @@ flexiblePriority ATTRIBUTE
 				"This attribute determines, if the signRouteNePart is used as current route. The signRouteNePart
 				instances with operational state = 'enabled' contained in the same signRouteSetNePart are chosen in
 				ascending order as current routes (The lower the value, the higher the priority). There are
-				different behaviours for the handling of priority gaps possible: i) priorityGapAllowedBEHAVIOUR ii)
-				priorityGapNotAllowedBehaviour: In the latter case it is not possible, to have a priority value. If
-				there is a lower value, which is not used in one of the routes of the route set. E.g. in case of
-				deleting a signRouteNePart instance whose priority value is not equal to the priority of at least
-				one of the remaining signRouteNeParts contained in the same signRouteSetNePart, the priority values
-				of the remaining instances have to be decremented by one (see also example in table below). What
-				kind of priority gap behaviour is performed by the switch is to be derived from the combination of
-				the values of the attributes vendorName and version of the managedSwitchingElement. This attribute
-				is writable only together with the attribute priorityMode.";;
+				different behaviours for the handling of 'priority gaps' possible: i) priorityGapAllowedBehaviour
+				ii) priorityGapNotAllowedBehaviour: In the latter case it is not possible, to have a priority
+				value. If there is a lower value, which is not used in one of the routes of the route set. E.g. in
+				case of deleting a signRouteNePart instance whose priority value is not equal to the priority of at
+				least one of the remaining signRouteNeParts contained in the same signRouteSetNePart, the priority
+				values of the remaining instances have to be decremented by one (see also example in table below).
+				What kind of priority gap behaviour is performed by the switch is to be derived from the
+				combination of the values of the attributes vendorName and version of the managedSwitchingElement.
+				This attribute is writable only together with the attribute priorityMode.";;
 REGISTERED AS { mtpAttribute 14 };
 
 
@@ -1546,7 +1546,7 @@ l2TimerT1 ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT1Behaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Alignment ready. The unit for the INTEGER range is milliseconds.";;
+				"Q.703: Level 2 timer 'Alignment ready'. The unit for the INTEGER range is milliseconds.";;
 REGISTERED AS { mtpAttribute 18 };
 
 
@@ -1555,7 +1555,7 @@ l2TimerT2 ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT2Behaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Not aligned. The unit for the INTEGER range is milliseconds.";;
+				"Q.703: Level 2 timer 'Not aligned'. The unit for the INTEGER range is milliseconds.";;
 REGISTERED AS { mtpAttribute 19 };
 
 
@@ -1564,7 +1564,7 @@ l2TimerT3 ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT3Behaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Aligned. The unit for the INTEGER range is milliseconds.";;
+				"Q.703: Level 2 timer 'Aligned'. The unit for the INTEGER range is milliseconds.";;
 REGISTERED AS { mtpAttribute 20 };
 
 
@@ -1573,7 +1573,7 @@ l2TimerT4E ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT4eBehaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Proving period timer emergency. The unit for the INTEGER range is
+				"Q.703: Level 2 timer 'Proving period timer emergency'. The unit for the INTEGER range is
 				milliseconds.";;
 REGISTERED AS { mtpAttribute 21 };
 
@@ -1583,7 +1583,7 @@ l2TimerT4N ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT4nBehaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Proving period timer normal. The unit for the INTEGER range is milliseconds.";;
+				"Q.703: Level 2 timer 'Proving period timer normal'. The unit for the INTEGER range is milliseconds.";;
 REGISTERED AS { mtpAttribute 22 };
 
 
@@ -1592,7 +1592,7 @@ l2TimerT5 ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT5Behaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Sending SIB. The unit for the INTEGER range is milliseconds.";;
+				"Q.703: Level 2 timer 'Sending SIB'. The unit for the INTEGER range is milliseconds.";;
 REGISTERED AS { mtpAttribute 23 };
 
 
@@ -1601,7 +1601,7 @@ l2TimerT6 ATTRIBUTE
 	BEHAVIOUR
 		l2TimerT6Behaviour BEHAVIOUR
 			DEFINED AS
-				"Q.703: Level 2 timer Remote congestion. The unit for the INTEGER range is milliseconds.";;
+				"Q.703: Level 2 timer 'Remote congestion'. The unit for the INTEGER range is milliseconds.";;
 REGISTERED AS { mtpAttribute 24 };
 
 
@@ -1627,8 +1627,8 @@ linkCongestionLevel ATTRIBUTE
 REGISTERED AS { mtpAttribute 26 };
 
 
-linkTPStatus ATTRIBUTE
-	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.LinkTPStatus;
+linkTpStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.LinkTpStatus;
 	MATCHES FOR
 		EQUALITY;
 	BEHAVIOUR
@@ -1951,8 +1951,8 @@ priorityMode ATTRIBUTE
 				priority attribute. It describes the influence of the management action on the priority attributes
 				of other signRouteNePart instances contained in the same signRouteSetNePart. This attribute is only
 				writable, and this only together with the writing of attribute flexiblePriority. The meanings of
-				the attribute values are: EQUAL: If by modifying the priority with priorityMode EQUAL a priority
-				gap would come into existence, then for the priorities of all created signRouteNePart instances
+				the attribute values are: EQUAL: If by modifying the priority with priorityMode 'EQUAL' a 'priority
+				gap' would come into existence, then for the priorities of all created signRouteNePart instances
 				from the same signRouteSetNePart with priorities lower than the 'gap priority' the priority value
 				has to be decremented by one. INSERT: Priority values of all created signRouteNePart instances from
 				the same signRouteSetNePart with equal or lower priorities are incremented by one. EXCHANGE_SINGLE:
@@ -1972,10 +1972,10 @@ q704-t1 ATTRIBUTE
 	BEHAVIOUR
 		q704-t1Behaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute defines the initial timer value of timer T1 Delay to avoid message mis-sequencing on
-				changeover from this link defined in Recommendation Q.704. The value range is from 500 to 1200 ms.
-				For routes with long propagation delays a minimum value of 800 ms is used.The same value applies
-				for all links associated with an instance of the procedure.";;
+				"This attribute defines the initial timer value of timer T1 'Delay to avoid message mis-sequencing
+				on changeover from this link' defined in Recommendation Q.704. The value range is from 500 to
+				1200ms. For routes with long propagation delays a minimum value of 800 ms is used. The same value
+				applies for all links associated with an instance of the procedure.";;
 REGISTERED AS { mtpAttribute 57 };
 
 
@@ -1984,7 +1984,7 @@ q704-t2 ATTRIBUTE
 	BEHAVIOUR
 		q704-t2Behaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute defines the initial timer value of timer T2 Waiting for changeover acknowledgement
+				"This attribute defines the initial timer value of timer T2 'Waiting for changeover acknowledgement'
 				defined in Recommendation Q.704. The value range is from 700 to 2000 ms. For routes with long
 				propagation delays a minimum value of 1400 ms is used.";;
 REGISTERED AS { mtpAttribute 58 };
@@ -1995,10 +1995,10 @@ q704-t3 ATTRIBUTE
 	BEHAVIOUR
 		q704-t3Behaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute defines the initial timer value of timer T3 Time controlled diversion-delay to avoid
-				mis-sequencing on changeback from this link defined in Recommendation Q.704. The value range is
-				from 500 to 1200 ms. For routes with long propagation delays a minimum value of 800 ms is used. The
-				value of this attribute is network implementation dependent.";;
+				"This attribute defines the initial timer value of timer T3 'Time controlled diversion-delay to
+				avoid mis-sequencing on changeback from this link' defined in Recommendation Q.704. The value range
+				is from 500 to 1200 ms. For routes with long propagation delays a minimum value of 800 ms is used.
+				The value of this attribute is network implementation dependent.";;
 REGISTERED AS { mtpAttribute 59 };
 
 
@@ -2007,9 +2007,9 @@ q704-t4 ATTRIBUTE
 	BEHAVIOUR
 		q704-t4Behaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute defines the initial timer value of timer T4 Waiting for changeback acknowledgement
-				(first attempt) defined in Recommendation Q.704. The value range is from 500 to 1200 ms. For routes
-				with long propagation delays a minimum value of 800 ms is used.";;
+				"This attribute defines the initial timer value of timer T4 'Waiting for changeback acknowledgement
+				(first attempt)' defined in Recommendation Q.704. The value range is from 500 to 1200 ms. For
+				routes with long propagation delays a minimum value of 800 ms is used.";;
 REGISTERED AS { mtpAttribute 60 };
 
 
@@ -2706,8 +2706,8 @@ timerTx ATTRIBUTE
 	BEHAVIOUR
 		timerTxBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies the Tx timer value for the multiple link congestion states without
-				congestion priority mechanism as described in 3.8.2.3/Q.704.";;
+				"This attribute identifies the Tx timer value for the 'multiple link congestion states without
+				congestion priority' mechanism as described in 3.8.2.3/Q.704.";;
 REGISTERED AS { mtpAttribute 122 };
 
 
@@ -2716,8 +2716,8 @@ timerTy ATTRIBUTE
 	BEHAVIOUR
 		timerTyBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies the Ty timer value for the multiple link congestion states without
-				congestion priority mechanism as described in 3.8.2.3/Q.704.";;
+				"This attribute identifies the Ty timer value for the 'multiple link congestion states without
+				congestion priority' mechanism as described in 3.8.2.3/Q.704.";;
 REGISTERED AS { mtpAttribute 123 };
 
 
@@ -2850,7 +2850,7 @@ getScreenedOpcsOrLinkSetsByDpc ACTION
 				attribute) together with their respective messageTreatments which are screened in combination with
 				a specific DPC within all the stpScreeningTableLineContents of all stpScreeningTableLine's
 				contained in the stpScreeningTable. The resulting list in the reply is empty, if no OPC or Linkset
-				within all the stpScreeningTableLine (Contents of all stpScreeningTableLine s contained in the
+				within all the stpScreeningTableLine (Contents of all stpScreeningTableLine's contained in the
 				stpScreeningTable is screened in combination with the DPC - given in the information syntax), or if
 				no stpScreeningTableLine contained in the stpScreeningTable does exist.";;
 	MODE CONFIRMED;
@@ -2890,9 +2890,9 @@ replaceSignTerm ACTION
 				"This action replaces the signalling terminal in a signalling link termination point. This action is
 				not performed if: i) the signTermPointer does not reference a signTerm or ii) the new signTerm does
 				not exist or iii) the signTerm is already referenced by the link or iv) the linkTpStatus does not
-				contain the values ndeactivated or failed. If the action has been successful, the signTermPointer
-				has the value of the signTermId given in the information syntax; otherwise the pointer value
-				remains unchanged.";;
+				contain the values 'deactivated' or 'failed'. If the action has been successful, the
+				signTermPointer has the value of the signTermId given in the information syntax; otherwise the
+				pointer value remains unchanged.";;
 	MODE CONFIRMED;
 	WITH INFORMATION SYNTAX MTPDefinedTypesModule.Pointer;
 	WITH REPLY SYNTAX MTPDefinedTypesModule.ResultOfAction;
@@ -2916,20 +2916,23 @@ REGISTERED AS { mtpNotification 1 };
 
 ss7OnOccEvent NOTIFICATION
 	BEHAVIOUR
-		ss7OnOccEventBhv BEHAVIOUR
+		ss7OnOccEventBehaviour BEHAVIOUR
 			DEFINED AS
 				"This notification is used to report the Q.752 on-occurrence measurement results and other MTP
 				events, which are not reported as a communication alarm.";;
 	WITH INFORMATION SYNTAX MTPDefinedTypesModule.SS7OnOccEventInfo;
 REGISTERED AS { mtpNotification 2 };
 -- 7.7 Naming binding definitions
--- Naming is specified by structure rules and name bindings. The structure rules define the distinguished names that the
--- managed objects shall have and the ways in which the objects are related to one another in the Management Information
--- Tree (MIT).
--- Each structure rule defines a sequence of name bindings. The name binding selects the attribute to be used in the relative
--- distinguished name of an object. The structure rule herewith selects all the attributes to be used in the distinguished name
--- of an object.
--- For the labels that are used for the name binding templates, the convention "superiorClass-subordinateClass" is followed.
+-- Naming is specified by structure rules and name bindings. The structure rules define the
+-- distinguished names that the managed objects shall have and the ways in which the objects are
+-- related to one another in the Management Information Tree (MIT).
+-- 
+-- Each structure rule defines a sequence of name bindings. The name binding selects the attribute
+-- to be used in the relative distinguished name of an object. The structure rule herewith selects
+-- all the attributes to be used in the distinguished name of an object.
+-- 
+-- For the labels that are used for the name binding templates, the convention
+-- "superiorClass-subordinateClass" is followed.
 
 
 managedSwitchingElement-mtpSignPoint NAME BINDING
@@ -2985,7 +2988,7 @@ signRouteSetNePart-signRouteNePart NAME BINDING
 	BEHAVIOUR
 		signRouteSetNePart-signRouteNePartBehaviour BEHAVIOUR
 			DEFINED AS
-				"A create request is rejected, if the signlinkSetTpPointer would reference an instance, which i)
+				"A create request is rejected, if the signLinkSetTpPointer would reference an instance, which i)
 				does not belong to the signLinkSetTp object class OR ii) does not exist OR iii) is not contained in
 				the same mtpSignPoint as the signRouteNePart OR iv) is already referenced by a signRouteNePart
 				contained within the same signRouteSetNePart A delete request is rejected if its
@@ -3057,9 +3060,8 @@ mtpSignPoint-signDataLinkTp NAME BINDING
 	NAMED BY
 	SUPERIOR OBJECT CLASS
 		mtpSignPoint;
-	--WITH ATTRIBUTE signDataLinkTpld;
 	WITH ATTRIBUTE
-		signDataLinkId;
+		signDataLinkTpId;
 	BEHAVIOUR
 		mtpSignPoint-signDataLinkTpBehaviour BEHAVIOUR
 			DEFINED AS
@@ -3078,12 +3080,12 @@ mtpSignPoint-signLinkSetTp NAME BINDING
 	SUPERIOR OBJECT CLASS
 		mtpSignPoint;
 	WITH ATTRIBUTE
-		signLinkSetId;
+		signLinkSetTpId;
 	BEHAVIOUR
 		mtpSignPoint-signLinkSetTpBehaviour BEHAVIOUR
 			DEFINED AS
 				"A creation request is only successful if a signRouteSetNePart exists within the mtpSignPoint for
-				the value of attribute adjPC In case the lsTimersProfilePackage is used, create or set request is
+				the value of attribute adjPC In case the lsTimersProfilePackage is used, a create or set request is
 				rejected, if i) the lsTimersProfilePointer does not reference an lsTimersProfile OR ii) the
 				lsTimersProfilePointer would reference an instance which does not exist If the name package is
 				supported: a create request with a value for the name attribute that is already used by another
@@ -3127,7 +3129,7 @@ mtpSignPoint-stpScreeningTable NAME BINDING
 			DEFINED AS
 				"If the name package is supported: a create request with a value for the name attribute that is
 				already used by another instance of the same object class will be rejected. It is only allowed to
-				delete an instance of this object class if its administrative state equals locked.";;
+				delete an instance of this object class if its administrative state equals 'locked'.";;
 	CREATE;
 	DELETE;
 REGISTERED AS { mtpNameBinding 10 };
@@ -3166,7 +3168,7 @@ managedSwitchingElement-mtpL2ProtocolProfile NAME BINDING
 			DEFINED AS
 				"If the name package is supported: a create request with a value for the name attribute that is
 				already used by another instance of the same object class will be rejected. If an attempt is made
-				to delete an mtpL2ProtocolProfile which is still referenced by a signLinkTP the delete request will
+				to delete an mtpL2ProtocolProfile which is still referenced by a signLinkTp the delete request will
 				be rejected.";;
 	CREATE;
 	DELETE;
