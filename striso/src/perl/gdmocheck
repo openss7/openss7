@@ -1261,8 +1261,12 @@ sub read {
 	TEST: {
 		my ($s,$e);
 		$e = 0;
-		if (($s = Preamble->parse($line))) {
+		if (($s = GdmoPreambleDirectives->parse($line))) {
 			$self->{preamble} = $s;
+			$e++;
+		}
+		if (($s = Module->parse($line))) {
+			$self->{module} = $s;
 			$e++;
 		}
 		if (($s = TemplateList->parse($line))) {
@@ -1273,7 +1277,11 @@ sub read {
 			$self->{asn1modules} = $s;
 			$e++;
 		}
-		if (($s = Postamble->parse($line))) {
+		last TEST unless (
+			!$self->{module} ||
+			($self->{end} = End->parse($line))
+		);
+		if (($s = GdmoPostambleDirectives->parse($line))) {
 			$self->{postamble} = $s;
 			$e++;
 		}
@@ -1290,8 +1298,10 @@ sub xref {
 
 	my $x;
 	if (($x = $self->{preamble})) { $x->xref(@_,$self); }
+	if (($x = $self->{module})) { $x->xref(@_,$self); }
 	if (($x = $self->{templates})) { $x->xref(@_,$self); }
 	if (($x = $self->{asn1modules})) { $x->xref(@_,$self); }
+	if (($x = $self->{end})) { $x->xref(@_,$self); }
 	if (($x = $self->{postamble})) { $x->xref(@_,$self); }
 	return;
 }
@@ -1302,8 +1312,10 @@ sub gdmo {
 		my $s;
 		if (($s = $self->{preamble})) { $s->gdmo(); }
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		if (($s = $self->{module})) { $s->gdmo(); }
 		if (($s = $self->{templates})) { $s->gdmo(); }
 		if (($s = $self->{asn1modules})) { $s->gdmo(); }
+		if (($s = $self->{end})) { $s->gdmo(); }
 		if (($s = $self->{postamble})) { $s->gdmo(); }
 		if (0) {
 			my ($d,$i);
@@ -1319,7 +1331,7 @@ sub gdmo {
 }
 
 # -------------------------------------
-package Preamble;
+package Module;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
@@ -1329,38 +1341,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		my ($s,$directive,$e);
-		$e = 0;
-		do {
-			if ($line=~s/^(?:\s|\n)*--<((?:.|\n)*?)>--(?:\s|\n)*//s) {
-				$directive = $1;
-				# strip all the continuation markers
-				$directive=~s/\n[ \t]*(?:--[ \t]*)?/\n/sg;
-				# strip leading and trailing whitespace
-				$directive=~s/^(?:\s|\n)*//s;
-				$directive=~s/(?:\s|\n)*$//s;
-				if (($s = GdmoCopyrightDirective->parse($directive))) {
-					$self->{copyright} = $s;
-					$e++;
-				} elsif (($s = GdmoDocumentDirective->parse($directive))) {
-					$self->{document} = $s;
-					$e++;
-				} elsif (($s = GdmoAliasDirective->parse($directive))) {
-					push @{$self->{aliases}}, $s;
-					$e++;
-				} elsif (($s = GdmoVersionDirective->parse($directive))) {
-					$self->{version} = $s;
-					$e++;
-				} elsif (($s = Comments->parse($line,1))) {
-					push @{$self->{comments}}, $s;
-					$e++;
-				}
-			} elsif (($s = Comments->parse($line))) {
-				push @{$self->{comments}}, $s;
-				$e++;
-			}
-		} while ($s);
-		last TEST unless ($e > 0 && $self->{document});
+		last TEST unless ($line=~s/^MODULE//s);
+		$self->{comments} = Comments->parse($line);
+		$self->{documentstring} = DocumentIdentifier->parse($line);
+		$self->{documentoid} = ObjectIdentifierValue->parse($line);
+		last TEST unless ($self->{documentstring} || $self->{documentoid});
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1369,63 +1354,38 @@ sub read {
 sub xref {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{document})) { $x->xref(@_); }
-	if (($x = $self->{version})) { $x->xref(@_); }
-	foreach $x (@{$self->{aliases}}) { $x->xref(@_); }
-	if (($x = $self->{copyright})) { $x->xref(@_); }
-	return;
+	if (($x = $self->{documentstring})) { $x->xref(@_); }
+	if (($x = $self->{documentoid})) { $x->xref(@_); }
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{document})) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--<'; $::first = 0;
-			$s->gdmo();
-			if (!$::first) { printf ' '; }
-			printf '>--'; $::first = 0;
-		} else {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--< GDMO.Document "Unknown Module" >--'; $::first = 0;
-		}
-		if (($s = $self->{version})) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--<'; $::first = 0;
-			$s->gdmo();
-			if (!$::first) { printf ' '; }
-			printf '>--'; $::first = 0;
-		} else {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--< GDMO.Version 1.3 >--'; $::first = 0;
-		}
-		foreach $s (@{$self->{aliases}}) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--<'; $::first = 0;
-			$s->gdmo();
-			if (!$::first) { printf ' '; }
-			printf '>--'; $::first = 0;
-		}
-		if (($s = $self->{copyright})) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--<'; $::first = 0;
-			$s->gdmo();
-			if (!$::first) { printf ' '; }
-			printf '>--'; $::first = 0;
-		} else {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--< GDMO.Copyright Copyright (c) 1997-2007 OpenSS7 Corporation. >--'; $::first = 0;
-		}
-		foreach $s (@{$self->{comments}}) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			$s->gdmo();
-		}
+		if (!$::first) { printf "\n$::indent"; $::first = 1; };
+		printf 'MODULE'; $::first = 0;
+		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (($s = $self->{documentstring})) { $s->gdmo(); }
+		if (($s = $self->{documentoid})) { $s->gdmo(); }
 	}
 }
 
 # -------------------------------------
-package Postamble;
+package GdmoPreambleDirectives;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Directives);
+# -------------------------------------
+
+# -------------------------------------
+package GdmoPostambleDirectives;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Directives);
+# -------------------------------------
+
+# -------------------------------------
+package GdmoPreambleDirectivesChoice;
 use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
@@ -1435,31 +1395,17 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		my ($s, $directive,$e);
-		$e = 0;
-		do {
-			if ($line=~s/^(?:\s|\n)*--<((?:.|\n)*?)>--(?:\s|\n)*//s) {
-				$directive = $1;
-				# strip all the continuation markers
-				$directive=~s/\n[ \t]*(?:--[ \t]*)?/\n/sg;
-				# strip leading and trailing whitespace
-				$directive=~s/^(?:\s|\n)*//s;
-				$directive=~s/(?:\s|\n)*$//s;
-				if (($s = GdmoEndDocumentDirective->parse($directive))) {
-					$self->{enddocument} = $s;
-					$e++;
-					goto DONE;
-				} elsif (($s = GdmoChangeLogDirective->parse($directive))) {
-					$self->{changelog} = $s;
-					$e++;
-				}
-			} elsif (($s = Comments->parse($line))) {
-				push @{$self->{comments}}, $s;
-				$e++;
-			}
-		} while ($s);
-	DONE:
-		last TEST unless ($e > 0);
+		last TEST unless ($line=~s/^GDMO\s*\.\s*(\w*)\s*//s);
+		$self->{directive} = $1;
+		if ($self->{directive}=~/^Version$/) {
+		} elsif ($self->{directive}=~/^Copyright$/) {
+		} elsif ($self->{directive}=~/^Document$/) {
+		} elsif ($self->{directive}=~/^Alias$/) {
+		} else {
+			last TEST;
+		}
+		$self->{type} = 'Gdmo'.$self->{directive}.'Directive';
+		last TEST unless (($self->{item} = "$self->{type}"->parse($line)));
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1467,37 +1413,54 @@ sub read {
 
 sub xref {
 	my $self = shift;
-	my $x;
-	if (($x = $self->{changelog})) { $x->xref(@_); }
-	if (($x = $self->{enddocument})) { $x->xref(@_); }
-	return;
+	$self->{item}->xref(@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my $s;
-		foreach $s (@{$self->{comments}}) {
-			$s->gdmo();
-		}
-		if (($s = $self->{changelog})) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--<'; $::first = 0;
-			$s->gdmo();
-			if (!$::first) { printf ' '; }
-			printf '>--'; $::first = 0;
-		}
-		if (($s = $self->{enddocument})) {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--<'; $::first = 0;
-			$s->gdmo();
-			if (!$::first) { printf ' '; }
-			printf '>--'; $::first = 0;
+		if (!$::first) { printf ' '; }
+		printf 'GDMO.'.$self->{directive}; $::first = 0;
+		$self->{item}->gdmo();
+	}
+}
+
+# -------------------------------------
+package GdmoPostambleDirectivesChoice;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless ($line=~s/^GDMO\s*\.\s*(\w*)\s*//s);
+		$self->{directive} = $1;
+		if ($self->{directive}=~/^ChangeLog$/) {
+		} elsif ($self->{directive}=~/^EndDocument$/) {
 		} else {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--< GDMO.EndDocument >--'; $::first = 0;
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
+			last TEST;
 		}
+		$self->{type} = 'Gdmo'.$self->{directive}.'Directive';
+		last TEST unless (($self->{item} = "$self->{type}"->parse($line)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub xref {
+	my $self = shift;
+	$self->{item}->xref(@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf ' '; }
+		printf 'GDMO.'.$self->{directive}; $::first = 0;
+		$self->{item}->gdmo();
 	}
 }
 
@@ -1522,22 +1485,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		my ($s, $directive);
-		do {
-			if ($line=~s/^(?:\s|\n)*--<((?:.|\n)*?)>--(?:\s|\n)*//s) {
-				$directive = $1;
-				# strip all the continuation markers
-				$directive=~s/\n[ \t]*(?:--[ \t]*)?/\n/sg;
-				# strip leading and trailing whitespace
-				$directive=~s/^(?:\s|\n)*//s;
-				$directive=~s/(?:\s|\n)*$//s;
-				if (($s = Asn1VersionDirective->parse($directive))) {
-					$self->{version} = $s;
-				}
-			} elsif (($s = Comments->parse($line))) {
-				push @{$self->{comments}}, $s;
-			}
-		} while ($s);
+		$self->{directives} = Asn1Directives->parse($line);
 		last TEST unless (($self->{name} = ModuleIdentifier->parse($line)));
 		last TEST unless (($self->{oid} = ObjectIdentifierValue->parse($line)));
 		last TEST unless (($self->{definitions} = Asn1Definitions->parse($line)));
@@ -1555,7 +1503,8 @@ sub read {
 sub xref {
 	my $self = shift;
 	my $x;
-	# if (($x = $self->{version})) { $x->xref(@_,$self); }
+
+	if (($x = $self->{directives})) { $x->xref(@_,$self); }
 	$self->{name}->xref(@_,$self);
 	$self->{oid}->xref(@_,$self);
 	# $self->{definitions}->xref(@_,$self);
@@ -1572,14 +1521,8 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (($s = $self->{version})) { $s->gdmo(); } else {
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-			printf '--< ASN1.Version 1.2 >--'; $::first = 0;
-			if (!$::first) { printf "\n$::indent"; $::first = 1; }
-		}
-		foreach $s (@{$self->{comments}}) {
-			$s->gdmo();
-		}
+		if (($s = $self->{preamble})) { $s->gdmo(); }
+		foreach $s (@{$self->{comments}}) { $s->gdmo(); }
 		$self->{name}->gdmo();
 		$self->{oid}->gdmo();
 		$self->{definitions}->gdmo();
@@ -2247,7 +2190,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
+		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-)//s);
 		$self->{identifier} = $&;
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
@@ -5671,89 +5614,6 @@ sub gdmo {
 }
 
 # -------------------------------------
-package DirectiveOrComment;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# -------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	TEST: {
-		last TEST unless (
-			($self->{directive} = Directive->parse($line)) ||
-			($self->{comment} = Comment->parse($line,0))
-		);
-		$_[0] = $line; return $self;
-	}
-	$self->{errors} = "must consist of <Directive> or <Comment>";
-	return $self->error($line);
-}
-
-sub xref {
-	my $self = shift;
-	my $x; if (($x = $self->{directive})) { $x->xref(@_); }
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		my $s;
-		if (($s = $self->{directive})) { $s->gdmo(); }
-		if (($s = $self->{comment})) { $s->gdmo(); }
-	}
-}
-
-# ----------------------------------------
-package Directive;
-use strict;
-use vars qw(@ISA);
-@ISA = qw(ParserGenerator);
-# ----------------------------------------
-
-sub read {
-	my $self = shift;
-	my $line = $_[0];
-	TEST: {
-		my ($s, $directive);
-		last TEST unless ($line=~s/^(?:\s|\n)*--<((?:.|\n)*?)>--(?:\s|\n)*//s);
-		$directive = $1;
-		# strip all the continuation markers
-		$directive=~s/\n[ \t]*(?:--[ \t]*)?/\n/sg;
-		# strip leading and trailing whitespace
-		$directive=~s/^(?:\s|\n)*//s;
-		$directive=~s/(?:\s|\n)*$//s;
-		last TEST unless (
-			($self->{directive} = GdmoAliasDirective->parse($directive)) ||
-			($self->{directive} = GdmoDocumentDirective->parse($directive)) ||
-			($self->{directive} = GdmoEndDocumentDirective->parse($directive)) ||
-			($self->{directive} = GdmoVersionDirective->parse($directive)) ||
-			($self->{directive} = Asn1VersionDirective->parse($directive))
-		);
-		# note that unrecognized directives will be matched as comments.
-		$_[0] = $line; return $self;
-	}
-	$self->{errors} = "must consist of GDMO.<directive> or ASN1.<directive>";
-	return $self->error($line);
-}
-
-sub xref {
-	my $self = shift;
-	$self->{directive}->xref(@_);
-}
-
-sub gdmo {
-	my $self = shift;
-	PRINT: {
-		printf '--< '; $::first = 0;
-		$self->{directive}->gdmo();
-		printf ' >--'; $::first = 0;
-		printf "\n$::indent"; $::first = 1;
-	}
-}
-
-# -------------------------------------
 package GdmoAliasDirective;
 use strict;
 use vars qw(@ISA);
@@ -5765,7 +5625,6 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		my $s;
-		last TEST unless ($line=~s/^GDMO\s*\.\s*Alias\s*//s);
 		last TEST unless (($self->{documentId} = DocumentSpecifier->parse($line)));
 		last TEST unless (($s = DocumentIdentifier->parse($line)));
 		push @{$self->{documentAliases}}, $s;
@@ -5792,7 +5651,6 @@ sub gdmo {
 	PRINT: {
 		my $s;
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.Alias'; $::first = 0;
 		$self->{documentId}->gdmo();
 		my $i = 0;
 		foreach $s (@{$self->{documentAliases}}) {
@@ -5849,7 +5707,6 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^GDMO\s*\.\s*Document\s*//s);
 		$self->{documentstring} = DocumentIdentifier->parse($line);
 		$self->{documentoid} = ObjectIdentifierValue->parse($line);
 		last TEST unless ($self->{documentstring} || $self->{documentoid});
@@ -5871,7 +5728,6 @@ sub gdmo {
 	PRINT: {
 		my $s;
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.Document'; $::first = 0;
 		if (($s = $self->{documentstring})) { $s->gdmo(); }
 		if (($s = $self->{documentoid})) { $s->gdmo(); }
 	}
@@ -5888,7 +5744,6 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^GDMO\s*\.\s*EndDocument\s*//s);
 		$self->{documentstring} = DocumentReference->parse($line);
 		$self->{documentoid} = ObjectIdentifierValue->parse($line);
 		$line=~s/^(?:\s|\n)*//s;
@@ -5909,7 +5764,6 @@ sub gdmo {
 	PRINT: {
 		my $s;
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.EndDocument'; $::first = 0;
 		if (($s = $self->{documentstring})) { $s->gdmo(); }
 		if (($s = $self->{documentoid})) { $s->gdmo(); }
 	}
@@ -5926,7 +5780,6 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^GDMO\s*\.\s*Version\s*//s);
 		$self->{version} = Version->parse($line);
 		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
@@ -5944,7 +5797,6 @@ sub gdmo {
 	PRINT: {
 		my $s;
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.Version'; $::first = 0;
 		if (($s = $self->{version})) { $s->gdmo(); }
 	}
 }
@@ -5960,8 +5812,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^GDMO\s*\.\s*Copyright\s*//s);
-		$self->{copyright} = $';
+		$self->{copyright} = $line;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -5972,7 +5823,6 @@ sub gdmo {
 	PRINT: {
 		my ($s,$l);
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.Copyright'; $::first = 0;
 		foreach $l (split(/\n/,$self->{copyright})) {
 			printf "\n--  ".$l; $::first = 0;
 		}
@@ -5991,8 +5841,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^GDMO\s*\.\s*ChangeLog\s*//s);
-		$self->{changelog} = $';
+		$self->{changelog} = $line;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -6003,7 +5852,6 @@ sub gdmo {
 	PRINT: {
 		my ($s,$l);
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.ChangeLog'; $::first = 0;
 		foreach $l (split(/\n/,$self->{changelog})) {
 			printf "\n--  ".$l; $::first = 0;
 		}
@@ -6022,7 +5870,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^(?:\s|\n)*--<\s*GDMO\s*\.\s*Include\s*"([^"]*)"\s*>--\s*?\n//s);
+		last TEST unless ($line=~s/^\s*"([^"]*)"\s*//s);
 		$self->{filename} = $1;
 		$_[0] = $line; return $self;
 	}
@@ -6034,7 +5882,6 @@ sub gdmo {
 	PRINT: {
 		my ($s,$l);
 		if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
-		printf 'GDMO.ChangeLog'; $::first = 0;
 		foreach $l (split(/\n/,$self->{changelog})) {
 			printf "\n--  ".$l; $::first = 0;
 		}
@@ -6054,8 +5901,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^ASN1\s*\.\s*Version\s*//s);
-		$self->{version} = Version->parse($line);
+		last TEST unless (($self->{version} = Version->parse($line)));
 		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
 	}
@@ -6064,15 +5910,13 @@ sub read {
 
 sub xref {
 	my $self = shift;
-	my $x; if (($x = $self->{version})) { $x->xref(@_); }
+	$self->{version}->xref(@_);
 }
 
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my $s;
-		printf 'ASN1.Version '; $::first = 0;
-		if (($s = $self->{version})) { $s->gdmo(); }
+		$self->{version}->gdmo();
 	}
 }
 
@@ -6103,6 +5947,121 @@ sub gdmo {
 		printf "$self->{version}"; $::first = 0;
 	}
 }
+
+# -------------------------------------
+package Directives;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub readdirective {
+	my $self = shift;
+	my $type = shift;
+	my $line = $_[0];
+	TEST: {
+		my ($s,$directive,$e);
+		do {
+			if ($line=~s/^(?:\s|\n)*--<((?:.|\n)*?)>--(?:\s|\n)*//s) {
+				$directive = $1;
+				# strip all the continuation markers
+				$directive=~s/\n[ \t]*(?:--[ \t]*)?/\n/sg;
+				# strip leading and trailing whitespace
+				$directive=~s/^(?:\s|\n)*//s;
+				$directive=~s/(?:\s|\n)*$//s;
+				if (($s = $type->parse($directive))) {
+					push @{$self->{directives}}, $s;
+				}
+				$e++;
+			} elsif (($s = Comments->parse($line))) {
+				push @{$self->{comments}}, $s;
+				$e++;
+			}
+		} while ($s);
+		last TEST unless ($e);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub read {
+	my $self = shift;
+	my $type = ref($self).'Choice';
+	return $self->readdirective($type,@_);
+}
+
+sub xref {
+	my $self = shift;
+	my $x;
+	foreach $x (@{$self->{directives}}) { $x->xref(@_); }
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		foreach $s (@{$self->{directives}}) {
+			if (!$::first) { printf "\n$::indent"; $::first = 1; }
+			printf '--<'; $::first = 0;
+			$s->gdmo();
+			if (!$::first) { printf ' '; } else { printf '-- '; $::first = 0; }
+			printf '>--'; $::first = 0;
+		}
+		foreach $s (@{$self->{comments}}) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
+package Asn1Directives;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Directives);
+# -------------------------------------
+
+# -------------------------------------
+package Asn1DirectivesChoice;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless ($line=~s/^ASN1\s*\.\s*(\w*)\s*//s);
+		$self->{directive} = $1;
+		if ($self->{directive}=~/^Version$/) {
+		} elsif ($self->{directive}=~/^FileNameExtension$/) {
+		} elsif ($self->{directive}=~/^FileNamePrefixe$/) {
+		} elsif ($self->{directive}=~/^FileNameSuffix$/) {
+		} elsif ($self->{directive}=~/^Nickname$/) {
+		} elsif ($self->{directive}=~/^Remove$/) {
+		} elsif ($self->{directive}=~/^WorkingSet1$/) {
+		} else {
+			last TEST;
+		}
+		$self->{type} = 'Asn1'.$self->{directive}.'Directive';
+		last TEST unless (($self->{item} = "$self->{type}"->parse($line)));
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub xref {
+	my $self = shift;
+	$self->{item}->xref(@_);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf ' '; }
+		printf 'ASN1.'.$self->{directive}; $::first = 0;
+		$self->{item}->gdmo();
+	}
+}
+
 
 # ----------------------------------------
 package Comments;
@@ -6264,7 +6223,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		$self->{derivedfrom} = DerivedFromClasses->parse($line);
@@ -6324,7 +6283,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		$self->{behaviour} = Behaviour->parse($line);
@@ -6390,7 +6349,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless ($self->{context} = Context->parse($line));
@@ -6453,7 +6412,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless ($self->{subordinate} = Subordinate->parse($line));
@@ -6522,7 +6481,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless (
@@ -6588,7 +6547,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		$self->{groupelements} = GroupElements->parse($line);
@@ -6648,7 +6607,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		$self->{definedas} = DefinedAs->parse($line);
@@ -6699,7 +6658,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		$self->{behaviour} = Behaviour->parse($line);
@@ -6765,7 +6724,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		$self->{behaviour} = Behaviour->parse($line);
@@ -6828,7 +6787,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless (($self->{superiorclass} = SuperiorObjectClass->parse($line)));
@@ -6928,7 +6887,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->{label} = $1;
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless (($self->{objectclass} = ObjectClass->parse($line)));
@@ -8051,7 +8010,8 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
+		# ok, you can have a period or slash in a label
+		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-)//s);
 		$self->{label} = $&;
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
