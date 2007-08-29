@@ -265,7 +265,7 @@ sub code {
 	$self->call('code',@_);
 }
 
-sub labelxform {
+sub xform {
 	my $self = shift;
 	my $prefix = shift;
 	my $label = shift;
@@ -273,17 +273,19 @@ sub labelxform {
 	$label=~s/-/_/g;
 	$label=~s/\./_/g;
 	$label=~s/\//_/g;
-	$label=~s/$suffix$//;
-	$label.=$suffix;
-	$label=$prefix.$label;
+	#$label=~s/$suffix$//;
+	#$label.=$suffix;
+	#$label=$prefix.$label;
+	#if (length($label) > 20) {
+	#	$label=~s/[aeiouy]//g;
+	#}
 	return $label;
 }
 
 sub decclass {
 	my $self = shift;
 	my $parent = shift;
-	my $label = $self->labelxform('',$self->{label},$parent);
-	printf "\n$::indent"."class $label";
+	printf "\n$::indent"."class $self->{name}";
 }
 
 sub begclass {
@@ -297,13 +299,29 @@ sub begclass {
 sub endclass {
 	my $self = shift;
 	my $parent = shift;
-	my $label = $self->labelxform('',$self->{label},$parent);
+	my $name = $self->{name};
+	if (defined $self->{constructorrefs} || defined $self->{constructorptrs}) {
+		my ($a,$e);
+		printf "\n$::indent"."$name"."(";
+		foreach $a (@{$self->{constructorrefs}}) {
+			if ($e) { printf ", "; } else { $e++; }
+			printf "$a->{name}&";
+		}
+		foreach $a (@{$self->{constructorptrs}}) {
+			if ($e) { printf ", "; } else { $e++; }
+			printf "$a->{name} *";
+		}
+		printf ");";
+	} else {
+		printf "\n$::indent"."$name"."() = 0;          // default constructor";
+	}
+	printf "\n$::indent"."virtual ~$name"."() = 0; // virtual default destructor";
 	$::indent=~s/^.//s;
 	printf "\n$::indent}";
 	if ($::indent=~/^$/) {
-		printf ";\t/* class $label */";
+		printf ";\t/* class $name */";
 	} else {
-		printf " $label;";
+		printf " $name;";
 	}
 	print '';
 }
@@ -777,14 +795,28 @@ sub head {
 		'ConstraintRule',
 		'SubordinationRule'
 	);
+	my @classes = (
+		'class ',
+		'class ',
+		'class ',
+		'class ',
+		'class ',
+		'class ',
+		'class ',
+		'static const char *',
+		'class ',
+		'class ',
+		'class ',
+		'class '
+	);
 	my ($x,$d,$i,$e);
 	for ($i=0;$i<scalar @names;$i++) {
 		# Generate declarations for all classes
 		printf "\n// $headers[$i] declarations\n";
 		foreach $x (sort keys %{$::root->{$names[$i]}}) {
 			if (($d = $::root->{$names[$i]}->{$x}->{defn})) {
-				my $label = $self->labelxform('',$d->{label},$suffixes[$i]);
-				printf "\nclass $label;";
+				my $label = $self->xform('',$d->{label},$suffixes[$i]);
+				printf "\n$classes[$i]$label;";
 				$e++;
 			}
 		}
@@ -6356,6 +6388,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'ManagedObject');
 		$self->{comments1} = Comments->parse($line);
 		$self->{derivedfrom} = DerivedFromClasses->parse($line);
 		$self->{characterization} = Characterization->parse($line);
@@ -6371,10 +6404,10 @@ sub read {
 sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{derivedfrom})) { $x->generate(@_); }
-	if (($x = $self->{characterization})) { $x->generate(@_); }
-	if (($x = $self->{conditionalpackages})) { $x->generate(@_); }
-	if (($x = $self->{registration})) { $x->generate(@_); }
+	if (($x = $self->{derivedfrom})) { $x->generate(@_,$self); }
+	if (($x = $self->{characterization})) { $x->generate(@_,$self); }
+	if (($x = $self->{conditionalpackages})) { $x->generate(@_,$self); }
+	if (($x = $self->{registration})) { $x->generate(@_,$self); }
 }
 
 sub xref {
@@ -6390,8 +6423,7 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{objects}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'ManagedObject');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('MangedObjectFactory');
 		$self->endclass('MangedObjectFactory');
@@ -6400,7 +6432,20 @@ sub head {
 		} else {
 			$self->begclass('ManagedObject');
 		}
-		$self->call('head',@_);
+		my $x;
+		if (($x = $self->{derivedfrom})) { $x->generate('head',@_,$self); }
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
+		if (defined $self->{superior}) {
+			printf "\n$::indent"."// NAMED BY SUPERIOR OBJECT CLASS:";
+			printf "\n$::indent"."$self->{superior}->{name}& $self->{superior}->{superior}->{class}->{name};"
+		}
+		if (defined $self->{subordinate}) {
+			printf "\n$::indent"."// SUBORDINATE OBJECT CLASS:";
+			printf "\n$::indent"."list <"."$self->{subordinate}->{name}&> $self->{subordinate}->{subordinate}->{class}->{name};"
+		}
+		if (($x = $self->{characterization})) { $x->generate('head',@_,$self); }
+		if (($x = $self->{conditionalpackages})) { $x->generate('head',@_,$self); }
+		if (($x = $self->{registration})) { $x->generate('head',@_,$self); }
 		$self->endclass('ManagedObject');
 		$::root->{objects}->{$self->{label}}->{intf} = $self;
 	}
@@ -6439,6 +6484,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Package');
 		$self->{comments1} = Comments->parse($line);
 		$self->{behaviour} = Behaviour->parse($line);
 		$self->{attributes} = Attributes->parse($line);
@@ -6456,12 +6502,12 @@ sub read {
 sub call {
 	my $self = shift;
 	my $x;
-	if (($x = $self->{behaviour})) { $x->generate(@_); }
-	if (($x = $self->{attributes})) { $x->generate(@_); }
-	if (($x = $self->{attributegroups})) { $x->generate(@_); }
-	if (($x = $self->{actions})) { $x->generate(@_); }
-	if (($x = $self->{notifications})) { $x->generate(@_); }
-	if (($x = $self->{registration})) { $x->generate(@_); }
+	if (($x = $self->{behaviour})) { $x->generate(@_,$self); }
+	if (($x = $self->{attributes})) { $x->generate(@_,$self); }
+	if (($x = $self->{attributegroups})) { $x->generate(@_,$self); }
+	if (($x = $self->{actions})) { $x->generate(@_,$self); }
+	if (($x = $self->{notifications})) { $x->generate(@_,$self); }
+	if (($x = $self->{registration})) { $x->generate(@_,$self); }
 }
 
 sub xref {
@@ -6476,10 +6522,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{packages}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Package');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('Package');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_);
 		$self->endclass('Package');
 		$::root->{packages}->{$self->{label}}->{intf} = $self;
@@ -6521,6 +6567,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Parameter');
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless ($self->{context} = Context->parse($line));
 		last TEST unless (
@@ -6539,10 +6586,10 @@ sub read {
 sub call {
 	my $self = shift;
 	my $x;
-	$self->{context}->generate(@_);
-	$self->{syntax}->generate(@_);
-	if (($x = $self->{behaviour})) { $x->generate(@_); }
-	if (($x = $self->{registration})) { $x->generate(@_); }
+	$self->{context}->generate(@_,$self);
+	$self->{syntax}->generate(@_,$self);
+	if (($x = $self->{behaviour})) { $x->generate(@_,$self); }
+	if (($x = $self->{registration})) { $x->generate(@_,$self); }
 }
 
 sub xref {
@@ -6557,10 +6604,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{parameters}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('Parameter');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_);
 		$self->endclass('Parameter');
 		$::root->{parameters}->{$self->{label}}->{intf} = $self;
@@ -6600,6 +6647,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'NameBinding');
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless ($self->{subordinate} = Subordinate->parse($line));
 		last TEST unless ($self->{superior} = NamedBySuperior->parse($line));
@@ -6618,13 +6666,13 @@ sub read {
 sub call {
 	my $self = shift;
 	my $x;
-	$self->{subordinate}->generate(@_);
-	$self->{superior}->generate(@_);
-	$self->{attribute}->generate(@_);
-	if (($x = $self->{behaviour})) { $x->generate(@_); }
-	if (($x = $self->{createit})) { $x->generate(@_); }
-	if (($x = $self->{deleteit})) { $x->generate(@_); }
-	if (($x = $self->{registration})) { $x->generate(@_); }
+	$self->{subordinate}->generate(@_,$self);
+	$self->{superior}->generate(@_,$self);
+	$self->{attribute}->generate(@_,$self);
+	if (($x = $self->{behaviour})) { $x->generate(@_,$self); }
+	if (($x = $self->{createit})) { $x->generate(@_,$self); }
+	if (($x = $self->{deleteit})) { $x->generate(@_,$self); }
+	if (($x = $self->{registration})) { $x->generate(@_,$self); }
 }
 
 sub xref {
@@ -6633,16 +6681,24 @@ sub xref {
 	$gdmo->{bindings}->{$self->{label}}->{defn} = $self;
 	$::root->{bindings}->{$self->{label}}->{defn} = $self;
 	$::root->{bindings}->{$self->{label}}->{modl} = $gdmo;
+	if (defined $::root->{objects}->{$self->{superior}->{class}->{label}}->{defn}) {
+		$::root->{objects}->{$self->{superior}->{class}->{label}}->{defn}->{subordinate} = $self;
+	}
+	if (defined $::root->{objects}->{$self->{subordinate}->{class}->{label}}->{defn}) {
+		$::root->{objects}->{$self->{subordinate}->{class}->{label}}->{defn}->{superior}= $self;
+	}
 	$self->call('xref',@_);
 }
 
 sub head {
 	my $self = shift;
 	if ($::root->{bindings}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('NameBinding');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
+		printf "\n$::indent"."$self->{superior}->{class}->{name} *Superior;";
+		printf "\n$::indent"."$self->{subordinate}->{class}->{name} *Subordinate;";
 		$self->call('head',@_);
 		$self->endclass('NameBinding');
 		$::root->{bindings}->{$self->{label}}->{intf} = $self;
@@ -6685,6 +6741,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Attribute');
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless (
 			($self->{syntax} = DerivedFromAttribute->parse($line)) ||
@@ -6705,10 +6762,10 @@ sub call {
 	my $self = shift;
 	my $x;
 	$self->{syntax}->generate(@_);
-	if (($x = $self->{matches})) { $x->generate(@_); }
-	if (($x = $self->{behaviour})) { $x->generate(@_); }
-	if (($x = $self->{parameters})) { $x->generate(@_); }
-	if (($x = $self->{registration})) { $x->generate(@_); }
+	if (($x = $self->{matches})) { $x->generate(@_,$self); }
+	if (($x = $self->{behaviour})) { $x->generate(@_,$self); }
+	if (($x = $self->{parameters})) { $x->generate(@_,$self); }
+	if (($x = $self->{registration})) { $x->generate(@_,$self); }
 }
 
 sub xref {
@@ -6723,11 +6780,27 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{attributes}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
-		$self->begclass('Attribute');
-		$self->call('head',@_);
+		my $x;
+		$self->decclass('Attribute');
+		$::indent.="\t";
+		$self->{syntax}->generate('head',@_,$self);
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
+		printf "\n$::indent"."static bool $self->{name}"."Equality = ";
+		if ($self->{equality})		    { printf 'true;'; } else { printf 'false;'; }
+		printf "\n$::indent"."static bool $self->{name}"."Ordering = ";
+		if ($self->{ordering})		    { printf 'true;'; } else { printf 'false;'; }
+		printf "\n$::indent"."static bool $self->{name}"."Substrings = ";
+		if ($self->{substrings})	    { printf 'true;'; } else { printf 'false;'; }
+		printf "\n$::indent"."static bool $self->{name}"."SetComparison = ";
+		if ($self->{setcomparison})	    { printf 'true;'; } else { printf 'false;'; }
+		printf "\n$::indent"."static bool $self->{name}"."SetInteraction = ";
+		if ($self->{setintersection})	    { printf 'true;'; } else { printf 'false;'; }
+		if (($x = $self->{behaviour}))	    { $x->generate('head',@_,$self); }
+		if (($x = $self->{parameters}))	    { $x->generate('head',@_,$self); }
+		if (($x = $self->{registration}))   { $x->generate('head',@_,$self); }
+		$::indent=~s/^.//s;
 		$self->endclass('Attribute');
 		$::root->{attributes}->{$self->{label}}->{intf} = $self;
 	}
@@ -6767,6 +6840,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'AttributeGroup');
 		$self->{comments1} = Comments->parse($line);
 		$self->{groupelements} = GroupElements->parse($line);
 		$self->{fixed} = Fixed->parse($line);
@@ -6800,10 +6874,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{groups}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('AttributeGroup');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_,$self);
 		$self->endclass('AttributeGroup');
 		$::root->{groups}->{$self->{label}}->{intf} = $self;
@@ -6843,6 +6917,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Behaviour');
 		$self->{comments1} = Comments->parse($line);
 		$self->{definedas} = DefinedAs->parse($line);
 		last TEST unless ($line=~s/^;//s);
@@ -6870,14 +6945,13 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{behaviours}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Behaviour');
-		printf "\n$::indent"."string $label;";
+		printf "\n$::indent"."static const char $self->{name}"."[];";
 	} else {
 		#$self->begclass('Behaviour');
+		#printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		#$self->call('head',@_);
 		#$self->endclass('Behaviour');
-		my $label = $self->labelxform('',$self->{label},'Behaviour');
-		printf "\n$::indent"."string $label = \"\\\n";
+		printf "\n$::indent"."static const char $self->{name}"."[] = \"\\\n";
 		$self->call('head',@_);
 		printf "\";\n$::indent";
 		$::root->{behaviours}->{$self->{label}}->{intf} = $self;
@@ -6914,6 +6988,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Action');
 		$self->{comments1} = Comments->parse($line);
 		$self->{behaviour} = Behaviour->parse($line);
 		$self->{mode} = Mode->parse($line);
@@ -6953,10 +7028,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{actions}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('Action');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_);
 		$self->endclass('Action');
 		$::root->{actions}->{$self->{label}}->{intf} = $self;
@@ -6998,6 +7073,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Notification');
 		$self->{comments1} = Comments->parse($line);
 		$self->{behaviour} = Behaviour->parse($line);
 		$self->{parameters} = Parameters->parse($line);
@@ -7035,10 +7111,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{notifications}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('Notification');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_);
 		$self->endclass('Notification');
 		$::root->{notifications}->{$self->{label}}->{intf} = $self;
@@ -7079,6 +7155,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Subordinate');
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless (($self->{superiorclass} = SuperiorObjectClass->parse($line)));
 		last TEST unless (($self->{namessubs} = NamesSubordinates->parse($line)));
@@ -7112,10 +7189,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{subordinates}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('Subordination');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_);
 		$self->endclass('Subordination');
 		$::root->{subordinates}->{$self->{label}}->{intf} = $self;
@@ -7155,6 +7232,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->{label} = $1;
+		$self->{name} = $self->xform('',$self->{label},'Constraint');
 		$self->{comments1} = Comments->parse($line);
 		last TEST unless (($self->{objectclass} = ObjectClass->parse($line)));
 		last TEST unless (($self->{isrelatedto} = IsRelatedTo->parse($line)));
@@ -7190,10 +7268,10 @@ sub xref {
 sub head {
 	my $self = shift;
 	if ($::root->{constraints}->{$self->{label}}->{intf}) {
-		my $label = $self->labelxform('',$self->{label},'Parameter');
-		printf "\n$::indent"."class $label $label;";
+		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$self->begclass('Constraint');
+		printf "\n$::indent"."static const char name"."[] = \"$self->{label}\";";
 		$self->call('head',@_);
 		$self->endclass('Constraint');
 		$::root->{constraints}->{$self->{label}}->{intf} = $self;
@@ -8339,6 +8417,7 @@ sub read {
 		# ok, you can have a period or slash in a label
 		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-)//s);
 		$self->{label} = $&;
+		$self->{name} = $self->xform('',$self->{label},'');
 		$self->{comments} = Comments->parse($line);
 		$_[0] = $line; return $self;
 	}
@@ -8412,12 +8491,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = ClassTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8470,12 +8551,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = PackageTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8528,12 +8611,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = ParameterTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8586,12 +8671,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = NameBindingTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8644,12 +8731,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = AttributeTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8702,12 +8791,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = AttributeGroupTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8760,12 +8851,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = BehaviourTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8818,12 +8911,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = ActionTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8876,12 +8971,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = NotificationTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8934,12 +9031,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = SubordinationRuleTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -8992,12 +9091,14 @@ sub read {
 	TEST: {
 		if (($self->{reference} = ConstraintRuleTemplate->parse($line))) {
 			$self->{label} = $self->{reference}->{label};
+			$self->{name} = $self->{reference}->{name};
 		} elsif (($self->{reference} = Reference->parse($line))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
 			if ($self->{reference}->{label}) {
 				$self->{label} = $self->{reference}->{label}->{label};
+				$self->{name} = $self->{reference}->{label}->{name};
 			}
 		} else {
 			last TEST;
@@ -9069,7 +9170,7 @@ sub head {
 	printf ' : public ';
 	foreach $i (@{$self->{classes}->{items}}) {
 		if ($e) { printf ', '; } else { $e++; }
-		printf $self->labelxform('',$i->{reference}->{label},'ManagedOBject');
+		printf "$i->{name}";
 	}
 	printf ' {';
 	$::indent.="\t";
@@ -9124,8 +9225,12 @@ sub call {
 
 sub head {
 	my $self = shift;
-	print "\n\n$::indent"."// Mandatory Packages";
+	my $tmpl = $_[-1]; # PackageTemplate
+	print "\n\n$::indent"."// CHARACTERIZED BY: (mandatory packages)";
 	$self->call('head',@_);
+	my $p; foreach $p (@{$self->{packages}->{items}}) {
+		push @{$tmpl->{constructorrefs}}, $p;
+	}
 }
 
 sub gdmo {
@@ -9176,7 +9281,7 @@ sub call {
 
 sub head {
 	my $self = shift;
-	printf "\n$::indent"."// Conditional Packages\n$::indent";
+	printf "\n$::indent"."// CONDITIONAL PACKAGES::\n$::indent";
 	$self->call('head',@_);
 	printf "\n$::indent";
 }
@@ -9231,12 +9336,18 @@ sub call {
 
 sub head {
 	my $self = shift;
-	#if (ref($self->{package}->{reference})=~/PackageTemplate/) {
-	#	$self->call('head',@_);
-	#} else {
-		my $label = $self->labelxform('',$self->{package}->{label},'Package');
-		printf "\n$::indent"."class $label *$label;";
-	#}
+	my $tmpl = $_[-1]; # PackageTemplate
+	if (ref($self->{package}->{reference})=~/PackageTemplate/) {
+		if (!$::root->{packages}->{$self->{package}->{label}}->{intf}) {
+			$self->{package}->generate('head',@_);
+			$::root->{packages}->{$self->{package}->{label}}->{intf}
+				= $self->{package}->{reference};
+		} 
+	}
+	$self->{condition}->generate('head',@_,$self->{package});
+	printf "\n$::indent"."$self->{package}->{name} *$self->{package}->{name};";
+	printf "\n$::indent";
+	push @{$tmpl->{constructorptrs}}, $self->{package};
 }
 
 sub gdmo {
@@ -9275,6 +9386,51 @@ sub call {
 	$self->{delimited}->generate(@_);
 }
 
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// PRESENT-IF:\n$::indent// "; $::first = 1;
+	# dig right down to the string inside the delimited string object
+	my ($s, $col, $spc, $len, $line, $d, $e);
+	$line = $self->{delimited}->{string};
+	$d = $self->{delimited}->{delimiter};
+	$d = '\\'.$d if ($d=~/[\$\*\?\\]/);
+	$line=~s/$d$d/$d/gs;
+	$col = 0;
+	my @paras = ( split(/\n\n/s,$line) );
+	my $p; foreach $p (@paras) {
+		if ($e) {
+			if (!$::first) { printf "\n$::indent// "; $col = 0; $::first = 1; }
+		} else { $e++; }
+		my @lines = ( split(/\n/s,$p) );
+		my $l; foreach $l (@lines) {
+			$l=~s/^\t+//s;
+			if ($l=~/^[^ ]/) {
+				my @words = ( split(/\s+/s,$l) );
+				my $w; foreach $w (@words) {
+					if ($col == 0) { $spc = 0; } else { $spc = 1; }
+					$len = length($w);
+					if ($len) {
+						if ($col + $spc + $len < $::colwidth) {
+							if ($spc) { printf ' '; }
+							$col += $spc + $len;
+						} else {
+							printf "\n$::indent// ";
+							$col = $len;
+						}
+						printf "$w";
+					}
+				}
+			} else {
+				if (!$::first) { printf "\n$::indent// "; $::first = 1; }
+				printf "$l"; $::first = 0;
+				if (!$::first) { printf "\n$::indent// "; $::first = 1; }
+			}
+		}
+	}
+
+	printf "\n$::indent";
+}
+
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -9310,6 +9466,13 @@ sub read {
 sub call {
 	my $self = shift;
 	$self->{delimited}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// PRESENT-ONLY-IF:\n$::indent";
+	$self->call('head',@_);
+	printf "\n$::indent";
 }
 
 sub gdmo {
@@ -9363,7 +9526,7 @@ sub head {
 	$line=~s/$d$d/$d/gs;
 	$line=~s/"/\"/gs;
 	$col = 0;
-	my @paras = ( split(/\n\n/s,$self->{string}) );
+	my @paras = ( split(/\n\n/s,$line) );
 	my $p; foreach $p (@paras) {
 		if ($e) {
 			if (!$::first) { printf "\\n\\\n"; $col = 0; $::first = 1; }
@@ -9468,7 +9631,7 @@ sub call {
 
 sub head {
 	my $self = shift;
-	printf "\n$::indent"."// Attributes\n$::indent";
+	printf "\n$::indent"."// ATTRIBUTES:\n$::indent";
 	$self->call('head',@_);
 	printf "\n$::indent";
 }
@@ -9522,10 +9685,12 @@ sub call {
 sub head {
 	my $self = shift;
 	if (ref($self->{attribute}->{reference})=~/AttributeTemplate/) {
-		$self->call('head',@_);
+		$self->call('head',@_,$self);
 	} else {
-		my $label = $self->labelxform('',$self->{attribute}->{label},'Attribute');
-		printf "\n$::indent"."class $label $label;";
+		my $x;
+		printf "\n$::indent"."$self->{attribute}->{name} $self->{attribute}->{name};";
+		if (($x = $self->{properties})) { $x->generate('head',@_,$self); }
+		if (($x = $self->{parameters})) { $x->generate('head',@_,$self); }
 	}
 }
 
@@ -9608,6 +9773,12 @@ sub read {
 	return $self->readtoken('REPLACE-WITH-DEFAULT',@_);
 }
 
+sub head {
+	my $self = shift;
+	my $prop = $_[-1];
+	printf "\n$::indent"."static bool ReplaceWithDefault = true;";
+}
+
 # -------------------------------------
 package DefaultValue;
 use strict;
@@ -9630,6 +9801,14 @@ sub read {
 sub call {
 	my $self = shift;
 	$self->{value}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."static const $name& $name"."Default;";
+	printf "\n$::indent"."void $name"."SetDefault(void);";
+	$self->{value}->generate('head',@_);
 }
 
 sub gdmo {
@@ -9667,6 +9846,13 @@ sub call {
 	$self->{value}->generate(@_);
 }
 
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."static const $name& $name"."Initial;";
+	$self->{value}->generate('head',@_);
+}
+
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -9700,6 +9886,13 @@ sub read {
 sub call {
 	my $self = shift;
 	$self->{typereference}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."static const $name& $name"."Permitted;";
+	$self->{typereference}->generate('head',@_);
 }
 
 sub gdmo {
@@ -9737,6 +9930,13 @@ sub call {
 	$self->{typereference}->generate(@_);
 }
 
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."static const $name& $name"."Required;";
+	$self->{typereference}->generate('head',@_);
+}
+
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -9760,6 +9960,13 @@ sub read {
 	return $self->readtoken('GET-REPLACE',@_);
 }
 
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."$name& $name"."Get(void);";
+	printf "\n$::indent"."void $name"."Set($name& val);";
+}
+
 # -------------------------------------
 package Get;
 use strict;
@@ -9770,6 +9977,12 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	return $self->readtoken('GET',@_);
+}
+
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."$name& $name"."Get(void);";
 }
 
 # -------------------------------------
@@ -9784,6 +9997,12 @@ sub read {
 	return $self->readtoken('REPLACE',@_);
 }
 
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."void $name"."Set($name& val);";
+}
+
 # -------------------------------------
 package AddRemove;
 use strict;
@@ -9794,6 +10013,13 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	return $self->readtoken('ADD-REMOVE',@_);
+}
+
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."void $name"."Add($name& val);";
+	printf "\n$::indent"."void $name"."Remove($name& val);";
 }
 
 # -------------------------------------
@@ -9808,6 +10034,12 @@ sub read {
 	return $self->readtoken('ADD',@_);
 }
 
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."void $name"."Add($name& val);";
+}
+
 # -------------------------------------
 package Remove;
 use strict;
@@ -9818,6 +10050,12 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	return $self->readtoken('REMOVE',@_);
+}
+
+sub head {
+	my $self = shift;
+	my $name = $_[-1]->{attribute}->{name};
+	printf "\n$::indent"."void $name"."Remove($name& val);";
 }
 
 # -------------------------------------
@@ -9832,6 +10070,14 @@ sub read {
 	return $self->readtoken('SET-BY-CREATE',@_);
 }
 
+sub head {
+	my $self = shift;
+	my $prop = $_[-1]; # AttributeProperty
+	my $tmpl = $_[-2]; # PackageTemplate
+	printf "\n$::indent"."// SET-BY-CREATE: $prop->{attribute}->{name}";
+	push @{$tmpl->{constructorrefs}}, $prop->{attribute};
+}
+
 # -------------------------------------
 package NoModify;
 use strict;
@@ -9842,6 +10088,13 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	return $self->readtoken('NO-MODIFY',@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// FIXME: override default $_[-1]->{attribute}->{name} ops with errors";
+	#fixme provide error overrides for default operations
+	#printf "\n$::indent"."static bool NoModify = true;";
 }
 
 # -------------------------------------
@@ -10312,7 +10565,7 @@ sub call {
 
 sub head {
 	my $self = shift;
-	printf "\n$::indent"."// Attribute Groups\n$::indent";
+	printf "\n$::indent"."// ATTRIBUTE GROUPS:\n$::indent";
 	$self->call('head',@_);
 	printf "\n$::indent";
 }
@@ -10369,7 +10622,7 @@ sub call {
 
 sub head {
 	my $self = shift;
-	printf "\n$::indent"."// Actions\n$::indent";
+	printf "\n$::indent"."// ACTIONS:\n$::indent";
 	$self->call('head',@_);
 	printf "\n$::indent";
 }
@@ -10423,8 +10676,7 @@ sub head {
 	if (ref($self->{action}->{reference})=~/ActionTemplate/) {
 		$self->call('head',@_);
 	} else {
-		my $label = $self->labelxform('',$self->{action}->{label},'Action');
-		printf "\n$::indent"."void $label();";
+		printf "\n$::indent"."void $self->{action}->{name}"."();";
 	}
 }
 
@@ -10479,7 +10731,7 @@ sub call {
 
 sub head {
 	my $self = shift;
-	printf "\n$::indent"."// Notifications\n$::indent";
+	printf "\n$::indent"."// NOTIFICATIONS:\n$::indent";
 	$self->call('head',@_);
 	printf "\n$::indent";
 }
@@ -11367,6 +11619,12 @@ sub call {
 	$self->{attribute}->generate(@_);
 }
 
+sub head {
+	my $self = shift;
+	printf " : public $self->{attribute}->{name} {";
+	$self->{attribute}->generate('head',@_);
+}
+
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -11408,6 +11666,13 @@ sub read {
 sub call {
 	my $self = shift;
 	$self->{syntax}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf ' : public Attribute {';
+	# could actually let the syntax fill out the parent class
+	$self->{syntax}->generate('head',@_);
 }
 
 sub gdmo {
@@ -11524,6 +11789,12 @@ sub read {
 	return $self->readtoken('EQUALITY',@_);
 }
 
+sub xref {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	$tmpl->{equality} = $self;
+}
+
 # -------------------------------------
 package Ordering;
 use strict;
@@ -11534,6 +11805,12 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	return $self->readtoken('ORDERING',@_);
+}
+
+sub xref {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	$tmpl->{ordering} = $self;
 }
 
 # -------------------------------------
@@ -11548,6 +11825,12 @@ sub read {
 	return $self->readtoken('SUBSTRINGS',@_);
 }
 
+sub xref {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	$tmpl->{substrings} = $self;
+}
+
 # -------------------------------------
 package SetComparison;
 use strict;
@@ -11560,6 +11843,12 @@ sub read {
 	return $self->readtoken('SET-COMPARISON',@_);
 }
 
+sub xref {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	$tmpl->{setcomparison} = $self;
+}
+
 # -------------------------------------
 package SetIntersection;
 use strict;
@@ -11570,6 +11859,12 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	return $self->readtoken('SET-INTERSECTION',@_);
+}
+
+sub xref {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	$tmpl->{setintersection} = $self;
 }
 
 # -------------------------------------
@@ -11596,6 +11891,12 @@ sub read {
 sub call {
 	my $self = shift;
 	$self->{parameters}->generate(@_);
+}
+
+sub head {
+	my $self = shift;
+	printf "\n$::indent"."// PARAMETERS:\n$::indent";
+	$self->call('head',@_);
 }
 
 sub gdmo {
@@ -11728,9 +12029,7 @@ sub call {
 
 sub head {
 	my $self = shift;
-	my $tmpl = $_[-1];
-	my $label = $self->labelxform('',$tmpl->{label},'Description');
-	printf "\n$::indent"."string $label = \"\\\n";
+	printf "\n$::indent"."static const char $_[-1]->{name}"."[] = \"\\\n";
 	$self->call('head',@_);
 	printf "\";\n$::indent";
 }
