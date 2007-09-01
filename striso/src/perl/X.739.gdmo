@@ -1,5 +1,9 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "Rec. X.739 (1993)" >--
 --< GDMO.Alias "Rec. X.739 (1993)"
+--  "Recommendation X.739:1993",
+--  "ITU-T Recommendation X.739 | ISO/IEC 10164-11",
 --  "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994",
 --  "Rec. X.739 (1993) | ISO/IEC 10164-11:1994" >--
 --< GDMO.Version 1.3 >--

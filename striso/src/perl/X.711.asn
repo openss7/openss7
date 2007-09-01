@@ -94,7 +94,7 @@ InvokeIDType FROM Remote-Operations-APDUs {joint-iso-ccitt remote-operations(4) 
 -- This Recommendation | International Standard imports abstract syntax from CCI TT Rec. X.501 (1988) |
 -- ISO/IEC 9594-2:1990. Annex D to this Recommendation | International Standard provides an extract
 -- from CCITT Rec. X.501 (1988) | ISO/IEC 9594-2:1990, sufficient to meet the needs of CMIP.
-DistinguishedName, RDNSequenceFROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)}; 
+DistinguishedName, RDNSequence FROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)}; 
 -- CMISE operations
 -- in the following operations, the argument type is mandatory in the corresponding ROSE APDU 
 -- Action operations (M-ACTION)

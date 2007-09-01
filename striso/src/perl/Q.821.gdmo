@@ -1,3 +1,4 @@
+--< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "ITU-T Rec. Q.821 (2000)" >--
 --< GDMO.Alias "ITU-T Rec. Q.821 (2000)" "Recommendation Q.821:1992" >--
 --< GDMO.Version 1.3 >--
@@ -443,7 +444,7 @@ suspectObjectListParameter PARAMETER
 REGISTERED AS { q821Parameter 3 };
 
 
-canceledAlarmSynchronizationParameter PARAMETER
+cancelledAlarmSynchronizationParameter PARAMETER
 	CONTEXT SPECIFIC ERROR;
 	WITH SYNTAX Q821-ASN1Module.CancelledAlarmSynchronization;
 	BEHAVIOUR

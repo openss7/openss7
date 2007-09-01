@@ -1,3 +1,7 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Include "Q.822.gdmo" >--
+--< GDMO.Include "T1.116.1.gdmo" >--
 --< GDMO.Document "ANSI T1.116.1/2000 Annex D" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
@@ -280,13 +284,13 @@ receivedOctetsOpcSioMeasurement MANAGED OBJECT CLASS
 -- D.3.13.	Route Set Information Data
 
 
-routeSetInformationData MANAGED OBJECT CLASS
+signRouteSetInformationData MANAGED OBJECT CLASS
 	DERIVED FROM
 		ss7CurrentData;
 	CHARACTERIZED BY
-		routeSetInformationDataPackage PACKAGE
+		signRouteSetInformationDataPackage PACKAGE
 			BEHAVIOUR
-				routeSetInformationDataBehaviour BEHAVIOUR
+				signRouteSetInformationDataBehaviour BEHAVIOUR
 					DEFINED AS
 						"This managed object class contains all permanent signalling point duration data. The
 						granularityPeriod is 30 minutes. The attributes are read-only.";;
@@ -392,12 +396,12 @@ ss7FirstAndIntervalThresholdData MANAGED OBJECT CLASS
 	DERIVED FROM
 		"ITU-T Rec. Q.822 (1994)":thresholdData;
 	CHARACTERIZED BY
-		"ITU-T Rec. Q.822 (1994)":counterThresholdListPackage,
+		"ITU-T Rec. Q.822 (1994)":counterThresholdListPkg,
 		ss7FirstAndIntervalThresholdDataPackage PACKAGE
 			BEHAVIOUR
 				ss7FirstAndIntervalThresholdDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"The conditional package counterThresholdListPackage is mandatory for this subclass. The threshold
+						"The conditional package counterThresholdListPkg is mandatory for this subclass. The threshold
 						values of the atributes in the counterThresholdAttributeList will be 1, indicating that the first
 						event should be notified to the managed using a qualityOfServiceAlarm notification. The attributes
 						being references will be part of instances of ss7FirstAndIntervalCurrentData or one of its
@@ -867,7 +871,7 @@ mtpSignPoint-handledMSUsOpcDpcSioMeasurement NAME BINDING
 		handledMSUsOpcDpcSioMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -880,7 +884,7 @@ mtpSignPoint-handledOctetsOpcDpcSioMeasurement NAME BINDING
 		handledOctetsOpcDpcSioMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -893,7 +897,7 @@ mtpSignPoint-handledOctetsSIOMeasurement NAME BINDING
 		handledOctetsSIOMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -906,7 +910,7 @@ mtpSignPoint-oblSignallingPointUtilisationData NAME BINDING
 		oblSignallingPointUtilisationData AND SUBCLASSES;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -919,7 +923,7 @@ mtpSignPoint-receivedOctetsOPCMeasurement NAME BINDING
 		receivedOctetsOPCMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -932,7 +936,7 @@ mtpSignPoint-receivedOctetsOpcSioMeasurement NAME BINDING
 		receivedOctetsOpcSioMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -940,12 +944,12 @@ mtpSignPoint-receivedOctetsOpcSioMeasurement NAME BINDING
 REGISTERED AS { mtpNameBinding 21 };
 
 
-routeSetNePart-routeSetInformationData NAME BINDING
+signRouteSetNePart-signRouteSetInformationData NAME BINDING
 	SUBORDINATE OBJECT CLASS
-		routeSetInformationData;
+		signRouteSetInformationData;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		routeSetNePart;
+		"ANSI T1.116.1/2000":signRouteSetNePart;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -958,7 +962,7 @@ mtpSignPoint-signallingPointData NAME BINDING
 		signallingPointData;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -971,7 +975,7 @@ mtpSignPoint-transmittedOctetsDPCMeasurement NAME BINDING
 		transmittedOctetsDPCMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -984,7 +988,7 @@ mtpSignPoint-transmittedOctetsDpcSioMeasurement NAME BINDING
 		transmittedOctetsDpcSioMeasurement;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		mtpSignPoint;
+		"ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -997,7 +1001,7 @@ signLinkSetTP-signallingLinkSetDurationData NAME BINDING
 		signallingLinkSetDurationData;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		signLinkSetTp;
+		"ANSI T1.116.1/2000":signLinkSetTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1010,7 +1014,7 @@ signLinkTp-all5And30MinSignallingLinkDurationData NAME BINDING
 		all5And30MinSignallingLinkDurationData;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		signLinkTp;
+		"ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1023,7 +1027,7 @@ signLinkTp-oblSignallingLinkDurationData NAME BINDING
 		oblSignallingLinkDurationData AND SUBCLASSES;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		signLinkTp;
+		"ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1036,7 +1040,7 @@ signLinkTp-oblSignallingLinkUtilisationData NAME BINDING
 		oblSignallingLinkUtilisationData AND SUBCLASSES;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		signLinkTp;
+		"ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1049,7 +1053,7 @@ signLinkTp-signallingLinkCongestionData NAME BINDING
 		signallingLinkCongestionData;
 	NAMED BY
 	SUPERIOR OBJECT CLASS
-		signLinkTp;
+		"ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;

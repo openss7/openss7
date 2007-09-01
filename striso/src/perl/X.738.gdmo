@@ -1,5 +1,9 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
 --< GDMO.Document "Rec. X.738 (1993)" >--
---< GDMO.Alias "Rec. X.738 (1993)" "Rec. X.738|ISO/IEC 10164-13:1992" >--
+--< GDMO.Alias "Rec. X.738 (1993)"
+--  "Recommendation X.738:1993",
+--  "Rec. X.738|ISO/IEC 10164-13:1992" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
 --  =============================================================================

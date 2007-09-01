@@ -1,3 +1,4 @@
+--< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "Rec. X.745 (1993)" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
@@ -665,7 +666,7 @@ testResultNotification NOTIFICATION
 			notificationIdentifier
 				"Rec. X.721 | ISO/IEC 10165-2:1992":notificationIdentifier,
 			correlatedNotifications
-				"Rec. X.721 | ISO/IEC 10165-2:1992":correlatedNotfications;
+				"Rec. X.721 | ISO/IEC 10165-2:1992":correlatedNotifications;
 REGISTERED AS { part12Notification 2 };
 
 
