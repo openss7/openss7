@@ -1,0 +1,2153 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "EN 300 292 V1.2.1 (1998-08)" >--
+MODULE "EN 300 292 V1.2.1 (1998-08)"
+--
+--8 OC definitions
+--This clause contains the formal OC definitions.
+--8.1 Managed OC definitions
+--8.1.1 analysisCriteria
+
+analysisCriteria MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		analysisCriteriaPackage PACKAGE
+			BEHAVIOUR
+				analysisCriteriaPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value combination of attributes (key-attributes) destinationCode, callingPartyCategory,
+						analysisOrigin, nationalDestinationInstance, destinationType, numberOfDigits, carrierDataInstance
+						shall be unique among all instances of this object class.";;
+			ATTRIBUTES
+				analysisCriteriaId
+					GET,
+				destinationCode
+					GET-REPLACE,
+				analysisOrigin
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultAnalysisOrigin
+					GET-REPLACE,
+				activeDestination
+					GET
+					SET-BY-CREATE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		callingPartyCategoryPackage
+			PRESENT IF
+				"calling party category has to be evaluated.",
+		nationalDestinationInstancePackage PACKAGE
+			ATTRIBUTES
+				nationalDestinationInstance
+					GET
+					SET-BY-CREATE;
+		REGISTERED AS { package 1 };
+			PRESENT IF
+				"the destinationCode value has to be assigned unambiguously to a national destination.",
+		destinationTypePackage
+			PRESENT IF
+				"the destination type has to be used to unambiguously identify the destination in addition to
+				destinationCode.",
+		extSchedulingPackage PACKAGE
+			BEHAVIOUR
+				extSchedulingPackageBeh BEHAVIOUR
+					DEFINED AS
+						"This package is used in the SMO to enable external scheduling e.g. as with OC multiScheduler from
+						EN 301 098 [3].";;
+			ATTRIBUTES
+				extSchedulingAttribute
+					GET-REPLACE;
+		REGISTERED AS { package 2 };
+			PRESENT IF
+				"external index scheduling is used for the attribute activeDestination.",
+		externalSchedulerPackage
+			PRESENT IF
+				"external scheduling by a SO is supported.",
+		activeDestinationPackage PACKAGE
+			BEHAVIOUR
+				activeDestinationPackageBeh BEHAVIOUR
+					DEFINED AS
+						"This package allows to perform a REPLACE operation additionally to the GET operation on the
+						activeDestination attribute, in case the scheduling packages are not instantiated.";;
+			ATTRIBUTES
+				activeDestination
+					REPLACE;
+		REGISTERED AS { package 3 };
+			PRESENT IF
+				"no scheduling is used",
+		numberOfDigitsPackage PACKAGE
+			ATTRIBUTES
+				numberOfDigits
+					GET
+					SET-BY-CREATE;
+		REGISTERED AS { package 4 };
+			PRESENT IF
+				"an instance supports it",
+		carrierDataInstancePackage PACKAGE
+			ATTRIBUTES
+				carrierDataInstance
+					GET
+					SET-BY-CREATE;
+		REGISTERED AS { package 5 };
+			PRESENT IF
+				"carrier dependent analysis is required and the carrier code is not part of the destination code";
+REGISTERED AS { managedObjectClass 1 };
+--8.1.2 callHistory
+
+
+callHistory MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		callHistoryPackage PACKAGE
+			BEHAVIOUR
+				callHistoryPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value combination of attributes (key-attributes) echoSuppressor, numberOfSatLinks shall be unique
+						among all instances of this object class.";;
+			ATTRIBUTES
+				callHistoryId
+					GET;;,
+		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
+	CONDITIONAL PACKAGES
+		echoSuppressorPackage PACKAGE
+			ATTRIBUTES
+				echoSuppressor
+					GET-REPLACE;
+		REGISTERED AS { package 6 };
+			PRESENT IF
+				"an instance supports it",
+		numberOfSatLinksPackage PACKAGE
+			ATTRIBUTES
+				numberOfSatLinks
+					GET-REPLACE;
+		REGISTERED AS { package 7 };
+			PRESENT IF
+				"an instance supports it",
+		"ITU-T Recommendation M.3100":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { managedObjectClass 2 };
+--8.1.3 carrierData
+
+
+carrierData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		carrierDataPackage PACKAGE
+			BEHAVIOUR
+				carrierDataPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value of attribute (key-attribute) carrierCode shall be unique among all instances of this object
+						class.";;
+			ATTRIBUTES
+				carrierDataId
+					GET,
+				carrierCode
+					GET
+					SET-BY-CREATE,
+				ownCac
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+REGISTERED AS { managedObjectClass 3 };
+--8.1.4 cep
+
+
+cep MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		cepPackage PACKAGE
+			BEHAVIOUR
+				cepPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0.";;
+			ATTRIBUTES
+				cepId
+					GET,
+				"ITU-T Recommendation X.721":administrativeState
+					GET-REPLACE,
+				ctpbInstance
+					GET
+					SET-BY-CREATE,
+				circuitNumber
+					GET
+					SET-BY-CREATE;;,
+		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage,
+		"ITU-T Recommendation M.3100":stateChangeNotificationPackage;
+	CONDITIONAL PACKAGES
+		cicPackage PACKAGE
+			ATTRIBUTES
+				cic
+					GET
+					SET-BY-CREATE;
+		REGISTERED AS { package 8 };
+			PRESENT IF
+				"SS No. 7 is used for signalling.",
+		officeEquipmentPackage PACKAGE
+			BEHAVIOUR
+				officeEquipmentPackageBeh BEHAVIOUR
+					DEFINED AS
+						"Value of attribute (key-attribute) officeEquipment shall be unique among all instances of this
+						object class";;
+			ATTRIBUTES
+				officeEquipment
+					GET
+					SET-BY-CREATE;
+		REGISTERED AS { package 9 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { managedObjectClass 4 };
+--8.1.5 cepsg
+
+
+cepsg MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation M.3100":circuitEndPointSubgroup;
+	CHARACTERIZED BY
+		cepsgPackage PACKAGE
+			BEHAVIOUR
+				cepsgPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0.
+
+						This OC represents a set of circuit end points with similar characteristics. A circuit end point
+						subgroup can be of type one-way incoming, one-way outgoing, or two-way. For type two-way,
+						conditional packages incomingCepsgPackage and outgoingCepsgPackage have both to be instantiated";;
+			ATTRIBUTES
+				"ITU-T Recommendation M.3100":transmissionCharacteristics
+					REPLACE,
+				"ITU-T Recommendation M.3100":labelOfFarEndExchange
+					REPLACE,
+				"ITU-T Recommendation X.721":administrativeState
+					GET-REPLACE,
+				assocSignRouteSetNePart
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultAssocSignRouteSetNePart
+					GET-REPLACE,
+				boundaryCrossing
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultBoundaryCrossing
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":stateChangeNotificationPackage;
+	CONDITIONAL PACKAGES
+		incomingCepsgPackage PACKAGE
+			ATTRIBUTES
+				prefixDigits
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultPrefixDigits
+					GET-REPLACE;
+		REGISTERED AS { package 10 };
+			PRESENT IF
+				"the circuit end point subgroup is of type incoming or two-way",
+		outgoingCepsgPackage PACKAGE
+			ATTRIBUTES
+				searchMethod
+					GET-REPLACE;
+		REGISTERED AS { package 11 };
+			PRESENT IF
+				"the circuit end point subgroup is of type outgoing or two-way",
+		originForRebuildingPackage PACKAGE
+			ATTRIBUTES
+				originForRebuilding
+					GET-REPLACE;
+		REGISTERED AS { package 12 };
+			PRESENT IF
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent digit
+				rebuilding is required.",
+		originForAnalysisPackage PACKAGE
+			ATTRIBUTES
+				originForAnalysis
+					GET-REPLACE;
+		REGISTERED AS { package 13 };
+			PRESENT IF
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent digit
+				analysis is required.",
+		originForRoutingPackage PACKAGE
+			ATTRIBUTES
+				originForRouting
+					GET-REPLACE;
+		REGISTERED AS { package 14 };
+			PRESENT IF
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent call routing
+				is required.",
+		originForPreparationPackage PACKAGE
+			ATTRIBUTES
+				originForPreparation
+					GET-REPLACE;
+		REGISTERED AS { package 15 };
+			PRESENT IF
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent digit
+				preparation is required.",
+		termForPreparationPackage PACKAGE
+			ATTRIBUTES
+				termForPreparation
+					GET-REPLACE;
+		REGISTERED AS { package 16 };
+			PRESENT IF
+				"the circuit end point subgroup is of type outgoing or two-way and if outgoing cepsg dependent digit
+				preparation is required.",
+		specificSignSystemPackage PACKAGE
+			ATTRIBUTES
+				languageDigitProc
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultLanguageDigitProc
+					GET-REPLACE;
+		REGISTERED AS { package 17 };
+			PRESENT IF
+				"one of the signalling systems R2 or C5 is used.",
+		twowayCepsgPackage PACKAGE
+			ATTRIBUTES
+				prefTrafficDirect
+					GET-REPLACE;
+		REGISTERED AS { package 18 };
+			PRESENT IF
+				"the circuit end point subgroup is of type two-way.",
+		carrierPackage PACKAGE
+			ATTRIBUTES
+				suppressOwnCac
+					GET-REPLACE;
+		REGISTERED AS { package 19 };
+			PRESENT IF
+				"the option to administer suppression of own carrier has to be provided and if the circuit end point
+				subgroup is of type incoming or two-way.";
+REGISTERED AS { managedObjectClass 5 };
+--8.1.6 cepsgComb
+
+
+cepsgComb MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		cepsgCombPackage PACKAGE
+			BEHAVIOUR
+				cepsgCombPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				cepsgCombId
+					GET,
+				cepsgCombSelection
+					GET-REPLACE,
+				usedAlgorithm
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		userLabelPackage PACKAGE
+			ATTRIBUTES
+				"ITU-T Recommendation M.3100":userLabel
+					GET-REPLACE;
+		REGISTERED AS { package 20 };
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { managedObjectClass 6 };
+--8.1.7 cepsgCombList
+
+
+cepsgCombList MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		cepsgCombListPackage PACKAGE
+			BEHAVIOUR
+				cepsgCombListPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				cepsgCombListId
+					GET,
+				cepsgCombListSelection
+					GET-REPLACE,
+				usedAlgorithm
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+REGISTERED AS { managedObjectClass 7 };
+--8.1.8 digitModification
+
+
+digitModification MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		digitModificationPackage PACKAGE
+			BEHAVIOUR
+				digitModificationPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				digitModificationId
+					GET,
+				digitSuppress
+					GET-REPLACE
+					ADD-REMOVE,
+				digitCombReplace
+					GET-REPLACE
+					ADD-REMOVE,
+				digitCombInsert
+					GET-REPLACE
+					ADD-REMOVE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+REGISTERED AS { managedObjectClass 8 };
+--8.1.9 digitPreparationCriteria
+
+
+digitPreparationCriteria MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		digitPreparationCriteriaPackage PACKAGE
+			BEHAVIOUR
+				digitPreparationCriteriaPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value combination of attributes (key-attributes) preparationOrigin, preparationTerm and
+						analysisCriteriaInstance shall be unique among all instances of this object class.";;
+			ATTRIBUTES
+				digitPreparationCriteriaId
+					GET,
+				preparationOrigin
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultPreparationOrigin
+					GET-REPLACE,
+				preparationTerm
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultPreparationTerm
+					GET-REPLACE,
+				analysisCriteriaInstance
+					GET-REPLACE,
+				digitModificationInstance
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+REGISTERED AS { managedObjectClass 9 };
+--8.1.10 digitRebuildingCriteria
+
+
+digitRebuildingCriteria MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		digitRebuildingCriteriaPackage PACKAGE
+			BEHAVIOUR
+				digitRebuildingCriteriaPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value combination of attributes (key-attributes) rebuildingOrigin, natureOfAddress and
+						calledNumberingPlan shall be unique among all instances of this object class.";;
+			ATTRIBUTES
+				digitRebuildingCriteriaId
+					GET,
+				rebuildingOrigin
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultRebuildingOrigin
+					GET-REPLACE,
+				natureOfAddress
+					GET-REPLACE,
+				calledNumberingPlan
+					GET-REPLACE,
+				digitModificationInstance
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+REGISTERED AS { managedObjectClass 10 };
+--8.1.11 exception
+
+
+exception MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		exceptionPackage PACKAGE
+			BEHAVIOUR
+				exceptionPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Any particular set-element value of attribute (key-attribute) matchesIf shall be unique among all
+						instances of this object class.";;
+			ATTRIBUTES
+				exceptionId
+					GET,
+				matchesIf
+					GET-REPLACE
+					ADD-REMOVE,
+				treatmentInstance
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+REGISTERED AS { managedObjectClass 11 };
+--8.1.12 localDestination
+
+
+localDestination MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		localDestinationPackage PACKAGE
+			BEHAVIOUR
+				localDestinationPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				localDestinationId
+					GET,
+				nationalDestinationInstance
+					GET
+					SET-BY-CREATE,
+				initialSubscriberCodes
+					GET-REPLACE;
+			ACTIONS
+				modifyNumberingScheme ACTION
+					BEHAVIOUR
+						modifyNumberingSchemeBeh BEHAVIOUR
+							DEFINED AS
+								"This action operation modifies data of OC localDestination instance and the DN instances which
+								belong to it. This action does not change the implicit relationship between the DNs and the local
+								destination: a DN that belonged/did not belong to the local destination before the ACTION
+								belongs/does not belong to it after the ACTION is executed on the localDestination instance. To
+								keep this relationship, the initialSubscriberCodes attribute is a SEQUENCE OF i.o. a SET OF value.
+
+								Information components (see ASN1TypeModule definitions):
+
+								newNationalDestInstance:
+
+								This component describes the value for the new local area code for the localDestination instance.
+								If the excludedSubscriberCodesPackage is present, the members of the excludedSubscriberCodes
+								attribute have to be adapted accordingly in their digit string part, representing the local area
+								code. The local area code related attribute parts of the DNs of OC E164DN, which belong to the
+								local destination, have to be updated accordingly.
+
+								newInitialSubscriberCodes:
+
+								This component describes the new value of the attribute initialSubscriberCodes in the addressed
+								object instance of the OC localDestination. The initial subscriber code related attribute parts of
+								the DNs of OC E164DN, which belong to the local destination, have to be updated accordingly. The
+								newInitialSubscriberCodes component must contain the same number of elements as the
+								initialSubscriberCodes attribute of the addressed object instance.
+
+								Reply component:
+
+								All attribute values of the local destination instance after the execution of the ACTION operation.";;
+					MODE CONFIRMED;
+					WITH INFORMATION SYNTAX ASN1TypeModule.ModifyNumberingSchemeInfo;
+					WITH REPLY SYNTAX ASN1TypeModule.ModifyNumberingSchemeReply;
+				REGISTERED AS { action 1 };;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		excludedSubscriberCodesPackage PACKAGE
+			ATTRIBUTES
+				excludedSubscriberCodes
+					GET-REPLACE
+					ADD-REMOVE;
+		REGISTERED AS { package 21 };
+			PRESENT IF
+				"it is necessary to exclude DNs from the local destination.";
+REGISTERED AS { managedObjectClass 12 };
+--8.1.13 nationalDestination
+
+
+nationalDestination MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		nationalDestinationPackage PACKAGE
+			BEHAVIOUR
+				nationalDestinationPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value of attribute (key-attribute) nationalDestinationCode shall be unique among all instances of
+						this object class.";;
+			ATTRIBUTES
+				nationalDestinationId
+					GET,
+				nationalDestinationCode
+					GET
+					SET-BY-CREATE;;,
+		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
+REGISTERED AS { managedObjectClass 13 };
+--8.1.14 postAnalysisEvaluation
+
+
+postAnalysisEvaluation MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		postAnalysisEvaluationPackage PACKAGE
+			BEHAVIOUR
+				postAnalysisEvaluationPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value combination of attributes (key-attributes) destinationGroupLabel, callHistoryInstance,
+						routingOrigin, reqBearerCapability, reqSignCapability and callingPartyCategory shall be unique
+						among all instances of this object class.";;
+			ATTRIBUTES
+				postAnalysisEvaluationId
+					GET,
+				destinationGroupLabel
+					GET-REPLACE,
+				callHistoryInstance
+					GET-REPLACE,
+				routingOrigin
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultRoutingOrigin
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		callingPartyCategoryPackage
+			PRESENT IF
+				"calling party category has to be evaluated.",
+		requiredCapabilitiesPackage PACKAGE
+			BEHAVIOUR
+				requiredCapabilitiesPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				reqBearerCapability
+					GET-REPLACE,
+				reqSignCapability
+					GET-REPLACE;
+		REGISTERED AS { package 22 };
+			PRESENT IF
+				"an instance requires it.",
+		digitModificationInstancePackage PACKAGE
+			ATTRIBUTES
+				digitModificationInstance
+					GET-REPLACE;
+		REGISTERED AS { package 23 };
+			PRESENT IF
+				"digit codes modification is needed.",
+		trafficDistributionInstancePackage PACKAGE
+			BEHAVIOUR
+				trafficDistributionInstancePackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				trafficDistributionInstance
+					GET-REPLACE;
+		REGISTERED AS { package 24 };
+			PRESENT IF
+				"activeRoutingPossibilitiesPackage is not instantiated and if this instance of OC
+				postAnalysisEvaluation shall not be referred by any instances of OC trafficDistribution.",
+		schedulingAttributePackage PACKAGE
+			BEHAVIOUR
+				schedulingAttributePackageBeh BEHAVIOUR
+					DEFINED AS
+						"This package is used in the SMO to enable external scheduling e.g. as with OC
+						timeControlledSelector from EN 301 098 [3].";;
+			ATTRIBUTES
+				schedulingAttribute
+					GET-REPLACE;
+		REGISTERED AS { package 25 };
+			PRESENT IF
+				"external index scheduling is used for the activeRoutingPossibilities attribute.",
+		externalSchedulerPackage
+			PRESENT IF
+				"external scheduling by a SO is supported.",
+		activeRoutingPossibilitiesPackage PACKAGE
+			BEHAVIOUR
+				activeRoutingPossibilitiesPackageBeh BEHAVIOUR
+					DEFINED AS
+						"This attribute contains the value of the instance of OC routingPossibilities which is applicable
+						(or also treatment instance when required).";;
+			ATTRIBUTES
+				activeRoutingPossibilities
+					GET;
+		REGISTERED AS { package 26 };
+			PRESENT IF
+				"trafficDistributionInstancePackage is not instantiated.",
+		replaceActiveRoutingPossibilitiesPackage PACKAGE
+			BEHAVIOUR
+				replaceActiveRoutingPossibilitiesPackageBeh BEHAVIOUR
+					DEFINED AS
+						"This package allows to perform a REPLACE operation additionally to the GET operation on the
+						activeRoutingPossibilities attribute, in case the scheduling packages are not instantiated.";;
+			ATTRIBUTES
+				activeRoutingPossibilities
+					REPLACE;
+		REGISTERED AS { package 27 };
+			PRESENT IF
+				"activeRoutingPossibilitiesPackage is instantiated and if scheduling packages are not instantiated.";
+REGISTERED AS { managedObjectClass 14 };
+--8.1.15 prefixDigitAnalysis
+
+
+prefixDigitAnalysis MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		prefixDigitAnalysisPackage PACKAGE
+			BEHAVIOUR
+				prefixDigitAnalysisPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0
+
+						Value of attribute (key-attribute) prefixCode shall be unique among all instances of this object
+						class.";;
+			ATTRIBUTES
+				prefixDigitAnalysisId
+					GET,
+				prefixCode
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		destinationTypePackage
+			PRESENT IF
+				"the destination type has to be derived from the prefixCode.",
+		carrierCodePresentPackage PACKAGE
+			BEHAVIOUR
+				carrierCodePresentPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				carrierCodePresent
+					INITIAL VALUE ASN1TypeModule.initialCarrierCodePresent
+					GET;
+		REGISTERED AS { package 28 };
+			PRESENT IF
+				"the presence of a carrier code in prefixCode has to be indicated.";
+REGISTERED AS { managedObjectClass 15 };
+--8.1.16 routingPossData
+
+
+routingPossData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		routingPossDataPackage PACKAGE
+			BEHAVIOUR
+				routingPossDataPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				routingPossDataId
+					GET,
+				trafficCategory
+					DEFAULT VALUE ASN1TypeModule.defaultTrafficCategory
+					GET-REPLACE,
+				cepsgCombOrCepsgInstance
+					GET
+					SET-BY-CREATE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		operatorLanguagePackage PACKAGE
+			BEHAVIOUR
+				operatorLanguagePackageBeh BEHAVIOUR
+					DEFINED AS
+						"Characterises the operator language.";;
+			ATTRIBUTES
+				languageDigit
+					GET
+					SET-BY-CREATE;
+		REGISTERED AS { package 29 };
+			PRESENT IF
+				"signalling system supports it and if it is needed on this routing possibility.",
+		suppressCacPackage PACKAGE
+			ATTRIBUTES
+				suppressCac
+					GET-REPLACE;
+		REGISTERED AS { package 30 };
+			PRESENT IF
+				"the option to administer suppression of CAC has to be provided.",
+		digitModificationInstancePackage PACKAGE
+			ATTRIBUTES
+				digitModificationInstance
+					GET-REPLACE;
+		REGISTERED AS { package 31 };
+			PRESENT IF
+				"digit string modification is needed for the instance of OC routingPossData.";
+REGISTERED AS { managedObjectClass 16 };
+--8.1.17 routingPossibilities
+
+
+routingPossibilities MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		routingPossibilitiesPackage PACKAGE
+			BEHAVIOUR
+				routingPossibilitiesPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				routingPossibilitiesId
+					GET,
+				routingPossibilitiesSelection
+					GET-REPLACE,
+				usedAlgorithm
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		crankbackAdminStatePackage PACKAGE
+			ATTRIBUTES
+				crankbackAdminState
+					REPLACE-WITH-DEFAULT
+					DEFAULT VALUE ASN1TypeModule.defaultCrankbackAdminState
+					GET-REPLACE;
+			NOTIFICATIONS
+				"ITU-T Recommendation X.721":stateChange;
+		REGISTERED AS { package 32 };
+			PRESENT IF
+				"locking-unlocking of crankback is needed.";
+REGISTERED AS { managedObjectClass 17 };
+--8.1.18 routingPossRestrict
+
+
+routingPossRestrict MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		routingPossRestrictPackage PACKAGE
+			BEHAVIOUR
+				routingPossRestrictPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				routingPossRestrictId
+					GET;;,
+		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
+	CONDITIONAL PACKAGES
+		skipGroupSignal1Package PACKAGE
+			BEHAVIOUR
+				skipGroupSignal1Beh BEHAVIOUR
+					DEFINED AS
+						"It is not allowed that a routing possibility is present in different instances of OC
+						routingPossRestrict contained in the same instance of OC routingPossibilities.";;
+			ATTRIBUTES
+				skipGroupSignal1
+					GET-REPLACE
+					ADD-REMOVE;
+		REGISTERED AS { package 33 };
+			PRESENT IF
+				"crankback with one or two signals (see ITU-T Recommendation E.170 [5]) is supported",
+		skipGroupSignal2Package PACKAGE
+			BEHAVIOUR
+				skipGroupSignal2Beh BEHAVIOUR
+					DEFINED AS
+						"It is not allowed that a routing possibility is present in different instances of OC
+						routingPossRestrict contained in the same instance of OC routingPossibilities.";;
+			ATTRIBUTES
+				skipGroupSignal2
+					GET-REPLACE
+					ADD-REMOVE;
+		REGISTERED AS { package 34 };
+			PRESENT IF
+				"crankback with two signals (see ITU-T Recommendation E.170 [5]) is supported",
+		"ITU-T Recommendation M.3100":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { managedObjectClass 18 };
+--8.1.19 trafficDistribution
+
+
+trafficDistribution MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		trafficDistributionPackage PACKAGE
+			BEHAVIOUR
+				trafficDistributionPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0. The number of list elements in attributes trafficDistributionData,
+						selectedInstances and inputCriteriaDataForAlgorithm has to be identical. The data with
+						corresponding list positions in these attributes belong together.
+
+						The sum of the percentage values within each of the attributes trafficDistributionData and
+						inputCriteriaDataForAlgorithm has to be 100 %.
+
+						The trafficDistributionData attribute is derived from the value of the
+						inputCriteriaDataForAlgorithm attribute at creation of the instance or modification of the
+						attribute inputCriteriaDataForAlgorithm. Modification of the userLabels in the attribute
+						inputCriteriaDataForAlgorithm triggers an update of userLabel specified in the attribute
+						trafficDistributionData. It does not trigger an update of the percentage values contained in the
+						trafficDistributionData Component of attribute inputCriteriaDataForAlgorithm being:
+
+						- out: causes percentage calculation from outgoing circuit subgroup capacity for the component
+						'percentage' of attribute trafficDistributionData;
+
+						- perc: causes transfer of percentage value for component 'percentage' of attribute
+						trafficDistributionData
+
+						- inc: causes transfer of percentage value, periodical recalculation of percentage values according
+						to the incoming carried traffic on specified incoming circuit subgroups after defined intervals for
+						component 'percentage' of attribute trafficDistributionData.
+
+						The attribute selectedInstances references instances of OC routingPossibilities or (exclusive or)
+						OC postAnalysisEvaluation (this last choice is possible, if this instance shall not be referred by
+						any instances of OC postAnalysisEvaluation). All referenced instances of this attribute belong to
+						the same OC.";;
+			ATTRIBUTES
+				trafficDistributionId
+					GET,
+				inputCriteriaDataForAlgorithm
+					GET-REPLACE,
+				trafficDistributionData
+					GET,
+				selectedInstances
+					GET-REPLACE;;,
+		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
+	CONDITIONAL PACKAGES
+		destinationGroupLabelPackage PACKAGE
+			BEHAVIOUR
+				destinationGroupLabelBeh BEHAVIOUR
+					DEFINED AS
+						"Value of attribute (key-attribute) destinationGroupLabel shall be unique among all instances of
+						this object class.";;
+			ATTRIBUTES
+				destinationGroupLabel
+					GET-REPLACE;
+		REGISTERED AS { package 35 };
+			PRESENT IF
+				"the relationship 'selects group of' (see E-R diag.2) is used.";
+REGISTERED AS { managedObjectClass 19 };
+--8.1.20 treatment
+
+
+treatment MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Recommendation X.721":top;
+	CHARACTERIZED BY
+		treatmentPackage PACKAGE
+			BEHAVIOUR
+				treatmentPackageBeh BEHAVIOUR
+					DEFINED AS
+						"See subclause 7.0";;
+			ATTRIBUTES
+				treatmentId
+					GET;;,
+		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
+REGISTERED AS { managedObjectClass 20 };
+--8.2 Reused packages definitions
+--8.2.1 callingPartyCategoryPackage
+
+
+callingPartyCategoryPackage PACKAGE
+	ATTRIBUTES
+		callingPartyCategory
+			REPLACE-WITH-DEFAULT
+			DEFAULT VALUE ASN1TypeModule.defaultCallingPartyCategory
+			GET-REPLACE;
+REGISTERED AS { package 36 };
+--8.2.2 destinationTypePackage
+
+
+destinationTypePackage PACKAGE
+	BEHAVIOUR
+		destinationTypePackageBeh BEHAVIOUR
+			DEFINED AS
+				"Characterises unambiguously the type of destination.";;
+	ATTRIBUTES
+		destinationType
+			GET
+			SET-BY-CREATE;
+REGISTERED AS { package 37 };
+--8.2.3 externalSchedulerPackage
+
+
+externalSchedulerPackage PACKAGE
+	BEHAVIOUR
+		externalSchedulerPackageBeh BEHAVIOUR
+			DEFINED AS
+				"This package is used in the SMO for reference to the external SO's.";;
+	ATTRIBUTES
+		"ITU-T Recommendation X.746":externalSchedulerName
+			GET-REPLACE;
+REGISTERED AS { package 38 };
+--8.3 Attributes definitions
+--8.3.1 activeDestination
+
+
+activeDestination ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ActiveDestination;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		activeDestinationBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute either references an object instance or selects a group of instances via a label.";;
+REGISTERED AS { attribute 1 };
+--8.3.2 activeRoutingPossibilities
+
+
+activeRoutingPossibilities ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		activeRoutingPossibilitiesBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC routingPossibilities or of OC treatment.";;
+REGISTERED AS { attribute 2 };
+--8.3.3 analysisCriteriaId
+
+
+analysisCriteriaId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 3 };
+--8.3.4 analysisCriteriaInstance
+
+
+analysisCriteriaInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstanceOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		analysisCriteriaInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC analysisCriteria.";;
+REGISTERED AS { attribute 4 };
+--8.3.5 analysisOrigin
+
+
+analysisOrigin ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Origin;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 5 };
+--8.3.6 assocSignRouteSetNePart
+
+
+assocSignRouteSetNePart ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstanceOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		assocSignRouteSetNePartBeh BEHAVIOUR
+			DEFINED AS
+				"Identifies the SS No. 7 signalling resource (ITU-T Recommendation Q.751.1: signRouteSetNePart).";;
+REGISTERED AS { attribute 6 };
+--8.3.7 boundaryCrossing
+
+
+boundaryCrossing ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.BoundaryCrossing;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		boundaryCrossingBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the circuit end point subgroup contains only circuit end points
+				terminating circuits which cross international or organisational boundaries.";;
+REGISTERED AS { attribute 7 };
+--8.3.8 calledNumberingPlan
+
+
+calledNumberingPlan ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CalledNumberingPlan;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 8 };
+--8.3.9 callHistoryId
+
+
+callHistoryId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 9 };
+--8.3.10 callHistoryInstance
+
+
+callHistoryInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstanceOrNull;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callHistoryInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC callHistory.";;
+REGISTERED AS { attribute 10 };
+--8.3.11 callingPartyCategory
+
+
+callingPartyCategory ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CallingPartyCategory;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 11 };
+--8.3.12 carrierCode
+
+
+carrierCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CarrierCode;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		carrierCodeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes the unambiguous carrier specific code used to distinguish from other
+				carriers. It can be dialled by the customer or supplied by the exchange.";;
+REGISTERED AS { attribute 12 };
+--8.3.13 carrierCodePresent
+
+
+carrierCodePresent ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CarrierCodePresent;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 13 };
+--8.3.14 carrierDataId
+
+
+carrierDataId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 14 };
+--8.3.15 carrierDataInstance
+
+
+carrierDataInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		carrierDataInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute references an instance of the OC carrierData. It allows the selection of
+				destinations depending on the dialled or assigned carrier code of the call.";;
+REGISTERED AS { attribute 15 };
+--8.3.16 cepId
+
+
+cepId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 16 };
+--8.3.17 cepsgCombId
+
+
+cepsgCombId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 17 };
+--8.3.18 cepsgCombListId
+
+
+cepsgCombListId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 18 };
+--8.3.19 cepsgCombListSelection
+
+
+cepsgCombListSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SelectionForAlgorithm;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cepsgCombListSelectionBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute gives a list of instances on which an algorithm is to apply. These instances can be
+				instances of OC routingPossData or of the OC cepsgComb.";;
+REGISTERED AS { attribute 19 };
+--8.3.20 cepsgCombOrCepsgInstance
+
+
+cepsgCombOrCepsgInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cepsgCombOrCepsgInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC cepsgComb or to an instance of OC cepsg (beside it
+				remains possible for this attribute to point to other OCs as e.g. test equipment).";;
+REGISTERED AS { attribute 20 };
+--8.3.21 cepsgCombSelection
+
+
+cepsgCombSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SelectionForAlgorithm;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cepsgCombSelectionBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute gives a list of instances of OC cepsg on which an algorithm is to apply.";;
+REGISTERED AS { attribute 21 };
+--8.3.22 cic
+
+
+cic ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Cic;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cicBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the circuit identification code (CIC) of a circuit and is applicable for
+				SS No.7.";;
+REGISTERED AS { attribute 22 };
+--8.3.23 circuitNumber
+
+
+circuitNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.CircuitNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitNumberBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the logical circuit end point number within the containing circuit end
+				point subgroup.";;
+REGISTERED AS { attribute 23 };
+--8.3.24 crankbackAdminState
+
+
+crankbackAdminState ATTRIBUTE
+	DERIVED FROM
+		"ITU-T Recommendation X.721":administrativeState;
+	BEHAVIOUR
+		crankbackAdminStateBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes whether crankback is locked or unlocked.";;
+REGISTERED AS { attribute 24 };
+--8.3.25 ctpbInstance
+
+
+ctpbInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ctpbInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC ITU-T Recommendation M.3100:
+				connectionTerminationPointBidirectional which has the channelNumber attribute.";;
+REGISTERED AS { attribute 25 };
+--8.3.26 destinationCode
+
+
+destinationCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.DestinationCode;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		destinationCodeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute characterises a destination of a call by specifying the country code, or/and area
+				code, or/and exchange identifying code, or/and individual line number etc.";;
+REGISTERED AS { attribute 26 };
+--8.3.27 destinationGroupLabel
+
+
+destinationGroupLabel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		destinationGroupLabelBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies - via a label - the destination group the instance belongs to";;
+REGISTERED AS { attribute 27 };
+--8.3.28 destinationType
+
+
+destinationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.DestinationType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		destinationTypeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the type of destination as a named integer value. The destinationType is
+				either derived from the called party number information element (nature of address indicator in
+				ITU-T Recommendation Q.763 or type of number in ITU-T Recommendation Q.931) or determined by the
+				prefix digit analysis.";;
+REGISTERED AS { attribute 28 };
+--8.3.29 digitCombInsert
+
+
+digitCombInsert ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.DigitCombInsert;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { attribute 29 };
+--8.3.30 digitCombReplace
+
+
+digitCombReplace ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.DigitCombReplace;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { attribute 30 };
+--8.3.31 digitModificationId
+
+
+digitModificationId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 31 };
+--8.3.32 digitModificationInstance
+
+
+digitModificationInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		digitModificationInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC digitModification.";;
+REGISTERED AS { attribute 32 };
+--8.3.33 digitPreparationCriteriaId
+
+
+digitPreparationCriteriaId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 33 };
+--8.3.34 digitRebuildingCriteriaId
+
+
+digitRebuildingCriteriaId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 34 };
+--8.3.35 digitSuppress
+
+
+digitSuppress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.DigitSuppress;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { attribute 35 };
+--8.3.36 echoSuppressor
+
+
+echoSuppressor ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.YesNo;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 36 };
+--8.3.37 exceptionId
+
+
+exceptionId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 37 };
+--8.3.38 excludedSubscriberCodes
+
+
+excludedSubscriberCodes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ExcludedSubscriberCodes;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { attribute 38 };
+--8.3.39 extSchedulingAttribute
+
+
+extSchedulingAttribute ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ExtSchedulingAttribute;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		extSchedulingAttributeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the scheduling information in the SMO, for external index scheduling as in
+				EN 301 098[3].";;
+REGISTERED AS { attribute 39 };
+--8.3.40 initialSubscriberCodes
+
+
+initialSubscriberCodes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.InitialSubscriberCodes;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 40 };
+--8.3.41 inputCriteriaDataForAlgorithm
+
+
+inputCriteriaDataForAlgorithm ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.InputCriteriaDataForAlgorithm;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 41 };
+--8.3.42 languageDigit
+
+
+languageDigit ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.LanguageDigit;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		languageDigitBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes the operator language.";;
+REGISTERED AS { attribute 42 };
+--8.3.43 languageDigitProc
+
+
+languageDigitProc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.YesNo;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		languageDigitProcBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the language digit has to be extracted from the transmitted digit
+				string for incoming calls and has to be included into the transmitted digit string for outgoing
+				calls on the position specified by the signalling systems R2 or C5 for international transit or
+				terminating traffic. The attribute is applicable if the circuit end point subgroup is of type
+				incoming or two-way and one of the above signalling systems is used.";;
+REGISTERED AS { attribute 43 };
+--8.3.44 localDestinationId
+
+
+localDestinationId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 44 };
+--8.3.45 matchesIf
+
+
+matchesIf ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.MatchesIf;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS { attribute 45 };
+--8.3.46 nationalDestinationCode
+
+
+nationalDestinationCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NationalDestinationCode;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		nationalDestinationCodeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes the NDC; its size is limited as described in ITU-T Recommendation E.164
+				[4] or any successor document.";;
+REGISTERED AS { attribute 46 };
+--8.3.47 nationalDestinationId
+
+
+nationalDestinationId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 47 };
+--8.3.48 nationalDestinationInstance
+
+
+nationalDestinationInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nationalDestinationInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute references an instance of OC nationalDestination.";;
+REGISTERED AS { attribute 48 };
+--8.3.49 natureOfAddress
+
+
+natureOfAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NatureOfAddress;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 49 };
+--8.3.50 numberOfDigits
+
+
+numberOfDigits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NumberOfDigits;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 50 };
+--8.3.51 numberOfSatLinks
+
+
+numberOfSatLinks ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NumberOfSatLinks;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 51 };
+--8.3.52 officeEquipment
+
+
+officeEquipment ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.OfficeEquipment;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		officeEquipmentBeh BEHAVIOUR
+			DEFINED AS
+				" This attribute references the physical equipment the circuit end point is associated with. If the
+				inst choice is used, it references an instance of OC ITU-T Recommendation M.3100: circuitPack. If
+				the string choice is used, the value is technology specific.";;
+REGISTERED AS { attribute 52 };
+--8.3.53 originForAnalysis
+
+
+originForAnalysis ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		originForAnalysisBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the group assigned to the circuit end point subgroup for digit analysis
+				purpose.";;
+REGISTERED AS { attribute 53 };
+--8.3.54 originForPreparation
+
+
+originForPreparation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		originForPreparationBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the group assigned to the incoming circuit end point subgroup for digit
+				preparation purpose.";;
+REGISTERED AS { attribute 54 };
+--8.3.55 originForRebuilding
+
+
+originForRebuilding ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		originForRebuidingBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the group assigned to the circuit end point subgroup for digit rebuilding
+				purpose.";;
+REGISTERED AS { attribute 55 };
+--8.3.56 originForRouting
+
+
+originForRouting ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		originForRoutingBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the group assigned to the circuit end point subgroup for post-analysis
+				evaluation purpose.";;
+REGISTERED AS { attribute 56 };
+--8.3.57 ownCac
+
+
+ownCac ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.OwnCac;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ownCacBeh BEHAVIOUR
+			DEFINED AS
+				" This attribute describes whether the carrier access code identifies the network where the exchange
+				is located.";;
+REGISTERED AS { attribute 57 };
+--8.3.58 postAnalysisEvaluationId
+
+
+postAnalysisEvaluationId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 58 };
+--8.3.59 prefixCode
+
+
+prefixCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.PrefixCode;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+REGISTERED AS { attribute 59 };
+--8.3.60 prefixDigitAnalysisId
+
+
+prefixDigitAnalysisId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 60 };
+--8.3.61 prefixDigits
+
+
+prefixDigits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.PrefixDigits;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		prefixDigitsBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the digits which have to be inserted in front of the dialled digits. An
+				empty string means that no digits have to be inserted. The attribute is present if the circuit end
+				point subgroup is of type incoming or two-way.";;
+REGISTERED AS { attribute 61 };
+--8.3.62 prefTrafficDirect
+
+
+prefTrafficDirect ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.PrefTrafficDirect;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 62 };
+--8.3.63 preparationOrigin
+
+
+preparationOrigin ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Origin;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 63 };
+--8.3.64 preparationTerm
+
+
+preparationTerm ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Term;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 64 };
+--8.3.65 rDNId
+
+
+rDNId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		rDNIdBeh BEHAVIOUR
+			DEFINED AS
+				"If the string choice for the syntax is used, matching on substrings is permitted. If the number
+				choice for the syntax is used, then matching on ordering is permitted.";;
+REGISTERED AS { attribute 65 };
+--8.3.66 rebuildingOrigin
+
+
+rebuildingOrigin ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Origin;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 66 };
+--8.3.67 reqBearerCapability
+
+
+reqBearerCapability ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ReqBearerCapability;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 67 };
+--8.3.68 reqSignCapability
+
+
+reqSignCapability ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ReqSignCapability;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 68 };
+--8.3.69 routingOrigin
+
+
+routingOrigin ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.Origin;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 69 };
+--8.3.70 routingPossDataId
+
+
+routingPossDataId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 70 };
+--8.3.71 routingPossibilitiesId
+
+
+routingPossibilitiesId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 71 };
+--8.3.72 routingPossibilitiesSelection
+
+
+routingPossibilitiesSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SelectionForAlgorithm;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		routingPossBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute gives a list of instances on which an algorithm is to apply. These instances can be
+				instances of OC routingPossData or of OC localDestination or of OC cepsgComb or of OC cepsg or of
+				OC routingPossibilities.";;
+REGISTERED AS { attribute 72 };
+--8.3.73 routingPossRestrictId
+
+
+routingPossRestrictId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 73 };
+--8.3.74 schedulingAttribute
+
+
+schedulingAttribute ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SchedulingAttribute;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		schedulingAttributeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the scheduling information in the SMO, for external index scheduling as in
+				EN 301 098[3].";;
+REGISTERED AS { attribute 74 };
+--8.3.75 searchMethod
+
+
+searchMethod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SearchMethod;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		searchMethodBeh BEHAVIOUR
+			DEFINED AS
+				"detailed under searchMethod in subclause 7.0";;
+REGISTERED AS { attribute 75 };
+--8.3.76 selectedInstances
+
+
+selectedInstances ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SelectedInstances;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		selectedInstancesBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute references object instances with an ordered list. Instances are of OC
+				routingPossibilities or postAnalysisEvaluation. All referenced instances of this attribute belong
+				to the same OC.";;
+REGISTERED AS { attribute 76 };
+--8.3.77 skipGroupSignal1
+
+
+skipGroupSignal1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SkipGroup;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		skipGroupSignal1Beh BEHAVIOUR
+			DEFINED AS
+				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to be skipped if
+				signal1 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg reachable via one of these
+				routing possibilities.";;
+REGISTERED AS { attribute 77 };
+--8.3.78 skipGroupSignal2
+
+
+skipGroupSignal2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SkipGroup;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		skipGroupSignal2Beh BEHAVIOUR
+			DEFINED AS
+				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to be skipped if
+				signal2 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg reachable via one of these
+				routing possibilities.";;
+REGISTERED AS { attribute 78 };
+--8.3.79 suppressCac
+
+
+suppressCac ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.SuppressCac;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		suppressCacBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes whether a CAC has to be suppressed or not.";;
+REGISTERED AS { attribute 79 };
+--8.3.80 suppressOwnCac
+
+
+suppressOwnCac ATTRIBUTE
+	DERIVED FROM
+		suppressCac;
+	BEHAVIOUR
+		suppressOwnCacBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes whether the network's own CAC has to be suppressed or not.";;
+REGISTERED AS { attribute 80 };
+--8.3.81 termForPreparation
+
+
+termForPreparation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		termForPreparationBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the group assigned to the outgoing circuit end point subgroup for digit
+				preparation purpose.";;
+REGISTERED AS { attribute 81 };
+--8.3.82 trafficCategory
+
+
+trafficCategory ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.TrafficCategory;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trafficCategoryBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes the traffic category that is assigned to the call. This attribute is not
+				the same as the parameter calling party's category of ITU-T Recommendation Q.763.
+
+				The Abstract Syntax Notation One (ASN.1) type TrafficCategory comprises the following values:
+
+				- nationalTraffic: This value is used for traffic that does not cross international boundaries and
+				when no other specific value of the ASN.1 type TrafficCategory is appropriate.
+
+				- internationalTransitTraffic: This value is used for traffic that crosses international boundaries
+				and when the adjacent exchange serves as international transit exchange for the traffic.
+
+				- internationalTerminatingTraffic: This value is used for traffic that crosses international
+				boundaries and when the adjacent exchange serves as an international terminating exchange.";;
+REGISTERED AS { attribute 82 };
+--8.3.83 trafficDistributionData
+
+
+trafficDistributionData ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.TrafficDistributionData;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { attribute 83 };
+--8.3.84 trafficDistributionId
+
+
+trafficDistributionId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 84 };
+--8.3.85 trafficDistributionInstance
+
+
+trafficDistributionInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		trafficDistributionInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC trafficDistribution.";;
+REGISTERED AS { attribute 85 };
+--8.3.86 treatmentId
+
+
+treatmentId ATTRIBUTE
+	DERIVED FROM
+		rDNId;
+REGISTERED AS { attribute 86 };
+--8.3.87 treatmentInstance
+
+
+treatmentInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		treatmentInstanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute points to an instance of OC treatment.";;
+REGISTERED AS { attribute 87 };
+--8.3.88 usedAlgorithm
+
+
+usedAlgorithm ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX ASN1TypeModule.UsedAlgorithm;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		usedAlgorithmBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute describes the algorithm used to select a member within a list.";;
+REGISTERED AS { attribute 88 };
+--8.4 Name bindings
+--8.4.1 analysisCriteria-managedElement
+
+
+analysisCriteria-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		analysisCriteria
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		analysisCriteriaId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 1 };
+--8.4.2 callHistory-managedElement
+
+
+callHistory-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		callHistory
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		callHistoryId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 2 };
+--8.4.3 carrierData-managedElement
+
+
+carrierData-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		carrierData
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		carrierDataId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 3 };
+--8.4.4 cep-cepsg
+
+
+cep-cepsg NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		cep
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":circuitEndPointSubgroup
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cepId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 4 };
+--8.4.5 cepsg-managedElement
+
+
+cepsg-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		cepsg
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Recommendation M.3100":circuitEndPointSubgroupId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 5 };
+--8.4.6 cepsgComb-managedElement
+
+
+cepsgComb-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		cepsgComb
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cepsgCombId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 6 };
+--8.4.7 cepsgCombList-managedElement
+
+
+cepsgCombList-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		cepsgCombList
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cepsgCombListId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 7 };
+--8.4.8 digitModification-managedElement
+
+
+digitModification-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		digitModification
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		digitModificationId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 8 };
+--8.4.9 digitPreparationCriteria-managedElement
+
+
+digitPreparationCriteria-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		digitPreparationCriteria
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		digitPreparationCriteriaId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 9 };
+--8.4.10 digitRebuildingCriteria-managedElement
+
+
+digitRebuildingCriteria-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		digitRebuildingCriteria
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		digitRebuildingCriteriaId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 10 };
+--8.4.11 exception-managedElement
+
+
+exception-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		exception
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		exceptionId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 11 };
+--8.4.12 localDestination-managedElement
+
+
+localDestination-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		localDestination
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		localDestinationId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 12 };
+--8.4.13 nationalDestination-managedElement
+
+
+nationalDestination-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		nationalDestination
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		nationalDestinationId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 13 };
+--8.4.14 postAnalysisEvaluation-managedElement
+
+
+postAnalysisEvaluation-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		postAnalysisEvaluation
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		postAnalysisEvaluationId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 14 };
+--8.4.15 prefixDigitAnalysis-managedElement
+
+
+prefixDigitAnalysis-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		prefixDigitAnalysis
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		prefixDigitAnalysisId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 15 };
+--8.4.16 routingPossData-managedElement
+
+
+routingPossData-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		routingPossData
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		routingPossDataId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 16 };
+--8.4.17 routingPossRestrict-routingPossibilities
+
+
+routingPossRestrict-routingPossibilities NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		routingPossRestrict
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		routingPossibilities
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		routingPossRestrictId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 17 };
+--8.4.18 routingPossibilities-managedElement
+
+
+routingPossibilities-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		routingPossibilities
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		routingPossibilitiesId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 18 };
+--8.4.19 trafficDistribution-managedElement
+
+
+trafficDistribution-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		trafficDistribution
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		trafficDistributionId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 19 };
+--8.4.20 treatment-managedElement
+
+
+treatment-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS
+		treatment
+		AND SUBCLASSES;
+	NAMED BY SUPERIOR OBJECT CLASS
+		"ITU-T Recommendation M.3100":managedElement
+		AND SUBCLASSES;
+	WITH ATTRIBUTE
+		treatmentId;
+	CREATE
+		WITH-REFERENCE-OBJECT,
+		WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { nameBinding 20 };
+
+END
+--< GDMO.EndDocument "EN 300 292 V1.2.1 (1998-08)" >--
