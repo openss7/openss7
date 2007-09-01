@@ -1,0 +1,653 @@
+
+--9.6 ASN.1 Syntax
+ES200653 {ccitt(0) identified-organization(4) etsi(0) ets(653) informationModel(0) asn1Module(2) es200653(0)}
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+--EXPORTS everything
+IMPORTS
+AdditionalInformation, AdministrativeState, AvailabilityStatus, OperationalState FROM Attribute-ASN1Module{joint-iso-ccitt ms(9) smi (3) part2
+(2) asn1Module(2) 1}
+Bundle, CharacteristicInformation, Directionality, NameType, UserLabel, LogicalProblem, ResourceProblem, ProblemCause, ObjectList,
+RelatedObjectInstance FROM ASN1DefinedTypesModule {ccitt(0) recommendation(0)
+m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0)}
+ObjectInstance FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+DistinguishedName FROM InformationFramework {joint-iso-ccitt ds(5) modules(1)
+informationFramework(1)}
+StopTime, Time24 FROM Attribute-ASN1Module {joint-iso-ccitt ms (9) smi (3) part2 (2)
+asn1Module (2) 1}
+TrafficDescriptor FROM ASN1TypeModule {ccitt (0) administration (2) etsi (0) ets (469) informationModel (0) asn1Module (2) asn1TypesModule
+(0)}
+;
+gomNLVClassLibrary OBJECT IDENTIFIER ::= {ccitt(0) identified-organization(4) etsi(0) ets(653) informationModel(0)}
+es200653MObjectClass OBJECT IDENTIFIER ::= {gomNLVClassLibrary managedObjectClass(3)}
+es200653Attribute OBJECT IDENTIFIER ::= {gomNLVClassLibrary attribute(7)}
+es200653NameBinding OBJECT IDENTIFIER ::= {gomNLVClassLibrary nameBinding(6)}
+es200653Package OBJECT IDENTIFIER ::= {gomNLVClassLibrary package(4)}
+es200653Action OBJECT IDENTIFIER ::= {gomNLVClassLibrary action(9)}
+es200653Notification OBJECT IDENTIFIER ::= {gomNLVClassLibrary notification(10)}
+ActivateSubNetworkConnectionInformation ::= SEQUENCE {
+snc ObjectInstance,
+transactionIdTransactionId OPTIONAL,
+userId UserId OPTIONAL
+}
+ActivateSubNetworkConnectionResult ::= CHOICE {
+failed [0] EXPLICIT Failed,
+sncActivated [1] SEQUENCE {
+snc [0] ObjectInstance,
+transactionId[1] TransactionIdOPTIONAL
+}
+}
+AddNWCTPsToTopologicalPtInformation ::= SEQUENCE OF SEQUENCE {
+nwCTPs SET OF ObjectInstance,
+topologicalPoint ObjectInstance OPTIONAL
+}
+AddNWCTPsToTopologicalPtResult ::= SEQUENCE OF CHOICE {
+failed [0] EXPLICIT Failed,
+addedNWCTPs [1] SEQUENCE {
+topologicalPoint ObjectInstance,
+addedNWCTPs SET OF ObjectInstance}
+}
+-- the nth element of the "SEQUENCE OF" is related to the nth element in the "SEQUENCE OF"
+--in the "addNWCTPsToTopologicalPtInformation" type.
+AddNWTPsToNWGTPInformation ::= SEQUENCE OF SEQUENCE {
+nwTPs SET OF ObjectInstance,
+nwGTP ObjectInstance OPTIONAL
+}
+AddNWTPsToNWGTPResult ::= SEQUENCE OF CHOICE {
+failed [0] EXPLICIT Failed,
+addedNWTPs [1] SEQUENCE {
+nwGTP ObjectInstance,
+addedNWTPs SET OF ObjectInstance}
+}
+-- the nth element of the "SEQUENCE OF" is related to the nth element in the "SEQUENCE OF"
+--in the "addNWTPsToNWGTP"Information" type.
+AddNWTTPsToAccessGroupInformation ::= SEQUENCE OF SEQUENCE {
+nwTTPs SET OF ObjectInstance,
+accessGroup ObjectInstance OPTIONAL
+}
+AddNWTTPsToAccessGroupResult ::= SEQUENCE OF CHOICE {
+failed [0] EXPLICIT Failed,
+addedNWTTPs [1] SEQUENCE {
+accessGroup ObjectInstance,
+addedNWTTPs SET OF ObjectInstance}
+}
+-- the nth element of the "SEQUENCE OF" is related to the nth element in the "SEQUENCE OF"
+--in the "addNWTTPsToAccessGroup" type.
+Address ::= GraphicString
+--the length of this string should be limited in application specific definitions
+AddToSubNetworkConnectionInformation ::= SEQUENCE {
+implicitTPCreation BOOLEAN,
+nWTP CHOICE {
+aEnds [0] SET OF ConnectivityEndPoint,
+zEnds [1] SET OF ConnectivityEndPoint,
+aAndZEndNWTPs [2] SEQUENCE OF SET OF ConnectivityEndPoint},
+existingsubNetworkConnection ObjectInstance
+}
+AddToSubNetworkConnectionResult ::= CHOICE {
+failed [0] EXPLICIT Failed,
+success [1] PtoMpSNCSetupResult
+}
+AssignmentState ::= ENUMERATED{
+free (0),
+reserved (1),
+partiallyAssigned (2),
+assigned (3)}
+BandwidthScheduling ::= SEQUENCE {
+startTime StartTime ,
+stopTime StopTime ,
+CHOICE {
+durationSchedule [0] BidirectionalTrafficDescriptor ,
+dailySchedule [1] DailySchedule ,
+weeklySchedule [2] WeeklySchedule ,
+occasionalSchedule [3] OccasionalSchedule,
+monthlySchedule [4] MonthlySchedule }}
+BidirectionalTrafficDescriptor ::= SEQUENCE {
+aToZ TrafficDescriptor ,
+zToA TrafficDescriptor}
+Broadcast ::= ConnectivityEndPoint
+-- single A end, no Z ends known
+ChangeDailySchedulingInfo ::= SEQUENCE {
+changeSchedule DailyScheduleModification OPTIONAL ,
+changeReservationBegin [10] StartTime OPTIONAL,
+changeReservationEnd [11] StopTime OPTIONAL}
+ChangeDailySchedulingProblem ::= CHOICE {
+problemMultipoint [1] ChangeMpDailySchedulingProblem ,
+oldNewScheduleTypeMismatch [10] NULL ,
+insufficientBandwidthAtTheServer [20] InsufficientBWAtTheServer ,
+networkProblem [30] ProblemCause ,
+numberOfSlotsTooLarge [40] INTEGER ,
+slotDurationTooSmall [41] Minutes ,
+overlappingDaySlots [42] OverlappingDaySlots ,
+invalidDaySlot [46] DaySlot,
+beginEndTimeInconsistency [49] NULL ,
+invalidReservationBegin [50] StartTime ,
+invalidReservationEnd [51] StopTime ,
+invalidScheduling [52] NULL}
+ChangeDailySchedulingResult ::= CHOICE {
+success [0] NULL ,
+problem [1] ChangeDailySchedulingProblem,
+generalFailure [2] NULL}
+ChangeDaySlot ::= SEQUENCE {
+slotId Time24 ,
+newSlot DaySlot}
+ChangeDurationSchedulingInfo ::= BidirectionalTrafficDescriptor
+ChangeDurationSchedulingProblem ::= CHOICE{
+resultMultipoint [2] ChangeMpDurationSchedulingProblem,
+insufficientBandwidthAtTheServer [20] InsufficientBWAtTheServer ,
+networkProblem [30] ProblemCause ,
+invalidDurationBw [45] StartTime ,
+invalidScheduling [52] NULL}
+ChangeDurationSchedulingResult ::= CHOICE {
+success [0] NULL ,
+problem [1] ChangeDurationSchedulingProblem,
+generalFailure [2] NULL}
+ChangeMonthlySchedulingInfo ::= SEQUENCE {
+changeSchedule MonthlyScheduleModification OPTIONAL ,
+changeReservationBegin [10] StartTime OPTIONAL,
+changeReservationEnd [11] StopTime OPTIONAL}
+ChangeMonthlySchedulingProblem ::= CHOICE {
+problemMultipoint [1] ChangeMpMonthlySchedulingProblem ,
+oldNewScheduleTypeMismatch [10] NULL ,
+insufficientBandwidthAtTheServer [20] InsufficientBWAtTheServer ,
+networkProblem [30] ProblemCause ,
+numberOfSlotsTooLarge [40] INTEGER ,
+slotDurationTooSmall [41] Minutes ,
+overlappingMonthSlots [42] OverlappingMonthSlots ,
+invalidMonthSlot [46] DaySlot,
+beginEndTimeInconsistency [49] NULL ,
+invalidReservationBegin [50] StartTime ,
+invalidReservationEnd [51] StopTime ,
+invalidScheduling [52] NULL}
+ChangeMonthlySchedulingResult ::= CHOICE {
+success [0] NULL,
+problem [1] ChangeMonthlySchedulingProblem,
+generalFailure [2] NULL}
+ChangeMonthSlot ::= SEQUENCE {
+slotId TimeMonth ,
+newSlot MonthSlot}
+ChangeMpDailySchedulingProblem ::= SEQUENCE {
+newScheduling DailyScheduling ,
+conflictingLegs SET OF LegChangeSlotProblem}
+ChangeMpDurationSchedulingProblem ::= SEQUENCE {
+newScheduling BidirectionalTrafficDescriptor,
+conflictingLegs SET OF LegChangeSlotProblem}
+ChangeMpMonthlySchedulingProblem ::= SEQUENCE {
+newScheduling MonthlyScheduling ,
+conflictingLegs SET OF LegChangeSlotProblem}
+ChangeMpOccasionalSchedulingProblem ::= SEQUENCE {
+newScheduling OccasionalScheduling ,
+conflictingLegs SET OF LegChangeSlotProblem}
+ChangeMpWeeklySchedulingProblem ::= SEQUENCE {
+newScheduling WeeklyScheduling,
+conflictingLegs SET OF LegChangeSlotProblem}
+ChangeOccasionalSchedulingInfo ::= SEQUENCE {
+changeSchedule OccasionalScheduleModification OPTIONAL ,
+changeReservationBegin [10] StartTime OPTIONAL,
+changeReservationEnd [11] StopTime OPTIONAL}
+ChangeOccasionalSchedulingProblem ::= CHOICE {
+problemMultipoint [1] ChangeMpOccasionalSchedulingProblem ,
+insufficientBandwidthAtTheServer [20] InsufficientBWAtTheServer ,
+networkProblem [30] ProblemCause ,
+numberOfSlotsTooLarge [40] INTEGER ,
+slotDurationTooSmall [41] Minutes ,
+overlappingOccasionalSlots [42] OverlappingOccasionalSlots ,
+invalidOccasionalSlot [48] OccasionalSlot,
+beginEndTimeInconsistency [49] NULL ,
+invalidReservationBegin [50] StartTime ,
+invalidReservationEnd [51] StopTime ,
+invalidScheduling [52] NULL}
+ChangeOccasionalSchedulingResult ::= CHOICE {
+success [0] NULL ,
+problem [1] ChangeOccasionalSchedulingProblem,
+generalFailure [2] NULL}
+ChangeOccasionalSlot ::= SEQUENCE {
+slotId StartTime ,
+newSlot OccasionalSlot}
+ChangeWeeklySchedulingInfo ::= SEQUENCE {
+changeSchedule WeeklyScheduleModification OPTIONAL ,
+changeReservationBegin [10] StartTime OPTIONAL,
+changeReservationEnd [11] StopTime OPTIONAL}
+ChangeWeeklySchedulingProblem ::= CHOICE {
+problemMultipoint [1] ChangeMpWeeklySchedulingProblem ,
+insufficientBandwidthAtTheServer [20] InsufficientBWAtTheServer ,
+networkProblem [30] ProblemCause ,
+numberOfSlotsTooLarge [40] INTEGER ,
+slotDurationTooSmall [41] Minutes ,
+overlappingWeekSlots [43] OverlappingWeekSlots ,
+invalidWeekSlot [47] WeekSlot,
+beginEndTimeInconsistency [49] NULL ,
+invalidReservationBegin [50] StartTime ,
+invalidReservationEnd [51] StopTime ,
+invalidScheduling [52] NULL}
+ChangeWeeklySchedulingResult ::= CHOICE {
+success [0] NULL,
+problem [1] ChangeWeeklySchedulingProblem,
+generalFailure [2] NULL}
+ChangeWeekSlot ::= SEQUENCE {
+slotId TimeWeek ,
+newSlot WeekSlot}
+ClientPtr::= ObjectInstance
+ComponentPointers ::= SET OF ObjectInstance
+CompositePointer ::= RelatedObjectInstance
+Conference ::= SET OF ConnectivityEndPoint
+-- all A ends, no Z ends
+ConnectionList ::= SET OF ObjectInstance
+ConnectivityDirectionality ::= CHOICE {
+ptoPUnidirectional [0] PtoPoint,
+ptoPBidirectional [1] PtoPoint,
+ptoMultipointUni [2] PtoMultipoint,
+ptoMultipointBidir [3] PtoMultipoint,
+multicastUni [4] Multicast,
+multicastBidir [5] Multicast,
+broadcastUni [6] Broadcast,
+broadcastBi [7] Broadcast,
+conference [8] Conference
+}
+ConnectivityEndPoint ::= CHOICE {
+none [0] NULL,
+sncTp [1] ObjectInstance,
+topologicalPoint [2] ObjectInstance,
+accessGroup [3] ObjectInstance
+}
+-- This allows a network termination point or GTP to be chosen explicitly (using the sncTPchoice)
+--or a Topological Point or Access Group may be selected, and hence any idle NWTP within them.
+ConnectivityPointer ::= RelatedObjectInstance
+Count ::= INTEGER
+DailySchedule ::= SEQUENCE OF DaySlot
+DailyScheduleModification ::= SET OF DaySlotModification
+DailyScheduling ::= SEQUENCE {
+reservationBegin StartTime ,
+reservationEnd StopTime ,
+schedule DailySchedule}
+DaySlot ::= SEQUENCE {
+slotBegin Time24 ,
+slotEnd Time24 ,
+bandwidth BidirectionalTrafficDescriptor}
+DaySlotModification::= CHOICE {
+deleteSlot [0] Time24 ,
+createSlot [1] DaySlot ,
+changeSlot [2] ChangeDaySlot}
+DeletedLeg ::= SEQUENCE {
+legId NameType ,
+zEnd ObjectInstance}
+DeleteFromSubNetworkConnectionInformation ::= SEQUENCE {
+nWTPs CHOICE {
+aEnds [0] SET OF ConnectivityEndPoint,
+zEnds [1] SET OF ConnectivityEndPoint,
+aAndZEndNWTPs [2] SEQUENCE OF SET OF ConnectivityEndPoint},
+existingSubNetworkConnection ObjectInstance
+}
+DeleteFromSubNetworkConnectionResult ::= CHOICE {
+legsDeleted [0] DeleteLegsResult ,
+multipointConnectionDeleted [1] DeleteLegsResult }
+DeleteLegProblem ::= CHOICE {
+noSuchTp [0] ObjectInstance ,
+connectionTpMismatch [1] ObjectInstance}
+DeleteLegsResult ::= SEQUENCE {
+multipointConnection ObjectInstance ,
+aEnd ObjectInstance ,
+deletedLegs SET OF DeletedLeg ,
+failures SET OF DeleteLegProblem}
+EndPNOs ::= SEQUENCE{
+nearEndPnoSubnetworkIdGraphicString OPTIONAL,
+CHOICE {
+farEndPnoSubnetworkId [0]GraphicString,
+destinationAddress [1]Address}OPTIONAL
+}
+Failed ::= CHOICE {
+logicalProblem [1] EXPLICIT LogicalProblem,
+resourceProblem [2] EXPLICIT ResourceProblem,
+noSuchConnection [10] ObjectInstance
+}
+Format ::= OBJECT IDENTIFIER
+Holdtime ::=INTEGER
+Implicit ::= BOOLEAN (TRUE)
+InsufficientBWAtTheServer ::= SEQUENCE {
+serverTTP ObjectInstance ,
+conflictingSlot SET OF SlotId OPTIONAL}
+LayerConnectionList ::= Tree
+LegChangeSlotProblem ::= SEQUENCE {
+legId NameType ,
+slotId SlotId OPTIONAL}
+LegDescription ::= SEQUENCE {
+legId NameType ,
+zEnd ObjectInstance ,
+statusCondition SetupStatus,
+slotProblems SET OF SlotId OPTIONAL}
+LegResult ::= CHOICE {
+success [0] LegDescription ,
+failure [1] LegSetupProblem}
+LegSetupProblem ::= CHOICE {
+noSuchSncTp [10] NULL ,
+noSuchServerTTP [11] NULL ,
+sncTpAlreadyConnected [12] NULL ,
+noMoreAvailableTpInServerTTP [13] NULL ,
+invalidSncTpParameter [14] NULL ,
+networkProblem [30] NULL}
+LegSetupResult ::= SEQUENCE {
+sncTP ConnectivityEndPoint ,
+legResult LegResult}
+LifecycleState ::= ENUMERATED{
+planned (0),
+inService (1),
+decommissioned (2)}
+LinkList ::= SET OF ObjectInstance
+LinkPointerList ::= SET OF ObjectInstance
+Minutes ::= INTEGER
+Mode ::= ENUMERATED {
+pointToPoint (0),
+pointToMultipoint (1),
+multicast (2),
+broadcast (3),
+conference (4)
+}
+MonthDay ::= INTEGER (1..31)
+MonthlySchedule ::= SEQUENCE OF MonthSlot
+MonthlyScheduleModification ::= SET OF MonthSlotModification
+MonthlyScheduling ::= SEQUENCE {
+reservationBegin StartTime ,
+reservationEnd StopTime ,
+schedule MonthlySchedule}
+MonthSlot ::= SEQUENCE {
+slotBegin TimeMonth ,
+slotEnd TimeMonth ,
+bandwidth BidirectionalTrafficDescriptor}
+MonthSlotModification::= CHOICE {
+deleteSlot [0] TimeMonth ,
+createSlot [1] MonthSlot ,
+changeSlot [2] ChangeMonthSlot}
+Multicast ::= SEQUENCE {
+aEnds SET OF ConnectivityEndPoint,
+zEnds SET OF ConnectivityEndPoint
+}
+-- multiple A ends, multiple Z ends
+NWCTPList ::= SET OF ObjectInstance
+NWTTPList ::= SET OF ObjectInstance
+OccasionalSchedule ::= SEQUENCE OF OccasionalSlot
+OccasionalScheduleModification ::= SET OF OccasionalSlotModification
+OccasionalScheduling ::= SEQUENCE {
+reservationBegin StartTime ,
+reservationEnd StopTime ,
+schedule OccasionalSchedule}
+OccasionalSlot ::= SEQUENCE {
+slotBegin StartTime ,
+slotEnd StopTime ,
+bandwidth BidirectionalTrafficDescriptor}
+OccasionalSlotModification::= CHOICE {
+deleteSlot [0] StartTime ,
+createSlot [1] OccasionalSlot ,
+changeSlot [2] ChangeOccasionalSlot}
+OverlappingDaySlots ::= SEQUENCE {
+slot1 DaySlot,
+slot2 DaySlot}
+OverlappingMonthSlots ::= SEQUENCE {
+slot1 MonthSlot,
+slot2 MonthSlot}
+OverlappingOccasionalSlots ::= SEQUENCE {
+slot1 OccasionalSlot,
+slot2 OccasionalSlot}
+OverlappingWeekSlots ::= SEQUENCE {
+slot1 WeekSlot,
+slot2 WeekSlot}
+--ProblemCause is imported from ITU-T Recommendation M.3100
+-- The following values are used for integerValue of ProblemCause:
+-- noSuchTPInstance 0
+-- noSuchTopologicalPtInstance 1
+-- noSuchAccessGroupInstance 2
+-- noSuchSNCInstance 3
+-- noNWCTPInTopologicalPoint 4
+-- noNWTTPInAccessGroup 5
+-- nwCTPAlreadyInTopologicalPoint 6
+-- nwTTPAlreadyInAccessGroup 7
+-- sncAlreadyInSNC 8
+PtoMpSNCReleaseResult ::= SEQUENCE {
+sNConnection ObjectInstance ,
+aEnd ObjectInstance OPTIONAL,
+zEnds SET OF ObjectInstance OPTIONAL}
+PtoMpSNCSetupResult ::= SEQUENCE {
+sNConnection ObjectInstance ,
+legs SET OF LegSetupResult}
+PtoMultipoint ::= SEQUENCE {
+aEnd ConnectivityEndPoint,
+zEnds SET OF ConnectivityEndPoint
+}
+-- single A end, multiple Z ends
+PtoPoint ::= SEQUENCE {
+aEnd ConnectivityEndPoint,
+zEnd ConnectivityEndPoint
+}
+-- single A and Z ends
+PtoPSNCReleaseResult ::= SEQUENCE {
+connection ObjectInstance ,
+aEnd [0] ObjectInstance OPTIONAL,
+zEnd [1] ObjectInstance OPTIONAL}
+PtoPSNCSetupResult ::= SEQUENCE {
+connection ObjectInstance ,
+aEnd ObjectInstance ,
+zEnd ObjectInstance
+}
+QofConnectivityService ::=ObjectInstance
+ReleaseSubNetworkConnectionInformation ::= SEQUENCE {
+snc ObjectInstance,
+userId UserId OPTIONAL
+}
+ReleaseSubNetworkConnectionResult ::= CHOICE {
+failure [0] EXPLICIT Failed,
+pointToPointResult [1] PtoPSNCReleaseResult,
+multipointResult [2] PtoMpSNCReleaseResult
+}
+ReleaseTrailInformation ::= SEQUENCE {
+trailId ObjectInstance,
+userId UserId OPTIONAL
+}
+ReleaseTrailResult ::= CHOICE {
+unknown NULL,
+integerValue INTEGER
+}
+-- The following values are used for integerValue of releaseTrailResult:
+-- The trail has been released 0
+-- The trail has not been released 1
+-- The identified trail was not recognized 2
+-- The service user which issued the release trail request is not authorized to do so 3
+-- The user Id was not recognized 4
+RemoveNWTTPsFromAccessGroupInformation ::= SEQUENCE OF SEQUENCE {
+nWTTPs SET OF ObjectInstance,
+accessGroup ObjectInstance
+}
+RemoveNWTTPsFromAccessGroupResult ::= SEQUENCE OF CHOICE {
+failed [0] EXPLICIT Failed,
+removedNWTTPs [1] SEQUENCE {
+accessGroup ObjectInstance,
+removedNWTTPs SET OF ObjectInstance}
+}
+-- the nth element of the "SEQUENCE OF" is related to the nth element in the "SEQUENCE
+-- OF" in the "removeNWTTPsFromAccessGroup" type.
+RemoveNWTPsFromNWGTPInformation ::= SEQUENCE OF SEQUENCE {
+nwTPs SET OF ObjectInstance,
+nwGTP ObjectInstance
+}
+RemoveNWTPsFromNWGTPResult ::= SEQUENCE OF CHOICE {
+failed [0] EXPLICIT Failed,
+removedNWTPs [1] SEQUENCE {
+nwGTP ObjectInstance,
+removedNWTPs SET OF ObjectInstance}
+}
+-- the nth element of the "SEQUENCE OF" is related to the nth element in the "SEQUENCE OF"
+--in the " RemoveNWTPsFromNWGTPInformation " type.
+RemoveNWCTPsFromTopologicalPtInformation ::= SEQUENCE OF SEQUENCE {
+nWCTPs SET OF ObjectInstance,
+topologicalPoint ObjectInstance
+}
+RemoveNWCTPsFromTopologicalPtResult ::= SEQUENCE OF CHOICE {
+failed [0] EXPLICIT Failed,
+removedNWCTPs [1] SEQUENCE {
+topologicalPoint ObjectInstance,
+removedNWCTPs SET OF ObjectInstance}
+}
+-- the nth element of the "SEQUENCE OF" is related to the nth element in the "SEQUENCE
+--OF" in the "removeNWCTPsFromTopologicalPtInformation" type.
+--ResourceProblem is imported from ITU-T Recommendation M.3100
+--The semantics for each integer valueis defined by the application.
+SetupStatus ::= SET {
+lifecycleState [0] LifecycleState,
+assignmentState [1] AssignmentState,
+availabilityStatus [2]AvailabilityStatus --see X.721
+}
+SetupSubNetworkConnectionInformation ::= SEQUENCE {
+sncDirectionality ConnectivityDirectionality,
+statusCondition [0] SetupStatus OPTIONAL,
+signalid [1] SignalId OPTIONAL,
+qofConnectivityService [2] QofConnectivityService OPTIONAL,
+transactionId [3] TransactionIdOPTIONAL,
+userId [4] UserId OPTIONAL,
+timeout [5] Timeout OPTIONAL ,
+holdtime [6] HoldtimeOPTIONAL,
+bandwidthScheduling [7] BandwidthScheduling OPTIONAL,
+implicitTPCreation [8] Implicit OPTIONAL,
+endPNOs [9] EndPNOs OPTIONAL
+}
+SetupSubnetworkConnectionProblem ::= CHOICE {
+logicalProblem [0] EXPLICIT LogicalProblem,
+resourceProblem [1] EXPLICIT ResourceProblem,
+parameterProblem [2] SET OF ENUMERATED {
+sncDirectionalityRelatedFailure (0),
+stateRelatedFailure (1),
+signalidRelatedFailure (2),
+qofServiceRelatedFailure (3),
+transactionIdRelatedFailure (4),
+senderRelatedFailure (5)},
+noSuchSncTp [10] ObjectInstance ,
+noSuchServerTTP [11] ObjectInstance ,
+sncTpAlreadyConnected [12] ObjectInstance ,
+noMoreAvailableTpInServerTTP [13] ObjectInstance ,
+invalidSncTpParameter [14] ObjectInstance ,
+insufficientBandwidthAtTheServer [20] InsufficientBWAtTheServer ,
+networkProblem [30] ProblemCause ,
+noLegsSetup [31] LegSetupProblem,
+numberOfSlotsTooLarge [40] INTEGER ,
+slotDurationTooSmall [41] Minutes ,
+overlappingDaySlots [42] OverlappingDaySlots ,
+overlappingMonthSlots [43] OverlappingMonthSlots ,
+overlappingOccasionalSlots [44] OverlappingOccasionalSlots ,
+overlappingWeekSlots [45] OverlappingWeekSlots ,
+invalidDurationBW [46] BidirectionalTrafficDescriptor ,
+invalidDaySlot [47] DaySlot ,
+invalidMonthSlot [48] MonthSlot ,
+invalidOccasionalSlot [49] OccasionalSlot ,
+invalidWeekSlot [50] WeekSlot ,
+beginEndTimeInconsistency [51] NULL ,
+invalidReservationBegin [52] StartTime ,
+invalidReservation [53] StopTime ,
+invalidScheduling [54] NULL
+}
+-- a logical problem indicates for example that an object instance was specified which does not
+--exist
+-- a resource problem - these need to be defined
+-- a parameter problem indicates that one of the parameters requested in the setup request
+--was not available, or that the failure is related to that parameter.
+SetupSubNetworkConnectionResult ::= SEQUENCE{
+transactionId TransactionId OPTIONAL,
+CHOICE {
+pointToPointResult [1] PtoPSNCSetupResult ,
+multipointResult [2] PtoMpSNCSetupResult ,
+generalFailure [3] NULL,
+problem [4] SetupSubnetworkConnectionProblem}
+}
+SetupTrailInformation ::= SEQUENCE {
+trailEndPoints ConnectivityDirectionality,
+userId [0] UserId OPTIONAL,
+userLabel [1] UserLabel OPTIONAL,
+additionalInformation [2] AdditionalInformationOPTIONAL
+}
+SetupTrailResult ::= SEQUENCE {
+setupTrailResultCode SetupTrailResultCode,
+trailId ObjectInstance,
+aEnds SET OF ObjectInstance,
+zEnds SET OF ObjectInstance
+}
+SetupTrailResultCode ::= CHOICE {
+unknown NULL ,
+integerValue INTEGER
+}
+-- The following values are used for integerValue of SetupTrailResultCode :
+-- Trail setup successful 0
+-- End point identifiers Parameter value error 1
+-- (requested end point identifiers not recognized)
+-- End point identifiers Parameter value error 2
+-- (requested end points not available)
+-- Directionality Parameter value error
+-- (requested directionality not supported) 3
+-- Mode Parameter value error - requested mode not supported 4
+-- User identifier Parameter value error- requested User identifier not recognized 5
+-- No route between the specified end-point identifiers can be found 6
+SignalId ::= CHOICE {
+simple [0] CharacteristicInformation,
+bundle [1] Bundle,
+none [2] NULL,
+complex [3] SEQUENCE OF Bundle,
+extended [4]SEQUENCE OF SEQUENCE{
+characteristicInformation CharacteristicInformation,
+format Format,
+variable [5] BidirectionalTrafficDescriptor}
+}
+-- The use of signal Id is described in Clause B.1.8. For unidirectional variable
+-- cases one of the traffic descriptors is NULL.
+SignalList ::= SET OF SignalId
+SlotId ::= CHOICE {
+duration [0] NULL ,
+daySlotId [1] Time24 ,
+weekSlotId [2] TimeWeek ,
+monthSlotId [3] TimeMonth,
+occasionalSlot [4] StartTime}
+StartTime ::= StopTime
+--StartTime uses the same syntax as StopTime to allow for a Null value of the StartTime, for example where a set-up is immediately activated on
+receipt of the setup request.
+SubNetworkConnectionPointerList ::= SEQUENCE OF RelatedObjectInstance
+SubNetworkList ::= SET OF ObjectInstance
+Subtree ::= CHOICE {
+singleConnectivityInstance [0] ObjectInstance,
+multicast [1] SET OF Subtree
+}
+TimeMonth ::= SEQUENCE {
+monthDay MonthDay ,
+time Time24}
+Timeout ::= INTEGER
+TimeWeek ::= SEQUENCE {
+weekDay WeekDay ,
+time Time24}
+TPList ::= SET OF ObjectInstance
+TrailList ::= SET OF ObjectInstance
+TransactionId ::= SEQUENCE {
+localId [0] INTEGER,
+globalRef [1] CHOICE {
+dnGlobalRef DistinguishedName,
+oidGlobalRef OBJECT IDENTIFIER} OPTIONAL
+}
+Tree ::= SET OF Subtree
+TypeText ::= GraphicString
+--Note that the length of this string shall be limited in Technology specific applications.
+UsageCost::=INTEGER(0..255)
+UserId ::= GraphicString
+--Note that the length of this string shall be limited in Technology specific applications.
+WeekDay ::= ENUMERATED {
+sunday (0) ,
+monday (1) ,
+tuesday (2) ,
+wednesday (3) ,
+thursday (4) ,
+friday (5) ,
+saturday (6)}
+WeeklySchedule ::= SEQUENCE OF WeekSlot
+WeeklyScheduleModification ::= SET OF WeekSlotModification
+WeeklyScheduling ::= SEQUENCE {
+reservationBegin StartTime ,
+reservationEnd StopTime ,
+schedule WeeklySchedule}
+WeekSlot ::= SEQUENCE {
+slotBegin TimeWeek ,
+slotEnd TimeWeek ,
+bandwidth BidirectionalTrafficDescriptor}
+WeekSlotModification ::= CHOICE {
+deleteSlot [0] TimeWeek ,
+createSlot [1] WeekSlot ,
+changeSlot [2] ChangeWeekSlot}
+END

@@ -1836,8 +1836,8 @@ dTEX25PLECounters-P PACKAGE
 			clearCountsExceeded
 			clearTimeouts
 			dataPacketsReceived
-			dataPacketsSentdata
-			RetransmissionTimerExpiries
+			dataPacketsSent
+			dataRetransmissionTimerExpiries
 			providerInitiatedDisconnects
 			providerInitiatedResets
 			remotelyInitiatedResets

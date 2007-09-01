@@ -1413,7 +1413,25 @@ sub gdmo {
 			}
 		}
 	}
+	# print a derivation tree
+	my ($d); if ($d = $::root->{objects}->{top}->{defn}) {
+		printf "\n--@@";
+		printf "\n--@@ Derivation Tree:";
+		printf "\n--@@";
+		$d->showderived();
+		printf "\n--@@\n";
+	}
+	# print a containment tree
+	my ($d); if ($d = $::root->{objects}->{top}->{defn}) {
+		printf "\n--@@";
+		printf "\n--@@ Containment Tree:";
+		printf "\n--@@";
+		$d->showcontained();
+		printf "\n--@@\n";
+	}
 }
+
+
 
 # -------------------------------------
 package GdmoModuleList;
@@ -6099,6 +6117,7 @@ sub xreftyped {
 	my $type = shift;
 	my $gdmo = $_[0];
 
+	$self->{documentid} = $gdmo->{documentid};
 	$gdmo->{$type}->{$self->{label}}->{defn} = $self;
 	$::root->{$type}->{$self->{label}}->{defn} = $self;
 	$::root->{$type}->{$self->{label}}->{modl} = $gdmo;
@@ -6376,6 +6395,69 @@ sub gdmo {
 	}
 }
 
+sub showderived {
+	my $self = shift;
+	printf "\n--@@ $::indent";
+	if (defined $self->{documentid}) {
+		printf "\"$self->{documentid}\":$self->{name}";
+	} else {
+		printf "$self->{name}";
+	}
+	if ($::indent eq '') { $::indent='+- '; } else { $::indent='|  '.$::indent; }
+	if (defined $self->{derivations}) {
+		my ($d); foreach $d (@{$self->{derivations}}) {
+			$d->showderived();
+		}
+	}
+	$::indent=~s/^...//;
+}
+
+sub walkcontained {
+	my $self = shift;
+	printf "\n--@@ $::indent";
+	if (defined $self->{documentid}) {
+		printf "\"$self->{documentid}\":$self->{name}";
+	} else {
+		printf "$self->{name}";
+	}
+	if (defined $self->{derivations}) {
+		if ($::indent eq '') { $::indent='>- '; } else { $::indent='|  '.$::indent; }
+		$::indent=~s/>/+/;
+		my ($d); foreach $d (@{$self->{derivations}}) {
+			$d->showderived();
+		}
+		$::indent=~s/\+/>/;
+		$::indent=~s/^...//;
+	}
+	if ($::indent eq '') { $::indent='>- '; } else { $::indent='|  '.$::indent; }
+	if (defined $self->{contains}) {
+		my ($d); foreach $d (@{$self->{contains}}) {
+			if ($d->{label} eq $self->{label}) {
+				if (defined $self->{documentid}) {
+					printf "\"$self->{documentid}\":$self->{name}";
+				} else {
+					printf "$self->{name}";
+				}
+			} else {
+				$d->walkcontained();
+			}
+		}
+	}
+	$::indent=~s/^...//;
+}
+
+sub showcontained {
+	my $self = shift;
+	if (!defined $self->{container}) {
+		$self->walkcontained();
+	}
+	if (defined $self->{derivations}) {
+		my ($d); foreach $d (@{$self->{derivations}}) {
+			$d->showcontained();
+		}
+	}
+}
+
 # ----------------------------------------
 package PackageTemplate;
 use strict;
@@ -6616,6 +6698,19 @@ sub read {
 	}
 	$self->popscope();
 	return $self->error($line);
+}
+
+sub xref {
+	my $self = shift;
+	my ($sup,$sub);
+	if (
+		($sup = $::root->{objects}->{$self->{superior}->{class}->{label}}->{defn}) &&
+		($sub = $::root->{objects}->{$self->{subordinate}->{class}->{label}}->{defn})
+	) {
+		push @{$sup->{contains}}, $sub;
+		push @{$sub->{container}}, $sup;
+	}
+	$self->call('xref',@_);
 }
 
 sub head {
@@ -8561,6 +8656,21 @@ sub read {
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
+}
+
+sub xref {
+	my $self = shift;
+	my $tmpl = $_[-1];
+	my ($i,$d);
+	foreach $i (@{$self->{classes}->{items}}) {
+		if (defined $::root->{objects}->{$i->{label}}) {
+			if ($d = $::root->{objects}->{$i->{label}}->{defn}) {
+				print "--@@ $tmpl->{name} is derived from $d->{name}.";
+				push @{$d->{derivations}}, $tmpl;
+			}
+		}
+	}
+	$self->call('xref',@_);
 }
 
 sub head {
