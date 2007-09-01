@@ -1,0 +1,83 @@
+
+--5.5.5 ASN.1 Definitions
+--Rules of extensibility (ITU-T Recommendation M.3100 (13]) - The following
+--types will be indicated as being
+--extensible:
+---  ENUMERATED;
+---  named INTEGER;
+---  named BIT STRING;
+---  tagged SET;
+---  tagged SEQUENCE;
+---  tagged CHOICE;
+--Under the rules of extensibility new enumerations (for ENUMERATED types), new
+--bit name assignments (for named
+--BIT STRING types), new named numbers (for named INTEGER types), and new tagged
+--elements (for tagged SET,
+--SEQUENCE, and CHOICE types) may be added in future versions of this
+--Recommendation. When processing
+--information in a System Management Protocol (SMAP) PDU, the accepting SMAP
+--machine shall ignore:
+---  enumerations not recognized;
+---  unrecognized named numbers;
+---  unrecognized named bits;
+---  unrecognized tagged elements of sets, sequences, and choices.
+--The ASN.1 productions defined in PhysicalResourceManagementModule conform to
+--both the ASN.1 88-90 ITU-T
+--Recommendation X.208 [15] version and the ASN.1 1994 ITU-T Recommendation
+--X.680 [16-19] version.
+PhysicalResourceManagementModule {ccitt(0) identified-organization(4) etsi(0)
+ets(x)
+informationModel(0) asn1Module(2) physicalResourceManagementModule(???)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+NameType FROM ASN1DefinedTypesModule {ccitt(0) recommendation(0) m(13)
+m3100(3100)
+informationModel(0) asn1Module(2) asn1DefinedTypesModule(0)};
+-- OBJECT IDENTIFIER DEFINITIONS
+informationModel OBJECT IDENTIFIER ::= {ccitt(0) identified-organization(4)
+etsi(0) ets(x)
+informationModel(0) }
+managedObjectClass OBJECT IDENTIFIER ::= { informationModel
+managedObjectClass(3) }
+package OBJECT IDENTIFIER ::= { informationModel package(4) }
+parameter OBJECT IDENTIFIER ::= { informationModel parameter(5) }
+nameBinding OBJECT IDENTIFIER ::= { informationModel nameBinding(6) }
+attribute OBJECT IDENTIFIER ::= { informationModel attribute(7) }
+attributeGroup OBJECT IDENTIFIER ::= { informationModel attributeGroup(3) }
+action OBJECT IDENTIFIER ::= { informationModel action(9) }
+notification OBJECT IDENTIFIER ::= { informationModel notification(10) }
+-- TYPE DEFINITIONS
+Connected ::= SEQUENCE {
+cableType [0] PrintableString,
+farEndConnectorList [1] FarEndConnectorList
+}
+Connection ::= CHOICE {
+notConnected NULL,
+connected Connected
+}
+Connector ::= SEQUENCE {
+connectorType [0] PrintableString,
+connectorIdentifier [1] NameType
+}
+FarEndConnectorList ::= SEQUENCE {
+farEndResource [0] OBJECT IDENTIFIER,
+connectorList [1] PhysicalConnectorList
+}
+ModuleType ::= CHOICE {
+globalValue OBJECT IDENTIFIER,
+localValue INTEGER
+}
+OnOff ::= ENUMERATED {
+off (0),
+on (1)
+}
+PhysicalConnectionList ::= SEQUENCE OF Connection
+PhysicalConnectorList ::= SEQUENCE OF Connector
+Polarity ::= ENUMERATED {
+activeLow (0),
+activeHigh (1)
+}
+END
+
