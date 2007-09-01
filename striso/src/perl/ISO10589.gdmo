@@ -1,3 +1,6 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "ISO10733.gdmo" >--
 --< GDMO.Document "ISO/IEC 10589" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Alias "ISO/IEC 10589" "ISIS" >--

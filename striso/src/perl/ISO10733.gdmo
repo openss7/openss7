@@ -1,3 +1,6 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "ISO10589.gdmo" >--
 --< GDMO.Document "ISO/IEC 10733" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
@@ -445,7 +448,7 @@ REGISTERED AS { NLM.nboi cLNS-networkEntity-Automatic(16) };
 
 assemblingSegmentsDiscarded ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		assemblingSegmentsDiscarded-B BEHAVIOUR
 			DEFINED AS
@@ -456,7 +459,7 @@ REGISTERED AS { NLM.aoi assemblingSegmentsDiscarded(8) };
 
 congestionDiscards ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		congestionDiscards-B BEHAVIOUR
 			DEFINED AS
@@ -479,7 +482,7 @@ REGISTERED AS { NLM.aoi enableChecksum(4) };
 
 errorReportsReceived ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		errorReportsReceived-B BEHAVIOUR
 			DEFINED AS
@@ -520,7 +523,7 @@ REGISTERED AS { NLM.aoi operationalSystemType(109) };
 
 pDUDiscards ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		pDUDiscards-B BEHAVIOUR
 			DEFINED AS
@@ -537,7 +540,7 @@ pDUDiscards ATTRIBUTE
 
 segmentsDiscarded ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		segmentsDiscarded-B BEHAVIOUR
 			DEFINED AS
@@ -549,7 +552,7 @@ REGISTERED AS { NLM.aoi segmentsDiscarded(7) };
 
 segmentsReceived ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		segmentsReceived-B BEHAVIOUR
 			DEFINED AS
@@ -906,7 +909,7 @@ REGISTERED AS { NLM.aoi activeESConfigTimer(22) };
 
 callsFailed ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		callsFailed-B BEHAVIOUR
 			DEFINED AS
@@ -916,7 +919,7 @@ REGISTERED AS { NLM.aoi callsFailed(30) };
 
 callsPlaced ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		callsPlaced-B BEHAVIOUR
 			DEFINED AS
@@ -938,7 +941,7 @@ REGISTERED AS { NLM.aoi defaultESConfigTimer(21) };
 
 eSReachabilityChanges ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		eSReachabilityChanges-B BEHAVIOUR
 			DEFINED AS
@@ -999,7 +1002,7 @@ REGISTERED AS { NLM.aoi initialMinimumTimer(33) };
 
 invalid9542PDUs ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		invalid9542PDUs-B BEHAVIOUR
 			DEFINED AS
@@ -1036,7 +1039,7 @@ REGISTERED AS { NLM.aoi iSO9542OperationalSubsets(115) };
 
 iSReachabilityChanges ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		iSReachabilityChanges-B BEHAVIOUR
 			DEFINED AS
@@ -1179,7 +1182,8 @@ cONS MANAGED OBJECT CLASS
 			ACTIONS
 				"Rec. X.723 | ISO/IEC 10165-5":activate,
 				"Rec. X.723 | ISO/IEC 10165-5":deactivate,
-				"Rec. X.723 | ISO/IEC 10165-5":shutdown;
+				"Rec. X.723 | ISO/IEC 10165-5":deactivateWhenNoUsers;
+				-- was "Rec. X.723 | ISO/IEC 10165-5":shutdown;
 			NOTIFICATIONS
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectCreation,
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectDeletion,
@@ -1237,7 +1241,7 @@ REGISTERED AS { NLM.nboi cONS-networkEntity-Automatic(17) };
 
 networkConnection MANAGED OBJECT CLASS
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":connection;
+		"Rec. X.723 | ISO/IEC 10165-5":singlePeerConnection;
 	CHARACTERIZED BY
 		networkConnection-P PACKAGE
 			BEHAVIOUR
@@ -1645,7 +1649,7 @@ REGISTERED AS { NLM.nboi x25PLE-networkSubsystem-Automatic(18) };
 
 callAttempts ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		callAttempts-B BEHAVIOUR
 			DEFINED AS
@@ -1667,7 +1671,7 @@ REGISTERED AS { NLM.aoi callDeflectionSubscription(114) };
 
 callsConnected ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		callsConnected-B BEHAVIOUR
 			DEFINED AS
@@ -1677,7 +1681,7 @@ REGISTERED AS { NLM.aoi callsConnected(53) };
 
 callEstablishmentRetryCountsExceeded ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		callEstablishmentRetryCountsExceeded-B BEHAVIOUR
 			DEFINED AS
@@ -1688,7 +1692,7 @@ REGISTERED AS { NLM.aoi callEstablishmentRetryCountsExceeded(65) };
 
 callTimeouts ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		callTimeouts-B BEHAVIOUR
 			DEFINED AS
@@ -1698,7 +1702,7 @@ REGISTERED AS { NLM.aoi callTimeouts(55) };
 
 clearCountsExceeded ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		clearCountsExceeded-B BEHAVIOUR
 			DEFINED AS
@@ -1709,7 +1713,7 @@ REGISTERED AS { NLM.aoi clearCountsExceeded(66) };
 
 clearTimeouts ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		clearTimeouts-B BEHAVIOUR
 			DEFINED AS
@@ -1719,7 +1723,7 @@ REGISTERED AS { NLM.aoi clearTimeouts(56) };
 
 dataPacketsReceived ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		dataPacketsReceived-B BEHAVIOUR
 			DEFINED AS
@@ -1729,7 +1733,7 @@ REGISTERED AS { NLM.aoi dataPacketsReceived(51) };
 
 dataPacketsSent ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		dataPacketsSent-B BEHAVIOUR
 			DEFINED AS
@@ -1739,7 +1743,7 @@ REGISTERED AS { NLM.aoi dataPacketsSent(50) };
 
 dataRetransmissionTimerExpiries ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		dataRetransmissionTimerExpiries-B BEHAVIOUR
 			DEFINED AS
@@ -1816,7 +1820,7 @@ REGISTERED AS { NLM.aoi interfaceMode(40) };
 
 interruptPacketsReceived ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		interruptPacketsReceived-B BEHAVIOUR
 			DEFINED AS
@@ -1826,7 +1830,7 @@ REGISTERED AS { NLM.aoi interruptPacketsReceived(68) };
 
 interruptPacketsSent ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		interruptPacketsSent-B BEHAVIOUR
 			DEFINED AS
@@ -1836,7 +1840,7 @@ REGISTERED AS { NLM.aoi interruptPacketsSent(67) };
 
 interruptTimerExpiries ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		interruptTimerExpiries-B BEHAVIOUR
 			DEFINED AS
@@ -1931,7 +1935,7 @@ pLEClientMOName ATTRIBUTE
 
 protocolErrorsAccusedOf ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		protocolErrorsAccusedOf-B BEHAVIOUR
 			DEFINED AS
@@ -1942,7 +1946,7 @@ REGISTERED AS { NLM.aoi protocolErrorsAccusedOf(64) };
 
 protocolErrorsDetectedLocally ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		protocolErrorsDetectedLocally-B BEHAVIOUR
 			DEFINED AS
@@ -1964,7 +1968,7 @@ REGISTERED AS { NLM.aoi protocolVersionSupported(38) };
 
 providerInitiatedDisconnects ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		providerInitiatedDisconnects-B BEHAVIOUR
 			DEFINED AS
@@ -1975,7 +1979,7 @@ REGISTERED AS { NLM.aoi providerInitiatedDisconnects(54) };
 
 providerInitiatedResets ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		providerInitiatedResets-B BEHAVIOUR
 			DEFINED AS
@@ -2021,7 +2025,7 @@ REGISTERED AS { NLM.aoi registrationRequestTime(44) };
 
 remotelyInitiatedResets ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		remotelyInitiatedResets-B BEHAVIOUR
 			DEFINED AS
@@ -2032,7 +2036,7 @@ REGISTERED AS { NLM.aoi remotelyInitiatedResets(57) };
 
 remotelyInitiatedRestarts ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		remotelyInitiatedestarts-B BEHAVIOUR
 			DEFINED AS
@@ -2044,7 +2048,7 @@ REGISTERED AS { NLM.aoi remotelyInitiatedRestarts(61) };
 
 resetTimeouts ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		resetTimeouts-B BEHAVIOUR
 			DEFINED AS
@@ -2066,7 +2070,7 @@ REGISTERED AS { NLM.aoi restartCount(45) };
 
 restartCountsExceeded ATTRIBUTE
 	DERIVED FROM
-		"Rec. X.723 | ISO/IEC 10165-5":nonWrappingCounter;
+		"Rec. X.723 | ISO/IEC 10165-5":nonWrapping64BitCounter;
 	BEHAVIOUR
 		restartCountsExceeded-B BEHAVIOUR
 			DEFINED AS

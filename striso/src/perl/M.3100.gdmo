@@ -1,5 +1,19 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "X.738.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Include "X.742.gdmo" >--
+--< GDMO.Include "X.745.gdmo" >--
+--< GDMO.Include "X.746.gdmo" >--
+--< GDMO.Include "X.521.gdmo" >--
+--< GDMO.Include "Q.821.gdmo" >--
+--< GDMO.Include "G.774.gdmo" >--
+--< GDMO.Include "G.774.3.gdmo" >--
+--< GDMO.Include "G.774.04.gdmo" >--
+--< GDMO.Include "G.774.03.gdmo" >--
 --< GDMO.Document "ITU-T Recommendation M.3100" >--
 --< GDMO.Alias "ITU-T Recommendation M.3100"
+--  "Rec. M.3100 : 1995",
 --  "Recommendation M.3100 : 1992",
 --  "Recommendation M.3100: 1992",
 --  "Recommendation M3100 : 1992",
@@ -7,6 +21,7 @@
 --  "Recommendation M.3100:1992",
 --  "ITU-T Rec. M.3100:1995",
 --  "Rec. M.3100",
+--  "M.3100:1995",
 --  "Recommendation M.3100",
 --  "ITU-T Rec. M.3100 (1992)",
 --  "ITU-T Rec. M.3100 (1995)" >--

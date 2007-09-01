@@ -1,3 +1,4 @@
+--< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "ITU-T Rec. G.774" >--
 --< GDMO.Alias "ITU-T Rec. G.774"
 --  "Recommendation G.774 : 1992",
@@ -5648,7 +5649,7 @@ tug3BidirectionalSubordinationR1 SUBORDINATION RULE
 
 vc3TTPSinkR1Subordination SUBORDINATION RULE
 	SUPERIOR OBJECT CLASS
-		vc3TTPSink;
+		vc3TTPSinkR1;
 	NAMES SUBORDINATES
 		tug2Sink,
 		vcnUserChannelCTPSink;

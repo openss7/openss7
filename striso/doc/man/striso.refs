@@ -3261,16 +3261,19 @@ Part 1: Protocol Specification
 %R ISO/IEC 8208 : 1995
 %T Information Technology \- Data Communications \- X.25 Packet Layer Protocol For Data Terminal Equipment
 %D 1995
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso8881
 %L ISO 8881
 %R ISO/IEC 8881:1989
 %A ISO/IEC
-%Q International Organization for Standardization
 %T Information Processing Systems \(em Data Communications \(em Use of the X.25 Packet Level Protocol in Local Area Networks
 %D 1989
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso9542
 %L ISO/IEC 9542
@@ -3278,7 +3281,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 9542 : 1988
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System to Intermediate System Routeing Exchange Protocol for use in Conjunction with the Protocol Routeing for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1988
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso10030
 %L ISO/IEC 10030
@@ -3286,7 +3291,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 10030 : 1995
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- End System Routeing Information Exchange Protocol for use in conjunction with ISO/IEC 8878
 %D 1995
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso10589
 %L ISO/IEC 10589
@@ -3294,7 +3301,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 10589 : 1992
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Intermediate System to Intermediate System Intra-Domain Routeing Routine Information Exchange Protocol for use in conjunction wht the Protocol for Providing the Connectionless-Mode Network Service (ISO 8473)
 %D 1992
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K iso10747
 %L ISO/IEC 10747
@@ -3302,7 +3311,9 @@ Part 1: Protocol Specification
 %R ISO/IEC 10747 : 1992
 %T Information Processing Systems \- Telecommunications and Information Exchange between Systems \- Protocol for Exchange of Inter-Domain Routeing Information Amoung Intermediate Systems to Support Forwarding of ISO 8473 PDUs
 %D 1992
+%Q International Organization for Standardization
 %I International Organization for Standardization
+%U http://www.iso.org/
 
 %K x680
 %L X.680
@@ -3627,6 +3638,16 @@ Part 1: Protocol Specification
 %Q International Telecommunication Union
 %O (Previously "CCITT Recommendation")
 %U http://www.itu.int/
+
+%K iso8473_2
+%L ISO 8473-2
+%R ISO/IEC 8473-2 : 1994
+%A ISO/IEC
+%T Information Technology \(em Open Systems Interconnect \(em Protocol for Providing the Connectionless-mode Network Service: Provision of the underlying service by an ISO/IEC 8802 Subnetwork
+%D 1994
+%Q International Organization for Standardization
+%I International Organization for Standardization
+%U http://www.iso.org/
 
 %K x622
 %L X.622

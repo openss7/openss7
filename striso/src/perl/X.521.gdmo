@@ -1,3 +1,4 @@
+--< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "CCITT X.521" >--
 --< GDMO.Alias "CCITT X.521" "ITU-T Rec. X.521" >--
 --< GDMO.Version 1.3 >--
