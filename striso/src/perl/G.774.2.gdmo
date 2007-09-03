@@ -1,5 +1,8 @@
 --< GDMO.Include "X.721.gdmo" >--
---< GDMO.Document "ITU-T Rec. G.774.2" >--
+--< GDMO.Include "G.774.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ITU-T Rec. G.774.2 : 2001" >--
+--< GDMO.Alias "ITU-T Rec. G.774.2 : 2001" "ITU-T Rec. G.774.2" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
 --  =============================================================================
@@ -53,6 +56,7 @@
 --  
 --  =============================================================================
 --  >--
+MODULE "ITU-T Rec. G.774.2 : 2001"
 --6 Object classes
 --Revisions that require re-registration
 --This clause provides replacement managed object class definitions for the existing ITU-T G.774.2
@@ -92,8 +96,8 @@ modifiableAugBidirectional MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableAugBidBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineAUGStructure;;;
 REGISTERED AS { g774-02MObjectClass 1 };
@@ -107,8 +111,8 @@ modifiableAugSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableAugSinkBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineAUGStructure;;;
 REGISTERED AS { g774-02MObjectClass 2 };
@@ -122,8 +126,8 @@ modifiableAugSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableAugSourceBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineAUGStructure;;;
 REGISTERED AS { g774-02MObjectClass 3 };
@@ -137,8 +141,8 @@ modifiableTug3Bidirectional MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableTug3BidBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineTug3Structure;;;
 REGISTERED AS { g774-02MObjectClass 4 };
@@ -152,8 +156,8 @@ modifiableTug3Sink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableTug3SinkBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineTug3Structure;;;
 REGISTERED AS { g774-02MObjectClass 5 };
@@ -167,8 +171,8 @@ modifiableTug3Source MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableTug3SourceBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineTug3Structure;;;
 REGISTERED AS { g774-02MObjectClass 6 };
@@ -182,8 +186,8 @@ modifiableTug2Bidirectional MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableTug2BidBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineTug2Structure;;;
 REGISTERED AS { g774-02MObjectClass 7 };
@@ -197,8 +201,8 @@ modifiableTug2Sink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableTug2SinkBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineTug2Structure;;;
 REGISTERED AS { g774-02MObjectClass 8 };
@@ -212,8 +216,8 @@ modifiableTug2Source MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableTug2SourceBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineTug2Structure;;;
 REGISTERED AS { g774-02MObjectClass 9 };
@@ -229,8 +233,8 @@ modifiableVC4TTPBidirectionalR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC4TTPBidR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineVC4Structure;;;
 REGISTERED AS { g774-02MObjectClass 25 };
@@ -245,8 +249,8 @@ modifiableVC4TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC4TTPSinkR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineVC4Structure;;;
 REGISTERED AS { g774-02MObjectClass 26 };
@@ -261,8 +265,8 @@ modifiableVC4TTPSourceR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC4TTPSourceR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineVC4Structure;;;
 REGISTERED AS { g774-02MObjectClass 27 };
@@ -277,8 +281,8 @@ modifiableVC3TTPBidirectionalR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC3TTPBidR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineVC3Structure;;;
 REGISTERED AS { g774-02MObjectClass 28 };
@@ -293,8 +297,8 @@ modifiableVC3TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC3TTPSinkR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineVC3Structure;;;
 REGISTERED AS { g774-02MObjectClass 29 };
@@ -309,8 +313,8 @@ modifiableVC3TTPSourceR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC3TTPSourceR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineVC3Structure;;;
 REGISTERED AS { g774-02MObjectClass 30 };
@@ -326,8 +330,8 @@ modifiableVC2TTPBidirectionalR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC2TTPBidR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 31 };
@@ -342,8 +346,8 @@ modifiableVC2TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC2TTPSinkR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 32 };
@@ -358,8 +362,8 @@ modifiableVC2TTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC2TTPSourceBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 18 };
@@ -374,8 +378,8 @@ modifiableVC12TTPBidirectionalR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC12TTPBidR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 33 };
@@ -390,8 +394,8 @@ modifiableVC12TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC12TTPSinkR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 34 };
@@ -406,8 +410,8 @@ modifiableVC12TTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC12TTPSourceBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 21 };
@@ -422,8 +426,8 @@ modifiableVC11TTPBidirectionalR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC11TTPBidR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 35 };
@@ -438,8 +442,8 @@ modifiableVC11TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC11TTPSinkR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 36 };
@@ -454,8 +458,8 @@ modifiableVC11TTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				modifiableVC11TTPSourceBehaviour BEHAVIOUR
 					DEFINED AS
-						*This CLASS shall be instantiated when change of the SDH frame structure by management operation is
-						supported*;;
+						*This CLASS shall be instantiated when change of the SDH frame structure by 
+						management operation is supported*;;
 			ACTIONS
 				defineClientType;;;
 REGISTERED AS { g774-02MObjectClass 24 };
@@ -479,23 +483,27 @@ REGISTERED AS { g774-02Action 1 };
 
 defineAUGStructureBehaviour BEHAVIOUR
 	DEFINED AS
-		*This action is used to select between a one au4 structured aug and a three au3 structured aug. If
-		the object(s) contained by the aug already matche(s) the "AUGStructureInfo" parameter nothing is
-		raised. In all other cases objects contained by the aug are deleted and corresponding to the
-		"AUGStructureInfo" parameter one au4CTP, or three au3CTP are created. The corresponding connection
-		termination point(s) are created with the crossConnectionPointerPackage package according to the
-		"connectionInfo" parameter. If the "unknown" choice of the "connectionInfo" parameter is selected
-		the choice is left to the network element according to its make-up and mode. When applied on a sink
-		managed object, sink connection termination points are created. When applied on a source managed
-		object, source connection termination points are created. When applied on a bidirectional managed
-		object, bidirectional connection termination points are created. The action fails if: change of
-		configuration applies on an already existing cross-connected connection termination point contained
-		directly or indirectly by the object on which the action is applied; the multiplexing structure is
-		not supported by the network element; at least one created connection termination point is not
-		cross-connectable and the crossConnectable choice of the "connectionInfo" parameter is selected.
-		NOTE The definition of the connection termination point managed object classes which represent the
-		adaptation function of the characteristic information of the client inside SDH virtual container is
-		not already defined.*;
+		*This action is used to select between a one au4 structured aug and a three au3 
+		structured aug. If the object(s) contained by the aug already matche(s) the 
+		"AUGStructureInfo" parameter nothing is raised. In all other cases objects 
+		contained by the aug are deleted and corresponding to the "AUGStructureInfo" 
+		parameter one au4CTP, or three au3CTP are created. The corresponding connection 
+		termination point(s) are created with the crossConnectionPointerPackage package 
+		according to the "connectionInfo" parameter. If the "unknown" choice of the 
+		"connectionInfo" parameter is selected the choice is left to the network element 
+		according to its make-up and mode. When applied on a sink managed object, sink 
+		connection termination points are created. When applied on a source managed 
+		object, source connection termination points are created. When applied on a 
+		bidirectional managed object, bidirectional connection termination points are 
+		created. The action fails if: change of configuration applies on an already 
+		existing cross-connected connection termination point contained directly or 
+		indirectly by the object on which the action is applied; the multiplexing 
+		structure is not supported by the network element; at least one created 
+		connection termination point is not cross-connectable and the crossConnectable 
+		choice of the "connectionInfo" parameter is selected. NOTE The definition of the 
+		connection termination point managed object classes which represent the 
+		adaptation function of the characteristic information of the client inside SDH 
+		virtual container is not already defined.*;
 --9.2 Define VC4 Structure
 
 
@@ -513,18 +521,21 @@ REGISTERED AS { g774-02Action 2 };
 
 defineVC4StructureBehaviour BEHAVIOUR
 	DEFINED AS
-		*If the action parameter is "notSubmultiplexed" and contains "noClient" all contained objects are
-		deleted. If the action parameter is "notSubmultiplexed" and contains a value different from
-		"noClient" a CTP which corresponds to the client of the VC4 is created and the existing contained
-		object(s) are deleted. If the action parameter is "threeTUG3", three tug3 are created if they do
-		not already exist, contained objects are deleted. Each TUG3 is structured according to the
-		"TUG3StructureInfo" parameter ranked according to the time sequence of the tug3. If the action has
-		succeeded then the C2 signal label is updated according to the new frame structure: When applied on
-		a sink VC4 the expected signal label is updated. When applied on a source VC4 the sent signal label
-		is updated. When applied on a bidirectional VC4 both the expected and sent signal label are
-		updated. NOTE The definition of the connection termination point managed object classes which
-		represent the adaptation function of the characteristic information of the client inside SDH
-		virtual container is not already defined.*;
+		*If the action parameter is "notSubmultiplexed" and contains "noClient" all 
+		contained objects are deleted. If the action parameter is "notSubmultiplexed" 
+		and contains a value different from "noClient" a CTP which corresponds to the 
+		client of the VC4 is created and the existing contained object(s) are deleted. 
+		If the action parameter is "threeTUG3", three tug3 are created if they do not 
+		already exist, contained objects are deleted. Each TUG3 is structured according 
+		to the "TUG3StructureInfo" parameter ranked according to the time sequence of 
+		the tug3. If the action has succeeded then the C2 signal label is updated 
+		according to the new frame structure: When applied on a sink VC4 the expected 
+		signal label is updated. When applied on a source VC4 the sent signal label is 
+		updated. When applied on a bidirectional VC4 both the expected and sent signal 
+		label are updated. NOTE The definition of the connection termination point 
+		managed object classes which represent the adaptation function of the 
+		characteristic information of the client inside SDH virtual container is not 
+		already defined.*;
 --9.3 Define VC3 Structure
 
 
@@ -541,18 +552,20 @@ REGISTERED AS { g774-02Action 3 };
 
 defineVC3StructureBehaviour BEHAVIOUR
 	DEFINED AS
-		*If the action parameter is "notSubmultiplexed" and contains "noClient" all contained objects are
-		deleted. If the action parameter is "notSubmultiplexed" and contains a value different from
-		"noClient" a CTP which corresponds to the client of the VC3 is created and the existing contained
-		objects are deleted. If the action parameter is "sevenTUG2", seven tug2 are created if they do not
-		already exist, contained CTP are deleted. Each TUG2 is structured according to the
-		"TUG2StructureInfo" parameter ranked according to the time sequence of the tug2. If the action has
-		succeeded then the C2 signal label is updated according to the new frame structure: When applied on
-		a sink VC3 the expected signal label is updated. When applied on a source VC3 the sent signal label
-		is updated. When applied on a bidirectional VC3 both the expected and sent signal label are
-		updated. NOTE The definition of the connection termination point managed object classes which
-		represent the adaptation function of the characteristic information of the client inside SDH
-		virtual container is not already defined.*;
+		*If the action parameter is "notSubmultiplexed" and contains "noClient" all 
+		contained objects are deleted. If the action parameter is "notSubmultiplexed" 
+		and contains a value different from "noClient" a CTP which corresponds to the 
+		client of the VC3 is created and the existing contained objects are deleted. If 
+		the action parameter is "sevenTUG2", seven tug2 are created if they do not 
+		already exist, contained CTP are deleted. Each TUG2 is structured according to 
+		the "TUG2StructureInfo" parameter ranked according to the time sequence of the 
+		tug2. If the action has succeeded then the C2 signal label is updated according 
+		to the new frame structure: When applied on a sink VC3 the expected signal label 
+		is updated. When applied on a source VC3 the sent signal label is updated. When 
+		applied on a bidirectional VC3 both the expected and sent signal label are 
+		updated. NOTE The definition of the connection termination point managed object 
+		classes which represent the adaptation function of the characteristic 
+		information of the client inside SDH virtual container is not already defined.*;
 --9.4 Define Tug3 Structure
 
 
@@ -569,13 +582,14 @@ REGISTERED AS { g774-02Action 4 };
 
 defineTug3StructureBehaviour BEHAVIOUR
 	DEFINED AS
-		*If the tug3StructureInfo parameter is "oneTU3" a tu3CTP is created if it does not already exist and
-		the existing contained object(s) are deleted. If the tug3StructureInfo parameter is "sevenTUG2",
-		seven tug2 are created if they do not already exist, contained CTP is deleted. Each TUG2 is
-		structured according to the "TUG2StructureInfo" parameter ranked according to the time sequence of
-		the tug2. NOTE The definition of the connection termination point managed object classes which
-		represent the adaptation function of the characteristic information of the client inside SDH
-		virtual container is not already defined.*;
+		*If the tug3StructureInfo parameter is "oneTU3" a tu3CTP is created if it does 
+		not already exist and the existing contained object(s) are deleted. If the 
+		tug3StructureInfo parameter is "sevenTUG2", seven tug2 are created if they do 
+		not already exist, contained CTP is deleted. Each TUG2 is structured according 
+		to the "TUG2StructureInfo" parameter ranked according to the time sequence of 
+		the tug2. NOTE The definition of the connection termination point managed object 
+		classes which represent the adaptation function of the characteristic 
+		information of the client inside SDH virtual container is not already defined.*;
 --9.5 Define Tug2 Structure
 
 
@@ -591,19 +605,22 @@ REGISTERED AS { g774-02Action 5 };
 
 defineTug2StructureBehaviour BEHAVIOUR
 	DEFINED AS
-		*If the object(s) contained by the tug2 already matche(s) the tug2StructureInfo parameter nothing is
-		raised. In all other cases objects contained by the tug2 are deleted and corresponding to the
-		"tug2StructureInfo" parameter one tu2CTP, three tu12CTP or four tu11CTP are created. The
-		corresponding connection termination point(s) are created with the crossConnectionPointerPackage
-		package according to the "connectionInfo" parameter. If the "unknown" choice of the
-		"connectionInfo" parameter is selected the choice is left to the network element according to its
-		make-up and mode. When applied on a sink managed object, sink connection termination points are
-		created. When applied on a source managed object, source connection termination points are created.
-		When applied on a bidirectional managed object, bidirectional connection termination points are
-		created. The action fails if: change of configuration applies on an already existing
-		cross-connected connection termination point contained directly or indirectly by the object on
-		which the action is applied; the multiplexing structure is not supported by the network element; at
-		least one created connection termination point is not cross-connectable and the crossConnectable
+		*If the object(s) contained by the tug2 already matche(s) the tug2StructureInfo 
+		parameter nothing is raised. In all other cases objects contained by the tug2 
+		are deleted and corresponding to the "tug2StructureInfo" parameter one tu2CTP, 
+		three tu12CTP or four tu11CTP are created. The corresponding connection 
+		termination point(s) are created with the crossConnectionPointerPackage package 
+		according to the "connectionInfo" parameter. If the "unknown" choice of the 
+		"connectionInfo" parameter is selected the choice is left to the network element 
+		according to its make-up and mode. When applied on a sink managed object, sink 
+		connection termination points are created. When applied on a source managed 
+		object, source connection termination points are created. When applied on a 
+		bidirectional managed object, bidirectional connection termination points are 
+		created. The action fails if: change of configuration applies on an already 
+		existing cross-connected connection termination point contained directly or 
+		indirectly by the object on which the action is applied; the multiplexing 
+		structure is not supported by the network element; at least one created 
+		connection termination point is not cross-connectable and the crossConnectable 
 		choice of the "connectionInfo" parameter is selected.*;
 --9.6 Definition of the Client type
 
@@ -620,19 +637,22 @@ REGISTERED AS { g774-02Action 6 };
 
 defineClientTypeBehaviour BEHAVIOUR
 	DEFINED AS
-		*This action is used to choose the type of the adaptation function of payload inside the SDH low
-		order Virtual Container. If the action parameter is "noClient" the contained object is deleted. If
-		the action parameter is different from "noClient" a CTP which corresponds to the client of the TTP
-		is created and the existing contained object is deleted. When applied on a sink TTP, a sink
-		connection termination point is created. When applied on a source TTP, a source connection
-		termination point is created. When applied on a bidirectional TTP, a bidirectional connection
-		termination point is created. The action fails if: the client type is not supported by the network
-		element. If the action has succeeded then the signal label V5 (bits 5-7) is updated according to
-		the new frame structure: When applied on a sink VC the expected signal label is updated. When
-		applied on a source VC the sent signal label is updated. When applied on a bidirectional VC both
-		the expected and sent signal label are updated. NOTE The definition of the connection termination
-		point managed object classes which represent the adaptation function of the characteristic
-		information of the client inside SDH virtual container is not already defined.*;
+		*This action is used to choose the type of the adaptation function of payload 
+		inside the SDH low order Virtual Container. If the action parameter is 
+		"noClient" the contained object is deleted. If the action parameter is different 
+		from "noClient" a CTP which corresponds to the client of the TTP is created and 
+		the existing contained object is deleted. When applied on a sink TTP, a sink 
+		connection termination point is created. When applied on a source TTP, a source 
+		connection termination point is created. When applied on a bidirectional TTP, a 
+		bidirectional connection termination point is created. The action fails if: the 
+		client type is not supported by the network element. If the action has succeeded 
+		then the signal label V5 (bits 5-7) is updated according to the new frame 
+		structure: When applied on a sink VC the expected signal label is updated. When 
+		applied on a source VC the sent signal label is updated. When applied on a 
+		bidirectional VC both the expected and sent signal label are updated. NOTE The 
+		definition of the connection termination point managed object classes which 
+		represent the adaptation function of the characteristic information of the 
+		client inside SDH virtual container is not already defined.*;
 --10 Notifications
 --None.
 --11 Parameters
@@ -714,107 +734,99 @@ REGISTERED AS { g774-02Parameter 1 };
 
 
 au3CTPSinkR1-augSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":au3CTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":au3CTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":augSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":augSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":au3CTPId;
 	BEHAVIOUR
 		au3CTPSinkR1-augSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 59 };
 
 
 au3CTPSource-augSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":au3CTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":au3CTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":augSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":augSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":au3CTPId;
 	BEHAVIOUR
 		au3CTPSource-augSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 2 };
 
 
 au4CTPSinkR1-augSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":au4CTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":au4CTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":augSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":augSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":au4CTPId;
 	BEHAVIOUR
 		au4CTPSinkR1-augSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 60 };
 
 
 au4CTPSource-augSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":au4CTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":au4CTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":augSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":augSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":au4CTPId;
 	BEHAVIOUR
 		au4CTPSource-augSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 4 };
 
 
 augSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":augSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":augSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":augId;
 	BEHAVIOUR
 		augSink-msTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 5 };
 
 
 augSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":augSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":augSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":augId;
 	BEHAVIOUR
 		augSource-msTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 6 };
 
 
 electricalSPITTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":electricalSPITTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":electricalSPITTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":electricalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -823,11 +835,9 @@ REGISTERED AS { g774-02NameBinding 7 };
 
 
 electricalSPITTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":electricalSPITTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":electricalSPITTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":electricalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -836,107 +846,99 @@ REGISTERED AS { g774-02NameBinding 8 };
 
 
 msCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msCTPId;
 	BEHAVIOUR
 		msCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 9 };
 
 
 msCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msCTPId;
 	BEHAVIOUR
 		msCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 10 };
 
 
 msDatacomCTPSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msDatacomCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msDatacomCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPSink-msTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 11 };
 
 
 msDatacomCTPSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msDatacomCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msDatacomCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPSource-msTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 12 };
 
 
 msOrderwireCTPSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msOrderwireCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msOrderwireCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPSink-msTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 13 };
 
 
 msOrderwireCTPSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msOrderwireCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msOrderwireCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPSource-msTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 14 };
 
 
 msTTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msTTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msTTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -945,11 +947,9 @@ REGISTERED AS { g774-02NameBinding 15 };
 
 
 msTTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":msTTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":msTTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":msTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -958,11 +958,9 @@ REGISTERED AS { g774-02NameBinding 16 };
 
 
 opticalSPITTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":opticalSPITTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":opticalSPITTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":opticalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -971,11 +969,9 @@ REGISTERED AS { g774-02NameBinding 17 };
 
 
 opticalSPITTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":opticalSPITTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":opticalSPITTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":opticalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -984,139 +980,129 @@ REGISTERED AS { g774-02NameBinding 18 };
 
 
 rsCTPSink-electricalSPITTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":electricalSPITTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":electricalSPITTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsCTPId;
 	BEHAVIOUR
 		rsCTPSink-electricalSPITTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 19 };
 
 
 rsCTPSource-electricalSPITTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":electricalSPITTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":electricalSPITTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsCTPId;
 	BEHAVIOUR
 		rsCTPSource-electricalSPITTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 20 };
 
 
 rsCTPSink-opticalSPITTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":opticalSPITTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":opticalSPITTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsCTPId;
 	BEHAVIOUR
 		rsCTPSink-opticalSPITTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 21 };
 
 
 rsCTPSource-opticalSPITTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":opticalSPITTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":opticalSPITTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsCTPId;
 	BEHAVIOUR
 		rsCTPSource-opticalSPITTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 22 };
 
 
 rsDatacomCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsDatacomCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsDatacomCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 23 };
 
 
 rsDatacomCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsDatacomCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsDatacomCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 24 };
 
 
 rsOrderwireCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsOrderwireCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsOrderwireCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 25 };
 
 
 rsOrderwireCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsOrderwireCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsOrderwireCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 26 };
 
 
 rsTTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsTTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsTTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1125,11 +1111,9 @@ REGISTERED AS { g774-02NameBinding 27 };
 
 
 rsTTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsTTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsTTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1138,267 +1122,249 @@ REGISTERED AS { g774-02NameBinding 28 };
 
 
 rsUserChannelCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsUserChannelCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsUserChannelCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 29 };
 
 
 rsUserChannelCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":rsUserChannelCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":rsUserChannelCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 30 };
 
 
 tu11CTPSinkR1-tug2Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu11CTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu11CTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug2Sink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug2Sink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu11CTPId;
 	BEHAVIOUR
 		tu11CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 61 };
 
 
 tu11CTPSource-tug2Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu11CTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu11CTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug2Source AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug2Source AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu11CTPId;
 	BEHAVIOUR
 		tu11CTPSource-tug2SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 32 };
 
 
 tu12CTPSinkR1-tug2Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu12CTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu12CTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug2Sink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug2Sink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu12CTPId;
 	BEHAVIOUR
 		tu12CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 62 };
 
 
 tu12CTPSource-tug2Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu12CTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu12CTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug2Source AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug2Source AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu12CTPId;
 	BEHAVIOUR
 		tu12CTPSource-tug2SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 34 };
 
 
 tu2CTPSinkR1-tug2Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu2CTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu2CTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug2Sink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug2Sink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu2CTPId;
 	BEHAVIOUR
 		tu2CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 63 };
 
 
 tu2CTPSource-tug2Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu2CTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu2CTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug2Source AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug2Source AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu2CTPId;
 	BEHAVIOUR
 		tu2CTPSource-tug2SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 36 };
 
 
 tu3CTPSinkR1-tug3Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu3CTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu3CTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug3Sink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug3Sink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu3CTPId;
 	BEHAVIOUR
 		tu3CTPSinkR1-tug3SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 64 };
 
 
 tu3CTPSource-tug3Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tu3CTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tu3CTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug3Source AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug3Source AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tu3CTPId;
 	BEHAVIOUR
 		tu3CTPSource-tug3SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 38 };
 
 
 tug2Sink-tug3Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tug2Sink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tug2Sink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug3Sink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug3Sink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tug2Id;
 	BEHAVIOUR
 		tug2Sink-tug3SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 39 };
 
 
 tug2Source-tug3Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tug2Source AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tug2Source AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":tug3Source AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":tug3Source AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tug2Id;
 	BEHAVIOUR
 		tug2Source-tug3SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 40 };
 
 
 tug2Sink-vc3TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tug2Sink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tug2Sink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tug2Id;
 	BEHAVIOUR
 		tug2Sink-vc3TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 65 };
 
 
 tug2Source-vc3TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tug2Source AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tug2Source AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tug2Id;
 	BEHAVIOUR
 		tug2Source-vc3TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 66 };
 
 
 tug3Sink-vc4TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tug3Sink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tug3Sink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tug3Id;
 	BEHAVIOUR
 		tug3Sink-vc4TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 67 };
 
 
 tug3Source-vc4TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":tug3Source AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":tug3Source AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":tug3Id;
 	BEHAVIOUR
 		tug3Source-vc4TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 68 };
 
 
 vc11TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc11TTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc11TTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc11TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1407,11 +1373,9 @@ REGISTERED AS { g774-02NameBinding 69 };
 
 
 vc11TTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc11TTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc11TTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc11TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1420,11 +1384,9 @@ REGISTERED AS { g774-02NameBinding 46 };
 
 
 vc12TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc12TTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc12TTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc12TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1433,11 +1395,9 @@ REGISTERED AS { g774-02NameBinding 70 };
 
 
 vc12TTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc12TTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc12TTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc12TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1446,11 +1406,9 @@ REGISTERED AS { g774-02NameBinding 48 };
 
 
 vc2TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc2TTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc2TTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc2TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1459,11 +1417,9 @@ REGISTERED AS { g774-02NameBinding 71 };
 
 
 vc2TTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc2TTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc2TTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc2TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1472,11 +1428,9 @@ REGISTERED AS { g774-02NameBinding 50 };
 
 
 vc3TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc3TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1485,11 +1439,9 @@ REGISTERED AS { g774-02NameBinding 72 };
 
 
 vc3TTPSourceR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc3TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1498,11 +1450,9 @@ REGISTERED AS { g774-02NameBinding 73 };
 
 
 vc4TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc4TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1511,11 +1461,9 @@ REGISTERED AS { g774-02NameBinding 74 };
 
 
 vc4TTPSourceR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vc4TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -1524,66 +1472,62 @@ REGISTERED AS { g774-02NameBinding 75 };
 
 
 vcnUserChannelCTPSink-vc3TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vcnUserChannelCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vcnUserChannelCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSink-vc3TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 76 };
 
 
 vcnUserChannelCTPSource-vc3TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vcnUserChannelCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vcnUserChannelCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSourceR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSource-vc3TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 77 };
 
 
 vcnUserChannelCTPSink-vc4TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vcnUserChannelCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vcnUserChannelCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSink-vc4TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 78 };
 
 
 vcnUserChannelCTPSource-vc4TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":vcnUserChannelCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":vcnUserChannelCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSourceR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation G.774":vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSource-vc4TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the NE*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the NE*;;
 REGISTERED AS { g774-02NameBinding 79 };
 --13 Constraint rules
 --13.1 Constraint rules extended syntax
@@ -2885,10 +2829,11 @@ vc4TTPBidirectionalR1Subordination SUBORDINATION RULE
 				"Recommendation G.774":vcnUserChannelCTPBidirectional } };
 ;
 
+END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. G.774.2 : 2001" >--

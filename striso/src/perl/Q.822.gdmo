@@ -4,8 +4,8 @@
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Include "Q.821.gdmo" >--
 --< GDMO.Document "ITU-T Rec. Q.822 (1994)" >--
---< GDMO.Alias "ITU-T Rec. Q.822 (1994)"
---  "Recommendation Q.822:1994",
+--< GDMO.Alias "ITU-T Rec. Q.822 (1994)" "Recommendation Q.822:1994",
+--  "Recommendation Q.822",
 --  "ITU-T Recommendation Q.822",
 --  "CCITT Recommendation Q.822" >--
 --< GDMO.Version 1.3 >--
@@ -62,6 +62,7 @@
 --  =============================================================================
 --  >--
 --4.3.1.1 Current data
+MODULE "ITU-T Rec. Q.822 (1994)"
 
 currentData MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -71,34 +72,36 @@ currentData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				currentDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"The currentData object class is a class of managed support objects that contain
-						the current performance data. This object class is a particular type of scanner
+						"The currentData object class is a class of managed support objects that contain 
+						the current performance data. This object class is a particular type of scanner 
 						(see ITU-T Recommendation X.739) that scans its own attributes.
 
-						 -- In this Recommendation an instance of current data is assumed to be contained in the managed
-						 -- object being monitored (such as the trailTerminationPointSink managed object defined in Recommenda-
-						 -- tion M.3100) and has performance data pertaining to the containing managed object.
+						- In this Recommendation an instance of current data is assumed to be contained 
+						  in the managed object being monitored (such as the trailTerminationPointSink 
+						  managed object defined in Recommendation M.3100) and has performance data 
+						  pertaining to the containing managed object.
 
-						Performance parameters are modelled as attributes. These attributes either
-						appear explicitly in the definition of subclasses of currentData or the
-						measurementListPkg is used for this purpose if the instantiated object class is
+						Performance parameters are modelled as attributes. These attributes either 
+						appear explicitly in the definition of subclasses of currentData or the 
+						measurementListPkg is used for this purpose if the instantiated object class is 
 						currentData.
 
-						Typically, the performance attributes may be derived from the counter attribute
-						or may be derived from the gauge attribute. Both the counter and gauge
-						attributes are defined in CCITT Recommendation X.721. All attributes with a
-						aCountu type syntax (e.g. errored seconds) shall be locally cleared (reset) at
-						the end of the granularity period following the scanning function. To provide
-						continuous counters, the granularityPeriod can be set to an arbitrarily large
+						Typically, the performance attributes may be derived from the counter attribute 
+						or may be derived from the gauge attribute. Both the counter and gauge 
+						attributes are defined in CCITT Recommendation X.721. All attributes with a 
+						'Count' type syntax (e.g. errored seconds) shall be locally cleared (reset) at 
+						the end of the granularity period following the scanning function. To provide 
+						continuous counters, the granularityPeriod can be set to an arbitrarily large 
 						value using the days CHOICE.
 
-						If the administrativeState is locked or the operationalState is disabled or the
-						currentData object is scheduled off-duty, the values of the counters are
-						undefined and historyData objects, if supported, are not created at the end of
+						If the administrativeState is locked or the operationalState is disabled or the 
+						currentData object is scheduled off-duty, the values of the counters are 
+						undefined and historyData objects, if supported, are not created at the end of 
 						the granularityPeriod.";;
 			ATTRIBUTES
 				suspectIntervalFlag REPLACE-WITH-DEFAULT
-					DEFAULT VALUE Q822-PM-ASN1Module.defaultCurrentDataSuspectIntervalFlag GET,
+					DEFAULT VALUE Q822-PM-ASN1Module.defaultCurrentDataSuspectIntervalFlag
+					GET,
 				elapsedTime GET;;;
 	CONDITIONAL PACKAGES
 		filterSuppressionPkg
@@ -109,14 +112,14 @@ currentData MANAGED OBJECT CLASS
 				"historyData objects are to be created at the end of an interval.",
 		maxSuppressedIntervalsPkg
 			PRESENT IF
-				"an instance supports it and at least one of zeroSuppressionPkg or
+				"an instance supports it and at least one of zeroSuppressionPkg or 
 				filterSuppressionPkg is present.",
 		measurementListPkg
 			PRESENT IF
 				"an instance supports it or the object class is currentData",
 		numSuppressedIntervalsPkg
 			PRESENT IF
-				"suppression counts are required and the filterSuppressionPkg or the
+				"suppression counts are required and the filterSuppressionPkg or the 
 				zeroSuppressionPkg is present.",
 		observedManagedObjectPkg
 			PRESENT IF
@@ -126,8 +129,7 @@ currentData MANAGED OBJECT CLASS
 				"scheduled notifications are to be emitted.",
 		thresholdPkg
 			PRESENT IF
-				"a Quality of Service Alarm Notification is to be emitted for threshold
-				crossing.",
+				"a Quality of Service Alarm Notification is to be emitted for threshold crossing.",
 		zeroSuppressionPkg
 			PRESENT IF
 				"an instance supports it and the filterSuppressionPkg is not present.";
@@ -179,9 +181,9 @@ thresholdData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				thresholdDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"The thresholdData object class is a class of managed support objects that
-						contains the values of the threshold settings for the PM parameters. At least
-						one of the counterThresholdListPkg or the gaugeThresholdListPkg must be
+						"The thresholdData object class is a class of managed support objects that 
+						contains the values of the threshold settings for the PM parameters. At least 
+						one of the counterThresholdListPkg or the gaugeThresholdListPkg must be 
 						instantiated.";;
 			ATTRIBUTES
 				thresholdDataId GET;;;
@@ -217,17 +219,18 @@ filterSuppressionPkg PACKAGE
 	BEHAVIOUR
 		filterSuppressionPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"The discriminatorConstruct attribute is used to suppress the creation of
-				historyData objects. The behaviour of the discriminatorConstruct is defined in
-				8.1.1.2 CCITT Rec. X.734. If the discriminatorConstruct evaluates to FALSE for
-				the filtering criteria on the attributes specified in the
-				discriminatorConstruct, no historyData objects are created. An empty
-				discriminator construct will evaluate to TRUE, thus allowing the creation of
-				historyData objects. Any attribute of the object which includes this package
-				may be used in defining the discriminator construct.";;
+				"The discriminatorConstruct attribute is used to suppress the creation of 
+				historyData objects. The behaviour of the discriminatorConstruct is defined in 
+				8.1.1.2 CCITT Rec. X.734. If the discriminatorConstruct evaluates to FALSE for 
+				the filtering criteria on the attributes specified in the 
+				discriminatorConstruct, no historyData objects are created. An empty 
+				discriminator construct will evaluate to TRUE, thus allowing the creation of 
+				historyData objects. Any attribute of the object which includes this package may 
+				be used in defining the discriminator construct.";;
 	ATTRIBUTES
 		"Recommendation X.721:1992":discriminatorConstruct
-			DEFAULT VALUE Attribute-ASN1Module.defaultDiscriminatorConstruct GET-REPLACE;
+			DEFAULT VALUE Attribute-ASN1Module.defaultDiscriminatorConstruct
+			GET-REPLACE;
 REGISTERED AS { q822Package 2 };
 --4.3.2.3 Gauge threshold list package
 
@@ -250,8 +253,8 @@ historyDataSuspectIntervalFlagPkg PACKAGE
 	BEHAVIOUR
 		historyDataSuspectIntervalFlagPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"The historyDataSuspectIntervalFlagPkg shall be instantiated in the historyData
-				object only if there are one or more suspected performance measurements in the
+				"The historyDataSuspectIntervalFlagPkg shall be instantiated in the historyData 
+				object only if there are one or more suspected performance measurements in the 
 				corresponding accumulation interval.";;
 	ATTRIBUTES
 		suspectIntervalFlag GET;
@@ -263,18 +266,18 @@ historyRetentionPkg PACKAGE
 	BEHAVIOUR
 		historyRetentionPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"At the end of each interval a historyData object instance is created if the
-				historyData creation has not been suppressed (i.e. by zero or filter
-				suppression). The class of the historyData object will correspond to the class
-				of the creating currentData object: an instance of the historyData object will
-				be instantiated if there is an instance of the currentData object. The
-				behaviour in subclasses of currentData should specify the subclass of
-				historyData that may be instantiated. The values of the historyData measurement
-				attributes are a copy of the values of the corresponding attributes of the
-				currentData measurement attributes at the end of the interval.
+				"At the end of each interval a historyData object instance is created if the 
+				historyData creation has not been suppressed (i.e. by zero or filter 
+				suppression). The class of the historyData object will correspond to the class 
+				of the creating currentData object: an instance of the historyData object will 
+				be instantiated if there is an instance of the currentData object. The behaviour 
+				in subclasses of currentData should specify the subclass of historyData that may 
+				be instantiated. The values of the historyData measurement attributes are a copy 
+				of the values of the corresponding attributes of the currentData measurement 
+				attributes at the end of the interval.
 
-				Once the new historyData object is created, it will be retained in the NE for
-				at least the duration equivalent to the number of intervals specified in the
+				Once the new historyData object is created, it will be retained in the NE for at 
+				least the duration equivalent to the number of intervals specified in the 
 				historyRetention attribute.";;
 	ATTRIBUTES
 		historyRetention GET-REPLACE;
@@ -293,24 +296,22 @@ measurementListPkg PACKAGE
 	BEHAVIOUR
 		measurementListPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"The measurementList attribute contains performance management measurements
-				(each measurement is in the form of an attribute identifier and its value) for
-				a specific monitored object. Typically, the performance attributes may be
-				derived from the counter attribute or may be derived from the gauge attribute.
-				Both the counter and gauge attributes are defined in CCITT Recommendation
-				X.721. All attributes with a Count type syntax (e.g. ES) shall be locally
-				cleared (reset) at the end of the granularity period following the scanning
-				function.
+				"The measurementList attribute contains performance management measurements (each 
+				measurement is in the form of an attribute identifier and its value) for a 
+				specific monitored object. Typically, the performance attributes may be derived 
+				from the counter attribute or may be derived from the gauge attribute. Both the 
+				counter and gauge attributes are defined in CCITT Recommendation X.721. All 
+				attributes with a Count type syntax (e.g. ES) shall be locally cleared (reset) 
+				at the end of the granularity period following the scanning function.
 
-				The measurement list shall not contain parameters which have already been
+				The measurement list shall not contain parameters which have already been 
 				defined as an attribute of that currentData object subclass.
 
-				The measurementList is only used when technology specific (currentData
-				subclass) is not available. Typical, but not restrictive use of this package is
-				as a home for not yet standardized performance parameters. This package should
-				not be used as an escape from standardizing technology specific currentData
-				subclasses. NOTE Measurements in the measurement list cannot be individually
-				reset to zero.";;
+				The measurementList is only used when technology specific (currentData subclass) 
+				is not available. Typical, but not restrictive use of this package is as a home 
+				for not yet standardized performance parameters. This package should not be used 
+				as an escape from standardizing technology specific currentData subclasses. NOTE 
+				Measurements in the measurement list cannot be individually reset to zero.";;
 	ATTRIBUTES
 		measurementList GET-REPLACE;
 REGISTERED AS { q822Package 8 };
@@ -328,8 +329,8 @@ objectDeleteNotificationPkg PACKAGE
 	BEHAVIOUR
 		objectDeleteNotificationBehaviour BEHAVIOUR
 			DEFINED AS
-				"An objectDeletion notification shall not be emitted when a historyData object
-				is deleted as a result of the expiry of the historyRetention duration.";;
+				"An objectDeletion notification shall not be emitted when a historyData object is 
+				deleted as a result of the expiry of the historyRetention duration.";;
 	NOTIFICATIONS
 		"Recommendation X.721:1992":objectDeletion;
 REGISTERED AS { q822Package 10 };
@@ -348,34 +349,37 @@ scheduledPMReportPkg PACKAGE
 	BEHAVIOUR
 		scheduledPMReportPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"Instances of the currentData object emit the scanReport notification containing
-				the performance monitoring data, at the end of each performance interval, as
+				"Instances of the currentData object emit the scanReport notification containing 
+				the performance monitoring data, at the end of each performance interval, as 
 				indicated by the granularityPeriod attribute.
 
-				Each performance monitoring attribute is included in the scanReport if its
-				identifier is listed in the scanAttributeIdList or the numericAttributeIdArray.
-				In the latter case, measurements must be included in the scanReport in the same
-				order as specified in the numericAttributeIdArray attribute and valueOnly (in
-				the NumericMeasure choice type) should be the only choice used to report such
+				Each performance monitoring attribute is included in the scanReport if its 
+				identifier is listed in the scanAttributeIdList or the numericAttributeIdArray. 
+				In the latter case, measurements must be included in the scanReport in the same 
+				order as specified in the numericAttributeIdArray attribute and valueOnly (in 
+				the NumericMeasure choice type) should be the only choice used to report such 
 				measurements.
 
-				Performance monitoring attributes (parameters) in the measurementList attribute
-				are included in the scanReport as if they were individually scanned attributes
-				of a scanned object. That is, the measurementList is scanned as if each
-				measurement in the list were a separate attribute of the currentData object.
-				The measurementList is not included in the scanReport as a single attribute.
+				Performance monitoring attributes (parameters) in the measurementList attribute 
+				are included in the scanReport as if they were individually scanned attributes 
+				of a scanned object. That is, the measurementList is scanned as if each 
+				measurement in the list were a separate attribute of the currentData object. The 
+				measurementList is not included in the scanReport as a single attribute.
 
-				Specific measurement attributes of subclasses of currentData may be included in
-				the scanReport notification if their identifier is listed in either the
-				scanAttributeIdList or the numericAttributeIdArray. In order to guarantee their
-				inclusion in an event report, the attribute ids for the following attributes of
-				currentData (if instantiated in currentData) must appear in the
+				Specific measurement attributes of subclasses of currentData may be included in 
+				the scanReport notification if their identifier is listed in either the 
+				scanAttributeIdList or the numericAttributeIdArray. In order to guarantee their 
+				inclusion in an event report, the attribute ids for the following attributes of 
+				currentData (if instantiated in currentData) must appear in the 
 				onceReportAttributeIdList attribute:
 
-				 The granularityPeriod attribute.
-				 The suspectIntervalFlag attribute.
-				 The numSuppressedIntervals attribute, if present.
-				 The observedObjectClass and observedObjectInstance attributes, if present.";;
+				- The granularityPeriod attribute.
+
+				- The suspectIntervalFlag attribute.
+
+				- The numSuppressedIntervals attribute, if present.
+
+				- The observedObjectClass and observedObjectInstance attributes, if present.";;
 	ATTRIBUTES
 		"Recommendation X.738:1993":scanAttributeIdList GET-REPLACE ADD-REMOVE,
 		"Recommendation X.738:1993":numericAttributeIdArray GET-REPLACE,
@@ -390,38 +394,39 @@ thresholdPkg PACKAGE
 	BEHAVIOUR
 		thresholdPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"This package is used to report threshold violations on performance data. The
-				thresholdDataInstance attribute is a pointer to a thresholdData object that
-				contains threshold limits for performance parameters. Whenever the value of a
-				PM parameter violates its threshold setting, a qualityofServiceAlarm
-				notification is emitted. The attribute violating the threshold has to be
-				reported using the thresholdInfo field of the alarm.
+				"This package is used to report threshold violations on performance data. The 
+				thresholdDataInstance attribute is a pointer to a thresholdData object that 
+				contains threshold limits for performance parameters. Whenever the value of a PM 
+				parameter violates its threshold setting, a qualityofServiceAlarm notification 
+				is emitted. The attribute violating the threshold has to be reported using the 
+				thresholdInfo field of the alarm.
 
-				New thresholds resulting from modifying the thresholdDataInstance attribute or
-				from changing a threshold value in the referenced thresholdData object, should
-				take effect immediately. If an alarm condition exists previous to the
-				occurrence of a threshold value change (i.e. an old threshold had been
-				violated), and the new threshold value is outside of the range of the old
-				threshold value (e.g. in the case of an increasing counter, the new threshold
-				value is greater than the old threshold value), and the current value of the
-				measurement is within the allowable range of the new threshold value, then a
-				QOS Alarm notification is emitted with a severity of eclear . If the new
-				threshold value is set within the range of the old threshold value, such that
-				the new threshold is violated, a QOS Alarm notification is emitted if an alarm
-				condition is not already outstanding.
+				New thresholds resulting from modifying the thresholdDataInstance attribute or 
+				from changing a threshold value in the referenced thresholdData object, should 
+				take effect immediately. If an alarm condition exists previous to the occurrence 
+				of a threshold value change (i.e. an old threshold had been violated), and the 
+				new threshold value is outside of the range of the old threshold value (e.g. in 
+				the case of an increasing counter, the new threshold value is greater than the 
+				old threshold value), and the current value of the measurement is within the 
+				allowable range of the new threshold value, then a QOS Alarm notification is 
+				emitted with a severity of eclear . If the new threshold value is set within the 
+				range of the old threshold value, such that the new threshold is violated, a QOS 
+				Alarm notification is emitted if an alarm condition is not already outstanding.
 
-				An alarm report which contains a Perceived Severity parameter with a value of
-				cleared and a Correlated Notifications parameter shall only indicate the
-				clearing of those alarms whose Notification Identifiers are included in the set
-				of Correlated Notifications. An alarm report which contains a Perceived
-				Severity parameter with a value of nclearedt, but no Correlated Notifications
-				parameter, shall indicate the clearing of alarms based on the value of the
-				Alarm Type, Probable Cause, and Specific Problems parameters.";;
+				An alarm report which contains a Perceived Severity parameter with a value of 
+				cleared and a Correlated Notifications parameter shall only indicate the 
+				clearing of those alarms whose Notification Identifiers are included in the set 
+				of Correlated Notifications. An alarm report which contains a Perceived Severity 
+				parameter with a value of nclearedt, but no Correlated Notifications parameter, 
+				shall indicate the clearing of alarms based on the value of the Alarm Type, 
+				Probable Cause, and Specific Problems parameters.";;
 	ATTRIBUTES
 		reportAllAttributes
-			DEFAULT VALUE Q822-PM-ASN1Module.defaultReportAllAttributes GET-REPLACE,
+			DEFAULT VALUE Q822-PM-ASN1Module.defaultReportAllAttributes
+			GET-REPLACE,
 		suppressAdditionalThresholds
-			DEFAULT VALUE Q822-PM-ASN1Module.defaultSuppressAdditionalThresholds GET-REPLACE,
+			DEFAULT VALUE Q822-PM-ASN1Module.defaultSuppressAdditionalThresholds
+			GET-REPLACE,
 		thresholdDataInstance GET-REPLACE ADD-REMOVE;
 	NOTIFICATIONS
 		"Recommendation X.721:1992":qualityofServiceAlarm
@@ -436,25 +441,25 @@ thresholdVerificationPkg PACKAGE
 	BEHAVIOUR
 		thresholdVerificationPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"This package allows for the agent to validate that the threshold settings
-				defined in a created thresholdData object are reasonable. Since the attributes
-				to which a threshold may be applied and the permissible threshold values are
-				dependent on the type of entity being monitored and the granularity period, the
-				agent must be aware of this information. This package provides the
-				monitoredEntityTypes and granularityPeriod attributes needed to verify that the
-				threshold values set in the counterthresholdAttributeList or
-				gaugethresholdAttributeList are reasonable. If the thresholdData object
-				receives a request to set the values in the counterthresholdAttributeList or
-				gaugethresholdAttributeList it may reject the M-SET service request by
-				returning an Error reply of setListError if the values are not appropriate for
-				the monitored entity type and interval combination. In some cases the actual
-				values set in the counterthresholdAttributeList or gaugethresholdAttributeList
-				may be different from the requested values for the threshold. In this case, the
-				next lowest threshold value supported by the managed system is used. This value
-				is returned in the Reply to a confirmed M-SET service request.
+				"This package allows for the agent to validate that the threshold settings 
+				defined in a created thresholdData object are reasonable. Since the attributes 
+				to which a threshold may be applied and the permissible threshold values are 
+				dependent on the type of entity being monitored and the granularity period, the 
+				agent must be aware of this information. This package provides the 
+				monitoredEntityTypes and granularityPeriod attributes needed to verify that the 
+				threshold values set in the counterthresholdAttributeList or 
+				gaugethresholdAttributeList are reasonable. If the thresholdData object receives 
+				a request to set the values in the counterthresholdAttributeList or 
+				gaugethresholdAttributeList it may reject the M-SET service request by returning 
+				an Error reply of setListError if the values are not appropriate for the 
+				monitored entity type and interval combination. In some cases the actual values 
+				set in the counterthresholdAttributeList or gaugethresholdAttributeList may be 
+				different from the requested values for the threshold. In this case, the next 
+				lowest threshold value supported by the managed system is used. This value is 
+				returned in the Reply to a confirmed M-SET service request.
 
-				The values used for the granularityPeriod attribute and monitoredEntityTypes
-				attribute shall be consistent with the actual values of granularityPeriod used
+				The values used for the granularityPeriod attribute and monitoredEntityTypes 
+				attribute shall be consistent with the actual values of granularityPeriod used 
 				in the system and with the class of actual monitored objects.";;
 	ATTRIBUTES
 		"Recommendation X.739:1993":granularityPeriod GET,
@@ -467,8 +472,8 @@ zeroSuppressionPkg PACKAGE
 	BEHAVIOUR
 		zeroSuppressionPkgBehaviour BEHAVIOUR
 			DEFINED AS
-				"When this package is present and an interval terminates with all-zeros
-				performance measurements, there is no scanReport notification issued and no
+				"When this package is present and an interval terminates with all-zeros 
+				performance measurements, there is no scanReport notification issued and no 
 				historyData object is created.";;
 REGISTERED AS { q822Package 15 };
 --4.3.3 Attribute definitions
@@ -477,14 +482,13 @@ REGISTERED AS { q822Package 15 };
 
 counterThresholdAttributeList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.CounterThresholdAttributeList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		counterThresholdAttributeListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute contains a set of threshold settings for performance attributes
-				of the counter type (e.g. errored seconds). Each threshold setting consists of
-				the attribute identifier, the threshold value and (optionally) the severity of
+				"This attribute contains a set of threshold settings for performance attributes 
+				of the counter type (e.g. errored seconds). Each threshold setting consists of 
+				the attribute identifier, the threshold value and (optionally) the severity of 
 				the threshold-exceeded event.";;
 REGISTERED AS { q822Attribute 1 };
 --4.3.3.2 Elapsed time
@@ -492,12 +496,11 @@ REGISTERED AS { q822Attribute 1 };
 
 elapsedTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.ElapsedTime;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		elapsedTimeBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute represents the difference between the current time and the start
+				"This attribute represents the difference between the current time and the start 
 				of the present summary interval.";;
 REGISTERED AS { q822Attribute 2 };
 --4.3.3.3 Gauge threshold attribute list
@@ -505,14 +508,13 @@ REGISTERED AS { q822Attribute 2 };
 
 gaugeThresholdAttributeList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.GaugeThresholdAttributeList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		gaugeThresholdAttributeListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute contains a set of threshold settings for performance attributes
-				of the gauge type. Each threshold setting consists of the attribute identifier,
-				the threshold value and (optionally) the severity of the threshold-exceeded
+				"This attribute contains a set of threshold settings for performance attributes 
+				of the gauge type. Each threshold setting consists of the attribute identifier, 
+				the threshold value and (optionally) the severity of the threshold-exceeded 
 				event.";;
 REGISTERED AS { q822Attribute 3 };
 --4.3.3.4 History data Id
@@ -520,12 +522,11 @@ REGISTERED AS { q822Attribute 3 };
 
 historyDataId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		historyDataIdBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is used as the RDN attribute for instances of the historyData
+				"This attribute is used as the RDN attribute for instances of the historyData 
 				object class.";;
 REGISTERED AS { q822Attribute 4 };
 --4.3.3.5 History retention
@@ -533,13 +534,11 @@ REGISTERED AS { q822Attribute 4 };
 
 historyRetention ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.HistoryRetention;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		historyRetentionBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute specifies the minimum number of intervals that the historyData
+				"This attribute specifies the minimum number of intervals that the historyData 
 				object instance (just being created) must be preserved.";;
 REGISTERED AS { q822Attribute 5 };
 --4.3.3.6 Maximum suppressed intervals
@@ -547,26 +546,25 @@ REGISTERED AS { q822Attribute 5 };
 
 maxSuppressedIntervals ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.MaxSuppressedIntervals;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		maxSuppressedIntervalsBehaviour BEHAVIOUR
 			DEFINED AS
-				"In conjunction with record compression, the maxSuppressedIntervals attribute
-				limits the maximum number of suppressed intervals that will be collected
-				without creating an instance of the historyData object.
+				"In conjunction with record compression, the maxSuppressedIntervals attribute 
+				limits the maximum number of suppressed intervals that will be collected without 
+				creating an instance of the historyData object.
 
-				For example, consider an instance of (a subClass of) currentData with
-				maxSuppressedIntervals set to 32, and the interval set to 15 minutes. For
-				record compression, it means that after 32 consecutive suppressed (e.g.
-				all-zero) intervals (8 hours) at least one historyData record (with all zero PM
-				Parameters) will be generated with a count of 32. This ensures that at least
-				one historyData record per maxSuppressedIntervals will be created.
+				For example, consider an instance of (a subClass of) currentData with 
+				maxSuppressedIntervals set to 32, and the interval set to 15 minutes. For record 
+				compression, it means that after 32 consecutive suppressed (e.g. all-zero) 
+				intervals (8 hours) at least one historyData record (with all zero PM 
+				Parameters) will be generated with a count of 32. This ensures that at least one 
+				historyData record per maxSuppressedIntervals will be created.
 
-				If the numSuppressedIntervalsPkg is present, the value of this attribute cannot
-				exceed the maximum possible value of the numSuppressedIntervals attribute (this
-				maximum value is a local matter). If a request to modify the value of this
-				attribute exceeds this maximum values then a CMIP error of invalid Attribute
+				If the numSuppressedIntervalsPkg is present, the value of this attribute cannot 
+				exceed the maximum possible value of the numSuppressedIntervals attribute (this 
+				maximum value is a local matter). If a request to modify the value of this 
+				attribute exceeds this maximum values then a CMIP error of invalid Attribute 
 				Value is returned.";;
 REGISTERED AS { q822Attribute 6 };
 --4.3.3.7 Measurement list
@@ -574,18 +572,15 @@ REGISTERED AS { q822Attribute 6 };
 
 measurementList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.AttributeList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		measurementListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute contains a set of performance parameter measurements for a
-				monitored object. Each measurement is represented by the attribute identifier
-				(e.g. errored seconds) and its value. Measurements may only be included in this
-				list if they do not already exist as explicit measurement attributes of an
-				instance of a subclass of currentData or of an instance of a subclass of
+				"This attribute contains a set of performance parameter measurements for a 
+				monitored object. Each measurement is represented by the attribute identifier 
+				(e.g. errored seconds) and its value. Measurements may only be included in this 
+				list if they do not already exist as explicit measurement attributes of an 
+				instance of a subclass of currentData or of an instance of a subclass of 
 				historyData.";;
 REGISTERED AS { q822Attribute 7 };
 --4.3.3.8 Monitored entity types
@@ -593,12 +588,11 @@ REGISTERED AS { q822Attribute 7 };
 
 monitoredEntityTypes ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.MonitoredEntityTypes;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		monitoredEntityTypesBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute specifies the monitored entities to which the specified
+				"This attribute specifies the monitored entities to which the specified 
 				thresholds apply.";;
 REGISTERED AS { q822Attribute 8 };
 --4.3.3.9 Number of suppressed intervals
@@ -606,46 +600,42 @@ REGISTERED AS { q822Attribute 8 };
 
 numSuppressedIntervals ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.NumSuppressedIntervals;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		numSuppressedIntervalsBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute, if present, is used to count the number of consecutive
-				intervals for which suppression (i.e. non-emission of a scanReport notification
-				and non-creation of a historyData instance) has occurred.This attribute
-				reflects performance measurements up to, but not including, the current
-				interval. This attribute gets incremented at the end of an interval if
-				suppression has occurred, otherwise, the attribute is reset.";;
+				"This attribute, if present, is used to count the number of consecutive intervals 
+				for which suppression (i.e. non-emission of a scanReport notification and 
+				non-creation of a historyData instance) has occurred.This attribute reflects 
+				performance measurements up to, but not including, the current interval. This 
+				attribute gets incremented at the end of an interval if suppression has 
+				occurred, otherwise, the attribute is reset.";;
 REGISTERED AS { q822Attribute 9 };
 --4.3.3.10 Observed object class
 
 
 observedObjectClass ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.ObjectClass;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		observedObjectClassBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies the managed object class of the managed object that
-				is being observed for the purpose of Performance Management.";;
+				"This attribute identifies the managed object class of the managed object that is 
+				being observed for the purpose of Performance Management.";;
 REGISTERED AS { q822Attribute 10 };
 --4.3.3.11 Report all attributes
 
 
 reportAllAttributes ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.ReportAllAttributes;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		reportAllAttributesBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is used to indicate whether all of the measurement attributes in
-				a currentData instance are returned in the Monitored attributes field of the
-				Quality of Service alarm. If the value of this attribute is True, all attribute
-				values are returned. If the value of this attribute is FALSE (default), the
+				"This attribute is used to indicate whether all of the measurement attributes in 
+				a currentData instance are returned in the Monitored attributes field of the 
+				Quality of Service alarm. If the value of this attribute is True, all attribute 
+				values are returned. If the value of this attribute is FALSE (default), the 
 				Quality of Service alarm does not contain the monitored attributes field.";;
 REGISTERED AS { q822Attribute 11 };
 --4.3.3.12 Period end time
@@ -653,8 +643,7 @@ REGISTERED AS { q822Attribute 11 };
 
 periodEndTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.PeriodEndTime;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		periodEndTimeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -665,14 +654,13 @@ REGISTERED AS { q822Attribute 12 };
 
 suppressAdditionalThresholds ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.SuppressAdditionalThresholds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		suppressAdditionalThresholdsBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is used to indicate whether additional threshold crossing
-				notifications will be emitted by the currentData object. The value of true for
-				this attribute indicates that no further threshold crossing notifications will
+				"This attribute is used to indicate whether additional threshold crossing 
+				notifications will be emitted by the currentData object. The value of true for 
+				this attribute indicates that no further threshold crossing notifications will 
 				be emitted until the end of the interval.";;
 REGISTERED AS { q822Attribute 13 };
 --4.3.3.14 Suspect interval flag
@@ -680,32 +668,36 @@ REGISTERED AS { q822Attribute 13 };
 
 suspectIntervalFlag ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.SuspectIntervalFlag;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		suspectIntervalFlagBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is used to indicate that the performance data for the current
+				"This attribute is used to indicate that the performance data for the current 
 				period may not be reliable. Some reasons for this to occur are:
 
 				 Suspect data were detected by the actual resource doing data collection.
+
 				 Transition of the administrativeState attribute to/from the 'lock' state.
+
 				 Transition of the operationalState to/from the 'disabled' state.
+
 				 Scheduler setting that inhibits the collection function.
+
 				 The performance counters were reset during the interval.
-				 The currentData (or subclass) object instance was created during the monitoring period.";;
+
+				 The currentData (or subclass) object instance was created during the monitoring 
+				 period.";;
 REGISTERED AS { q822Attribute 14 };
 --4.3.3.15 Threshold data Id
 
 
 thresholdDataId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		thresholdDataIdBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is used as the RDN attribute for instances of the thresholdData
+				"This attribute is used as the RDN attribute for instances of the thresholdData 
 				object class.";;
 REGISTERED AS { q822Attribute 15 };
 --4.3.3.16 Threshold data instance
@@ -713,12 +705,11 @@ REGISTERED AS { q822Attribute 15 };
 
 thresholdDataInstance ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q822-PM-ASN1Module.ThresholdDataInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		thresholdDataInstanceBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies an instance of the thresholdData object class which
+				"This attribute identifies an instance of the thresholdData object class which 
 				contains the threshold settings used by the currentData instance.";;
 REGISTERED AS { q822Attribute 16 };
 --4.3.4 Name binding definitions
@@ -729,11 +720,9 @@ REGISTERED AS { q822Attribute 16 };
 
 
 historyData-currentData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		historyData AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS historyData AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		currentData AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS currentData AND SUBCLASSES;
 	WITH ATTRIBUTE
 		historyDataId;
 	DELETE DELETES-CONTAINED-OBJECTS;
@@ -743,17 +732,16 @@ REGISTERED AS { q822NameBinding 1 };
 
 
 thresholdData-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		thresholdData AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS thresholdData AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation M.3100:1992":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation M.3100:1992":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		thresholdDataId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { q822NameBinding 2 };
 
+END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  

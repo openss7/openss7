@@ -68,8 +68,8 @@ all30MinSignallingLinkDurationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				all30MinSignallingLinkDurationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all signalling link duration data with granularityPeriod 30
-						minutes. The attributes are read-only.";;
+						"This managed object class contains all signalling link duration data with 
+						granularityPeriod 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				slLocalInhibition GET SET-BY-CREATE,-- Measurement T1.116.2/2.5
 				slRemoteInhibition GET SET-BY-CREATE,-- Measurement T1.116.2/2.6 
@@ -87,8 +87,9 @@ all5And30MinSignallingLinkDurationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				all5And30MinSignallingLinkDurationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all obligated signalling link duration data. The preferred
-						granularityPeriod is 5 and 30 minutes. The attributes are read-only.";;
+						"This managed object class contains all obligated signalling link duration data. 
+						The preferred granularityPeriod is 5 and 30 minutes. The attributes are 
+						read-only.";;
 			ATTRIBUTES
 				localMgntInhibit GET SET-BY-CREATE,-- Measurement T1.116.2/2.13
 				localMgntUninhibit GET SET-BY-CREATE,-- Measurement T1.116.2/2.14
@@ -105,8 +106,8 @@ allSignallingLinkUtilisationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				allSignallingLinkUtilisationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all signalling link utilisation data. The preferred
-						granularityPeriods are 5 and 30 minutes. The attributes are read-only.";;
+						"This managed object class contains all signalling link utilisation data. The 
+						preferred granularityPeriods are 5 and 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				slAlignment GET SET-BY-CREATE,-- Measurement T1.116.2/1.7
 				negAckReceived GET SET-BY-CREATE,-- Measurement T1.116.2/1.9
@@ -129,8 +130,8 @@ allSignallingPointUtilisationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				allSignallingPointUtilisationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all signalling point utilisation data. The preferred
-						granularityPeriods are 5 or 30 minutes. The attributes are read-only.";;
+						"This managed object class contains all signalling point utilisation data. The 
+						preferred granularityPeriods are 5 or 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				adjacentInaccessibleEvents GET SET-BY-CREATE;;;-- Measurement T1.116.2/5.1 
 	REGISTERED AS { mtpObjectClass 20 };
@@ -145,10 +146,10 @@ handledMSUsOpcDpcSioMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				handledMSUsOpcDpcSioMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific OPC/DPC/SIO combination. The
-						preferred granularityPeriods are 5 and 30 minutes. Activation of these measurements should be
-						limited to a small number of OPC/DPC combinations at a given time. The measurement attribute is
-						read-only.";;
+						"This managed object class starts a measurement for a specific OPC/DPC/SIO 
+						combination. The preferred granularityPeriods are 5 and 30 minutes. Activation 
+						of these measurements should be limited to a small number of OPC/DPC 
+						combinations at a given time. The measurement attribute is read-only.";;
 			ATTRIBUTES
 				opc GET SET-BY-CREATE,
 				dpc GET SET-BY-CREATE,
@@ -166,9 +167,10 @@ handledOctetsOpcDpcSioMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				handledOctetsOpcDpcSioMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific OPC/DPC/SIO combination. The
-						preferred granularityPeriods are 5 and 30 minutes. Activation of these measurements should be
-						limited to a small number of OPC/DPC combinations at a given time. The attribute is read-only.";;
+						"This managed object class starts a measurement for a specific OPC/DPC/SIO 
+						combination. The preferred granularityPeriods are 5 and 30 minutes. Activation 
+						of these measurements should be limited to a small number of OPC/DPC 
+						combinations at a given time. The attribute is read-only.";;
 			ATTRIBUTES
 				opc GET SET-BY-CREATE,
 				dpc GET SET-BY-CREATE,
@@ -186,8 +188,8 @@ handledOctetsSIOMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				handledOctetsSIOMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific SIO. The preferred granularityPeriods
-						are 5 and 30 minutes. The attribute is read-only.";;
+						"This managed object class starts a measurement for a specific SIO. The preferred 
+						granularityPeriods are 5 and 30 minutes. The attribute is read-only.";;
 			ATTRIBUTES
 				sio GET SET-BY-CREATE,
 				handledOctetsSIO GET SET-BY-CREATE;;;-- Measurement T1.116.2/6.3
@@ -203,8 +205,8 @@ oblSignallingLinkDurationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				oblSignallingLinkDurationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains the obligated signalling link duration data. The preferred
-						granularityPeriod is 30 minutes. The attributes are read-only.";;
+						"This managed object class contains the obligated signalling link duration data. 
+						The preferred granularityPeriod is 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				slUnavailabilityDuration GET SET-BY-CREATE,-- Measurement T1.116.2/2.1
 				slInServiceDuration GET SET-BY-CREATE;;;-- Measurement T1.116.2/1.1
@@ -220,8 +222,8 @@ oblSignallingLinkUtilisationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				oblSignallingLinkUtilisationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all obligated signalling link utilisation data. The
-						granularityPeriods is 30 minutes. The attributes are read-only.";;
+						"This managed object class contains all obligated signalling link utilisation 
+						data. The granularityPeriods is 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				signUnitsReceived GET SET-BY-CREATE,-- Measurement T1.116.2/1.8
 				transmittedOctetsSIFSIO GET SET-BY-CREATE,-- Measurement T1.116.2/3.1
@@ -239,8 +241,9 @@ oblSignallingPointUtilisationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				oblSignallingPointUtilisationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all obligated signalling point utilisation data. The preferred
-						granularityPeriods are 5 minutes. The attributes are read-only.";;
+						"This managed object class contains all obligated signalling point utilisation 
+						data. The preferred granularityPeriods are 5 minutes. The attributes are 
+						read-only.";;
 			ATTRIBUTES
 				adjacentInaccessibleDuration GET SET-BY-CREATE;;;-- Measurement T1.116.2/5.2
 	REGISTERED AS { mtpObjectClass 26 };
@@ -255,9 +258,10 @@ receivedOctetsOPCMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				receivedOctetsOPCMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific OPC. The preferred granularityPeriods
-						are 5 and 30 minutes. Activation of these measurements should be limited to a small number of
-						signalling point codes at a given time. The attribute is read-only.";;
+						"This managed object class starts a measurement for a specific OPC. The preferred 
+						granularityPeriods are 5 and 30 minutes. Activation of these measurements should 
+						be limited to a small number of signalling point codes at a given time. The 
+						attribute is read-only.";;
 			ATTRIBUTES
 				opc GET SET-BY-CREATE,
 				receivedOctetsOPC GET SET-BY-CREATE;;;-- Measurement T1.116.2/6.1
@@ -273,9 +277,10 @@ receivedOctetsOpcSioMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				receivedOctetsOpcSioMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific OPC/SIO combination. The preferred
-						granularityPeriods are 5 and 30 minutes. Activation of these measurements should be limited to a
-						small number of signalling point codes at a given time. The attribute is read-only.";;
+						"This managed object class starts a measurement for a specific OPC/SIO 
+						combination. The preferred granularityPeriods are 5 and 30 minutes. Activation 
+						of these measurements should be limited to a small number of signalling point 
+						codes at a given time. The attribute is read-only.";;
 			ATTRIBUTES
 				opc GET SET-BY-CREATE,
 				sio GET SET-BY-CREATE,
@@ -292,8 +297,8 @@ signRouteSetInformationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				signRouteSetInformationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all permanent signalling point duration data. The
-						granularityPeriod is 30 minutes. The attributes are read-only.";;
+						"This managed object class contains all permanent signalling point duration data. 
+						The granularityPeriod is 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				routeSetUnavailable GET SET-BY-CREATE,-- Measurement T1.116.2/4.9
 				routeSetUnavailableDuration GET SET-BY-CREATE;;;-- Measurement  T1.116.2/4.10
@@ -309,10 +314,11 @@ signallingLinkCongestionData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				signallingLinkCongestionDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains the optional signalling link congestion data. The preferred
-						granularityPeriods are 5 and 30 minutes. The attributes slCongestedStarts, slCongestionStops and
-						congestionEventsMSULoss can be referenced from an instance of ss7FirstAndIntervalThresholdData when
-						they are used for a first and interval measurement. The attributes are read-only.";;
+						"This managed object class contains the optional signalling link congestion data. 
+						The preferred granularityPeriods are 5 and 30 minutes. The attributes 
+						slCongestedStarts, slCongestionStops and congestionEventsMSULoss can be 
+						referenced from an instance of ss7FirstAndIntervalThresholdData when they are 
+						used for a first and interval measurement. The attributes are read-only.";;
 			ATTRIBUTES
 				slCongestedStarts GET SET-BY-CREATE,-- Measurement T1.116.2/3.6
 				slCongestionStops GET SET-BY-CREATE,-- Measurement T1.116.2/3.9
@@ -333,8 +339,8 @@ signallingLinkSetDurationData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				signallingLinkSetDurationDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains all signalling link set duration data. The granularityPeriod is
-						30 minutes. The attributes are read-only.";;
+						"This managed object class contains all signalling link set duration data. The 
+						granularityPeriod is 30 minutes. The attributes are read-only.";;
 			ATTRIBUTES
 				slsUnavailable GET SET-BY-CREATE;;;-- Measurement T1.116.2/4.2
 	REGISTERED AS { mtpObjectClass 31 };
@@ -349,10 +355,11 @@ signallingPointData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				signallingPointDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class contains informations about signalling point. The preferred
-						granularityPeriod are 5 or 30 minutes. All attributes are read-only and are referenced by an
-						instance of ss7FirstandIntervalThresholdData managed object class so does discardedMSUs attribute
-						when it is used as a first and interval measurement.";;
+						"This managed object class contains informations about signalling point. The 
+						preferred granularityPeriod are 5 or 30 minutes. All attributes are read-only 
+						and are referenced by an instance of ss7FirstandIntervalThresholdData managed 
+						object class so does discardedMSUs attribute when it is used as a first and 
+						interval measurement.";;
 			ATTRIBUTES
 				discardedMSUs GET SET-BY-CREATE,-- Measurement T1.116.2/5.5
 				transmittedUPUnavailable GET SET-BY-CREATE,-- Measurement T1.116.2/5.6
@@ -370,8 +377,9 @@ ss7CurrentData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				ss7CurrentDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class is used for subtyping of T1.116.2 duration measurements. Subtypes will
-						have to contain one or more attributes that can be scanned.";;;;
+						"This managed object class is used for subtyping of T1.116.2 duration 
+						measurements. Subtypes will have to contain one or more attributes that can be 
+						scanned.";;;;
 REGISTERED AS { mtpObjectClass 33 };
 -- D.3.18.	SS No. 7 First and Interval Current Data
 
@@ -384,10 +392,11 @@ ss7FirstandIntervalCurrentData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				ss7FirstandIntervalCurrentDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class is used for subtyping of T1.116.2 first and interval measurements.
-						Subtypes will have to contain one or more attributes that can be scanned. The start of a
-						measurement can possibly generate a X.721:qualityOfServicealarm with an indication of the probable
-						cause in an instance of another class";;;;
+						"This managed object class is used for subtyping of T1.116.2 first and interval 
+						measurements. Subtypes will have to contain one or more attributes that can be 
+						scanned. The start of a measurement can possibly generate a 
+						X.721:qualityOfServicealarm with an indication of the probable cause in an 
+						instance of another class";;;;
 REGISTERED AS { mtpObjectClass 34 };
 -- D.3.19.	SS No. 7 First and Interval Threshold Data
 
@@ -401,11 +410,11 @@ ss7FirstAndIntervalThresholdData MANAGED OBJECT CLASS
 			BEHAVIOUR
 				ss7FirstAndIntervalThresholdDataBehaviour BEHAVIOUR
 					DEFINED AS
-						"The conditional package counterThresholdListPkg is mandatory for this subclass. The threshold
-						values of the atributes in the counterThresholdAttributeList will be 1, indicating that the first
-						event should be notified to the managed using a qualityOfServiceAlarm notification. The attributes
-						being references will be part of instances of ss7FirstAndIntervalCurrentData or one of its
-						sublasses.";;;;
+						"The conditional package counterThresholdListPkg is mandatory for this subclass. 
+						The threshold values of the atributes in the counterThresholdAttributeList will 
+						be 1, indicating that the first event should be notified to the managed using a 
+						qualityOfServiceAlarm notification. The attributes being references will be part 
+						of instances of ss7FirstAndIntervalCurrentData or one of its sublasses.";;;;
 REGISTERED AS { mtpObjectClass 35 };
 -- D.3.20.	Transmitted Octets per DPC
 
@@ -418,9 +427,10 @@ transmittedOctetsDPCMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				transmittedOctetsDPCMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific DPC. The preferred granularityPeriods
-						are 5 and 30 minutes. Activation of these measurements should be limited to a small number of
-						signalling point codes at a given time. The attribute is read-only.";;
+						"This managed object class starts a measurement for a specific DPC. The preferred 
+						granularityPeriods are 5 and 30 minutes. Activation of these measurements should 
+						be limited to a small number of signalling point codes at a given time. The 
+						attribute is read-only.";;
 			ATTRIBUTES
 				dpc GET SET-BY-CREATE,
 				transmittedOctetsDPC GET SET-BY-CREATE;;;-- Measurement T1.116.2/6.2
@@ -436,9 +446,10 @@ transmittedOctetsDpcSioMeasurement MANAGED OBJECT CLASS
 			BEHAVIOUR
 				transmittedOctetsDpcSioMeasurementBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object class starts a measurement for a specific DPC/SIO combination. The preferred
-						granularityPeriods are 5 and 30 minutes. Activation of these measurements should be limited to a
-						small number of signalling point codes at a given time. The attribute is read-only.";;
+						"This managed object class starts a measurement for a specific DPC/SIO 
+						combination. The preferred granularityPeriods are 5 and 30 minutes. Activation 
+						of these measurements should be limited to a small number of signalling point 
+						codes at a given time. The attribute is read-only.";;
 			ATTRIBUTES
 				dpc GET SET-BY-CREATE,
 				sio GET SET-BY-CREATE,
@@ -462,8 +473,7 @@ slCongestedDurationPackage PACKAGE
 
 adjacentInaccessibleDuration ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		adjacentInaccessibleDurationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -553,8 +563,7 @@ REGISTERED AS { mtpAttribute 142 };
 
 localMgntInhibit ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		localMgntInhibitBehaviour BEHAVIOUR
 			DEFINED AS
@@ -564,8 +573,7 @@ REGISTERED AS { mtpAttribute 143 };
 
 localMgntUninhibit ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		localMgntUninhibitBehaviour BEHAVIOUR
 			DEFINED AS
@@ -637,7 +645,8 @@ receivedUPUnavailable ATTRIBUTE
 	BEHAVIOUR
 		receivedUPUnavailableBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute represents measurement T1.116.2/5.7.See also Chapter T1.111.4 11.7.2.";;
+				"This attribute represents measurement T1.116.2/5.7.See also Chapter T1.111.4 
+				11.7.2.";;
 REGISTERED AS { mtpAttribute 151 };
 
 
@@ -657,18 +666,19 @@ routeSetUnavailable ATTRIBUTE
 	BEHAVIOUR
 		routeSetUnavailableBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute represents measurement T1.116.2/4.9. See also Chapter T1.111.4 11.2.2.";;
+				"This attribute represents measurement T1.116.2/4.9. See also Chapter T1.111.4 
+				11.2.2.";;
 REGISTERED AS { mtpAttribute 153 };
 
 
 routeSetUnavailableDuration ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		routeSetUnavailableDurationlBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute represents measurement T1.116.2/4.10. See also Chapter T1.111.4 11.2.1.";;
+				"This attribute represents measurement T1.116.2/4.10. See also Chapter T1.111.4 
+				11.2.1.";;
 REGISTERED AS { mtpAttribute 154 };
 
 
@@ -684,8 +694,7 @@ REGISTERED AS { mtpAttribute 155 };
 
 sio ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.SIOType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { mtpAttribute 156 };
 
 
@@ -701,8 +710,7 @@ REGISTERED AS { mtpAttribute 157 };
 
 slCongestedDuration ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slCongestedDurationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -732,8 +740,7 @@ REGISTERED AS { mtpAttribute 160 };
 
 slFailed ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slFailedBehaviour BEHAVIOUR
 			DEFINED AS
@@ -743,8 +750,7 @@ REGISTERED AS { mtpAttribute 161 };
 
 slInServiceDuration ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slInServiceDurationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -754,8 +760,7 @@ REGISTERED AS { mtpAttribute 162 };
 
 slLocalInhibition ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slLocalInhibitionBehaviour BEHAVIOUR
 			DEFINED AS
@@ -765,8 +770,7 @@ REGISTERED AS { mtpAttribute 163 };
 
 slRemoteInhibition ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slRemoteInhibitionBehaviour BEHAVIOUR
 			DEFINED AS
@@ -776,8 +780,7 @@ REGISTERED AS { mtpAttribute 164 };
 
 slRemoteProcOutage ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slRemoteProcOutageBehaviour BEHAVIOUR
 			DEFINED AS
@@ -796,8 +799,7 @@ REGISTERED AS { mtpAttribute 166 };
 
 slUnavailable ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slUnavailableBehaviour BEHAVIOUR
 			DEFINED AS
@@ -807,8 +809,7 @@ REGISTERED AS { mtpAttribute 167 };
 
 slUnavailabilityDuration ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX MTPDefinedTypesModule.Seconds;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		slUnavailabilityDurationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -861,17 +862,16 @@ transmittedUPUnavailable ATTRIBUTE
 	BEHAVIOUR
 		transmittedUPUnavailableBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute represents measurement T1.116.2/5.6.See also Chapter T1.111.4 11.7.2.";;
+				"This attribute represents measurement T1.116.2/5.6.See also Chapter T1.111.4 
+				11.7.2.";;
 REGISTERED AS { mtpAttribute 173 };
 -- D.6	Name Binding Definitions
 
 
 mtpSignPoint-handledMSUsOpcDpcSioMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		handledMSUsOpcDpcSioMeasurement;
+	SUBORDINATE OBJECT CLASS handledMSUsOpcDpcSioMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -880,11 +880,9 @@ REGISTERED AS { mtpNameBinding 16 };
 
 
 mtpSignPoint-handledOctetsOpcDpcSioMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		handledOctetsOpcDpcSioMeasurement;
+	SUBORDINATE OBJECT CLASS handledOctetsOpcDpcSioMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -893,11 +891,9 @@ REGISTERED AS { mtpNameBinding 17 };
 
 
 mtpSignPoint-handledOctetsSIOMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		handledOctetsSIOMeasurement;
+	SUBORDINATE OBJECT CLASS handledOctetsSIOMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -906,11 +902,9 @@ REGISTERED AS { mtpNameBinding 18 };
 
 
 mtpSignPoint-oblSignallingPointUtilisationData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		oblSignallingPointUtilisationData AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS oblSignallingPointUtilisationData AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -919,11 +913,9 @@ REGISTERED AS { mtpNameBinding 19 };
 
 
 mtpSignPoint-receivedOctetsOPCMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		receivedOctetsOPCMeasurement;
+	SUBORDINATE OBJECT CLASS receivedOctetsOPCMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -932,11 +924,9 @@ REGISTERED AS { mtpNameBinding 20 };
 
 
 mtpSignPoint-receivedOctetsOpcSioMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		receivedOctetsOpcSioMeasurement;
+	SUBORDINATE OBJECT CLASS receivedOctetsOpcSioMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -945,11 +935,9 @@ REGISTERED AS { mtpNameBinding 21 };
 
 
 signRouteSetNePart-signRouteSetInformationData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		signRouteSetInformationData;
+	SUBORDINATE OBJECT CLASS signRouteSetInformationData;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":signRouteSetNePart;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":signRouteSetNePart;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -958,11 +946,9 @@ REGISTERED AS { mtpNameBinding 22 };
 
 
 mtpSignPoint-signallingPointData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		signallingPointData;
+	SUBORDINATE OBJECT CLASS signallingPointData;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -971,11 +957,9 @@ REGISTERED AS { mtpNameBinding 23 };
 
 
 mtpSignPoint-transmittedOctetsDPCMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		transmittedOctetsDPCMeasurement;
+	SUBORDINATE OBJECT CLASS transmittedOctetsDPCMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -984,11 +968,9 @@ REGISTERED AS { mtpNameBinding 24 };
 
 
 mtpSignPoint-transmittedOctetsDpcSioMeasurement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		transmittedOctetsDpcSioMeasurement;
+	SUBORDINATE OBJECT CLASS transmittedOctetsDpcSioMeasurement;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":mtpSignPoint;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":mtpSignPoint;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -997,11 +979,9 @@ REGISTERED AS { mtpNameBinding 25 };
 
 
 signLinkSetTP-signallingLinkSetDurationData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		signallingLinkSetDurationData;
+	SUBORDINATE OBJECT CLASS signallingLinkSetDurationData;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":signLinkSetTp;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":signLinkSetTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1010,11 +990,9 @@ REGISTERED AS { mtpNameBinding 26 };
 
 
 signLinkTp-all5And30MinSignallingLinkDurationData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		all5And30MinSignallingLinkDurationData;
+	SUBORDINATE OBJECT CLASS all5And30MinSignallingLinkDurationData;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":signLinkTp;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1023,11 +1001,9 @@ REGISTERED AS { mtpNameBinding 27 };
 
 
 signLinkTp-oblSignallingLinkDurationData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		oblSignallingLinkDurationData AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS oblSignallingLinkDurationData AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":signLinkTp;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1036,11 +1012,9 @@ REGISTERED AS { mtpNameBinding 28 };
 
 
 signLinkTp-oblSignallingLinkUtilisationData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		oblSignallingLinkUtilisationData AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS oblSignallingLinkUtilisationData AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":signLinkTp;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;
@@ -1049,11 +1023,9 @@ REGISTERED AS { mtpNameBinding 29 };
 
 
 signLinkTp-signallingLinkCongestionData NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		signallingLinkCongestionData;
+	SUBORDINATE OBJECT CLASS signallingLinkCongestionData;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ANSI T1.116.1/2000":signLinkTp;
+	SUPERIOR OBJECT CLASS "ANSI T1.116.1/2000":signLinkTp;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993":scannerId;
 	CREATE;

@@ -1,7 +1,9 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
---< GDMO.Document "EN 300 292 V1.2.1 (1998-08)" >--
-MODULE "EN 300 292 V1.2.1 (1998-08)"
+--< GDMO.Document "EN 300 292" >--
+--< GDMO.Alias "EN 300 292"
+--  "EN 300 292 V1.2.1 (1998-08)" >--
+MODULE "EN 300 292"
 --
 --8 OC definitions
 --This clause contains the formal OC definitions.
@@ -2150,4 +2152,4 @@ treatment-managedElement NAME BINDING
 REGISTERED AS { nameBinding 20 };
 
 END
---< GDMO.EndDocument "EN 300 292 V1.2.1 (1998-08)" >--
+--< GDMO.EndDocument "EN 300 292" >--

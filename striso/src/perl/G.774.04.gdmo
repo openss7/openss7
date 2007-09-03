@@ -1,7 +1,8 @@
 --< GDMO.Include "G.774.03.gdmo" >--
---< GDMO.Document "ITU-T Rec. G.774.04" >--
+--< GDMO.Document "ITU-T Rec. G.774.04 : 1995" >--
 --< GDMO.Version 1.3 >--
---< GDMO.Alias "ITU-T Rec. G.774.04"
+--< GDMO.Alias "ITU-T Rec. G.774.04 : 1995"
+--  "ITU-T Rec. G.774.04",
 --  "ITU-T Recommendation G.774-04",
 --  "Recommendation G.774.04" >--
 --< GDMO.Copyright
@@ -603,4 +604,4 @@ REGISTERED AS { g774-04NameBinding 6 };
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. G.774.04 : 1995" >--

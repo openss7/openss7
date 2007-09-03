@@ -362,7 +362,9 @@ TransmissionCongestionThresholdOnsetLevel3 ::= INTEGER
 TransmissionRate ::= ENUMERATED {
 kbits4point8 (0),
 kbits56 (1),
-kbits64 (2)}
+kbits64 (2),
+kbits1544 (3),
+kbits2048 (4)}
 TreatmentOf ::= ENUMERATED {
 normal (0),
 discard (1) }

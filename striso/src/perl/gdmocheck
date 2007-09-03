@@ -149,6 +149,7 @@ sub parse {
 	my $self = {};
 	#print STDERR "Type is $type.";
 	bless $self, $type;
+	$self->{id} = ++$::oid;
 	if ($::debug) {
 		unless ($type=~/^Comment/) {
 			$::depth++;
@@ -242,10 +243,12 @@ sub call {
 	if ($::trace) { printf "--!!".ref($self)."!!--"; }
 	#print STDERR "// calling ".ref($self)."(".$_[0].")";
 	#print STDERR $self;
+	push @::backtrack, $self;
 	my $s; foreach $s (@{$self->{children}}) {
 		#print STDERR "// calling ".ref($self)."(".$_[0].",".ref($s).")";
 		if (defined $s) { $s->generate(@_); }
 	}
+	pop @::backtrack;
 }
 
 sub xref {
@@ -401,10 +404,12 @@ use vars qw(@ISA);
 sub call {
 	my $self = shift;
 	#print STDERR "// calling ".ref($self)."(".$_[0].")";
+	push @::backtrack, ref $self;
 	my $c; foreach $c (@{$self->{children}}) {
 		#print STDERR "// calling ".ref($self)."(".$_[0].",".ref($c).")";
 		$c->generate(@_,$self);
 	}
+	pop @::backtrack;
 }
 
 # -------------------------------------
@@ -420,12 +425,12 @@ sub readitem {
 	my $line = $_[0];
 	TEST: {
 		my ($s);
-		last TEST unless (($s = $type->parse($line)));
+		last TEST unless (($s = $type->parse($line,@_[1,-1])));
 		push @{$self->{items}}, $s;
 		push @{$self->{children}}, $s;
 		while ($line=~s/^,//s) {
-			$s->{commentplus} = Comments->parse($line);
-			last TEST unless (($s = $type->parse($line)));
+			$s->{commentplus} = Comments->parse($line,@_[1,-1]);
+			last TEST unless (($s = $type->parse($line,@_[1,-1])));
 			push @{$self->{items}}, $s;
 			push @{$self->{children}}, $s;
 		}
@@ -437,7 +442,7 @@ sub readitem {
 sub read {
 	my $self = shift;
 	my $type = ref $self;
-	#printf STDERR "Reading type $type.";
+	#print STDERR "Reading type $type.";
 	unless ($type=~s/List$//) {
 		$type.='Item';
 	}
@@ -474,10 +479,10 @@ sub readitem {
 	my $line = $_[0];
 	TEST: {
 		my ($s);
-		last TEST unless (($s = $type->parse($line)));
+		last TEST unless (($s = $type->parse($line,@_[1,-1])));
 		push @{$self->{items}}, $s;
 		push @{$self->{children}}, $s;
-		while (($s = $type->parse($line))) {
+		while (($s = $type->parse($line,@_[1,-1]))) {
 			push @{$self->{items}}, $s;
 			push @{$self->{children}}, $s;
 		}
@@ -489,7 +494,7 @@ sub readitem {
 sub read {
 	my $self = shift;
 	my $type = ref $self;
-	#printf STDERR "Reading type $type.";
+	#print STDERR "Reading type $type.";
 	unless ($type=~s/List$//) {
 		$type.='Item';
 	}
@@ -540,11 +545,11 @@ sub readinterior {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{interior} = $type->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{interior} = $type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{interior};
 		last TEST unless ($line=~s/^}//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -553,7 +558,7 @@ sub readinterior {
 sub read {
 	my $self = shift;
 	my $type = ref $self;
-	#printf STDERR "Reading type $type.";
+	#print STDERR "Reading type $type.";
 	unless ($type=~s/Braced$//) {
 		$type.='Lists';
 	}
@@ -591,11 +596,11 @@ sub readinterior {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^\(//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{interior} = $type->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{interior} = $type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{interior};
 		last TEST unless ($line=~s/^\)//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -604,7 +609,7 @@ sub readinterior {
 sub read {
 	my $self = shift;
 	my $type = ref $self;
-	#printf STDERR "Reading type $type.";
+	#print STDERR "Reading type $type.";
 	unless ($type=~s/Parens$//) {
 		$type.='Lists';
 	}
@@ -642,12 +647,12 @@ sub readinterior {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^{//s);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{interior} = $type->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		if (($self->{interior} = $type->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{interior};
 		}
 		last TEST unless ($line=~s/^}//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -656,7 +661,7 @@ sub readinterior {
 sub read {
 	my $self = shift;
 	my $type = ref $self;
-	#printf STDERR "Reading type $type.";
+	#print STDERR "Reading type $type.";
 	unless ($type=~s/Braced$//) {
 		$type.='Lists';
 	}
@@ -701,7 +706,7 @@ sub readtoken {
 		last TEST unless ($line=~s/^$substitute//s);
 		# $self->{token} = $&;
 		#print STDERR "Got '$self->{token}'.";
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -744,7 +749,7 @@ sub readtoken {
 		last TEST unless ($line=~s/^$substitute//s);
 		# $self->{token} = $&;
 		#print STDERR "Got '$self->{token}'.";
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -807,7 +812,7 @@ sub read {
 	my $line = $_[0];
 	my $s;
 	$::error = '';
-	if (($self->{modules} = GdmoModuleList->parse($line))) {
+	if (($self->{modules} = GdmoModuleList->parse($line,@_[1,-1]))) {
 		push @{$self->{children}}, $self->{modules};
 	}
 	if (length($line)) {
@@ -1455,34 +1460,34 @@ sub read {
 	TEST: {
 		my ($s,$e);
 		$e = 0;
-		if (($s = GdmoPreambleDirectives->parse($line))) {
+		if (($s = GdmoPreambleDirectives->parse($line,$self))) {
 			$self->{preamble} = $s;
 			push @{$self->{children}}, $s;
 			$e++;
 		}
-		if (($s = Module->parse($line))) {
+		if (($s = Module->parse($line,$self))) {
 			$self->{module} = $s;
 			push @{$self->{children}}, $s;
 			$e++;
 		}
-		if (($s = TemplateList->parse($line))) {
+		if (($s = TemplateList->parse($line,$self))) {
 			$self->{templates} = $s;
 			push @{$self->{children}}, $s;
 			$e++;
 		}
-		if (($s = Asn1ModuleList->parse($line))) {
+		if (($s = Asn1ModuleList->parse($line,$self))) {
 			$self->{asn1modules} = $s;
 			push @{$self->{children}}, $s;
 			$e++;
 		}
 		last TEST unless (
 			!$self->{module} ||
-			($self->{end} = End->parse($line))
+			($self->{end} = End->parse($line,$self))
 		);
 		if ($self->{end}) {
 			push @{$self->{children}}, $self->{end};
 		}
-		if (($s = GdmoPostambleDirectives->parse($line))) {
+		if (($s = GdmoPostambleDirectives->parse($line,$self))) {
 			$self->{postamble} = $s;
 			push @{$self->{children}}, $s;
 			$e++;
@@ -1550,11 +1555,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^MODULE//s);
-		$self->{comments} = Comments->parse($line);
-		if ($self->{documentstring} = DocumentIdentifier->parse($line)) {
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		if ($self->{documentstring} = DocumentIdentifier->parse($line,@_[1,-1])) {
 			push @{$self->{children}}, $self->{documentstring};
 		}
-		if ($self->{documentoid} = ObjectIdentifierValue->parse($line)) {
+		if ($self->{documentoid} = ObjectIdentifierValue->parse($line,@_[1,-1])) {
 			push @{$self->{children}}, $self->{documentoid};
 		}
 		last TEST unless ($self->{documentstring} || $self->{documentoid});
@@ -1611,7 +1616,7 @@ sub read {
 			last TEST;
 		}
 		$self->{type} = 'Gdmo'.$self->{directive}.'Directive';
-		last TEST unless (($self->{item} = "$self->{type}"->parse($line)));
+		last TEST unless (($self->{item} = "$self->{type}"->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{item};
 		$_[0] = $line; return $self;
 	}
@@ -1646,7 +1651,7 @@ sub read {
 			last TEST;
 		}
 		$self->{type} = 'Gdmo'.$self->{directive}.'Directive';
-		last TEST unless (($self->{item} = "$self->{type}"->parse($line)));
+		last TEST unless (($self->{item} = "$self->{type}"->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{item};
 		$_[0] = $line; return $self;
 	}
@@ -1683,29 +1688,29 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if ($self->{directives} = Asn1Directives->parse($line)) {
+		if ($self->{directives} = Asn1Directives->parse($line,@_[1,-1],$self)) {
 			push @{$self->{children}}, $self->{directives};
 		}
-		last TEST unless (($self->{name} = ModuleIdentifier->parse($line)));
+		last TEST unless (($self->{name} = ModuleIdentifier->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{name};
-		last TEST unless (($self->{oid} = ObjectIdentifierValue->parse($line)));
+		last TEST unless (($self->{oid} = ObjectIdentifierValue->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{oid};
-		last TEST unless (($self->{definitions} = Asn1Definitions->parse($line)));
+		last TEST unless (($self->{definitions} = Asn1Definitions->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{definitions};
-		if ($self->{tagdefault} = TagDefault->parse($line)) {
+		if ($self->{tagdefault} = TagDefault->parse($line,@_[1,-1],$self)) {
 			push @{$self->{children}}, $self->{tagdefault};
 		}
-		if ($self->{extdefault} = ExtensionDefault->parse($line)) {
+		if ($self->{extdefault} = ExtensionDefault->parse($line,@_[1,-1],$self)) {
 			push @{$self->{children}}, $self->{extdefault};
 		}
-		last TEST unless (($self->{assign} = Assign->parse($line)));
+		last TEST unless (($self->{assign} = Assign->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{assign};
-		last TEST unless (($self->{begin} = Begin->parse($line)));
+		last TEST unless (($self->{begin} = Begin->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{begin};
-		if ($self->{body} = ModuleBody->parse($line)) {
+		if ($self->{body} = ModuleBody->parse($line,@_[1,-1],$self)) {
 			push @{$self->{children}}, $self->{body};
 		}
-		last TEST unless (($self->{end} = End->parse($line)));
+		last TEST unless (($self->{end} = End->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{end};
 		$_[0] = $line; return $self;
 	}
@@ -1754,9 +1759,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{tags} = ExplicitTags->parse($line)) ||
-			($self->{tags} = ImplicitTags->parse($line)) ||
-			($self->{tags} = AutomaticTags->parse($line))
+			($self->{tags} = ExplicitTags->parse($line,@_[1,-1])) ||
+			($self->{tags} = ImplicitTags->parse($line,@_[1,-1])) ||
+			($self->{tags} = AutomaticTags->parse($line,@_[1,-1]))
 		);
 		$_[0] = $line; return $self;
 	}
@@ -1865,13 +1870,13 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if ($self->{exports} = Exports->parse($line)) {
+		if ($self->{exports} = Exports->parse($line,@_[1,-1])) {
 			push @{$self->{children}}, $self->{exports};
 		}
-		if ($self->{imports} = Imports->parse($line)) {
+		if ($self->{imports} = Imports->parse($line,@_[1,-1])) {
 			push @{$self->{children}}, $self->{imports};
 		}
-		if ($self->{assignmentlist} = AssignmentList->parse($line)) {
+		if ($self->{assignmentlist} = AssignmentList->parse($line,@_[1,-1])) {
 			push @{$self->{children}}, $self->{assignmentlist};
 		}
 		last TEST unless ($line=~s/^\s*((?:.|\n)*?)\s*(?=END)//s);
@@ -1906,14 +1911,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^EXPORTS//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
-			($self->{exports} = ExportsAll->parse($line)) ||
-			($self->{exports} = ExportedSymbols->parse($line))
+			($self->{exports} = ExportsAll->parse($line,@_[1,-1])) ||
+			($self->{exports} = ExportedSymbols->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{exports};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -1969,12 +1974,12 @@ sub read {
 	TEST: {
 		my ($s);
 		last TEST unless ($line=~s/^IMPORTS//s);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{imports} = SymbolsFromModuleList->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		if (($self->{imports} = SymbolsFromModuleList->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{imports};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2012,13 +2017,13 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		my ($s);
-		last TEST unless (($self->{symbols} = ImportedSymbols->parse($line)));
+		last TEST unless (($self->{symbols} = ImportedSymbols->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{symbols};
 		last TEST unless ($line=~s/^FROM//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
-			($self->{module} = GlobalModuleReference->parse($line)) ||
-			($self->{module} = ModuleReference->parse($line))
+			($self->{module} = GlobalModuleReference->parse($line,@_[1,-1])) ||
+			($self->{module} = ModuleReference->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{module};
 		$_[0] = $line; return $self;
@@ -2071,9 +2076,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{module} = ModuleReference->parse($line)));
+		last TEST unless (($self->{module} = ModuleReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{module};
-		last TEST unless (($self->{object} = ObjectIdentifierValue->parse($line)));
+		last TEST unless (($self->{object} = ObjectIdentifierValue->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{object};
 		$_[0] = $line; return $self;
 	}
@@ -2114,14 +2119,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{assignment} = TypeAssignment->parse($line)) ||
-			($self->{assignment} = ValueAssignment->parse($line)) ||
-#			($self->{assignment} = XMLValueAssignment->parse($line)) ||
-			($self->{assignment} = ValueSetTypeAssignment->parse($line))
-#			|| ($self->{assignment} = ObjectClassAssignment->parse($line))
-#			|| ($self->{assignment} = ObjectAssignment->parse($line))
-#			|| ($self->{assignment} = ObjectSetAssignment->parse($line))
-#			|| ($self->{assignment} = ParameterizedAssignment->parse($line))
+			($self->{assignment} = TypeAssignment->parse($line,@_[1,-1])) ||
+			($self->{assignment} = ValueAssignment->parse($line,@_[1,-1])) ||
+#			($self->{assignment} = XMLValueAssignment->parse($line,@_[1,-1])) ||
+			($self->{assignment} = ValueSetTypeAssignment->parse($line,@_[1,-1]))
+#			|| ($self->{assignment} = ObjectClassAssignment->parse($line,@_[1,-1]))
+#			|| ($self->{assignment} = ObjectAssignment->parse($line,@_[1,-1]))
+#			|| ($self->{assignment} = ObjectSetAssignment->parse($line,@_[1,-1]))
+#			|| ($self->{assignment} = ParameterizedAssignment->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{assignment};
 		$_[0] = $line; return $self;
@@ -2148,11 +2153,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{reference} = TypeReference->parse($line)));
+		last TEST unless (($self->{reference} = TypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{reference};
-		last TEST unless (($self->{assign} = Assign->parse($line)));
+		last TEST unless (($self->{assign} = Assign->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{assign};
-		last TEST unless (($self->{type} = Type->parse($line)));
+		last TEST unless (($self->{type} = Type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
 	}
@@ -2179,13 +2184,13 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{reference} = ValueReference->parse($line)));
+		last TEST unless (($self->{reference} = ValueReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{reference};
-		last TEST unless (($self->{type} = Type->parse($line)));
+		last TEST unless (($self->{type} = Type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
-		last TEST unless (($self->{assign} = Assign->parse($line)));
+		last TEST unless (($self->{assign} = Assign->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{assign};
-		last TEST unless (($self->{value} = Value->parse($line)));
+		last TEST unless (($self->{value} = Value->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -2214,9 +2219,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = BuiltinValue->parse($line)) ||
-			($self->{value} = ReferencedValue->parse($line)) ||
-			($self->{value} = ObjectClassFieldName->parse($line))
+			($self->{value} = BuiltinValue->parse($line,@_[1,-1])) ||
+			($self->{value} = ReferencedValue->parse($line,@_[1,-1])) ||
+			($self->{value} = ObjectClassFieldName->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -2243,25 +2248,25 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = BitStringValue->parse($line)) ||
-			($self->{value} = BooleanValue->parse($line)) ||
-			($self->{value} = CharacterStringValue->parse($line)) ||
-			($self->{value} = ChoiceValue->parse($line)) ||
-			($self->{value} = EmbeddedPDVValue->parse($line)) ||
-			($self->{value} = EnumeratedValue->parse($line)) ||
-			($self->{value} = ExternalValue->parse($line)) ||
-#			($self->{value} = InstanceOfValue->parse($line)) ||
-			($self->{value} = IntegerValue->parse($line)) ||
-			($self->{value} = NullValue->parse($line)) ||
-			($self->{value} = ObjectIdentifierValue->parse($line)) ||
-			($self->{value} = OctetStringValue->parse($line)) ||
-			($self->{value} = RealValue->parse($line)) ||
-			($self->{value} = RelativeOIDValue->parse($line)) ||
-			($self->{value} = SequenceValue->parse($line)) ||
-			($self->{value} = SequenceOfValue->parse($line)) ||
-			($self->{value} = SetValue->parse($line)) ||
-			($self->{value} = SetOfValue->parse($line)) ||
-			($self->{value} = TaggedValue->parse($line))
+			($self->{value} = BitStringValue->parse($line,@_[1,-1])) ||
+			($self->{value} = BooleanValue->parse($line,@_[1,-1])) ||
+			($self->{value} = CharacterStringValue->parse($line,@_[1,-1])) ||
+			($self->{value} = ChoiceValue->parse($line,@_[1,-1])) ||
+			($self->{value} = EmbeddedPDVValue->parse($line,@_[1,-1])) ||
+			($self->{value} = EnumeratedValue->parse($line,@_[1,-1])) ||
+			($self->{value} = ExternalValue->parse($line,@_[1,-1])) ||
+#			($self->{value} = InstanceOfValue->parse($line,@_[1,-1])) ||
+			($self->{value} = IntegerValue->parse($line,@_[1,-1])) ||
+			($self->{value} = NullValue->parse($line,@_[1,-1])) ||
+			($self->{value} = ObjectIdentifierValue->parse($line,@_[1,-1])) ||
+			($self->{value} = OctetStringValue->parse($line,@_[1,-1])) ||
+			($self->{value} = RealValue->parse($line,@_[1,-1])) ||
+			($self->{value} = RelativeOIDValue->parse($line,@_[1,-1])) ||
+			($self->{value} = SequenceValue->parse($line,@_[1,-1])) ||
+			($self->{value} = SequenceOfValue->parse($line,@_[1,-1])) ||
+			($self->{value} = SetValue->parse($line,@_[1,-1])) ||
+			($self->{value} = SetOfValue->parse($line,@_[1,-1])) ||
+			($self->{value} = TaggedValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -2288,8 +2293,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = DefinedValue->parse($line)) ||
-			($self->{value} = ValueFromObject->parse($line))
+			($self->{value} = DefinedValue->parse($line,@_[1,-1])) ||
+			($self->{value} = ValueFromObject->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -2315,9 +2320,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
-		last TEST unless (($self->{value} = Value->parse($line)));
+		last TEST unless (($self->{value} = Value->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -2345,7 +2350,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-)//s);
 		$self->{identifier} = $&;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2371,11 +2376,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{reference} = TypeReference->parse($line)));
+		last TEST unless (($self->{reference} = TypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{reference};
-		last TEST unless (($self->{assign} = Assign->parse($line)));
+		last TEST unless (($self->{assign} = Assign->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{assign};
-		last TEST unless (($self->{valueset} = ValueSet->parse($line)));
+		last TEST unless (($self->{valueset} = ValueSet->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{valueset};
 		$_[0] = $line; return $self;
 	}
@@ -2412,9 +2417,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = BuiltinType->parse($line)) ||
-			($self->{type} = ReferencedType->parse($line)) ||
-			($self->{type} = ConstrainedType->parse($line))
+			($self->{type} = BuiltinType->parse($line,@_[1,-1])) ||
+			($self->{type} = ReferencedType->parse($line,@_[1,-1])) ||
+			($self->{type} = ConstrainedType->parse($line,@_[1,-1]))
 
 		);
 		push @{$self->{children}}, $self->{type};
@@ -2442,26 +2447,26 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = BitStringType->parse($line)) ||
-			($self->{type} = BooleanType->parse($line)) ||
-			($self->{type} = CharacterStringType->parse($line)) ||
-			($self->{type} = ChoiceType->parse($line)) ||
-			($self->{type} = EmbeddedPDVType->parse($line)) ||
-			($self->{type} = EnumeratedType->parse($line)) ||
-			($self->{type} = ExternalType->parse($line)) ||
-#			($self->{type} = InstanceOfType->parse($line)) ||
-			($self->{type} = IntegerType->parse($line)) ||
-			($self->{type} = NullType->parse($line)) ||
-#			($self->{type} = ObjectClassFieldType->parse($line)) ||
-			($self->{type} = ObjectIdentifierType->parse($line)) ||
-			($self->{type} = OctetStringType->parse($line)) ||
-			($self->{type} = RealType->parse($line)) ||
-			($self->{type} = RelativeOIDType->parse($line)) ||
-			($self->{type} = SequenceType->parse($line)) ||
-			($self->{type} = SequenceOfType->parse($line)) ||
-			($self->{type} = SetType->parse($line)) ||
-			($self->{type} = SetOfType->parse($line)) ||
-			($self->{type} = TaggedType->parse($line))
+			($self->{type} = BitStringType->parse($line,@_[1,-1])) ||
+			($self->{type} = BooleanType->parse($line,@_[1,-1])) ||
+			($self->{type} = CharacterStringType->parse($line,@_[1,-1])) ||
+			($self->{type} = ChoiceType->parse($line,@_[1,-1])) ||
+			($self->{type} = EmbeddedPDVType->parse($line,@_[1,-1])) ||
+			($self->{type} = EnumeratedType->parse($line,@_[1,-1])) ||
+			($self->{type} = ExternalType->parse($line,@_[1,-1])) ||
+#			($self->{type} = InstanceOfType->parse($line,@_[1,-1])) ||
+			($self->{type} = IntegerType->parse($line,@_[1,-1])) ||
+			($self->{type} = NullType->parse($line,@_[1,-1])) ||
+#			($self->{type} = ObjectClassFieldType->parse($line,@_[1,-1])) ||
+			($self->{type} = ObjectIdentifierType->parse($line,@_[1,-1])) ||
+			($self->{type} = OctetStringType->parse($line,@_[1,-1])) ||
+			($self->{type} = RealType->parse($line,@_[1,-1])) ||
+			($self->{type} = RelativeOIDType->parse($line,@_[1,-1])) ||
+			($self->{type} = SequenceType->parse($line,@_[1,-1])) ||
+			($self->{type} = SequenceOfType->parse($line,@_[1,-1])) ||
+			($self->{type} = SetType->parse($line,@_[1,-1])) ||
+			($self->{type} = SetOfType->parse($line,@_[1,-1])) ||
+			($self->{type} = TaggedType->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -2501,7 +2506,7 @@ sub read {
 	TEST: {
 		last TEST unless (($line=~s/^(TRUE|FALSE)//s));
 		$self->{value} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2528,8 +2533,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^INTEGER//s);
-		$self->{comments} = Comments->parse($line);
-		if (($self->{list} = NamedNumberListBraced->parse($line))) {
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		if (($self->{list} = NamedNumberListBraced->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{list};
 		}
 		$_[0] = $line; return $self;
@@ -2573,17 +2578,17 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
 		last TEST unless ($line=~s/^\(//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
 			($self->{number} = SignedNumber->($line)) ||
 			($self->{number} = DefinedValue->($line))
 		);
 		push @{$self->{children}}, $self->{number};
 		last TEST unless ($line=~s/^\)//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2615,7 +2620,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^(0|-?[1-9][0-9]*)//s);
 		$self->{number} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2643,7 +2648,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^(0|[1-9][0-9]*)//s);
 		$self->{number} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2671,8 +2676,8 @@ sub read {
 	TEST: {
 		my $s;
 		last TEST unless (
-			($s = SignedNumber->parse($line)) ||
-			($s = Identifier->parse($line))
+			($s = SignedNumber->parse($line,@_[1,-1])) ||
+			($s = Identifier->parse($line,@_[1,-1]))
 			# FIXME: the identifier here must ne one of the identifiers in the
 			# IntegerType with which the value is associated, and shall represent the
 			# corresponding number.  See X.608 Clause 18.10.
@@ -2703,13 +2708,13 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ENUMERATED//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless ($line=~s/^{//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($self->{enumerations} = Enumerations->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{enumerations} = Enumerations->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{enumerations};
 		last TEST unless ($line=~s/^}//s);
-		$self->{comments3} = Comments->parse($line);
+		$self->{comments3} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -2746,17 +2751,17 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{root} = RootEnumeration->parse($line)));
+		last TEST unless (($self->{root} = RootEnumeration->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{root};
 		if ($line=~s/^\,//s) {
-			$self->{comments1} = Comments->parse($line);
+			$self->{comments1} = Comments->parse($line,@_[1,-1]);
 			last TEST unless ($line=~s/^\.\.\.//s);
-			$self->{comments2} = Comments->parse($line);
-			last TEST unless (($self->{exceptionspec} = ExceptionSpec->parse($line)));
+			$self->{comments2} = Comments->parse($line,@_[1,-1]);
+			last TEST unless (($self->{exceptionspec} = ExceptionSpec->parse($line,@_[1,-1])));
 			push @{$self->{children}}, $self->{exceptionspec};
 			if ($line=~s/^\,//s) {
-				$self->{comments3} = Comments->parse($line);
-				last TEST unless (($self->{additional} = AdditionalEnumeration->parse($line)));
+				$self->{comments3} = Comments->parse($line,@_[1,-1]);
+				last TEST unless (($self->{additional} = AdditionalEnumeration->parse($line,@_[1,-1])));
 				push @{$self->{children}}, $self->{additional};
 			}
 		}
@@ -2799,7 +2804,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{enumeration} = Enumeration->parse($line)));
+		last TEST unless (($self->{enumeration} = Enumeration->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{enumeration};
 		$_[0] = $line; return $self;
 	}
@@ -2824,7 +2829,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{enumeration} = Enumeration->parse($line)));
+		last TEST unless (($self->{enumeration} = Enumeration->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{enumeration};
 		$_[0] = $line; return $self;
 	}
@@ -2857,8 +2862,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{item} = Identifier->parse($line)) ||
-			($self->{item} = NamedNumber->parse($line))
+			($self->{item} = Identifier->parse($line,@_[1,-1])) ||
+			($self->{item} = NamedNumber->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{item};
 		$_[0] = $line; return $self;
@@ -2884,7 +2889,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{value} = Identifier->parse($line)));
+		last TEST unless (($self->{value} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		# FIXME: identifier must be in enumerated type
 		$_[0] = $line; return $self;
@@ -2923,8 +2928,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = NumericRealValue->parse($line)) ||
-			($self->{value} = SpecialRealValue->parse($line))
+			($self->{value} = NumericRealValue->parse($line,@_[1,-1])) ||
+			($self->{value} = SpecialRealValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -2951,8 +2956,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = SignedRealNumber->parse($line)) ||
-			($self->{value} = SequenceValue->parse($line))
+			($self->{value} = SignedRealNumber->parse($line,@_[1,-1])) ||
+			($self->{value} = SequenceValue->parse($line,@_[1,-1]))
 			# FIXME; where the sequence must contain mantisa base and exponent
 			# named numbers (exponent may only be 2 or 10).
 		);
@@ -2982,7 +2987,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^-?(?:0|[1-9][0-9]*)(?:\.[0-9][0-9]*)?//s);
 		$self->{number} = $&;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3012,7 +3017,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^(?:PLUS|MINUS)-INFINITY//s);
 		$self->{value} = $&;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3039,8 +3044,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^BIT\s*STRING//s);
-		$self->{comments} = Comments->parse($line);
-		if (($self->{list} = NamedBitListBraced->parse($line))) {
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		if (($self->{list} = NamedBitListBraced->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{list};
 		}
 		$_[0] = $line; return $self;
@@ -3084,17 +3089,17 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
 		last TEST unless ($line=~s/^\(//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
 			($self->{number} = Number->($line)) ||
 			($self->{number} = DefinedValue->($line))
 		);
 		push @{$self->{children}}, $self->{number};
 		last TEST unless ($line=~s/^\)//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3125,10 +3130,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = Bstring->parse($line)) ||
-			($self->{value} = Hstring->parse($line)) ||
-			($self->{value} = BitStringValueList->parse($line)) ||
-			($self->{value} = ContainingValue->parse($line))
+			($self->{value} = Bstring->parse($line,@_[1,-1])) ||
+			($self->{value} = Hstring->parse($line,@_[1,-1])) ||
+			($self->{value} = BitStringValueList->parse($line,@_[1,-1])) ||
+			($self->{value} = ContainingValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -3156,7 +3161,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^'([01]*)'[Bb]//s);
 		$self->{value} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3184,7 +3189,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^'([0-9A-Fa-f]*)'[Hh]//s);
 		$self->{value} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3227,8 +3232,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CONTAINING//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{value} = Value->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{value} = Value->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -3269,9 +3274,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = Bstring->parse($line)) ||
-			($self->{value} = Hstring->parse($line)) ||
-			($self->{value} = ContainingValue->parse($line))
+			($self->{value} = Bstring->parse($line,@_[1,-1])) ||
+			($self->{value} = Hstring->parse($line,@_[1,-1])) ||
+			($self->{value} = ContainingValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -3322,8 +3327,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SEQUENCE(?!\s*OF)//s);
-		$self->{comments} = Comments->parse($line);
-		if (($self->{list} = ExtensionOrComponentTypeListBraced->parse($line))) {
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		if (($self->{list} = ExtensionOrComponentTypeListBraced->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{list};
 		}
 		$_[0] = $line; return $self;
@@ -3361,8 +3366,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{exception} = ExtensionAndExceptionList->parse($line)) ||
-			($self->{component} = ComponentTypeLists->parse($line))
+			($self->{exception} = ExtensionAndExceptionList->parse($line,@_[1,-1])) ||
+			($self->{component} = ComponentTypeLists->parse($line,@_[1,-1]))
 		);
 		if ($self->{exception}) {
 			push @{$self->{children}}, $self->{exception};
@@ -3395,9 +3400,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if (($self->{exception} = ExtensionAndException->parse($line))) {
+		if (($self->{exception} = ExtensionAndException->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{exception};
-			if (($self->{extension} = ExtensionMarker->parse($line))) {
+			if (($self->{extension} = ExtensionMarker->parse($line,@_[1,-1]))) {
 				push @{$self->{children}}, $self->{extension};
 			}
 		} else { last TEST; }
@@ -3427,8 +3432,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^\.\.\.//s);
-		$self->{comments} = Comments->parse($line);
-		if (($self->{exception} = ExceptionSpec->parse($line))) {
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		if (($self->{exception} = ExceptionSpec->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{exception};
 		}
 		$_[0] = $line; return $self;
@@ -3459,9 +3464,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless ($line=~s/^\.\.\.//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3491,24 +3496,24 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if (($self->{root} = RootComponentTypeList->parse($line))) {
+		if (($self->{root} = RootComponentTypeList->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{root};
 			goto DONE unless ($line=~s/^\,//s);
-			$self->{comments1} = Comments->parse($line);
+			$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		}
 		push @{$self->{children}}, $self->{root};
-		last TEST unless (($self->{exception} = ExtensionAndException->parse($line)));
+		last TEST unless (($self->{exception} = ExtensionAndException->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{exception};
-		last TEST unless (($self->{addition} = ExtensionAdditions->parse($line)));
+		last TEST unless (($self->{addition} = ExtensionAdditions->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{addition};
-		if (($self->{endmarker} = ExtensionMarker->parse($line))) {
+		if (($self->{endmarker} = ExtensionMarker->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{endmarker};
 			last TEST unless ($line=~s/^,//s);
-			$self->{comments2} = Comments->parse($line);
-			last TEST unless (($self->{list} = RootComponentTypeList->parse($line)));
+			$self->{comments2} = Comments->parse($line,@_[1,-1]);
+			last TEST unless (($self->{list} = RootComponentTypeList->parse($line,@_[1,-1])));
 			push @{$self->{children}}, $self->{list};
 		} else {
-			if (($self->{extension} = ExtensionMarker->parse($line))) {
+			if (($self->{extension} = ExtensionMarker->parse($line,@_[1,-1]))) {
 				push @{$self->{children}}, $self->{extension};
 			}
 		}
@@ -3551,7 +3556,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{list} = ComponentTypeList->parse($line)));
+		last TEST unless (($self->{list} = ComponentTypeList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		$_[0] = $line; return $self;
 	}
@@ -3577,8 +3582,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{list} = ExtensionAdditionList->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{list} = ExtensionAdditionList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		$_[0] = $line; return $self;
 	}
@@ -3613,8 +3618,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{addition} = ComponentType->parse($line)) ||
-			($self->{addition} = ExtensionAdditionGroup->parse($line))
+			($self->{addition} = ComponentType->parse($line,@_[1,-1])) ||
+			($self->{addition} = ExtensionAdditionGroup->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{addition};
 		$_[0] = $line; return $self;
@@ -3641,14 +3646,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^\[\[//s);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{version} = VersionNumber->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		if (($self->{version} = VersionNumber->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{version};
 		}
-		last TEST unless (($self->{list} = ComponentTypeList->parse($line)));
+		last TEST unless (($self->{list} = ComponentTypeList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		last TEST unless ($line=~s/^\]\]//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3680,10 +3685,10 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{number} = Number->parse($line)));
+		last TEST unless (($self->{number} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{number};
 		last TEST unless ($line=~s/^://s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -3716,20 +3721,20 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if (($self->{namedtype} = NamedType->parse($line))) {
+		if (($self->{namedtype} = NamedType->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{namedtype};
 			if ($line=~s/^OPTIONAL//s) {
 				$self->{optional} = 'OPTIONAL';
-				$self->{comments} = Comments->parse($line);
+				$self->{comments} = Comments->parse($line,@_[1,-1]);
 			} elsif ($line=~s/^DEFAULT//s) {
 				$self->{default} = 'DEFAULT';
-				$self->{comments} = Comments->parse($line);
-				last TEST unless (($self->{value} = Value->parse($line)));
+				$self->{comments} = Comments->parse($line,@_[1,-1]);
+				last TEST unless (($self->{value} = Value->parse($line,@_[1,-1])));
 				push @{$self->{children}}, $self->{value};
 			}
 		} elsif ($line=~s/^COMPONENTS\s*OF//s) {
-			$self->{comments} = Comments->parse($line);
-			last TEST unless (($self->{type} = Type->parse($line)));
+			$self->{comments} = Comments->parse($line,@_[1,-1]);
+			last TEST unless (($self->{type} = Type->parse($line,@_[1,-1])));
 			push @{$self->{children}}, $self->{type};
 		} else {
 			last TEST;
@@ -3797,10 +3802,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SEQUENCE\s*OF//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
-			($self->{type} = Type->parse($line)) ||
-			($self->{type} = NamedType->parse($line))
+			($self->{type} = Type->parse($line,@_[1,-1])) ||
+			($self->{type} = NamedType->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -3839,8 +3844,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{list} = ValueList->parse($line)) ||
-			($self->{list} = NamedValueList->parse($line))
+			($self->{list} = ValueList->parse($line,@_[1,-1])) ||
+			($self->{list} = NamedValueList->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{list};
 		$_[0] = $line; return $self;
@@ -3882,7 +3887,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^SET(?!\s*OF)//s);
 		$self->{comments} = Comments->pcase($line);
-		$self->{list} = ExtensionOrComponentTypeListBraced->parse($line);
+		$self->{list} = ExtensionOrComponentTypeListBraced->parse($line,@_[1,-1]);
 		push @{$self->{children}}, $self->{list};
 		$_[0] = $line; return $self;
 	}
@@ -3924,10 +3929,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SET\s*OF//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
-			($self->{type} = Type->parse($line)) ||
-			($self->{type} = NamedType->parse($line))
+			($self->{type} = Type->parse($line,@_[1,-1])) ||
+			($self->{type} = NamedType->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -3969,8 +3974,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CHOICE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{alternatives} = AlternativeTypeListsBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{alternatives} = AlternativeTypeListsBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{alternatives};
 		$_[0] = $line; return $self;
 	}
@@ -4006,16 +4011,16 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{root} = RootAlternativeTypeList->parse($line)));
+		last TEST unless (($self->{root} = RootAlternativeTypeList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{root};
 		if ($line=~s/^,//s) {
-			$self->{comments} = Comments->parse($line);
-			last TEST unless (($self->{exception} = ExtensionAndException->parse($line)));
+			$self->{comments} = Comments->parse($line,@_[1,-1]);
+			last TEST unless (($self->{exception} = ExtensionAndException->parse($line,@_[1,-1])));
 			push @{$self->{children}}, $self->{exception};
-			if (($self->{addition} = ExtensionAdditionAlternatives->parse($line))) {
+			if (($self->{addition} = ExtensionAdditionAlternatives->parse($line,@_[1,-1]))) {
 				push @{$self->{children}}, $self->{addition};
 			}
-			if (($self->{marker} = ExtensionMarker->parse($line))) {
+			if (($self->{marker} = ExtensionMarker->parse($line,@_[1,-1]))) {
 				push @{$self->{children}}, $self->{marker};
 			}
 		}
@@ -4050,7 +4055,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{list} = AlternativeTypeList->parse($line)));
+		last TEST unless (($self->{list} = AlternativeTypeList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		$_[0] = $line; return $self;
 	}
@@ -4076,8 +4081,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{list} = ExtensionAdditionAlternativesList->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{list} = ExtensionAdditionAlternativesList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		$_[0] = $line; return $self;
 	}
@@ -4116,8 +4121,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{alternative} = ExtensionAdditionAlternativesGroup->parse($line)) ||
-			($self->{alternative} = NamedType->parse($line))
+			($self->{alternative} = ExtensionAdditionAlternativesGroup->parse($line,@_[1,-1])) ||
+			($self->{alternative} = NamedType->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{alternative};
 		$_[0] = $line; return $self;
@@ -4144,14 +4149,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^\[\[//s);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{version} = VersionNumber->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		if (($self->{version} = VersionNumber->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{version};
 		}
-		last TEST unless (($self->{list} = AlternativeTypeList->parse($line)));
+		last TEST unless (($self->{list} = AlternativeTypeList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		last TEST unless ($line=~s/^\]\]//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4192,11 +4197,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
 		last TEST unless ($line=~s/^://s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{value} = Value->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{value} = Value->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -4224,11 +4229,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
 		last TEST unless ($line=~s/^\<//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{type} = Type->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{type} = Type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
 	}
@@ -4256,16 +4261,16 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{tag} = Tag->parse($line)));
+		last TEST unless (($self->{tag} = Tag->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{tag};
 		if ($line=~s/^IMPLICIT//s) {
 			$self->{implicit} = 'IMPLICIT';
-			$self->{comments} = Comments->parse($line);
+			$self->{comments} = Comments->parse($line,@_[1,-1]);
 		} elsif ($line=~s/^EXPLICIT//s) {
 			$self->{explicit} = 'EXPLICIT';
-			$self->{comments} = Comments->parse($line);
+			$self->{comments} = Comments->parse($line,@_[1,-1]);
 		}
-		last TEST unless (($self->{type} = Type->parse($line)));
+		last TEST unless (($self->{type} = Type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
 	}
@@ -4303,14 +4308,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^\[//);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{class} = Class->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		if (($self->{class} = Class->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{class};
 		}
-		last TEST unless (($self->{number} = ClassNumber->parse($line)));
+		last TEST unless (($self->{number} = ClassNumber->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{number};
 		last TEST unless ($line=~s/^\]//);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4348,9 +4353,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{class} = ClassUniversal->parse($line)) ||
-			($self->{class} = ClassApplication->parse($line)) ||
-			($self->{class} = ClassPrivate->parse($line))
+			($self->{class} = ClassUniversal->parse($line,@_[1,-1])) ||
+			($self->{class} = ClassApplication->parse($line,@_[1,-1])) ||
+			($self->{class} = ClassPrivate->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{class};
 		$_[0] = $line; return $self;
@@ -4413,8 +4418,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = Number->parse($line)) ||
-			($self->{value} = DefinedValue->parse($line))
+			($self->{value} = Number->parse($line,@_[1,-1])) ||
+			($self->{value} = DefinedValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -4472,10 +4477,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{component} = NameAndNumberForm->parse($line)) ||
-			($self->{component} = NumberForm->parse($line)) ||
-			($self->{component} = NameForm->parse($line)) ||
-			($self->{component} = DefinedValue->parse($line))
+			($self->{component} = NameAndNumberForm->parse($line,@_[1,-1])) ||
+			($self->{component} = NumberForm->parse($line,@_[1,-1])) ||
+			($self->{component} = NameForm->parse($line,@_[1,-1])) ||
+			($self->{component} = DefinedValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{component};
 		$_[0] = $line; return $self;
@@ -4501,7 +4506,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
 		$_[0] = $line; return $self;
 	}
@@ -4527,8 +4532,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{number} = Number->parse($line)) ||
-			($self->{number} = DefinedValue->parse($line))
+			($self->{number} = Number->parse($line,@_[1,-1])) ||
+			($self->{number} = DefinedValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{number};
 		$_[0] = $line; return $self;
@@ -4554,14 +4559,14 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
 		last TEST unless ($line=~s/^\(//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{number}  = NumberForm->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{number}  = NumberForm->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{number};
 		last TEST unless ($line=~s/^\)//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -4624,9 +4629,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{component} = NameAndNumberForm->parse($line)) ||
-			($self->{component} = NumberForm->parse($line)) ||
-			($self->{component} = DefinedValue->parse($line))
+			($self->{component} = NameAndNumberForm->parse($line,@_[1,-1])) ||
+			($self->{component} = NumberForm->parse($line,@_[1,-1])) ||
+			($self->{component} = DefinedValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{component};
 		$_[0] = $line; return $self;
@@ -4664,7 +4669,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{value} = SequenceValue->parse($line)));
+		last TEST unless (($self->{value} = SequenceValue->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -4701,7 +4706,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{value} = SequenceValue->parse($line)));
+		last TEST unless (($self->{value} = SequenceValue->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -4727,8 +4732,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = RestrictedCharacterStringType->parse($line)) ||
-			($self->{type} = UnrestrictedCharacterStringType->parse($line))
+			($self->{type} = RestrictedCharacterStringType->parse($line,@_[1,-1])) ||
+			($self->{type} = UnrestrictedCharacterStringType->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -4755,8 +4760,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = RestrictedCharacterStringValue->parse($line)) ||
-			($self->{value} = UnrestrictedCharacterStringValue->parse($line))
+			($self->{value} = RestrictedCharacterStringValue->parse($line,@_[1,-1])) ||
+			($self->{value} = UnrestrictedCharacterStringValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -4783,19 +4788,19 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = BMPStringToken->parse($line)) ||
-			($self->{type} = GeneralStringToken->parse($line)) ||
-			($self->{type} = GraphicStringToken->parse($line)) ||
-			($self->{type} = IA5StringToken->parse($line)) ||
-			($self->{type} = ISO646StringToken->parse($line)) ||
-			($self->{type} = NumericStringToken->parse($line)) ||
-			($self->{type} = PrintableStringToken->parse($line)) ||
-			($self->{type} = TeletexStringToken->parse($line)) ||
-			($self->{type} = T61StringToken->parse($line)) ||
-			($self->{type} = UniversalStringToken->parse($line)) ||
-			($self->{type} = UTF8StringToken->parse($line)) ||
-			($self->{type} = VideotexStringToken->parse($line)) ||
-			($self->{type} = VisibleStringToken->parse($line))
+			($self->{type} = BMPStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = GeneralStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = GraphicStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = IA5StringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = ISO646StringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = NumericStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = PrintableStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = TeletexStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = T61StringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = UniversalStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = UTF8StringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = VideotexStringToken->parse($line,@_[1,-1])) ||
+			($self->{type} = VisibleStringToken->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -4913,10 +4918,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = CString->parse($line)) ||
-			($self->{value} = CharacterStringList->parse($line)) ||
-			($self->{value} = Quadruple->parse($line)) ||
-			($self->{value} = Tuple->parse($line))
+			($self->{value} = CString->parse($line,@_[1,-1])) ||
+			($self->{value} = CharacterStringList->parse($line,@_[1,-1])) ||
+			($self->{value} = Quadruple->parse($line,@_[1,-1])) ||
+			($self->{value} = Tuple->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -4961,10 +4966,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = CString->parse($line)) ||
-			($self->{value} = CharacterStringList->parse($line)) ||
-			($self->{value} = Quadruple->parse($line)) ||
-			($self->{value} = Tuple->parse($line))
+			($self->{value} = CString->parse($line,@_[1,-1])) ||
+			($self->{value} = CharacterStringList->parse($line,@_[1,-1])) ||
+			($self->{value} = Quadruple->parse($line,@_[1,-1])) ||
+			($self->{value} = Tuple->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -4999,19 +5004,19 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{group} = Number->parse($line)));
+		last TEST unless (($self->{group} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{group};
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{plane} = Number->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{plane} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{plane};
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($self->{row} = Number->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{row} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{row};
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments3} = Comments->parse($line);
-		last TEST unless (($self->{cell} = Number->parse($line)));
+		$self->{comments3} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{cell} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{cell};
 		$_[0] = $line; return $self;
 	}
@@ -5055,11 +5060,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{column} = Number->parse($line)));
+		last TEST unless (($self->{column} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{column};
 		last TEST unless ($line=~s/^,//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{row} = Number->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{row} = Number->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{row};
 		$_[0] = $line; return $self;
 	}
@@ -5093,7 +5098,7 @@ sub read {
 		$string=~s/\"\s+\"//gs;
 		$string=~s/\"\"/\"/gs;
 		$self->{string} = $string;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -5131,7 +5136,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{value} = SequenceValue->parse($line)));
+		last TEST unless (($self->{value} = SequenceValue->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -5157,9 +5162,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = GeneralizedTimeToken->parse($line)) ||
-			($self->{type} = UTCTimeToken->parse($line)) ||
-			($self->{type} = ObjectDescriptorToken->parse($line))
+			($self->{type} = GeneralizedTimeToken->parse($line,@_[1,-1])) ||
+			($self->{type} = UTCTimeToken->parse($line,@_[1,-1])) ||
+			($self->{type} = ObjectDescriptorToken->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -5208,11 +5213,11 @@ sub read {
 	TEST: {
 		my $s;
 		last TEST unless (
-			($s = DefinedType->parse($line)) ||
-			($s = UsefulType->parse($line)) ||
-			($s = SelectionType->parse($line)) ||
-			($s = TypeFromObject->parse($line)) ||
-			($s = ValueSetFromObjects->parse($line))
+			($s = DefinedType->parse($line,@_[1,-1])) ||
+			($s = UsefulType->parse($line,@_[1,-1])) ||
+			($s = SelectionType->parse($line,@_[1,-1])) ||
+			($s = TypeFromObject->parse($line,@_[1,-1])) ||
+			($s = ValueSetFromObjects->parse($line,@_[1,-1]))
 		);
 		$self->{type} = $s;
 		push @{$self->{children}}, $self->{type};
@@ -5239,9 +5244,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{identifier} = Identifier->parse($line)));
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{identifier};
-		last TEST unless (($self->{type} = Type->parse($line)));
+		last TEST unless (($self->{type} = Type->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
 	}
@@ -5360,10 +5365,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = ExternalTypeReference->parse($line)) ||
-			($self->{type} = TypeReference->parse($line)) ||
-			($self->{type} = ParameterizedType->parse($line)) ||
-			($self->{type} = ParameterizedValueSetType->parse($line))
+			($self->{type} = ExternalTypeReference->parse($line,@_[1,-1])) ||
+			($self->{type} = TypeReference->parse($line,@_[1,-1])) ||
+			($self->{type} = ParameterizedType->parse($line,@_[1,-1])) ||
+			($self->{type} = ParameterizedValueSetType->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
 		$_[0] = $line; return $self;
@@ -5390,9 +5395,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = ExternalValueReference->parse($line)) ||
-			($self->{value} = ValueReference->parse($line)) ||
-			($self->{value} = ParameterizedValue->parse($line))
+			($self->{value} = ExternalValueReference->parse($line,@_[1,-1])) ||
+			($self->{value} = ValueReference->parse($line,@_[1,-1])) ||
+			($self->{value} = ParameterizedValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
@@ -5511,13 +5516,13 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		my $s;
-		last TEST unless (($self->{documentId} = DocumentSpecifier->parse($line)));
+		last TEST unless (($self->{documentId} = DocumentSpecifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{documentId};
-		last TEST unless (($s = DocumentIdentifier->parse($line)));
+		last TEST unless (($s = DocumentIdentifier->parse($line,@_[1,-1])));
 		push @{$self->{documentAliases}}, $s;
 		push @{$self->{children}}, $s;
 		while ($line=~s/^,(?:\s|\n)*//s) {
-			last TEST unless (($s = DocumentIdentifier->parse($line)));
+			last TEST unless (($s = DocumentIdentifier->parse($line,@_[1,-1])));
 			push @{$self->{documentAliases}}, $s;
 			push @{$self->{children}}, $s;
 		}
@@ -5554,11 +5559,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{specifier} = DocumentReference->parse($line)) ||
-			($self->{specifier} = ObjectIdentifierValue->parse($line))
+			($self->{specifier} = DocumentReference->parse($line,@_[1,-1])) ||
+			($self->{specifier} = ObjectIdentifierValue->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{specifier};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -5584,10 +5589,10 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if (($self->{documentstring} = DocumentIdentifier->parse($line))) {
+		if (($self->{documentstring} = DocumentIdentifier->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{documentstring};
 		}
-		if (($self->{documentoid} = ObjectIdentifierValue->parse($line))) {
+		if (($self->{documentoid} = ObjectIdentifierValue->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{documentoid};
 		}
 		last TEST unless ($self->{documentstring} || $self->{documentoid});
@@ -5617,10 +5622,10 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if (($self->{documentstring} = DocumentIdentifier->parse($line))) {
+		if (($self->{documentstring} = DocumentIdentifier->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{documentstring};
 		}
-		if (($self->{documentoid} = ObjectIdentifierValue->parse($line))) {
+		if (($self->{documentoid} = ObjectIdentifierValue->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{documentoid};
 		}
 		$line=~s/^(?:\s|\n)*//s;
@@ -5650,7 +5655,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{version} = Version->parse($line);
+		$self->{version} = Version->parse($line,@_[1,-1]);
 		push @{$self->{children}}, $self->{version};
 		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
@@ -5810,7 +5815,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{version} = Version->parse($line)));
+		last TEST unless (($self->{version} = Version->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{version};
 		$line=~s/^(?:\s|\n)*//s;
 		$_[0] = $line; return $self;
@@ -5874,12 +5879,12 @@ sub readdirective {
 				# strip leading and trailing whitespace
 				$directive=~s/^(?:\s|\n)*//s;
 				$directive=~s/(?:\s|\n)*$//s;
-				if (($s = $type->parse($directive))) {
+				if (($s = $type->parse($directive,@_[1,-1]))) {
 					push @{$self->{directives}}, $s;
 					push @{$self->{children}}, $s;
 				}
 				$e++;
-			} elsif (($s = Comments->parse($line))) {
+			} elsif (($s = Comments->parse($line,@_[1,-1]))) {
 				push @{$self->{comments}}, $s;
 				$e++;
 			}
@@ -5943,7 +5948,7 @@ sub read {
 			last TEST;
 		}
 		$self->{type} = 'Asn1'.$self->{directive}.'Directive';
-		last TEST unless (($self->{item} = "$self->{type}"->parse($line)));
+		last TEST unless (($self->{item} = "$self->{type}"->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{item};
 		$_[0] = $line; return $self;
 	}
@@ -5970,12 +5975,11 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	my $line = $_[0];
-	my $test = $_[2];
 	TEST: {
 		my $s;
-		if (($s = Comment->parse($line,$test))) {
+		if (($s = Comment->parse($line,@_[1,-1]))) {
 			push @{$self->{comments}}, $s;
-			while (($s = Comment->parse($line,$test))) {
+			while (($s = Comment->parse($line,@_[1,-1]))) {
 				push @{$self->{comments}}, $s;
 			}
 			$line=~s/^(\s|\n)*//s;
@@ -6011,19 +6015,11 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	my $line = $_[0];
-	my $test = $_[2];
 	TEST: {
-		if (defined $_[2] && $test) {
-			last TEST unless ($line=~s/^((?:\s|\n)*)--([^\n]*)(\n|--)(?:\s|\n)*//s);
-			$self->{beginning} = $1;
-			$self->{comment} = $2;
-			$self->{ending} = $3;
-		} else {
-			last TEST unless ($line=~s/^((?:\s|\n)*)--(?!<)([^\n]*)(\n|--)(?:\s|\n)*//s);
-			$self->{beginning} = $1;
-			$self->{comment} = $2;
-			$self->{ending} = $3;
-		}
+		last TEST unless ($line=~s/^((?:\s|\n)*)--(?!<)([^\n]*)(\n|--)(?:\s|\n)*//s);
+		$self->{beginning} = $1;
+		$self->{comment} = $2;
+		$self->{ending} = $3;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -6073,20 +6069,20 @@ sub read {
 	TEST: {
 		$::noref++;
 		last TEST unless (
-			($self->{template} = ClassTemplate->parse($line)) ||
-			($self->{template} = PackageTemplate->parse($line)) ||
-			($self->{template} = ParameterTemplate->parse($line)) ||
-			($self->{template} = NameBindingTemplate->parse($line)) ||
-			($self->{template} = AttributeTemplate->parse($line)) ||
-			($self->{template} = AttributeGroupTemplate->parse($line)) ||
-			($self->{template} = BehaviourTemplate->parse($line)) ||
-			($self->{template} = ActionTemplate->parse($line)) ||
-			($self->{template} = NotificationTemplate->parse($line)) ||
-			($self->{template} = SubordinationRuleTemplate->parse($line)) ||
-			($self->{template} = ConstraintRuleTemplate->parse($line))
+			($self->{template} = ClassTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = PackageTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = ParameterTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = NameBindingTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = AttributeTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = AttributeGroupTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = BehaviourTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = ActionTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = NotificationTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = SubordinationRuleTemplate->parse($line,@_[1,-1])) ||
+			($self->{template} = ConstraintRuleTemplate->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{template};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -6117,10 +6113,17 @@ sub xreftyped {
 	my $type = shift;
 	my $gdmo = $_[0];
 
-	$self->{documentid} = $gdmo->{documentid};
-	$gdmo->{$type}->{$self->{label}}->{defn} = $self;
-	$::root->{$type}->{$self->{label}}->{defn} = $self;
-	$::root->{$type}->{$self->{label}}->{modl} = $gdmo;
+#	if (defined $::root{$type}->{$self->{label}}->{defn}) {
+#		print STDERR "E: object ".ref($self)."($self->{label}) already defined.";
+#		print STDERR "E: attempted redefinition from \"$gdmo->{documentid}\".";
+#		print STDERR "E: original definition in \"$::root->{$type}->{$self->{label}}->{modl}->{documentid}\".";
+#		die "multiple definitions";
+#	}
+#	print STDERR "Assigning document id \"$gdmo->{documentid}\" from ".ref($gdmo)." to ".ref($self)." from xreftyped";
+#	$self->{documentid} = $gdmo->{documentid};
+#	$gdmo->{$type}->{$self->{label}}->{defn} = $self;
+#	$::root->{$type}->{$self->{label}}->{defn} = $self;
+#	$::root->{$type}->{$self->{label}}->{modl} = $gdmo;
 	if ($type=~/bindings|subordinates/) {
 		if (defined $self->{superior}) {
 			my $s = $self->{superior}->{class};
@@ -6173,6 +6176,37 @@ sub popscope {
 	my $self = shift;
 	$::scope = $self->{scope};
 }
+sub definition {
+	my $self = shift;
+	my $gdmo = $_[1];
+
+	#print STDERR "I: Stack from: ".ref($self);
+	#my $s; foreach $s (@_) {
+	#	print STDERR "I: Stack is: ".ref($s);
+	#}
+
+	my $type = ref $self;
+	$type=~s/Template//;
+	$type=lc $type;
+	$type.='s';
+	$type=~s/classs/objects/;
+	$type=~s/namebindings/bindings/;
+	$type=~s/attributegroups/groups/;
+	$type=~s/subordinationrules/subordinates/;
+	$type=~s/constraintrules/constraints/;
+
+	if (defined $::root{$type}->{$self->{label}}->{defn}) {
+		print STDERR "E: object ".ref($self)."($self->{label}) already defined.";
+		print STDERR "E: attempted redefinition from \"$gdmo->{documentid}\".";
+		print STDERR "E: original definition in \"$::root->{$type}->{$self->{label}}->{modl}->{documentid}\".";
+		die "multiple definitions";
+	}
+	#print STDERR "Assigning document id \"$gdmo->{documentid}\" from ".ref($gdmo)." to ".ref($self)." $self->{label} from definition";
+	$self->{documentid} = $gdmo->{documentid};
+	$gdmo->{$type}->{$self->{label}}->{defn} = $self;
+	$::root->{$type}->{$self->{label}}->{defn} = $self;
+	$::root->{$type}->{$self->{label}}->{modl} = $gdmo;
+}
 
 sub xref {
 	my $self = shift;
@@ -6202,21 +6236,22 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{derivedfrom} = DerivedFromClasses->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{derivedfrom} = DerivedFromClasses->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{derivedfrom};
 		}
-		if (($self->{characterization} = Characterization->parse($line))) {
+		if (($self->{characterization} = Characterization->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{characterization};
 		}
-		if (($self->{conditionalpackages} = ConditionalPackages->parse($line))) {
+		if (($self->{conditionalpackages} = ConditionalPackages->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{conditionalpackages};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -6420,27 +6455,33 @@ sub walkcontained {
 	} else {
 		printf "$self->{name}";
 	}
-	if (defined $self->{derivations}) {
-		if ($::indent eq '') { $::indent='>- '; } else { $::indent='|  '.$::indent; }
-		$::indent=~s/>/+/;
-		my ($d); foreach $d (@{$self->{derivations}}) {
-			$d->showderived();
-		}
-		$::indent=~s/\+/>/;
-		$::indent=~s/^...//;
-	}
+#	if (defined $self->{derivations}) {
+#		if ($::indent eq '') { $::indent='>- '; } else { $::indent='|  '.$::indent; }
+#		$::indent=~s/>/+/;
+#		my ($d); foreach $d (@{$self->{derivations}}) {
+#			$d->showderived();
+#		}
+#		$::indent=~s/\+/>/;
+#		$::indent=~s/^...//;
+#	}
 	if ($::indent eq '') { $::indent='>- '; } else { $::indent='|  '.$::indent; }
 	if (defined $self->{contains}) {
-		my ($d); foreach $d (@{$self->{contains}}) {
-			if ($d->{label} eq $self->{label}) {
-				if (defined $self->{documentid}) {
-					printf "\"$self->{documentid}\":$self->{name}";
+		if (!defined $self->{beenthere}) {
+			$self->{beenthere} = 1;
+			my ($d); foreach $d (@{$self->{contains}}) {
+				if ($d->{label} eq $self->{label}) {
+					printf "\n--@@ $::indent";
+					if (defined $self->{documentid}) {
+						printf "\"$self->{documentid}\":$self->{name}";
+					} else {
+						printf "$self->{name}";
+					}
 				} else {
-					printf "$self->{name}";
+					$d->walkcontained();
 				}
-			} else {
-				$d->walkcontained();
 			}
+		} else {
+			printf ' +++';
 		}
 	}
 	$::indent=~s/^...//;
@@ -6448,7 +6489,7 @@ sub walkcontained {
 
 sub showcontained {
 	my $self = shift;
-	if (!defined $self->{container}) {
+	if (!defined $self->{container} && defined $self->{contains}) {
 		$self->walkcontained();
 	}
 	if (defined $self->{derivations}) {
@@ -6472,27 +6513,28 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{behaviour} = Behaviour->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{behaviour};
 		}
-		if (($self->{attributes} = Attributes->parse($line))) {
+		if (($self->{attributes} = Attributes->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{attributes};
 		}
-		if (($self->{attributegroups} = AttributeGroups->parse($line))) {
+		if (($self->{attributegroups} = AttributeGroups->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{attributegroups};
 		}
-		if (($self->{actions} = Actions->parse($line))) {
+		if (($self->{actions} = Actions->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{actions};
 		}
-		if (($self->{notifications} = Notifications->parse($line))) {
+		if (($self->{notifications} = Notifications->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{notifications};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -6564,22 +6606,23 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless ($self->{context} = Context->parse($line));
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		last TEST unless ($self->{context} = Context->parse($line,@_[1,-1],$self));
 		push @{$self->{children}}, $self->{context};
 		last TEST unless (
-			($self->{syntax} = WithSyntax->parse($line)) ||
-			($self->{syntax} = Attribute->parse($line))
+			($self->{syntax} = WithSyntax->parse($line,@_[1,-1],$self)) ||
+			($self->{syntax} = Attribute->parse($line,@_[1,-1],$self))
 		);
 		push @{$self->{children}}, $self->{syntax};
-		if (($self->{behaviour} = Behaviour->parse($line))) {
+		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{behaviour};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -6672,27 +6715,28 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless ($self->{subordinate} = Subordinate->parse($line));
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		last TEST unless ($self->{subordinate} = Subordinate->parse($line,@_[1,-1],$self));
 		push @{$self->{children}}, $self->{subordinate};
-		last TEST unless ($self->{superior} = NamedBySuperior->parse($line));
+		last TEST unless ($self->{superior} = NamedBySuperior->parse($line,@_[1,-1],$self));
 		push @{$self->{children}}, $self->{superior};
-		last TEST unless ($self->{attribute} = WithAttribute->parse($line));
+		last TEST unless ($self->{attribute} = WithAttribute->parse($line,@_[1,-1],$self));
 		push @{$self->{children}}, $self->{attribute};
-		if (($self->{behaviour} = Behaviour->parse($line))) {
+		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{behaviour};
 		}
-		if (($self->{createit} = Create->parse($line))) {
+		if (($self->{createit} = Create->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{createit};
 		}
-		if (($self->{deleteit} = Delete->parse($line))) {
+		if (($self->{deleteit} = Delete->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{deleteit};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -6796,26 +6840,27 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		last TEST unless (
-			($self->{syntax} = DerivedFromAttribute->parse($line)) ||
-			($self->{syntax} = WithAttributeSyntax->parse($line))
+			($self->{syntax} = DerivedFromAttribute->parse($line,@_[1,-1],$self)) ||
+			($self->{syntax} = WithAttributeSyntax->parse($line,@_[1,-1],$self))
 		);
 		push @{$self->{children}}, $self->{syntax};
-		if (($self->{matches} = MatchesFor->parse($line))) {
+		if (($self->{matches} = MatchesFor->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{matches};
 		}
-		if (($self->{behaviour} = Behaviour->parse($line))) {
+		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{behaviour};
 		}
-		if (($self->{parameters} = Parameters->parse($line))) {
+		if (($self->{parameters} = Parameters->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -6911,21 +6956,22 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{groupelements} = GroupElements->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{groupelements} = GroupElements->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{groupelements};
 		}
-		if (($self->{fixed} = Fixed->parse($line))) {
+		if (($self->{fixed} = Fixed->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{fixed};
 		}
-		if (($self->{description} = Description->parse($line))) {
+		if (($self->{description} = Description->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{description};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -6995,12 +7041,13 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{definedas} = DefinedAs->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{definedas} = DefinedAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{definedas};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -7067,27 +7114,28 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{behaviour} = Behaviour->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{behaviour};
 		}
-		if (($self->{mode} = Mode->parse($line))) {
+		if (($self->{mode} = Mode->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{mode};
 		}
-		if (($self->{parameters} = Parameters->parse($line))) {
+		if (($self->{parameters} = Parameters->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
-		if (($self->{infosyntax} = WithInformationSyntax->parse($line))) {
+		if (($self->{infosyntax} = WithInformationSyntax->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{infosyntax};
 		}
-		if (($self->{replysyntax} = WithReplySyntax->parse($line))) {
+		if (($self->{replysyntax} = WithReplySyntax->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{replysyntax};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -7159,24 +7207,25 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{behaviour} = Behaviour->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{behaviour};
 		}
-		if (($self->{parameters} = Parameters->parse($line))) {
+		if (($self->{parameters} = Parameters->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
-		if (($self->{infosyntax} = WithInformationSyntaxAndAttributeIds->parse($line))) {
+		if (($self->{infosyntax} = WithInformationSyntaxAndAttributeIds->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{infosyntax};
 		}
-		if (($self->{replysyntax} = WithReplySyntax->parse($line))) {
+		if (($self->{replysyntax} = WithReplySyntax->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{replysyntax};
 		}
-		if (($self->{registration} = RegisteredAs->parse($line))) {
+		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -7247,15 +7296,16 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{superior} = SuperiorObjectClass->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		last TEST unless (($self->{superior} = SuperiorObjectClass->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{superior};
-		last TEST unless (($self->{subordinates} = NamesSubordinates->parse($line)));
+		last TEST unless (($self->{subordinates} = NamesSubordinates->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{subordinates};
-		last TEST unless (($self->{accordingto} = AccordingToRule->parse($line)));
+		last TEST unless (($self->{accordingto} = AccordingToRule->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{accordingto};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -7325,17 +7375,18 @@ sub read {
 		$self->{scope} = $::scope;
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->pushscope($1);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{objectclass} = ObjectClass->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		last TEST unless (($self->{objectclass} = ObjectClass->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{objectclass};
-		last TEST unless (($self->{isrelatedto} = IsRelatedTo->parse($line)));
+		last TEST unless (($self->{isrelatedto} = IsRelatedTo->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{isrelatedto};
-		last TEST unless (($self->{usingattribute} = UsingAttribute->parse($line)));
+		last TEST unless (($self->{usingattribute} = UsingAttribute->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{usingattribute};
-		last TEST unless (($self->{ruleset} = ConstraintRuleSet->parse($line)));
+		last TEST unless (($self->{ruleset} = ConstraintRuleSet->parse($line,@_[1,-1],$self)));
 		push @{$self->{children}}, $self->{ruleset};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
+		$self->definition(@_);
 		$self->popscope();
 		$_[0] = $line; return $self;
 	}
@@ -7403,12 +7454,12 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{accordingto} = AccordingToRuleToken->parse($line)));
+		last TEST unless (($self->{accordingto} = AccordingToRuleToken->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{accordingto};
-		last TEST unless (($self->{rule} = SubordinationRule->parse($line)));
+		last TEST unless (($self->{rule} = SubordinationRule->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rule};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7442,14 +7493,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SUPERIOR\s*-?\s*OBJECT\s*-?\s*CLASS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{class} = ClassReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{class} = ClassReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{class};
-		if (($self->{subclasses} = AndSubclasses->parse($line))) {
+		if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{subclasses};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7485,14 +7536,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{class} = ClassReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{class} = ClassReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{class};
-		if (($self->{subclasses} = AndSubclasses->parse($line))) {
+		if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{subclasses};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7528,11 +7579,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^NAMES\s*-?\s*SUBORDINATES//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{list} = ClassReferenceList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{list} = ClassReferenceList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7563,11 +7614,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^IS(?:\s|\n)*((-)?)(?:\s|\n)*RELATED(?:\s|\n)*((-)?)(?:\s|\n)*TO//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{list} = ClassSpecList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{list} = ClassSpecList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{list};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7604,9 +7655,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{reference} = ClassReference->parse($line)));
+		last TEST unless (($self->{reference} = ClassReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{reference};
-		if (($self->{subclasses} = AndSubclasses->parse($line))) {
+		if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{subclasses};
 		}
 		$_[0] = $line; return $self;
@@ -7635,11 +7686,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^USING(?:\s|\n)*((-)?)(?:\s|\n)*ATTRIBUTE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{attribute} = AttributeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attribute};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7674,12 +7725,12 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{ruleset} = SingleConstraintRule->parse($line)) ||
-			($self->{ruleset} = NamedTypeConstraintRule->parse($line))
+			($self->{ruleset} = SingleConstraintRule->parse($line,@_[1,-1])) ||
+			($self->{ruleset} = NamedTypeConstraintRule->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{ruleset};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -7708,8 +7759,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ACCORDING\s*-?\s*TO\s*-?\s*RULE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rule} = ConstraintRule->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rule} = ConstraintRule->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rule};
 		$_[0] = $line; return $self;
 	}
@@ -7739,8 +7790,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CASE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rules} = NamedTypeConstraintRuleListBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rules} = NamedTypeConstraintRuleListBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rules};
 		$_[0] = $line; return $self;
 	}
@@ -7785,11 +7836,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{type} = Identifier->parse($line)));
+		last TEST unless (($self->{type} = Identifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
-		last TEST unless (($self->{accordingto} = AccordingToRuleToken->parse($line)));
+		last TEST unless (($self->{accordingto} = AccordingToRuleToken->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{accordingto};
-		last TEST unless (($self->{rule} = ConstraintRule->parse($line)));
+		last TEST unless (($self->{rule} = ConstraintRule->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rule};
 		$_[0] = $line; return $self;
 	}
@@ -7827,9 +7878,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{rule} = SetSubordinationRule->parse($line)) ||
-			($self->{rule} = ChoiceSubordinationRule->parse($line)) ||
-			($self->{rule} = SetSizeSubordinationRule->parse($line))
+			($self->{rule} = SetSubordinationRule->parse($line,@_[1,-1])) ||
+			($self->{rule} = ChoiceSubordinationRule->parse($line,@_[1,-1])) ||
+			($self->{rule} = SetSizeSubordinationRule->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{rule};
 		$_[0] = $line; return $self;
@@ -7856,11 +7907,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{rule} = SetConstraintRule->parse($line)) ||
-			($self->{rule} = SequenceConstraintRule->parse($line)) ||
-			($self->{rule} = ChoiceConstraintRule->parse($line)) ||
-			($self->{rule} = SetSizeConstraintRule->parse($line)) ||
-			($self->{rule} = SequenceSizeConstraintRule->parse($line))
+			($self->{rule} = SetConstraintRule->parse($line,@_[1,-1])) ||
+			($self->{rule} = SequenceConstraintRule->parse($line,@_[1,-1])) ||
+			($self->{rule} = ChoiceConstraintRule->parse($line,@_[1,-1])) ||
+			($self->{rule} = SetSizeConstraintRule->parse($line,@_[1,-1])) ||
+			($self->{rule} = SequenceSizeConstraintRule->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{rule};
 		$_[0] = $line; return $self;
@@ -7887,8 +7938,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SET//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rules} = SubordinationTermListBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rules} = SubordinationTermListBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rules};
 		$_[0] = $line; return $self;
 	}
@@ -7918,8 +7969,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SET//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rules} = ConstraintTermListBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rules} = ConstraintTermListBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rules};
 		$_[0] = $line; return $self;
 	}
@@ -7949,8 +8000,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SEQUENCE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rules} = ConstraintTermListBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rules} = ConstraintTermListBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rules};
 		$_[0] = $line; return $self;
 	}
@@ -7980,8 +8031,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CHOICE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rules} = SubordinationTermListBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rules} = SubordinationTermListBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rules};
 		$_[0] = $line; return $self;
 	}
@@ -8011,8 +8062,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CHOICE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{rules} = ConstraintTermListBraced->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{rules} = ConstraintTermListBraced->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{rules};
 		$_[0] = $line; return $self;
 	}
@@ -8042,12 +8093,12 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SET\s*-?\s*SIZE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{ordinality} = OrdinalityParens->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{ordinality} = OrdinalityParens->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{ordinality};
 		last TEST unless ($line=~s/^OF//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($self->{constraint} = SubordinationTerm->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{constraint} = SubordinationTerm->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{constraint};
 		$_[0] = $line; return $self;
 	}
@@ -8082,12 +8133,12 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SET\s*-?\s*SIZE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{ordinality} = OrdinalityParens->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{ordinality} = OrdinalityParens->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{ordinality};
 		last TEST unless ($line=~s/^OF//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($self->{constraint} = ConstraintTerm->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{constraint} = ConstraintTerm->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{constraint};
 		$_[0] = $line; return $self;
 	}
@@ -8122,12 +8173,12 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SEQUENCE\s*-?\s*SIZE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{ordinality} = OrdinalityParens->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{ordinality} = OrdinalityParens->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{ordinality};
 		last TEST unless ($line=~s/^OF//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($self->{constraint} = ConstraintTerm->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{constraint} = ConstraintTerm->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{constraint};
 		$_[0] = $line; return $self;
 	}
@@ -8169,8 +8220,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{ordinality} = ValueRange->parse($line)) ||
-			($self->{ordinality} = ValueList->parse($line))
+			($self->{ordinality} = ValueRange->parse($line,@_[1,-1])) ||
+			($self->{ordinality} = ValueList->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{ordinality};
 		$_[0] = $line; return $self;
@@ -8198,13 +8249,13 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{lower} = IntegerValue->parse($line)));
+		last TEST unless (($self->{lower} = IntegerValue->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{lower};
 		last TEST unless ($line=~s/^\.\.//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
 			$line=~s/^N//s ||
-			($self->{upper} = IntegerValue->parse($line))
+			($self->{upper} = IntegerValue->parse($line,@_[1,-1]))
 		);
 		if ($self->{upper}) {
 			push @{$self->{children}}, $self->{upper};
@@ -8255,13 +8306,13 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{term} = ClassReference->parse($line)) ||
-			($self->{term} = SubordinationRule->parse($line))
+			($self->{term} = ClassReference->parse($line,@_[1,-1])) ||
+			($self->{term} = SubordinationRule->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{term};
 		my $ref = ref $self->{term};
 		if ($ref=~/ClassReference/) {
-			if (($self->{subclasses} = AndSubclasses->parse($line))) {
+			if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 				push @{$self->{children}}, $self->{subclasses};
 			}
 		}
@@ -8304,13 +8355,13 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{term} = ClassReference->parse($line)) ||
-			($self->{term} = ConstraintRule->parse($line))
+			($self->{term} = ClassReference->parse($line,@_[1,-1])) ||
+			($self->{term} = ConstraintRule->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{term};
 		my $ref = ref $self->{term};
 		if ($ref=~/ClassReference/) {
-			if (($self->{subclasses} = AndSubclasses->parse($line))) {
+			if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 				push @{$self->{children}}, $self->{subclasses};
 			}
 		}
@@ -8337,10 +8388,15 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	my $line = $_[0];
+	my $gdmo = $_[-1];
 	TEST: {
 		last TEST unless ($line=~s/^(?:"([^"]*)")//s);
 		$self->{documentid} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		#print STDERR "Assigning document id \"$self->{documentid}\" to ".ref($gdmo)." from DocumentIdentifier";
+		$gdmo->{documentid} = $self->{documentid};
+		$gdmo->{aliases}->{$self->{documentid}}++;
+		$::root->{gdmos}->{$self->{documentid}}->{defn} = $gdmo;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8351,9 +8407,10 @@ sub xref {
 	my $gdmo = $_[0];
 
 	# last TEST if ($::root->{gdmos}->{$self->{documentid}}->{defn});
-	$gdmo->{documentid} = $self->{documentid};
-	$gdmo->{aliases}->{$self->{documentid}}++;
-	$::root->{gdmos}->{$self->{documentid}}->{defn} = $gdmo;
+	#print STDERR "Assigning document id to ".ref($gdmo);
+	#$gdmo->{documentid} = $self->{documentid};
+	#$gdmo->{aliases}->{$self->{documentid}}++;
+	#$::root->{gdmos}->{$self->{documentid}}->{defn} = $gdmo;
 }
 
 sub gdmo {
@@ -8376,10 +8433,13 @@ use vars qw(@ISA);
 sub read {
 	my $self = shift;
 	my $line = $_[0];
+	my $gdmo = $_[1];
 	TEST: {
 		last TEST unless ($line=~s/^(?:"([^"]*)")//s);
 		$self->{documentid} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		$gdmo->{docrefs}->{$self->{documentid}}->{refs}++;
+		$::root->{gdmos}->{$self->{documentid}}->{refs}++;
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8389,8 +8449,8 @@ sub xref {
 	my $self = shift;
 	my $gdmo = $_[0];
 
-	$gdmo->{docrefs}->{$self->{documentid}}->{refs}++;
-	$::root->{gdmos}->{$self->{documentid}}->{refs}++;
+	#$gdmo->{docrefs}->{$self->{documentid}}->{refs}++;
+	#$::root->{gdmos}->{$self->{documentid}}->{refs}++;
 }
 
 sub gdmo {
@@ -8418,7 +8478,7 @@ sub read {
 		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-)//s);
 		$self->{label} = $&;
 		$self->{name} = $self->xform('',$self->{label},'');
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8445,12 +8505,12 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		if (($self->{documentid} = DocumentReference->parse($line))) {
+		if (($self->{documentid} = DocumentReference->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{documentid};
 			last TEST unless ($line=~s/^://s);
-			$self->{comments} = Comments->parse($line);
+			$self->{comments} = Comments->parse($line,@_[1,-1]);
 		}
-		last TEST unless (($self->{label} = Label->parse($line)));
+		last TEST unless (($self->{label} = Label->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{label};
 		$_[0] = $line; return $self;
 	}
@@ -8484,12 +8544,12 @@ sub readreference {
 	my $line = $_[0];
 	my $gdmo = $_[1];
 	TEST: {
-		if (($self->{reference} = $tmpl->parse($line))) {
+		if (($self->{reference} = $tmpl->parse($line,@_[1,-1]))) {
 			$self->{label} = $self->{reference}->{label};
 			$self->{name} = $self->{reference}->{name};
 			$self->{scope} = $self->{reference}->{scope};
 			$self->{scopedname} = $self->{reference}->{scopedname};
-		} elsif (($self->{reference} = Reference->parse($line))) {
+		} elsif (($self->{reference} = Reference->parse($line,@_[1,-1]))) {
 			if ($self->{reference}->{documentid}) {
 				$self->{documentid} = $self->{reference}->{documentid}->{documentid};
 			}
@@ -8503,7 +8563,7 @@ sub readreference {
 			last TEST;
 		}
 		push @{$self->{children}}, $self->{reference};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8648,11 +8708,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^DERIVED(?:\s|\n)*((-)?)(?:\s|\n)*FROM//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{classes} = ClassReferenceList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{classes} = ClassReferenceList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{classes};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8661,12 +8721,40 @@ sub read {
 sub xref {
 	my $self = shift;
 	my $tmpl = $_[-1];
+	my $gdmo = $_[-2];
 	my ($i,$d);
 	foreach $i (@{$self->{classes}->{items}}) {
 		if (defined $::root->{objects}->{$i->{label}}) {
 			if ($d = $::root->{objects}->{$i->{label}}->{defn}) {
-				print "--@@ $tmpl->{name} is derived from $d->{name}.";
-				push @{$d->{derivations}}, $tmpl;
+				my ($t);
+				if (defined $tmpl->{backtrace}) {
+					print STDERR "E: multiple markings of $tmpl->{label}";
+					print STDERR "E: backtrace is:";
+					my $b; foreach $b (@::backtrack) {
+						print STDERR "E: B: ".ref($b);
+					}
+					print STDERR "E: original backtrace was:";
+					my $b; foreach $b (@{$tmpl->{backtrace}}) {
+						print STDERR "E: B: ".ref($b);
+					}
+					#die "multiple markings";
+				} else {
+					my $b; foreach $b (@::backtrace) {
+						push @{$tmpl->{backtrace}}, $b;
+					}
+					my ($t,$e); foreach $t (@{$d->{derivations}}) {
+						if ($t->{label} eq $tmpl->{label}) {
+							print STDERR "E: multiple markings with same label $t->{label}";
+							print STDERR "E: template 1 is ".ref($t).".$t->{id}";
+							print STDERR "E: template 2 is ".ref($tmpl).".$t->{id}";
+							$e++;
+						}
+					}
+					unless ($e) {
+						#print "--@@ $tmpl->{label} is derived from $d->{label}.";
+						push @{$d->{derivations}}, $tmpl;
+					}
+				}
 			}
 		}
 	}
@@ -8720,11 +8808,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CHARACTERIZED(?:\s|\n)*((-)?)(?:\s|\n)*BY//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{packages} = PackageReferenceList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{packages} = PackageReferenceList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{packages};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8779,11 +8867,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^CONDITIONAL(?:\s|\n)*((-)?)(?:\s|\n)*PACKAGES//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{conditions} = PackageConditionList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{conditions} = PackageConditionList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{conditions};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8827,14 +8915,14 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{package} = PackageReference->parse($line)));
+		last TEST unless (($self->{package} = PackageReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{package};
 		last TEST unless (
-			($self->{condition} = PresentIf->parse($line)) ||
-			($self->{condition} = PresentOnlyIf->parse($line))
+			($self->{condition} = PresentIf->parse($line,@_[1,-1])) ||
+			($self->{condition} = PresentOnlyIf->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{condition};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8891,8 +8979,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^PRESENT(?:\s|\n)*((-)?)(?:\s|\n)*IF//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{delimited} = DelimitedString->parse($line,',;')));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{delimited} = DelimitedString->parse($line,',;',@_[1,-1])));
 		push @{$self->{children}}, $self->{delimited};
 		$_[0] = $line; return $self;
 	}
@@ -8969,8 +9057,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^PRESENT(?:\s|\n)*((-)?)(?:\s|\n)*ONLY(?:\s|\n)*((-)?)(?:\s|\n)*IF//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{delimited} = DelimitedString->parse($line,',;')));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{delimited} = DelimitedString->parse($line,',;',@_[1,-1])));
 		push @{$self->{children}}, $self->{delimited};
 		$_[0] = $line; return $self;
 	}
@@ -9020,7 +9108,7 @@ sub read {
 		}
 		last TEST unless ($line=~s/^$pattern//s);
 		$self->{string} = $1;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[2,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -9071,36 +9159,48 @@ sub stub {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
-		my ($s,$col,$spc,$len,$e);
+		my ($s,$col,$e,$tws,$lws,$sep);
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf "$self->{delimiter}";
 		$col = 0;
+		# any line with trailing whitespace is a continutation line
+		if ($self->{string}=~s/[ \t]+\n[ \t]*/ /sg) {
+			$tws = 1;
+		}
+		# anything separated by a double line break is a paragraph
 		my @paras = ( split(/\n\n/s,$self->{string}) );
+		if ($tws || scalar @paras <= 1) {
+			# this treats lines as paragraphs but doesn't doublespace them unless they
+			# were already double spaced
+			if (scalar @paras > 1) { $sep = "\n"; } else { $sep = ''; }
+			# if there was trailing whitespace, all single line breaks are paragraphs
+			@paras = ( split(/\n/s,join("\n",@paras)) );
+		} else {
+			# if there are lines in pagarages separated by double linefeeeds, separate
+			# them again by double linefeeds
+			$sep = "\n";
+		}
 		my $p; foreach $p (@paras) {
-			if ($e) { printf "\n\n$::indent"; $col = 0; $::first = 1; } else { $e++; }
+			if ($e) { printf "$sep\n$::indent"; $col = 0; $::first = 1; } else { $e++; }
 			my @lines = ( split(/\n/s,$p) );
 			my $l; foreach $l (@lines) {
 				$l=~s/^\t+//s;
-				if ($l=~/^[^ ]/) {
-					my @words = ( split(/\s+/s,$l) );
-					my $w; foreach $w (@words) {
-						if ($col == 0) { $spc = 0; } else { $spc = 1; }
-						$len = length($w);
-						if ($len) {
-							if ($col + $spc + $len < $::colwidth) {
-								if ($spc) { printf ' '; }
-								$col += $spc + $len;
-							} else {
-								printf "\n$::indent";
-								$col = $len;
-							}
-							printf "$w";
+				$l=~s/\s+$//s;
+				$l=~s/\t/ /sg;
+				$l=~s/^(\s+|\s*-\s+|\s*[\(\[\{]?[a-zA-Z1-9][ivxIVX0-9]*[\.:]??[\.:\)\]\}]\s*)//;
+				$lws = $1;
+				my @words = ( split(/\s+/s,$l) );
+				my $w; foreach $w (@words) {
+					if (!$::first) {
+						printf ' ';  $col++;
+						if ($col + length($w) > $::colwidth) {
+							printf "\n$::indent"; $::first = 1;
 						}
 					}
-				} else {
-					if (!$::first) { printf "\n$::indent"; $::first = 1; }
-					printf "$l"; $::first = 0;
-					if (!$::first) { printf "\n$::indent"; $::first = 1; }
+					if ($::first) {
+						printf "$lws"; $col = length($lws); $::first = 0; $lws=~s/[^ ]/ /sg;
+					}
+					printf "$w"; $::first = 0; $col += length($w);
 				}
 			}
 		}
@@ -9124,11 +9224,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ATTRIBUTES//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{attributes} = AttributePropertyList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attributes} = AttributePropertyList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attributes};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -9172,11 +9272,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{attribute} = AttributeReference->parse($line)));
-		if (($self->{properties} = PropertyList->parse($line))) {
+		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1],$self)));
+		if (($self->{properties} = PropertyList->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{properties};
 		}
-		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line))) {
+		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
 		$_[0] = $line; return $self;
@@ -9229,22 +9329,22 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{property} = ReplaceWithDefault->parse($line)) ||
-			($self->{property} = DefaultValue->parse($line)) ||
-			($self->{property} = InitialValue->parse($line)) ||
-			($self->{property} = PermittedValues->parse($line)) ||
-			($self->{property} = RequiredValues->parse($line)) ||
-			($self->{property} = GetReplace->parse($line)) ||
-			($self->{property} = Get->parse($line)) ||
-			($self->{property} = Replace->parse($line)) ||
-			($self->{property} = AddRemove->parse($line)) ||
-			($self->{property} = Add->parse($line)) ||
-			($self->{property} = Remove->parse($line)) ||
-			($self->{property} = SetByCreate->parse($line)) ||
-			($self->{property} = NoModify->parse($line))
+			($self->{property} = ReplaceWithDefault->parse($line,@_[1,-1])) ||
+			($self->{property} = DefaultValue->parse($line,@_[1,-1])) ||
+			($self->{property} = InitialValue->parse($line,@_[1,-1])) ||
+			($self->{property} = PermittedValues->parse($line,@_[1,-1])) ||
+			($self->{property} = RequiredValues->parse($line,@_[1,-1])) ||
+			($self->{property} = GetReplace->parse($line,@_[1,-1])) ||
+			($self->{property} = Get->parse($line,@_[1,-1])) ||
+			($self->{property} = Replace->parse($line,@_[1,-1])) ||
+			($self->{property} = AddRemove->parse($line,@_[1,-1])) ||
+			($self->{property} = Add->parse($line,@_[1,-1])) ||
+			($self->{property} = Remove->parse($line,@_[1,-1])) ||
+			($self->{property} = SetByCreate->parse($line,@_[1,-1])) ||
+			($self->{property} = NoModify->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{property};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -9263,7 +9363,7 @@ sub gdmo {
 package ReplaceWithDefault;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
@@ -9298,8 +9398,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^DEFAULT(?:\s|\n)*((-)?)(?:\s|\n)*VALUE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{value} = ValueSpecifier->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{value} = ValueSpecifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -9336,6 +9436,7 @@ sub gdmo {
 		printf 'DEFAULT VALUE'; $::first = 0;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		if (($s = $self->{value})) { $s->gdmo(); }
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 	}
 }
 
@@ -9351,8 +9452,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^INITIAL(?:\s|\n)*((-)?)(?:\s|\n)*VALUE//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{value} = ValueSpecifier->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{value} = ValueSpecifier->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{value};
 		$_[0] = $line; return $self;
 	}
@@ -9386,6 +9487,7 @@ sub gdmo {
 		printf 'INITIAL VALUE'; $::first = 0;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		$self->{value}->gdmo();
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 	}
 }
 
@@ -9401,8 +9503,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^PERMITTED(?:\s|\n)*((-)?)(?:\s|\n)*VALUES//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{typereference};
 		$_[0] = $line; return $self;
 	}
@@ -9427,6 +9529,7 @@ sub gdmo {
 		printf 'PERMITTED VALUES'; $::first = 0;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		$self->{typereference}->gdmo();
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 	}
 }
 
@@ -9442,8 +9545,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^REQUIRED(?:\s|\n)*((-)?)(?:\s|\n)*VALUES//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{typereference};
 		$_[0] = $line; return $self;
 	}
@@ -9468,6 +9571,7 @@ sub gdmo {
 		printf 'REQUIRED VALUES'; $::first = 0;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		$self->{typereference}->gdmo();
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 	}
 }
 
@@ -9475,7 +9579,7 @@ sub gdmo {
 package GetReplace;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: Inclusing of the GET-REPLACE peroperty is the notation for specifying that both
 # the GET property and the REPLACE property are included.
@@ -9524,7 +9628,7 @@ sub stub {
 package Get;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: The GET property is included if the value of the attributes may be retrieved
 # with the Get attribute value operation.
@@ -9560,7 +9664,7 @@ sub stub {
 package Replace;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: The REPLACE property is included if the attribute may be set with the Replace
 # attribute value operation andw ith the Create operation.  Setting with the Create operation applies
@@ -9606,7 +9710,7 @@ sub stub {
 package AddRemove;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: Inclusinon of the ADD-REMOVE property is the notation for specifying that both
 # the ADD property and the REMOVE property are included.
@@ -9646,7 +9750,7 @@ sub stub {
 package Add;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: The ADD property is included if the attribut may be set with the Add member
 # operation.
@@ -9682,7 +9786,7 @@ sub stub {
 package Remove;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: The REMOVE property is included if the attribute may bse sset with the Remove
 # member operation.
@@ -9718,7 +9822,7 @@ sub stub {
 package SetByCreate;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 1: The SET-BY-CREATE property is included if the attribute may be set by means of
 # the Create operation.  This property is only meaningful if the Create operation is supported by the
@@ -9753,7 +9857,7 @@ sub head {
 package NoModify;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # X.722 Ammendment 2: The absence of the REPLACE property may be used to specify that an attribute
 # cannot be replaced for instances of a class but this absence does not preclude subclasses adding the
@@ -9798,11 +9902,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{value} = ExternalValueReference->parse($line)) ||
-			($self->{value} = DerivationRule->parse($line))
+			($self->{value} = ExternalValueReference->parse($line,@_[1,-1])) ||
+			($self->{value} = DerivationRule->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{value};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -9828,11 +9932,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{modulereference} = ModuleReference->parse($line)));
+		last TEST unless (($self->{modulereference} = ModuleReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{modulereference};
 		last TEST unless ($line=~s/^\.//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{typename} = TypeReference->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{typename} = TypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{typename};
 		$_[0] = $line; return $self;
 	}
@@ -9862,11 +9966,11 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{modulereference} = ModuleReference->parse($line)));
+		last TEST unless (($self->{modulereference} = ModuleReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{modulereference};
 		last TEST unless ($line=~s/^\.//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{valuename} = ValueReference->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{valuename} = ValueReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{valuename};
 		$_[0] = $line; return $self;
 	}
@@ -9910,19 +10014,19 @@ sub read {
 	TEST: {
 		my ($s,$c);
 		last TEST unless ($line=~s/^@//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{modulereference} = ModuleReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{modulereference} = ModuleReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{modulereference};
 		last TEST unless ($line=~s/^\.//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($s = TypeReference->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($s = TypeReference->parse($line,@_[1,-1])));
 		push @{$self->{typereferences}}, $s;
 		push @{$self->{children}}, $s;
 		while ($line=~s/^\.//s) {
-			if (($c = Comments->parse($line))) {
+			if (($c = Comments->parse($line,@_[1,-1]))) {
 				$s->{commentplus} = $c;
 			}
-			last TEST unless (($s = TypeReference->parse($line)));
+			last TEST unless (($s = TypeReference->parse($line,@_[1,-1])));
 			push @{$self->{typereferences}}, $s;
 			push @{$self->{children}}, $s;
 			# Fixme: the last element after the '.' is an identifier, a number, or a '*'
@@ -9969,8 +10073,8 @@ sub read {
 			$line=~s/^DERIVATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s ||
 			$line=~s/^DERIVED(?:\s|\n)*((-)?)(?:\s\|\n)*RULES//s
 		);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless ($self->{behaviour} = BehaviourReference->parse($line));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless ($self->{behaviour} = BehaviourReference->parse($line,@_[1,-1]));
 		push @{$self->{children}}, $self->{behaviour};
 		$_[0] = $line; return $self;
 	}
@@ -10005,7 +10109,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^[A-Z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
 		$self->{reference} = $&;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10045,7 +10149,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^[A-Z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
 		$self->{reference} = $&;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10094,7 +10198,7 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^[a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
 		$self->{name} = $&;
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10132,7 +10236,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^[A-Z](?:[a-zA-Z0-9]|-(?!-))*(?<!-)//s);
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$self->{name} = $&;
 		$_[0] = $line; return $self;
 	}
@@ -10171,11 +10275,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUPS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{groups} = AttributeGroupAttributesList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{groups} = AttributeGroupAttributesList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{groups};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10212,12 +10316,12 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{group} = AttributeGroupReference->parse($line)));
+		last TEST unless (($self->{group} = AttributeGroupReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{groups};
-		if (($self->{attributes} = AttributeReferenceSimpleList->parse($line))) {
+		if (($self->{attributes} = AttributeReferenceSimpleList->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{attributes};
 		}
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10266,11 +10370,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ACTIONS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{actions} = ActionParameterList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{actions} = ActionParameterList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{actions};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10314,9 +10418,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{action} = ActionReference->parse($line)));
+		last TEST unless (($self->{action} = ActionReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{action};
-		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line))) {
+		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
 		$_[0] = $line; return $self;
@@ -10368,11 +10472,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^NOTIFICATIONS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{notifications} = NotificationParameterList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{notifications} = NotificationParameterList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{notifications};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10416,12 +10520,12 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{notification} = NotificationReference->parse($line)));
+		last TEST unless (($self->{notification} = NotificationReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{notification};
-		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line))) {
+		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10455,8 +10559,8 @@ sub read {
 	TEST: {
 		last TEST unless
 		($line=~s/^REGISTERED(?:\s|\n)*((-)?)(?:\s|\n)*AS//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{objectid} = ObjectIdentifierValue->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{objectid} = ObjectIdentifierValue->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{objectid};
 		$_[0] = $line; return $self;
 	}
@@ -10486,11 +10590,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*SYNTAX//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{syntax};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10525,11 +10629,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^PACKAGE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{package} = PackageReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{package} = PackageReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{package};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10564,11 +10668,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^PARAMETER//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{parameter} = ParameterReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{parameter} = ParameterReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{parameter};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10603,11 +10707,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{namebinding} = NameBindingReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{namebinding} = NameBindingReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{namebinding};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10642,11 +10746,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ATTRIBUTE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{attribute} = AttributeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attribute};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10681,11 +10785,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{attributegroup} = AttributeGroupReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attributegroup} = AttributeGroupReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attributegroup};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10720,11 +10824,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^BEHAVIOUR//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{behaviour} = BehaviourReferenceList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{behaviour} = BehaviourReferenceList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{behaviour};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10762,11 +10866,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^ACTION//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{action} = ActionReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{action} = ActionReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{action};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10801,11 +10905,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^NOTIFICATION//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{notification} = NotificationReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{notification} = NotificationReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{notification};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10845,14 +10949,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^SUBORDINATE(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{class} = ClassReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{class} = ClassReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{class};
-		if (($self->{subclasses} = AndSubclasses->parse($line))) {
+		if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{subclasses};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10867,6 +10971,7 @@ sub gdmo {
 		{
 			$::indent.="\t";
 			if (($s = $self->{comments1})) { $s->gdmo(); }
+			if (!$::first) { printf ' '; $::first = 1; }
 			$self->{class}->gdmo();
 			if (($s = $self->{subclasses})) { $s->gdmo(); }
 			$::indent=~s/.$//s;
@@ -10892,16 +10997,16 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^NAMED(?:\s|\n)*((-)?)(?:\s|\n)*BY//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless ($line=~s/^SUPERIOR(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
-		$self->{comments2} = Comments->parse($line);
-		last TEST unless (($self->{class} = ClassReference->parse($line)));
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{class} = ClassReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{class};
-		if (($self->{subclasses} = AndSubclasses->parse($line))) {
+		if (($self->{subclasses} = AndSubclasses->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{subclasses};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments3} = Comments->parse($line);
+		$self->{comments3} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -10914,12 +11019,13 @@ sub gdmo {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'NAMED BY'; $::first = 0;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
-		#if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		if (!$::first) { printf ' '; }
 		printf 'SUPERIOR OBJECT CLASS'; $::first = 0;
 		{
 			$::indent.="\t";
 			if (($s = $self->{comments2})) { $s->gdmo(); }
+			if (!$::first) { printf ' '; $::first = 1; }
 			$self->{class}->gdmo();
 			if (($s = $self->{subclasses})) { $s->gdmo(); }
 			$::indent=~s/.$//s;
@@ -10933,7 +11039,7 @@ sub gdmo {
 package AndSubclasses;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 
 sub read {
@@ -10959,11 +11065,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*ATTRIBUTE//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{attribute} = AttributeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attribute};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11012,15 +11118,15 @@ sub read {
 	TEST: {
 		my ($s,$c);
 		last TEST unless ($line=~s/^CREATE//s);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{modifiers} = CreateModifierList->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{modifiers} = CreateModifierList->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{modifiers};
 		}
-		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line))) {
+		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
 		last TEST unless ($line=~s/^;//s); 
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11059,11 +11165,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{modifier} = WithReferenceObject->parse($line)) ||
-			($self->{modifier} = WithAutomaticInstanceNaming->parse($line))
+			($self->{modifier} = WithReferenceObject->parse($line,@_[1,-1])) ||
+			($self->{modifier} = WithAutomaticInstanceNaming->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{modifier};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11082,7 +11188,7 @@ sub gdmo {
 package WithReferenceObject;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # If present, a reference managed object may be specified on creation as a source of default values
 # and to specify choice of conditional packages.
@@ -11096,7 +11202,7 @@ sub read {
 package WithAutomaticInstanceNaming;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(DashedTokenIndented);
+@ISA = qw(DashedToken);
 # -------------------------------------
 # If present, the Create request may omit to specify the instance name of the new managed object.
 
@@ -11136,15 +11242,15 @@ sub read {
 	TEST: {
 		my ($s,$c);
 		last TEST unless ($line=~s/^DELETE//s);
-		$self->{comments1} = Comments->parse($line);
-		if (($self->{modifiers} = DeleteModifierList->parse($line))) {
+		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
+		if (($self->{modifiers} = DeleteModifierList->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{modifiers};
 		}
-		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line))) {
+		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
 		last TEST unless ($line=~s/^;//s); 
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11189,11 +11295,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{modifier} = OnlyIfNoContainedObjects->parse($line)) ||
-			($self->{modifier} = DeletesContainedObjects->parse($line))
+			($self->{modifier} = OnlyIfNoContainedObjects->parse($line,@_[1,-1])) ||
+			($self->{modifier} = DeletesContainedObjects->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{modifier};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11264,11 +11370,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^DERIVED(?:\s|\n)*((-)?)(?:\s|\n)*FROM//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{attribute} = AttributeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attribute};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11312,11 +11418,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*SYNTAX//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{syntax};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11358,11 +11464,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^MATCHES(?:\s|\n)*((-)?)(?:\s|\n)*FOR//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{matches} = MatchQualifierList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{matches} = MatchQualifierList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{matches};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11400,14 +11506,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{qualifier} = Equality->parse($line)) ||
-			($self->{qualifier} = Ordering->parse($line)) ||
-			($self->{qualifier} = Substrings->parse($line)) ||
-			($self->{qualifier} = SetComparison->parse($line)) ||
-			($self->{qualifier} = SetIntersection->parse($line))
+			($self->{qualifier} = Equality->parse($line,@_[1,-1])) ||
+			($self->{qualifier} = Ordering->parse($line,@_[1,-1])) ||
+			($self->{qualifier} = Substrings->parse($line,@_[1,-1])) ||
+			($self->{qualifier} = SetComparison->parse($line,@_[1,-1])) ||
+			($self->{qualifier} = SetIntersection->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{qualifier};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11525,11 +11631,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^PARAMETERS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{parameters} = ParameterReferenceList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{parameters} = ParameterReferenceList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{parameters};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11573,11 +11679,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^GROUP(?:\s|\n)*((-)?)(?:\s|\n)*ELEMENTS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{elements} = AttributeReferenceList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{elements} = AttributeReferenceList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{elements};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11615,9 +11721,9 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^FIXED//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11651,11 +11757,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^DESCRIPTION//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{delimited} = DelimitedString->parse($line,';')));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{delimited} = DelimitedString->parse($line,';',@_[1,-1])));
 		push @{$self->{children}}, $self->{delimited};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11706,8 +11812,8 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^DEFINED(?:\s|\n)*((-)?)(?:\s|\n)*AS//s);
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{delimited} = DelimitedString->parse($line,';')));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{delimited} = DelimitedString->parse($line,';',@_[1,-1])));
 		push @{$self->{children}}, $self->{delimited};
 		$_[0] = $line; return $self;
 	}
@@ -11757,14 +11863,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^MODE//s);
-		$self->{comments1} = Comments->parse($line);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (
-			($self->{mode} = Confirmed->parse($line)) ||
-			($self->{mode} = Unconfirmed->parse($line))
+			($self->{mode} = Confirmed->parse($line,@_[1,-1])) ||
+			($self->{mode} = Unconfirmed->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{mode};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11823,11 +11929,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*INFORMATION(?:\s|\n)*((-)?)(?:\s|\n)*SYNTAX//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{syntax};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11862,11 +11968,11 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*REPLY(?:\s|\n)*((-)?)(?:\s|\n)*SYNTAX//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{syntax};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11901,14 +12007,14 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^WITH(?:\s|\n)*((-)?)(?:\s|\n)*INFORMATION(?:\s|\n)*((-)?)(?:\s|\n)*SYNTAX//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{syntax} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{syntax};
-		if (($self->{attributeids} = AndAttributeIds->parse($line))) {
+		if (($self->{attributeids} = AndAttributeIds->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{attributeids};
 		}
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11944,10 +12050,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless ($line=~s/^AND(?:\s|\n)*((-)?)(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*IDS//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{ids} = FieldAttributeList->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{ids} = FieldAttributeList->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{ids};
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -11985,8 +12091,8 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9]|-(?!-))*(?<!-))//s);
 		$self->{fieldname} = $1;
-		$self->{comments} = Comments->parse($line);
-		last TEST unless (($self->{attribute} = AttributeReference->parse($line)));
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attribute};
 		$_[0] = $line; return $self;
 	}
@@ -12019,11 +12125,11 @@ sub read {
 	TEST: {
 		my $s;
 		last TEST unless ($line=~s/^CONTEXT//s);
-		$self->{comments1} = Comments->parse($line);
-		last TEST unless (($self->{type} = ContextType->parse($line)));
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{type} = ContextType->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
 		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -12058,15 +12164,15 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{type} = ContextKeyword->parse($line)) ||
-			($self->{type} = ActionInfo->parse($line)) ||
-			($self->{type} = ActionReply->parse($line)) ||
-			($self->{type} = EventInfo->parse($line)) ||
-			($self->{type} = EventReply->parse($line)) ||
-			($self->{type} = SpecificError->parse($line))
+			($self->{type} = ContextKeyword->parse($line,@_[1,-1])) ||
+			($self->{type} = ActionInfo->parse($line,@_[1,-1])) ||
+			($self->{type} = ActionReply->parse($line,@_[1,-1])) ||
+			($self->{type} = EventInfo->parse($line,@_[1,-1])) ||
+			($self->{type} = EventReply->parse($line,@_[1,-1])) ||
+			($self->{type} = SpecificError->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{type};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -12092,9 +12198,9 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line)));
+		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{typereference};
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -12180,7 +12286,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{comments} = Comments->parse($line);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -12212,11 +12318,13 @@ $indent = '';
 $first = 0;
 $noref = 0;
 $depth = 0;
-$colwidth = 100; # width of delimited string reflow
+$colwidth = 80; # width of delimited string reflow
 $context = 50; # number of lines to report on error
 @objects = ();
 $root = {}; # root object
 $scope = '';
+@backtrack = ();
+$oid = 0;
 
 $root->{gdmos} = {};
 $root->{oids} = {};
