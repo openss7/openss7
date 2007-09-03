@@ -1,7 +1,7 @@
 --< GDMO.Include "G.774.gdmo" >--
---< GDMO.Document "ITU-T Rec. G.774.03" >--
+--< GDMO.Document "ITU-T Rec. G.774.03 : 1994" >--
 --< GDMO.Version 1.3 >--
---< GDMO.Alias "ITU-T Rec. G.774.03"
+--< GDMO.Alias "ITU-T Rec. G.774.03 : 1994" "ITU-T Rec. G.774.03",
 --  "ITU-T Recommendation G.774-03",
 --  "Recommendation G.774.03 : 1994",
 --  "Recommendation G.774.03" >--
@@ -75,14 +75,14 @@ apsReportRecord MANAGED OBJECT CLASS
 				apsReportRecordBeh;
 			ATTRIBUTES
 				reportedProtectionUnit GET;;;
-REGISTERED AS { g774-03ObjectClass 1 };
+REGISTERED AS { g774-03MObjectClass 1 };
 
 
 apsReportRecordBeh BEHAVIOUR
 	DEFINED AS
 		"An instance of the apsReportRecord object is created when a protectionSwitchReporting Notification
 		is generated. The protectionStatusParameter must be included in the management extension.";
--- 6.2 Protected Trail Termination Point
+--6.2 Protected Trail Termination Point
 
 
 protectedTTPBidirectional MANAGED OBJECT CLASS
@@ -102,6 +102,7 @@ protectedTTPBidirectionalBeh BEHAVIOUR
 		"The protectedTTPBidirectional object class is a class of objects that represents the bidirectional
 		protected resources in a protection system. If the SDH bidirectional multiplex section protection
 		switching function is present, this object class shall be supported.";
+--6.3 Protected TTP sink
 
 
 protectedTTPSink MANAGED OBJECT CLASS
@@ -129,6 +130,7 @@ protectedTTPSinkBeh BEHAVIOUR
 		is switched to another unit, the value of the upstreamConnectivityPointer is updated. If the
 		attributeValueChangeNotification package is present, then a change in the value of the
 		supportedByObjectList shall cause an attributeValueChange notification.";
+--6.4 Protected TTP source
 
 
 protectedTTPSource MANAGED OBJECT CLASS
@@ -156,7 +158,7 @@ protectedTTPSourceBeh BEHAVIOUR
 		actual signal flow, and when a signal is switched to another unit, the pointer is updated. If the
 		attributeValueChangeNotification package is present, then a change in the value of the
 		supportedByObjectList shall cause an attributeValueChange notification.";
--- 6.3 Protection Group
+--6.3 Protection Group
 
 
 protectionGroup MANAGED OBJECT CLASS
@@ -172,7 +174,8 @@ protectionGroup MANAGED OBJECT CLASS
 				protectionGroupId GET,
 				protectionGroupType GET-REPLACE,
 				revertive REPLACE-WITH-DEFAULT
-					DEFAULT VALUE SDHProtASN1.booleanTrueDefault GET-REPLACE,
+					DEFAULT VALUE SDHProtASN1.booleanTrueDefault
+					GET-REPLACE,
 				"Recommendation M.3100 : 1992":supportedByObjectList GET,
 				waitToRestoreTime GET-REPLACE;
 			ACTIONS
@@ -206,11 +209,11 @@ protectionGroupBeh BEHAVIOUR
 		switch), lockout or release of lockout. If the attributeValueChangeNotification package is present,
 		then changes to the protectionGroupType attribute, the revertive attribute or the waitToRestoreTime
 		attribute shall cause an attributeValueChange notification to be emitted. The protectionGroupType
-		attribute shall have the value scolonc when more than one protectionUnit is protected. Changing the
-		value of this attribute between tplusa and ccolon is allowed when only one protected protectionUnit
-		and one protecting protectionUnit are contained by the protectionGroup. The change from plusp to
-		ccolonr is only allowed if the underlying resources support M:N protection.";
--- 6.4 Protection Unit
+		attribute shall have the value 'colon' when more than one protectionUnit is protected. Changing the
+		value of this attribute between 'plus' and 'colon' is allowed when only one protected
+		protectionUnit and one protecting protectionUnit are contained by the protectionGroup. The change
+		from 'plus' to 'colon' is only allowed if the underlying resources support M:N protection.";
+--6.4 Protection Unit
 
 
 protectionUnit MANAGED OBJECT CLASS
@@ -247,7 +250,7 @@ protectionUnitBeh BEHAVIOUR
 		attributeValueChangeNotificationPackage is present, then changes to the unreliableResourcePointer
 		attribute, the priority attribute or the reliableResourcePointer attribute shall cause an
 		attributeValueChange notification to be emitted.";
--- 6.5 SDH Multiplex Section Protection Group
+--6.5 SDH Multiplex-Section Protection Group
 
 
 sdhMSProtectionGroup MANAGED OBJECT CLASS
@@ -274,12 +277,12 @@ REGISTERED AS { g774-03MObjectClass 7 };
 
 sdhMSProtectionGroupBeh BEHAVIOUR
 	DEFINED AS
-		"This object class is used specifically for representing a SDH multiplex section protection group in
+		"This object class is used specifically for representing a SDH multiplex-section protection group in
 		a protection system. Only one protecting protection unit is allowed. The protectionMismatchStatus
 		indicates a mismatch between the provisioned protectionGroupType of this protection group and the
-		provisioned protectionGroupType of the far-end. It also indicates mismatch of unidirectional versus
-		bidirectional switch provisioning between the two protection groups.";
--- 6.6 SDH Multiplex Section Protection Unit
+		provisioned protectionGroupType of the far-end. It also indicates mismatch of uni-directional
+		versus bi-directional switch provisioning between the two protection groups.";
+--6.6 SDH Multiplex-Section Protection Unit
 
 
 sdhMSProtectionUnit MANAGED OBJECT CLASS
@@ -293,9 +296,11 @@ sdhMSProtectionUnit MANAGED OBJECT CLASS
 				channelNumber GET,
 				protectionStatus GET,
 				reliableResourcePointer
-					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer,
+					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer
+					,
 				unreliableResourcePointer
-					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer;;;
+					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer
+					;;;
 	CONDITIONAL PACKAGES
 		sdhPriorityPkg
 			PRESENT IF
@@ -319,7 +324,7 @@ sdhMSProtectionUnitBeh BEHAVIOUR
 		protecting, then the channelNumber attribute shall have the value 0. If the sdhMSProtectionUnit is
 		protected, the channelNumber attribute shall have a value between 1 and 14. For Lockout of
 		protecting unit, protected channels 1 to 14 are incapable of being carried on protection.";
--- 6.7 Unprotected Connection Termination Point
+--6.7 Unprotected Connection Termination Point
 
 
 unprotectedCTPBidirectional MANAGED OBJECT CLASS
@@ -338,6 +343,7 @@ unprotectedCTPBidirectionalBeh BEHAVIOUR
 	DEFINED AS
 		"The unprotectedCTPBidirectional object class is a class of objects that represents the unprotected
 		resources in a protection system.";
+--6.10 Unprotected CTP sink
 
 
 unprotectedCTPSink MANAGED OBJECT CLASS
@@ -361,6 +367,7 @@ unprotectedCTPSinkBeh BEHAVIOUR
 		subclasses). The crossConnectionObjectPointer attribute in an instance of this object class points
 		to its associated protectionUnit object instance which has the unreliableResourcePointer attribute
 		pointing back to the instance of this object class.";
+--6.11 Unprotected CTP source
 
 
 unprotectedCTPSource MANAGED OBJECT CLASS
@@ -384,8 +391,8 @@ unprotectedCTPSourceBeh BEHAVIOUR
 		subclasses). The crossConnectionObjectPointer attribute in an instance of this object class points
 		to its associated protectionUnit object instance which has the reliableResourcePointer attribute
 		pointing back to the instance of this object class.";
--- 7 Packages
--- 7.1 Extra Traffic Control
+--7 Packages
+--7.1 Extra Traffic Control
 
 
 extraTrafficControlPkg PACKAGE
@@ -403,51 +410,50 @@ extraTrafficControlPkgBeh BEHAVIOUR
 		not prevent protected channel traffic from being switched to the protecting channel. When unlocked,
 		extra traffic is resumed on the protecting channel as long as there is no request from a protected
 		channel of higher priority than on the protecting channel.";
--- 7.2 Last Attempt Result
+--7.2 Last Attempt Result
 
 
 lastAttemptResultPkg PACKAGE
 	ATTRIBUTES
 		lastAttemptResult GET;
 REGISTERED AS { g774-03Package 2 };
--- 7.3 Protection Switch Exercise
+--7.3 Protection Switch Exercise
 
 
 protectionSwitchExercisePkg PACKAGE
 	ACTIONS
 		invokeExercise;
 REGISTERED AS { g774-03Package 3 };
--- 7.4 Protection Mismatch Status
+--7.4 Protection Mismatch Status
 
 
 protectionMismatchStatusPkg PACKAGE
 	ATTRIBUTES
 		protectionMismatchStatus GET;
 REGISTERED AS { g774-03Package 4 };
--- 7.5 Priority
+--7.5 Priority
 
 
 priorityPkg PACKAGE
 	ATTRIBUTES
 		priority GET-REPLACE;
 REGISTERED AS { g774-03Package 5 };
--- 7.6 Sdh Priority
+--7.6 SDH Priority
 
 
 sdhPriorityPkg PACKAGE
 	ATTRIBUTES
 		sdhPriority
-			PERMITTED VALUES SDHProtASN1.SDHMSPriority GET-REPLACE;
+			PERMITTED VALUES SDHProtASN1.SDHMSPriority
+			GET-REPLACE;
 REGISTERED AS { g774-03Package 6 };
--- 8 Attributes
--- 8.1 Channel Number
+--8 Attributes
+--8.1 Channel Number
 
 
 channelNumber ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		channelNumberBeh;
 REGISTERED AS { g774-03Attribute 1 };
@@ -456,13 +462,12 @@ REGISTERED AS { g774-03Attribute 1 };
 channelNumberBeh BEHAVIOUR
 	DEFINED AS
 		"This attribute indicates the channel number associated with a protectionUnit.";
--- 8.2 Last Attempt Result
+--8.2 Last Attempt Result
 
 
 lastAttemptResult ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.LastAttemptResult;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		lastAttemptResultBeh;
 REGISTERED AS { g774-03Attribute 2 };
@@ -472,18 +477,16 @@ lastAttemptResultBeh BEHAVIOUR
 	DEFINED AS
 		"The value of the last exercise result or the result of a protection group/unit diagnostic or switch
 		attempt which performs at least the same functionality as an exercise, is available from his
-		attribute. If a failure ocurs, the availabilityStatus of the protectionGroup object will be set to
+		attribute. If a failure occurs, the availabilityStatus of the protectionGroup object will be set to
 		degraded. The successful completion of a protection group/unit diagnostic or switch attempt which
 		performs at least the same functionality as an exercise causes the availabilityStatus attribute to
-		be set to NULL (i.e available), and the lastAttemptResult value is set to success.";
--- 8.3 Priority
+		be set to NULL (i.e. available), and the lastAttemptResult value is set to success.";
+--8.3 Priority
 
 
 priority ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		priorityBeh;
 REGISTERED AS { g774-03Attribute 3 };
@@ -498,15 +501,12 @@ priorityBeh BEHAVIOUR
 		choice of the protecting protectionUnit relative to other available protecting protectionUnit(s)
 		within the same protectionGroup. The lower the value, the more preferred the protectionUnit is
 		relative to other protectionUnits.";
--- 8.4 Protected Trail Termination Point Identifier
+--8.4 Protected Trail Termination Point Identifier
 
 
 protectedTTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		protectedTTPIdBeh;
 REGISTERED AS { g774-03Attribute 4 };
@@ -517,23 +517,19 @@ protectedTTPIdBeh BEHAVIOUR
 		"This attribute is used as an RDN for naming instances of the protectedTTP object classes. If the
 		string choice of the syntax is used, then matching on substrings is permitted. If the number choice
 		for the syntax is used, then matching on ordering is permitted.";
--- 8.5 Reported Protection Unit
+--8.5 Reported Protection Unit
 
 
 reportedProtectionUnit ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.RelativeDistinguishedName;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { g774-03Attribute 5 };
--- 8.6 Protection Group Identifier
+--8.6 Protection Group Identifier
 
 
 protectionGroupId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		protectionGroupIdBeh;
 REGISTERED AS { g774-03Attribute 6 };
@@ -545,13 +541,12 @@ protectionGroupIdBeh BEHAVIOUR
 		RDN when naming an instance of the protectionGroup object class. If the string choice of the syntax
 		is used, then matching on substrings is permitted. If the number choice for the syntax is used,
 		then matching on ordering is permitted.";
--- 8.7 Protection Group Type
+--8.7 Protection Group Type
 
 
 protectionGroupType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionGroupType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectionGroupTypeBeh;
 REGISTERED AS { g774-03Attribute 7 };
@@ -561,13 +556,12 @@ protectionGroupTypeBeh BEHAVIOUR
 	DEFINED AS
 		"This attribute specifies whether the protection scheme used is 1 + 1 (plus) or M:N (colon). M:N
 		includes the cases where M = 1 and/or N = 1.";
--- 8.8 Protection Mismatch Status
+--8.8 Protection Mismatch Status
 
 
 protectionMismatchStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionMismatchStatus;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectionMismatchStatusBeh;
 REGISTERED AS { g774-03Attribute 8 };
@@ -578,15 +572,12 @@ protectionMismatchStatusBeh BEHAVIOUR
 		"This attribute indicates a mismatch between the local and far-end provisioned values for the
 		protectionGroupType attribute and has a separate indication for a mismatch between the local and
 		far-end provisioned values for the protectionSwitchMode attribute.";
--- 8.9 Protection Status
+--8.9 Protection Status
 
 
 protectionStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionStatus;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		protectionStatusBeh;
 REGISTERED AS { g774-03Attribute 9 };
@@ -602,13 +593,13 @@ protectionStatusBeh BEHAVIOUR
 		provides protection is used to hold the protection request which is actually performed on that
 		protectionUnit. Locally invoked management operations (e.g. manual, forced, lockout switch
 		completions) can be overridden at the near end or the far end, but may only be released at the near
-		end. Single-ended systems keep the status of local and far-end switch requests as separate
-		entitities in the protectionStatus attribute. The remainder of this behaviour provides the
-		allowable protectionStatus attribute values for protected and protecting units for both revertive
-		and non-revertive systems. The following allowable protectionStatus values are associated with each
+		end. Single-ended systems keep the status of local and far-end switch requests as separate entities
+		in the protectionStatus attribute. The remainder of this behaviour provides the allowable
+		protectionStatus attribute values for protected and protecting units for both revertive and
+		non-revertive systems. The following allowable protectionStatus values are associated with each
 		protected unit: No Request No switch request is present on the unit. Manual Switch to Protecting
 		Complete The unit has completed a Manual Switch. Release failed A switch has been released or
-		preempted and a timeout occurs while waiting for a release of associated bridges, or the near-end
+		pre-empted and a timeout occurs while waiting for a release of associated bridges, or the near-end
 		switch. Automatic Switch (SF) Pending The unit has a Signal Fail condition present and the
 		protecting unit is unavailable. Automatic Switch (SD) Pending The unit has a Signal Degrade
 		condition present and the protecting unit is unavailable. Automatic Switch (SF) Complete The unit
@@ -663,7 +654,7 @@ protectionStatusBeh BEHAVIOUR
 		Unit The unit has completed a Force Switch of a protected unit to the protecting unit. Force Switch
 		Complete to Protecting Unit, SD Present on Protecting Unit The unit has completed a Force Switch of
 		a protected unit to the protecting unit. Additionally, there is a Signal Degrade present on the
-		protecting unit. Force Switch Complete to Protecting , SF Present on Protecting Unit The unit has
+		protecting unit. Force Switch Complete to Protecting, SF Present on Protecting Unit The unit has
 		completed a Force Switch of a protected unit to the protecting unit. Additionally, there is a
 		Signal Fail (1 + 1 unidirectional systems only) present on the protecting unit. Protecting Unit
 		Locked Out The protecting unit has been locked out. Protecting Unit Locked Out, Release Failed A
@@ -691,13 +682,12 @@ protectionStatusBeh BEHAVIOUR
 		for the invoked action will report this. Additionally, attribute lastAttemptResult will provide a
 		record of the failure, until a successful exercise or protection switch causes this attribute to be
 		cleared.";
--- 8.10 Protection Switch Mode
+--8.10 Protection Switch Mode
 
 
 protectionSwitchMode ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionSwitchMode;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectionSwitchModeBeh;
 REGISTERED AS { g774-03Attribute 10 };
@@ -707,15 +697,12 @@ protectionSwitchModeBeh BEHAVIOUR
 	DEFINED AS
 		"This attribute specifies whether protection switching is done on a unidirectional or bidirectional
 		basis.";
--- 8.11 Protection Unit Identifier
+--8.11 Protection Unit Identifier
 
 
 protectionUnitId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		protectionUnitIdBeh;
 REGISTERED AS { g774-03Attribute 11 };
@@ -727,13 +714,12 @@ protectionUnitIdBeh BEHAVIOUR
 		when naming an instance of the protectionUnit object class. If the string choice of the syntax is
 		used, then matching on substrings is permitted. If the number choice for the syntax is used, then
 		matching on ordering is permitted.";
--- 8.12 Protecting
+--8.12 Protecting
 
 
 protecting ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectingBeh;
 REGISTERED AS { g774-03Attribute 12 };
@@ -744,13 +730,12 @@ protectingBeh BEHAVIOUR
 		"This attribute specifies the type of the protectionUnit. A value of TRUE indicates that the
 		protectionUnit is a protecting (i.e. backup or standby) unit. A value of FALSE indicates that the
 		protectionUnit is a protected (i.e. a regular, working, or preferred) unit.";
--- 8.13 Reliable Resource Pointer
+--8.13 Reliable Resource Pointer
 
 
 reliableResourcePointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ResourcePointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		reliableResourcePointerBeh;
 REGISTERED AS { g774-03Attribute 13 };
@@ -760,13 +745,12 @@ reliableResourcePointerBeh BEHAVIOUR
 	DEFINED AS
 		"The value of the reliableResourcePointer attribute points to the reliable resource(s) (e.g.
 		termination point) that is/are associated with the protectionUnit instance.";
--- 8.14 Revertive
+--8.14 Revertive
 
 
 revertive ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		revertiveBeh;
 REGISTERED AS { g774-03Attribute 14 };
@@ -779,13 +763,12 @@ revertiveBeh BEHAVIOUR
 		the switch after the fault clears and the waitToRestoreTime interval (if any) has expired. If the
 		value of this attribute is FALSE, then after the fault has cleared, traffic does not revert to the
 		protectionUnit that initiated the switch.";
--- 8.15 Sdh Priority
+--8.15 SDH Priority
 
 
 sdhPriority ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		sdhPriorityBeh;
 REGISTERED AS { g774-03Attribute 15 };
@@ -795,15 +778,12 @@ sdhPriorityBeh BEHAVIOUR
 	DEFINED AS
 		"SDH priority may be High or Low for protected protection units. This is intended for prioritizing
 		SD and SF conditions on 1:n systems.";
--- 8.16 Unprotected Connection Termination Point Identifier
+--8.16 Unprotected Connection Termination Point Identifier
 
 
 unprotectedCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		unprotectedCTPIdBeh;
 REGISTERED AS { g774-03Attribute 16 };
@@ -814,13 +794,12 @@ unprotectedCTPIdBeh BEHAVIOUR
 		"This attribute is used as an RDN for naming instances of the unprotectedCTP object classes. If the
 		string choice of the syntax is used, then matching on substrings is permitted. If the number choice
 		for the syntax is used, then matching on ordering is permitted.";
--- 8.17 Unreliable Resource Pointer
+--8.17 Unreliable Resource Pointer
 
 
 unreliableResourcePointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ResourcePointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		unreliableResourcePointerBeh;
 REGISTERED AS { g774-03Attribute 17 };
@@ -830,14 +809,12 @@ unreliableResourcePointerBeh BEHAVIOUR
 	DEFINED AS
 		"The value of the unreliableResourcePointer attribute points to the unreliable resource(s) (e.g.
 		equipment hardware or termination point) that is/are associated with the protectionUnit instance.";
--- 8.18 Wait to Restore Time
+--8.18 Wait to Restore Time
 
 
 waitToRestoreTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		waitToRestoreTimeBeh;
 REGISTERED AS { g774-03Attribute 18 };
@@ -847,8 +824,8 @@ waitToRestoreTimeBeh BEHAVIOUR
 	DEFINED AS
 		"This attribute specifies the amount of time, in seconds, to wait after a fault clears before
 		restoring traffic to the protected protectionUnit that initiated the switching.";
--- 9 Actions
--- 9.1 Invoke Exercise
+--9 Actions
+--9.1 Invoke Exercise
 
 
 invokeExercise ACTION
@@ -871,8 +848,8 @@ invokeExerciseBeh BEHAVIOUR
 		value of the protectionStatus attribute shall continue to indicate No Request. When an exercise
 		routine has completed for any protectionUnit instances, the lastAttemptResult attribute is updated
 		to reflect pass or fail for each exercised protection unit.";
--- 9.2 Invoke Protection
--- NOTE  The definition of Lockout, Forced Switch, and Manual Switch is provided in Recommendation G.783.
+--9.2 Invoke Protection
+--NOTE  The definition of Lockout, Forced Switch, and Manual Switch is provided in Recommendation G.783.
 
 
 invokeProtection ACTION
@@ -902,10 +879,10 @@ invokeProtectionBeh BEHAVIOUR
 		protectingUnits field, and either field may be absent. For a Lockout request, the specified
 		protected units and/or protecting units are locked out. For requests which cannot be completed,
 		either because the request is the protecting unit is serving a request of higher priority (in the
-		error parameter of the CMIP APDU, reason: preempted), or failure occurs (failure), or timeout
+		error parameter of the CMIP APDU, reason: pre-empted), or failure occurs (failure), or timeout
 		occurs (timeout), the reply shall indicate why the request could not be completed, and the request
 		shall not be made pending. The CMIP error APDU contains the failure reasons.";
--- 9.3 Release Protection
+--9.3 Release Protection
 
 
 releaseProtection ACTION
@@ -935,8 +912,8 @@ releaseProtectionBeh BEHAVIOUR
 		are no longer locked out. That is, the protected units are now under protection and the protecting
 		units are now capable of providing protection. For release requests which cannot be completed, the
 		reply shall indicate why the request could not be completed.";
--- 10 Notifications
--- 10.1 Protection Switch Reporting
+--10 Notifications
+--10.1 Protection Switch Reporting
 
 
 protectionSwitchReporting NOTIFICATION
@@ -957,8 +934,8 @@ protectionSwitchReportingBeh BEHAVIOUR
 		protection switch events. The choice of protectingUnit is utilized for the protectionUnit argument
 		of the notification in all cases except for when reporting olockout of workings or lrelease of
 		lockout of workingr.";
--- 11 Parameters
--- 11.1 Invoke Protection Error
+--11 Parameters
+--11.1 Invoke Protection Error
 
 
 invokeProtectionError PARAMETER
@@ -972,11 +949,11 @@ REGISTERED AS { g774-03Parameter 1 };
 invokeProtectionErrorBeh BEHAVIOUR
 	DEFINED AS
 		"This parameter is included in the error parameter of the CMIP APDU when the invoke protection
-		action fails. The preempted choice means that a higher priority switch request exists on the
+		action fails. The pre-empted choice means that a higher priority switch request exists on the
 		protecting protection unit. The failure choice indicates that the request has not been performed
 		due to an abnormal condition on the protection system. The timeout choice indicates that the
 		protection switch has not been performed in the required time frame.";
--- 11.2 Release Protection Error
+--11.2 Release Protection Error
 
 
 releaseProtectionError PARAMETER
@@ -993,7 +970,7 @@ releaseProtectionErrorBeh BEHAVIOUR
 		action fails. The failure choice indicates that the request has not been performed due to an
 		abnormal condition on the protection system. The timeout choice indicates that the protection
 		switch has not been performed in the required time frame.";
--- 11.3 Protection Status Parameter
+--11.3 Protection Status Parameter
 
 
 protectionStatusParameter PARAMETER
@@ -1009,13 +986,13 @@ protectionStatusParameterBeh BEHAVIOUR
 		"This parameter is included in the additional info parameters of the protection switching reporting
 		notification. This notification is sent by the protection group according to the following rules.
 		There are several cases: The switch from protected to protecting or protecting to protected has
-		been done without preempting an existing switch. In this case the old and new values of the
+		been done without pre-empting an existing switch. In this case the old and new values of the
 		Protection Status attribute of the protecting channel shall be reported in the notification by
 		means of the oldProtectionStatus and newProtectionStatus parameters respectively. A switch is
-		perfomed by preemting an existing one. In this case the old and new values of the Protection Status
-		attribute of the protecting channel shall be reported in the notification by means of the
+		performed by pre-empting an existing one. In this case the old and new values of the Protection
+		Status attribute of the protecting channel shall be reported in the notification by means of the
 		oldProtectionStatus and newProtectionStatus parameters respectively. An auto-switch condition
-		exists on a channel but the auto-switch cannot be served due to the unavailibility of the channel
+		exists on a channel but the auto-switch cannot be served due to the unavailability of the channel
 		that otherwise protects it. In this case the oldProtectionStatus and newProtectionStatus parameters
 		refer to the protection status attribute value of the channel on which the autoswitch condition
 		arises. The exception is when the channel is already forced or locked out, in which case no
@@ -1028,16 +1005,14 @@ protectionStatusParameterBeh BEHAVIOUR
 		channel which has been locked out. The protectionSwitchReporting is not sent when the automatic
 		switch condition is toggling between SD, SF and WTR condition. While in the lockout of forced
 		switch state no notification is sent except for ending of release failure.";
--- 12 Name Bindings
--- 12.1 Protected Trail Termination Point
+--12 Name Bindings
+--12.1 Protected Trail Termination Point
 
 
 protectedTTPBidirectional-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectedTTPBidirectional;
+	SUBORDINATE OBJECT CLASS protectedTTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774 : 1992":sdhNE;
+	SUPERIOR OBJECT CLASS "Recommendation G.774 : 1992":sdhNE;
 	WITH ATTRIBUTE
 		protectedTTPId;
 	BEHAVIOUR
@@ -1053,11 +1028,9 @@ protectedTTPBidirectional-sdhNEBeh BEHAVIOUR
 
 
 protectedTTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectedTTPSink;
+	SUBORDINATE OBJECT CLASS protectedTTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774 : 1992":sdhNE;
+	SUPERIOR OBJECT CLASS "Recommendation G.774 : 1992":sdhNE;
 	WITH ATTRIBUTE
 		protectedTTPId;
 	BEHAVIOUR
@@ -1073,11 +1046,9 @@ protectedTTPSink-sdhNEBeh BEHAVIOUR
 
 
 protectedTTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectedTTPSource;
+	SUBORDINATE OBJECT CLASS protectedTTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774 : 1992":sdhNE;
+	SUPERIOR OBJECT CLASS "Recommendation G.774 : 1992":sdhNE;
 	WITH ATTRIBUTE
 		protectedTTPId;
 	BEHAVIOUR
@@ -1090,27 +1061,23 @@ protectedTTPSource-sdhNEBeh BEHAVIOUR
 		"The subordinate managed objects are instantiated when the multiplex section protection switching
 		function is present. Instances of this object class may also be instantiated when other types of
 		protection switching functions, such as path protection, are present.";
--- 12.2 Protection Group
+--12.2 Protection Group
 
 
 protectionGroup-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectionGroup AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS protectionGroup AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation M.3100: 1992":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation M.3100: 1992":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		protectionGroupId;
 REGISTERED AS { g774-03NameBinding 4 };
--- 12.3 Aug
+--12.3 Aug
 
 
 augBidirectional-protectedTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774 : 1992":augBidirectional;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774 : 1992":augBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectedTTPBidirectional;
+	SUPERIOR OBJECT CLASS protectedTTPBidirectional;
 	WITH ATTRIBUTE
 		"Recommendation G.774 : 1992":augId;
 	BEHAVIOUR
@@ -1120,16 +1087,14 @@ REGISTERED AS { g774-03NameBinding 5 };
 
 augBidirectional-protectedTTPBidirectionalBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
+		"The subordinate managed objects are instantiated when the multiplex-section protection switching
 		function is present.";
 
 
 augSink-protectedTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774 : 1992":augSink;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774 : 1992":augSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectedTTPSink;
+	SUPERIOR OBJECT CLASS protectedTTPSink;
 	WITH ATTRIBUTE
 		"Recommendation G.774 : 1992":augId;
 	BEHAVIOUR
@@ -1139,16 +1104,14 @@ REGISTERED AS { g774-03NameBinding 6 };
 
 augSink-protectedTTPSinkBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
+		"The subordinate managed objects are instantiated when the multiplex-section protection switching
 		function is present.";
 
 
 augSource-protectedTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774 : 1992":augSource;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774 : 1992":augSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectedTTPSource;
+	SUPERIOR OBJECT CLASS protectedTTPSource;
 	WITH ATTRIBUTE
 		"Recommendation G.774 : 1992":augId;
 	BEHAVIOUR
@@ -1158,29 +1121,25 @@ REGISTERED AS { g774-03NameBinding 7 };
 
 augSource-protectedTTPSourceBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
+		"The subordinate managed objects are instantiated when the multiplex-section protection switching
 		function is present.";
--- 12.4 Protection Unit
+--12.4 Protection Unit
 
 
 protectionUnit-protectionGroup NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectionUnit AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS protectionUnit AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectionGroup AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS protectionGroup AND SUBCLASSES;
 	WITH ATTRIBUTE
 		protectionUnitId;
 REGISTERED AS { g774-03NameBinding 8 };
--- 12.5 Unprotected Connection Termination Point
+--12.5 Unprotected Connection Termination Point
 
 
 unprotectedCTPBidirectional-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		unprotectedCTPBidirectional;
+	SUBORDINATE OBJECT CLASS unprotectedCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774 : 1992":msTTPBidirectional;
+	SUPERIOR OBJECT CLASS "Recommendation G.774 : 1992":msTTPBidirectional;
 	WITH ATTRIBUTE
 		unprotectedCTPId;
 	BEHAVIOUR
@@ -1195,11 +1154,9 @@ unprotectedCTPBidirectional-msTTPBidirectionalBeh BEHAVIOUR
 
 
 unprotectedCTPSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		unprotectedCTPSink;
+	SUBORDINATE OBJECT CLASS unprotectedCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774 : 1992":msTTPSink;
+	SUPERIOR OBJECT CLASS "Recommendation G.774 : 1992":msTTPSink;
 	WITH ATTRIBUTE
 		unprotectedCTPId;
 	BEHAVIOUR
@@ -1214,11 +1171,9 @@ unprotectedCTPSink-msTTPSinkBeh BEHAVIOUR
 
 
 unprotectedCTPSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		unprotectedCTPSource;
+	SUBORDINATE OBJECT CLASS unprotectedCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774 : 1992":msTTPSource;
+	SUPERIOR OBJECT CLASS "Recommendation G.774 : 1992":msTTPSource;
 	WITH ATTRIBUTE
 		unprotectedCTPId;
 	BEHAVIOUR
@@ -1230,10 +1185,10 @@ unprotectedCTPSource-msTTPSourceBeh BEHAVIOUR
 	DEFINED AS
 		"The subordinate managed objects are instantiated when the multiplex section protection switching
 		function is present.";
--- 13 Subordination Rules
--- None.
--- 14 Pointer Constraints
--- None.
+--13 Subordination Rules
+--None.
+--14 Pointer Constraints
+--None.
 
 --< GDMO.ChangeLog
 --  =============================================================================
@@ -1241,4 +1196,4 @@ unprotectedCTPSource-msTTPSourceBeh BEHAVIOUR
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. G.774.03 : 1994" >--

@@ -1,8 +1,7 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
 --< GDMO.Document "Rec. X.738 (1993)" >--
---< GDMO.Alias "Rec. X.738 (1993)"
---  "Recommendation X.738:1993",
+--< GDMO.Alias "Rec. X.738 (1993)" "Recommendation X.738:1993",
 --  "Rec. X.738|ISO/IEC 10164-13:1992" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
@@ -57,6 +56,7 @@
 --  
 --  =============================================================================
 --  >--
+MODULE "Rec. X.738 (1993)"
 
 bufferedScanner MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -91,8 +91,8 @@ bufferedScanReportRecord MANAGED OBJECT CLASS
 			BEHAVIOUR
 				bufferedScanReportRecordBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object is used to represent logged information that resulted from buffered scan report
-						notifications or event reports.";;
+						"This managed object is used to represent logged information that resulted from 
+						buffered scan report notifications or event reports.";;
 			ATTRIBUTES
 				"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":granularityPeriod GET,
 				bufferedObservationList GET;;;
@@ -280,8 +280,8 @@ scanReportRecord MANAGED OBJECT CLASS
 			BEHAVIOUR
 				scanReportRecordBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object is used to represent logged information that resulted from scan report
-						notifications or event reports.";;
+						"This managed object is used to represent logged information that resulted from 
+						scan report notifications or event reports.";;
 			ATTRIBUTES
 				observationScanList GET;;;
 	CONDITIONAL PACKAGES
@@ -329,8 +329,8 @@ statisticalReportRecord MANAGED OBJECT CLASS
 			BEHAVIOUR
 				statisticalReportRecordBehaviour BEHAVIOUR
 					DEFINED AS
-						"This managed object is used to represent logged information that resulted from statistical report
-						notifications or event reports.";;
+						"This managed object is used to represent logged information that resulted from 
+						statistical report notifications or event reports.";;
 			ATTRIBUTES
 				algorithmOutputs GET;;;
 	CONDITIONAL PACKAGES
@@ -414,7 +414,8 @@ scopedSelectionPackage PACKAGE
 		baseManagedObject GET-REPLACE,
 		scope GET-REPLACE,
 		scanningFilter
-			DEFAULT VALUE SummarizationASN1Productions.scanningFilterDefault GET-REPLACE;
+			DEFAULT VALUE SummarizationASN1Productions.scanningFilterDefault
+			GET-REPLACE;
 REGISTERED AS { summarizationPackage 10 };
 
 
@@ -427,7 +428,8 @@ REGISTERED AS { summarizationPackage 11 };
 timeStampReportPackage PACKAGE
 	ATTRIBUTES
 		timeStampReportMode
-			DEFAULT VALUE SummarizationASN1Productions.timeStampingDefault GET-REPLACE;
+			DEFAULT VALUE SummarizationASN1Productions.timeStampingDefault
+			GET-REPLACE;
 REGISTERED AS { summarizationPackage 12 };
 
 
@@ -448,8 +450,8 @@ algorithmOutputs ATTRIBUTE
 	BEHAVIOUR
 		algorithmOutputsBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute includes the outputs of a statistical algorithm that was applied to scanned
-				attribute values. See 8.2.2.2.3.";;
+				"This attribute includes the outputs of a statistical algorithm that was applied 
+				to scanned attribute values. See 8.2.2.2.3.";;
 REGISTERED AS { summarizationAttribute 1 };
 
 
@@ -458,32 +460,30 @@ algorithmParameters ATTRIBUTE
 	BEHAVIOUR
 		algorithmParametersBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute includes one or more parameters of a statistical algorithm that was applied to
-				scanned attribute values. See 8.2.2.2.4.";;
+				"This attribute includes one or more parameters of a statistical algorithm that 
+				was applied to scanned attribute values. See 8.2.2.2.4.";;
 REGISTERED AS { summarizationAttribute 2 };
 
 
 baseManagedObject ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		baseManagedObjectBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies an existing managed object which is the base of the scoping process for
-				selecting managed objects. See 8.1.12.3";;
+				"This attribute identifies an existing managed object which is the base of the 
+				scoping process for selecting managed objects. See 8.1.12.3";;
 REGISTERED AS { summarizationAttribute 3 };
 
 
 beginTimeOffset ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimePeriod;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		beginTimeOffsetBehaviour BEHAVIOUR
 			DEFINED AS
-				"The value of this attribute, subtracted from the current time, indicates the beginning of a time
-				window. See 8.1.12.5.";;
+				"The value of this attribute, subtracted from the current time, indicates the 
+				beginning of a time window. See 8.1.12.5.";;
 REGISTERED AS { summarizationAttribute 4 };
 
 
@@ -492,8 +492,8 @@ bufferedObservationIdList ATTRIBUTE
 	BEHAVIOUR
 		bufferedObservationIdListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies observed objects, and observed attributes within those managed objects,
-				to be scanned. See 8.1.9.2.";;
+				"This attribute identifies observed objects, and observed attributes within those 
+				managed objects, to be scanned. See 8.1.9.2.";;
 REGISTERED AS { summarizationAttribute 5 };
 
 
@@ -508,76 +508,69 @@ REGISTERED AS { summarizationAttribute 6 };
 
 endTimeOffset ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimePeriod;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		endTimeOffsetBehaviour BEHAVIOUR
 			DEFINED AS
-				"The value of this attribute, subtracted from the current time, indicates the end of a time window.
-				See 8.1.12.5.";;
+				"The value of this attribute, subtracted from the current time, indicates the end 
+				of a time window. See 8.1.12.5.";;
 REGISTERED AS { summarizationAttribute 7 };
 
 
 firstScanInitiationTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.FirstScanInitiationTime;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		firstScanInitiationTimeBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the start time of the first scan in buffer. See 8.2.2.3.2.";;
+				"This attribute indicates the start time of the first scan in buffer. See 
+				8.2.2.3.2.";;
 REGISTERED AS { summarizationAttribute 8 };
 
 
 incompleteScan ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.IncompleteScan;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		incompleteScanBehaviour BEHAVIOUR
 			DEFINED AS
-				"The value of this attribute indicates the reason a scan could not be completed. See 8.2.2.1.4.";;
+				"The value of this attribute indicates the reason a scan could not be completed. 
+				See 8.2.2.1.4.";;
 REGISTERED AS { summarizationAttribute 30 };
 
 
 numericAttributeIdArray ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NumericAttributeIdArray;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		numericAttributeIdArrayBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is an ordered list of identifiers of attributes whose values are to be scanned. The
-				identified attributes must be of either the integer or the real type. See 8.1.9.2.";;
+				"This attribute is an ordered list of identifiers of attributes whose values are 
+				to be scanned. The identified attributes must be of either the integer or the 
+				real type. See 8.1.9.2.";;
 REGISTERED AS { summarizationAttribute 10 };
 
 
 numericAttributeIdList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NumericAttributeIdList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		numericAttributeIdListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute is a list of identifiers of attributes whose values are to be scanned. The
-				identified attributes must be of either the integer or the real type. See 8.1.3.2.";;
+				"This attribute is a list of identifiers of attributes whose values are to be 
+				scanned. The identified attributes must be of either the integer or the real 
+				type. See 8.1.3.2.";;
 REGISTERED AS { summarizationAttribute 11 };
 
 
 objectList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObjectList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		objectListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies the managed objects whose attributes are to be scanned.";;
+				"This attribute identifies the managed objects whose attributes are to be 
+				scanned.";;
 REGISTERED AS { summarizationAttribute 12 };
 
 
@@ -586,8 +579,8 @@ observationIdList ATTRIBUTE
 	BEHAVIOUR
 		observationIdListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies observed objects, and observed attributes within those managed objects,
-				to be scanned.";;
+				"This attribute identifies observed objects, and observed attributes within those 
+				managed objects, to be scanned.";;
 REGISTERED AS { summarizationAttribute 13 };
 
 
@@ -596,8 +589,8 @@ observationReportList ATTRIBUTE
 	BEHAVIOUR
 		observationReportListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute specifies the set of managed objects and their attributes values that were scanned.
-				See 8.2.2.2.2.";;
+				"This attribute specifies the set of managed objects and their attributes values 
+				that were scanned. See 8.2.2.2.2.";;
 REGISTERED AS { summarizationAttribute 14 };
 
 
@@ -606,17 +599,14 @@ observationScanList ATTRIBUTE
 	BEHAVIOUR
 		observationScanListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute specifies the set of managed objects and their attributes values that were scanned.
-				See 8.2.2.1.3.";;
+				"This attribute specifies the set of managed objects and their attributes values 
+				that were scanned. See 8.2.2.1.3.";;
 REGISTERED AS { summarizationAttribute 15 };
 
 
 onceReportAttributeIdList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.OnceReportAttributeIdList;
-	MATCHES FOR
-		EQUALITY,
-		SET-INTERSECTION,
-		SET-COMPARISON;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
 	BEHAVIOUR
 		onceReportAttributeIdListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -626,10 +616,7 @@ REGISTERED AS { summarizationAttribute 16 };
 
 onceReportAttributeList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.OnceReportAttributeList;
-	MATCHES FOR
-		EQUALITY,
-		SET-INTERSECTION,
-		SET-COMPARISON;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
 	BEHAVIOUR
 		onceReportAttributeListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -639,35 +626,30 @@ REGISTERED AS { summarizationAttribute 17 };
 
 reportPeriod ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ReportPeriod;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		reportPeriodBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the number of granularity periods in a report period. See 8.1.9.2.";;
+				"This attribute indicates the number of granularity periods in a report period. 
+				See 8.1.9.2.";;
 REGISTERED AS { summarizationAttribute 19 };
 
 
 scanAttributeIdList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ScanAttributeIdList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		scanAttributeIdListBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies attributes of any ASN.1 type whose attribute identifiers are to be
-				included in summary reports along with the attribute values. See 8.1.9.2.";;
+				"This attribute identifies attributes of any ASN.1 type whose attribute 
+				identifiers are to be included in summary reports along with the attribute 
+				values. See 8.1.9.2.";;
 REGISTERED AS { summarizationAttribute 21 };
 
 
 scanInitiationTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ScanInitiationTime;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		scanInitiationTimeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -680,40 +662,37 @@ scanningFilter ATTRIBUTE
 	BEHAVIOUR
 		scanningFilterBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies a set of criteria for selecting managed objects, used in the filtering
-				process. See 8.1.12.3";;
+				"This attribute identifies a set of criteria for selecting managed objects, used 
+				in the filtering process. See 8.1.12.3";;
 REGISTERED AS { summarizationAttribute 24 };
 
 
 scope ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.Scope;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		scopeBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies a set of managed objects, used in the scoping process for selecting
-				managed objects. See 8.1.12.3.";;
+				"This attribute identifies a set of managed objects, used in the scoping process 
+				for selecting managed objects. See 8.1.12.3.";;
 REGISTERED AS { summarizationAttribute 25 };
 
 
 suppressObjectInstance ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.SuppressObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		suppressObjectInstanceBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies a boolean value which, if true, causes the observed object instance
-				parameter to be suppressed from all summary reports. See 8.1.9.2.";;
+				"This attribute identifies a boolean value which, if true, causes the observed 
+				object instance parameter to be suppressed from all summary reports. See 
+				8.1.9.2.";;
 REGISTERED AS { summarizationAttribute 26 };
 
 
 suspectIntervals ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.SuspectIntervals;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		suspectIntervalsBehaviour BEHAVIOUR
 			DEFINED AS
@@ -723,26 +702,24 @@ REGISTERED AS { summarizationAttribute 27 };
 
 timeAttributeIdentifier ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimeAttributeIdentifier;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		timeAttributeIdBehaviour BEHAVIOUR
 			DEFINED AS
-				"This attribute identifies which attribute within an observed managed object is used for time-based
-				selection. See 8.1.12.5.";;
+				"This attribute identifies which attribute within an observed managed object is 
+				used for time-based selection. See 8.1.12.5.";;
 REGISTERED AS { summarizationAttribute 28 };
 
 
 timeStampReportMode ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimeStampReportMode;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		timeStampReportModeBehaviour BEHAVIOUR
 			DEFINED AS
-				"The value of this attribute identifies which method of time stamping reports should be used:
-				timeStampingOff (0), globalTimeStampOnly (1), or individualTimeStamping (2). See 8.1.12.4.";;
+				"The value of this attribute identifies which method of time stamping reports 
+				should be used: timeStampingOff (0), globalTimeStampOnly (1), or 
+				individualTimeStamping (2). See 8.1.12.4.";;
 REGISTERED AS { summarizationAttribute 29 };
 
 
@@ -750,8 +727,9 @@ bufferedScanReport NOTIFICATION
 	BEHAVIOUR
 		bufferedScanReportBehaviour BEHAVIOUR
 			DEFINED AS
-				"This notification is emitted upon completion of the last scan in the report period, and includes
-				attribute values scanned within the report period which has just completed.";;
+				"This notification is emitted upon completion of the last scan in the report 
+				period, and includes attribute values scanned within the report period which has 
+				just completed.";;
 	WITH INFORMATION SYNTAX SummarizationASN1Productions.BufferedScanReportInformation
 		AND ATTRIBUTE IDS
 			granularityPeriod
@@ -775,8 +753,8 @@ scanReport NOTIFICATION
 	BEHAVIOUR
 		scanReportBehaviour BEHAVIOUR
 			DEFINED AS
-				"This notification is emitted upon completion of a scan, and includes attribute values observed
-				during the scan.";;
+				"This notification is emitted upon completion of a scan, and includes attribute 
+				values observed during the scan.";;
 	WITH INFORMATION SYNTAX SummarizationASN1Productions.ScanReportInformation
 		AND ATTRIBUTE IDS
 			scanInitiationTime
@@ -798,8 +776,8 @@ statisticalReport NOTIFICATION
 	BEHAVIOUR
 		statisticalReportBehaviour BEHAVIOUR
 			DEFINED AS
-				"This notification is emitted upon completion of a scan, and includes statistical summary
-				information.";;
+				"This notification is emitted upon completion of a scan, and includes statistical 
+				summary information.";;
 	WITH INFORMATION SYNTAX SummarizationASN1Productions.StatisticalScanReportInformation
 		AND ATTRIBUTE IDS
 			scanInitiationTime
@@ -823,8 +801,8 @@ activateDynamicSimpleScanReport ACTION
 	BEHAVIOUR
 		activateDynamicSimpleScanReportBehaviour BEHAVIOUR
 			DEFINED AS
-				"The contents of SummarizationASN1Productions.ScanReportInformation may be sent in multiple replies.
-				See 8.3";;
+				"The contents of SummarizationASN1Productions.ScanReportInformation may be sent 
+				in multiple replies. See 8.3";;
 	MODE CONFIRMED;
 	WITH INFORMATION SYNTAX SummarizationASN1Productions.DynamicSimpleScanArgument;
 	WITH REPLY SYNTAX SummarizationASN1Productions.ScanReportInformation;
@@ -835,9 +813,10 @@ activateScanReport ACTION
 	BEHAVIOUR
 		activateScanReportBehaviour BEHAVIOUR
 			DEFINED AS
-				"This action initiates a scan according to the current object and attribute selection attributes of
-				the scanner. The reply includes all scanned attribute values. The contents of
-				SummarizationASN1Productions.ScanReportInformation may be sent in multiple replies.";;
+				"This action initiates a scan according to the current object and attribute 
+				selection attributes of the scanner. The reply includes all scanned attribute 
+				values. The contents of SummarizationASN1Productions.ScanReportInformation may 
+				be sent in multiple replies.";;
 	MODE CONFIRMED;
 	WITH REPLY SYNTAX SummarizationASN1Productions.ScanReportInformation;
 REGISTERED AS { summarizationAction 2 };
@@ -847,10 +826,11 @@ activateStatisticalReport ACTION
 	BEHAVIOUR
 		activateStatisticalReportBehaviour BEHAVIOUR
 			DEFINED AS
-				"This action initiates a scan according to the current object and attribute selection attributes of
-				the scanner. The reply includes scanned attribute values and/or statistical summary information
-				calculated from those values. The contents of
-				SummarizationASN1Productions.StatisticalScanReportInformation may be sent in multiple replies.";;
+				"This action initiates a scan according to the current object and attribute 
+				selection attributes of the scanner. The reply includes scanned attribute values 
+				and/or statistical summary information calculated from those values. The 
+				contents of SummarizationASN1Productions.StatisticalScanReportInformation may be 
+				sent in multiple replies.";;
 	MODE CONFIRMED;
 	WITH REPLY SYNTAX SummarizationASN1Productions.StatisticalScanReportInformation;
 REGISTERED AS { summarizationAction 3 };
@@ -860,22 +840,21 @@ reportBuffer ACTION
 	BEHAVIOUR
 		reportBufferBehaviour BEHAVIOUR
 			DEFINED AS
-				"The report buffer action initiates a scan of the attributes specified in the report time attribute
-				Id list. The retained values of the previously scanned attributes together with the results of this
-				scan are returned in the action result. The contents of
-				SummarizationASN1Productions.BufferedScanReportInformation may be sent in multiple replies. See
-				8.1.9.3.";;
+				"The report buffer action initiates a scan of the attributes specified in the 
+				report time attribute Id list. The retained values of the previously scanned 
+				attributes together with the results of this scan are returned in the action 
+				result. The contents of 
+				SummarizationASN1Productions.BufferedScanReportInformation may be sent in 
+				multiple replies. See 8.1.9.3.";;
 	MODE CONFIRMED;
 	WITH REPLY SYNTAX SummarizationASN1Productions.BufferedScanReportInformation;
 REGISTERED AS { summarizationAction 4 };
 
 
 dynamicSimpleScanner-system NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		dynamicSimpleScanner AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS dynamicSimpleScanner AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
@@ -885,11 +864,9 @@ REGISTERED AS { summarizationNameBinding 2 };
 
 
 conflictingPackagesScanner-system NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
@@ -904,9 +881,10 @@ conflictingPackagesRequestedError PARAMETER
 	BEHAVIOUR
 		conflictingPackagesRequestedErrorBehaviour BEHAVIOUR
 			DEFINED AS
-				"This error is returned when an object creation is requested either with attributes defined for
-				conditional packages all of which shall not be present together or attributes of packages that have
-				to be present together but are not specified in the request.";;
+				"This error is returned when an object creation is requested either with 
+				attributes defined for conditional packages all of which shall not be present 
+				together or attributes of packages that have to be present together but are not 
+				specified in the request.";;
 REGISTERED AS { summarizationParameter 2 };
 
 
@@ -916,12 +894,14 @@ scanActionError PARAMETER
 	BEHAVIOUR
 		scannerActionErrorBehaviour BEHAVIOUR
 			DEFINED AS
-				"The scan action request to a summarization managed object was not performed because of one of the
-				following reasons: administrative state is locked, administrative state is shutting down, scan is
-				terminated because administrative state was set to locked when performing the scan action or an
-				unspecified error occurred.";;
+				"The scan action request to a summarization managed object was not performed 
+				because of one of the following reasons: administrative state is locked, 
+				administrative state is shutting down, scan is terminated because administrative 
+				state was set to locked when performing the scan action or an unspecified error 
+				occurred.";;
 REGISTERED AS { summarizationParameter 1 };
 
+END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  

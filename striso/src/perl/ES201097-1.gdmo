@@ -1,6 +1,7 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "ES 201 097-1 V1.1.1 (1998-01)" >--
+--< GDMO.Alias "ES 201 097-1 V1.1.1 (1998-01)" "ES 201 097-1" >--
 MODULE "ES 201 097-1 V1.1.1 (1998-01)"
 --5.5 Physical resources fragment
 --5.5.1 Managed object class definitions

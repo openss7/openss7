@@ -1,6 +1,7 @@
 --< GDMO.Include "M.3100.gdmo" >--
---< GDMO.Document "ITU-T Rec. G.774" >--
---< GDMO.Alias "ITU-T Rec. G.774"
+--< GDMO.Include "G.774.5.gdmo" >--
+--< GDMO.Document "ITU-T Rec. G.774 : 2001" >--
+--< GDMO.Alias "ITU-T Rec. G.774 : 2001" "ITU-T Rec. G.774",
 --  "Recommendation G.774 : 1992",
 --  "Recommendation G.774" >--
 --< GDMO.Version 1.3 >--
@@ -56,6 +57,7 @@
 --  
 --  =============================================================================
 --  >--
+MODULE "ITU-T Rec. G.774 : 2001"
 --6 Object classes 
 --This  clause  provides  replacement  managed  object  class  definitions  for  the  existing 
 --Recommendation G.774 (1992). Any  managed object class replaced  by the one  in this clause  is 
@@ -123,13 +125,15 @@ au3CTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				au3CTPSinkR1PkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class represents a termination point where an AU-3 Connection is terminated. The AU-3
-						consists of a VC-3 plus an AU pointer which indicates the phase alignment of the VC-3 with respect
-						to the STM-N frame. A communicationsAlarm notification shall be issued if a loss of AU pointer is
-						detected. The probableCause parameter of the notification shall indicate LOP (Loss Of Pointer). A
-						communicationsAlarm notification shall be issued if an AU path alarm indication signal is detected.
-						The probableCause parameter of the notification shall indicate AIS (Alarm Indication Signal). A
-						change in the operational state shall cause a state change notification*;;
+						*This object class represents a termination point where an AU-3 Connection is 
+						terminated. The AU-3 consists of a VC-3 plus an AU pointer which indicates the 
+						phase alignment of the VC-3 with respect to the STM-N frame. A 
+						communicationsAlarm notification shall be issued if a loss of AU pointer is 
+						detected. The probableCause parameter of the notification shall indicate LOP 
+						(Loss Of Pointer). A communicationsAlarm notification shall be issued if an AU 
+						path alarm indication signal is detected. The probableCause parameter of the 
+						notification shall indicate AIS (Alarm Indication Signal). A change in the 
+						operational state shall cause a state change notification*;;
 			ATTRIBUTES
 				au3CTPId GET,
 				pointerSinkType GET;;;
@@ -145,9 +149,9 @@ au3CTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				au3CTPSourcePkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class represents a termination point where an AU-3 Connection is originated. The AU-3
-						consists of a VC-3 plus an AU pointer which indicates the phase alignment of the VC-3 with respect
-						to the STM-N frame.*;;
+						*This object class represents a termination point where an AU-3 Connection is 
+						originated. The AU-3 consists of a VC-3 plus an AU pointer which indicates the 
+						phase alignment of the VC-3 with respect to the STM-N frame.*;;
 			ATTRIBUTES
 				au3CTPId GET,
 				pointerSourceType GET;;;
@@ -175,13 +179,15 @@ au4CTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				au4CTPSinkR1PkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class represents a termination point where an AU-4 Connection is terminated. The AU-4
-						consists of a VC-4 plus an AU pointer which indicates the phase alignment of the VC-4 with respect
-						to the STM-N frame. A communicationsAlarm notification shall be issued if a loss of AU pointer is
-						detected. The probableCause parameter of the notification shall indicate LOP (Loss Of Pointer). A
-						communicationsAlarm notification shall be issued if an AU path alarm indication signal is detected.
-						The probableCause parameter of the notification shall indicate AIS (Alarm Indication Signal). A
-						change in the operational state shall cause a state change notification*;;
+						*This object class represents a termination point where an AU-4 Connection is 
+						terminated. The AU-4 consists of a VC-4 plus an AU pointer which indicates the 
+						phase alignment of the VC-4 with respect to the STM-N frame. A 
+						communicationsAlarm notification shall be issued if a loss of AU pointer is 
+						detected. The probableCause parameter of the notification shall indicate LOP 
+						(Loss Of Pointer). A communicationsAlarm notification shall be issued if an AU 
+						path alarm indication signal is detected. The probableCause parameter of the 
+						notification shall indicate AIS (Alarm Indication Signal). A change in the 
+						operational state shall cause a state change notification*;;
 			ATTRIBUTES
 				au4CTPId GET,
 				pointerSinkType GET;;;
@@ -197,9 +203,9 @@ au4CTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				au4CTPSourcePkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class represents a termination point where an AU-4 Connection is originated. The AU-4
-						consists of a VC-4 plus an AU pointer which indicates the phase alignment of the VC-4 with respect
-						to the STM-N frame.*;;
+						*This object class represents a termination point where an AU-4 Connection is 
+						originated. The AU-4 consists of a VC-4 plus an AU pointer which indicates the 
+						phase alignment of the VC-4 with respect to the STM-N frame.*;;
 			ATTRIBUTES
 				au4CTPId GET,
 				pointerSourceType GET;;;
@@ -223,11 +229,12 @@ augSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				augSinkPkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class is instantiated if AU-n Connection(s) are being terminated. An AUG consists of a
-						homogeneous, byte interleaved, assembly of either three AU-3s or one AU-4. This object class
-						represents the point at which the AU-3/4 pointer is derived, based on the phase of the VC-3/4 POH
-						relative to the STM-N SOH. Also, the STM-N payload is byte-demultiplexed into its component AU
-						Groups (AUGs).*;;
+						*This object class is instantiated if AU-n Connection(s) are being terminated. An 
+						AUG consists of a homogeneous, byte interleaved, assembly of either three AU-3s 
+						or one AU-4. This object class represents the point at which the AU-3/4 pointer 
+						is derived, based on the phase of the VC-3/4 POH relative to the STM-N SOH. 
+						Also, the STM-N payload is byte-demultiplexed into its component AU Groups 
+						(AUGs).*;;
 			ATTRIBUTES
 				augId GET,
 				"Recommendation M.3100":supportableClientList GET;;;
@@ -242,11 +249,12 @@ augSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				augSourcePkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class is instantiated if AU-n Connection(s) are being originated. An AUG consists of a
-						homogeneous, byte interleaved, assembly of either three AU-3s or one AU-4. This object class
-						represents the point at which the AU-3/4 pointer is generated to indicate the phase of the VC-3/4
-						POH relative to the STM-N SOH. Also, the AU Groups (AUGs) are byte-multiplexed to construct the
-						complete STM-N frame.*;;
+						*This object class is instantiated if AU-n Connection(s) are being originated. An 
+						AUG consists of a homogeneous, byte interleaved, assembly of either three AU-3s 
+						or one AU-4. This object class represents the point at which the AU-3/4 pointer 
+						is generated to indicate the phase of the VC-3/4 POH relative to the STM-N SOH. 
+						Also, the AU Groups (AUGs) are byte-multiplexed to construct the complete STM-N 
+						frame.*;;
 			ATTRIBUTES
 				augId GET,
 				"Recommendation M.3100":supportableClientList GET;;;
@@ -275,12 +283,13 @@ electricalSPITTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				electricalSPITTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the point where the incoming electrical interface signal is converted
-						into an internal logic level and the timing is recovered from the line signal. A
-						communicationsAlarm notification shall be issued if a loss of signal is detected. The probableCause
-						parameter of the notification shall indicate LOS (Loss Of signal). The upstream connectivity
-						pointer is NULL for an instance of this class when the upstream termination point is not contained
-						within the same network element.*;;;;
+						*This object class represents the point where the incoming electrical interface 
+						signal is converted into an internal logic level and the timing is recovered 
+						from the line signal. A communicationsAlarm notification shall be issued if a 
+						loss of signal is detected. The probableCause parameter of the notification 
+						shall indicate LOS (Loss Of signal). The upstream connectivity pointer is NULL 
+						for an instance of this class when the upstream termination point is not 
+						contained within the same network element.*;;;;
 REGISTERED AS { g774ObjectClass 11 };
 
 
@@ -296,10 +305,11 @@ electricalSPITTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				electricalSPITTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the point at which an outgoing internal logic level STM-N signal is
-						converted into a STM-N in station electrical interface signal. The downstream connectivity pointer
-						is NULL for an instance of this class when the downstream termination point is not contained within
-						the same network element.*;;;;
+						*This object class represents the point at which an outgoing internal logic level 
+						STM-N signal is converted into a STM-N in station electrical interface signal. 
+						The downstream connectivity pointer is NULL for an instance of this class when 
+						the downstream termination point is not contained within the same network 
+						element.*;;;;
 REGISTERED AS { g774ObjectClass 12 };
 --6.5  Indirect Adaptor Object Classes 
 
@@ -320,8 +330,8 @@ indirectAdaptorSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				indirectAdaptorSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class provides a naming mechanism which describes the multiplexing hierarchy of the SDH
-						signal.*;;;;
+						*This object class provides a naming mechanism which describes the multiplexing 
+						hierarchy of the SDH signal.*;;;;
 REGISTERED AS { g774ObjectClass 14 };
 
 
@@ -334,8 +344,8 @@ indirectAdaptorSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				indirectAdaptorSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class provides a naming mechanism which describes the multiplexing hierarchy of the SDH
-						signal.*;;;;
+						*This object class provides a naming mechanism which describes the multiplexing 
+						hierarchy of the SDH signal.*;;;;
 REGISTERED AS { g774ObjectClass 15 };
 --6.6  Multiplex Section Connection Termination Point Object Classes 
 
@@ -433,7 +443,8 @@ msOrderwireCTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				msOrderwireCTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents a termination point where the E2 byte orderwire channel is terminated.*;;
+						*This object class represents a termination point where the E2 byte orderwire 
+						channel is terminated.*;;
 			ATTRIBUTES
 				msOrderwireCTPId GET;;;
 REGISTERED AS { g774ObjectClass 23 };
@@ -448,7 +459,8 @@ msOrderwireCTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				msOrderwireCTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents a termination point where the E2 byte orderwire channel is originated.*;;
+						*This object class represents a termination point where the E2 byte orderwire 
+						channel is originated.*;;
 			ATTRIBUTES
 				msOrderwireCTPId GET;;;
 REGISTERED AS { g774ObjectClass 24 };
@@ -465,10 +477,11 @@ msTTPBidirectional MANAGED OBJECT CLASS
 			BEHAVIOUR
 				msTTPBidirectionalBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*When the excessiveBERMtceInhibit attribute is set to TRUE, MS-FERF is not inserted upstream upon
-						detection of excessive BER. A communicationsAlarm notification shall be issued if a far end receive
-						failure is detected. The probableCause parameter of the notification shall indicate FERF (Far End
-						Receive Failure).*;;;;
+						*When the excessiveBERMtceInhibit attribute is set to TRUE, MS-FERF is not 
+						inserted upstream upon detection of excessive BER. A communicationsAlarm 
+						notification shall be issued if a far end receive failure is detected. The 
+						probableCause parameter of the notification shall indicate FERF (Far End Receive 
+						Failure).*;;;;
 REGISTERED AS { g774ObjectClass 25 };
 
 
@@ -485,15 +498,17 @@ msTTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				msTTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a multiplex section trail, i.e. the processing and removal of the
-						multiplex section overhead from the incoming signal. When the excessiveBERMtceInhibit attribute is
-						set to TRUE, AIS is not inserted downstream upon detection of excessive BER. A communicationsAlarm
-						notification shall be issued if an excessive bit error rate is detected. The probableCause
-						parameter of the notification shall indicate excessive BER. A communicationsAlarm notification
-						shall be issued if a degraded signal is detected. The probableCause parameter of the notification
-						shall indicate signal degrade. A communicationsAlarm notification shall be issued if an MS alarm
-						indication signal is detected. The probableCause parameter of the notification shall indicate AIS
-						(Alarm Indication Signal).*;;
+						*This object class terminates a multiplex section trail, i.e. the processing and 
+						removal of the multiplex section overhead from the incoming signal. When the 
+						excessiveBERMtceInhibit attribute is set to TRUE, AIS is not inserted downstream 
+						upon detection of excessive BER. A communicationsAlarm notification shall be 
+						issued if an excessive bit error rate is detected. The probableCause parameter 
+						of the notification shall indicate excessive BER. A communicationsAlarm 
+						notification shall be issued if a degraded signal is detected. The probableCause 
+						parameter of the notification shall indicate signal degrade. A 
+						communicationsAlarm notification shall be issued if an MS alarm indication 
+						signal is detected. The probableCause parameter of the notification shall 
+						indicate AIS (Alarm Indication Signal).*;;
 			ATTRIBUTES
 				excessiveBERMtceInhibit GET-REPLACE,
 				signalDegradeThreshold GET-REPLACE;;;
@@ -512,8 +527,8 @@ msTTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				msTTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class originates a multiplex section trail, i.e. the generation and addition of the
-						multiplex section overhead to the outgoing signal.*;;;;
+						*This object class originates a multiplex section trail, i.e. the generation and 
+						addition of the multiplex section overhead to the outgoing signal.*;;;;
 REGISTERED AS { g774ObjectClass 27 };
 --6.10  Optical SDH Physical Interface Trail Termination Point Object Classes 
 
@@ -539,12 +554,13 @@ opticalSPITTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				opticalSPITTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the point where the incoming optical interface signal is converted
-						into an internal logic level and the timing is recovered from the line signal. A
-						communicationsAlarm notification shall be issued if a loss of signal is detected. The probableCause
-						parameter of the notification shall indicate LOS (Loss Of signal). The upstream connectivity
-						pointer is NULL for an instance of this class when the upstream termination point is not contained
-						within the same network element.*;;;;
+						*This object class represents the point where the incoming optical interface 
+						signal is converted into an internal logic level and the timing is recovered 
+						from the line signal. A communicationsAlarm notification shall be issued if a 
+						loss of signal is detected. The probableCause parameter of the notification 
+						shall indicate LOS (Loss Of signal). The upstream connectivity pointer is NULL 
+						for an instance of this class when the upstream termination point is not 
+						contained within the same network element.*;;;;
 REGISTERED AS { g774ObjectClass 29 };
 
 
@@ -561,12 +577,13 @@ opticalSPITTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				opticalSPITTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the point at which an outgoing internal logic level STM-N signal is
-						converted into a STM-N in-station or interstation optical interface signal. A communicationsAlarm
-						notification shall be issued if the transmit laser fails. The probableCause parameter of the
-						notification shall indicate TransmitFail. The downstream connectivity pointer is NULL for an
-						instance of this class when the downstream termination point is not contained within the same
-						network element.*;;;;
+						*This object class represents the point at which an outgoing internal logic level 
+						STM-N signal is converted into a STM-N in-station or interstation optical 
+						interface signal. A communicationsAlarm notification shall be issued if the 
+						transmit laser fails. The probableCause parameter of the notification shall 
+						indicate TransmitFail. The downstream connectivity pointer is NULL for an 
+						instance of this class when the downstream termination point is not contained 
+						within the same network element.*;;;;
 REGISTERED AS { g774ObjectClass 30 };
 --6.11  Regenerator Section Connection Termination Point Object Classes 
 
@@ -664,7 +681,8 @@ rsOrderwireCTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsOrderwireCTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the point where the E1 byte orderwire channel is terminated.*;;
+						*This object class represents the point where the E1 byte orderwire channel is 
+						terminated.*;;
 			ATTRIBUTES
 				rsOrderwireCTPId GET;;;
 REGISTERED AS { g774ObjectClass 38 };
@@ -679,7 +697,8 @@ rsOrderwireCTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsOrderwireCTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the point where the E1 byte orderwire channel is originated.*;;
+						*This object class represents the point where the E1 byte orderwire channel is 
+						originated.*;;
 			ATTRIBUTES
 				rsOrderwireCTPId GET;;;
 REGISTERED AS { g774ObjectClass 39 };
@@ -715,10 +734,11 @@ rsTTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsTTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the termination of the regenerator section trail, i.e. the processing
-						and removal of the regenerator section overhead from the incoming signal and the descrambling of
-						that signal. A communicationsAlarm notification shall be issued if a loss of frame is detected. The
-						probableCause parameter of the notification shall indicate LOF (Loss of Frame).*;;;;
+						*This object class represents the termination of the regenerator section trail, 
+						i.e. the processing and removal of the regenerator section overhead from the 
+						incoming signal and the descrambling of that signal. A communicationsAlarm 
+						notification shall be issued if a loss of frame is detected. The probableCause 
+						parameter of the notification shall indicate LOF (Loss of Frame).*;;;;
 REGISTERED AS { g774ObjectClass 41 };
 
 
@@ -731,8 +751,8 @@ rsTTPTrailTraceSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsTTPTrailTraceSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the termination of the regenerator section trail and supports trail
-						trace management.*;;;;
+						*This object class represents the termination of the regenerator section trail 
+						and supports trail trace management.*;;;;
 REGISTERED AS { g774ObjectClass 108 };
 
 
@@ -748,8 +768,9 @@ rsTTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsTTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the origination of the regenerator section trail, i.e. generates the
-						regenerator section overhead for the outgoing signal, and scrambles that signal.*;;;;
+						*This object class represents the origination of the regenerator section trail, 
+						i.e. generates the regenerator section overhead for the outgoing signal, and 
+						scrambles that signal.*;;;;
 REGISTERED AS { g774ObjectClass 42 };
 
 
@@ -762,8 +783,8 @@ rsTTPTrailTraceSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsTTPTrailTraceSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents the origination of the regenerator section trail and supports trail
-						trace management.*;;;;
+						*This object class represents the origination of the regenerator section trail 
+						and supports trail trace management.*;;;;
 REGISTERED AS { g774ObjectClass 109 };
 --6.15  Regenerator Section User Channel Object Classes 
 
@@ -785,7 +806,8 @@ rsUserChannelCTPSink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsUserChannelCTPSinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents a class of objects that terminates the F1 byte user channel.*;;
+						*This object class represents a class of objects that terminates the F1 byte user 
+						channel.*;;
 			ATTRIBUTES
 				rsUserChannelCTPId GET;;;
 REGISTERED AS { g774ObjectClass 44 };
@@ -800,7 +822,8 @@ rsUserChannelCTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				rsUserChannelCTPSourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class represents a class of objects that originates the F1 byte user channel.*;;
+						*This object class represents a class of objects that originates the F1 byte user 
+						channel.*;;
 			ATTRIBUTES
 				rsUserChannelCTPId GET;;;
 REGISTERED AS { g774ObjectClass 45 };
@@ -843,8 +866,8 @@ tu11CTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tu11CTPSinkR1BehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a tu-11 connection. A change in the operational state shall cause a
-						state change notification*;;
+						*This object class terminates a tu-11 connection. A change in the operational 
+						state shall cause a state change notification*;;
 			ATTRIBUTES
 				tu11CTPId GET;;;
 REGISTERED AS { g774ObjectClass 88 };
@@ -888,8 +911,8 @@ tu12CTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tu12CTPSinkR1BehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a tu-12 connection. A change in the operational state shall cause a
-						state change notification*;;
+						*This object class terminates a tu-12 connection. A change in the operational 
+						state shall cause a state change notification*;;
 			ATTRIBUTES
 				tu12CTPId GET;;;
 REGISTERED AS { g774ObjectClass 90 };
@@ -933,8 +956,8 @@ tu2CTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tu2CTPSinkR1BehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a tu-2 connection. A change in the operational state shall cause a
-						state change notification.*;;
+						*This object class terminates a tu-2 connection. A change in the operational 
+						state shall cause a state change notification.*;;
 			ATTRIBUTES
 				tu2CTPId GET;;;
 REGISTERED AS { g774ObjectClass 92 };
@@ -978,8 +1001,8 @@ tu3CTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tu3CTPSinkR1BehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a tu-3 connection. A change in the operational state shall cause a
-						state change notification.*;;
+						*This object class terminates a tu-3 connection. A change in the operational 
+						state shall cause a state change notification.*;;
 			ATTRIBUTES
 				tu3CTPId GET;;;
 REGISTERED AS { g774ObjectClass 94 };
@@ -1018,11 +1041,11 @@ tug2Sink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tug2SinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class is instantiated if TU-11, TU-12, TU-2 connection(s) are being terminated or
-						originated. A TUG-2 consists of a homogeneous or heterogeneous, assembly of four TU-11s, three
-						TU-12s or one TU-2. This object class represents the point at which the TU pointer is derived,
-						based on the phase of the VC 11/12/2 POH relative to the VC-3/4 POH and the VC-3/4 signal is
-						disassembled.*;;
+						*This object class is instantiated if TU-11, TU-12, TU-2 connection(s) are being 
+						terminated or originated. A TUG-2 consists of a homogeneous or heterogeneous, 
+						assembly of four TU-11s, three TU-12s or one TU-2. This object class represents 
+						the point at which the TU pointer is derived, based on the phase of the VC 
+						11/12/2 POH relative to the VC-3/4 POH and the VC-3/4 signal is disassembled.*;;
 			ATTRIBUTES
 				tug2Id GET,
 				"Recommendation M.3100":supportableClientList GET;;;
@@ -1037,11 +1060,11 @@ tug2Source MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tug2SourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class is instantiated if TU-11, TU-12, TU-2 connection(s) are being terminated or
-						originated. A TUG-2 consists of a homogeneous or heterogeneous, assembly of four TU-11s, three
-						TU-12s or one TU-2. This object class represents the point at which the TU pointer is processed to
-						indicate the phase of the VC 11/12/2 POH relative to the VC-3/4 POH and assembles the complete
-						VC-3/4.*;;
+						*This object class is instantiated if TU-11, TU-12, TU-2 connection(s) are being 
+						terminated or originated. A TUG-2 consists of a homogeneous or heterogeneous, 
+						assembly of four TU-11s, three TU-12s or one TU-2. This object class represents 
+						the point at which the TU pointer is processed to indicate the phase of the VC 
+						11/12/2 POH relative to the VC-3/4 POH and assembles the complete VC-3/4.*;;
 			ATTRIBUTES
 				tug2Id GET,
 				"Recommendation M.3100":supportableClientList GET;;;
@@ -1065,9 +1088,9 @@ tug3Sink MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tug3SinkBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class is instantiated if TU-3 connection(s) are being terminated. Or if TU-11s, TU-12s,
-						or TU-2s are being terminated from a VC-4. A TUG-3 consists of a homogeneous assembly of seven
-						TUG-2s or one TU-3.*;;
+						*This object class is instantiated if TU-3 connection(s) are being terminated. Or 
+						if TU-11s, TU-12s, or TU-2s are being terminated from a VC-4. A TUG-3 consists 
+						of a homogeneous assembly of seven TUG-2s or one TU-3.*;;
 			ATTRIBUTES
 				tug3Id GET,
 				"Recommendation M.3100":supportableClientList GET;;;
@@ -1082,9 +1105,9 @@ tug3Source MANAGED OBJECT CLASS
 			BEHAVIOUR
 				tug3SourceBehaviourPkg BEHAVIOUR
 					DEFINED AS
-						*This object class is instantiated if TU-3 connection(s) are being originated. Or TU-11s, TU-12s, or
-						TU-2s are being combined to form a VC-4. A TUG-3 consists of a homogeneous assembly of seven TUG-2s
-						or one TU-3.*;;
+						*This object class is instantiated if TU-3 connection(s) are being originated. Or 
+						TU-11s, TU-12s, or TU-2s are being combined to form a VC-4. A TUG-3 consists of 
+						a homogeneous assembly of seven TUG-2s or one TU-3.*;;
 			ATTRIBUTES
 				tug3Id GET,
 				"Recommendation M.3100":supportableClientList GET;;;
@@ -1115,8 +1138,8 @@ vc11TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc11TTPSinkPkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a vc11 trail, i.e. the point at which the VC11-POH is extracted from
-						the STM-N frame.*;;
+						*This object class terminates a vc11 trail, i.e. the point at which the VC11-POH 
+						is extracted from the STM-N frame.*;;
 			ATTRIBUTES
 				vc11TTPId GET;;;
 REGISTERED AS { g774ObjectClass 96 };
@@ -1133,8 +1156,8 @@ vc11TTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc11TTPSourcePkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class originates a vc11 trail, i.e. the point at which the VC11-POH is added to the
-						STM-N frame.*;;
+						*This object class originates a vc11 trail, i.e. the point at which the VC11-POH 
+						is added to the STM-N frame.*;;
 			ATTRIBUTES
 				vc11TTPId GET,
 				v5SignalLabelSend GET;;;
@@ -1165,8 +1188,8 @@ vc12TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc12TTPSinkPkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a vc12 trail, i.e. the point at which the VC12-POH is extracted from
-						the STM-N frame.*;;
+						*This object class terminates a vc12 trail, i.e. the point at which the VC12-POH 
+						is extracted from the STM-N frame.*;;
 			ATTRIBUTES
 				vc12TTPId GET;;;
 REGISTERED AS { g774ObjectClass 98 };
@@ -1183,8 +1206,8 @@ vc12TTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc12TTPSourcePkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class originates a vc12 trail, i.e. the point at which the VC12-POH is added to the
-						STM-N frame.*;;
+						*This object class originates a vc12 trail, i.e. the point at which the VC12-POH 
+						is added to the STM-N frame.*;;
 			ATTRIBUTES
 				vc12TTPId GET,
 				v5SignalLabelSend GET;;;
@@ -1215,8 +1238,8 @@ vc2TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc2TTPSinkPkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a vc2 trail, i.e. the point at which the VC2-POH is extracted from the
-						STM-N frame.*;;
+						*This object class terminates a vc2 trail, i.e. the point at which the VC2-POH is 
+						extracted from the STM-N frame.*;;
 			ATTRIBUTES
 				vc2TTPId GET;;;
 REGISTERED AS { g774ObjectClass 100 };
@@ -1233,8 +1256,8 @@ vc2TTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc2TTPSourcePkgBehaviour BEHAVIOUR
 					DEFINED AS
-						*This object class originates a vc2 trail, i.e. the point at which the VC2-POH is added to the STM-N
-						frame.*;;
+						*This object class originates a vc2 trail, i.e. the point at which the VC2-POH is 
+						added to the STM-N frame.*;;
 			ATTRIBUTES
 				vc2TTPId GET,
 				v5SignalLabelSend GET;;;
@@ -1265,7 +1288,8 @@ vc3TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc3TTPSinkPkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a vc3 trail, i.e. the point at which the SDH VC-3 is terminated.*;;
+						*This object class terminates a vc3 trail, i.e. the point at which the SDH VC-3 
+						is terminated.*;;
 			ATTRIBUTES
 				vc3TTPId GET;;;
 REGISTERED AS { g774ObjectClass 102 };
@@ -1283,7 +1307,8 @@ vc3TTPSourceR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc3TTPSourcePkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class originates a vc3 trail, i.e. the point at which the SDH VC-3 is originated.*;;
+						*This object class originates a vc3 trail, i.e. the point at which the SDH VC-3 
+						is originated.*;;
 			ATTRIBUTES
 				vc3TTPId GET;;;
 REGISTERED AS { g774ObjectClass 103 };
@@ -1313,7 +1338,8 @@ vc4TTPSinkR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc4TTPSinkPkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class terminates a vc4 trail, i.e. the point at which the SDH VC-4 is terminated.*;;
+						*This object class terminates a vc4 trail, i.e. the point at which the SDH VC-4 
+						is terminated.*;;
 			ATTRIBUTES
 				vc4TTPId GET;;;
 REGISTERED AS { g774ObjectClass 105 };
@@ -1331,7 +1357,8 @@ vc4TTPSourceR1 MANAGED OBJECT CLASS
 			BEHAVIOUR
 				vc3-4TTPSourcePkgR1Behaviour BEHAVIOUR
 					DEFINED AS
-						*This object class originates a vc4 trail, i.e. the point at which the SDH VC-4 is originated.*;;
+						*This object class originates a vc4 trail, i.e. the point at which the SDH VC-4 
+						is originated.*;;
 			ATTRIBUTES
 				vc4TTPId GET;;;
 REGISTERED AS { g774ObjectClass 106 };
@@ -1450,7 +1477,8 @@ trailTraceSinkPackage PACKAGE
 				*This Package supports trail trace management at the termination sink.*;;
 	ATTRIBUTES
 		trailTraceExpected REPLACE-WITH-DEFAULT
-			DEFAULT VALUE SDH.defaultNull GET-REPLACE,
+			DEFAULT VALUE SDH.defaultNull
+			GET-REPLACE,
 		trailTraceReceive GET;;
 --7.8  trailTraceSourcePackage 
 
@@ -1469,10 +1497,11 @@ tu-nSinkPackage PACKAGE
 	BEHAVIOUR
 		tu-nSinkPackageBehaviour BEHAVIOUR
 			DEFINED AS
-				*A communicationsAlarm notification shall be issued if a loss of TU pointer is detected. The
-				probableCause parameter of the notification shall indicate LOP (Loss of Pointer). A
-				communicationsAlarm notification shall be issued if an TU path alarm indication signal is detected.
-				The probableCause parameter of the notification shall indicate AIS (Alarm Indication Signal).*;;
+				*A communicationsAlarm notification shall be issued if a loss of TU pointer is 
+				detected. The probableCause parameter of the notification shall indicate LOP 
+				(Loss of Pointer). A communicationsAlarm notification shall be issued if an TU 
+				path alarm indication signal is detected. The probableCause parameter of the 
+				notification shall indicate AIS (Alarm Indication Signal).*;;
 	ATTRIBUTES
 		pointerSinkType GET;;
 --7.10 vc11-2BidirectionalPackageR1 
@@ -1482,9 +1511,9 @@ vc11-2BidirectionalPackageR1 PACKAGE
 	BEHAVIOUR
 		vc11-2BidirectionalPackageR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*A communicationsAlarm notification shall be issued if a far end receive failure (V5 byte) is
-				detected. The probableCause parameter of the notification shall indicate FERF (Far End Receive
-				Failure).*;;;
+				*A communicationsAlarm notification shall be issued if a far end receive failure 
+				(V5 byte) is detected. The probableCause parameter of the notification shall 
+				indicate FERF (Far End Receive Failure).*;;;
 --7.11 vc11-2SinkPackageR1 
 
 
@@ -1492,9 +1521,9 @@ vc11-2SinkPackageR1 PACKAGE
 	BEHAVIOUR
 		vc11-2SinkPackageR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*A communicationsAlarm notification shall be issued if the signal label received (V5 Byte) does not
-				match the signal label expected. The probableCause parameter of the notification shall indicate
-				signal label mismatch.*;;
+				*A communicationsAlarm notification shall be issued if the signal label received 
+				(V5 Byte) does not match the signal label expected. The probableCause parameter 
+				of the notification shall indicate signal label mismatch.*;;
 	ATTRIBUTES
 		v5SignalLabelExpected GET,
 		v5SignalLabelReceive GET;;
@@ -1505,9 +1534,9 @@ vc3-4BidirectionalPackageR1 PACKAGE
 	BEHAVIOUR
 		vc3-4BidirectionalPackageR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*A communicationsAlarm notification shall be issued if a far end receive failure (G1 byte) is
-				detected. The probableCause parameter of the notification shall indicate FERF (Far End Receive
-				Failure).*;;;
+				*A communicationsAlarm notification shall be issued if a far end receive failure 
+				(G1 byte) is detected. The probableCause parameter of the notification shall 
+				indicate FERF (Far End Receive Failure).*;;;
 --7.13 vc3-4SinkPackageR1 
 
 
@@ -1515,19 +1544,23 @@ vc3-4SinkPackageR1 PACKAGE
 	BEHAVIOUR
 		vc3-4SinkPackageR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*A communicationsAlarm notification shall be issued if the signal label received (C2 Byte) does not
-				match the signal label expected. The probableCause parameter of the notification shall indicate
-				signal label mismatch. A communicationsAlarm notification shall be issued if the path trace
-				received (J1 Byte) does not match the path trace expected. The probableCause parameter of the
-				notification shall indicate path trace mismatch. A communicationsAlarm notification shall be issued
-				if a loss of TU multiframe indicator (H4 Byte) is detected. The probableCause parameter of the
-				notification shall indicate loss of TU multiframe. This communicationsAlarm notification is only
-				required for high order paths with payloads that require use of the multiframe indicator. When 16
-				bytes are supported, the 16 bytes of the path trace shall be conveyed at the management interface
-				in both ways. This is a local issue whether the NE recompute the CRC-7 under a replace operation.*;;
+				*A communicationsAlarm notification shall be issued if the signal label received 
+				(C2 Byte) does not match the signal label expected. The probableCause parameter 
+				of the notification shall indicate signal label mismatch. A communicationsAlarm 
+				notification shall be issued if the path trace received (J1 Byte) does not match 
+				the path trace expected. The probableCause parameter of the notification shall 
+				indicate path trace mismatch. A communicationsAlarm notification shall be issued 
+				if a loss of TU multiframe indicator (H4 Byte) is detected. The probableCause 
+				parameter of the notification shall indicate loss of TU multiframe. This 
+				communicationsAlarm notification is only required for high order paths with 
+				payloads that require use of the multiframe indicator. When 16 bytes are 
+				supported, the 16 bytes of the path trace shall be conveyed at the management 
+				interface in both ways. This is a local issue whether the NE recompute the CRC-7 
+				under a replace operation.*;;
 	ATTRIBUTES
 		j1PathTraceExpected REPLACE-WITH-DEFAULT
-			DEFAULT VALUE SDH.defaultNull GET-REPLACE,
+			DEFAULT VALUE SDH.defaultNull
+			GET-REPLACE,
 		"Recommendation G.774.05":j1PathTraceReceive GET,
 		c2SignalLabelExpected GET,
 		c2SignalLabelReceive GET;;
@@ -1538,8 +1571,8 @@ vc3-4SourcePackageR1 PACKAGE
 	BEHAVIOUR
 		vc3-4SourcePackageR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*When 16 bytes are supported, the 16 bytes of the path trace shall be conveyed at the management
-				interface.*;;
+				*When 16 bytes are supported, the 16 bytes of the path trace shall be conveyed at 
+				the management interface.*;;
 	ATTRIBUTES
 		"Recommendation G.774.5":j1PathTraceSend GET-REPLACE,
 		c2SignalLabelSend GET;;
@@ -1560,16 +1593,15 @@ vc3-4SourcePackageR1 PACKAGE
 
 au3CTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		au3CTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The au3CTPId attribute is an attribute type whose distinguished value can be used as an RDN when
-				naming an instance of the AU3CTPBidirectional, AU3CTPSink, and AU3CTPSource managed object classes.
-				This attribute specifies the timeslot of the au3CTP within its server TTP or IA. The value shall be
-				the integer which represents the position of the timeslot in temporal order. The first timeslot
+				*The au3CTPId attribute is an attribute type whose distinguished value can be 
+				used as an RDN when naming an instance of the AU3CTPBidirectional, AU3CTPSink, 
+				and AU3CTPSource managed object classes. This attribute specifies the timeslot 
+				of the au3CTP within its server TTP or IA. The value shall be the integer which 
+				represents the position of the timeslot in temporal order. The first timeslot 
 				shall be numbered one.*;;
 REGISTERED AS { g774Attribute 1 };
 --8.2 AU-4 Identification 
@@ -1577,16 +1609,15 @@ REGISTERED AS { g774Attribute 1 };
 
 au4CTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		au4CTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The au4CTPId attribute is an attribute type whose distinguished value can be used as an RDN when
-				naming an instance of the AU4CTPBidirectional, AU4CTPSink, and AU4CTPSource managed object classes.
-				This attribute specifies the timeslot of the au4CTP within its server TTP or IA. The value shall be
-				the integer which represents the position of the timeslot in temporal order. The first timeslot
+				*The au4CTPId attribute is an attribute type whose distinguished value can be 
+				used as an RDN when naming an instance of the AU4CTPBidirectional, AU4CTPSink, 
+				and AU4CTPSource managed object classes. This attribute specifies the timeslot 
+				of the au4CTP within its server TTP or IA. The value shall be the integer which 
+				represents the position of the timeslot in temporal order. The first timeslot 
 				shall be numbered one.*;;
 REGISTERED AS { g774Attribute 2 };
 --8.3 AUG Identification 
@@ -1594,615 +1625,567 @@ REGISTERED AS { g774Attribute 2 };
 
 augId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		augIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The augId attribute is an attribute type whose distinguished value can be used as an RDN when
-				naming an instance of the AUG managed object class. This attribute specifies the timeslot of the
-				aug within its server TTP or IA. The value shall be the integer which represents the position of
-				the timeslot in temporal order. The first timeslot shall be numbered one.*;;
+				*The augId attribute is an attribute type whose distinguished value can be used 
+				as an RDN when naming an instance of the AUG managed object class. This 
+				attribute specifies the timeslot of the aug within its server TTP or IA. The 
+				value shall be the integer which represents the position of the timeslot in 
+				temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 3 };
 --8.4  C2 Signal Label Expected 
 
 
 c2SignalLabelExpected ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.C2SignalLabel;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		c2SignalLabelExpectedBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the expected C2 VC Signal Label for an incoming VC-n. See Recommendation
-				G.707/Y.1322 for a list of valid values.*;;
+				*This attribute specifies the expected C2 VC Signal Label for an incoming VC-n. 
+				See Recommendation G.707/Y.1322 for a list of valid values.*;;
 REGISTERED AS { g774Attribute 4 };
 --8.5  C2 Signal Label Receive 
 
 
 c2SignalLabelReceive ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.C2SignalLabel;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		c2SignalLabelReceiveBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the C2 VC Signal Label for an incoming VC-n. See Recommendation
-				G.707/Y.1322 for a list of valid values.*;;
+				*This attribute specifies the C2 VC Signal Label for an incoming VC-n. See 
+				Recommendation G.707/Y.1322 for a list of valid values.*;;
 REGISTERED AS { g774Attribute 5 };
 --8.6  C2 Signal Label Send 
 
 
 c2SignalLabelSend ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.C2SignalLabel;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		c2SignalLabelSendBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the C2 VC Signal Label for an outgoing VC-n. See Recommendation
-				G.707/Y.1322 for a list of valid values.*;;
+				*This attribute specifies the C2 VC Signal Label for an outgoing VC-n. See 
+				Recommendation G.707/Y.1322 for a list of valid values.*;;
 REGISTERED AS { g774Attribute 6 };
 --8.7  Electrical SDH Physical Interface Trail Termination Point Identification 
 
 
 electricalSPITTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		electricalSPITTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the electricalSPITTP object classes. If
-				the string choice of the syntax is used then matching on substrings is permitted. If the number
-				choice for the syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the electricalSPITTP 
+				object classes. If the string choice of the syntax is used then matching on 
+				substrings is permitted. If the number choice for the syntax is used then 
+				matching on ordering is permitted.*;;
 REGISTERED AS { g774Attribute 7 };
 --8.8  Excessive Bit Error Ratio Maintenance Inhibit 
 
 
 excessiveBERMtceInhibit ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		excessiveBERMtceInhibitBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is set to TRUE to cause the inhibition of consequent maintenance signalling upon the
-				detection of excessive bit error ratio.*;;
+				*This attribute is set to TRUE to cause the inhibition of consequent maintenance 
+				signalling upon the detection of excessive bit error ratio.*;;
 REGISTERED AS { g774Attribute 8 };
 --8.9  J1 Path Trace Expected 
 
 
 j1PathTraceExpected ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		j1PathTraceExpectedBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used to specify the value of the expected J1 Byte VC Path Trace byte message for
-				instances of the VC-n. If the value of this attribute is set to NULL then any Received Path Trace
-				shall be considered to match.*;;
+				*This attribute is used to specify the value of the expected J1 Byte VC Path 
+				Trace byte message for instances of the VC-n. If the value of this attribute is 
+				set to NULL then any Received Path Trace shall be considered to match.*;;
 REGISTERED AS { g774Attribute 10 };
 --8.10  J1 Path Trace Receive 
 
 
 j1PathTraceReceive ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		j1PathTraceReceiveBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used to indicate the value of the incoming J1 Byte VC Path Trace byte message for
-				instances of the VC-n.*;;
+				*This attribute is used to indicate the value of the incoming J1 Byte VC Path 
+				Trace byte message for instances of the VC-n.*;;
 REGISTERED AS { g774Attribute 11 };
 --8.11  J1 Path Trace Send 
 
 
 j1PathTraceSend ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		j1PathTraceSendBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used to indicate the value of the outgoing J1 VC Path Trace byte message for
-				instances of the VC-n. The NULL choice is not supported.*;;
+				*This attribute is used to indicate the value of the outgoing J1 VC Path Trace 
+				byte message for instances of the VC-n. The NULL choice is not supported.*;;
 REGISTERED AS { g774Attribute 12 };
 --8.12  Multiplex Section Connection Termination Point Identification 
 
 
 msCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		msCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the msCTP object class. This attribute
-				represents the first and only timeslot of this type. The value of this attribute shall be integer
-				one.*;;
+				*This attribute is used as an RDN for naming instances of the msCTP object class. 
+				This attribute represents the first and only timeslot of this type. The value of 
+				this attribute shall be integer one.*;;
 REGISTERED AS { g774Attribute 13 };
 --8.13  MS Data Communications Channel CTP Identification 
 
 
 msDatacomCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		msDatacomCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The msDatacomCTPId attribute is an attribute type whose distinguished value can be used as an RDN
-				when naming an instance of the msDatacomCTPBidirectional, msDatacomCTPSink, and msDatacomCTPSource
-				managed object classes. This attribute represents the first and only timeslot of this type. The
-				value of this attribute shall be integer one.*;;
+				*The msDatacomCTPId attribute is an attribute type whose distinguished value can 
+				be used as an RDN when naming an instance of the msDatacomCTPBidirectional, 
+				msDatacomCTPSink, and msDatacomCTPSource managed object classes. This attribute 
+				represents the first and only timeslot of this type. The value of this attribute 
+				shall be integer one.*;;
 REGISTERED AS { g774Attribute 14 };
 --8.14  Multiplex Section Orderwire Identification 
 
 
 msOrderwireCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		msOrderwireCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the Multiplex Section Orderwire Channel
-				object class. This attribute represents the first and only timeslot of this type. The value of this
-				attribute shall be integer one.*;;
+				*This attribute is used as an RDN for naming instances of the Multiplex Section 
+				Orderwire Channel object class. This attribute represents the first and only 
+				timeslot of this type. The value of this attribute shall be integer one.*;;
 REGISTERED AS { g774Attribute 15 };
 --8.15  Multiplex Section Trail Termination Point Identification 
 
 
 msTTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		msTTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the msTTP object class. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the msTTP object class. 
+				If the string choice of the syntax is used then matching on substrings is 
+				permitted. If the number choice for the syntax is used then matching on ordering 
+				is permitted.*;;
 REGISTERED AS { g774Attribute 16 };
 --8.16 Optical Reach 
 
 
 opticalReach ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.OpticalReach;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		opticalReachBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute indicates the length the optical signal may travel before requiring termination or
-				regeneration.*;;
+				*This attribute indicates the length the optical signal may travel before 
+				requiring termination or regeneration.*;;
 REGISTERED AS { g774Attribute 17 };
 --8.17  Optical SDH Physical Interface Trail Termination Point Identification 
 
 
 opticalSPITTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		opticalSPITTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the opticalSPITTP object class. If the
-				string choice of the syntax is used then matching on substrings is permitted. If the number choice
-				for the syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the opticalSPITTP 
+				object class. If the string choice of the syntax is used then matching on 
+				substrings is permitted. If the number choice for the syntax is used then 
+				matching on ordering is permitted.*;;
 REGISTERED AS { g774Attribute 18 };
 --8.18  Optical WaveLength 
 
 
 opticalWavelength ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.OpticalWavelength;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		opticalWavelengthBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the optical wavelength used by an opticalSPITTP object instance.*;;
+				*This attribute specifies the optical wavelength used by an opticalSPITTP object 
+				instance.*;;
 REGISTERED AS { g774Attribute 19 };
 --8.19  Pointer Sink Type 
 
 
 pointerSinkType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.PointerSinkType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		pointerSinkTypeBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute indicates the status of the incoming Pointer of a sink or bidirectional CTP.*;;
+				*This attribute indicates the status of the incoming Pointer of a sink or 
+				bidirectional CTP.*;;
 REGISTERED AS { g774Attribute 20 };
 --8.20  Pointer Source Type 
 
 
 pointerSourceType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.PointerSourceType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		pointerSourceTypeBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute indicates the status of the outgoing Pointer of a source or bidirectional CTP.*;;
+				*This attribute indicates the status of the outgoing Pointer of a source or 
+				bidirectional CTP.*;;
 REGISTERED AS { g774Attribute 21 };
 --8.21  Regenerator Section Connection Termination Point Identification 
 
 
 rsCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		rsCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the rsCTP object classes. This attribute
-				represents the first and only timeslot of this type. The value of this attribute shall be integer
-				one.*;;
+				*This attribute is used as an RDN for naming instances of the rsCTP object 
+				classes. This attribute represents the first and only timeslot of this type. The 
+				value of this attribute shall be integer one.*;;
 REGISTERED AS { g774Attribute 22 };
 --8.22  Regenerator Section Data Communications Channel CTP Identification 
 
 
 rsDatacomCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		rsDatacomCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The rsDatacomCTPId attribute is an attribute type whose distinguished value can be used as an RDN
-				when naming an instance of the rsDatacomCTPBidirectional, rsDatacomCTPSink, and rsDatacomCTPSource
-				managed object classes. This attribute represents the first and only timeslot of this type. The
-				value of this attribute shall be integer one.*;;
+				*The rsDatacomCTPId attribute is an attribute type whose distinguished value can 
+				be used as an RDN when naming an instance of the rsDatacomCTPBidirectional, 
+				rsDatacomCTPSink, and rsDatacomCTPSource managed object classes. This attribute 
+				represents the first and only timeslot of this type. The value of this attribute 
+				shall be integer one.*;;
 REGISTERED AS { g774Attribute 23 };
 --8.23  Regenerator Section Orderwire Identification 
 
 
 rsOrderwireCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		rsOrderwireCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the Regenerator Section Orderwire Channel
-				object classes. This attribute represents the first and only timeslot of this type. The value of
-				this attribute shall be integer one.*;;
+				*This attribute is used as an RDN for naming instances of the Regenerator Section 
+				Orderwire Channel object classes. This attribute represents the first and only 
+				timeslot of this type. The value of this attribute shall be integer one.*;;
 REGISTERED AS { g774Attribute 24 };
 --8.24  Regenerator Section Trail Termination Point Identification 
 
 
 rsTTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		rsTTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the rsTTP object classes. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the rsTTP object 
+				classes. If the string choice of the syntax is used then matching on substrings 
+				is permitted. If the number choice for the syntax is used then matching on 
+				ordering is permitted.*;;
 REGISTERED AS { g774Attribute 25 };
 --8.25  Regenerator Section User Channel Identification 
 
 
 rsUserChannelCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		rsUserChannelCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the rsUserChannel object classes. This
-				attribute represents the first and only timeslot of this type. The value of this attribute shall be
-				integer one.*;;
+				*This attribute is used as an RDN for naming instances of the rsUserChannel 
+				object classes. This attribute represents the first and only timeslot of this 
+				type. The value of this attribute shall be integer one.*;;
 REGISTERED AS { g774Attribute 26 };
 --8.26  Signal Degrade Threshold 
 
 
 signalDegradeThreshold ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.Integer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		signalDegradeThresholdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the specific BER used to define the signal degrade threshold. The specific
-				BER used is an equipment issue. This attribute represents the negative power of 10. So, for
-				instance, if this attribute had a value of 5, then the BER threshold is 10 raised to the power of
-				5.*;;
+				*This attribute specifies the specific BER used to define the signal degrade 
+				threshold. The specific BER used is an equipment issue. This attribute 
+				represents the negative power of 10. So, for instance, if this attribute had a 
+				value of 5, then the BER threshold is 10 raised to the power of 5.*;;
 REGISTERED AS { g774Attribute 27 };
 --8.27  STM Level 
 
 
 stmLevel ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.Integer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		stmLevelBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the level, n, of the STM-n signal being received, transmitted, or received
-				and transmitted for termination point object instance.*;;
+				*This attribute specifies the level, n, of the STM-n signal being received, 
+				transmitted, or received and transmitted for termination point object instance.*;;
 REGISTERED AS { g774Attribute 28 };
 --8.28  Trail Trace Expected 
 
 
 trailTraceExpected ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.PathTrace;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		trailTraceExpectedBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used to specify the value of the expected Trail Trace information. If the value
-				of this attribute is set to NULL then any Trail Trace shall be considered to match.*;;
+				*This attribute is used to specify the value of the expected Trail Trace 
+				information. If the value of this attribute is set to NULL then any Trail Trace 
+				shall be considered to match.*;;
 REGISTERED AS { g774Attribute 44 };
 --8.29  Trail Trace Receive 
 
 
 trailTraceReceive ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.TrailTraceReceiveSend;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		trailTraceReceiveBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used to indicate the value of the incoming Trail Trace information.*;;
+				*This attribute is used to indicate the value of the incoming Trail Trace 
+				information.*;;
 REGISTERED AS { g774Attribute 45 };
 --8.30  Trail Trace Send 
 
 
 trailTraceSend ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.TrailTraceReceiveSend;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		trailTraceSendBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used to indicate the value of the outgoing Trail Trace information.*;;
+				*This attribute is used to indicate the value of the outgoing Trail Trace 
+				information.*;;
 REGISTERED AS { g774Attribute 46 };
 --8.31  Tributary Unit 11 Connection Termination Point Identification 
 
 
 tu11CTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		tu11CTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the tu11CTP object classes. This attribute
-				specifies the timeslot of the TU-11 CTP within its server TTP or IA. The value shall be the integer
-				which represents the position of the timeslot in temporal order. The first timeslot shall be
-				numbered one.*;;
+				*This attribute is used as an RDN for naming instances of the tu11CTP object 
+				classes. This attribute specifies the timeslot of the TU-11 CTP within its 
+				server TTP or IA. The value shall be the integer which represents the position 
+				of the timeslot in temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 29 };
 --8.32  Tributary Unit 12 Connection Termination Point Identification 
 
 
 tu12CTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		tu12CTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the tu12CTP object classes. This attribute
-				specifies the timeslot of the TU-12 CTP within its server TTP or IA. The value shall be the integer
-				which represents the position of the timeslot in temporal order. The first timeslot shall be
-				numbered one.*;;
+				*This attribute is used as an RDN for naming instances of the tu12CTP object 
+				classes. This attribute specifies the timeslot of the TU-12 CTP within its 
+				server TTP or IA. The value shall be the integer which represents the position 
+				of the timeslot in temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 30 };
 --8.33  Tributary Unit 2 Connection Termination Point Identification 
 
 
 tu2CTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		tu2CTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the tu2CTP object classes. This attribute
-				specifies the timeslot of the TU-2 CTP within its server TTP or IA. The value shall be the integer
-				which represents the position of the timeslot in temporal order. The first timeslot shall be
-				numbered one.*;;
+				*This attribute is used as an RDN for naming instances of the tu2CTP object 
+				classes. This attribute specifies the timeslot of the TU-2 CTP within its server 
+				TTP or IA. The value shall be the integer which represents the position of the 
+				timeslot in temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 31 };
 --8.34  Tributary Unit 3 Connection Termination Point Identification 
 
 
 tu3CTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		tu3CTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the tu3CTP object classes. This attribute
-				specifies the timeslot of the TU-3 CTP within its server TTP or IA. The value shall be the integer
-				which represents the position of the timeslot in temporal order. The first timeslot shall be
-				numbered one.*;;
+				*This attribute is used as an RDN for naming instances of the tu3CTP object 
+				classes. This attribute specifies the timeslot of the TU-3 CTP within its server 
+				TTP or IA. The value shall be the integer which represents the position of the 
+				timeslot in temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 32 };
 --8.35  TUG-2 Identification 
 
 
 tug2Id ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		tug2IdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The tug2Id attribute is an attribute type whose distinguished value can be used as an RDN when
-				naming an instance of the TUG-2 managed object class. This attribute specifies the timeslot of the
-				TUG2 within its server TTP or IA. The value shall be the integer which represents the position of
-				the timeslot in temporal order. The first timeslot shall be numbered one.*;;
+				*The tug2Id attribute is an attribute type whose distinguished value can be used 
+				as an RDN when naming an instance of the TUG-2 managed object class. This 
+				attribute specifies the timeslot of the TUG2 within its server TTP or IA. The 
+				value shall be the integer which represents the position of the timeslot in 
+				temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 33 };
 --8.36  TUG-3 Identification 
 
 
 tug3Id ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		tug3IdBehaviour BEHAVIOUR
 			DEFINED AS
-				*The tug3Id attribute is an attribute type whose distinguished value can be used as an RDN when
-				naming an instance of the TUG-3 managed object class. This attribute specifies the timeslot of the
-				TUG3 within its server TTP or IA. The value shall be the integer which represents the position of
-				the timeslot in temporal order. The first timeslot shall be numbered one.*;;
+				*The tug3Id attribute is an attribute type whose distinguished value can be used 
+				as an RDN when naming an instance of the TUG-3 managed object class. This 
+				attribute specifies the timeslot of the TUG3 within its server TTP or IA. The 
+				value shall be the integer which represents the position of the timeslot in 
+				temporal order. The first timeslot shall be numbered one.*;;
 REGISTERED AS { g774Attribute 34 };
 --8.37  V5 Signal Label Expected 
 
 
 v5SignalLabelExpected ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.V5SignalLabel;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		v5SignalLabelExpectedBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the expected V5 VC Signal Label for an incoming VC-n. See Recommendation
-				G.707/Y.1322 for a list of valid values.*;;
+				*This attribute specifies the expected V5 VC Signal Label for an incoming VC-n. 
+				See Recommendation G.707/Y.1322 for a list of valid values.*;;
 REGISTERED AS { g774Attribute 35 };
 --8.38  V5 Signal Label Receive 
 
 
 v5SignalLabelReceive ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.V5SignalLabel;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		v5SignalLabelReceiveBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the V5 VC Signal Label for an incoming VC-n. See Recommendation
-				G.707/Y.1322 for a list of valid values.*;;
+				*This attribute specifies the V5 VC Signal Label for an incoming VC-n. See 
+				Recommendation G.707/Y.1322 for a list of valid values.*;;
 REGISTERED AS { g774Attribute 36 };
 --8.39  V5 Signal Label Send 
 
 
 v5SignalLabelSend ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.V5SignalLabel;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		v5SignalLabelSendBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute specifies the V5 VC Signal Label for an outgoing VC-n. See Recommendation
-				G.707/Y.1322 for a list of valid values.*;;
+				*This attribute specifies the V5 VC Signal Label for an outgoing VC-n. See 
+				Recommendation G.707/Y.1322 for a list of valid values.*;;
 REGISTERED AS { g774Attribute 37 };
 --8.40  Virtual Container 11 Trail Termination Point Identification 
 
 
 vc11TTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		vc11TTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the vc11TTP object classes. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the vc11TTP object 
+				classes. If the string choice of the syntax is used then matching on substrings 
+				is permitted. If the number choice for the syntax is used then matching on 
+				ordering is permitted.*;;
 REGISTERED AS { g774Attribute 38 };
 --8.41  Virtual Container 12 Trail Termination Point Identification 
 
 
 vc12TTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		vc12TTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the vc12TTP object classes. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the vc12TTP object 
+				classes. If the string choice of the syntax is used then matching on substrings 
+				is permitted. If the number choice for the syntax is used then matching on 
+				ordering is permitted.*;;
 REGISTERED AS { g774Attribute 39 };
 --8.42  Virtual Container 2 Trail Termination Point Identification 
 
 
 vc2TTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		vc2TTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the vc2TTP object classes. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the vc2TTP object 
+				classes. If the string choice of the syntax is used then matching on substrings 
+				is permitted. If the number choice for the syntax is used then matching on 
+				ordering is permitted.*;;
 REGISTERED AS { g774Attribute 40 };
 --8.43  Virtual Container 3 Trail Termination Point Identification 
 
 
 vc3TTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		vc3TTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the vc3TTP object classes. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the vc3TTP object 
+				classes. If the string choice of the syntax is used then matching on substrings 
+				is permitted. If the number choice for the syntax is used then matching on 
+				ordering is permitted.*;;
 REGISTERED AS { g774Attribute 41 };
 --8.44  Virtual Container 4 Trail Termination Point Identification 
 
 
 vc4TTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		vc4TTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the vc4TTP object classes. If the string
-				choice of the syntax is used then matching on substrings is permitted. If the number choice for the
-				syntax is used then matching on ordering is permitted.*;;
+				*This attribute is used as an RDN for naming instances of the vc4TTP object 
+				classes. If the string choice of the syntax is used then matching on substrings 
+				is permitted. If the number choice for the syntax is used then matching on 
+				ordering is permitted.*;;
 REGISTERED AS { g774Attribute 42 };
 --8.45  VC-n User Channel Identification 
 
 
 vcnUserChannelCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDH.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		vcnUserChannelCTPIdBehaviour BEHAVIOUR
 			DEFINED AS
-				*This attribute is used as an RDN for naming instances of the vcnUserChannel object classes. This
-				attribute represents the first and only timeslot of this type. The value of this attribute shall be
-				integer one.*;;
+				*This attribute is used as an RDN for naming instances of the vcnUserChannel 
+				object classes. This attribute represents the first and only timeslot of this 
+				type. The value of this attribute shall be integer one.*;;
 REGISTERED AS { g774Attribute 43 };
 --9  Name Bindings 
 --This clause provides replacement namebinding definitions  for the existing Recommendation G.774 
@@ -2322,222 +2305,207 @@ REGISTERED AS { g774Attribute 43 };
 
 
 au3CTPBidirectionalR1-augBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au3CTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS au3CTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augBidirectional;
+	SUPERIOR OBJECT CLASS augBidirectional;
 	WITH ATTRIBUTE
 		au3CTPId;
 	BEHAVIOUR
 		au3CTPBidirectionalR1-augBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 121 };
 
 
 au3CTPSinkR1-augBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au3CTPSinkR1;
+	SUBORDINATE OBJECT CLASS au3CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augBidirectional;
+	SUPERIOR OBJECT CLASS augBidirectional;
 	WITH ATTRIBUTE
 		au3CTPId;
 	BEHAVIOUR
 		au3CTPSinkR1-augBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 122 };
 
 
 au3CTPSinkR1-augSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au3CTPSinkR1;
+	SUBORDINATE OBJECT CLASS au3CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augSink;
+	SUPERIOR OBJECT CLASS augSink;
 	WITH ATTRIBUTE
 		au3CTPId;
 	BEHAVIOUR
 		au3CTPSinkR1-augSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 123 };
 
 
 au3CTPSource-augBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au3CTPSource;
+	SUBORDINATE OBJECT CLASS au3CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augBidirectional;
+	SUPERIOR OBJECT CLASS augBidirectional;
 	WITH ATTRIBUTE
 		au3CTPId;
 	BEHAVIOUR
 		au3CTPSource-augBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 4 };
 
 
 au3CTPSource-augSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au3CTPSource;
+	SUBORDINATE OBJECT CLASS au3CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augSource;
+	SUPERIOR OBJECT CLASS augSource;
 	WITH ATTRIBUTE
 		au3CTPId;
 	BEHAVIOUR
 		au3CTPSource-augSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 5 };
 --9.2  au4CTP 
 
 
 au4CTPBidirectionalR1-augBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au4CTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS au4CTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augBidirectional;
+	SUPERIOR OBJECT CLASS augBidirectional;
 	WITH ATTRIBUTE
 		au4CTPId;
 	BEHAVIOUR
 		au4CTPBidirectionalR1-augBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 124 };
 
 
 au4CTPSinkR1-augBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au4CTPSinkR1;
+	SUBORDINATE OBJECT CLASS au4CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augBidirectional;
+	SUPERIOR OBJECT CLASS augBidirectional;
 	WITH ATTRIBUTE
 		au4CTPId;
 	BEHAVIOUR
 		au4CTPSinkR1-augBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 125 };
 
 
 au4CTPSinkR1-augSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au4CTPSinkR1;
+	SUBORDINATE OBJECT CLASS au4CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augSink;
+	SUPERIOR OBJECT CLASS augSink;
 	WITH ATTRIBUTE
 		au4CTPId;
 	BEHAVIOUR
 		au4CTPSinkR1-augSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 126 };
 
 
 au4CTPSource-augBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au4CTPSource;
+	SUBORDINATE OBJECT CLASS au4CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augBidirectional;
+	SUPERIOR OBJECT CLASS augBidirectional;
 	WITH ATTRIBUTE
 		au4CTPId;
 	BEHAVIOUR
 		au4CTPSource-augBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 9 };
 
 
 au4CTPSource-augSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		au4CTPSource;
+	SUBORDINATE OBJECT CLASS au4CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		augSource;
+	SUPERIOR OBJECT CLASS augSource;
 	WITH ATTRIBUTE
 		au4CTPId;
 	BEHAVIOUR
 		au4CTPSource-augSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 10 };
 --9.3  aug 
 
 
 augBidirectional-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		augBidirectional;
+	SUBORDINATE OBJECT CLASS augBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		augId;
 	BEHAVIOUR
 		augBidirectional-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 11 };
 
 
 augSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		augSink;
+	SUBORDINATE OBJECT CLASS augSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPSink;
+	SUPERIOR OBJECT CLASS msTTPSink;
 	WITH ATTRIBUTE
 		augId;
 	BEHAVIOUR
 		augSink-msTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 12 };
 
 
 augSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		augSource;
+	SUBORDINATE OBJECT CLASS augSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPSource;
+	SUPERIOR OBJECT CLASS msTTPSource;
 	WITH ATTRIBUTE
 		augId;
 	BEHAVIOUR
 		augSource-msTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 13 };
 --9.4 electricalSPITTP 
 
 
 electricalSPITTPBidirectional-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		electricalSPITTPBidirectional;
+	SUBORDINATE OBJECT CLASS electricalSPITTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		electricalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2546,11 +2514,9 @@ REGISTERED AS { g774NameBinding 14 };
 
 
 electricalSPITTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		electricalSPITTPSink;
+	SUBORDINATE OBJECT CLASS electricalSPITTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		electricalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2559,11 +2525,9 @@ REGISTERED AS { g774NameBinding 15 };
 
 
 electricalSPITTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		electricalSPITTPSource;
+	SUBORDINATE OBJECT CLASS electricalSPITTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		electricalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2572,255 +2536,238 @@ REGISTERED AS { g774NameBinding 16 };
 
 
 msCTPBidirectional-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msCTPBidirectional AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS msCTPBidirectional AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		msCTPId;
 	BEHAVIOUR
 		msCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 17 };
 --9.5 msCTP 
 
 
 msCTPSink-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS msCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		msCTPId;
 	BEHAVIOUR
 		msCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 18 };
 
 
 msCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS msCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		msCTPId;
 	BEHAVIOUR
 		msCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 19 };
 
 
 msCTPSource-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS msCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		msCTPId;
 	BEHAVIOUR
 		msCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 20 };
 
 
 msCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS msCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		msCTPId;
 	BEHAVIOUR
 		msCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 21 };
 --9.6 msDatacomCTP 
 
 
 msDatacomCTPBidirectional-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msDatacomCTPBidirectional;
+	SUBORDINATE OBJECT CLASS msDatacomCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPBidirectional-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 22 };
 
 
 msDatacomCTPSink-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msDatacomCTPSink;
+	SUBORDINATE OBJECT CLASS msDatacomCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPSink-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 23 };
 
 
 msDatacomCTPSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msDatacomCTPSink;
+	SUBORDINATE OBJECT CLASS msDatacomCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPSink;
+	SUPERIOR OBJECT CLASS msTTPSink;
 	WITH ATTRIBUTE
 		msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPSink-msTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 24 };
 
 
 msDatacomCTPSource-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msDatacomCTPSource;
+	SUBORDINATE OBJECT CLASS msDatacomCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPSource-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 25 };
 
 
 msDatacomCTPSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msDatacomCTPSource;
+	SUBORDINATE OBJECT CLASS msDatacomCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPSource;
+	SUPERIOR OBJECT CLASS msTTPSource;
 	WITH ATTRIBUTE
 		msDatacomCTPId;
 	BEHAVIOUR
 		msDatacomCTPSource-msTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 26 };
 --9.7  msOrderwireCTP 
 
 
 msOrderwireCTPBidirectional-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msOrderwireCTPBidirectional;
+	SUBORDINATE OBJECT CLASS msOrderwireCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPBidirectional-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 27 };
 
 
 msOrderwireCTPSink-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msOrderwireCTPSink;
+	SUBORDINATE OBJECT CLASS msOrderwireCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPSink-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 28 };
 
 
 msOrderwireCTPSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msOrderwireCTPSink;
+	SUBORDINATE OBJECT CLASS msOrderwireCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPSink;
+	SUPERIOR OBJECT CLASS msTTPSink;
 	WITH ATTRIBUTE
 		msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPSink-msTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 29 };
 
 
 msOrderwireCTPSource-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msOrderwireCTPSource;
+	SUBORDINATE OBJECT CLASS msOrderwireCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPBidirectional;
+	SUPERIOR OBJECT CLASS msTTPBidirectional;
 	WITH ATTRIBUTE
 		msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPSource-msTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 30 };
 
 
 msOrderwireCTPSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msOrderwireCTPSource;
+	SUBORDINATE OBJECT CLASS msOrderwireCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		msTTPSource;
+	SUPERIOR OBJECT CLASS msTTPSource;
 	WITH ATTRIBUTE
 		msOrderwireCTPId;
 	BEHAVIOUR
 		msOrderwireCTPSource-msTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 31 };
 --9.8 msTTP 
 
 
 msTTPBidirectional-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msTTPBidirectional;
+	SUBORDINATE OBJECT CLASS msTTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		msTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2829,11 +2776,9 @@ REGISTERED AS { g774NameBinding 32 };
 
 
 msTTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msTTPSink;
+	SUBORDINATE OBJECT CLASS msTTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		msTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2842,11 +2787,9 @@ REGISTERED AS { g774NameBinding 33 };
 
 
 msTTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		msTTPSource;
+	SUBORDINATE OBJECT CLASS msTTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		msTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2856,11 +2799,9 @@ REGISTERED AS { g774NameBinding 34 };
 
 
 opticalSPITTPBidirectional-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		opticalSPITTPBidirectional;
+	SUBORDINATE OBJECT CLASS opticalSPITTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		opticalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2869,11 +2810,9 @@ REGISTERED AS { g774NameBinding 35 };
 
 
 opticalSPITTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		opticalSPITTPSink;
+	SUBORDINATE OBJECT CLASS opticalSPITTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		opticalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2882,11 +2821,9 @@ REGISTERED AS { g774NameBinding 36 };
 
 
 opticalSPITTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		opticalSPITTPSource;
+	SUBORDINATE OBJECT CLASS opticalSPITTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		opticalSPITTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2895,335 +2832,313 @@ REGISTERED AS { g774NameBinding 37 };
 
 
 rsCTPBidirectional-electricalSPITTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPBidirectional;
+	SUBORDINATE OBJECT CLASS rsCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		electricalSPITTPBidirectional;
+	SUPERIOR OBJECT CLASS electricalSPITTPBidirectional;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPBidirectional-electricalSPITTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 38 };
 --9.10 rsCTP 
 
 
 rsCTPSink-electricalSPITTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSink;
+	SUBORDINATE OBJECT CLASS rsCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		electricalSPITTPBidirectional;
+	SUPERIOR OBJECT CLASS electricalSPITTPBidirectional;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSink-electricalSPITTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 39 };
 
 
 rsCTPSink-electricalSPITTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSink;
+	SUBORDINATE OBJECT CLASS rsCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		electricalSPITTPSink;
+	SUPERIOR OBJECT CLASS electricalSPITTPSink;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSink-electricalSPITTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 40 };
 
 
 rsCTPSource-electricalSPITTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSource;
+	SUBORDINATE OBJECT CLASS rsCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		electricalSPITTPBidirectional;
+	SUPERIOR OBJECT CLASS electricalSPITTPBidirectional;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSource-electricalSPITTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 41 };
 
 
 rsCTPSource-electricalSPITTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSource;
+	SUBORDINATE OBJECT CLASS rsCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		electricalSPITTPSource;
+	SUPERIOR OBJECT CLASS electricalSPITTPSource;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSource-electricalSPITTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 42 };
 
 
 rsCTPBidirectional-opticalSPITTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPBidirectional;
+	SUBORDINATE OBJECT CLASS rsCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		opticalSPITTPBidirectional;
+	SUPERIOR OBJECT CLASS opticalSPITTPBidirectional;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPBidirectional-opticalSPITTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 43 };
 
 
 rsCTPSink-opticalSPITTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSink;
+	SUBORDINATE OBJECT CLASS rsCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		opticalSPITTPBidirectional;
+	SUPERIOR OBJECT CLASS opticalSPITTPBidirectional;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSink-opticalSPITTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 44 };
 
 
 rsCTPSink-opticalSPITTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSink;
+	SUBORDINATE OBJECT CLASS rsCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		opticalSPITTPSink;
+	SUPERIOR OBJECT CLASS opticalSPITTPSink;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSink-opticalSPITTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 45 };
 
 
 rsCTPSource-opticalSPITTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSource;
+	SUBORDINATE OBJECT CLASS rsCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		opticalSPITTPBidirectional;
+	SUPERIOR OBJECT CLASS opticalSPITTPBidirectional;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSource-opticalSPITTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 46 };
 
 
 rsCTPSource-opticalSPITTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsCTPSource;
+	SUBORDINATE OBJECT CLASS rsCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		opticalSPITTPSource;
+	SUPERIOR OBJECT CLASS opticalSPITTPSource;
 	WITH ATTRIBUTE
 		rsCTPId;
 	BEHAVIOUR
 		rsCTPSource-opticalSPITTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 47 };
 --9.11 rsDatacomCTP 
 
 
 rsDatacomCTPBidirectional-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsDatacomCTPBidirectional AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsDatacomCTPBidirectional AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 48 };
 
 
 rsDatacomCTPSink-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsDatacomCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsDatacomCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 49 };
 
 
 rsDatacomCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsDatacomCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsDatacomCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 50 };
 
 
 rsDatacomCTPSource-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsDatacomCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsDatacomCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 51 };
 
 
 rsDatacomCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsDatacomCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsDatacomCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsDatacomCTPId;
 	BEHAVIOUR
 		rsDatacomCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 52 };
 
 
 rsOrderwireCTPBidirectional-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsOrderwireCTPBidirectional AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsOrderwireCTPBidirectional AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 53 };
 --9.12 rsOrderwireCTP 
 
 
 rsOrderwireCTPSink-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsOrderwireCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsOrderwireCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 54 };
 
 
 rsOrderwireCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsOrderwireCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsOrderwireCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 55 };
 
 
 rsOrderwireCTPSource-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsOrderwireCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsOrderwireCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 56 };
 
 
 rsOrderwireCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsOrderwireCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsOrderwireCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsOrderwireCTPId;
 	BEHAVIOUR
 		rsOrderwireCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 57 };
 --9.13 rsTTP 
 
 
 rsTTPBidirectional-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		rsTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3232,11 +3147,9 @@ REGISTERED AS { g774NameBinding 58 };
 
 
 rsTTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsTTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsTTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		rsTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3245,11 +3158,9 @@ REGISTERED AS { g774NameBinding 59 };
 
 
 rsTTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsTTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsTTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		rsTTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3259,562 +3170,526 @@ REGISTERED AS { g774NameBinding 60 };
 
 
 rsUserChannelCTPBidirectional-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsUserChannelCTPBidirectional AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsUserChannelCTPBidirectional AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPBidirectional-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 61 };
 
 
 rsUserChannelCTPSink-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsUserChannelCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsUserChannelCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPSink-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 62 };
 
 
 rsUserChannelCTPSink-rsTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsUserChannelCTPSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsUserChannelCTPSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPSink-rsTTPSinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 63 };
 
 
 rsUserChannelCTPSource-rsTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsUserChannelCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsUserChannelCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPSource-rsTTPBidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 64 };
 
 
 rsUserChannelCTPSource-rsTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		rsUserChannelCTPSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS rsUserChannelCTPSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		rsTTPSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS rsTTPSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		rsUserChannelCTPId;
 	BEHAVIOUR
 		rsUserChannelCTPSource-rsTTPSourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 65 };
 --9.15 tu11CTP 
 
 
 tu11CTPBidirectionalR1-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu11CTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS tu11CTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu11CTPId;
 	BEHAVIOUR
 		tu11CTPBidirectionalR1-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 127 };
 
 
 tu11CTPSinkR1-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu11CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu11CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu11CTPId;
 	BEHAVIOUR
 		tu11CTPSinkR1-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 128 };
 
 
 tu11CTPSinkR1-tug2Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu11CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu11CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Sink;
+	SUPERIOR OBJECT CLASS tug2Sink;
 	WITH ATTRIBUTE
 		tu11CTPId;
 	BEHAVIOUR
 		tu11CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 129 };
 
 
 tu11CTPSource-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu11CTPSource;
+	SUBORDINATE OBJECT CLASS tu11CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu11CTPId;
 	BEHAVIOUR
 		tu11CTPSource-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 69 };
 
 
 tu11CTPSource-tug2Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu11CTPSource;
+	SUBORDINATE OBJECT CLASS tu11CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Source;
+	SUPERIOR OBJECT CLASS tug2Source;
 	WITH ATTRIBUTE
 		tu11CTPId;
 	BEHAVIOUR
 		tu11CTPSource-tug2SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 70 };
 --9.16 tu12CTP 
 
 
 tu12CTPBidirectionalR1-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu12CTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS tu12CTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu12CTPId;
 	BEHAVIOUR
 		tu12CTPBidirectionalR1-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 130 };
 
 
 tu12CTPSinkR1-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu12CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu12CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu12CTPId;
 	BEHAVIOUR
 		tu12CTPSinkR1-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 131 };
 
 
 tu12CTPSinkR1-tug2Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu12CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu12CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Sink;
+	SUPERIOR OBJECT CLASS tug2Sink;
 	WITH ATTRIBUTE
 		tu12CTPId;
 	BEHAVIOUR
 		tu12CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 132 };
 
 
 tu12CTPSource-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu12CTPSource;
+	SUBORDINATE OBJECT CLASS tu12CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu12CTPId;
 	BEHAVIOUR
 		tu12CTPSource-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 74 };
 
 
 tu12CTPSource-tug2Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu12CTPSource;
+	SUBORDINATE OBJECT CLASS tu12CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Source;
+	SUPERIOR OBJECT CLASS tug2Source;
 	WITH ATTRIBUTE
 		tu12CTPId;
 	BEHAVIOUR
 		tu12CTPSource-tug2SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 75 };
 --9.17 tu2CTP 
 
 
 tu2CTPBidirectionalR1-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu2CTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS tu2CTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu2CTPId;
 	BEHAVIOUR
 		tu2CTPBidirectionalR1-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 133 };
 
 
 tu2CTPSinkR1-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu2CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu2CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu2CTPId;
 	BEHAVIOUR
 		tu2CTPSinkR1-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 134 };
 
 
 tu2CTPSinkR1-tug2Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu2CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu2CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Sink;
+	SUPERIOR OBJECT CLASS tug2Sink;
 	WITH ATTRIBUTE
 		tu2CTPId;
 	BEHAVIOUR
 		tu2CTPSinkR1-tug2SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 135 };
 
 
 tu2CTPSource-tug2Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu2CTPSource;
+	SUBORDINATE OBJECT CLASS tu2CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Bidirectional;
+	SUPERIOR OBJECT CLASS tug2Bidirectional;
 	WITH ATTRIBUTE
 		tu2CTPId;
 	BEHAVIOUR
 		tu2CTPSource-tug2BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 79 };
 
 
 tu2CTPSource-tug2Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu2CTPSource;
+	SUBORDINATE OBJECT CLASS tu2CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug2Source;
+	SUPERIOR OBJECT CLASS tug2Source;
 	WITH ATTRIBUTE
 		tu2CTPId;
 	BEHAVIOUR
 		tu2CTPSource-tug2SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 80 };
 --9.18 tu3CTP 
 
 
 tu3CTPBidirectionalR1-tug3Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu3CTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS tu3CTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Bidirectional;
+	SUPERIOR OBJECT CLASS tug3Bidirectional;
 	WITH ATTRIBUTE
 		tu3CTPId;
 	BEHAVIOUR
 		tu3CTPBidirectionalR1-tug3BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 136 };
 
 
 tu3CTPSinkR1-tug3Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu3CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu3CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Bidirectional;
+	SUPERIOR OBJECT CLASS tug3Bidirectional;
 	WITH ATTRIBUTE
 		tu3CTPId;
 	BEHAVIOUR
 		tu3CTPSinkR1-tug3BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 137 };
 
 
 tu3CTPSinkR1-tug3Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu3CTPSinkR1;
+	SUBORDINATE OBJECT CLASS tu3CTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Sink;
+	SUPERIOR OBJECT CLASS tug3Sink;
 	WITH ATTRIBUTE
 		tu3CTPId;
 	BEHAVIOUR
 		tu3CTPSinkR1-tug3SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 138 };
 
 
 tu3CTPSource-tug3Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu3CTPSource;
+	SUBORDINATE OBJECT CLASS tu3CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Bidirectional;
+	SUPERIOR OBJECT CLASS tug3Bidirectional;
 	WITH ATTRIBUTE
 		tu3CTPId;
 	BEHAVIOUR
 		tu3CTPSource-tug3BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 84 };
 
 
 tu3CTPSource-tug3Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tu3CTPSource;
+	SUBORDINATE OBJECT CLASS tu3CTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Source;
+	SUPERIOR OBJECT CLASS tug3Source;
 	WITH ATTRIBUTE
 		tu3CTPId;
 	BEHAVIOUR
 		tu3CTPSource-tug3SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 85 };
 --9.19 tug2 
 
 
 tug2Bidirectional-tug3Bidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug2Bidirectional;
+	SUBORDINATE OBJECT CLASS tug2Bidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Bidirectional;
+	SUPERIOR OBJECT CLASS tug3Bidirectional;
 	WITH ATTRIBUTE
 		tug2Id;
 	BEHAVIOUR
 		tug2Bidirectional-tug3BidirectionalBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 86 };
 
 
 tug2Sink-tug3Sink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug2Sink;
+	SUBORDINATE OBJECT CLASS tug2Sink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Sink;
+	SUPERIOR OBJECT CLASS tug3Sink;
 	WITH ATTRIBUTE
 		tug2Id;
 	BEHAVIOUR
 		tug2Sink-tug3SinkBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 87 };
 
 
 tug2Source-tug3Source NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug2Source;
+	SUBORDINATE OBJECT CLASS tug2Source;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		tug3Source;
+	SUPERIOR OBJECT CLASS tug3Source;
 	WITH ATTRIBUTE
 		tug2Id;
 	BEHAVIOUR
 		tug2Source-tug3SourceBehaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 88 };
 
 
 tug2Bidirectional-vc3TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug2Bidirectional;
+	SUBORDINATE OBJECT CLASS tug2Bidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc3TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		tug2Id;
 	BEHAVIOUR
 		tug2Bidirectional-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 139 };
 
 
 tug2Sink-vc3TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug2Sink;
+	SUBORDINATE OBJECT CLASS tug2Sink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPSinkR1;
+	SUPERIOR OBJECT CLASS vc3TTPSinkR1;
 	WITH ATTRIBUTE
 		tug2Id;
 	BEHAVIOUR
 		tug2Sink-vc3TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 140 };
 
 
 tug2Source-vc3TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug2Source;
+	SUBORDINATE OBJECT CLASS tug2Source;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPSourceR1;
+	SUPERIOR OBJECT CLASS vc3TTPSourceR1;
 	WITH ATTRIBUTE
 		tug2Id;
 	BEHAVIOUR
 		tug2Source-vc3TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 141 };
 --9.20 tug3 
 
 
 tug3Bidirectional-vc4TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug3Bidirectional;
+	SUBORDINATE OBJECT CLASS tug3Bidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc4TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		tug3Id;
 	BEHAVIOUR
 		tug3Bidirectional-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 142 };
 
 
 tug3Sink-vc4TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug3Sink;
+	SUBORDINATE OBJECT CLASS tug3Sink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPSinkR1;
+	SUPERIOR OBJECT CLASS vc4TTPSinkR1;
 	WITH ATTRIBUTE
 		tug3Id;
 	BEHAVIOUR
 		tug3Sink-vc4TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 143 };
 
 
 tug3Source-vc4TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tug3Source;
+	SUBORDINATE OBJECT CLASS tug3Source;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPSourceR1;
+	SUPERIOR OBJECT CLASS vc4TTPSourceR1;
 	WITH ATTRIBUTE
 		tug3Id;
 	BEHAVIOUR
 		tug3Source-vc4TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed objects are automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed objects are automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 144 };
 --9.21 vc11TTP 
 
 
 vc11TTPBidirectionalR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc11TTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS vc11TTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc11TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3823,11 +3698,9 @@ REGISTERED AS { g774NameBinding 145 };
 
 
 vc11TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc11TTPSinkR1;
+	SUBORDINATE OBJECT CLASS vc11TTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc11TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3836,11 +3709,9 @@ REGISTERED AS { g774NameBinding 146 };
 
 
 vc11TTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc11TTPSource;
+	SUBORDINATE OBJECT CLASS vc11TTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc11TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3850,11 +3721,9 @@ REGISTERED AS { g774NameBinding 97 };
 
 
 vc12TTPBidirectionalR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc12TTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS vc12TTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc12TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3863,11 +3732,9 @@ REGISTERED AS { g774NameBinding 147 };
 
 
 vc12TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc12TTPSinkR1;
+	SUBORDINATE OBJECT CLASS vc12TTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc12TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3876,11 +3743,9 @@ REGISTERED AS { g774NameBinding 148 };
 
 
 vc12TTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc12TTPSource;
+	SUBORDINATE OBJECT CLASS vc12TTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc12TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3890,11 +3755,9 @@ REGISTERED AS { g774NameBinding 100 };
 
 
 vc2TTPBidirectionalR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc2TTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS vc2TTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc2TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3903,11 +3766,9 @@ REGISTERED AS { g774NameBinding 149 };
 
 
 vc2TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc2TTPSinkR1;
+	SUBORDINATE OBJECT CLASS vc2TTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc2TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3916,11 +3777,9 @@ REGISTERED AS { g774NameBinding 150 };
 
 
 vc2TTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc2TTPSource;
+	SUBORDINATE OBJECT CLASS vc2TTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc2TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3929,11 +3788,9 @@ REGISTERED AS { g774NameBinding 103 };
 
 
 vc3TTPBidirectionalR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc3TTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS vc3TTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc3TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3943,11 +3800,9 @@ REGISTERED AS { g774NameBinding 151 };
 
 
 vc3TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc3TTPSinkR1;
+	SUBORDINATE OBJECT CLASS vc3TTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc3TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3956,11 +3811,9 @@ REGISTERED AS { g774NameBinding 152 };
 
 
 vc3TTPSourceR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc3TTPSourceR1;
+	SUBORDINATE OBJECT CLASS vc3TTPSourceR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc3TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3970,11 +3823,9 @@ REGISTERED AS { g774NameBinding 153 };
 
 
 vc4TTPBidirectionalR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc4TTPBidirectionalR1;
+	SUBORDINATE OBJECT CLASS vc4TTPBidirectionalR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc4TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3983,11 +3834,9 @@ REGISTERED AS { g774NameBinding 154 };
 
 
 vc4TTPSinkR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc4TTPSinkR1;
+	SUBORDINATE OBJECT CLASS vc4TTPSinkR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc4TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -3996,11 +3845,9 @@ REGISTERED AS { g774NameBinding 155 };
 
 
 vc4TTPSourceR1-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vc4TTPSourceR1;
+	SUBORDINATE OBJECT CLASS vc4TTPSourceR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		sdhNE;
+	SUPERIOR OBJECT CLASS sdhNE;
 	WITH ATTRIBUTE
 		vc4TTPId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -4010,162 +3857,152 @@ REGISTERED AS { g774NameBinding 156 };
 
 
 vcnUserChannelCTPBidirectional-vc3TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPBidirectional;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc3TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPBidirectional-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 157 };
 
 
 vcnUserChannelCTPSink-vc3TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSink;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc3TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSink-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 158 };
 
 
 vcnUserChannelCTPSink-vc3TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSink;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPSinkR1;
+	SUPERIOR OBJECT CLASS vc3TTPSinkR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSink-vc3TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 159 };
 
 
 vcnUserChannelCTPSource-vc3TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSource;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc3TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSource-vc3TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 160 };
 
 
 vcnUserChannelCTPSource-vc3TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSource;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc3TTPSourceR1;
+	SUPERIOR OBJECT CLASS vc3TTPSourceR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSource-vc3TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 161 };
 
 
 vcnUserChannelCTPBidirectional-vc4TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPBidirectional;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc4TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPBidirectional-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 162 };
 
 
 vcnUserChannelCTPSink-vc4TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSink;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc4TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSink-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 163 };
 
 
 vcnUserChannelCTPSink-vc4TTPSinkR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSink;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPSinkR1;
+	SUPERIOR OBJECT CLASS vc4TTPSinkR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSink-vc4TTPSinkR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 164 };
 
 
 vcnUserChannelCTPSource-vc4TTPBidirectionalR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSource;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPBidirectionalR1;
+	SUPERIOR OBJECT CLASS vc4TTPBidirectionalR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSource-vc4TTPBidirectionalR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 165 };
 
 
 vcnUserChannelCTPSource-vc4TTPSourceR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		vcnUserChannelCTPSource;
+	SUBORDINATE OBJECT CLASS vcnUserChannelCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		vc4TTPSourceR1;
+	SUPERIOR OBJECT CLASS vc4TTPSourceR1;
 	WITH ATTRIBUTE
 		vcnUserChannelCTPId;
 	BEHAVIOUR
 		vcnUserChannelCTPSource-vc4TTPSourceR1Behaviour BEHAVIOUR
 			DEFINED AS
-				*The subordinate managed object is automatically instantiated when the superior managed object is
-				instantiated, according to the make-up and mode of operation of the equipment.*;;
+				*The subordinate managed object is automatically instantiated when the superior 
+				managed object is instantiated, according to the make-up and mode of operation 
+				of the equipment.*;;
 REGISTERED AS { g774NameBinding 166 };
 --11 Object relations 
 --NOTE The  SUBORDINATION  RULE  and  CONSTRAINT  RULE  templates  are  used  in  this 
@@ -5746,10 +5583,11 @@ vc4TTPBidirectionalR1Subordination SUBORDINATION RULE
 				vcnUserChannelCTPBidirectional } };
 ;
 
+END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. G.774 : 2001" >--

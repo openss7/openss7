@@ -57,6 +57,7 @@
 --  >--
 -- A.1 Object class definitions
 -- A.1.1 Scheduler object definition
+MODULE "Rec. X.746 (1995)"
 
 scheduler MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -107,11 +108,12 @@ periodicScheduler MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		resynchronizeModePackage
 			PRESENT IF
-				"an instance supports it and the periodSynchronizationPackage package is not present",
+				"an instance supports it and the periodSynchronizationPackage package is not 
+				present",
 		"Rec. X.739 (1993) | ISO/IEC 10164-11:1994":periodSynchronizationPackage
 			PRESENT IF
-				"Synchronization to a specified time other than the duration start time is required, and the
-				resynchronizeMode package is not present.";
+				"Synchronization to a specified time other than the duration start time is 
+				required, and the resynchronizeMode package is not present.";
 REGISTERED AS { schedMo 5 };
 -- A.1.6 Daily operation scheduler object definition
 
@@ -124,7 +126,8 @@ dailyOperationScheduler MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		operationNotificationPackage
 			PRESENT IF
-				"the results of the operation need to be reported or the operation performed is a GET operation";
+				"the results of the operation need to be reported or the operation performed is a 
+				GET operation";
 REGISTERED AS { schedMo 6 };
 -- A.1.7 Weekly operation scheduler object definition
 
@@ -137,7 +140,8 @@ weeklyOperationScheduler MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		operationNotificationPackage
 			PRESENT IF
-				"the results of the operation need to be reported or the operation performed is a GET operation";
+				"the results of the operation need to be reported or the operation performed is a 
+				GET operation";
 REGISTERED AS { schedMo 7 };
 -- A.1.8 Monthly operation scheduler object definition
 
@@ -150,7 +154,8 @@ monthlyOperationScheduler MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		operationNotificationPackage
 			PRESENT IF
-				"the results of the operation need to be reported or the operation performed is a GET operation";
+				"the results of the operation need to be reported or the operation performed is a 
+				GET operation";
 REGISTERED AS { schedMo 8 };
 -- A.1.9 Periodic operation scheduler object definition
 
@@ -163,7 +168,8 @@ periodicOperationScheduler MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		operationNotificationPackage
 			PRESENT IF
-				"the results of the operation need to be reported or the operation performed is a GET operation";
+				"the results of the operation need to be reported or the operation performed is a 
+				GET operation";
 REGISTERED AS { schedMo 9 };
 -- A.1.10 Operation result record object definition
 
@@ -199,18 +205,26 @@ multiScheduler MANAGED OBJECT CLASS
 			BEHAVIOUR
 				intervalSchedulingPackageBeh BEHAVIOUR
 					DEFINED AS
-						"Because the schedules defined in the attribute schedulingData are independent, the possibility
-						exists that none of the intervals are valid. In that situation, the value indicated by the default
-						index is applicable. The following restrictions apply to the schedulingData attribute: - index is
-						the only valid component of IndexOrOperSpec, - intervalsOfDayWps is the only valid component of
-						TimeOfDayWps. When the interval scheduler is created or resumed at a time that is within the
-						scheduler's defined duration, the activity within the SMO will be set according to the index
-						defined by the interval scheduler's schedule. When the interval scheduler is deleted or suspended,
-						or the scheduler exists at a time outside the scheduler's defined duration, the activity within the
-						SMO will be set according to the default index.";;
+						"Because the schedules defined in the attribute schedulingData are independent, 
+						the possibility exists that none of the intervals are valid. In that situation, 
+						the value indicated by the default index is applicable. The following 
+						restrictions apply to the schedulingData attribute:
+
+						- index is the only valid component of IndexOrOperSpec,
+
+						- intervalsOfDayWps is the only valid component of TimeOfDayWps.
+
+						When the interval scheduler is created or resumed at a time that is within the 
+						scheduler's defined duration, the activity within the SMO will be set according 
+						to the index defined by the interval scheduler's schedule.
+
+						When the interval scheduler is deleted or suspended, or the scheduler exists at 
+						a time outside the scheduler's defined duration, the activity within the SMO 
+						will be set according to the default index.";;
 			ATTRIBUTES
 				defaultIndex REPLACE-WITH-DEFAULT
-					DEFAULT VALUE Schedulerev1-ASN1Module.defaultDefaultIndex GET-REPLACE;
+					DEFAULT VALUE Schedulerev1-ASN1Module.defaultDefaultIndex
+					GET-REPLACE;
 		REGISTERED AS { schedPkg 1 };
 			PRESENT IF
 				"Instance provides interval scheduling",
@@ -218,12 +232,19 @@ multiScheduler MANAGED OBJECT CLASS
 			BEHAVIOUR
 				triggerSchedulingPackageBeh BEHAVIOUR
 					DEFINED AS
-						"The following restrictions apply to the schedulingData attribute: - TimesOfDayWps shall have the
-						component triggerTimes; - the optional component priority shall be absent. When the trigger
-						scheduler is created or resumed at a time that is within the scheduler's defined duration, the
-						first triggering of an activity within the SMO will occur according to the schedule. When the
-						trigger scheduler is deleted or suspended, or the scheduler exists at a time outside the
-						scheduler's defined duration, the scheduled activities within the SMO will not be triggered.";;
+						"The following restrictions apply to the schedulingData attribute:
+
+						- TimesOfDayWps shall have the component triggerTimes;
+
+						- the optional component priority shall be absent.
+
+						When the trigger scheduler is created or resumed at a time that is within the 
+						scheduler's defined duration, the first triggering of an activity within the SMO 
+						will occur according to the schedule.
+
+						When the trigger scheduler is deleted or suspended, or the scheduler exists at a 
+						time outside the scheduler's defined duration, the scheduled activities within 
+						the SMO will not be triggered.";;
 		REGISTERED AS { schedPkg 2 };
 			PRESENT IF
 				"Instance provides trigger scheduling",
@@ -231,17 +252,18 @@ multiScheduler MANAGED OBJECT CLASS
 			BEHAVIOUR
 				typeOfDayControllerInstancePackageBeh BEHAVIOUR
 					DEFINED AS
-						"The attribute typeOfDayControllerInstance identifies the instance of OC typeOfDayController that is
-						relevant for this instance of OC multiScheduler.";;
+						"The attribute typeOfDayControllerInstance identifies the instance of OC 
+						typeOfDayController that is relevant for this instance of OC multiScheduler.";;
 			ATTRIBUTES
 				typeOfDayControllerInstance GET-REPLACE;
 		REGISTERED AS { schedPkg 3 };
 			PRESENT IF
-				"More than one instance of OC typeOfDayController can exist in managedElement and if scheduler
-				instance uses 'type of day' scheduling",
+				"More than one instance of OC typeOfDayController can exist in managedElement and 
+				if scheduler instance uses 'type of day' scheduling",
 		"ITU-T Recommendation X.746":operationNotificationPackage
 			PRESENT IF
-				"the results of an operation need to be reported or an operation performed is a GET operation.";
+				"the results of an operation need to be reported or an operation performed is a 
+				GET operation.";
 REGISTERED AS { schedMo 11 };
 -- A.1.12 typeOfDayController
 
@@ -254,19 +276,23 @@ typeOfDayController MANAGED OBJECT CLASS
 			BEHAVIOUR
 				typeOfDayControllerPackageBeh BEHAVIOUR
 					DEFINED AS
-						"As in section Type of day controller. The mapping is maintained in the attributes
-						'dateTranslationList' and 'weekDayTranslationList'. The typeOfDay value that is specified for
-						specific dates (via dateTranslationList attribute) has precedence on the typeOfDay value for a week
-						day (via weekDayTranslationList attribute).";;
+						"As in section Type of day controller. The mapping is maintained in the 
+						attributes 'dateTranslationList' and 'weekDayTranslationList'. The typeOfDay 
+						value that is specified for specific dates (via dateTranslationList attribute) 
+						has precedence on the typeOfDay value for a week day (via weekDayTranslationList 
+						attribute).";;
 			ATTRIBUTES
 				typeOfDayControllerId GET,
 				currentTypeOfDay
 					INITIAL VALUE DERIVATION RULE
-						currentTypeOfDayAlgorithm GET,
+						currentTypeOfDayAlgorithm
+					GET,
 				dateTranslationList REPLACE-WITH-DEFAULT
-					DEFAULT VALUE Schedulerev1-ASN1Module.defaultDateTranslationList GET-REPLACE ADD-REMOVE,
+					DEFAULT VALUE Schedulerev1-ASN1Module.defaultDateTranslationList
+					GET-REPLACE ADD-REMOVE,
 				weekDayTranslationList REPLACE-WITH-DEFAULT
-					DEFAULT VALUE Schedulerev1-ASN1Module.defaultWeekDayTranslationList GET-REPLACE;;,
+					DEFAULT VALUE Schedulerev1-ASN1Module.defaultWeekDayTranslationList
+					GET-REPLACE;;,
 		"ITU-T Recommendation M.3100: 1995":objectManagementNotificationsPackage;
 REGISTERED AS { schedMo 11 };
 -- A.2 Name bindings
@@ -277,11 +303,9 @@ REGISTERED AS { schedMo 11 };
 
 
 scheduler-system NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		scheduler AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS scheduler AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Rec. X.721 | ISO/IEC 10165-2 : 1992":system AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Rec. X.721 | ISO/IEC 10165-2 : 1992":system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		schedulerID;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING
@@ -291,11 +315,9 @@ REGISTERED AS { schedNb 1 };
 
 
 scheduler-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		scheduler AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS scheduler AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		schedulerID;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -307,11 +329,9 @@ REGISTERED AS { schedNb 2 };
 
 
 typeOfDayController-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		typeOfDayController AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS typeOfDayController AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		typeOfDayControllerId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -320,11 +340,9 @@ REGISTERED AS { schedNb 3 };
 
 
 typeOfDayController-system NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		typeOfDayController AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS typeOfDayController AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Rec. X.721 | ISO/IEC 10165-2 : 1992":system AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Rec. X.721 | ISO/IEC 10165-2 : 1992":system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		typeOfDayControllerId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -341,7 +359,8 @@ multipleDailyScheduling PACKAGE
 				"See 8.3.3 and 8.3.4.3";;
 	ATTRIBUTES
 		sequenceOfDays
-			DEFAULT VALUE Schedulerev1-ASN1Module.defaultSequenceOfDays GET-REPLACE;
+			DEFAULT VALUE Schedulerev1-ASN1Module.defaultSequenceOfDays
+			GET-REPLACE;
 REGISTERED AS { schedPkg 10 };
 -- A.3.2 Multiple monthly scheduling package
 
@@ -353,7 +372,8 @@ multipleMonthlyScheduling PACKAGE
 				"See 8.3.3 and 8.3.6.3";;
 	ATTRIBUTES
 		sequenceOfMonths
-			DEFAULT VALUE Schedulerev1-ASN1Module.defaultSequenceOfMonths GET-REPLACE;
+			DEFAULT VALUE Schedulerev1-ASN1Module.defaultSequenceOfMonths
+			GET-REPLACE;
 REGISTERED AS { schedPkg 11 };
 -- A.3.3 Multiple weekly scheduling package
 
@@ -365,7 +385,8 @@ multipleWeeklyScheduling PACKAGE
 				"See 8.3.3 and 8.3.5.3";;
 	ATTRIBUTES
 		sequenceOfWeeks
-			DEFAULT VALUE Schedulerev1-ASN1Module.defaultSequenceOfWeeks GET-REPLACE;
+			DEFAULT VALUE Schedulerev1-ASN1Module.defaultSequenceOfWeeks
+			GET-REPLACE;
 REGISTERED AS { schedPkg 12 };
 -- A.3.4 Periodic scheduling package
 
@@ -377,7 +398,8 @@ periodicSchedulingPackage PACKAGE
 				"See 8.3.7.3";;
 	ATTRIBUTES
 		timePeriod
-			DEFAULT VALUE Schedulerev1-ASN1Module.defaultTimePeriod GET-REPLACE;
+			DEFAULT VALUE Schedulerev1-ASN1Module.defaultTimePeriod
+			GET-REPLACE;
 REGISTERED AS { schedPkg 4 };
 -- A.3.5 Resynchronize mode package
 
@@ -447,32 +469,28 @@ REGISTERED AS { schedPkg 9 };
 
 currentTypeOfDay ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.TypeOfDay;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { schedAtt 12 };
 -- A.4.0.2 date translation list attribute
 
 
 dateTranslationList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.DateTranslationList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		dateTranslationListBeh BEHAVIOUR
 			DEFINED AS
-				"The translation list is a set that contains the mapping of a particular date into a type of day.
-				The typeOfDay can be either a weekday type ('workday' or 'weekend'), or one of the special days
-				that are defined. A specific date value may only occur once in dateTranslationList attribute.";;
+				"The translation list is a set that contains the mapping of a particular date 
+				into a type of day. The typeOfDay can be either a weekday type ('workday' or 
+				'weekend'), or one of the special days that are defined. A specific date value 
+				may only occur once in dateTranslationList attribute.";;
 REGISTERED AS { schedAtt 13 };
 -- A.4.0.3 default index attribute
 
 
 defaultIndex ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.DefaultIndex;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		defaultIndexBeh BEHAVIOUR
 			DEFINED AS
@@ -485,8 +503,7 @@ REGISTERED AS { schedAtt 14 };
 
 externalSchedulerName ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.ExternalSchedulerName;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		externalSchedulerNameBehaviour BEHAVIOUR
 			DEFINED AS
@@ -498,8 +515,7 @@ REGISTERED AS { schedAtt 1 };
 
 onDuty ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.OnDuty;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		onDutyBehaviour BEHAVIOUR
 			DEFINED AS
@@ -511,8 +527,7 @@ REGISTERED AS { schedAtt 2 };
 
 resynchronizeMode ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.ResynchronizeMode;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		resynchronizeModeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -525,9 +540,7 @@ REGISTERED AS { schedAtt 3 };
 
 scheduledManagedObjects ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.ScheduledManagedObjectsList;
-	MATCHES FOR
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		scheduledManagedObjectsBehaviour BEHAVIOUR
 			DEFINED AS
@@ -539,9 +552,7 @@ REGISTERED AS { schedAtt 4 };
 
 schedulerID ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.SimpleNameType;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		schedulerIDBehaviour BEHAVIOUR
 			DEFINED AS
@@ -552,18 +563,17 @@ REGISTERED AS { schedAtt 5 };
 
 schedulingData ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.SchedulingData;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		schedulingDataBeh BEHAVIOUR
 			DEFINED AS
-				"As in section 8.2.10 Multi-scheduler. Intervals within one member of the set shall be
-				non-overlapping, but intervals defined in different members of the set can overlap. In that case,
-				the (optional) sequence member 'priority' shall be present in each member of the set containing an
-				interval that overlaps. The priority associated with each member of the set determines which
-				activity will be scheduled. The higher priority numerical value has precedence on the lower one.";;
+				"As in section 8.2.10 Multi-scheduler. Intervals within one member of the set 
+				shall be non-overlapping, but intervals defined in different members of the set 
+				can overlap. In that case, the (optional) sequence member 'priority' shall be 
+				present in each member of the set containing an interval that overlaps. The 
+				priority associated with each member of the set determines which activity will 
+				be scheduled. The higher priority numerical value has precedence on the lower 
+				one.";;
 REGISTERED AS { schedAtt 15 };
 -- A.4.7 Sequence of days attribute
 -- This structured attribute defines a sequence of intervals of day.
@@ -571,8 +581,7 @@ REGISTERED AS { schedAtt 15 };
 
 sequenceOfDays ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.SequenceOfDays;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		sequenceOfDaysBehaviour BEHAVIOUR
 			DEFINED AS
@@ -584,8 +593,7 @@ REGISTERED AS { schedAtt 6 };
 
 sequenceOfMonths ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.SequenceOfMonths;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		sequenceOfMonthsBehaviour BEHAVIOUR
 			DEFINED AS
@@ -597,8 +605,7 @@ REGISTERED AS { schedAtt 7 };
 
 sequenceOfWeeks ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.SequenceOfWeeks;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		sequenceOfWeeksBehaviour BEHAVIOUR
 			DEFINED AS
@@ -611,9 +618,7 @@ REGISTERED AS { schedAtt 8 };
 
 timePeriod ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.TimePeriod;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		timePeriodBehaviour BEHAVIOUR
 			DEFINED AS
@@ -625,10 +630,7 @@ REGISTERED AS { schedAtt 9 };
 
 operationSpecifications ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.OperationSpecifications;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		operationSpecificationsBehaviour BEHAVIOUR
 			DEFINED AS
@@ -641,8 +643,7 @@ REGISTERED AS { schedAtt 10 };
 
 operationResult ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.OperationResult;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		operationResultBehaviour BEHAVIOUR
 			DEFINED AS
@@ -653,8 +654,7 @@ REGISTERED AS { schedAtt 11 };
 
 typeOfDayControllerInstance ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.ObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		typeOfDayControllerInstanceBeh BEHAVIOUR
 			DEFINED AS
@@ -665,33 +665,30 @@ REGISTERED AS { schedAtt 16 };
 
 typeOfDayControllerId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { schedAtt 17 };
 -- A.4.15 week day translation list attribute
 
 
 weekDayTranslationList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Schedulerev1-ASN1Module.WeekDayTranslationList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		weekDayTranslationListBeh BEHAVIOUR
 			DEFINED AS
-				"The translation list is a set that contains the mapping of a particular day of the week into a type
-				of day. The typeOfDay can be either a weekday type ('workday' or 'weekend'), or one of the special
-				days that are defined. In weekDayTranslationList attribute, there shall be one mapping for every
-				week day and a weekday value shall only occur once.";;
+				"The translation list is a set that contains the mapping of a particular day of 
+				the week into a type of day. The typeOfDay can be either a weekday type 
+				('workday' or 'weekend'), or one of the special days that are defined. In 
+				weekDayTranslationList attribute, there shall be one mapping for every week day 
+				and a weekday value shall only occur once.";;
 REGISTERED AS { schedAtt 18 };
 -- A.4.16 Behaviour for current TypeOfDay initial value
 
 
 currentTypeOfDayAlgorithm BEHAVIOUR
 	DEFINED AS
-		"The currentTypeOfDay attribute is determined in accordance to the value of the attributes
-		'dateTranslationList' and 'weekDayTranslationList'.";
+		"The currentTypeOfDay attribute is determined in accordance to the value of the 
+		attributes 'dateTranslationList' and 'weekDayTranslationList'.";
 -- A.5 Notifications
 -- A.5.1 Operation result notification
 
@@ -704,6 +701,7 @@ operationResultNotification NOTIFICATION
 	WITH INFORMATION SYNTAX Schedulerev1-ASN1Module.OperationResult;
 REGISTERED AS { schedNotif 1 };
 
+END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  

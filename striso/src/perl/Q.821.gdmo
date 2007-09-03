@@ -54,6 +54,7 @@
 --  
 --  =============================================================================
 --  >--
+MODULE "ITU-T Rec. Q.821 (2000)"
 
 currentAlarmSummaryControl MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -66,10 +67,10 @@ currentAlarmSummaryControl MANAGED OBJECT CLASS
 						"-- see 5.2.2.1 --";;
 			ATTRIBUTES
 				currentAlarmSummaryControlId GET,
-				alarmStatusList GET REPLACE ADD REMOVE,
-				objectList GET REPLACE ADD REMOVE,
-				perceivedSeverityList GET REPLACE ADD REMOVE,
-				probableCauseList GET REPLACE ADD REMOVE;
+				alarmStatusList GET-REPLACE ADD-REMOVE,
+				objectList GET-REPLACE ADD-REMOVE,
+				perceivedSeverityList GET-REPLACE ADD-REMOVE,
+				probableCauseList GET-REPLACE ADD-REMOVE;
 			ACTIONS
 				retrieveCurrentAlarmSummary;
 			NOTIFICATIONS
@@ -87,18 +88,20 @@ managementOperationsSchedule MANAGED OBJECT CLASS
 					DEFINED AS
 						"-- see 5.2.2.2 --";;
 			ATTRIBUTES
-				"Recommendation X.721:1992":administrativeState GET REPLACE,
-				affectedObjectClass GET REPLACE,
-				affectedObjectInstances GET REPLACE,
-				beginTime GET REPLACE,
+				"Recommendation X.721:1992":administrativeState GET-REPLACE,
+				affectedObjectClass GET-REPLACE,
+				affectedObjectInstances GET-REPLACE,
+				beginTime GET-REPLACE,
 				-- first activation at begin time, if
 				-- present, or else when schedule is created
 				destinationAddress GET,
 				-- As this attribute is 'GET' only, the way to set the Q.821 destinationAddress is to
 				-- re-create an instance of managementOperationsSchedule with the new
 				-- destinationAddress(es).
-				endTime DEFAULT VALUE Q821-ASN1Module.managementOperationsScheduleEndTimeDefault GET REPLACE,
-				interval GET REPLACE,
+				endTime
+					DEFAULT VALUE Q821-ASN1Module.managementOperationsScheduleEndTimeDefault
+					GET-REPLACE,
+				interval GET-REPLACE,
 				scheduIeId GET;;;
 	CONDITIONAL PACKAGES
 		managementOperationsScheduleOperationalStatePkg PACKAGE
@@ -121,7 +124,7 @@ enhancedCurrentAlarmSummaryControl MANAGED OBJECT CLASS
 					DEFINED AS
 						"-- see 6.2.2.1, enhancedCurrentAlarmSummaryControl on model --";;
 			ATTRIBUTES
-				enhancedCurrentAlarmSummaryControlId GET SET BY CREATE;
+				enhancedCurrentAlarmSummaryControlId GET SET-BY-CREATE;
 			ACTIONS
 				alarmSynchronization
 					logRecordIdActionParameter
@@ -150,8 +153,7 @@ REGISTERED AS { q821Package 1 };
 
 affectedObjectClass ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.AffectedObjectClass;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		affectedObjectClassBeh BEHAVIOUR
 			DEFINED AS
@@ -161,8 +163,7 @@ REGISTERED AS { q821Attribute 1 };
 
 affectedObjectInstances ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.ObjectList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		affectedObjectInstancesBeh BEHAVIOUR
 			DEFINED AS
@@ -172,8 +173,7 @@ REGISTERED AS { q821Attribute 2 };
 
 alarmStatusList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.AlarmStatusList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		alarmStatusListBeh BEHAVIOUR
 			DEFINED AS
@@ -183,8 +183,7 @@ REGISTERED AS { q821Attribute 3 };
 
 beginTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.StartTime;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		beginTimeBeh BEHAVIOUR
 			DEFINED AS
@@ -194,8 +193,7 @@ REGISTERED AS { q821Attribute 4 };
 
 currentAlarmSummaryControlId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		currentAlarmSummaryControlIdBeh BEHAVIOUR
 			DEFINED AS
@@ -205,8 +203,7 @@ REGISTERED AS { q821Attribute 5 };
 
 destinationAddress ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.DestinationAddress;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		destinationAddressBeh BEHAVIOUR
 			DEFINED AS
@@ -216,8 +213,7 @@ REGISTERED AS { q821Attribute 6 };
 
 endTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.StopTime;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		endTimeBeh BEHAVIOUR
 			DEFINED AS
@@ -227,8 +223,7 @@ REGISTERED AS { q821Attribute 7 };
 
 interval ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.Interval;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		intervalBeh BEHAVIOUR
 			DEFINED AS
@@ -238,8 +233,7 @@ REGISTERED AS { q821Attribute 8 };
 
 objectList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.ObjectList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		objectListBeh BEHAVIOUR
 			DEFINED AS
@@ -249,8 +243,7 @@ REGISTERED AS { q821Attribute 9 };
 
 perceivedSeverityList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.PerceivedSeverityList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		perceivedSeverityListBeh BEHAVIOUR
 			DEFINED AS
@@ -260,8 +253,7 @@ REGISTERED AS { q821Attribute 10 };
 
 probableCauseList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.ProbableCauseList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		probableCauseListBeh BEHAVIOUR
 			DEFINED AS
@@ -271,8 +263,7 @@ REGISTERED AS { q821Attribute 11 };
 
 scheduleId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.NameType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		scheduleIdBeh BEHAVIOUR
 			DEFINED AS
@@ -282,10 +273,7 @@ REGISTERED AS { q821Attribute 12 };
 
 enhancedCurrentAlarmSummaryControlId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX Q821-ASN1Module.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721":rDNIdBehaviour,
 		enhancedCurrentAlarmSummaryControlIdBeh BEHAVIOUR
@@ -295,37 +283,31 @@ REGISTERED AS { q821Attribute 13 };
 
 
 currAlarmSumControl-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		currentAlarmSummaryControl AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS currentAlarmSummaryControl AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ITU-T Rec. M.3100:1995":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "ITU-T Rec. M.3100:1995":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		currentAlarmSummaryControlId;
 	CREATE;
-	DELETE DELETES CONTAINED OBJECTS;
+	DELETE DELETES-CONTAINED-OBJECTS;
 REGISTERED AS { q821NameBinding 1 };
 
 
 managementOperationsSchedule-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managementOperationsSchedule AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managementOperationsSchedule AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"ITU-T Rec. M.3100:1995":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "ITU-T Rec. M.3100:1995":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		scheduleId;
 	CREATE;
-	DELETE DELETES CONTAINED OBJECTS;
+	DELETE DELETES-CONTAINED-OBJECTS;
 REGISTERED AS { q821NameBinding 2 };
 
 
 enhancedCurrentAlarmSummaryControl-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation M.3100":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		enhancedCurrentAlarmSummaryControlId;
 	BEHAVIOUR
@@ -336,11 +318,9 @@ REGISTERED AS { q821NameBinding 3 };
 
 
 enhancedCurrentAlarmSummaryControl-managedElementComplex NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation M.3100":managedElementComplex AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElementComplex AND SUBCLASSES;
 	WITH ATTRIBUTE
 		enhancedCurrentAlarmSummaryControlId;
 	BEHAVIOUR
@@ -351,11 +331,9 @@ REGISTERED AS { q821NameBinding 4 };
 
 
 enhancedCurrentAlarmSummaryControl-network NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS enhancedCurrentAlarmSummaryControl AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation M.3100":network AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network AND SUBCLASSES;
 	WITH ATTRIBUTE
 		enhancedCurrentAlarmSummaryControlId;
 	BEHAVIOUR
@@ -415,7 +393,7 @@ REGISTERED AS { q821Action 4 };
 
 
 logRecordIdParameter PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX Q821-ASN1Module.LogRecordId;
 	BEHAVIOUR
 		logRecordIdBeh BEHAVIOUR
@@ -425,7 +403,7 @@ REGISTERED AS { q821Parameter 1 };
 
 
 correlatedRecordNameParameter PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX Q821-ASN1Module.CorrelatedRecordName;
 	BEHAVIOUR
 		correlatedRecordNameBeh BEHAVIOUR
@@ -435,7 +413,7 @@ REGISTERED AS { q821Parameter 2 };
 
 
 suspectObjectListParameter PARAMETER
-	CONTEXT EVENT INFO;
+	CONTEXT EVENT-INFO;
 	WITH SYNTAX Q821-ASN1Module.SuspectObjectList;
 	BEHAVIOUR
 		suspectObjectListBeh BEHAVIOUR
@@ -445,7 +423,7 @@ REGISTERED AS { q821Parameter 3 };
 
 
 cancelledAlarmSynchronizationParameter PARAMETER
-	CONTEXT SPECIFIC ERROR;
+	CONTEXT SPECIFIC-ERROR;
 	WITH SYNTAX Q821-ASN1Module.CancelledAlarmSynchronization;
 	BEHAVIOUR
 		cancelledAlarmSynchronizationBeh BEHAVIOUR
@@ -455,7 +433,7 @@ REGISTERED AS { q821Parameter 4 };
 
 
 correlatedRecordNameActionParameter PARAMETER
-	CONTEXT ACTION REPLY;
+	CONTEXT ACTION-REPLY;
 	WITH SYNTAX Q821-ASN1Module.CorrelatedRecordName;
 	BEHAVIOUR
 		correlatedRecordNameBeh;
@@ -463,7 +441,7 @@ REGISTERED AS { q821Parameter 5 };
 
 
 invalidBaseManagedObjectErrorParameter PARAMETER
-	CONTEXT SPECIFIC ERROR;
+	CONTEXT SPECIFIC-ERROR;
 	WITH SYNTAX Q821-ASN1Module.InvalidBaseManagedObjectError;
 	BEHAVIOUR
 		invalidBaseManagedObjectErrorBeh BEHAVIOUR
@@ -473,7 +451,7 @@ REGISTERED AS { q821Parameter 6 };
 
 
 invalidObjectInstanceErrorParameter PARAMETER
-	CONTEXT SPECIFIC ERROR;
+	CONTEXT SPECIFIC-ERROR;
 	WITH SYNTAX Q821-ASN1Module.InvalidObjectInstanceError;
 	BEHAVIOUR
 		invalidObjectInstanceErrorBeh BEHAVIOUR
@@ -483,7 +461,7 @@ REGISTERED AS { q821Parameter 7 };
 
 
 logRecordIdActionParameter PARAMETER
-	CONTEXT ACTION REPLY;
+	CONTEXT ACTION-REPLY;
 	WITH SYNTAX Q821-ASN1Module.LogRecordId;
 	BEHAVIOUR
 		logRecordIdBeh;
@@ -491,7 +469,7 @@ REGISTERED AS { q821Parameter 8 };
 
 
 noSuchInvokeIdErrorParameter PARAMETER
-	CONTEXT SPECIFIC ERROR;
+	CONTEXT SPECIFIC-ERROR;
 	WITH SYNTAX Q821-ASN1Module.NoSuchInvokeIdError;
 	BEHAVIOUR
 		noSuchInvokeIdErrorBeh BEHAVIOUR
@@ -501,12 +479,13 @@ REGISTERED AS { q821Parameter 9 };
 
 
 suspectObjectListActionParameter PARAMETER
-	CONTEXT ACTION REPLY;
+	CONTEXT ACTION-REPLY;
 	WITH SYNTAX Q821-ASN1Module.SuspectObjectList;
 	BEHAVIOUR
 		suspectObjectListBeh;
 REGISTERED AS { q821Parameter 10 };
 
+END
 --< GDMO.ChangeLog
 --  =============================================================================
 --  

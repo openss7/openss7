@@ -101,7 +101,8 @@ circuitPack MANAGED OBJECT CLASS
 			ATTRIBUTES
 				circuitPackType GET SET-BY-CREATE,
 				"Recommendation X.721: 1992":availabilityStatus
-					PERMITTED VALUES ASN-CONTDefinedTypesModule.CircuitPackAvailabilityStatus GET;;;
+					PERMITTED VALUES ASN-CONTDefinedTypesModule.CircuitPackAvailabilityStatus
+					GET;;;
 REGISTERED AS { m3100ObjectClass 30 };
 
 
@@ -452,7 +453,8 @@ connectionTerminationPointSink MANAGED OBJECT CLASS
 				downstreamConnectivityPointer
 					PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
 					-- CTPDownstreamPointer
-					ASN-CONTDefinedTypesModule.CTPDownstreamPointer GET SET-BY-CREATE;;;
+					ASN-CONTDefinedTypesModule.CTPDownstreamPointer
+					GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		ctpInstancePackage
 			PRESENT IF
@@ -481,7 +483,8 @@ connectionTerminationPointSource MANAGED OBJECT CLASS
 				upstreamConnectivityPointer
 					PERMITTED VALUES-- The allowed choices for the syntax of this attribute are restricted in the subtype
 					-- CTPUpstreamPointer
-					ASN-CONTDefinedTypesModule.CTPUpstreamPointer GET SET-BY-CREATE;;;
+					ASN-CONTDefinedTypesModule.CTPUpstreamPointer
+					GET SET-BY-CREATE;;;
 	CONDITIONAL PACKAGES
 		ctpInstancePackage
 			PRESENT IF
@@ -835,19 +838,19 @@ fabric MANAGED OBJECT CLASS
 						"The Fabric object represents the function of managing the establishment and release of
 						cross-connections. It also manages the assignment of termination points to TP Pools and GTPs.
 						Administrative State: - Unlocked: The Fabric is allowed to perform its normal functions. ACTIONS
-						will be accepted tosetup or remove cross-connections, to rearrange TP Pools, to add/remove
+						will be accepted to setup or remove cross-connections, to rearrange TP Pools, to add/remove
 						termination points to/from GTPs. - Locked: The Fabric is not allowed to perform its normal
-						functions. No ACTIONS will be accepted.No new cross-connection can be setup or removed, no TP Pool
+						functions. No ACTIONS will be accepted. No new cross-connection can be setup or removed, no TP Pool
 						can be rearranged, and no termination points can be added/removed to/from GTPs. Operational State:
 						- Enabled: When the Fabric is in the enabled operational state, it may be fully-operational or
 						partially-operational (partially operational is indicated by the availability status attribute). -
-						Disabled: The Fabric is incapable of performing its normal function. For instance, the
-						managingsystem will not be able to: 1) setup or remove any cross-connection; 2) rearrange TP Pools;
-						and 3) add/remove termination points to/from GTPs. Availability Status: The supported values for
-						this attribute are: - Degraded: The Fabric is degraded in some respect. For instance, the Fabric
-						cannot perform thefunction of establishing new cross-connections while it can still accept ACTIONs
-						to re-arrange TP Pools. The Fabric remains available for service (i.e. its operational state is
-						enabled) while it isdegraded. - Empty SET.";;
+						Disabled: The Fabric is incapable of performing its normal function. For instance, the managing
+						system will not be able to: 1) setup or remove any cross-connection; 2) rearrange TP Pools; and 3)
+						add/remove termination points to/from GTPs. Availability Status: The supported values for this
+						attribute are: - Degraded: The Fabric is degraded in some respect. For instance, the Fabric cannot
+						perform the function of establishing new cross-connections while it can still accept ACTIONs to
+						re-arrange TP Pools. The Fabric remains available for service (i.e. its operational state is
+						enabled) while it is degraded. - Empty SET.";;
 			ATTRIBUTES
 				fabricId GET SET-BY-CREATE,
 				"Recommendation X.721: 1992":administrativeState GET-REPLACE,
@@ -856,12 +859,12 @@ fabric MANAGED OBJECT CLASS
 				listOfCharacteristicInfo GET SET-BY-CREATE,
 				supportedByObjectList GET-REPLACE ADD-REMOVE;
 			ACTIONS
-				addTpsToGTP
-					removeTpsFromGTP
-					addTpsToTpPool
-					removeTpsFromTpPool
-					connect
-					disconnect;;;
+				addTpsToGTP,
+				removeTpsFromGTP,
+				addTpsToTpPool,
+				removeTpsFromTpPool,
+				connect,
+				disconnect;;;
 REGISTERED AS { m3100ObjectClass 16 };
 
 
@@ -1295,8 +1298,7 @@ REGISTERED AS { m3100Package 34 };
 
 a-TPInstance ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.RelatedObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		aTPInstanceBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1307,10 +1309,7 @@ REGISTERED AS { m3100Attribute 1 };
 
 acceptableCircuitPackTypeList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.AcceptableCircuitPackTypeList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		acceptableCircuitPackTypeListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1321,10 +1320,7 @@ REGISTERED AS { m3100Attribute 58 };
 
 affectedObjectList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		affectedObjectListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1347,10 +1343,7 @@ REGISTERED AS { m3100Attribute 3 };
 
 alarmSeverityAssignmentProfileId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		alarmSeverityAssignmentProfileIdBehaviour BEHAVIOUR
@@ -1362,8 +1355,7 @@ REGISTERED AS { m3100Attribute 4 };
 
 alarmSeverityAssignmentProfilePointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.PointerOrNull;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		alarmSeverityAssignmentProfilePointerBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1373,8 +1365,7 @@ REGISTERED AS { m3100Attribute 5 };
 
 alarmStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.AlarmStatus;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		alarmStatusBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1390,16 +1381,13 @@ REGISTERED AS { m3100Attribute 6 };
 
 channelNumber ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ChannelNumber;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 REGISTERED AS { m3100Attribute 7 };
 
 
 characteristicInformation ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CharacteristicInformation;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		characteristicInformationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1410,8 +1398,7 @@ REGISTERED AS { m3100Attribute 8 };
 
 circuitDirectionality ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CircuitDirectionality;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		circuitDirectionalityBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1421,10 +1408,7 @@ REGISTERED AS { m3100Attribute 66 };
 
 circuitEndPointSubgroupId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		circuitEndPointSubgroupIdBehaviour BEHAVIOUR
@@ -1436,9 +1420,7 @@ REGISTERED AS { m3100Attribute 61 };
 
 circuitPackType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CircuitPackType;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		circuitPackTypeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1448,10 +1430,7 @@ REGISTERED AS { m3100Attribute 54 };
 
 clientConnectionList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		clientConnectionListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1463,8 +1442,7 @@ REGISTERED AS { m3100Attribute 53 };
 
 clientTrail ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		clientTrailBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1475,9 +1453,7 @@ REGISTERED AS { m3100Attribute 10 };
 
 connectedTpCount ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Count;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		connectedTpCountBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1488,10 +1464,7 @@ REGISTERED AS { m3100Attribute 11 };
 
 connectionId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,
 		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
@@ -1504,10 +1477,7 @@ REGISTERED AS { m3100Attribute 12 };
 
 cTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour;
 	-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
@@ -1516,10 +1486,7 @@ cTPId ATTRIBUTE
 
 crossConnectionId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		crossConnectionIdBehaviour BEHAVIOUR
@@ -1531,9 +1498,7 @@ REGISTERED AS { m3100Attribute 14 };
 
 crossConnectionName ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CrossConnectionName;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		crossConnectionNameBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1544,8 +1509,7 @@ REGISTERED AS { m3100Attribute 15 };
 
 crossConnectionObjectPointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.CrossConnectionObjectPointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		crossConnectionObjectPointerBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1567,8 +1531,7 @@ REGISTERED AS { m3100Attribute 17 };
 
 directionality ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Directionality;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		directionalityBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1579,10 +1542,7 @@ REGISTERED AS { m3100Attribute 18 };
 
 downstreamConnectivityPointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.DownstreamConnectivityPointer;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		downstreamConnectivityPointerBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1594,9 +1554,7 @@ REGISTERED AS { m3100Attribute 19 };
 
 equipmentHolderAddress ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.EquipmentHolderAddress;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		equipmentHolderAddressBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1618,8 +1576,7 @@ REGISTERED AS { m3100Attribute 56 };
 
 equipmentHolderType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.EquipmentHolderType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		equipmentHolderTypeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1630,10 +1587,7 @@ REGISTERED AS { m3100Attribute 57 };
 
 equipmentId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		equipmentIdBehaviour BEHAVIOUR
@@ -1645,8 +1599,7 @@ REGISTERED AS { m3100Attribute 20 };
 
 externalTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ExternalTime;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		externalTimeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1657,10 +1610,7 @@ REGISTERED AS { m3100Attribute 21 };
 
 fabricId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		fabricIdBehaviour BEHAVIOUR
@@ -1672,8 +1622,7 @@ REGISTERED AS { m3100Attribute 22 };
 
 fromTermination ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.PointerOrNull;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		fromTerminationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1684,10 +1633,7 @@ REGISTERED AS { m3100Attribute 23 };
 
 gtpId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		gtpIdBehaviour BEHAVIOUR
@@ -1699,9 +1645,7 @@ REGISTERED AS { m3100Attribute 24 };
 
 holderStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.HolderStatus;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		holderStatusBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1713,9 +1657,7 @@ REGISTERED AS { m3100Attribute59 };
 
 idleTpCount ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Count;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		idleTpCountBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1726,8 +1668,7 @@ REGISTERED AS { m3100Attribute 25 };
 
 informationTransferCapabilities ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.InformationTransferCapabilities;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		informationTransferCapabilitiesBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1738,9 +1679,7 @@ REGISTERED AS { m3100Attribute 65 };
 
 labelOfFarEndExchange ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.UserLabel;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		labelOfFarEndExchangeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1751,8 +1690,7 @@ REGISTERED AS { m3100Attribute 63 };
 
 listOfCharacteristicInfo ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ListOfCharacteristicInformation;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		listOfCharacteristicInfoBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1762,9 +1700,7 @@ REGISTERED AS { m3100Attribute 26 };
 
 locationName ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.LocationName;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		locationNameBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1774,10 +1710,7 @@ REGISTERED AS { m3100Attribute 27 };
 
 managedElementId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		managedElementIdBehaviour BEHAVIOUR
@@ -1789,10 +1722,7 @@ REGISTERED AS { m3100Attribute 28 };
 
 managedElementComplexId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		managedElementComplexIdBehaviour BEHAVIOUR
@@ -1804,10 +1734,7 @@ REGISTERED AS { m3100Attribute 68 };
 
 mpCrossConnectionId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,
 		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
@@ -1820,10 +1747,7 @@ REGISTERED AS { m3100Attribute 29 };
 
 networkId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,
 		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
@@ -1836,16 +1760,13 @@ REGISTERED AS { m3100Attribute 30 };
 
 networkLevelPointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { m3100Attribute 31 };
 
 
 numberOfCircuits ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NumberOfCircuits;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		numberOfCircuitsBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1855,8 +1776,7 @@ REGISTERED AS { m3100Attribute 62 };
 
 protected ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectedBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1867,8 +1787,7 @@ REGISTERED AS { m3100Attribute 32 };
 
 redline ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		redlineBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1879,8 +1798,7 @@ REGISTERED AS { m3100Attribute 33 };
 
 replaceable ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Replaceable;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		replaceableBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1891,9 +1809,7 @@ REGISTERED AS { m3100Attribute 34 };
 
 serialNumber ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SerialNumber;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		serialNumberBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1903,8 +1819,7 @@ REGISTERED AS { m3100Attribute69 };
 
 serverConnectionList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SequenceOfObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		serverConnectionListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1915,8 +1830,7 @@ REGISTERED AS { m3100Attribute 35 };
 
 serverTrailList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		serverTrailListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1927,8 +1841,7 @@ REGISTERED AS { m3100Attribute 36 };
 
 signallingCapabilities ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SignallingCapabilities;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		signallingCapabilitiesBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1938,8 +1851,7 @@ REGISTERED AS { m3100Attribute 64 };
 
 signalType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SignalType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		signalTypeBehaviour BEHAVIOUR
 			DEFINED AS
@@ -1954,10 +1866,7 @@ REGISTERED AS { m3100Attribute 37 };
 
 softwareId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,
 		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
@@ -1985,10 +1894,7 @@ REGISTERED AS { m3100Attribute 60 };
 
 supportableClientList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SupportableClientList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		supportableClientListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2000,10 +1906,7 @@ REGISTERED AS { m3100Attribute 39 };
 
 supportedByObjectList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ObjectList;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		supportedByObjectListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2017,8 +1920,7 @@ REGISTERED AS { m3100Attribute 40 };
 
 systemTimingSource ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.SystemTimingSource;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		systemTimingSourceBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2029,9 +1931,7 @@ REGISTERED AS { m3100Attribute 41 };
 
 totalTpCount ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Count;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		totalTpCountBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2041,8 +1941,7 @@ REGISTERED AS { m3100Attribute 42 };
 
 toTermination ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Pointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		toTerminationBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2053,10 +1952,7 @@ REGISTERED AS { m3100Attribute 43 };
 
 tpPoolId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,
 		-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
@@ -2069,8 +1965,7 @@ REGISTERED AS { m3100Attribute 44 };
 
 tpsInGtpList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TpsInGtpList;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		tpsInGtpListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2080,8 +1975,7 @@ REGISTERED AS { m3100Attribute 45 };
 
 tpsInTpPoolList ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ListOfTPs;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		tpsInTpPoolListBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2091,10 +1985,7 @@ REGISTERED AS { m3100Attribute 46 };
 
 trailId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		trailIdBehaviour BEHAVIOUR
@@ -2106,10 +1997,7 @@ REGISTERED AS { m3100Attribute 47 };
 
 tTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		"Recommendation X.721 : 1992":rDNIdBehaviour,-- The above behaviour is defined as part of discriminatorId in Recommendation X.721
 		ttpIdBehaviour BEHAVIOUR
@@ -2121,8 +2009,7 @@ REGISTERED AS { m3100Attribute 48 };
 
 transmissionCharacteristics ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.TransmissionCharacteristics;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		transmissionCharacteristicsBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2134,8 +2021,7 @@ REGISTERED AS { m3100Attribute 67 };
 
 upstreamConnectivityPointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.ConnectivityPointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		upstreamConnectivityPointerBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2145,9 +2031,7 @@ REGISTERED AS { m3100Attribute 49 };
 
 userLabel ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.UserLabel;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		userLabelBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2157,9 +2041,7 @@ REGISTERED AS { m3100Attribute 50 };
 
 vendorName ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.VendorName;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		vendorNameBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2169,9 +2051,7 @@ REGISTERED AS { m3100Attribute 51 };
 
 version ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.Version;
-	MATCHES FOR
-		EQUALITY,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		versionBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2181,8 +2061,7 @@ REGISTERED AS { m3100Attribute 52 };
 
 z-TPInstance ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ASN1DefinedTypesModule.RelatedObjectInstance;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		z-TPInstanceBehaviour BEHAVIOUR
 			DEFINED AS
@@ -2192,11 +2071,9 @@ REGISTERED AS { m3100Attribute 55 };
 
 
 alarmSeverityAssignment-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		alarmSeverityAssignmentProfile AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS alarmSeverityAssignmentProfile AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		alarmSeverityAssignmentProfileId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2205,11 +2082,9 @@ REGISTERED AS { m3100NameBinding 1 };
 
 
 circuitPack-equipmentHolder-autoCreated NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		circuitPack AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS circuitPack AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		equipmentHolder AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS equipmentHolder AND SUBCLASSES;
 	WITH ATTRIBUTE
 		equipmentId;
 	BEHAVIOUR
@@ -2218,11 +2093,9 @@ REGISTERED AS { m3100NameBinding 32 };
 
 
 circuitPack-equipmentHolder-explicitlyCreated NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		circuitPack AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS circuitPack AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		equipmentHolder AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS equipmentHolder AND SUBCLASSES;
 	WITH ATTRIBUTE
 		equipmentId;
 	BEHAVIOUR
@@ -2234,11 +2107,9 @@ REGISTERED AS { m3100NameBinding 33 };
 
 
 connectionR1-network NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		connectionR1;
+	SUBORDINATE OBJECT CLASS connectionR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		network;
+	SUPERIOR OBJECT CLASS network;
 	WITH ATTRIBUTE
 		connectionId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2247,11 +2118,9 @@ REGISTERED AS { m3100NameBinding 25 };
 
 
 connectionTerminationPointSource-trailTerminationPointSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		connectionTerminationPointSource;
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		trailTerminationPointSource AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS trailTerminationPointSource AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cTPId;
 	BEHAVIOUR
@@ -2262,11 +2131,9 @@ REGISTERED AS { m3100NameBinding 3 };
 
 
 connectionTerminationPointSource-trailTerminationPointBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		connectionTerminationPointSource;
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		trailTerminationPointBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS trailTerminationPointBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cTPId;
 	BEHAVIOUR
@@ -2277,11 +2144,9 @@ REGISTERED AS { m3100NameBinding 4 };
 
 
 connectionTerminationPointSink-trailTerminationPointSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		connectionTerminationPointSink;
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		trailTerminationPointSink AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS trailTerminationPointSink AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cTPId;
 	BEHAVIOUR
@@ -2292,11 +2157,9 @@ REGISTERED AS { m3100NameBinding 5 };
 
 
 connectionTerminationPointSink-trailTerminationPointBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		connectionTerminationPointSink;
+	SUBORDINATE OBJECT CLASS connectionTerminationPointSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		trailTerminationPointBidirectional AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS trailTerminationPointBidirectional AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cTPId;
 	BEHAVIOUR
@@ -2307,11 +2170,9 @@ REGISTERED AS { m3100NameBinding 6 };
 
 
 crossConnection-fabric NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		crossConnection AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS crossConnection AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		fabric AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
 	WITH ATTRIBUTE
 		crossConnectionId;
 	BEHAVIOUR
@@ -2330,11 +2191,9 @@ REGISTERED AS { m3100NameBinding 7 };
 
 
 crossConnection-mpCrossConnection NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		crossConnection AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS crossConnection AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		mpCrossConnection AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS mpCrossConnection AND SUBCLASSES;
 	WITH ATTRIBUTE
 		crossConnectionId;
 	BEHAVIOUR
@@ -2355,11 +2214,9 @@ REGISTERED AS { m3100NameBinding 8 };
 
 
 equipment-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		equipment AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS equipment AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		equipmentId;
 	BEHAVIOUR
@@ -2370,11 +2227,9 @@ REGISTERED AS { m3100NameBinding 9 };
 
 
 equipment-equipment NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		equipment AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS equipment AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		equipment AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS equipment AND SUBCLASSES;
 	WITH ATTRIBUTE
 		equipmentId;
 	BEHAVIOUR
@@ -2385,11 +2240,9 @@ REGISTERED AS { m3100NameBinding 10 };
 
 
 equipmentHolder-equipmentHolder NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		equipmentHolder AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS equipmentHolder AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		equipmentHolder AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS equipmentHolder AND SUBCLASSES;
 	WITH ATTRIBUTE
 		equipmentId;
 	BEHAVIOUR
@@ -2401,11 +2254,9 @@ REGISTERED AS { m3100NameBinding 31 };
 
 
 eventForwardingDiscriminator-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation X.721:1992":eventForwardingDiscriminator;
+	SUBORDINATE OBJECT CLASS "Recommendation X.721:1992":eventForwardingDiscriminator;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation X.721:1992":discriminatorId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2414,11 +2265,9 @@ REGISTERED AS { m3100NameBinding 11 };
 
 
 fabric-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		fabric AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS fabric AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		fabricId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2427,22 +2276,18 @@ REGISTERED AS { m3100NameBinding 12 };
 
 
 gtp-fabric NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		gtp;
+	SUBORDINATE OBJECT CLASS gtp;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		fabric AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
 	WITH ATTRIBUTE
 		gtpId;
 REGISTERED AS { m3100NameBinding 13 };
 
 
 log-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation X.721:1992":log;
+	SUBORDINATE OBJECT CLASS "Recommendation X.721:1992":log;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Recommendation X.721:1992":logId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2451,11 +2296,9 @@ REGISTERED AS { m3100NameBinding 14 };
 
 
 managedElement-network NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		network;
+	SUPERIOR OBJECT CLASS network;
 	WITH ATTRIBUTE
 		managedElementId;
 	BEHAVIOUR
@@ -2467,11 +2310,9 @@ REGISTERED AS { m3100NameBinding 15 };
 
 
 managedElement-organization NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT X.521":organization AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT X.521":organization AND SUBCLASSES;
 	WITH ATTRIBUTE
 		managedElementId;
 	BEHAVIOUR
@@ -2480,11 +2321,9 @@ REGISTERED AS { m3100NameBinding 27 };
 
 
 managedElement-organizationalUnit NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT X.521":organizationalUnit AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT X.521":organizationalUnit AND SUBCLASSES;
 	WITH ATTRIBUTE
 		managedElementId;
 	BEHAVIOUR
@@ -2493,11 +2332,9 @@ REGISTERED AS { m3100NameBinding 28 };
 
 
 managedElement-managedElementComplex NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managedElement AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElementComplex AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElementComplex AND SUBCLASSES;
 	WITH ATTRIBUTE
 		managedElementId;
 	BEHAVIOUR
@@ -2509,11 +2346,9 @@ REGISTERED AS { m3100NameBinding 34 };
 
 
 managedElementComplex-organization NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managedElementComplex AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managedElementComplex AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT X.521":organization AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT X.521":organization AND SUBCLASSES;
 	WITH ATTRIBUTE
 		managedElementComplexId;
 	BEHAVIOUR
@@ -2522,11 +2357,9 @@ REGISTERED AS { m3100NameBinding 35 };
 
 
 managedElementComplex-organizationalUnit NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		managedElementComplex AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS managedElementComplex AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT X.521":organizationalUnit AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT X.521":organizationalUnit AND SUBCLASSES;
 	WITH ATTRIBUTE
 		managedElementComplexId;
 	BEHAVIOUR
@@ -2535,22 +2368,18 @@ REGISTERED AS { m3100NameBinding 36 };
 
 
 mpCrossConnection-fabric NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		mpCrossConnection AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS mpCrossConnection AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		fabric AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
 	WITH ATTRIBUTE
 		mpCrossConnectionId;
 REGISTERED AS { m3100NameBinding 16 };
 
 
 network-network NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		network AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS network AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		network AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS network AND SUBCLASSES;
 	WITH ATTRIBUTE
 		networkId;
 	BEHAVIOUR
@@ -2562,11 +2391,9 @@ REGISTERED AS { m3100NameBinding 17 };
 
 
 network-organization NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		network AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS network AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT X.521":organization AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT X.521":organization AND SUBCLASSES;
 	WITH ATTRIBUTE
 		networkId;
 	BEHAVIOUR
@@ -2575,11 +2402,9 @@ REGISTERED AS { m3100NameBinding 29 };
 
 
 network-organizationalUnit NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		network AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS network AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"CCITT X.521":organizationalUnit AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "CCITT X.521":organizationalUnit AND SUBCLASSES;
 	WITH ATTRIBUTE
 		networkId;
 	BEHAVIOUR
@@ -2588,11 +2413,9 @@ REGISTERED AS { m3100NameBinding 30 };
 
 
 software-equipment NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		software AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS software AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		equipment AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS equipment AND SUBCLASSES;
 	WITH ATTRIBUTE
 		softwareId;
 	BEHAVIOUR
@@ -2603,11 +2426,9 @@ REGISTERED AS { m3100NameBinding 18 };
 
 
 software-software NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		software AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS software AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		software AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS software AND SUBCLASSES;
 	WITH ATTRIBUTE
 		softwareId;
 	BEHAVIOUR
@@ -2618,11 +2439,9 @@ REGISTERED AS { m3100NameBinding 19 };
 
 
 software-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		software AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS software AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		softwareId;
 	BEHAVIOUR
@@ -2633,22 +2452,18 @@ REGISTERED AS { m3100NameBinding 20 };
 
 
 tpPool-fabric NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		tpPool;
+	SUBORDINATE OBJECT CLASS tpPool;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		fabric AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS fabric AND SUBCLASSES;
 	WITH ATTRIBUTE
 		tpPoolId;
 REGISTERED AS { m3100NameBinding 21 };
 
 
 trailR1-network NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		trailR1;
+	SUBORDINATE OBJECT CLASS trailR1;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		network;
+	SUPERIOR OBJECT CLASS network;
 	WITH ATTRIBUTE
 		trailId;
 	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
@@ -2657,11 +2472,9 @@ REGISTERED AS { m3100NameBinding 26 };
 
 
 trailTerminationPointSource-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		trailTerminationPointSource AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS trailTerminationPointSource AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		tTPId;
 	BEHAVIOUR
@@ -2672,11 +2485,9 @@ REGISTERED AS { m3100NameBinding 23 };
 
 
 trailTerminationPointSink-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		trailTerminationPointSink AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS trailTerminationPointSink AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		tTPId;
 	BEHAVIOUR

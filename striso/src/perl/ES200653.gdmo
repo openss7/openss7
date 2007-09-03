@@ -1,6 +1,7 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "ES 200 653 V1.2.1 (1999-05)" >--
+--< GDMO.Alias "ES 200 653 V1.2.1 (1999-05)" "ES 200 653" >--
 MODULE "ES 200 653 V1.2.1 (1999-05)"
 --
 --9 Managed object class library for the network level

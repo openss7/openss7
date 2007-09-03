@@ -1,6 +1,7 @@
 --< GDMO.Include "G.774.gdmo" >--
---< GDMO.Document "ITU-T Rec. G.774.3" >--
---< GDMO.Alias "ITU-T Rec. G.774.3"
+--< GDMO.Document "ITU-T Rec. G.774.3 : 2001" >--
+--< GDMO.Alias "ITU-T Rec. G.774.3 : 2001" "ITU-T Rec. G.774.3",
+--  "Recommendation G.774.03",
 --  "Rec. G.774.3",
 --  "Recommendation G.774.3" >--
 --< GDMO.Version 1.3 >--
@@ -79,8 +80,9 @@ REGISTERED AS { g774-03MObjectClass 1 };
 
 apsReportRecordBeh BEHAVIOUR
 	DEFINED AS
-		"An instance of the apsReportRecord object is created when a protectionSwitchReportingNotification
-		is generated. The protectionStatusParameter must be included in the management extension.";
+		"An instance of the apsReportRecord object is created when a 
+		protectionSwitchReporting Notification is generated. The 
+		protectionStatusParameter must be included in the management extension.";
 --6.2 Protected TTP bidirectional
 
 
@@ -98,9 +100,10 @@ REGISTERED AS { g774-03MObjectClass 2 };
 
 protectedTTPBidirectionalBeh BEHAVIOUR
 	DEFINED AS
-		"The protectedTTPBidirectional object class is a class of objects that represents the bidirectional
-		protected resources in a protection system. If the SDH bidirectional multiplex section protection
-		switching function is present, this object class shall be supported.";
+		"The protectedTTPBidirectional object class is a class of objects that represents 
+		the bidirectional protected resources in a protection system. If the SDH 
+		bidirectional multiplex section protection switching function is present, this 
+		object class shall be supported.";
 --6.3 Protected TTP sink
 
 
@@ -119,16 +122,18 @@ REGISTERED AS { g774-03MObjectClass 3 };
 
 protectedTTPSinkBeh BEHAVIOUR
 	DEFINED AS
-		"The protectedTTPSink object class is a class of objects that represents the protected resources in
-		a protection system. An instance of this object class is pointed to by the reliableResourcePointer
-		attribute in an instance of the protectionUnit object class. The crossConnectionObjectPointer
-		attribute in an instance of this object class points to its associated protectionUnit instance
-		which has the reliableResourcePointer attribute pointing back to the instance of this object class.
-		The upstreamConnectivityPointer in an instance of this object class points to either null or its
-		associated unprotected CTP object instance; it indicates the actual signal flow, and when a signal
-		is switched to another unit, the value of the upstreamConnectivityPointer is updated. If the
-		attributeValueChangeNotification package is present, then a change in the value of the
-		supportedByObjectList shall cause an attributeValueChange notification.";
+		"The protectedTTPSink object class is a class of objects that represents the 
+		protected resources in a protection system. An instance of this object class is 
+		pointed to by the reliableResourcePointer attribute in an instance of the 
+		protectionUnit object class. The crossConnectionObjectPointer attribute in an 
+		instance of this object class points to its associated protectionUnit instance 
+		which has the reliableResourcePointer attribute pointing back to the instance of 
+		this object class. The upstreamConnectivityPointer in an instance of this object 
+		class points to either null or its associated unprotected CTP object instance; 
+		it indicates the actual signal flow, and when a signal is switched to another 
+		unit, the value of the upstreamConnectivityPointer is updated. If the 
+		attributeValueChangeNotification package is present, then a change in the value 
+		of the supportedByObjectList shall cause an attributeValueChange notification.";
 --6.4 Protected TTP source
 
 
@@ -141,23 +146,25 @@ protectedTTPSource MANAGED OBJECT CLASS
 			BEHAVIOUR
 				protectedTTPSourceBeh;
 			ATTRIBUTES
-				protectedTTPIdGET;;;
+				protectedTTPId GET;;;
 REGISTERED AS { g774-03MObjectClass 4 };
 
 
 protectedTTPSourceBeh BEHAVIOUR
 	DEFINED AS
-		"The protectedTTPSource object class is a class of objects that represents the protected resources
-		in a protection system. An instance of this object class is pointed to by the
-		reliableResourcePointer attribute in an instance of the protectionUnit object class. The
-		crossConnectionObjectPointer attribute in an instance of this object class points to its associated
-		protectionUnit object instance which has the reliableResourcePointer attribute pointing back to the
-		instance of this object class. The downstreamConnectivityPointer in an instance of this object
-		class points to either null or its associated unprotected CTP object instance(s); it indicates the
-		actual signal flow, and when a signal is switched to another unit, the pointer is updated. If the
-		attributeValueChangeNotification package is present, then a change in the value of the
-		supportedByObjectList shall cause an attributeValueChange notification.";
---6.5 Protection group
+		"The protectedTTPSource object class is a class of objects that represents the 
+		protected resources in a protection system. An instance of this object class is 
+		pointed to by the reliableResourcePointer attribute in an instance of the 
+		protectionUnit object class. The crossConnectionObjectPointer attribute in an 
+		instance of this object class points to its associated protectionUnit object 
+		instance which has the reliableResourcePointer attribute pointing back to the 
+		instance of this object class. The downstreamConnectivityPointer in an instance 
+		of this object class points to either null or its associated unprotected CTP 
+		object instance(s); it indicates the actual signal flow, and when a signal is 
+		switched to another unit, the pointer is updated. If the 
+		attributeValueChangeNotification package is present, then a change in the value 
+		of the supportedByObjectList shall cause an attributeValueChange notification.";
+--6.5 Protection Group
 
 
 protectionGroupR1 MANAGED OBJECT CLASS
@@ -173,7 +180,8 @@ protectionGroupR1 MANAGED OBJECT CLASS
 				protectionGroupId GET,
 				protectionGroupType GET-REPLACE,
 				revertive REPLACE-WITH-DEFAULT
-					DEFAULT VALUE SDHProtASN1.booleanTrueDefault GET-REPLACE,
+					DEFAULT VALUE SDHProtASN1.booleanTrueDefault
+					GET-REPLACE,
 				"Recommendation M.3100":supportedByObjectList GET,
 				waitToRestoreTime GET-REPLACE;
 			ACTIONS
@@ -194,24 +202,28 @@ REGISTERED AS { g774-03MObjectClass 12 };
 
 protectionGroupR1Beh BEHAVIOUR
 	DEFINED AS
-		"A protectionGroup object instance contains zero or more protectionUnit objects for defining a
-		protection switching relationship where one or more standby (i.e. backup) entities provide
-		protection for one or more working (i.e. regular or preferred) entities. The invokeProtection
-		action can be used to request a lockout, a forced switch, or a manual switch (i.e. normal switch)
-		on one or more protectionUnit instances contained in the protectionGroup object. The
-		releaseProtection action can be used to release a lockout, a forced switch, or a manual switch
-		(i.e. normal switch) on one or more protectionUnit instances contained in the protectionGroup
-		object. The protectionSwitchReporting notification is emitted from the protectionGroup object to
-		report any protection switch events, such as protection switching (forced switch, manual switch, or
-		automatic switch), protection release (release of forced switch, manual switch, or automatic
-		switch), lockout or release of lockout. If the attributeValueChangeNotification package is present,
-		then changes to the protectionGroupType attribute, the revertive attribute or the waitToRestoreTime
-		attribute shall cause an attributeValueChange notification to be emitted. The protectionGroupType
-		attribute shall have the value 'colon' when more than one protectionUnit is protected. Changing the
-		value of this attribute between 'plus' and 'colon' is allowed when only one protected
-		protectionUnit and one protecting protectionUnit are contained by the protectionGroup. The change
-		from 'plus' to 'colon' is only allowed if the underlying resources support M:N protection.";
---6.6 Protection unit
+		"A protectionGroup object instance contains zero or more protectionUnit objects 
+		for defining a protection switching relationship where one or more standby (i.e. 
+		backup) entities provide protection for one or more working (i.e. regular or 
+		preferred) entities. The invokeProtection action can be used to request a 
+		lockout, a forced switch, or a manual switch (i.e. normal switch) on one or more 
+		protectionUnit instances contained in the protectionGroup object. The 
+		releaseProtection action can be used to release a lockout, a forced switch, or a 
+		manual switch (i.e. normal switch) on one or more protectionUnit instances 
+		contained in the protectionGroup object. The protectionSwitchReporting 
+		notification is emitted from the protectionGroup object to report any protection 
+		switch events, such as protection switching (forced switch, manual switch, or 
+		automatic switch), protection release (release of forced switch, manual switch, 
+		or automatic switch), lockout or release of lockout. If the 
+		attributeValueChangeNotification package is present, then changes to the 
+		protectionGroupType attribute, the revertive attribute or the waitToRestoreTime 
+		attribute shall cause an attributeValueChange notification to be emitted. The 
+		protectionGroupType attribute shall have the value 'colon' when more than one 
+		protectionUnit is protected. Changing the value of this attribute between 'plus' 
+		and 'colon' is allowed when only one protected protectionUnit and one protecting 
+		protectionUnit are contained by the protectionGroup. The change from 'plus' to 
+		'colon' is only allowed if the underlying resources support M:N protection.";
+--6.6 Protection Unit
 
 
 protectionUnit MANAGED OBJECT CLASS
@@ -238,17 +250,19 @@ REGISTERED AS { g774-03MObjectClass 6 };
 
 protectionUnitBeh BEHAVIOUR
 	DEFINED AS
-		"A protectionUnit object represents a protected (i.e. working, regular, or preferred) unit or a
-		protecting (i.e. backup or standby) unit. For a protecting protectionUnit, the attribute protecting
-		shall have the value TRUE. For a protected protectionUnit, the attribute protecting shall have the
-		value FALSE. The value of the unreliableResourcePointer attribute points to an unreliable resource
-		(e.g. equipment hardware or termination point) that is associated with the protectionUnit instance.
-		The value of the reliableResourcePointer attribute points to a reliable resource (e.g. termination
-		point) that is associated with the protectionUnit instance. If the
-		attributeValueChangeNotificationPackage is present, then changes to the unreliableResourcePointer
-		attribute, the priority attribute or the reliableResourcePointer attribute shall cause an
+		"A protectionUnit object represents a protected (i.e. working, regular, or 
+		preferred) unit or a protecting (i.e. backup or standby) unit. For a protecting 
+		protectionUnit, the attribute protecting shall have the value TRUE. For a 
+		protected protectionUnit, the attribute protecting shall have the value FALSE. 
+		The value of the unreliableResourcePointer attribute points to an unreliable 
+		resource (e.g. equipment hardware or termination point) that is associated with 
+		the protectionUnit instance. The value of the reliableResourcePointer attribute 
+		points to a reliable resource (e.g. termination point) that is associated with 
+		the protectionUnit instance. If the attributeValueChangeNotificationPackage is 
+		present, then changes to the unreliableResourcePointer attribute, the priority 
+		attribute or the reliableResourcePointer attribute shall cause an 
 		attributeValueChange notification to be emitted.";
---6.7 SDH multiplex-section protection group
+--6.7 SDH Multiplex-Section Protection Group
 
 
 sdhMSProtectionGroupR1 MANAGED OBJECT CLASS
@@ -275,12 +289,14 @@ REGISTERED AS { g774-03MObjectClass 13 };
 
 sdhMSProtectionGroupR1Beh BEHAVIOUR
 	DEFINED AS
-		"This object class is used specifically for representing a SDH multiplex-section protection group in
-		a protection system. Only one protecting protection unit is allowed. The protectionMismatchStatus
-		indicates a mismatch between the provisioned protectionGroupType of this protection group and the
-		provisioned protectionGroupType of the far-end. It also indicates mismatch of uni-directional
-		versus bi-directional switch provisioning between the two protection groups.";
---6.8 SDH multiplex-section protection unit
+		"This object class is used specifically for representing a SDH multiplex-section 
+		protection group in a protection system. Only one protecting protection unit is 
+		allowed. The protectionMismatchStatus indicates a mismatch between the 
+		provisioned protectionGroupType of this protection group and the provisioned 
+		protectionGroupType of the far-end. It also indicates mismatch of 
+		uni-directional versus bi-directional switch provisioning between the two 
+		protection groups.";
+--6.8 SDH Multiplex-Section Protection Unit
 
 
 sdhMSProtectionUnit MANAGED OBJECT CLASS
@@ -294,9 +310,11 @@ sdhMSProtectionUnit MANAGED OBJECT CLASS
 				channelNumber GET,
 				protectionStatus GET,
 				reliableResourcePointer
-					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer,
+					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer
+					,
 				unreliableResourcePointer
-					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer;;;
+					PERMITTED VALUES SDHProtASN1.SDHMSResourcePointer
+					;;;
 	CONDITIONAL PACKAGES
 		sdhPriorityPkg
 			PRESENT IF
@@ -312,15 +330,17 @@ REGISTERED AS { g774-03MObjectClass 8 };
 
 sdhMSProtectionUnitBeh BEHAVIOUR
 	DEFINED AS
-		"This object class is specific to SDH multiplex section protection systems. Instances of this object
-		class are used to represent a relationship between a protectedTTP and an unprotectedCTP. If this is
-		a protecting protection unit, the reliableResourcePointer points to the protectedTTP for extra
-		traffic or NULL if there is no extra traffic. The channelNumber attribute value represents the
-		number of the channel used by the SDH MSP protocol, if any. If the sdhMSProtectionUnit is
-		protecting, then the channelNumber attribute shall have the value 0. If the sdhMSProtectionUnit is
-		protected, the channelNumber attribute shall have a value between 1 and 14. For Lockout of
-		protecting unit, protected channels 1 to 14 are incapable of being carried on protection.";
---6.9 Unprotected CTP bidirectional
+		"This object class is specific to SDH multiplex section protection systems. 
+		Instances of this object class are used to represent a relationship between a 
+		protectedTTP and an unprotectedCTP. If this is a protecting protection unit, the 
+		reliableResourcePointer points to the protectedTTP for extra traffic or NULL if 
+		there is no extra traffic. The channelNumber attribute value represents the 
+		number of the channel used by the SDH MSP protocol, if any. If the 
+		sdhMSProtectionUnit is protecting, then the channelNumber attribute shall have 
+		the value 0. If the sdhMSProtectionUnit is protected, the channelNumber 
+		attribute shall have a value between 1 and 14. For Lockout of protecting unit, 
+		protected channels 1 to 14 are incapable of being carried on protection.";
+--6.9 Unprotected CTP Bidirectional
 
 
 unprotectedCTPBidirectional MANAGED OBJECT CLASS
@@ -337,8 +357,8 @@ REGISTERED AS { g774-03MObjectClass 9 };
 
 unprotectedCTPBidirectionalBeh BEHAVIOUR
 	DEFINED AS
-		"The unprotectedCTPBidirectional object class is a class of objects that represents the unprotected
-		resources in a protection system.";
+		"The unprotectedCTPBidirectional object class is a class of objects that 
+		represents the unprotected resources in a protection system.";
 --6.10 Unprotected CTP sink
 
 
@@ -357,12 +377,14 @@ REGISTERED AS { g774-03MObjectClass 10 };
 
 unprotectedCTPSinkBeh BEHAVIOUR
 	DEFINED AS
-		"The unprotectedCTPSink object class is a class of objects that represents the unprotected resources
-		in a protection system. An instance of this object class is pointed to by the
-		unreliableResourcePointer attribute in an instance of the protectionUnit object class (or its
-		subclasses). The crossConnectionObjectPointer attribute in an instance of this object class points
-		to its associated protectionUnit object instance which has the unreliableResourcePointer attribute
-		pointing back to the instance of this object class.";
+		"The unprotectedCTPSink object class is a class of objects that represents the 
+		unprotected resources in a protection system. An instance of this object class 
+		is pointed to by the unreliableResourcePointer attribute in an instance of the 
+		protectionUnit object class (or its subclasses). The 
+		crossConnectionObjectPointer attribute in an instance of this object class 
+		points to its associated protectionUnit object instance which has the 
+		unreliableResourcePointer attribute pointing back to the instance of this object 
+		class.";
 --6.11 Unprotected CTP source
 
 
@@ -381,14 +403,16 @@ REGISTERED AS { g774-03MObjectClass 11 };
 
 unprotectedCTPSourceBeh BEHAVIOUR
 	DEFINED AS
-		"The unprotectedCTPSource object class is a class of objects that represents the unprotected
-		resources in a protection system. An instance of this object class is pointed to by the
-		unreliableResourcePointer attribute in an instance of the protectionUnit object class (or its
-		subclasses). The crossConnectionObjectPointer attribute in an instance of this object class points
-		to its associated protectionUnit object instance which has the reliableResourcePointer attribute
-		pointing back to the instance of this object class.";
+		"The unprotectedCTPSource object class is a class of objects that represents the 
+		unprotected resources in a protection system. An instance of this object class 
+		is pointed to by the unreliableResourcePointer attribute in an instance of the 
+		protectionUnit object class (or its subclasses). The 
+		crossConnectionObjectPointer attribute in an instance of this object class 
+		points to its associated protectionUnit object instance which has the 
+		reliableResourcePointer attribute pointing back to the instance of this object 
+		class.";
 --7 Packages
---7.1 Extra traffic control
+--7.1 Extra Traffic Control
 
 
 extraTrafficControlPkg PACKAGE
@@ -401,12 +425,13 @@ REGISTERED AS { g774-03Package 1 };
 
 extraTrafficControlPkgBeh BEHAVIOUR
 	DEFINED AS
-		"Attribute administrativeState is used to suspend or resume extra traffic on the protecting channel.
-		When in the Locked state, no extra traffic is carried on the protecting channel, however, this does
-		not prevent protected channel traffic from being switched to the protecting channel. When unlocked,
-		extra traffic is resumed on the protecting channel as long as there is no request from a protected
-		channel of higher priority than on the protecting channel.";
---7.2 Last attempt result
+		"Attribute administrativeState is used to suspend or resume extra traffic on the 
+		protecting channel. When in the Locked state, no extra traffic is carried on the 
+		protecting channel, however, this does not prevent protected channel traffic 
+		from being switched to the protecting channel. When unlocked, extra traffic is 
+		resumed on the protecting channel as long as there is no request from a 
+		protected channel of higher priority than on the protecting channel.";
+--7.2 Last Attempt Result
 
 
 lastAttemptResultPkg PACKAGE
@@ -440,7 +465,8 @@ REGISTERED AS { g774-03Package 5 };
 sdhPriorityPkg PACKAGE
 	ATTRIBUTES
 		sdhPriority
-			PERMITTED VALUES SDHProtASN1.SDHMSPriority GET-REPLACE;
+			PERMITTED VALUES SDHProtASN1.SDHMSPriority
+			GET-REPLACE;
 REGISTERED AS { g774-03Package 6 };
 --8 Attributes
 --8.1 Channel Number
@@ -448,9 +474,7 @@ REGISTERED AS { g774-03Package 6 };
 
 channelNumber ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		channelNumberBeh;
 REGISTERED AS { g774-03Attribute 1 };
@@ -459,13 +483,12 @@ REGISTERED AS { g774-03Attribute 1 };
 channelNumberBeh BEHAVIOUR
 	DEFINED AS
 		"This attribute indicates the channel number associated with a protectionUnit.";
---8.2 Last attempt result
+--8.2 Last Attempt Result
 
 
 lastAttemptResult ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.LastAttemptResult;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		lastAttemptResultBeh;
 REGISTERED AS { g774-03Attribute 2 };
@@ -473,20 +496,20 @@ REGISTERED AS { g774-03Attribute 2 };
 
 lastAttemptResultBeh BEHAVIOUR
 	DEFINED AS
-		"The value of the last exercise result or the result of a protection group/unit diagnostic or switch
-		attempt which performs at least the same functionality as an exercise, is available from his
-		attribute. If a failure occurs, the availabilityStatus of the protectionGroup object will be set to
-		degraded. The successful completion of a protection group/unit diagnostic or switch attempt which
-		performs at least the same functionality as an exercise causes the availabilityStatus attribute to
-		be set to NULL (i.e. available), and the lastAttemptResult value is set to success.";
+		"The value of the last exercise result or the result of a protection group/unit 
+		diagnostic or switch attempt which performs at least the same functionality as 
+		an exercise, is available from his attribute. If a failure occurs, the 
+		availabilityStatus of the protectionGroup object will be set to degraded. The 
+		successful completion of a protection group/unit diagnostic or switch attempt 
+		which performs at least the same functionality as an exercise causes the 
+		availabilityStatus attribute to be set to NULL (i.e. available), and the 
+		lastAttemptResult value is set to success.";
 --8.3 Priority
 
 
 priority ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		priorityBeh;
 REGISTERED AS { g774-03Attribute 3 };
@@ -494,22 +517,20 @@ REGISTERED AS { g774-03Attribute 3 };
 
 priorityBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute specifies the priority of the service (e.g. traffic) carried on the resource
-		associated with the protected protectionUnit instance. Valid values for this attribute are
-		integers, where the value 1 indicates the highest priority, and a larger value indicates a lower
-		priority. For a protecting protectionUnit, the value of this attribute indicates the priority of
-		choice of the protecting protectionUnit relative to other available protecting protectionUnit(s)
-		within the same protectionGroup. The lower the value, the more preferred the protectionUnit is
-		relative to other protectionUnits.";
---8.4 Protected trail termination point identifier
+		"This attribute specifies the priority of the service (e.g. traffic) carried on 
+		the resource associated with the protected protectionUnit instance. Valid values 
+		for this attribute are integers, where the value 1 indicates the highest 
+		priority, and a larger value indicates a lower priority. For a protecting 
+		protectionUnit, the value of this attribute indicates the priority of choice of 
+		the protecting protectionUnit relative to other available protecting 
+		protectionUnit(s) within the same protectionGroup. The lower the value, the more 
+		preferred the protectionUnit is relative to other protectionUnits.";
+--8.4 Protected Trail Termination Point Identifier
 
 
 protectedTTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		protectedTTPIdBeh;
 REGISTERED AS { g774-03Attribute 4 };
@@ -517,26 +538,23 @@ REGISTERED AS { g774-03Attribute 4 };
 
 protectedTTPIdBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute is used as an RDN for naming instances of the protectedTTP object classes. If the
-		string choice of the syntax is used, then matching on substrings is permitted. If the number choice
-		for the syntax is used, then matching on ordering is permitted.";
---8.5 Reported protection unit
+		"This attribute is used as an RDN for naming instances of the protectedTTP object 
+		classes. If the string choice of the syntax is used, then matching on substrings 
+		is permitted. If the number choice for the syntax is used, then matching on 
+		ordering is permitted.";
+--8.5 Reported Protection Unit
 
 
 reportedProtectionUnit ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.RelativeDistinguishedName;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { g774-03Attribute 5 };
---8.6 Protection group identifier
+--8.6 Protection Group Identifier
 
 
 protectionGroupId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		protectionGroupIdBeh;
 REGISTERED AS { g774-03Attribute 6 };
@@ -544,17 +562,17 @@ REGISTERED AS { g774-03Attribute 6 };
 
 protectionGroupIdBeh BEHAVIOUR
 	DEFINED AS
-		"The protectionGroupId attribute is an attribute type whose distinguished value can be used as an
-		RDN when naming an instance of the protectionGroup object class. If the string choice of the syntax
-		is used, then matching on substrings is permitted. If the number choice for the syntax is used,
-		then matching on ordering is permitted.";
---8.7 Protection group type
+		"The protectionGroupId attribute is an attribute type whose distinguished value 
+		can be used as an RDN when naming an instance of the protectionGroup object 
+		class. If the string choice of the syntax is used, then matching on substrings 
+		is permitted. If the number choice for the syntax is used, then matching on 
+		ordering is permitted.";
+--8.7 Protection Group Type
 
 
 protectionGroupType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionGroupType;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectionGroupTypeBeh;
 REGISTERED AS { g774-03Attribute 7 };
@@ -562,15 +580,14 @@ REGISTERED AS { g774-03Attribute 7 };
 
 protectionGroupTypeBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute specifies whether the protection scheme used is 1 + 1 (plus) or M:N (colon). M:N
-		includes the cases where M = 1 and/or N = 1.";
---8.8 Protection mismatch status
+		"This attribute specifies whether the protection scheme used is 1 + 1 (plus) or 
+		M:N (colon). M:N includes the cases where M = 1 and/or N = 1.";
+--8.8 Protection Mismatch Status
 
 
 protectionMismatchStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionMismatchStatus;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectionMismatchStatusBeh;
 REGISTERED AS { g774-03Attribute 8 };
@@ -578,18 +595,16 @@ REGISTERED AS { g774-03Attribute 8 };
 
 protectionMismatchStatusBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute indicates a mismatch between the local and far-end provisioned values for the
-		protectionGroupType attribute and has a separate indication for a mismatch between the local and
-		far-end provisioned values for the protectionSwitchMode attribute.";
---8.9 Protection status
+		"This attribute indicates a mismatch between the local and far-end provisioned 
+		values for the protectionGroupType attribute and has a separate indication for a 
+		mismatch between the local and far-end provisioned values for the 
+		protectionSwitchMode attribute.";
+--8.9 Protection Status
 
 
 protectionStatus ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionStatus;
-	MATCHES FOR
-		EQUALITY,
-		SET-COMPARISON,
-		SET-INTERSECTION;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
 	BEHAVIOUR
 		protectionStatusBeh;
 REGISTERED AS { g774-03Attribute 9 };
@@ -597,110 +612,272 @@ REGISTERED AS { g774-03Attribute 9 };
 
 protectionStatusBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute is used to indicate the status of the protection switch in a protectionUnit
-		instance. This attribute is set-valued because some requests are allowed to be pending. The
-		following rule shall be followed: Only one of the values lockout, forcedSwitch, or manualSwitch can
-		be present at the same time, either local or remote. It is also possible to have two or more
-		pending automatic switch requests. The protectionStatus attribute of a protection Unit which
-		provides protection is used to hold the protection request which is actually performed on that
-		protectionUnit. Locally invoked management operations (e.g. manual, forced, lockout switch
-		completions) can be overridden at the near end or the far end, but may only be released at the near
-		end. Single-ended systems keep the status of local and far-end switch requests as separate entities
-		in the protectionStatus attribute. The remainder of this behaviour provides the allowable
-		protectionStatus attribute values for protected and protecting units for both revertive and
-		non-revertive systems. The following allowable protectionStatus values are associated with each
-		protected unit: No Request No switch request is present on the unit. Manual Switch to Protecting
-		Complete The unit has completed a Manual Switch. Release failed A switch has been released or
-		pre-empted and a timeout occurs while waiting for a release of associated bridges, or the near-end
-		switch. Automatic Switch (SF) Pending The unit has a Signal Fail condition present and the
-		protecting unit is unavailable. Automatic Switch (SD) Pending The unit has a Signal Degrade
-		condition present and the protecting unit is unavailable. Automatic Switch (SF) Complete The unit
-		has completed an Automatic Switch to the protecting unit due to a Signal Fail condition. Automatic
-		Switch (SD) Complete The unit has completed an Automatic Switch to the protecting unit due to a
-		Signal Degrade condition. Automatic Switch (SF) Present, Operate failed An automatic switch (SF)
-		request is in progress and a time-out occurs while waiting for completion. Automatic Switch (SD)
-		Present, Operate failed An automatic switch (SD) request is in progress and a time-out occurs while
-		waiting for completion. Force Switch Complete, Automatic Switch (SF) Pending The unit has completed
-		a Force Switch. Additionally, the unit has an automatic switch (SF) pending. Force Switch Complete,
-		Automatic Switch (SD) Pending The unit has completed a Force Switch. Additionally, the unit has an
-		automatic switch (SD) pending. Automatic Switch Complete, Wait-to-Restore The unit has completed an
-		Automatic Switch to the protecting unit. Force Switch Complete The unit has completed a Force
-		Switch to the protecting unit. Protected Unit Lockout Completed The unit has been locked out from
-		the protecting unit. Protected Unit Lockout complete, Operate Failed The unit has been locked out
-		from the protecting unit, and, the previously completed switch could not be released within the
-		expected time-out. When the switch is released, the operate failed status is removed. Additionally,
-		the non-revertive protected protection unit has the following status values: Do Not Revert The
-		protected unit has been switched to the protecting unit and the request to do so has been released.
-		The switch to the protecting unit is maintained. Manual Switch to Protected Unit Complete The unit
-		has completed a Manual Switch from the protecting unit to the protected unit. Force Switch to
-		Protected Unit Complete The unit has completed a Force Switch from the protecting unit to the
-		protected unit. Automatic Switch (SF) to Protected Unit Complete The protecting unit has a Signal
-		Fail condition present and traffic is now being carried on the protected unit. Automatic Switch
-		(SD) to Protected Unit Complete The protecting unit has a Signal Degrade condition present and
-		traffic is now being carried on the protected unit. Automatic Switch (SD) to Protected Unit
-		Complete, Signal Degrade Present The protecting unit has a Signal Degrade condition present and
-		traffic is now being carried on the protected unit. Additionally, the protected unit has a Signal
-		Degrade condition present. Automatic Switch (SF) to Protected Unit Complete, Signal Degrade Present
-		The protecting unit has a Signal Fail condition present and traffic is now being carried on the
-		protected unit. Additionally, the protected unit has a Signal Degrade condition present. Force
-		Switch from Protecting Unit Complete, Automatic Switch (SF) Pending The unit has completed a Force
-		Switch from the protecting unit to the protected unit. Additionally, the protected unit has an
-		automatic switch (SF) condition present. Force Switch from Protecting Unit Complete, Automatic
-		Switch (SD) Pending The unit has completed a Force Switch from the protecting unit to the protected
-		unit. Additionally, the protected unit has an automatic switch (SD) condition present. The
-		following allowable protectionStatus values are associated with each protecting unit: No Request No
-		request is present on the protecting unit. Manual Switch to Protecting Unit Complete The protected
-		unit has completed a Manual Switch. Automatic Switch Complete (SF) to Protecting Unit The protected
-		unit has completed an automatic switch (SF) to the protecting unit. Automatic Switch Complete (SD)
-		to Protecting Unit The protected unit has completed an automatic switch (SD) to the protecting
-		unit. Automatic Switch Complete (SD) to Protecting Unit, Protecting Unit Signal Degraded The
-		protected unit has completed an automatic switch to the protecting unit. Additionally, the
-		protecting unit has a Signal Degrade condition present. This applies to 1:n systems only. Automatic
-		Switch Complete (SF) to Protecting Unit, Protecting Unit Signal Degraded The protected unit has
-		completed an automatic switch to the protecting unit. Additionally, the protecting unit has a
-		Signal Degrade condition present. This applies to 1:n systems only. Protecting Unit SD Present The
-		protecting unit has a Signal Degrade condition present. This state may also be a result of invalid
-		or toggling APS byte values. This applies to 1:n systems only. Protecting Unit SF Present The
-		protecting unit has a Signal Fail condition present. This state may also be a result of invalid or
-		toggling APS byte values. This applies to 1:n systems only. Force Switch Complete to Protecting
-		Unit The unit has completed a Force Switch of a protected unit to the protecting unit. Force Switch
-		Complete to Protecting Unit, SD Present on Protecting Unit The unit has completed a Force Switch of
-		a protected unit to the protecting unit. Additionally, there is a Signal Degrade present on the
-		protecting unit. Force Switch Complete to Protecting, SF Present on Protecting Unit The unit has
-		completed a Force Switch of a protected unit to the protecting unit. Additionally, there is a
-		Signal Fail (1 + 1 unidirectional systems only) present on the protecting unit. Protecting Unit
-		Locked Out The protecting unit has been locked out. Protecting Unit Locked Out, Release Failed A
-		release of a lockout is in progress and a timeout occurs waiting for the lockout condition to
-		clear. Additionally, the non-revertive protecting unit has the following values: Do Not Revert The
-		protected unit has been switched to the protecting unit and the request to do so has been released.
-		The switch to the protecting unit is maintained. Manual Switch to Protected Unit Complete The unit
-		has completed a Manual Switch from the protecting unit to the protected unit. Force Switch to
-		Protected Unit Complete The protecting unit has completed a forced switch to the protected unit.
-		Force Switch to Protected Unit Complete, Protecting Unit Signal Degraded The protecting unit has
-		completed a forced switch to the protected unit. Additionally, there is a Signal Degrade condition
-		on the protecting unit. Force Switch to Protected Unit Complete, Protecting Unit Signal Failed The
-		protecting unit shows a forced switch to the protected unit. Additionally, there is a Signal Fail
-		condition on the protecting unit. Automatic Switch (SF) to Protected Unit Complete The protecting
-		unit has a Signal Fail condition present and traffic is now being carried on the protected unit.
-		Automatic Switch (SD) to Protected Unit Complete The protecting unit has a Signal Degrade condition
-		present and traffic is now being carried on the protected unit. Automatic Switch Complete (SD) to
-		Protecting, Automatic Switch (SD) to Protected Unit Pending The protected unit has completed an
-		automatic switch to the protecting unit. Additionally, the protecting unit has a Signal Degrade
-		condition present. Automatic Switch Complete (SF) to Protecting, Automatic Switch (SD) to Protected
-		Unit Pending The protected unit has completed an automatic switch to the protecting unit.
-		Additionally, the protecting unit has a Signal Degrade condition present. APS timeout detected by
-		the exerciser, or, during an attempt to invoke a manual or forced switch will not be indicated as
-		APS failure (operate or release fail) in the protectionStatus attribute. Instead, the actionReply
-		for the invoked action will report this. Additionally, attribute lastAttemptResult will provide a
-		record of the failure, until a successful exercise or protection switch causes this attribute to be
-		cleared.";
---8.10 Protection switch mode
+		"This attribute is used to indicate the status of the protection switch in a 
+		protectionUnit instance. This attribute is set-valued because some requests are 
+		allowed to be pending.
+
+		The following rule shall be followed:
+
+		Only one of the values lockout, forcedSwitch, or manualSwitch can be present at 
+		the same time, either local or remote. It is also possible to have two or more 
+		pending automatic switch requests.
+
+		The protectionStatus attribute of a protection Unit which provides protection is 
+		used to hold the protection request which is actually performed on that 
+		protectionUnit. Locally invoked management operations (e.g. manual, forced, 
+		lockout switch completions) can be overridden at the near end or the far end, 
+		but may only be released at the near end. Single-ended systems keep the status 
+		of local and far-end switch requests as separate entities in the 
+		protectionStatus attribute.
+
+		The remainder of this behaviour provides the allowable protectionStatus 
+		attribute values for protected and protecting units for both revertive and 
+		non-revertive systems.
+
+		The following allowable protectionStatus values are associated with each 
+		protected unit:
+
+		No Request
+
+		No switch request is present on the unit.
+
+		Manual Switch to Protecting Complete
+
+		The unit has completed a Manual Switch. Release failed A switch has been 
+		released or pre-empted and a timeout occurs while waiting for a release of 
+		associated bridges, or the near-end switch.
+
+		Automatic Switch (SF) Pending
+
+		The unit has a Signal Fail condition present and the protecting unit is 
+		unavailable.
+
+		Automatic Switch (SD) Pending
+
+		The unit has a Signal Degrade condition present and the protecting unit is 
+		unavailable.
+
+		Automatic Switch (SF) Complete
+
+		The unit has completed an Automatic Switch to the protecting unit due to a 
+		Signal Fail condition.
+
+		Automatic Switch (SD) Complete
+
+		The unit has completed an Automatic Switch to the protecting unit due to a 
+		Signal Degrade condition.
+
+		Automatic Switch (SF) Present, Operate failed
+
+		An automatic switch (SF) request is in progress and a time-out occurs while 
+		waiting for completion.
+
+		Automatic Switch (SD) Present, Operate failed
+
+		An automatic switch (SD) request is in progress and a time-out occurs while 
+		waiting for completion. Force Switch Complete,
+
+		Automatic Switch (SF) Pending
+
+		The unit has completed a Force Switch. Additionally, the unit has an automatic 
+		switch (SF) pending.
+
+		Force Switch Complete, Automatic Switch (SD) Pending
+
+		The unit has completed a Force Switch. Additionally, the unit has an automatic 
+		switch (SD) pending.
+
+		Automatic Switch Complete, Wait-to-Restore
+
+		The unit has completed an Automatic Switch to the protecting unit.
+
+		Force Switch Complete
+
+		The unit has completed a Force Switch to the protecting unit.
+
+		Protected Unit Lockout Completed
+
+		The unit has been locked out from the protecting unit.
+
+		Protected Unit Lockout complete, Operate Failed
+
+		The unit has been locked out from the protecting unit, and, the previously 
+		completed switch could not be released within the expected time-out. When the 
+		switch is released, the operate failed status is removed. Additionally, the 
+		non-revertive protected protection unit has the following status values: Do Not 
+		Revert The protected unit has been switched to the protecting unit and the 
+		request to do so has been released. The switch to the protecting unit is 
+		maintained.
+
+		Manual Switch to Protected Unit Complete
+
+		The unit has completed a Manual Switch from the protecting unit to the protected 
+		unit.
+
+		Force Switch to Protected Unit Complete
+
+		The unit has completed a Force Switch from the protecting unit to the protected 
+		unit.
+
+		Automatic Switch (SF) to Protected Unit Complete
+
+		The protecting unit has a Signal Fail condition present and traffic is now being 
+		carried on the protected unit.
+
+		Automatic Switch (SD) to Protected Unit Complete
+
+		The protecting unit has a Signal Degrade condition present and traffic is now 
+		being carried on the protected unit.
+
+		Automatic Switch (SD) to Protected Unit Complete, Signal Degrade Present
+
+		The protecting unit has a Signal Degrade condition present and traffic is now 
+		being carried on the protected unit. Additionally, the protected unit has a 
+		Signal Degrade condition present.
+
+		Automatic Switch (SF) to Protected Unit Complete, Signal Degrade Present
+
+		The protecting unit has a Signal Fail condition present and traffic is now being 
+		carried on the protected unit. Additionally, the protected unit has a Signal 
+		Degrade condition present.
+
+		Force Switch from Protecting Unit Complete, Automatic Switch (SF) Pending
+
+		The unit has completed a Force Switch from the protecting unit to the protected 
+		unit. Additionally, the protected unit has an automatic switch (SF) condition 
+		present.
+
+		Force Switch from Protecting Unit Complete, Automatic Switch (SD) Pending
+
+		The unit has completed a Force Switch from the protecting unit to the protected 
+		unit. Additionally, the protected unit has an automatic switch (SD) condition 
+		present. The following allowable protectionStatus values are associated with 
+		each protecting unit: No Request No request is present on the protecting unit.
+
+		Manual Switch to Protecting Unit Complete
+
+		The protected unit has completed a Manual Switch.
+
+		Automatic Switch Complete (SF) to Protecting Unit
+
+		The protected unit has completed an automatic switch (SF) to the protecting 
+		unit.
+
+		Automatic Switch Complete (SD) to Protecting Unit
+
+		The protected unit has completed an automatic switch (SD) to the protecting 
+		unit.
+
+		Automatic Switch Complete (SD) to Protecting Unit, Protecting Unit Signal 
+		Degraded
+
+		The protected unit has completed an automatic switch to the protecting unit. 
+		Additionally, the protecting unit has a Signal Degrade condition present. This 
+		applies to 1:n systems only.
+
+		Automatic Switch Complete (SF) to Protecting Unit, Protecting Unit Signal 
+		Degraded
+
+		The protected unit has completed an automatic switch to the protecting unit. 
+		Additionally, the protecting unit has a Signal Degrade condition present. This 
+		applies to 1:n systems only.
+
+		Protecting Unit SD Present The protecting unit has a Signal Degrade condition 
+		present.
+
+		This state may also be a result of invalid or toggling APS byte values. This 
+		applies to 1:n systems only.
+
+		Protecting Unit SF Present
+
+		The protecting unit has a Signal
+
+		Fail condition present.
+
+		This state may also be a result of invalid or toggling APS byte values. This 
+		applies to 1:n systems only.
+
+		Force Switch Complete to Protecting Unit
+
+		The unit has completed a Force Switch of a protected unit to the protecting 
+		unit.
+
+		Force Switch Complete to Protecting Unit, SD Present on Protecting Unit
+
+		The unit has completed a Force Switch of a protected unit to the protecting 
+		unit. Additionally, there is a Signal Degrade present on the protecting unit.
+
+		Force Switch Complete to Protecting, SF Present on Protecting Unit
+
+		The unit has completed a Force Switch of a protected unit to the protecting 
+		unit. Additionally, there is a Signal Fail (1 + 1 unidirectional systems only) 
+		present on the protecting unit.
+
+		Protecting Unit Locked Out
+
+		The protecting unit has been locked out.
+
+		Protecting Unit Locked Out, Release Failed
+
+		A release of a lockout is in progress and a timeout occurs waiting for the 
+		lockout condition to clear. Additionally, the non-revertive protecting unit has 
+		the following values: Do Not Revert The protected unit has been switched to the 
+		protecting unit and the request to do so has been released. The switch to the 
+		protecting unit is maintained.
+
+		Manual Switch to Protected Unit Complete
+
+		The unit has completed a Manual Switch from the protecting unit to the protected 
+		unit.
+
+		Force Switch to Protected Unit Complete
+
+		The protecting unit has completed a forced switch to the protected unit.
+
+		Force Switch to Protected Unit Complete, Protecting Unit Signal Degraded
+
+		The protecting unit has completed a forced switch to the protected unit. 
+		Additionally, there is a Signal Degrade condition on the protecting unit.
+
+		Force Switch to Protected Unit Complete, Protecting Unit Signal Failed
+
+		The protecting unit shows a forced switch to the protected unit. Additionally, 
+		there is a Signal Fail condition on the protecting unit.
+
+		Automatic Switch (SF) to Protected Unit Complete
+
+		The protecting unit has a Signal Fail condition present and traffic is now being 
+		carried on the protected unit.
+
+		Automatic Switch (SD) to Protected Unit Complete
+
+		The protecting unit has a Signal Degrade condition present and traffic is now 
+		being carried on the protected unit.
+
+		Automatic Switch Complete (SD) to Protecting, Automatic Switch (SD) to Protected 
+		Unit Pending
+
+		The protected unit has completed an automatic switch to the protecting unit. 
+		Additionally, the protecting unit has a Signal Degrade condition present.
+
+		Automatic Switch Complete (SF) to Protecting, Automatic Switch (SD) to Protected 
+		Unit Pending
+
+		The protected unit has completed an automatic switch to the protecting unit. 
+		Additionally, the protecting unit has a Signal Degrade condition present.
+
+		APS timeout detected by the exerciser, or, during an attempt to invoke a manual 
+		or forced switch will not be indicated as APS failure (operate or release fail) 
+		in the protectionStatus attribute. Instead, the actionReply for the invoked 
+		action will report this. Additionally, attribute lastAttemptResult will provide 
+		a record of the failure, until a successful exercise or protection switch causes 
+		this attribute to be cleared.";
+--8.10 Protection Switch Mode
 
 
 protectionSwitchMode ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionSwitchMode;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectionSwitchModeBeh;
 REGISTERED AS { g774-03Attribute 10 };
@@ -708,17 +885,14 @@ REGISTERED AS { g774-03Attribute 10 };
 
 protectionSwitchModeBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute specifies whether protection switching is done on a unidirectional or bidirectional
-		basis.";
---8.11 Protection unit identifier
+		"This attribute specifies whether protection switching is done on a 
+		unidirectional or bidirectional basis.";
+--8.11 Protection Unit Identifier
 
 
 protectionUnitId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		protectionUnitIdBeh;
 REGISTERED AS { g774-03Attribute 11 };
@@ -726,17 +900,17 @@ REGISTERED AS { g774-03Attribute 11 };
 
 protectionUnitIdBeh BEHAVIOUR
 	DEFINED AS
-		"The protectionUnitId attribute is an attribute type whose distinguished value can be used as an RDN
-		when naming an instance of the protectionUnit object class. If the string choice of the syntax is
-		used, then matching on substrings is permitted. If the number choice for the syntax is used, then
-		matching on ordering is permitted.";
+		"The protectionUnitId attribute is an attribute type whose distinguished value 
+		can be used as an RDN when naming an instance of the protectionUnit object 
+		class. If the string choice of the syntax is used, then matching on substrings 
+		is permitted. If the number choice for the syntax is used, then matching on 
+		ordering is permitted.";
 --8.12 Protecting
 
 
 protecting ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		protectingBeh;
 REGISTERED AS { g774-03Attribute 12 };
@@ -744,16 +918,16 @@ REGISTERED AS { g774-03Attribute 12 };
 
 protectingBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute specifies the type of the protectionUnit. A value of TRUE indicates that the
-		protectionUnit is a protecting (i.e. backup or standby) unit. A value of FALSE indicates that the
-		protectionUnit is a protected (i.e. a regular, working, or preferred) unit.";
---8.13 Reliable resource pointer
+		"This attribute specifies the type of the protectionUnit. A value of TRUE 
+		indicates that the protectionUnit is a protecting (i.e. backup or standby) unit. 
+		A value of FALSE indicates that the protectionUnit is a protected (i.e. a 
+		regular, working, or preferred) unit.";
+--8.13 Reliable Resource Pointer
 
 
 reliableResourcePointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ResourcePointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		reliableResourcePointerBeh;
 REGISTERED AS { g774-03Attribute 13 };
@@ -761,15 +935,15 @@ REGISTERED AS { g774-03Attribute 13 };
 
 reliableResourcePointerBeh BEHAVIOUR
 	DEFINED AS
-		"The value of the reliableResourcePointer attribute points to the reliable resource(s) (e.g.
-		termination point) that is/are associated with the protectionUnit instance.";
+		"The value of the reliableResourcePointer attribute points to the reliable 
+		resource(s) (e.g. termination point) that is/are associated with the 
+		protectionUnit instance.";
 --8.14 Revertive
 
 
 revertive ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Boolean;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		revertiveBeh;
 REGISTERED AS { g774-03Attribute 14 };
@@ -777,18 +951,18 @@ REGISTERED AS { g774-03Attribute 14 };
 
 revertiveBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute indicates whether the protection scheme is revertive or not. If the value of this
-		attribute is TRUE, the traffic is returned to the protected protectionUnit instance that initiated
-		the switch after the fault clears and the waitToRestoreTime interval (if any) has expired. If the
-		value of this attribute is FALSE, then after the fault has cleared, traffic does not revert to the
+		"This attribute indicates whether the protection scheme is revertive or not. If 
+		the value of this attribute is TRUE, the traffic is returned to the protected 
+		protectionUnit instance that initiated the switch after the fault clears and the 
+		waitToRestoreTime interval (if any) has expired. If the value of this attribute 
+		is FALSE, then after the fault has cleared, traffic does not revert to the 
 		protectionUnit that initiated the switch.";
 --8.15 SDH Priority
 
 
 sdhPriority ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		sdhPriorityBeh;
 REGISTERED AS { g774-03Attribute 15 };
@@ -796,17 +970,14 @@ REGISTERED AS { g774-03Attribute 15 };
 
 sdhPriorityBeh BEHAVIOUR
 	DEFINED AS
-		"SDH priority may be High or Low for protected protection units. This is intended for prioritizing
-		SD and SF conditions on 1:n systems.";
---8.16 Unprotected connection termination point identifier
+		"SDH priority may be High or Low for protected protection units. This is intended 
+		for prioritizing SD and SF conditions on 1:n systems.";
+--8.16 Unprotected Connection Termination Point Identifier
 
 
 unprotectedCTPId ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.NameType;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING,
-		SUBSTRINGS;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
 	BEHAVIOUR
 		unprotectedCTPIdBeh;
 REGISTERED AS { g774-03Attribute 16 };
@@ -814,16 +985,16 @@ REGISTERED AS { g774-03Attribute 16 };
 
 unprotectedCTPIdBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute is used as an RDN for naming instances of the unprotectedCTP object classes. If the
-		string choice of the syntax is used, then matching on substrings is permitted. If the number choice
-		for the syntax is used, then matching on ordering is permitted.";
---8.17 Unreliable resource pointer
+		"This attribute is used as an RDN for naming instances of the unprotectedCTP 
+		object classes. If the string choice of the syntax is used, then matching on 
+		substrings is permitted. If the number choice for the syntax is used, then 
+		matching on ordering is permitted.";
+--8.17 Unreliable Resource Pointer
 
 
 unreliableResourcePointer ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ResourcePointer;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 	BEHAVIOUR
 		unreliableResourcePointerBeh;
 REGISTERED AS { g774-03Attribute 17 };
@@ -831,16 +1002,15 @@ REGISTERED AS { g774-03Attribute 17 };
 
 unreliableResourcePointerBeh BEHAVIOUR
 	DEFINED AS
-		"The value of the unreliableResourcePointer attribute points to the unreliable resource(s) (e.g.
-		equipment hardware or termination point) that is/are associated with the protectionUnit instance.";
---8.18 Wait to restore time
+		"The value of the unreliableResourcePointer attribute points to the unreliable 
+		resource(s) (e.g. equipment hardware or termination point) that is/are 
+		associated with the protectionUnit instance.";
+--8.18 Wait to Restore Time
 
 
 waitToRestoreTime ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.Integer;
-	MATCHES FOR
-		EQUALITY,
-		ORDERING;
+	MATCHES FOR EQUALITY, ORDERING;
 	BEHAVIOUR
 		waitToRestoreTimeBeh;
 REGISTERED AS { g774-03Attribute 18 };
@@ -848,18 +1018,18 @@ REGISTERED AS { g774-03Attribute 18 };
 
 waitToRestoreTimeBeh BEHAVIOUR
 	DEFINED AS
-		"This attribute specifies the amount of time, in seconds, to wait after a fault clears before
-		restoring traffic to the protected protectionUnit that initiated the switching.";
+		"This attribute specifies the amount of time, in seconds, to wait after a fault 
+		clears before restoring traffic to the protected protectionUnit that initiated 
+		the switching.";
 --8.19 Notified protection unit
 
 
 notifiedProtectionUnit ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX SDHProtASN1.ProtectionUnit;
-	MATCHES FOR
-		EQUALITY;
+	MATCHES FOR EQUALITY;
 REGISTERED AS { g774-03Attribute 19 };
 --9 Actions
---9.1 Invoke exercise
+--9.1 Invoke Exercise
 
 
 invokeExercise ACTION
@@ -873,16 +1043,19 @@ REGISTERED AS { g774-03Action 1 };
 
 invokeExerciseBeh BEHAVIOUR
 	DEFINED AS
-		"The invokeExercise action can be used to request a protection exercise routine to be performed on
-		one or more protectionUnit instances contained in the protectionGroup object. The action argument
-		contains indications of the protected and protecting units to which the request applies. If a
-		protecting unit is identified in the protectedUnits field, or if a protected unit is identified in
-		the protectingUnits field, the action fails. The protectionEntity field may be absent, indicating
-		that the request applies to all contained protection units. While an exercise is in progress, the
-		value of the protectionStatus attribute shall continue to indicate No Request. When an exercise
-		routine has completed for any protectionUnit instances, the lastAttemptResult attribute is updated
-		to reflect pass or fail for each exercised protection unit.";
---9.2 Invoke protection
+		"The invokeExercise action can be used to request a protection exercise routine 
+		to be performed on one or more protectionUnit instances contained in the 
+		protectionGroup object. The action argument contains indications of the 
+		protected and protecting units to which the request applies. If a protecting 
+		unit is identified in the protectedUnits field, or if a protected unit is 
+		identified in the protectingUnits field, the action fails. The protectionEntity 
+		field may be absent, indicating that the request applies to all contained 
+		protection units. While an exercise is in progress, the value of the 
+		protectionStatus attribute shall continue to indicate No Request. When an 
+		exercise routine has completed for any protectionUnit instances, the 
+		lastAttemptResult attribute is updated to reflect pass or fail for each 
+		exercised protection unit.";
+--9.2 Invoke Protection
 --NOTE  The definition of Lockout, Forced Switch, and Manual Switch is provided in ITU-T G.783.
 
 
@@ -898,25 +1071,30 @@ REGISTERED AS { g774-03Action 2 };
 
 invokeProtectionBeh BEHAVIOUR
 	DEFINED AS
-		"The invokeProtection action can be used to request a lockout, a forced switch, or a manual (i.e.
-		normal switch) on one or more protectionUnit instances contained in the protectionGroup object. The
-		action argument contains a request (Forced Switch, Manual Switch, or Lockout) and indications of
-		the protected and protecting units to which the request applies. If a protecting unit is identified
-		in the protectedUnits field, or if a protected unit is identified in the protectingUnits field, the
-		action fails. If the request is Forced Switch or Manual Switch, the protectedUnits field shall
-		identify one or more protection units. If only one unit is identified in the protectedUnits field,
-		and there is only one protecting unit in the protection group, the protectingUnits field may be
-		omitted. If the protectingUnits field is present, it shall identify the same number of units as the
-		protectedUnits field. If the request is Lockout, the protectionEntity field may be absent,
-		indicating that the request applies to all contained protection units. If the protectionEntity
-		field is present, any number of protection units may be identified in the protectedUnits and/or
-		protectingUnits field, and either field may be absent. For a Lockout request, the specified
-		protected units and/or protecting units are locked out. For requests which cannot be completed,
-		either because the request is the protecting unit is serving a request of higher priority (in the
-		error parameter of the CMIP APDU, reason: pre-empted), or failure occurs (failure), or timeout
-		occurs (timeout), the reply shall indicate why the request could not be completed, and the request
-		shall not be made pending. The CMIP error APDU contains the failure reasons.";
---9.3 Release protection
+		"The invokeProtection action can be used to request a lockout, a forced switch, 
+		or a manual (i.e. normal switch) on one or more protectionUnit instances 
+		contained in the protectionGroup object. The action argument contains a request 
+		(Forced Switch, Manual Switch, or Lockout) and indications of the protected and 
+		protecting units to which the request applies. If a protecting unit is 
+		identified in the protectedUnits field, or if a protected unit is identified in 
+		the protectingUnits field, the action fails. If the request is Forced Switch or 
+		Manual Switch, the protectedUnits field shall identify one or more protection 
+		units. If only one unit is identified in the protectedUnits field, and there is 
+		only one protecting unit in the protection group, the protectingUnits field may 
+		be omitted. If the protectingUnits field is present, it shall identify the same 
+		number of units as the protectedUnits field. If the request is Lockout, the 
+		protectionEntity field may be absent, indicating that the request applies to all 
+		contained protection units. If the protectionEntity field is present, any number 
+		of protection units may be identified in the protectedUnits and/or 
+		protectingUnits field, and either field may be absent. For a Lockout request, 
+		the specified protected units and/or protecting units are locked out. For 
+		requests which cannot be completed, either because the request is the protecting 
+		unit is serving a request of higher priority (in the error parameter of the CMIP 
+		APDU, reason: pre-empted), or failure occurs (failure), or timeout occurs 
+		(timeout), the reply shall indicate why the request could not be completed, and 
+		the request shall not be made pending. The CMIP error APDU contains the failure 
+		reasons.";
+--9.3 Release Protection
 
 
 releaseProtection ACTION
@@ -931,21 +1109,25 @@ REGISTERED AS { g774-03Action 3 };
 
 releaseProtectionBeh BEHAVIOUR
 	DEFINED AS
-		"The releaseProtection action can be used to release a lockout, a forced switch, or a manual (i.e.
-		normal switch) on one or more protectionUnit instances contained in the protectionGroup object. The
-		action argument contains a request (Forced Switch, Manual Switch, or Lockout) and indications of
-		the protected and protecting units to which the request applies. If a protecting unit is identified
-		in the protectedUnits field, or if a protected unit is identified in the protectingUnits field, the
-		action fails. If the request is Forced Switch or Manual Switch, the protectedUnits field shall
-		identify one or more protection units, and the protectingUnits field shall be omitted. For each
-		identified protected unit, if it is not switched to a protecting unit, the action fails. If the
-		request is Lockout, the protectionEntity field may be absent, indicating that the request applies
-		to all contained protection units. If the protectionEntity field is present, any number of
-		protection units may be identified in the protectedUnits and/or protectingUnits field, and either
-		field may be absent. For a Lockout request, the specified protected units and/or protecting units
-		are no longer locked out. That is, the protected units are now under protection and the protecting
-		units are now capable of providing protection. For release requests which cannot be completed, the
-		reply shall indicate why the request could not be completed.";
+		"The releaseProtection action can be used to release a lockout, a forced switch, 
+		or a manual (i.e. normal switch) on one or more protectionUnit instances 
+		contained in the protectionGroup object. The action argument contains a request 
+		(Forced Switch, Manual Switch, or Lockout) and indications of the protected and 
+		protecting units to which the request applies. If a protecting unit is 
+		identified in the protectedUnits field, or if a protected unit is identified in 
+		the protectingUnits field, the action fails. If the request is Forced Switch or 
+		Manual Switch, the protectedUnits field shall identify one or more protection 
+		units, and the protectingUnits field shall be omitted. For each identified 
+		protected unit, if it is not switched to a protecting unit, the action fails. If 
+		the request is Lockout, the protectionEntity field may be absent, indicating 
+		that the request applies to all contained protection units. If the 
+		protectionEntity field is present, any number of protection units may be 
+		identified in the protectedUnits and/or protectingUnits field, and either field 
+		may be absent. For a Lockout request, the specified protected units and/or 
+		protecting units are no longer locked out. That is, the protected units are now 
+		under protection and the protecting units are now capable of providing 
+		protection. For release requests which cannot be completed, the reply shall 
+		indicate why the request could not be completed.";
 --10 Notifications
 --Revisions that require re-registration
 --This clause provides replacement notification definitions for the existing ITU-T G.774.3 (1994). Any
@@ -968,7 +1150,7 @@ protectionSwitchReportingR1 NOTIFICATION
 		protectionSwitchReportingR1Beh;
 	WITH INFORMATION SYNTAX SDHProtASN1.ProtectionSwitchReportingInfo
 		AND ATTRIBUTE IDS
-			protectingUnit
+			notifiedProtectionUnit--protectingUnit
 				reportedProtectionUnit,
 			additionalInfo
 				"Recommendation X.721":additionalInformation;
@@ -977,8 +1159,8 @@ REGISTERED AS { g774-03Notification 2 };
 
 protectionSwitchReportingR1Beh BEHAVIOUR
 	DEFINED AS
-		"The protectionSwitchReporting notification is emitted from the protectionGroup object to report any
-		protection switch events.";
+		"The protectionSwitchReporting notification is emitted from the protectionGroup 
+		object to report any protection switch events.";
 --11 Parameters
 --11.1 Invoke Protection Error
 
@@ -993,10 +1175,11 @@ REGISTERED AS { g774-03Parameter 1 };
 
 invokeProtectionErrorBeh BEHAVIOUR
 	DEFINED AS
-		"This parameter is included in the error parameter of the CMIP APDU when the invoke protection
-		action fails. The pre-empted choice means that a higher priority switch request exists on the
-		protecting protection unit. The failure choice indicates that the request has not been performed
-		due to an abnormal condition on the protection system. The timeout choice indicates that the
+		"This parameter is included in the error parameter of the CMIP APDU when the 
+		invoke protection action fails. The pre-empted choice means that a higher 
+		priority switch request exists on the protecting protection unit. The failure 
+		choice indicates that the request has not been performed due to an abnormal 
+		condition on the protection system. The timeout choice indicates that the 
 		protection switch has not been performed in the required time frame.";
 --11.2 Release Protection Error
 
@@ -1011,10 +1194,11 @@ REGISTERED AS { g774-03Parameter 2 };
 
 releaseProtectionErrorBeh BEHAVIOUR
 	DEFINED AS
-		"This parameter is included in the error parameter of the CMIP APDU when the release protection
-		action fails. The failure choice indicates that the request has not been performed due to an
-		abnormal condition on the protection system. The timeout choice indicates that the protection
-		switch has not been performed in the required time frame.";
+		"This parameter is included in the error parameter of the CMIP APDU when the 
+		release protection action fails. The failure choice indicates that the request 
+		has not been performed due to an abnormal condition on the protection system. 
+		The timeout choice indicates that the protection switch has not been performed 
+		in the required time frame.";
 --11.3 Protection Status Parameter
 
 
@@ -1028,28 +1212,43 @@ REGISTERED AS { g774-03Parameter 3 };
 
 protectionStatusParameterBeh BEHAVIOUR
 	DEFINED AS
-		"This parameter is included in the additional info parameters of the protection switching reporting
-		notification. This notification is sent by the protection group according to the following rules.
-		There are several cases: The switch from protected to protecting or protecting to protected has
-		been done without pre-empting an existing switch. In this case the old and new values of the
-		Protection Status attribute of the protecting channel shall be reported in the notification by
-		means of the oldProtectionStatus and newProtectionStatus parameters respectively. A switch is
-		preformed by pre-empting an existing one. In this case the old and new values of the Protection
-		Status attribute of the protecting channel shall be reported in the notification by means of the
-		oldProtectionStatus and newProtectionStatus parameters respectively. An auto-switch condition
-		exists on a channel but the auto-switch cannot be served due to the unavailability of the channel
-		that otherwise protects it. In this case the oldProtectionStatus and newProtectionStatus parameters
-		refer to the protection status attribute value of the channel on which the autoswitch condition
-		arises. The exception is when the channel is already forced or locked out, in which case no
-		notification is sent. A working channel (protected unit) has been locked out or released from
-		lockout without modifying any existing switch. In this case the oldProtectionStatus and
-		newProtectionStatus parameters refer to the protection status attribute value of the working
-		channel which has been locked out. A protection channel (protecting unit) has been locked out or
-		release from lockout without modifying the existing switch. In this case the oldProtectionStatus
-		and newProtectionStatus parameters refer to the protection status attribute value of the protection
-		channel which has been locked out. The protectionSwitchReporting is not sent when the automatic
-		switch condition is toggling between SD, SF and WTR condition. While in the lockout of forced
-		switch state no notification is sent except for ending of release failure.";
+		"This parameter is included in the additional info parameters of the protection 
+		switching reporting notification. This notification is sent by the protection 
+		group according to the following rules.
+
+		There are several cases:
+
+		The switch from protected to protecting or protecting to protected has been done 
+		without pre-empting an existing switch. In this case the old and new values of 
+		the Protection Status attribute of the protecting channel shall be reported in 
+		the notification by means of the oldProtectionStatus and newProtectionStatus 
+		parameters respectively.
+
+		A switch is performed by pre-empting an existing one. In this case the old and 
+		new values of the Protection Status attribute of the protecting channel shall be 
+		reported in the notification by means of the oldProtectionStatus and 
+		newProtectionStatus parameters respectively.
+
+		An auto-switch condition exists on a channel but the auto-switch cannot be 
+		served due to the unavailability of the channel that otherwise protects it. In 
+		this case the oldProtectionStatus and newProtectionStatus parameters refer to 
+		the protection status attribute value of the channel on which the autoswitch 
+		condition arises. The exception is when the channel is already forced or locked 
+		out, in which case no notification is sent.
+
+		A working channel (protected unit) has been locked out or released from lockout 
+		without modifying any existing switch. In this case the oldProtectionStatus and 
+		newProtectionStatus parameters refer to the protection status attribute value of 
+		the working channel which has been locked out.
+
+		A protection channel (protecting unit) has been locked out or release from 
+		lockout without modifying the existing switch. In this case the 
+		oldProtectionStatus and newProtectionStatus parameters refer to the protection 
+		status attribute value of the protection channel which has been locked out.
+
+		The protectionSwitchReporting is not sent when the automatic switch condition is 
+		toggling between SD, SF and WTR condition. While in the lockout of forced switch 
+		state no notification is sent except for ending of release failure.";
 --12 Name Bindings
 --Revisions that require re-registration
 --This clause provides replacement namebinding definitions for the existing ITU-T G.774.3 (1994).
@@ -1076,11 +1275,9 @@ protectionStatusParameterBeh BEHAVIOUR
 
 
 protectedTTPBidirectional-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectedTTPBidirectional;
+	SUBORDINATE OBJECT CLASS protectedTTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
 	WITH ATTRIBUTE
 		protectedTTPId;
 	BEHAVIOUR
@@ -1090,17 +1287,16 @@ REGISTERED AS { g774-03NameBinding 1 };
 
 protectedTTPBidirectional-sdhNEBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
-		function is present. Instances of this object class may also be instantiated when other types of
-		protection switching functions, such as path protection, are present.";
+		"The subordinate managed objects are instantiated when the multiplex section 
+		protection switching function is present. Instances of this object class may 
+		also be instantiated when other types of protection switching functions, such as 
+		path protection, are present.";
 
 
 protectedTTPSink-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectedTTPSink;
+	SUBORDINATE OBJECT CLASS protectedTTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
 	WITH ATTRIBUTE
 		protectedTTPId;
 	BEHAVIOUR
@@ -1110,17 +1306,16 @@ REGISTERED AS { g774-03NameBinding 2 };
 
 protectedTTPSink-sdhNEBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
-		function is present. Instances of this object may also be instantiated when other types of
-		protection switching functions, such as path protection, are present.";
+		"The subordinate managed objects are instantiated when the multiplex section 
+		protection switching function is present. Instances of this object may also be 
+		instantiated when other types of protection switching functions, such as path 
+		protection, are present.";
 
 
 protectedTTPSource-sdhNE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectedTTPSource;
+	SUBORDINATE OBJECT CLASS protectedTTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":sdhNE;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":sdhNE;
 	WITH ATTRIBUTE
 		protectedTTPId;
 	BEHAVIOUR
@@ -1130,18 +1325,17 @@ REGISTERED AS { g774-03NameBinding 3 };
 
 protectedTTPSource-sdhNEBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
-		function is present. Instances of this object class may also be instantiated when other types of
-		protection switching functions, such as path protection, are present.";
+		"The subordinate managed objects are instantiated when the multiplex section 
+		protection switching function is present. Instances of this object class may 
+		also be instantiated when other types of protection switching functions, such as 
+		path protection, are present.";
 --12.2 Protection Group
 
 
 protectionGroupR1-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectionGroupR1 AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS protectionGroupR1 AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation M.3100":managedElement AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		protectionGroupId;
 REGISTERED AS { g774-03NameBinding 12 };
@@ -1149,11 +1343,9 @@ REGISTERED AS { g774-03NameBinding 12 };
 
 
 augBidirectional-protectedTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":augBidirectional;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":augBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectedTTPBidirectional;
+	SUPERIOR OBJECT CLASS protectedTTPBidirectional;
 	WITH ATTRIBUTE
 		"Recommendation G.774":augId;
 	BEHAVIOUR
@@ -1163,16 +1355,14 @@ REGISTERED AS { g774-03NameBinding 5 };
 
 augBidirectional-protectedTTPBidirectionalBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex-section protection switching
-		function is present.";
+		"The subordinate managed objects are instantiated when the multiplex-section 
+		protection switching function is present.";
 
 
 augSink-protectedTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":augSink;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":augSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectedTTPSink;
+	SUPERIOR OBJECT CLASS protectedTTPSink;
 	WITH ATTRIBUTE
 		"Recommendation G.774":augId;
 	BEHAVIOUR
@@ -1182,16 +1372,14 @@ REGISTERED AS { g774-03NameBinding 6 };
 
 augSink-protectedTTPSinkBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex-section protection switching
-		function is present.";
+		"The subordinate managed objects are instantiated when the multiplex-section 
+		protection switching function is present.";
 
 
 augSource-protectedTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		"Recommendation G.774":augSource;
+	SUBORDINATE OBJECT CLASS "Recommendation G.774":augSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectedTTPSource;
+	SUPERIOR OBJECT CLASS protectedTTPSource;
 	WITH ATTRIBUTE
 		"Recommendation G.774":augId;
 	BEHAVIOUR
@@ -1201,29 +1389,25 @@ REGISTERED AS { g774-03NameBinding 7 };
 
 augSource-protectedTTPSourceBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex-section protection switching
-		function is present.";
---12.4 Protection unit
+		"The subordinate managed objects are instantiated when the multiplex-section 
+		protection switching function is present.";
+--12.4 Protection Unit
 
 
 protectionUnit-protectionGroupR1 NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		protectionUnit AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS protectionUnit AND SUBCLASSES;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		protectionGroupR1 AND SUBCLASSES;
+	SUPERIOR OBJECT CLASS protectionGroupR1 AND SUBCLASSES;
 	WITH ATTRIBUTE
 		protectionUnitId;
 REGISTERED AS { g774-03NameBinding 13 };
---12.5 Unprotected connection termination point
+--12.5 Unprotected Connection Termination Point
 
 
 unprotectedCTPBidirectional-msTTPBidirectional NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		unprotectedCTPBidirectional;
+	SUBORDINATE OBJECT CLASS unprotectedCTPBidirectional;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPBidirectional;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPBidirectional;
 	WITH ATTRIBUTE
 		unprotectedCTPId;
 	BEHAVIOUR
@@ -1233,16 +1417,14 @@ REGISTERED AS { g774-03NameBinding 9 };
 
 unprotectedCTPBidirectional-msTTPBidirectionalBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
-		function is present.";
+		"The subordinate managed objects are instantiated when the multiplex section 
+		protection switching function is present.";
 
 
 unprotectedCTPSink-msTTPSink NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		unprotectedCTPSink;
+	SUBORDINATE OBJECT CLASS unprotectedCTPSink;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSink;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSink;
 	WITH ATTRIBUTE
 		unprotectedCTPId;
 	BEHAVIOUR
@@ -1252,16 +1434,14 @@ REGISTERED AS { g774-03NameBinding 10 };
 
 unprotectedCTPSink-msTTPSinkBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
-		function is present.";
+		"The subordinate managed objects are instantiated when the multiplex section 
+		protection switching function is present.";
 
 
 unprotectedCTPSource-msTTPSource NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		unprotectedCTPSource;
+	SUBORDINATE OBJECT CLASS unprotectedCTPSource;
 	NAMED BY
-	SUPERIOR OBJECT CLASS
-		"Recommendation G.774":msTTPSource;
+	SUPERIOR OBJECT CLASS "Recommendation G.774":msTTPSource;
 	WITH ATTRIBUTE
 		unprotectedCTPId;
 	BEHAVIOUR
@@ -1271,11 +1451,11 @@ REGISTERED AS { g774-03NameBinding 11 };
 
 unprotectedCTPSource-msTTPSourceBeh BEHAVIOUR
 	DEFINED AS
-		"The subordinate managed objects are instantiated when the multiplex section protection switching
-		function is present.";
---13 Subordination rules
+		"The subordinate managed objects are instantiated when the multiplex section 
+		protection switching function is present.";
+--13 Subordination Rules
 --None.
---14 Pointer constraints
+--14 Pointer Constraints
 --None.
 
 --< GDMO.ChangeLog
@@ -1284,4 +1464,4 @@ unprotectedCTPSource-msTTPSourceBeh BEHAVIOUR
 --  $Log$
 --  =============================================================================
 --  >--
---< GDMO.EndDocument >--
+--< GDMO.EndDocument "ITU-T Rec. G.774.3 : 2001" >--
