@@ -1,3 +1,11 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 12:01:45 MDT 2007
+--@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" >--
 --< GDMO.Version 1.3 >--
@@ -627,3 +635,54 @@ END
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

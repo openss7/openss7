@@ -1,3 +1,11 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 04:32:56 MDT 2007
+--@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
 --< GDMO.Include "X.283.gdmo" >--
@@ -2512,3 +2520,116 @@ END
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ISO/IEC 10589: 2001" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":cLNS
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":cONS
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":nSAP
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkSubsystem
+--@@ +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":linkage
+--@@ +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE_DTE
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE_DCE
+--@@ +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLEIVMO
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLEIVMO_DTE
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLEIVMO_DCE
+--@@ +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCircuit
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCircuit_DTE
+--@@ |  |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":permanentVirtualCircuit_DTE
+--@@ |  |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DTE
+--@@ |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCircuit_DCE
+--@@ |  |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":permanentVirtualCircuit_DCE
+--@@ |  |  +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DCE
+--@@ +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCallIVMO
+--@@ +- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":dSeriesCounts
+--@@ +- "ISO/IEC 10589: 2001":adjacency
+--@@ +- "ISO/IEC 10589: 2001":virtualAdjacency
+--@@ +- "ISO/IEC 10589: 2001":destination
+--@@ |  +- "ISO/IEC 10589: 2001":destinationSystem
+--@@ |  +- "ISO/IEC 10589: 2001":destinationArea
+--@@ +- "ISO/IEC 10589: 2001":reachableAddress
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkSubsystem
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkEntity
+--@@ |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":cLNS
+--@@ |  |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":linkage
+--@@ |  |  |  |  >- "ISO/IEC 10589: 2001":adjacency
+--@@ |  |  |  |  >- "ISO/IEC 10589: 2001":adjacency
+--@@ |  |  |  |  >- "ISO/IEC 10589: 2001":reachableAddress
+--@@ |  |  |  |  >- "ISO/IEC 10589: 2001":reachableAddress
+--@@ |  |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":linkage +++
+--@@ |  |  |  >- "ISO/IEC 10589: 2001":virtualAdjacency
+--@@ |  |  |  >- "ISO/IEC 10589: 2001":destinationSystem
+--@@ |  |  |  >- "ISO/IEC 10589: 2001":destinationArea
+--@@ |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":cLNS +++
+--@@ |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":cONS
+--@@ |  |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":linkage +++
+--@@ |  |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":linkage +++
+--@@ |  |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkConnection
+--@@ |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":cONS +++
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":networkEntity +++
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":nSAP
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":nSAP
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLEIVMO
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE
+--@@ |  |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCallIVMO
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE +++
+--@@ "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE_DTE
+--@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":permanentVirtualCircuit_DTE
+--@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DTE
+--@@ "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":x25PLE_DCE
+--@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":permanentVirtualCircuit_DCE
+--@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DCE
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":dSeriesCounts
+--@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":dSeriesCounts
+--@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DCE +++
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

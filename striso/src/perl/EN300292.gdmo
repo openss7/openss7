@@ -1,8 +1,15 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 04:43:19 MDT 2007
+--@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "EN 300 292" >--
---< GDMO.Alias "EN 300 292"
---  "EN 300 292 V1.2.1 (1998-08)" >--
+--< GDMO.Alias "EN 300 292" "EN 300 292 V1.2.1 (1998-08)" >--
 MODULE "EN 300 292"
 --
 --8 OC definitions
@@ -20,21 +27,17 @@ analysisCriteria MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value combination of attributes (key-attributes) destinationCode, callingPartyCategory,
-						analysisOrigin, nationalDestinationInstance, destinationType, numberOfDigits, carrierDataInstance
-						shall be unique among all instances of this object class.";;
+						Value combination of attributes (key-attributes) destinationCode, 
+						callingPartyCategory, analysisOrigin, nationalDestinationInstance, 
+						destinationType, numberOfDigits, carrierDataInstance shall be unique 
+						among all instances of this object class.";;
 			ATTRIBUTES
-				analysisCriteriaId
-					GET,
-				destinationCode
-					GET-REPLACE,
-				analysisOrigin
-					REPLACE-WITH-DEFAULT
+				analysisCriteriaId GET,
+				destinationCode GET-REPLACE,
+				analysisOrigin REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultAnalysisOrigin
 					GET-REPLACE,
-				activeDestination
-					GET
-					SET-BY-CREATE;;,
+				activeDestination GET SET-BY-CREATE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 	CONDITIONAL PACKAGES
 		callingPartyCategoryPackage
@@ -42,25 +45,22 @@ analysisCriteria MANAGED OBJECT CLASS
 				"calling party category has to be evaluated.",
 		nationalDestinationInstancePackage PACKAGE
 			ATTRIBUTES
-				nationalDestinationInstance
-					GET
-					SET-BY-CREATE;
+				nationalDestinationInstance GET SET-BY-CREATE;
 		REGISTERED AS { package 1 };
 			PRESENT IF
 				"the destinationCode value has to be assigned unambiguously to a national destination.",
 		destinationTypePackage
 			PRESENT IF
-				"the destination type has to be used to unambiguously identify the destination in addition to
-				destinationCode.",
+				"the destination type has to be used to unambiguously identify the destination in 
+				addition to destinationCode.",
 		extSchedulingPackage PACKAGE
 			BEHAVIOUR
 				extSchedulingPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package is used in the SMO to enable external scheduling e.g. as with OC multiScheduler from
-						EN 301 098 [3].";;
+						"This package is used in the SMO to enable external scheduling e.g. as 
+						with OC multiScheduler from EN 301 098 [3].";;
 			ATTRIBUTES
-				extSchedulingAttribute
-					GET-REPLACE;
+				extSchedulingAttribute GET-REPLACE;
 		REGISTERED AS { package 2 };
 			PRESENT IF
 				"external index scheduling is used for the attribute activeDestination.",
@@ -71,30 +71,27 @@ analysisCriteria MANAGED OBJECT CLASS
 			BEHAVIOUR
 				activeDestinationPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package allows to perform a REPLACE operation additionally to the GET operation on the
-						activeDestination attribute, in case the scheduling packages are not instantiated.";;
+						"This package allows to perform a REPLACE operation additionally to the 
+						GET operation on the activeDestination attribute, in case the scheduling 
+						packages are not instantiated.";;
 			ATTRIBUTES
-				activeDestination
-					REPLACE;
+				activeDestination REPLACE;
 		REGISTERED AS { package 3 };
 			PRESENT IF
 				"no scheduling is used",
 		numberOfDigitsPackage PACKAGE
 			ATTRIBUTES
-				numberOfDigits
-					GET
-					SET-BY-CREATE;
+				numberOfDigits GET SET-BY-CREATE;
 		REGISTERED AS { package 4 };
 			PRESENT IF
 				"an instance supports it",
 		carrierDataInstancePackage PACKAGE
 			ATTRIBUTES
-				carrierDataInstance
-					GET
-					SET-BY-CREATE;
+				carrierDataInstance GET SET-BY-CREATE;
 		REGISTERED AS { package 5 };
 			PRESENT IF
-				"carrier dependent analysis is required and the carrier code is not part of the destination code";
+				"carrier dependent analysis is required and the carrier code is not part of the 
+				destination code";
 REGISTERED AS { managedObjectClass 1 };
 --8.1.2 callHistory
 
@@ -109,24 +106,22 @@ callHistory MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value combination of attributes (key-attributes) echoSuppressor, numberOfSatLinks shall be unique
-						among all instances of this object class.";;
+						Value combination of attributes (key-attributes) echoSuppressor, 
+						numberOfSatLinks shall be unique among all instances of this object 
+						class.";;
 			ATTRIBUTES
-				callHistoryId
-					GET;;,
+				callHistoryId GET;;,
 		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
 	CONDITIONAL PACKAGES
 		echoSuppressorPackage PACKAGE
 			ATTRIBUTES
-				echoSuppressor
-					GET-REPLACE;
+				echoSuppressor GET-REPLACE;
 		REGISTERED AS { package 6 };
 			PRESENT IF
 				"an instance supports it",
 		numberOfSatLinksPackage PACKAGE
 			ATTRIBUTES
-				numberOfSatLinks
-					GET-REPLACE;
+				numberOfSatLinks GET-REPLACE;
 		REGISTERED AS { package 7 };
 			PRESENT IF
 				"an instance supports it",
@@ -147,16 +142,12 @@ carrierData MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value of attribute (key-attribute) carrierCode shall be unique among all instances of this object
-						class.";;
+						Value of attribute (key-attribute) carrierCode shall be unique among all 
+						instances of this object class.";;
 			ATTRIBUTES
-				carrierDataId
-					GET,
-				carrierCode
-					GET
-					SET-BY-CREATE,
-				ownCac
-					GET-REPLACE;;,
+				carrierDataId GET,
+				carrierCode GET SET-BY-CREATE,
+				ownCac GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 REGISTERED AS { managedObjectClass 3 };
 --8.1.4 cep
@@ -172,24 +163,16 @@ cep MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0.";;
 			ATTRIBUTES
-				cepId
-					GET,
-				"ITU-T Recommendation X.721":administrativeState
-					GET-REPLACE,
-				ctpbInstance
-					GET
-					SET-BY-CREATE,
-				circuitNumber
-					GET
-					SET-BY-CREATE;;,
+				cepId GET,
+				"ITU-T Recommendation X.721":administrativeState GET-REPLACE,
+				ctpbInstance GET SET-BY-CREATE,
+				circuitNumber GET SET-BY-CREATE;;,
 		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage,
 		"ITU-T Recommendation M.3100":stateChangeNotificationPackage;
 	CONDITIONAL PACKAGES
 		cicPackage PACKAGE
 			ATTRIBUTES
-				cic
-					GET
-					SET-BY-CREATE;
+				cic GET SET-BY-CREATE;
 		REGISTERED AS { package 8 };
 			PRESENT IF
 				"SS No. 7 is used for signalling.",
@@ -197,12 +180,10 @@ cep MANAGED OBJECT CLASS
 			BEHAVIOUR
 				officeEquipmentPackageBeh BEHAVIOUR
 					DEFINED AS
-						"Value of attribute (key-attribute) officeEquipment shall be unique among all instances of this
-						object class";;
+						"Value of attribute (key-attribute) officeEquipment shall be unique 
+						among all instances of this object class";;
 			ATTRIBUTES
-				officeEquipment
-					GET
-					SET-BY-CREATE;
+				officeEquipment GET SET-BY-CREATE;
 		REGISTERED AS { package 9 };
 			PRESENT IF
 				"an instance supports it.";
@@ -220,30 +201,26 @@ cepsg MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0.
 
-						This OC represents a set of circuit end points with similar characteristics. A circuit end point
-						subgroup can be of type one-way incoming, one-way outgoing, or two-way. For type two-way,
-						conditional packages incomingCepsgPackage and outgoingCepsgPackage have both to be instantiated";;
+						This OC represents a set of circuit end points with similar 
+						characteristics. A circuit end point subgroup can be of type one-way 
+						incoming, one-way outgoing, or two-way. For type two-way, conditional 
+						packages incomingCepsgPackage and outgoingCepsgPackage have both to be 
+						instantiated";;
 			ATTRIBUTES
-				"ITU-T Recommendation M.3100":transmissionCharacteristics
-					REPLACE,
-				"ITU-T Recommendation M.3100":labelOfFarEndExchange
-					REPLACE,
-				"ITU-T Recommendation X.721":administrativeState
-					GET-REPLACE,
-				assocSignRouteSetNePart
-					REPLACE-WITH-DEFAULT
+				"ITU-T Recommendation M.3100":transmissionCharacteristics REPLACE,
+				"ITU-T Recommendation M.3100":labelOfFarEndExchange REPLACE,
+				"ITU-T Recommendation X.721":administrativeState GET-REPLACE,
+				assocSignRouteSetNePart REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultAssocSignRouteSetNePart
 					GET-REPLACE,
-				boundaryCrossing
-					REPLACE-WITH-DEFAULT
+				boundaryCrossing REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultBoundaryCrossing
 					GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":stateChangeNotificationPackage;
 	CONDITIONAL PACKAGES
 		incomingCepsgPackage PACKAGE
 			ATTRIBUTES
-				prefixDigits
-					REPLACE-WITH-DEFAULT
+				prefixDigits REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultPrefixDigits
 					GET-REPLACE;
 		REGISTERED AS { package 10 };
@@ -251,55 +228,48 @@ cepsg MANAGED OBJECT CLASS
 				"the circuit end point subgroup is of type incoming or two-way",
 		outgoingCepsgPackage PACKAGE
 			ATTRIBUTES
-				searchMethod
-					GET-REPLACE;
+				searchMethod GET-REPLACE;
 		REGISTERED AS { package 11 };
 			PRESENT IF
 				"the circuit end point subgroup is of type outgoing or two-way",
 		originForRebuildingPackage PACKAGE
 			ATTRIBUTES
-				originForRebuilding
-					GET-REPLACE;
+				originForRebuilding GET-REPLACE;
 		REGISTERED AS { package 12 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent digit
-				rebuilding is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
+				digit rebuilding is required.",
 		originForAnalysisPackage PACKAGE
 			ATTRIBUTES
-				originForAnalysis
-					GET-REPLACE;
+				originForAnalysis GET-REPLACE;
 		REGISTERED AS { package 13 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent digit
-				analysis is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
+				digit analysis is required.",
 		originForRoutingPackage PACKAGE
 			ATTRIBUTES
-				originForRouting
-					GET-REPLACE;
+				originForRouting GET-REPLACE;
 		REGISTERED AS { package 14 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent call routing
-				is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
+				call routing is required.",
 		originForPreparationPackage PACKAGE
 			ATTRIBUTES
-				originForPreparation
-					GET-REPLACE;
+				originForPreparation GET-REPLACE;
 		REGISTERED AS { package 15 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent digit
-				preparation is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
+				digit preparation is required.",
 		termForPreparationPackage PACKAGE
 			ATTRIBUTES
-				termForPreparation
-					GET-REPLACE;
+				termForPreparation GET-REPLACE;
 		REGISTERED AS { package 16 };
 			PRESENT IF
-				"the circuit end point subgroup is of type outgoing or two-way and if outgoing cepsg dependent digit
-				preparation is required.",
+				"the circuit end point subgroup is of type outgoing or two-way and if outgoing cepsg 
+				dependent digit preparation is required.",
 		specificSignSystemPackage PACKAGE
 			ATTRIBUTES
-				languageDigitProc
-					REPLACE-WITH-DEFAULT
+				languageDigitProc REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultLanguageDigitProc
 					GET-REPLACE;
 		REGISTERED AS { package 17 };
@@ -307,19 +277,17 @@ cepsg MANAGED OBJECT CLASS
 				"one of the signalling systems R2 or C5 is used.",
 		twowayCepsgPackage PACKAGE
 			ATTRIBUTES
-				prefTrafficDirect
-					GET-REPLACE;
+				prefTrafficDirect GET-REPLACE;
 		REGISTERED AS { package 18 };
 			PRESENT IF
 				"the circuit end point subgroup is of type two-way.",
 		carrierPackage PACKAGE
 			ATTRIBUTES
-				suppressOwnCac
-					GET-REPLACE;
+				suppressOwnCac GET-REPLACE;
 		REGISTERED AS { package 19 };
 			PRESENT IF
-				"the option to administer suppression of own carrier has to be provided and if the circuit end point
-				subgroup is of type incoming or two-way.";
+				"the option to administer suppression of own carrier has to be provided and if the 
+				circuit end point subgroup is of type incoming or two-way.";
 REGISTERED AS { managedObjectClass 5 };
 --8.1.6 cepsgComb
 
@@ -334,18 +302,14 @@ cepsgComb MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				cepsgCombId
-					GET,
-				cepsgCombSelection
-					GET-REPLACE,
-				usedAlgorithm
-					GET-REPLACE;;,
+				cepsgCombId GET,
+				cepsgCombSelection GET-REPLACE,
+				usedAlgorithm GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 	CONDITIONAL PACKAGES
 		userLabelPackage PACKAGE
 			ATTRIBUTES
-				"ITU-T Recommendation M.3100":userLabel
-					GET-REPLACE;
+				"ITU-T Recommendation M.3100":userLabel GET-REPLACE;
 		REGISTERED AS { package 20 };
 			PRESENT IF
 				"an instance supports it.";
@@ -363,12 +327,9 @@ cepsgCombList MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				cepsgCombListId
-					GET,
-				cepsgCombListSelection
-					GET-REPLACE,
-				usedAlgorithm
-					GET-REPLACE;;,
+				cepsgCombListId GET,
+				cepsgCombListSelection GET-REPLACE,
+				usedAlgorithm GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 REGISTERED AS { managedObjectClass 7 };
 --8.1.8 digitModification
@@ -384,17 +345,10 @@ digitModification MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				digitModificationId
-					GET,
-				digitSuppress
-					GET-REPLACE
-					ADD-REMOVE,
-				digitCombReplace
-					GET-REPLACE
-					ADD-REMOVE,
-				digitCombInsert
-					GET-REPLACE
-					ADD-REMOVE;;,
+				digitModificationId GET,
+				digitSuppress GET-REPLACE ADD-REMOVE,
+				digitCombReplace GET-REPLACE ADD-REMOVE,
+				digitCombInsert GET-REPLACE ADD-REMOVE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 REGISTERED AS { managedObjectClass 8 };
 --8.1.9 digitPreparationCriteria
@@ -410,23 +364,19 @@ digitPreparationCriteria MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value combination of attributes (key-attributes) preparationOrigin, preparationTerm and
-						analysisCriteriaInstance shall be unique among all instances of this object class.";;
+						Value combination of attributes (key-attributes) preparationOrigin, 
+						preparationTerm and analysisCriteriaInstance shall be unique among all 
+						instances of this object class.";;
 			ATTRIBUTES
-				digitPreparationCriteriaId
-					GET,
-				preparationOrigin
-					REPLACE-WITH-DEFAULT
+				digitPreparationCriteriaId GET,
+				preparationOrigin REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultPreparationOrigin
 					GET-REPLACE,
-				preparationTerm
-					REPLACE-WITH-DEFAULT
+				preparationTerm REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultPreparationTerm
 					GET-REPLACE,
-				analysisCriteriaInstance
-					GET-REPLACE,
-				digitModificationInstance
-					GET-REPLACE;;,
+				analysisCriteriaInstance GET-REPLACE,
+				digitModificationInstance GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 REGISTERED AS { managedObjectClass 9 };
 --8.1.10 digitRebuildingCriteria
@@ -442,21 +392,17 @@ digitRebuildingCriteria MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value combination of attributes (key-attributes) rebuildingOrigin, natureOfAddress and
-						calledNumberingPlan shall be unique among all instances of this object class.";;
+						Value combination of attributes (key-attributes) rebuildingOrigin, 
+						natureOfAddress and calledNumberingPlan shall be unique among all 
+						instances of this object class.";;
 			ATTRIBUTES
-				digitRebuildingCriteriaId
-					GET,
-				rebuildingOrigin
-					REPLACE-WITH-DEFAULT
+				digitRebuildingCriteriaId GET,
+				rebuildingOrigin REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultRebuildingOrigin
 					GET-REPLACE,
-				natureOfAddress
-					GET-REPLACE,
-				calledNumberingPlan
-					GET-REPLACE,
-				digitModificationInstance
-					GET-REPLACE;;,
+				natureOfAddress GET-REPLACE,
+				calledNumberingPlan GET-REPLACE,
+				digitModificationInstance GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 REGISTERED AS { managedObjectClass 10 };
 --8.1.11 exception
@@ -472,16 +418,12 @@ exception MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Any particular set-element value of attribute (key-attribute) matchesIf shall be unique among all
-						instances of this object class.";;
+						Any particular set-element value of attribute (key-attribute) matchesIf 
+						shall be unique among all instances of this object class.";;
 			ATTRIBUTES
-				exceptionId
-					GET,
-				matchesIf
-					GET-REPLACE
-					ADD-REMOVE,
-				treatmentInstance
-					GET-REPLACE;;,
+				exceptionId GET,
+				matchesIf GET-REPLACE ADD-REMOVE,
+				treatmentInstance GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 REGISTERED AS { managedObjectClass 11 };
 --8.1.12 localDestination
@@ -497,45 +439,55 @@ localDestination MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				localDestinationId
-					GET,
-				nationalDestinationInstance
-					GET
-					SET-BY-CREATE,
-				initialSubscriberCodes
-					GET-REPLACE;
+				localDestinationId GET,
+				nationalDestinationInstance GET SET-BY-CREATE,
+				initialSubscriberCodes GET-REPLACE;
 			ACTIONS
 				modifyNumberingScheme ACTION
 					BEHAVIOUR
 						modifyNumberingSchemeBeh BEHAVIOUR
 							DEFINED AS
-								"This action operation modifies data of OC localDestination instance and the DN instances which
-								belong to it. This action does not change the implicit relationship between the DNs and the local
-								destination: a DN that belonged/did not belong to the local destination before the ACTION
-								belongs/does not belong to it after the ACTION is executed on the localDestination instance. To
-								keep this relationship, the initialSubscriberCodes attribute is a SEQUENCE OF i.o. a SET OF value.
+								"This action operation modifies data of OC 
+								localDestination instance and the DN instances which 
+								belong to it. This action does not change the implicit 
+								relationship between the DNs and the local destination: 
+								a DN that belonged/did not belong to the local 
+								destination before the ACTION belongs/does not belong to 
+								it after the ACTION is executed on the localDestination 
+								instance. To keep this relationship, the 
+								initialSubscriberCodes attribute is a SEQUENCE OF i.o. a 
+								SET OF value.
 
 								Information components (see ASN1TypeModule definitions):
 
 								newNationalDestInstance:
 
-								This component describes the value for the new local area code for the localDestination instance.
-								If the excludedSubscriberCodesPackage is present, the members of the excludedSubscriberCodes
-								attribute have to be adapted accordingly in their digit string part, representing the local area
-								code. The local area code related attribute parts of the DNs of OC E164DN, which belong to the
-								local destination, have to be updated accordingly.
+								This component describes the value for the new local 
+								area code for the localDestination instance. If the 
+								excludedSubscriberCodesPackage is present, the members 
+								of the excludedSubscriberCodes attribute have to be 
+								adapted accordingly in their digit string part, 
+								representing the local area code. The local area code 
+								related attribute parts of the DNs of OC E164DN, which 
+								belong to the local destination, have to be updated 
+								accordingly.
 
 								newInitialSubscriberCodes:
 
-								This component describes the new value of the attribute initialSubscriberCodes in the addressed
-								object instance of the OC localDestination. The initial subscriber code related attribute parts of
-								the DNs of OC E164DN, which belong to the local destination, have to be updated accordingly. The
-								newInitialSubscriberCodes component must contain the same number of elements as the
-								initialSubscriberCodes attribute of the addressed object instance.
+								This component describes the new value of the attribute 
+								initialSubscriberCodes in the addressed object instance 
+								of the OC localDestination. The initial subscriber code 
+								related attribute parts of the DNs of OC E164DN, which 
+								belong to the local destination, have to be updated 
+								accordingly. The newInitialSubscriberCodes component 
+								must contain the same number of elements as the 
+								initialSubscriberCodes attribute of the addressed object 
+								instance.
 
 								Reply component:
 
-								All attribute values of the local destination instance after the execution of the ACTION operation.";;
+								All attribute values of the local destination instance 
+								after the execution of the ACTION operation.";;
 					MODE CONFIRMED;
 					WITH INFORMATION SYNTAX ASN1TypeModule.ModifyNumberingSchemeInfo;
 					WITH REPLY SYNTAX ASN1TypeModule.ModifyNumberingSchemeReply;
@@ -544,9 +496,7 @@ localDestination MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		excludedSubscriberCodesPackage PACKAGE
 			ATTRIBUTES
-				excludedSubscriberCodes
-					GET-REPLACE
-					ADD-REMOVE;
+				excludedSubscriberCodes GET-REPLACE ADD-REMOVE;
 		REGISTERED AS { package 21 };
 			PRESENT IF
 				"it is necessary to exclude DNs from the local destination.";
@@ -564,14 +514,11 @@ nationalDestination MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value of attribute (key-attribute) nationalDestinationCode shall be unique among all instances of
-						this object class.";;
+						Value of attribute (key-attribute) nationalDestinationCode shall be 
+						unique among all instances of this object class.";;
 			ATTRIBUTES
-				nationalDestinationId
-					GET,
-				nationalDestinationCode
-					GET
-					SET-BY-CREATE;;,
+				nationalDestinationId GET,
+				nationalDestinationCode GET SET-BY-CREATE;;,
 		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
 REGISTERED AS { managedObjectClass 13 };
 --8.1.14 postAnalysisEvaluation
@@ -587,18 +534,15 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value combination of attributes (key-attributes) destinationGroupLabel, callHistoryInstance,
-						routingOrigin, reqBearerCapability, reqSignCapability and callingPartyCategory shall be unique
-						among all instances of this object class.";;
+						Value combination of attributes (key-attributes) destinationGroupLabel, 
+						callHistoryInstance, routingOrigin, reqBearerCapability, 
+						reqSignCapability and callingPartyCategory shall be unique among all 
+						instances of this object class.";;
 			ATTRIBUTES
-				postAnalysisEvaluationId
-					GET,
-				destinationGroupLabel
-					GET-REPLACE,
-				callHistoryInstance
-					GET-REPLACE,
-				routingOrigin
-					REPLACE-WITH-DEFAULT
+				postAnalysisEvaluationId GET,
+				destinationGroupLabel GET-REPLACE,
+				callHistoryInstance GET-REPLACE,
+				routingOrigin REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultRoutingOrigin
 					GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
@@ -612,17 +556,14 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				reqBearerCapability
-					GET-REPLACE,
-				reqSignCapability
-					GET-REPLACE;
+				reqBearerCapability GET-REPLACE,
+				reqSignCapability GET-REPLACE;
 		REGISTERED AS { package 22 };
 			PRESENT IF
 				"an instance requires it.",
 		digitModificationInstancePackage PACKAGE
 			ATTRIBUTES
-				digitModificationInstance
-					GET-REPLACE;
+				digitModificationInstance GET-REPLACE;
 		REGISTERED AS { package 23 };
 			PRESENT IF
 				"digit codes modification is needed.",
@@ -632,21 +573,20 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				trafficDistributionInstance
-					GET-REPLACE;
+				trafficDistributionInstance GET-REPLACE;
 		REGISTERED AS { package 24 };
 			PRESENT IF
-				"activeRoutingPossibilitiesPackage is not instantiated and if this instance of OC
-				postAnalysisEvaluation shall not be referred by any instances of OC trafficDistribution.",
+				"activeRoutingPossibilitiesPackage is not instantiated and if this instance of OC 
+				postAnalysisEvaluation shall not be referred by any instances of OC 
+				trafficDistribution.",
 		schedulingAttributePackage PACKAGE
 			BEHAVIOUR
 				schedulingAttributePackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package is used in the SMO to enable external scheduling e.g. as with OC
-						timeControlledSelector from EN 301 098 [3].";;
+						"This package is used in the SMO to enable external scheduling e.g. as 
+						with OC timeControlledSelector from EN 301 098 [3].";;
 			ATTRIBUTES
-				schedulingAttribute
-					GET-REPLACE;
+				schedulingAttribute GET-REPLACE;
 		REGISTERED AS { package 25 };
 			PRESENT IF
 				"external index scheduling is used for the activeRoutingPossibilities attribute.",
@@ -657,11 +597,11 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 			BEHAVIOUR
 				activeRoutingPossibilitiesPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This attribute contains the value of the instance of OC routingPossibilities which is applicable
-						(or also treatment instance when required).";;
+						"This attribute contains the value of the instance of OC 
+						routingPossibilities which is applicable (or also treatment instance 
+						when required).";;
 			ATTRIBUTES
-				activeRoutingPossibilities
-					GET;
+				activeRoutingPossibilities GET;
 		REGISTERED AS { package 26 };
 			PRESENT IF
 				"trafficDistributionInstancePackage is not instantiated.",
@@ -669,14 +609,15 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 			BEHAVIOUR
 				replaceActiveRoutingPossibilitiesPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package allows to perform a REPLACE operation additionally to the GET operation on the
-						activeRoutingPossibilities attribute, in case the scheduling packages are not instantiated.";;
+						"This package allows to perform a REPLACE operation additionally to the 
+						GET operation on the activeRoutingPossibilities attribute, in case the 
+						scheduling packages are not instantiated.";;
 			ATTRIBUTES
-				activeRoutingPossibilities
-					REPLACE;
+				activeRoutingPossibilities REPLACE;
 		REGISTERED AS { package 27 };
 			PRESENT IF
-				"activeRoutingPossibilitiesPackage is instantiated and if scheduling packages are not instantiated.";
+				"activeRoutingPossibilitiesPackage is instantiated and if scheduling packages are not 
+				instantiated.";
 REGISTERED AS { managedObjectClass 14 };
 --8.1.15 prefixDigitAnalysis
 
@@ -691,13 +632,11 @@ prefixDigitAnalysis MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value of attribute (key-attribute) prefixCode shall be unique among all instances of this object
-						class.";;
+						Value of attribute (key-attribute) prefixCode shall be unique among all 
+						instances of this object class.";;
 			ATTRIBUTES
-				prefixDigitAnalysisId
-					GET,
-				prefixCode
-					GET-REPLACE;;,
+				prefixDigitAnalysisId GET,
+				prefixCode GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 	CONDITIONAL PACKAGES
 		destinationTypePackage
@@ -729,14 +668,11 @@ routingPossData MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				routingPossDataId
-					GET,
+				routingPossDataId GET,
 				trafficCategory
 					DEFAULT VALUE ASN1TypeModule.defaultTrafficCategory
 					GET-REPLACE,
-				cepsgCombOrCepsgInstance
-					GET
-					SET-BY-CREATE;;,
+				cepsgCombOrCepsgInstance GET SET-BY-CREATE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 	CONDITIONAL PACKAGES
 		operatorLanguagePackage PACKAGE
@@ -745,23 +681,19 @@ routingPossData MANAGED OBJECT CLASS
 					DEFINED AS
 						"Characterises the operator language.";;
 			ATTRIBUTES
-				languageDigit
-					GET
-					SET-BY-CREATE;
+				languageDigit GET SET-BY-CREATE;
 		REGISTERED AS { package 29 };
 			PRESENT IF
 				"signalling system supports it and if it is needed on this routing possibility.",
 		suppressCacPackage PACKAGE
 			ATTRIBUTES
-				suppressCac
-					GET-REPLACE;
+				suppressCac GET-REPLACE;
 		REGISTERED AS { package 30 };
 			PRESENT IF
 				"the option to administer suppression of CAC has to be provided.",
 		digitModificationInstancePackage PACKAGE
 			ATTRIBUTES
-				digitModificationInstance
-					GET-REPLACE;
+				digitModificationInstance GET-REPLACE;
 		REGISTERED AS { package 31 };
 			PRESENT IF
 				"digit string modification is needed for the instance of OC routingPossData.";
@@ -779,18 +711,14 @@ routingPossibilities MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				routingPossibilitiesId
-					GET,
-				routingPossibilitiesSelection
-					GET-REPLACE,
-				usedAlgorithm
-					GET-REPLACE;;,
+				routingPossibilitiesId GET,
+				routingPossibilitiesSelection GET-REPLACE,
+				usedAlgorithm GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 	CONDITIONAL PACKAGES
 		crankbackAdminStatePackage PACKAGE
 			ATTRIBUTES
-				crankbackAdminState
-					REPLACE-WITH-DEFAULT
+				crankbackAdminState REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ASN1TypeModule.defaultCrankbackAdminState
 					GET-REPLACE;
 			NOTIFICATIONS
@@ -812,20 +740,18 @@ routingPossRestrict MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				routingPossRestrictId
-					GET;;,
+				routingPossRestrictId GET;;,
 		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
 	CONDITIONAL PACKAGES
 		skipGroupSignal1Package PACKAGE
 			BEHAVIOUR
 				skipGroupSignal1Beh BEHAVIOUR
 					DEFINED AS
-						"It is not allowed that a routing possibility is present in different instances of OC
-						routingPossRestrict contained in the same instance of OC routingPossibilities.";;
+						"It is not allowed that a routing possibility is present in different 
+						instances of OC routingPossRestrict contained in the same instance of OC 
+						routingPossibilities.";;
 			ATTRIBUTES
-				skipGroupSignal1
-					GET-REPLACE
-					ADD-REMOVE;
+				skipGroupSignal1 GET-REPLACE ADD-REMOVE;
 		REGISTERED AS { package 33 };
 			PRESENT IF
 				"crankback with one or two signals (see ITU-T Recommendation E.170 [5]) is supported",
@@ -833,12 +759,11 @@ routingPossRestrict MANAGED OBJECT CLASS
 			BEHAVIOUR
 				skipGroupSignal2Beh BEHAVIOUR
 					DEFINED AS
-						"It is not allowed that a routing possibility is present in different instances of OC
-						routingPossRestrict contained in the same instance of OC routingPossibilities.";;
+						"It is not allowed that a routing possibility is present in different 
+						instances of OC routingPossRestrict contained in the same instance of OC 
+						routingPossibilities.";;
 			ATTRIBUTES
-				skipGroupSignal2
-					GET-REPLACE
-					ADD-REMOVE;
+				skipGroupSignal2 GET-REPLACE ADD-REMOVE;
 		REGISTERED AS { package 34 };
 			PRESENT IF
 				"crankback with two signals (see ITU-T Recommendation E.170 [5]) is supported",
@@ -857,54 +782,56 @@ trafficDistribution MANAGED OBJECT CLASS
 			BEHAVIOUR
 				trafficDistributionPackageBeh BEHAVIOUR
 					DEFINED AS
-						"See subclause 7.0. The number of list elements in attributes trafficDistributionData,
-						selectedInstances and inputCriteriaDataForAlgorithm has to be identical. The data with
+						"See subclause 7.0. The number of list elements in attributes 
+						trafficDistributionData, selectedInstances and 
+						inputCriteriaDataForAlgorithm has to be identical. The data with 
 						corresponding list positions in these attributes belong together.
 
-						The sum of the percentage values within each of the attributes trafficDistributionData and
-						inputCriteriaDataForAlgorithm has to be 100 %.
+						The sum of the percentage values within each of the attributes 
+						trafficDistributionData and inputCriteriaDataForAlgorithm has to be 100 
+						%.
 
-						The trafficDistributionData attribute is derived from the value of the
-						inputCriteriaDataForAlgorithm attribute at creation of the instance or modification of the
-						attribute inputCriteriaDataForAlgorithm. Modification of the userLabels in the attribute
-						inputCriteriaDataForAlgorithm triggers an update of userLabel specified in the attribute
-						trafficDistributionData. It does not trigger an update of the percentage values contained in the
-						trafficDistributionData Component of attribute inputCriteriaDataForAlgorithm being:
+						The trafficDistributionData attribute is derived from the value of the 
+						inputCriteriaDataForAlgorithm attribute at creation of the instance or 
+						modification of the attribute inputCriteriaDataForAlgorithm. 
+						Modification of the userLabels in the attribute 
+						inputCriteriaDataForAlgorithm triggers an update of userLabel specified 
+						in the attribute trafficDistributionData. It does not trigger an update 
+						of the percentage values contained in the trafficDistributionData 
+						Component of attribute inputCriteriaDataForAlgorithm being:
 
-						- out: causes percentage calculation from outgoing circuit subgroup capacity for the component
-						'percentage' of attribute trafficDistributionData;
+						- out: causes percentage calculation from outgoing circuit subgroup 
+						capacity for the component 'percentage' of attribute 
+						trafficDistributionData;
 
-						- perc: causes transfer of percentage value for component 'percentage' of attribute
-						trafficDistributionData
+						- perc: causes transfer of percentage value for component 'percentage' 
+						of attribute trafficDistributionData
 
-						- inc: causes transfer of percentage value, periodical recalculation of percentage values according
-						to the incoming carried traffic on specified incoming circuit subgroups after defined intervals for
-						component 'percentage' of attribute trafficDistributionData.
+						- inc: causes transfer of percentage value, periodical recalculation of 
+						percentage values according to the incoming carried traffic on specified 
+						incoming circuit subgroups after defined intervals for component 
+						'percentage' of attribute trafficDistributionData.
 
-						The attribute selectedInstances references instances of OC routingPossibilities or (exclusive or)
-						OC postAnalysisEvaluation (this last choice is possible, if this instance shall not be referred by
-						any instances of OC postAnalysisEvaluation). All referenced instances of this attribute belong to
-						the same OC.";;
+						The attribute selectedInstances references instances of OC 
+						routingPossibilities or (exclusive or) OC postAnalysisEvaluation (this 
+						last choice is possible, if this instance shall not be referred by any 
+						instances of OC postAnalysisEvaluation). All referenced instances of 
+						this attribute belong to the same OC.";;
 			ATTRIBUTES
-				trafficDistributionId
-					GET,
-				inputCriteriaDataForAlgorithm
-					GET-REPLACE,
-				trafficDistributionData
-					GET,
-				selectedInstances
-					GET-REPLACE;;,
+				trafficDistributionId GET,
+				inputCriteriaDataForAlgorithm GET-REPLACE,
+				trafficDistributionData GET,
+				selectedInstances GET-REPLACE;;,
 		"ITU-T Recommendation M.3100":objectManagementNotificationsPackage;
 	CONDITIONAL PACKAGES
 		destinationGroupLabelPackage PACKAGE
 			BEHAVIOUR
 				destinationGroupLabelBeh BEHAVIOUR
 					DEFINED AS
-						"Value of attribute (key-attribute) destinationGroupLabel shall be unique among all instances of
-						this object class.";;
+						"Value of attribute (key-attribute) destinationGroupLabel shall be 
+						unique among all instances of this object class.";;
 			ATTRIBUTES
-				destinationGroupLabel
-					GET-REPLACE;
+				destinationGroupLabel GET-REPLACE;
 		REGISTERED AS { package 35 };
 			PRESENT IF
 				"the relationship 'selects group of' (see E-R diag.2) is used.";
@@ -922,8 +849,7 @@ treatment MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0";;
 			ATTRIBUTES
-				treatmentId
-					GET;;,
+				treatmentId GET;;,
 		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
 REGISTERED AS { managedObjectClass 20 };
 --8.2 Reused packages definitions
@@ -932,8 +858,7 @@ REGISTERED AS { managedObjectClass 20 };
 
 callingPartyCategoryPackage PACKAGE
 	ATTRIBUTES
-		callingPartyCategory
-			REPLACE-WITH-DEFAULT
+		callingPartyCategory REPLACE-WITH-DEFAULT
 			DEFAULT VALUE ASN1TypeModule.defaultCallingPartyCategory
 			GET-REPLACE;
 REGISTERED AS { package 36 };
@@ -946,9 +871,7 @@ destinationTypePackage PACKAGE
 			DEFINED AS
 				"Characterises unambiguously the type of destination.";;
 	ATTRIBUTES
-		destinationType
-			GET
-			SET-BY-CREATE;
+		destinationType GET SET-BY-CREATE;
 REGISTERED AS { package 37 };
 --8.2.3 externalSchedulerPackage
 
@@ -959,8 +882,7 @@ externalSchedulerPackage PACKAGE
 			DEFINED AS
 				"This package is used in the SMO for reference to the external SO's.";;
 	ATTRIBUTES
-		"ITU-T Recommendation X.746":externalSchedulerName
-			GET-REPLACE;
+		"ITU-T Recommendation X.746":externalSchedulerName GET-REPLACE;
 REGISTERED AS { package 38 };
 --8.3 Attributes definitions
 --8.3.1 activeDestination
@@ -972,7 +894,8 @@ activeDestination ATTRIBUTE
 	BEHAVIOUR
 		activeDestinationBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute either references an object instance or selects a group of instances via a label.";;
+				"This attribute either references an object instance or selects a group of instances via 
+				a label.";;
 REGISTERED AS { attribute 1 };
 --8.3.2 activeRoutingPossibilities
 
@@ -1019,7 +942,8 @@ assocSignRouteSetNePart ATTRIBUTE
 	BEHAVIOUR
 		assocSignRouteSetNePartBeh BEHAVIOUR
 			DEFINED AS
-				"Identifies the SS No. 7 signalling resource (ITU-T Recommendation Q.751.1: signRouteSetNePart).";;
+				"Identifies the SS No. 7 signalling resource (ITU-T Recommendation Q.751.1: 
+				signRouteSetNePart).";;
 REGISTERED AS { attribute 6 };
 --8.3.7 boundaryCrossing
 
@@ -1030,8 +954,9 @@ boundaryCrossing ATTRIBUTE
 	BEHAVIOUR
 		boundaryCrossingBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates whether the circuit end point subgroup contains only circuit end points
-				terminating circuits which cross international or organisational boundaries.";;
+				"This attribute indicates whether the circuit end point subgroup contains only circuit 
+				end points terminating circuits which cross international or organisational 
+				boundaries.";;
 REGISTERED AS { attribute 7 };
 --8.3.8 calledNumberingPlan
 
@@ -1074,8 +999,8 @@ carrierCode ATTRIBUTE
 	BEHAVIOUR
 		carrierCodeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute describes the unambiguous carrier specific code used to distinguish from other
-				carriers. It can be dialled by the customer or supplied by the exchange.";;
+				"This attribute describes the unambiguous carrier specific code used to distinguish from 
+				other carriers. It can be dialled by the customer or supplied by the exchange.";;
 REGISTERED AS { attribute 12 };
 --8.3.13 carrierCodePresent
 
@@ -1100,7 +1025,7 @@ carrierDataInstance ATTRIBUTE
 	BEHAVIOUR
 		carrierDataInstanceBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute references an instance of the OC carrierData. It allows the selection of
+				"This attribute references an instance of the OC carrierData. It allows the selection of 
 				destinations depending on the dialled or assigned carrier code of the call.";;
 REGISTERED AS { attribute 15 };
 --8.3.16 cepId
@@ -1133,8 +1058,8 @@ cepsgCombListSelection ATTRIBUTE
 	BEHAVIOUR
 		cepsgCombListSelectionBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute gives a list of instances on which an algorithm is to apply. These instances can be
-				instances of OC routingPossData or of the OC cepsgComb.";;
+				"This attribute gives a list of instances on which an algorithm is to apply. These 
+				instances can be instances of OC routingPossData or of the OC cepsgComb.";;
 REGISTERED AS { attribute 19 };
 --8.3.20 cepsgCombOrCepsgInstance
 
@@ -1145,8 +1070,9 @@ cepsgCombOrCepsgInstance ATTRIBUTE
 	BEHAVIOUR
 		cepsgCombOrCepsgInstanceBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute points to an instance of OC cepsgComb or to an instance of OC cepsg (beside it
-				remains possible for this attribute to point to other OCs as e.g. test equipment).";;
+				"This attribute points to an instance of OC cepsgComb or to an instance of OC cepsg 
+				(beside it remains possible for this attribute to point to other OCs as e.g. test 
+				equipment).";;
 REGISTERED AS { attribute 20 };
 --8.3.21 cepsgCombSelection
 
@@ -1157,7 +1083,8 @@ cepsgCombSelection ATTRIBUTE
 	BEHAVIOUR
 		cepsgCombSelectionBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute gives a list of instances of OC cepsg on which an algorithm is to apply.";;
+				"This attribute gives a list of instances of OC cepsg on which an algorithm is to 
+				apply.";;
 REGISTERED AS { attribute 21 };
 --8.3.22 cic
 
@@ -1168,8 +1095,8 @@ cic ATTRIBUTE
 	BEHAVIOUR
 		cicBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the circuit identification code (CIC) of a circuit and is applicable for
-				SS No.7.";;
+				"This attribute indicates the circuit identification code (CIC) of a circuit and is 
+				applicable for SS No.7.";;
 REGISTERED AS { attribute 22 };
 --8.3.23 circuitNumber
 
@@ -1180,8 +1107,8 @@ circuitNumber ATTRIBUTE
 	BEHAVIOUR
 		circuitNumberBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the logical circuit end point number within the containing circuit end
-				point subgroup.";;
+				"This attribute indicates the logical circuit end point number within the containing 
+				circuit end point subgroup.";;
 REGISTERED AS { attribute 23 };
 --8.3.24 crankbackAdminState
 
@@ -1203,7 +1130,7 @@ ctpbInstance ATTRIBUTE
 	BEHAVIOUR
 		ctpbInstanceBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute points to an instance of OC ITU-T Recommendation M.3100:
+				"This attribute points to an instance of OC ITU-T Recommendation M.3100: 
 				connectionTerminationPointBidirectional which has the channelNumber attribute.";;
 REGISTERED AS { attribute 25 };
 --8.3.26 destinationCode
@@ -1215,8 +1142,9 @@ destinationCode ATTRIBUTE
 	BEHAVIOUR
 		destinationCodeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute characterises a destination of a call by specifying the country code, or/and area
-				code, or/and exchange identifying code, or/and individual line number etc.";;
+				"This attribute characterises a destination of a call by specifying the country code, 
+				or/and area code, or/and exchange identifying code, or/and individual line number 
+				etc.";;
 REGISTERED AS { attribute 26 };
 --8.3.27 destinationGroupLabel
 
@@ -1227,7 +1155,8 @@ destinationGroupLabel ATTRIBUTE
 	BEHAVIOUR
 		destinationGroupLabelBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute specifies - via a label - the destination group the instance belongs to";;
+				"This attribute specifies - via a label - the destination group the instance belongs 
+				to";;
 REGISTERED AS { attribute 27 };
 --8.3.28 destinationType
 
@@ -1238,10 +1167,10 @@ destinationType ATTRIBUTE
 	BEHAVIOUR
 		destinationTypeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the type of destination as a named integer value. The destinationType is
-				either derived from the called party number information element (nature of address indicator in
-				ITU-T Recommendation Q.763 or type of number in ITU-T Recommendation Q.931) or determined by the
-				prefix digit analysis.";;
+				"This attribute indicates the type of destination as a named integer value. The 
+				destinationType is either derived from the called party number information element 
+				(nature of address indicator in ITU-T Recommendation Q.763 or type of number in ITU-T 
+				Recommendation Q.931) or determined by the prefix digit analysis.";;
 REGISTERED AS { attribute 28 };
 --8.3.29 digitCombInsert
 
@@ -1326,8 +1255,8 @@ extSchedulingAttribute ATTRIBUTE
 	BEHAVIOUR
 		extSchedulingAttributeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute provides the scheduling information in the SMO, for external index scheduling as in
-				EN 301 098[3].";;
+				"This attribute provides the scheduling information in the SMO, for external index 
+				scheduling as in EN 301 098[3].";;
 REGISTERED AS { attribute 39 };
 --8.3.40 initialSubscriberCodes
 
@@ -1363,11 +1292,12 @@ languageDigitProc ATTRIBUTE
 	BEHAVIOUR
 		languageDigitProcBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates whether the language digit has to be extracted from the transmitted digit
-				string for incoming calls and has to be included into the transmitted digit string for outgoing
-				calls on the position specified by the signalling systems R2 or C5 for international transit or
-				terminating traffic. The attribute is applicable if the circuit end point subgroup is of type
-				incoming or two-way and one of the above signalling systems is used.";;
+				"This attribute indicates whether the language digit has to be extracted from the 
+				transmitted digit string for incoming calls and has to be included into the transmitted 
+				digit string for outgoing calls on the position specified by the signalling systems R2 
+				or C5 for international transit or terminating traffic. The attribute is applicable if 
+				the circuit end point subgroup is of type incoming or two-way and one of the above 
+				signalling systems is used.";;
 REGISTERED AS { attribute 43 };
 --8.3.44 localDestinationId
 
@@ -1392,8 +1322,8 @@ nationalDestinationCode ATTRIBUTE
 	BEHAVIOUR
 		nationalDestinationCodeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute describes the NDC; its size is limited as described in ITU-T Recommendation E.164
-				[4] or any successor document.";;
+				"This attribute describes the NDC; its size is limited as described in ITU-T 
+				Recommendation E.164 [4] or any successor document.";;
 REGISTERED AS { attribute 46 };
 --8.3.47 nationalDestinationId
 
@@ -1443,9 +1373,9 @@ officeEquipment ATTRIBUTE
 	BEHAVIOUR
 		officeEquipmentBeh BEHAVIOUR
 			DEFINED AS
-				" This attribute references the physical equipment the circuit end point is associated with. If the
-				inst choice is used, it references an instance of OC ITU-T Recommendation M.3100: circuitPack. If
-				the string choice is used, the value is technology specific.";;
+				" This attribute references the physical equipment the circuit end point is associated 
+				with. If the inst choice is used, it references an instance of OC ITU-T Recommendation 
+				M.3100: circuitPack. If the string choice is used, the value is technology specific.";;
 REGISTERED AS { attribute 52 };
 --8.3.53 originForAnalysis
 
@@ -1456,8 +1386,8 @@ originForAnalysis ATTRIBUTE
 	BEHAVIOUR
 		originForAnalysisBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the circuit end point subgroup for digit analysis
-				purpose.";;
+				"This attribute determines the group assigned to the circuit end point subgroup for 
+				digit analysis purpose.";;
 REGISTERED AS { attribute 53 };
 --8.3.54 originForPreparation
 
@@ -1468,8 +1398,8 @@ originForPreparation ATTRIBUTE
 	BEHAVIOUR
 		originForPreparationBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the incoming circuit end point subgroup for digit
-				preparation purpose.";;
+				"This attribute determines the group assigned to the incoming circuit end point subgroup 
+				for digit preparation purpose.";;
 REGISTERED AS { attribute 54 };
 --8.3.55 originForRebuilding
 
@@ -1480,8 +1410,8 @@ originForRebuilding ATTRIBUTE
 	BEHAVIOUR
 		originForRebuidingBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the circuit end point subgroup for digit rebuilding
-				purpose.";;
+				"This attribute determines the group assigned to the circuit end point subgroup for 
+				digit rebuilding purpose.";;
 REGISTERED AS { attribute 55 };
 --8.3.56 originForRouting
 
@@ -1492,8 +1422,8 @@ originForRouting ATTRIBUTE
 	BEHAVIOUR
 		originForRoutingBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the circuit end point subgroup for post-analysis
-				evaluation purpose.";;
+				"This attribute determines the group assigned to the circuit end point subgroup for 
+				post-analysis evaluation purpose.";;
 REGISTERED AS { attribute 56 };
 --8.3.57 ownCac
 
@@ -1504,8 +1434,8 @@ ownCac ATTRIBUTE
 	BEHAVIOUR
 		ownCacBeh BEHAVIOUR
 			DEFINED AS
-				" This attribute describes whether the carrier access code identifies the network where the exchange
-				is located.";;
+				" This attribute describes whether the carrier access code identifies the network where 
+				the exchange is located.";;
 REGISTERED AS { attribute 57 };
 --8.3.58 postAnalysisEvaluationId
 
@@ -1537,9 +1467,9 @@ prefixDigits ATTRIBUTE
 	BEHAVIOUR
 		prefixDigitsBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute defines the digits which have to be inserted in front of the dialled digits. An
-				empty string means that no digits have to be inserted. The attribute is present if the circuit end
-				point subgroup is of type incoming or two-way.";;
+				"This attribute defines the digits which have to be inserted in front of the dialled 
+				digits. An empty string means that no digits have to be inserted. The attribute is 
+				present if the circuit end point subgroup is of type incoming or two-way.";;
 REGISTERED AS { attribute 61 };
 --8.3.62 prefTrafficDirect
 
@@ -1571,8 +1501,8 @@ rDNId ATTRIBUTE
 	BEHAVIOUR
 		rDNIdBeh BEHAVIOUR
 			DEFINED AS
-				"If the string choice for the syntax is used, matching on substrings is permitted. If the number
-				choice for the syntax is used, then matching on ordering is permitted.";;
+				"If the string choice for the syntax is used, matching on substrings is permitted. If 
+				the number choice for the syntax is used, then matching on ordering is permitted.";;
 REGISTERED AS { attribute 65 };
 --8.3.66 rebuildingOrigin
 
@@ -1625,9 +1555,9 @@ routingPossibilitiesSelection ATTRIBUTE
 	BEHAVIOUR
 		routingPossBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute gives a list of instances on which an algorithm is to apply. These instances can be
-				instances of OC routingPossData or of OC localDestination or of OC cepsgComb or of OC cepsg or of
-				OC routingPossibilities.";;
+				"This attribute gives a list of instances on which an algorithm is to apply. These 
+				instances can be instances of OC routingPossData or of OC localDestination or of OC 
+				cepsgComb or of OC cepsg or of OC routingPossibilities.";;
 REGISTERED AS { attribute 72 };
 --8.3.73 routingPossRestrictId
 
@@ -1645,8 +1575,8 @@ schedulingAttribute ATTRIBUTE
 	BEHAVIOUR
 		schedulingAttributeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute provides the scheduling information in the SMO, for external index scheduling as in
-				EN 301 098[3].";;
+				"This attribute provides the scheduling information in the SMO, for external index 
+				scheduling as in EN 301 098[3].";;
 REGISTERED AS { attribute 74 };
 --8.3.75 searchMethod
 
@@ -1668,9 +1598,9 @@ selectedInstances ATTRIBUTE
 	BEHAVIOUR
 		selectedInstancesBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute references object instances with an ordered list. Instances are of OC
-				routingPossibilities or postAnalysisEvaluation. All referenced instances of this attribute belong
-				to the same OC.";;
+				"This attribute references object instances with an ordered list. Instances are of OC 
+				routingPossibilities or postAnalysisEvaluation. All referenced instances of this 
+				attribute belong to the same OC.";;
 REGISTERED AS { attribute 76 };
 --8.3.77 skipGroupSignal1
 
@@ -1681,9 +1611,9 @@ skipGroupSignal1 ATTRIBUTE
 	BEHAVIOUR
 		skipGroupSignal1Beh BEHAVIOUR
 			DEFINED AS
-				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to be skipped if
-				signal1 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg reachable via one of these
-				routing possibilities.";;
+				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to 
+				be skipped if signal1 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg 
+				reachable via one of these routing possibilities.";;
 REGISTERED AS { attribute 77 };
 --8.3.78 skipGroupSignal2
 
@@ -1694,9 +1624,9 @@ skipGroupSignal2 ATTRIBUTE
 	BEHAVIOUR
 		skipGroupSignal2Beh BEHAVIOUR
 			DEFINED AS
-				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to be skipped if
-				signal2 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg reachable via one of these
-				routing possibilities.";;
+				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to 
+				be skipped if signal2 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg 
+				reachable via one of these routing possibilities.";;
 REGISTERED AS { attribute 78 };
 --8.3.79 suppressCac
 
@@ -1729,8 +1659,8 @@ termForPreparation ATTRIBUTE
 	BEHAVIOUR
 		termForPreparationBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the outgoing circuit end point subgroup for digit
-				preparation purpose.";;
+				"This attribute determines the group assigned to the outgoing circuit end point subgroup 
+				for digit preparation purpose.";;
 REGISTERED AS { attribute 81 };
 --8.3.82 trafficCategory
 
@@ -1741,19 +1671,24 @@ trafficCategory ATTRIBUTE
 	BEHAVIOUR
 		trafficCategoryBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute describes the traffic category that is assigned to the call. This attribute is not
-				the same as the parameter calling party's category of ITU-T Recommendation Q.763.
+				"This attribute describes the traffic category that is assigned to the call. This 
+				attribute is not the same as the parameter calling party's category of ITU-T 
+				Recommendation Q.763.
 
-				The Abstract Syntax Notation One (ASN.1) type TrafficCategory comprises the following values:
+				The Abstract Syntax Notation One (ASN.1) type TrafficCategory comprises the following 
+				values:
 
-				- nationalTraffic: This value is used for traffic that does not cross international boundaries and
-				when no other specific value of the ASN.1 type TrafficCategory is appropriate.
+				- nationalTraffic: This value is used for traffic that does not cross international 
+				  boundaries and when no other specific value of the ASN.1 type TrafficCategory is 
+				  appropriate.
 
-				- internationalTransitTraffic: This value is used for traffic that crosses international boundaries
-				and when the adjacent exchange serves as international transit exchange for the traffic.
+				- internationalTransitTraffic: This value is used for traffic that crosses international 
+				  boundaries and when the adjacent exchange serves as international transit exchange for 
+				  the traffic.
 
-				- internationalTerminatingTraffic: This value is used for traffic that crosses international
-				boundaries and when the adjacent exchange serves as an international terminating exchange.";;
+				- internationalTerminatingTraffic: This value is used for traffic that crosses 
+				  international boundaries and when the adjacent exchange serves as an international 
+				  terminating exchange.";;
 REGISTERED AS { attribute 82 };
 --8.3.83 trafficDistributionData
 
@@ -1814,342 +1749,962 @@ REGISTERED AS { attribute 88 };
 
 
 analysisCriteria-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		analysisCriteria
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS analysisCriteria AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		analysisCriteriaId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 1 };
 --8.4.2 callHistory-managedElement
 
 
 callHistory-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		callHistory
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS callHistory AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		callHistoryId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 2 };
 --8.4.3 carrierData-managedElement
 
 
 carrierData-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		carrierData
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS carrierData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		carrierDataId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 3 };
 --8.4.4 cep-cepsg
 
 
 cep-cepsg NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cep
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":circuitEndPointSubgroup
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cep AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":circuitEndPointSubgroup AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cepId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 4 };
 --8.4.5 cepsg-managedElement
 
 
 cepsg-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cepsg
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cepsg AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"ITU-T Recommendation M.3100":circuitEndPointSubgroupId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 5 };
 --8.4.6 cepsgComb-managedElement
 
 
 cepsgComb-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cepsgComb
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cepsgComb AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cepsgCombId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 6 };
 --8.4.7 cepsgCombList-managedElement
 
 
 cepsgCombList-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cepsgCombList
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cepsgCombList AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		cepsgCombListId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 7 };
 --8.4.8 digitModification-managedElement
 
 
 digitModification-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		digitModification
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS digitModification AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		digitModificationId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 8 };
 --8.4.9 digitPreparationCriteria-managedElement
 
 
 digitPreparationCriteria-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		digitPreparationCriteria
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS digitPreparationCriteria AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		digitPreparationCriteriaId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 9 };
 --8.4.10 digitRebuildingCriteria-managedElement
 
 
 digitRebuildingCriteria-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		digitRebuildingCriteria
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS digitRebuildingCriteria AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		digitRebuildingCriteriaId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 10 };
 --8.4.11 exception-managedElement
 
 
 exception-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		exception
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS exception AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		exceptionId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 11 };
 --8.4.12 localDestination-managedElement
 
 
 localDestination-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		localDestination
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS localDestination AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		localDestinationId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 12 };
 --8.4.13 nationalDestination-managedElement
 
 
 nationalDestination-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		nationalDestination
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS nationalDestination AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		nationalDestinationId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 13 };
 --8.4.14 postAnalysisEvaluation-managedElement
 
 
 postAnalysisEvaluation-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		postAnalysisEvaluation
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS postAnalysisEvaluation AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		postAnalysisEvaluationId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 14 };
 --8.4.15 prefixDigitAnalysis-managedElement
 
 
 prefixDigitAnalysis-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		prefixDigitAnalysis
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS prefixDigitAnalysis AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		prefixDigitAnalysisId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 15 };
 --8.4.16 routingPossData-managedElement
 
 
 routingPossData-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		routingPossData
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS routingPossData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		routingPossDataId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 16 };
 --8.4.17 routingPossRestrict-routingPossibilities
 
 
 routingPossRestrict-routingPossibilities NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		routingPossRestrict
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		routingPossibilities
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS routingPossRestrict AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS routingPossibilities AND SUBCLASSES;
 	WITH ATTRIBUTE
 		routingPossRestrictId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 17 };
 --8.4.18 routingPossibilities-managedElement
 
 
 routingPossibilities-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		routingPossibilities
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS routingPossibilities AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		routingPossibilitiesId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 18 };
 --8.4.19 trafficDistribution-managedElement
 
 
 trafficDistribution-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		trafficDistribution
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS trafficDistribution AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		trafficDistributionId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 19 };
 --8.4.20 treatment-managedElement
 
 
 treatment-managedElement NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		treatment
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"ITU-T Recommendation M.3100":managedElement
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS treatment AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Recommendation M.3100":managedElement AND SUBCLASSES;
 	WITH ATTRIBUTE
 		treatmentId;
-	CREATE
-		WITH-REFERENCE-OBJECT,
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { nameBinding 20 };
 
 END
 --< GDMO.EndDocument "EN 300 292" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":scanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":statisticalReportRecord
+--@@ |  |  +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
+--@@ |  |  +- "Rec. X.746 (1995)":operationResultRecord
+--@@ |  |  +- "Recommendation G.774.3":apsReportRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":monitorMetric
+--@@ |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":movingAverageMeanMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndMinMaxMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndPercentileMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndVarianceMonitor
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":heterogeneousScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":homogeneousScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":ensembleStatisticScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanScanner
+--@@ |  |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanVarianceScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":minMaxScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":percentileScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  +- "ITU-T Rec. Q.822 (1994)":currentData
+--@@ |  |  +- "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ |  |  |  +- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringDataObject
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ +- "Rec. X.746 (1995)":scheduler
+--@@ |  +- "Rec. X.746 (1995)":dailyScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":dailyOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":weeklyScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":weeklyOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":monthlyScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":monthlyOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":periodicScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":periodicOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":multiScheduler
+--@@ +- "Rec. X.746 (1995)":typeOfDayController
+--@@ +- "CCITT X.521":organization
+--@@ +- "CCITT X.521":organizationalUnit
+--@@ +- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ +- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ |  +- "ITU-T G.774.1 (02/2001)":pathTerminationHistoryData
+--@@ +- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSink
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSource
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "Recommendation G.774.3":protectionGroupR1
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionGroupR1
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  +- "Recommendation M.3100:1992":protectionGroupR2
+--@@ +- "Recommendation G.774.3":protectionUnit
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionUnit
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  +- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ +- "Recommendation M.3100:1992":abstractLink
+--@@ |  +- "Recommendation M.3100:1992":logicalLink
+--@@ |  +- "Recommendation M.3100:1992":topologicalLink
+--@@ +- "Recommendation M.3100:1992":abstractLinkEnd
+--@@ |  +- "Recommendation M.3100:1992":abstractLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":logicalLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":topologicalLinkEndR1
+--@@ +- "Recommendation M.3100:1992":accessGroup
+--@@ +- "Recommendation M.3100:1992":alarmReportingControlManager
+--@@ +- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ +- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ +- "Recommendation M.3100:1992":attributeRanges
+--@@ +- "Recommendation M.3100:1992":circuitEndPointSubgroup
+--@@ |  +- "EN 300 292":cepsg
+--@@ +- "Recommendation M.3100:1992":crossConnection
+--@@ |  +- "Recommendation M.3100:1992":crossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedCrossConnection
+--@@ +- "Recommendation M.3100:1992":equipment
+--@@ |  +- "Recommendation M.3100:1992":equipmentR1
+--@@ |  |  +- "Recommendation M.3100:1992":circuitPack
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":circuitPackR1
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentHolder
+--@@ +- "Recommendation M.3100:1992":externalPoint
+--@@ |  +- "Recommendation M.3100:1992":controlPoint
+--@@ |  +- "Recommendation M.3100:1992":scanPoint
+--@@ +- "Recommendation M.3100:1992":fabric
+--@@ |  +- "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ |  +- "Recommendation M.3100:1992":fabricR1
+--@@ |  |  +- "Recommendation M.3100:1992":fabricR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":fabricR3
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":fabricR4
+--@@ +- "Recommendation M.3100:1992":gtp
+--@@ |  +- "Recommendation M.3100:1992":gtpR1
+--@@ +- "Recommendation M.3100:1992":managedElement
+--@@ |  +- "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ |  +- "Recommendation M.3100:1992":managedElementR1
+--@@ |  |  +- "Recommendation M.3100:1992":managedElementR2
+--@@ +- "Recommendation M.3100:1992":managedElementComplex
+--@@ +- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  +- "Recommendation M.3100:1992":mpCrossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedMpCrossConnection
+--@@ +- "Recommendation M.3100:1992":network
+--@@ |  +- "Recommendation M.3100:1992":networkR1
+--@@ |  |  +- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  |  |  +- "Recommendation M.3100:1992":layerNetworkDomainR1
+--@@ +- "Recommendation M.3100:1992":physicalPort
+--@@ +- "Recommendation M.3100:1992":pipe
+--@@ |  +- "Recommendation M.3100:1992":connectionR1
+--@@ |  +- "Recommendation M.3100:1992":trailR1
+--@@ +- "Recommendation M.3100:1992":pipeR2
+--@@ |  +- "Recommendation M.3100:1992":linkConnection
+--@@ |  +- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  +- "Recommendation M.3100:1992":trailR2
+--@@ +- "Recommendation M.3100:1992":protectionUnitR1
+--@@ +- "Recommendation M.3100:1992":software
+--@@ |  +- "Recommendation M.3100:1992":softwareR1
+--@@ +- "Recommendation M.3100:1992":subNetwork
+--@@ +- "Recommendation M.3100:1992":terminationPoint
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":networkTerminationPoint
+--@@ |  |  +- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  |  |  +- "Recommendation M.3100:1992":genericTransportTTPR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPSinkR1
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSink
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ +- "Recommendation M.3100:1992":tpPool
+--@@ +- "EN 300 292":analysisCriteria
+--@@ +- "EN 300 292":callHistory
+--@@ +- "EN 300 292":carrierData
+--@@ +- "EN 300 292":cep
+--@@ +- "EN 300 292":cepsgComb
+--@@ +- "EN 300 292":cepsgCombList
+--@@ +- "EN 300 292":digitModification
+--@@ +- "EN 300 292":digitPreparationCriteria
+--@@ +- "EN 300 292":digitRebuildingCriteria
+--@@ +- "EN 300 292":exception
+--@@ +- "EN 300 292":localDestination
+--@@ +- "EN 300 292":nationalDestination
+--@@ +- "EN 300 292":postAnalysisEvaluation
+--@@ +- "EN 300 292":prefixDigitAnalysis
+--@@ +- "EN 300 292":routingPossData
+--@@ +- "EN 300 292":routingPossibilities
+--@@ +- "EN 300 292":routingPossRestrict
+--@@ +- "EN 300 292":trafficDistribution
+--@@ +- "EN 300 292":treatment
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "Rec. X.746 (1995)":scheduler
+--@@ >- "Rec. X.746 (1995)":typeOfDayController
+--@@ "ITU-T Rec. Q.822 (1994)":currentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "CCITT X.521":organization
+--@@ >- "Recommendation M.3100:1992":managedElement
+--@@ |  >- "Rec. X.746 (1995)":scheduler
+--@@ |  >- "Rec. X.746 (1995)":typeOfDayController
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ |  >- "Recommendation G.774.3":protectionGroupR1
+--@@ |  |  >- "Recommendation G.774.3":protectionUnit
+--@@ |  >- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":attributeRanges
+--@@ |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  |  >- "Recommendation M.3100:1992":software
+--@@ |  |  |  >- "Recommendation M.3100:1992":software
+--@@ |  >- "Recommendation M.3100:1992":equipment +++
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":fabric
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":gtp
+--@@ |  |  >- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":tpPool
+--@@ |  >- "Recommendation M.3100:1992":fabric +++
+--@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
+--@@ |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  >- "Rec. X.746 (1995)":scheduler
+--@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  >- "Recommendation M.3100:1992":software +++
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++
+--@@ |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ |  |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ |  >- "EN 300 292":analysisCriteria
+--@@ |  >- "EN 300 292":callHistory
+--@@ |  >- "EN 300 292":carrierData
+--@@ |  >- "EN 300 292":cepsg
+--@@ |  >- "EN 300 292":cepsgComb
+--@@ |  >- "EN 300 292":cepsgCombList
+--@@ |  >- "EN 300 292":digitModification
+--@@ |  >- "EN 300 292":digitPreparationCriteria
+--@@ |  >- "EN 300 292":digitRebuildingCriteria
+--@@ |  >- "EN 300 292":exception
+--@@ |  >- "EN 300 292":localDestination
+--@@ |  >- "EN 300 292":nationalDestination
+--@@ |  >- "EN 300 292":postAnalysisEvaluation
+--@@ |  >- "EN 300 292":prefixDigitAnalysis
+--@@ |  >- "EN 300 292":routingPossData
+--@@ |  >- "EN 300 292":routingPossibilities
+--@@ |  |  >- "EN 300 292":routingPossRestrict
+--@@ |  >- "EN 300 292":trafficDistribution
+--@@ |  >- "EN 300 292":treatment
+--@@ >- "Recommendation M.3100:1992":managedElementComplex
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":network
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":connectionR1
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":network
+--@@ |  >- "Recommendation M.3100:1992":trailR1
+--@@ "CCITT X.521":organizationalUnit
+--@@ >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ >- "Recommendation M.3100:1992":network +++
+--@@ "Recommendation M.3100:1992":circuitEndPointSubgroup
+--@@ >- "EN 300 292":cep
+--@@ "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ >- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  >- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  >- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":mpCrossConnection +++
+--@@ "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Sink +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Source +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional +++
+--@@ >- "Recommendation G.774.3":protectedTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink +++
+--@@ >- "Recommendation G.774.3":protectedTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource +++
+--@@ "Recommendation M.3100:1992":networkR1
+--@@ >- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  >- "Recommendation M.3100:1992":accessGroup
+--@@ |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":logicalLink
+--@@ |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  >- "Recommendation M.3100:1992":subNetwork
+--@@ |  |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":topologicalLink
+--@@ |  |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":trailR2
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
