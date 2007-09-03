@@ -1,0 +1,124 @@
+-- A.1 Allocation of object identifiers
+-- This Recommendation | International Standard allocates the following object identifiers
+AccessControlDefinitions{ joint-iso-ccitt(2) ms(9) function(2) part9(9) asn1Module(2) 1 }
+DEFINITIONS ::= BEGIN
+accessControl-Object OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) }
+accessControl-Package OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt(2) ms(9) function(2) part9(9) package (4) }
+accessControl-Parameter OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt(2) ms(9) function(2) part9(9) parameter(5) }
+accessControl-NameBinding OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) }
+accessControl-Attribute OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) }
+END
+-- A.6 Abstract syntax definitions
+AcessControl-ASN1Module { joint-iso-ccitt ms(9) function(2) part9(9) asn1Module(2) 2 }
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+IMPORTS
+AttributeId, CMISFilter, CMISSync, DistinguishedName, ObjectClass, ObjectInstance, Scope, ActionTypeId
+FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+-- NOTE  This Recommendation | International Standard imports DistinguishedName from
+-- CCITT Rec. X.501 (1988) | ISO/IEC 9594-2:1990. The specification for this syntax can now be
+-- found in an informative annex of ITU-T Rec. X.711 (1997) | ISO/IEC 9596 -1:1997.
+AE-title
+FROM ACSE-1 { joint-iso-itu-t(2) association-control(2) modules(0) apdus(0) version1(1) }
+DMI-TYPE-IDENTIFIER, DiscriminatorConstruct
+FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 };
+AccessControlList ::= SET OF CHOICE { proxy [0] Proxy,
+initiatorName [1] InitiatorName }
+InitiatorName ::= CHOICE { individualName [1] IMPLICIT DistinguishedName,
+groupName [2] IMPLICIT DistinguishedName,
+role [3] IMPLICIT DistinguishedName,
+application [4] AE-Title }
+AC-PROXY ::= DMI-TYPE-IDENTIFIER
+Proxy ::= SEQUENCE {
+proxyId [0] IMPLICIT AC-PROXY.&id ({ProxySet}),
+proxyValue [1] AC-PROXY.&Value ({ProxySet} {@.proxyId}) }
+ProxySet AC-PROXY ::= {...}
+AccessControlObjectName ::= GraphicString
+ActionFilterList ::= SET OF SEQUENCE { actionTypeId ActionTypeId,
+attributeFilterList FilterList OPTIONAL }
+AC-AUTH-CONTEXT ::= DMI-TYPE-IDENTIFIER
+AuthenticationContext ::= SEQUENCE {
+authenticationPolicyId [0] IMPLICIT AC-AUTH-CONTEXT.&id ({AuthenticationContextSet}),
+requirements [1] AC-AUTH-CONTEXT.&Value ({AuthenticationContextSet}
+{@.authenticationPolicyId}) }
+AuthenticationContextSet AC-AUTH-CONTEXT ::= {...}
+Boolean ::= BOOLEAN
+false Boolean ::= FALSE
+AC-CAP-IDENTITY ::= DMI-TYPE-IDENTIFIER
+CapabilityIdentitiesList ::= SET OF CHOICE {
+knownForm [0] SEQUENCE {
+initiatorName InitiatorName,
+sdaList SdaList OPTIONAL },
+unknownForm [1] SEQUENCE {
+identifier AC-CAP-IDENTITY.&id ({CapabilityIdentitiesSet}),
+value AC-CAP-IDENTITY.&Value ({CapabilityIdentitiesSet} {@.identifier})}
+}
+CapabilityIdentitiesSet AC-CAP-IDENTITY ::= {...}
+SdaList ::= SET OF SEQUENCE {
+securityDomainAuthorityName SecurityDomainAuthorityName,
+operationType OperationType }
+DefaultAccess ::= SEQUENCE {
+action [0] IMPLICIT EnforcementAction DEFAULT deny,
+create [1] IMPLICIT EnforcementAction DEFAULT deny,
+delete [2] IMPLICIT EnforcementAction DEFAULT deny,
+get [3] IMPLICIT EnforcementAction DEFAULT deny,
+replace [4] IMPLICIT EnforcementAction DEFAULT deny,
+addMember [5] IMPLICIT EnforcementAction DEFAULT deny,
+removeMember [6] IMPLICIT EnforcementAction DEFAULT deny,
+replaceWithDefault [7] IMPLICIT EnforcementAction DEFAULT deny,
+multipleObjectSelection [8] IMPLICIT EnforcementAction DEFAULT deny,
+filter [9] IMPLICIT EnforcementAction DEFAULT deny }
+denyAll DefaultAccess ::= {}
+DenialResponse ::= ENUMERATED
+{ denyWithResponse (0),
+denyWithoutResponse (1),
+abortAssociation (2),
+denyWithFalseResponse (3) }
+DenialGranularity ::= ENUMERATED { request(0),
+object(1),
+attribute(2) }
+DomainIdentity ::= CHOICE { domainName DistinguishedName,
+privateName OCTET STRING }
+EnforcementAction ::= ENUMERATED { denyWithResponse (0),
+denyWithoutResponse (1),
+abortAssociation (2),
+denyWithFalseResponse (3),
+allow (4) }
+deny EnforcementAction ::= denyWithResponse
+FilterList ::= SET OF CMISFilter
+InvalidAccessControlFilter ::= SEQUENCE
+{ errorId ENUMERATED
+{ duplicateId(0),
+heterogeneousId(1),
+invalidId(2) },
+filter CMISFilter OPTIONAL }
+LabelName ::= INTEGER
+ObjectClassList ::= SET OF SEQUENCE { objectClass [0] ObjectClass,
+nameBinding [1] OBJECT IDENTIFIER OPTIONAL}
+OperationsList ::= SET OF OperationType
+OperationType ::= INTEGER { action (0),
+create (1),
+delete (2),
+get (3),
+replace (4),
+addMember (5),
+removeMember (6),
+replaceWithDefault (7),
+multipleObjectSelection (8),
+filter (9) }
+SecurityLabel ::= SET OF CHOICE {
+initiatorLabel [1] IMPLICIT SEQUENCE {
+clearance CHOICE {
+localForm [0] IMPLICIT INTEGER,
+globalForm [1] IMPLICIT OBJECT IDENTIFIER },
+category [2] IMPLICIT BIT STRING OPTIONAL } }
+SecurityDomainAuthorityName ::= CHOICE {
+domainAuthorityName [1] IMPLICIT DistinguishedName,
+alternativeAuthorityName [2] IMPLICIT Proxy }
+StateConditions ::= SET OF SEQUENCE { conditionalObject ObjectInstance,
+state CMISFilter }
+END

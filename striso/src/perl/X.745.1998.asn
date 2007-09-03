@@ -1,0 +1,86 @@
+-- A.7 Abstract Syntax definitions
+Test-ASN1Module { joint-iso-ccitt ms(9) function(2) part12(12) asn1Module(2) 0 }DEFINITIONS IMPLICIT TAGS ::= BEGIN-- EXPORTS everything
+IMPORTS
+-- NOTE  This Recommendation | International Standard imports DistinguishedName from
+-- CCITT Rec. X.501 (1988) | ISO/IEC 9594-2:1990. The specification for this syntax can now be
+-- found in an informative annex of ITU-T Rec. X.711 (1997) | ISO/IEC 9596-1:1998.
+DistinguishedName FROM InformationFramework{ joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
+CMISFilter, Attribute, AttributeId, ObjectInstance, ScopeFROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) module(0) protocol(3) } -- Corrigendum 1
+   StopTime, StartTime, CorrelatedNotifications, NotificationIdentifier, MonitoredAttributes,   AdditionalInformation, AdditionalText, ProposedRepairActions, AttributeList, AvailabilityStatus,
+   ControlStatus, ProceduralStatus, OperationalState, SimpleNameType -- Corrigendum 1
+FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }; part12Action OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part12(12) action(9) }part12AttributeId OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part12(12) attribute(7) }
+part12MObjectClass OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part12(12)mObjectClass(3) } part12Notification OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part12(12) notification(10) }part12Package OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part12(12) package(4) } part12Parameter OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part12(12) parameter(5) }
+-- A.7.1 Attribute definitions
+ActualStartTime ::= CHOICE {unknown NULL,
+actualStart GeneralizedTime } ActualStopTime ::= CHOICE {unknown NULL,
+actualStop GeneralizedTime } AssociatedObjects ::= SET OF SEQUENCE {associatedObject ObjectInstance,
+associatedObjectInfo SEQUENCE {associatedObjectInfoId OBJECT IDENTIFIER,
+associatedObjectInform ANY DEFINED BY associatedObjectInfoId } OPTIONAL }
+defaultActualStartTime ActualStartTime ::= unknown:NULL-- The Actual start time remains unknown until the test performer has a real knowledge of the actual or expected time.
+defaultActualStopTime ActualStopTime ::= unknown NULL -- Corrigendum 1
+defaultEndTime EndTime ::= continual: NULL EndTime ::= CHOICE {specific GeneralizedTime,
+relative Timespec,continual NULL }
+InitializingTime ::= CHOICE {actualTime GeneralizedTime,
+relativeTime Timespec }-- Timespec value forever [0] means NOW
+InvocationId ::= SEQUENCE {tARRName DistinguishedName,
+testId INTEGER } MORTs ::= SET OF ObjectInstance SupportedTOClasses ::= SET OF OBJECT IDENTIFIER
+SupportedUncontrolledTests ::= SET OF OBJECT IDENTIFIER TestObjectId ::= INTEGER
+TestActionPerformerId ::= SimpleNameType
+TestStep ::= INTEGER TestStepQualifier ::= GraphicString TestOutcome ::= INTEGER {inconclusive(0),
+pass(1),fail(2), timed-out(3),premature-termination(4) }
+Timespec ::= CHOICE {forever [22] NULL,
+hours [23] INTEGER,minutes [24] INTEGER, seconds [25] INTEGER,millisecs [26] INTEGER, microsecs [27] INTEGER,nanosecs [28] INTEGER }
+TimeoutPeriod ::= Timespec TestInvocationId ::= CHOICE {tOName [0] ObjectInstance,
+invocationId [1] InvocationId } TestSessionId ::= SEQUENCE {localId INTEGER,
+globalRef [1] CHOICE { dnGlobRef DistinguishedName, oidGlobRef OBJECT IDENTIFIER } OPTIONAL }
+-- A.7.2 Action Types
+TestRequestControlledInfo ::= SEQUENCE {controlledTestRequestType [1] ControlledTestRequestType,
+testCategoryInformation [2] TestCategoryInformation OPTIONAL,testSessionId [3] TestSessionId OPTIONAL, toBeTestedMORTs ToBeTestedMORTs OPTIONAL,associatedObjects [5] AssociatedObjects OPTIONAL, timeoutPeriod TimeoutPeriod OPTIONAL,testObjectList [7] TestObjectList }
+TestObjectList ::= SEQUENCE OF SEQUENCE {tOClass OBJECT IDENTIFIER,
+tOInstance [1] ObjectInstance OPTIONAL,referenceTOInstance [2] ObjectInstance OPTIONAL, initialAttributeList [3] AttributeList OPTIONAL }-- initialAttributeList overrides any referenceTOInstance attribute values
+ControlledTestRequestType ::= ENUMERATED { independent(0), related(1) }
+TestCategoryInformation ::= AdditionalInformation
+ToBeTestedMORTs ::= CHOICE {normalForm [29] SET OF ObjectInstance,
+scopedSet [30] SEQUENCE {
+base ObjectInstance,
+mORTsScope0
+Scope DEFAULT namedNumbers:baseObject,
+mORTsFilter[3] CMISFilter DEFAULT and:{ } } } -- Corrigendum 1
+TestRequestControlledResponse ::= CHOICE {independentTestResponseList [0] SEQUENCE OF IndependentTestResponse,
+relatedTestResponse [1] RelatedTestResponse } IndependentTestResponse ::= SEQUENCE {testInvocationId TestInvocationId,
+tOName TOName OPTIONAL,tOAttributeList AttributeList OPTIONAL}
+RelatedTestResponse ::= SEQUENCE {testInvocationId TestInvocationId,
+testObjectResponseList SEQUENCE OF TestObjectResponse } TestObjectResponse ::= SEQUENCE {tOName TOName,
+tOAttributeList AttributeList OPTIONAL } TOName ::= CHOICE {conductorProvidedName NULL,
+performerProvidedName ObjectInstance } TestRequestUncontrolledInfo ::= SEQUENCE {testCategoryInformation [1] TestCategoryInformation,
+testSessionId [2] TestSessionId OPTIONAL,timeoutPeriod TimeoutPeriod OPTIONAL, associatedObjects [4] AssociatedObjects OPTIONAL,toBeTestedMORTs ToBeTestedMORTs OPTIONAL }
+TestRequestUncontrolledResult ::= SEQUENCE {testOutcome [0] TestOutcome OPTIONAL,
+mORTs [1] SET OF ObjectInstance OPTIONAL,proposedRepairActions [2] ProposedRepairActions OPTIONAL, additionalText [3] AdditionalText OPTIONAL,additionalInformation [4] AdditionalInformation OPTIONAL }
+TestSuspendResumeInfo ::= SEQUENCE {indicatedTests IndicatedTests,
+suspendResumeChoice SuspendResumeChoice } SuspendResumeChoice ::= ENUMERATED { suspend(0), resume(1) } IndicatedTests ::= CHOICE {testSessionId [0] TestSessionId,
+testInvocationId [1] SET OF TestInvocationId } TestSuspendResumeElement ::= SEQUENCE {testInvocationId [0] TestInvocationId,
+tOsStates [1] SET OF TOsState } TestSuspendResumeResult ::= SET OF TestSuspendResumeElement TOsState ::= SEQUENCE {tOInstance ObjectInstance OPTIONAL,
+-- tOInstance is optional if Test Invocation Id is a tOName --,testState TestState }
+TestTerminateInfo ::= IndicatedTests TestTerminateResult ::= SET OF TestInvocationId
+TestState ::= SEQUENCE {operationalState OperationalState,
+proceduralStatus ProceduralStatus,
+controlStatus [2] ControlStatus OPTIONAL, -- Corrigendum 1
+availabilityStatus [3] AvailabilityStatus OPTIONAL -- Corrigendum 1
+}
+-- A.7.3 Notification Types
+TestResultInfo ::= SEQUENCE {testInvocationId [0] TestInvocationId OPTIONAL,
+testSessionId [1] TestSessionId OPTIONAL,testOutcome [2] TestOutcome OPTIONAL, mORTs [3] MORTs OPTIONAL,associatedObjects [4] AssociatedObjects OPTIONAL, monitoredAttributes [5] MonitoredAttributes OPTIONAL,proposedRepairActions [6] ProposedRepairActions OPTIONAL, additionalText [7] AdditionalText OPTIONAL,additionalInformation [8] AdditionalInformation OPTIONAL, notificationIdentifier [9] NotificationIdentifier OPTIONAL,correlatedNotifications [10] CorrelatedNotifications OPTIONAL }
+SchedulingConflictInfo ::= SEQUENCE {testInvocationId TestInvocationId,
+testSessionId [1] TestSessionId OPTIONAL,startTime StartTime, endTime EndTime,actualStartTime ActualStartTime, actualStopTime ActualStopTime,additionalText [6] AdditionalText OPTIONAL, additionalInformation [7] AdditionalInformation OPTIONAL }
+-- A.7.4 Parameter Types
+NoSuchMORT ::= SET OF ObjectInstance MORTNotAvailable ::= SET OF ObjectInstance MistypedTestCategoryInformation ::= OBJECT IDENTIFIER NoSuchTestInvocationId ::= TestInvocationId NoSuchTestSessionId ::= TestSessionId InvalidTestOperation ::= OBJECT IDENTIFIER NoSuchAssociatedObject ::= SET OF ObjectInstance AssociatedObjectNotAvailable ::= SET OF ObjectInstance IndependentTestInvocationError ::= SEQUENCE OF CHOICE {testInstanceCreated [0] IndependentTestResponse,
+tONotCreated TONotCreated }
+RelatedTOError ::= SEQUENCE OF CHOICE {ableToCreateTO NULL,
+unableToCreateTO TONotCreated }
+TONotCreated ::= CHOICE {reason   ENUMERATED {
+invalidTOclass(0),duplicateTOInstance(1), invalidMORTClass(2),invalidAssociatedObjectClass(3), mORTNotAvailable(4),associatedObjectNotAvailable(5) }, inappropriateAttributeValue      AttributeList }
+TestSuspendResumeError ::= SET OF CHOICE {testSuspendResumeSuccess [0] TestSuspendResumeElement,
+testSuspendResumeFailure [1] TestSuspendResumeElement }
+TestTerminateError ::= SET OF CHOICE {testTerminateSuccess [0] TestInvocationId,
+testTerminateFailure [1] TestInvocationId }
+END

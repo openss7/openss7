@@ -1,0 +1,200 @@
+--< GDMO.Alias "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" "X.745",
+--  "ITU-T Rec. X.745 (1993)/Cor.1 (1997) | ISO/IEC 10164-12 : 1993/Cor.1 : 1998" >--
+MODULE "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993"
+-- Annex  A
+-- Definition of management information
+-- (This annex does form an integral part of this Recommendation | International Standard)
+-- A.1 Generic Object Classes
+-- A.1.1 Scheduling conflict record object class
+schedulingConflictRecord MANAGED OBJECT CLASSDERIVED FROM "Rec. X.721 | ISO/IEC 10165-2:1992": eventLogRecord;
+CHARACTERIZED BYschedulingConflictRecordPackage PACKAGE
+BEHAVIOUR schedulingConflictRecordBehaviour BEHAVIOUR DEFINED AS"This managed object is used to represent information logged as a result of receiving a
+Scheduling conflict event report.";;ATTRIBUTES testInvocationId GET,"Rec. X.721 | ISO/IEC 10165-2:1992": startTime GET, endTime GET,actualStartTime GET, actualStopTime GET;;;CONDITIONAL PACKAGES testSessionPackage PRESENT IF"a Test session identifier was present in the event report."; REGISTERED AS { part12MObjectClass 1 };
+-- A.1.2 Test action performer object class
+testActionPerformer MANAGED OBJECT CLASSDERIVED FROM "Rec. X.721 | ISO/IEC 10165-2:1992": top;
+CHARACTERIZED BY testActionPerformerPackage;CONDITIONAL PACKAGES
+uncontrolledTestRequestPackage PRESENT IF"this functionality is supported. This package and/or the controlledTestRequest package shall
+be present.",controlledTestRequestPackage PRESENT IF "this functionality is supported. This package and/or the uncontrolledTestRequest packageshall be present.", testSuspendResumePackage PRESENT IF"the controlledTestRequestPackage is present and this functionality is supported.", testTerminatePackage PRESENT IF"the controlledTestRequestPackage is present and this functionality is supported.", supportedTOClassesPackage PRESENT IF"the controlledTestRequestPackage is present.", supportedUncontrolledTestsPackage PRESENT IF"the uncontrolledTestRequestPackage is present."; REGISTERED AS { part12MObjectClass 2 };
+-- A.1.3 TO object class
+-- This Recommendation | International Standard does not define a name binding for this class.
+-- Such name bindings are deemed to be implementation specific.
+testObject MANAGED OBJECT CLASSDERIVED FROM "Rec. X.721 | ISO/IEC 10165-2:1992": top;
+CHARACTERIZED BY testObjectPackage;CONDITIONAL PACKAGES
+testOutcomePackage PRESENT IF"test results are to be retrieved by the Test conductor.", testSessionPackage PRESENT IF"a Test session identifier was present in the test request.", testResultPackage PRESENT IF"the test object is required to emit test result notifications.", associatedObjectsPackage PRESENT IF"Associated objects were specified in the test request.", mORTsPackage PRESENT IF"MORT(s) are identified by the test object.",
+tOControlStatusPackage PRESENT IF"the TO may exhibit the suspended state as specified in 7.3.3", "Rec. X.721 | ISO/IEC 10165-2:1992": availabilityStatusPackage PRESENT IF"scheduling is supported as defined in 7.2.2 or if the TO may exhibit the Idle state
+as specified in 7.3.3",requestedWindowPackage PRESENT IF "scheduling is supported as defined in 7.2.2 and the test conductor may control the time atwhich the test is to be executed.", actualTestTimePackage PRESENT IF"scheduling is supported as defined in 7.2.2 and the test performer may schedule the time at
+which the test is to be executed.";REGISTERED AS { part12MObjectClass 3 };
+-- A.1.4 Test results record object class
+testResultsRecord MANAGED OBJECT CLASSDERIVED FROM "Rec. X.721 | ISO/IEC 10165-2:1992": eventLogRecord;
+CHARACTERIZED BYtestResultsRecordPackage PACKAGE
+BEHAVIOUR testResultsRecordBehaviour BEHAVIOUR DEFINED AS"This managed object is used to represent information logged as a result of receiving a Test
+results event report.";;;;CONDITIONAL PACKAGES testInvocationIdPackage PRESENT IF"a Test invocation identifier was present in the event report.", testSessionPackage PRESENT IF"a Test session identifier was present in the event report.", testOutcomePackage PRESENT IF"a Test outcome parameter was present in the event report.", mORTsPackage PRESENT IF"a MORT(s) parameter was present in the event report.", associatedObjectsPackage PRESENT IF"an Associated objects parameter was present in the event report.", monitoredAttributesPackage PRESENT IF"a Monitored attributes parameter was present in the event report.", proposedRepairActionsPackage PRESENT IF"a Proposed repair actions parameter was present in the event report."; REGISTERED AS { part12MObjectClass 4 };
+-- A.2 Package definitions
+actualTestTimePackage PACKAGEBEHAVIOUR actualTestTimePackageBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.2.2 and 8.2.1.";;ATTRIBUTES actualStartTime DEFAULT VALUE Test-ASN1Module.defaultActualStartTime GET,
+actualStopTime DEFAULT VALUE Test-ASN1Module.defaultActualStopTime GET;REGISTERED AS { part12Package 1 };
+associatedObjectsPackage PACKAGEBEHAVIOUR associatedObjectsBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.1.1.";;ATTRIBUTES associatedObjects GET; REGISTERED AS { part12Package 2 };
+controlledTestRequestPackage PACKAGEBEHAVIOUR controlledTestRequestBehaviour BEHAVIOUR
+DEFINED AS "indicates that the managed object supports the Test request controlled action andbehaviour as specified in clauses 7 and 9.5.";; ACTIONS testRequestControlledActionn o S u c h M O R T m O R T N o t A v a i l a b l emistypedTestCategoryInformation noSuchAssociatedObject
+associatedObjectNotAvailable independentTestInvocationErrorrelatedTOError; REGISTERED AS { part12Package 3 };
+initializingTimePackage PACKAGEBEHAVIOUR initializingTimePackageBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.2.2 and 8.2.2";;ATTRIBUTES initializingTime GET; REGISTERED AS { part12Package 4 }; mORTsPackage PACKAGEBEHAVIOUR mORTsBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.1.2.";;ATTRIBUTES mORTs GET; REGISTERED AS { part12Package 5 }; requestedWindowPackage PACKAGEBEHAVIOUR requestedWindowBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.2.2 and 8.2.3";;ATTRIBUTES "Rec. X.721 | ISO/IEC 10165-2:1992": startTime DEFAULT VALUE
+DERIVATION RULE requestedWindowBehaviour -- Corrigendum 1
+GET-REPLACE, endTime DEFAULT VALUE Test-ASN1Module.defaultEndTime GET-REPLACEREPLACE-WITH-DEFAULT; REGISTERED AS { part12Package 6 }; supportedTOClassesPackage PACKAGEBEHAVIOUR supportedTOClassesBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.5.2.2.";;ATTRIBUTES supportedTOClasses GET; REGISTERED AS { part12Package 7 }; supportedUncontrolledTestsPackage PACKAGEBEHAVIOUR supportedUncontrolledTestsBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.5.2.1.";;ATTRIBUTES supportedUncontrolledTests GET; REGISTERED AS { part12Package 8 }; testActionPerformerPackage PACKAGEBEHAVIOUR testActionPerformerBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.5.2.";;ATTRIBUTES testActionPerformerId GET; REGISTERED AS { part12Package 9 }; testInvocationIdPackage PACKAGEBEHAVIOUR testInvocationIdPackageBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.3.1.";;ATTRIBUTES testInvocationId GET; REGISTERED AS { part12Package 10 }; testObjectPackage PACKAGEBEHAVIOUR testObjectBehaviour BEHAVIOUR
+DEFINED AS "as defined in clause 7. The behaviour of the Operational state and Procedural statusattributes in this context are specified in 7.3.3.";; ATTRIBUTES testObjectId GET,testInvocationId GET,
+"Rec. X.721 | ISO/IEC 10165-2:1992": operationalState GET,"Rec. X.721 | ISO/IEC 10165-2:1992": proceduralStatus GET; REGISTERED AS { part12Package 11 }; testOutcomePackage PACKAGEBEHAVIOUR testOutcomeBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.1.5.";;ATTRIBUTES testOutcome GET; REGISTERED AS { part12Package 12 }; testResultPackage PACKAGENOTIFICATIONS testResultNotification; REGISTERED AS { part12Package 13 };
+testSessionPackage PACKAGEBEHAVIOUR testSessionBehaviour BEHAVIOUR
+DEFINED AS "as defined in 7.3.2 and 8.1.6.";;ATTRIBUTES testSessionId GET; REGISTERED AS { part12Package 14 };
+testStepsPackage PACKAGEBEHAVIOUR testStepsBehaviour BEHAVIOUR
+DEFINED AS "as defined in 7.3.4 and 8.2.4.";;ATTRIBUTES testStep GET,
+testStepQualifier GET;REGISTERED AS { part12Package 15 };
+testSuspendResumePackage PACKAGEBEHAVIOUR testSuspendResumePackageBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.2.4 and 9.7.";;ACTIONS testSuspendResumeAction invalidTestOperation noSuchTestInvocationIdnoSuchTestSessionId testSuspendResumeError; REGISTERED AS { part12Package 16 };
+testTerminatePackage PACKAGEBEHAVIOUR testTerminatePackageBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.2.5 and 9.8.";;ACTIONS testTerminateAction invalidTestOperation noSuchTestInvocationIdnoSuchTestSessionId testTerminateError; REGISTERED AS { part12Package 17 };
+tOControlStatusPackage PACKAGEBEHAVIOUR tOControlStatusBehaviour BEHAVIOUR
+DEFINED AS "as specified in 7.3.3.";;ATTRIBUTES "Rec. X.721 | ISO/IEC 10165-2:1992":controlStatus GET; REGISTERED AS { part12Package 18 };
+uncontrolledTestRequestPackage PACKAGEBEHAVIOUR uncontrolledTestRequestBehaviour BEHAVIOUR
+DEFINED AS "indicates that the managed object supports the Test request uncontrolled action andbehaviour as specified in clause 7 and in 9.6.";; ACTIONS testRequestUncontrolledAction n o S u c h M O R T   m O R T N o t A v a i l a b l emistypedTestCategoryInformation
+noSuchAssociatedObjectassociatedObjectNotAvailable; REGISTERED AS { part12Package 19 };
+-- A.3 Attribute definitions
+-- A.3.1 Actual start time
+actualStartTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.ActualStartTime;
+MATCHES FOR EQUALITY, ORDERING;REGISTERED AS { part12AttributeId 1 };
+-- A.3.2 Actual stop time
+actualStopTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.ActualStopTime;
+MATCHES FOR EQUALITY, ORDERING;REGISTERED AS { part12AttributeId 2 };
+-- A.3.3 Associated objects
+associatedObjects ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.AssociatedObjects;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 3 };
+-- A.3.4 End time
+endTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.EndTime;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 4 };
+-- A.3.5 Initializing time
+initializingTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.InitializingTime;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 5 };
+-- A.3.6 MORT(s)
+mORTs ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.MORTs;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 6 };
+-- A.3.7 Supported TO classes
+supportedTOClasses ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.SupportedTOClasses;
+MATCHES FOR SET-COMPARISON, SET-INTERSECTION;REGISTERED AS { part12AttributeId 7 };
+-- A.3.8 Supported uncontrolled Tests
+supportedUncontrolledTests ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.SupportedUncontrolledTests;
+MATCHES FOR SET-COMPARISON, SET-INTERSECTION;REGISTERED AS { part12AttributeId 8 };
+-- A.3.9 Test action performer id
+testActionPerformerId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestActionPerformerId;
+MATCHES FOR EQUALITY; -- Corrigendum 1
+REGISTERED AS { part12AttributeId 9 };
+-- A.3.10 Test invocation identifier
+testInvocationId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestInvocationId;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 10 };
+-- A.3.11 Test object id
+testObjectId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestObjectId
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 11 };
+-- A.3.12 Test outcome testOutcome
+ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestOutcome;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 12 };
+-- A.3.13 Test session identifier
+testSessionId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestSessionId;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 13 };
+-- A.3.14 Test step testStep
+ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestStep;
+MATCHES FOR EQUALITY, ORDERING;REGISTERED AS { part12AttributeId 14 };
+-- A.3.15 Test step qualifier
+testStepQualifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TestStepQualifier;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 15 };
+-- A.3.16 Timeout period
+timeoutPeriod ATTRIBUTE
+WITH ATTRIBUTE SYNTAX Test-ASN1Module.TimeoutPeriod;
+MATCHES FOR EQUALITY;REGISTERED AS { part12AttributeId 16 };
+-- A.4 Action definitions
+testRequestControlledAction ACTION
+BEHAVIOUR testRequestControlledActionBehaviour;
+MODE CONFIRMED;WITH INFORMATION SYNTAX Test-ASN1Module.TestRequestControlledInfo; WITH REPLY SYNTAX Test-ASN1Module.TestRequestControlledResponse; -- Corrigendum 1
+REGISTERED AS { part12Action 1 };
+testRequestControlledActionBehaviour BEHAVIOUR DEFINED AS"When an action request as defined by 9.5 is received a controlled test shall be invoked as defined in
+clause 7. The information associated with the action request and specific behaviour of the test shalldepend upon the Test category. The names of the TOs created for the test shall be returned in the response if no such names were supplied in the request."; testSuspendResumeAction ACTION
+BEHAVIOUR testSuspendResumeBehaviour;
+MODE CONFIRMED;WITH INFORMATION SYNTAX Test-ASN1Module.TestSuspendResumeInfo; WITH REPLY SYNTAX Test-ASN1Module.TestSuspendResumeResult;REGISTERED AS { part12Action 2 };
+testSuspendResumeBehaviour BEHAVIOUR DEFINED AS"When an action request as defined by 9.7 is received the test or tests specified by the request shall be
+suspended or resumed according to the Suspend/resume choice parameter. In the response to asuspend request the Test state parameter shall indicate the state of the TO before the test was suspended. In the response to a resume request the Test state parameter shall indicate the state atwhich the TO is being resumed.";
+testTerminateAction ACTION
+BEHAVIOUR testTerminateBehaviour;
+MODE CONFIRMED;WITH INFORMATION SYNTAX Test-ASN1Module.TestTerminateInfo; WITH REPLY SYNTAX Test-ASN1Module.TestTerminateResult;REGISTERED AS { part12Action 3 };
+testTerminateBehaviour BEHAVIOUR DEFINED AS"When an action request as defined by 9.8 is received the test or tests specified by the request shall be
+terminated. Result reports pertaining to associated TO(s) may be returned before the TO(s) are deletedas a side effect.";
+testRequestUncontrolledAction ACTION
+BEHAVIOUR testRequestControlledActionBehaviour;
+MODE CONFIRMED;WITH INFORMATION SYNTAX Test-ASN1Module.TestRequestUncontrolledInfo; WITH REPLY SYNTAX Test-ASN1Module.TestRequestUncontrolledResult;REGISTERED AS { part12Action 4 };
+testRequestUncontrolledActionBehaviour BEHAVIOUR DEFINED AS"When an action request as defined by 9.6 is received an uncontrolled test shall be invoked as defined in
+clause 7. The information associated with the action request and specific behaviour of the test shalldepend upon the Test category.";
+-- A.5 Notification definitions
+schedulingConflictNotification NOTIFICATIONBEHAVIOUR schedulingConflictBehaviour;
+WITH INFORMATION SYNTAX Test-ASN1Module.SchedulingConflictInfoAND ATTRIBUTE IDS
+testInvocationId testInvocationId,testSessionId testSessionId, startTime "Rec. X.721 | ISO/IEC 10165-2:1992": startTime,endTime endTime, actualStartTime actualStartTime,actualStopTime actualStopTime, additionalText "Rec. X.721 | ISO/IEC 10165-2:1992": additionalText,additionalInformation "Rec. X.721 | ISO/IEC 10165-2:1992": additionalInformation; REGISTERED AS { part12Notification 1 }; schedulingConflictBehaviour BEHAVIOUR DEFINED AS"This notification type is used to report scheduling conflicts as defined in 7.2.2 and 9.10.";
+testResultNotification NOTIFICATIONBEHAVIOUR testResultBehaviour;
+WITH INFORMATION SYNTAX Test-ASN1Module.TestResultInfoAND ATTRIBUTE IDS
+testInvocationId testInvocationId,testSessionId testSessionId, testOutcome testOutcome,mORTs mORTs, associatedObjects associatedObjects,monitoredAttributes "Rec. X.721 | ISO/IEC 10165-2:1992": monitoredAttributes, proposedRepairActions "Rec. X.721 | ISO/IEC 10165-2:1992": proposedRepairActions,additionalText "Rec. X.721 | ISO/IEC 10165-2:1992": additionalText, additionalInformation "Rec. X.721 | ISO/IEC 10165-2:1992": additionalInformation,notificationIdentifier "Rec. X.721 | ISO/IEC 10165-2:1992": notificationIdentifier, correlatedNotifications "Rec. X.721 | ISO/IEC 10165-2:1992": correlatedNotfications;REGISTERED AS { part12Notification 2 };
+testResultBehaviour BEHAVIOUR DEFINED AS"This notification type is used to report test results as specified in 7.2.3 and 9.9.";
+-- A.6 Specific Error definitions
+associatedObjectNotAvailable PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.AssociatedObjectNotAvailable;BEHAVIOUR associatedObjectNotAvailableBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.4.4.2";;REGISTERED AS { part12Parameter 1 };
+independentTestInvocationError PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.IndependentTestInvocationError;BEHAVIOUR independentTestInvocationErrorBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.4.4.3";;REGISTERED AS { part12Parameter 2 };
+invalidTestOperation PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.InvalidTestOperation;BEHAVIOUR invalidTestOperationBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.4.4.4";;REGISTERED AS { part12Parameter 3 };
+mistypedTestCategoryInformation PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.MistypedTestCategoryInformation;BEHAVIOUR mistypedTestCategoryInformationBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.4.4.5";;REGISTERED AS { part12Parameter 4 };
+mORTNotAvailable PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.MORTNotAvailable;BEHAVIOUR mORTNotAvailable BEHAVIOUR
+DEFINED AS "as specified in 8.4.4.6";;REGISTERED AS { part12Parameter 5 };
+noSuchAssociatedObject PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.NoSuchAssociatedObject;BEHAVIOUR noSuchAssociatedObjectBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.4.4.7";;REGISTERED AS { part12Parameter 6 };
+noSuchMORT PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.NoSuchMORT;BEHAVIOUR noSuchMORTBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.4.4.8";;REGISTERED AS { part12Parameter 7 };
+noSuchTestInvocationId PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.NoSuchTestInvocationId;BEHAVIOUR noSuchTestInvocationIdBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.4.4.9";;REGISTERED AS { part12Parameter 8 };
+noSuchTestSessionId PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.NoSuchTestSessionId;BEHAVIOUR noSuchTestSessionIdBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.4.4.10";;REGISTERED AS { part12Parameter 9 };
+relatedTOError PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.RelatedTOError;BEHAVIOUR relatedTOErrorBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.4.4.11";;REGISTERED AS { part12Parameter 10 };
+testSuspendResumeError PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.TestSuspendResumeError;BEHAVIOUR testSuspendResumeErrorBehaviour BEHAVIOUR
+DEFINED AS "as specified in 8.4.4.12";;REGISTERED AS { part12Parameter 11 };
+testTerminateError PARAMETERCONTEXT SPECIFIC-ERROR ;
+WITH SYNTAX Test-ASN1Module.TestTerminateError;BEHAVIOUR testTerminateErrorBehaviour BEHAVIOUR
+DEFINED AS "as defined in 8.4.4.13";;REGISTERED AS { part12Parameter 12 };
+END

@@ -1,0 +1,357 @@
+--< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" >--
+--< GDMO.Alias "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" "X.742",
+--  "ITU-T Rec. X.742 (1995)/Cor.1 (1998) | ISO/IEC 10164-10 : 1995/Cor.1 : 1999" >--
+MODULE "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+-- Annex A
+-- Usage metering templates and abstract syntax
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.1 Definitions of managed object classes
+usageMeteringControlObject MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+CHARACTERIZED BY
+meteringControlObject PACKAGE
+ATTRIBUTES
+controlObjectId GET,
+"CCITT Rec. X.721 | ISO/IEC 10165-2":operationalState;;
+,
+meteringControlCapabilities PACKAGE
+BEHAVIOUR
+usageMeterControlBehaviour;
+ATTRIBUTES
+reportingTriggers GET-REPLACE ADD-REMOVE,
+accountableObjectsReferenceList GET,
+dataObjectsReferenceList GET;
+NOTIFICATIONS
+"CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange,
+"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion,
+"CCITT Rec. X.721 | ISO/IEC 10165-2":stateChange;
+REGISTERED AS {umf-pkg 1};
+;
+CONDITIONAL PACKAGES
+meteringStart
+PRESENT IF "corresponding data objects are explicitly created in a suspended condition",
+meteringControl
+PRESENT IF "suspend and resume operations are required and the corresponding data objects
+support the meteringDataCondition package",
+startNotification
+PRESENT IF "there is a static requirement to advise manager(s) other than the one generating the
+action of the outcome of the action and the meteringStart package is supported",
+controlNotification
+PRESENT IF "there is a static requirement to advise manager(s) other than the one generating the
+action of the outcome of the action and the meteringControl package is supported";
+REGISTERED AS {umf-mo 1};
+----
+usageMeteringDataObject MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+CHARACTERIZED BY
+meteringDataObject PACKAGE
+ATTRIBUTES
+dataObjectId GET;;
+,
+meteringDataInfo PACKAGE
+BEHAVIOUR
+usageMeterDataObjectBehaviour;
+ATTRIBUTES
+accountableObjectReference GET,
+usageInfo GET,
+dataErrors GET,
+providerId GET;
+NOTIFICATIONS
+usageReport,
+"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion;
+REGISTERED AS { umf-pkg 2 };;
+CONDITIONAL PACKAGES
+meteringDataCondition
+PRESENT IF "the accounting activity can be suspended or can exist in a terminating condition
+pending the emission of a usageReport notification",
+auditInformation
+PRESENT IF "the accounting activity requires the measurement of certain source information for
+audit purposes";
+REGISTERED AS {umf-mo 2};
+----
+usageMeteringRecord MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2":eventLogRecord;
+CHARACTERIZED BY
+usageMeteringRecordObject PACKAGE
+ATTRIBUTES
+accountableObjectReference GET,
+usageInfo GET,
+dataErrors GET,
+providerId GET;;;
+CONDITIONAL PACKAGES
+auditInformation
+PRESENT IF "this package has been included in the usageMeteringData object emitting the
+notification to be stored in this record managed object";
+REGISTERED AS { umf-mo 3 };
+-- A.2 Definition of packages
+auditInformation PACKAGE
+ATTRIBUTES
+auditInfo GET;
+REGISTERED AS { umf-pkg 3 };
+----
+controlNotification PACKAGE
+NOTIFICATIONS meteringSuspended,
+meteringResumed;
+REGISTERED AS {umf-pkg 4};
+----
+meteringControl PACKAGE
+ACTIONS suspendMetering deniedMeteringAction,
+resumeMetering deniedMeteringAction;
+REGISTERED AS {umf-pkg 5};
+----
+meteringDataCondition PACKAGE
+BEHAVIOUR meterConditionBehaviour;
+ATTRIBUTES
+"CCITT Rec X.721 | ISO/IEC 10165-2":controlStatus
+PERMITTED VALUES UsageMeteringFunction.ControlStatusValue
+REQUIRED VALUES UsageMeteringFunction.ControlStatusValue
+GET,
+"CCITT Rec X.721 | ISO/IEC 10165-2":proceduralStatus
+PERMITTED VALUES UsageMeteringFunction.ProceduralStatusValue
+REQUIRED VALUES UsageMeteringFunction.ProceduralStatusValue
+GET;
+REGISTERED AS { umf-pkg 6};
+----
+meteringStart PACKAGE
+ACTIONS startMetering deniedMeteringAction;
+REGISTERED AS {umf-pkg 7};
+----
+startNotification PACKAGE
+NOTIFICATIONS meteringStarted;
+REGISTERED AS {umf-pkg 8};
+-- A.3 Definition of attributes
+accountableObjectReference ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.AccountableObjectReference;
+MATCHES FOR EQUALITY;
+REGISTERED AS {umf-att 1};
+----
+accountableObjectsReferenceList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.AccountableObjectsReferenceList;
+MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS {umf-att 2};
+----
+actionResponse ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.ActionResponse;
+MATCHES FOR EQUALITY;
+REGISTERED AS {umf-att 3};
+----
+auditInfo ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.AuditInfo;
+MATCHES FOR EQUALITY;
+BEHAVIOUR usageObjectRecordsIdBehaviour;
+REGISTERED AS { umf-att 4};
+----
+controlObjectId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.UsageMeteringControlObjectId;
+MATCHES FOR EQUALITY;
+REGISTERED AS {umf-att 5};
+----
+dataObjectId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.UsageMeteringDataObjectId;
+MATCHES FOR EQUALITY;
+REGISTERED AS {umf-att 6};
+----
+dataObjectsReferenceList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.DataObjectsReferenceList;
+MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+REGISTERED AS {umf-att 7};
+----
+dataErrors ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.DataErrors;
+MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+BEHAVIOUR dataErrorBehaviour;
+REGISTERED AS {umf-att 8};
+----
+notificationCause ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.NotificationCause;
+MATCHES FOR EQUALITY;
+REGISTERED AS {umf-att 9};
+----
+providerId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.ProviderId;
+MATCHES FOR EQUALITY;
+REGISTERED AS {umf-att 10};
+----
+reportingTriggers ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.ReportingTriggers;
+MATCHES FOR EQUALITY;
+BEHAVIOUR triggerBehaviour;
+REGISTERED AS {umf-att 11};
+----
+usageInfo ATTRIBUTE
+WITH ATTRIBUTE SYNTAX UsageMeteringFunction.UsageInfo;
+REGISTERED AS {umf-att 12};
+-- A.4 Definition of notification types
+usageReport NOTIFICATION
+BEHAVIOUR usageReportBehaviour, usageMeterTimeBehaviour, triggerBehaviour;
+WITH INFORMATION SYNTAX UsageMeteringFunction.UsageDataInfo
+AND ATTRIBUTE IDS
+accountableObjectReference accountableObjectReference,
+notificationCause notificationCause,
+usageInfo usageInfo,
+auditInfo auditInfo,
+dataErrors dataErrors,
+providerId providerId;
+REGISTERED AS {umf-not 1};
+----
+meteringResumed NOTIFICATION
+BEHAVIOUR meteringResumedBehaviour;
+WITH INFORMATION SYNTAX UsageMeteringFunction.ControlInfo
+AND ATTRIBUTE IDS
+actionResponse actionResponse,
+reportingTriggers reportingTriggers,
+dataObjectsReferenceList dataObjectsReferenceList; -- Corrigendum 1
+REGISTERED AS {umf-not 2};
+----
+meteringStarted NOTIFICATION
+BEHAVIOUR meteringStartedBehaviour;
+WITH INFORMATION SYNTAX UsageMeteringFunction.ControlInfo
+AND ATTRIBUTE IDS
+actionResponse actionResponse,
+reportingTriggers reportingTriggers,
+dataObjectsReferenceList dataObjectsReferenceList; -- Corrigendum 1
+REGISTERED AS {umf-not 3};
+----
+meteringSuspended NOTIFICATION
+BEHAVIOUR meteringSuspendedBehaviour;
+WITH INFORMATION SYNTAX UsageMeteringFunction.ControlInfo
+AND ATTRIBUTE IDS
+actionResponse actionResponse,
+reportingTriggers reportingTriggers,
+dataObjectsReferenceList dataObjectsReferenceList; -- Corrigendum 1
+REGISTERED AS {umf-not 4};
+-- A.5 Definition of actions
+resumeMetering ACTION
+BEHAVIOUR resumeBehaviour;
+MODE CONFIRMED;
+WITH INFORMATION SYNTAX UsageMeteringFunction.ActionArgument;
+WITH REPLY SYNTAX UsageMeteringFunction.ActionResponse;
+REGISTERED AS {umf-act 1};
+----
+startMetering ACTION
+BEHAVIOUR startBehaviour;
+MODE CONFIRMED;
+WITH INFORMATION SYNTAX UsageMeteringFunction.ActionArgument;
+WITH REPLY SYNTAX UsageMeteringFunction.ActionResponse;
+REGISTERED AS {umf-act 2};
+----
+suspendMetering ACTION
+BEHAVIOUR suspendBehaviour;
+MODE CONFIRMED;
+WITH INFORMATION SYNTAX UsageMeteringFunction.ActionArgument;
+WITH REPLY SYNTAX UsageMeteringFunction.ActionResponse;
+REGISTERED AS {umf-act 3};
+-- A.6 Definition of behaviour
+usageObjectRecordsIdBehaviour BEHAVIOUR
+DEFINED AS "This attribute provides the storage for audit information which is included in the usage metering record in
+order to enable a guarantee of completeness of all usage metering data provided";
+----
+usageMeterDataObjectBehaviour BEHAVIOUR
+DEFINED AS "The data object reports usage metering data when triggered by or on the occurrence of events identified in
+the reportingTriggers attribute in the associated control object";
+----
+usageReportBehaviour BEHAVIOUR
+DEFINED AS "On the occurrence of an event specified by the reporting triggers attribute within an object containing usage
+metering control or the usage metering control object, the usage metering data objects or the objects which
+contain a meteringDataInfo package, generates a usageReport notification. The notification cause field of the
+usageReport notification service supplies the value of the reportingTriggers attribute which caused the
+notification to occur.";
+----
+meteringResumedBehaviour BEHAVIOUR
+DEFINED AS "A meteringResumed notification is generated when the resume action completes without error.";
+----
+meteringStartedBehaviour BEHAVIOUR
+DEFINED AS "A meteringStarted notification is generated when the start action completes without error.";
+----
+meteringSuspendedBehaviour BEHAVIOUR
+DEFINED AS "A meteringSuspended notification is generated when the suspend action completes without error.";
+----
+usageMeterControlBehaviour BEHAVIOUR
+DEFINED AS "When an instance of usage metering control has been created to account for usage of a named resource, it
+controls the behaviour of related instances of usage metering data through its reportingTriggers attribute.
+These identify the internal events which will cause a usageReport notification to be generated within a
+controlled instance of usage metering data. The triggers may be time related, e.g. as in the case of time related
+units, they may be determined by operations performed upon the control object e.g. suspend or resume
+metering, they may be determined by the accountable events as described in 8.2.3 or they may be externally
+specified. When the associated accountable objects requires no further usage to be metered and there are no
+more instances of data objects, the instance of usage metering control may be deleted.";
+----
+meterConditionBehaviour BEHAVIOUR
+DEFINED AS "If the data meter is in a suspended condition, the control status takes the value suspended. This status value is
+removed when the data object is carrying out usage metering after being started or resumed. When a request
+is made (either explicitly or implicitly) for the data object to be deleted and, where the reporting triggers
+specify that this is a situation which will lead to a usage report notification, the data object shall take a
+procedural status value of terminating until the required notification has been generated";
+----
+resumeBehaviour BEHAVIOUR
+DEFINED AS "Upon the completion of a resume ACTION, the response indicates the corresponding data objects upon which
+the requested operation was successful, those upon which it was unsuccessful and, where the result of the
+operation is unknown, returns an indeterminate response. The action is only effective when the instance of a
+selected data object is in a suspended condition. Because the action is idempotent, the action has no additional
+effect if applied to a data object in a metering condition.";
+----
+startBehaviour BEHAVIOUR
+DEFINED AS "This action enables a control object to (re-)start usage metering. All parameters for a selected data object (or
+objects) metering usage which are under the control of that object are re-initialized. Upon the completion of a
+start ACTION, the response indicates the corresponding data objects upon which the requested operation was
+successful, those upon which it was unsuccessful and, where the result of the operation is unknown, returns an
+indeterminate response.";
+----
+suspendBehaviour BEHAVIOUR
+DEFINED AS "Upon the completion of a suspend ACTION, the response indicates the corresponding data objects upon
+which the requested operation was successful, those upon which it was unsuccessful and, where the result of
+the operation is unknown, returns an indeterminate response. The action is only effective when the instance of a
+selected data object is already metering. Because the action is idempotent, the action has no additional effect if
+applied to a data object in a suspended condition.";
+----
+triggerBehaviour BEHAVIOUR
+DEFINED AS "Given a set of events, which result in some defined activity with respect to metering of resource usage, the
+event will lead either to the update of meter information (recording triggers) or to the generation of usage
+report notifications (reporting triggers). Triggering events may be of three kinds: initiated at regular time
+intervals, induced as the result of a usage metering action (both locally and externally induced), and initiated
+by identified external stimuli.";
+----
+usageMeterTimeBehaviour BEHAVIOUR
+DEFINED AS "The usageMeterTime is the current time if metering of usage is taking place. If metering of usage has been
+suspended or the instance of usage metering data has been deleted, then the usageMeterTime value is the
+usageStoppedTime.";
+----
+dataErrorBehaviour BEHAVIOUR
+DEFINED AS "Set matching is only permitted if the set valued syntax choice is selected";
+-- A.7 Definition of name binding
+-- A.7.1 Usage meter data
+-- No name bindings for the usageMeterData object class are provided in this Recommendation | International Standard
+-- because of the variety of accountable objects for which the usage data can be collected. Users of this Recommendation |
+-- International Standard specializing the usage data are expected to specify name bindings for usageMeterData or its
+-- subclasses to make them instantiable.
+-- A.7.2 Usage meter control
+-- One name binding is provided in this Recommendation | International Standard for the usage meter control object class.
+-- This can be used only when the accountable object is contained in a managed object that is an instance of either the
+-- system managed object class or its subclasses. Other name bindings are expected to be defined by users of this
+-- Recommendation | International Standard when the accountable objects have name bindings to objects other than the
+-- system or its subclass.
+usageMeterControl-system NAME BINDING
+SUBORDINATE OBJECT CLASS usageMeteringControlObject
+AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS
+"CCITT Rec. X.721 | ISO/IEC 10165-2":system AND SUBCLASSES;
+WITH ATTRIBUTE controlObjectId;
+DELETE
+DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { umf-nb 1};
+-- A.8 Parameter Templates
+deniedMeteringAction PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX UsageMeteringFunction.DeniedMeteringAction;
+BEHAVIOUR
+deniedMeteringActionBehaviour BEHAVIOUR
+DEFINED AS "This error is returned if the usage metering control object received a request to start metering or
+suspend metering or resume metering for the data object that has the value of terminating for the
+procedural status.";;
+REGISTERED AS { umf-par 1};
+END
+--< GDMO.EndDocument "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" >--
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

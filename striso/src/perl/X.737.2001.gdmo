@@ -1,0 +1,1049 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 12:01:47 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.745.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996" >--
+--< GDMO.Alias "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996" "X.737",
+--  "ITU-T Rec. X.737 (1995)/Cor.1 (1998) | ISO/IEC 10165-14 : 1996/Cor.1 : 1999" >--
+MODULE "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996"
+-- A.2 Generic Object Classes
+-- A.2.1 Connection Test Object
+
+connectionTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":associatedObjectsPackage,
+		connectionTestPkg PACKAGE
+			BEHAVIOUR
+				connectionTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!The MORT(s) represent the communications path to be tested. The two associated 
+						objects represent the resources at the ends of the communication path that drive 
+						signals into and receive signals from the communication path. The test patterns 
+						represents the signals or data to be applied to the communication path. If the 
+						test is intrusive, the administrativeState and availabilityStatus may need to be 
+						supported and to be set to a proper state before the test may be initiated.!;;
+			ATTRIBUTES
+				testPatterns GET,
+				connectionTestResults GET;;;
+	CONDITIONAL PACKAGES
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		connectionTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 1 };
+-- A.2.2 Connectivity Test Object
+
+
+connectivityTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":associatedObjectsPackage,
+		connectivityTestPkg PACKAGE
+			BEHAVIOUR
+				connectivityTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!The MORT represents the entity that initiates the establishment of the 
+						connection with the associated object. The connectivityTestResults and 
+						connectivityType must be included as part of the monitoredAttributes parameter 
+						of the testResultNotification. If the timeoutPeriod is present and expires 
+						before the test outcome can be concluded, the timeoutPeriod will be returned in 
+						the test result with the test outcome set to TIMEOUT.!;;
+			ATTRIBUTES
+				connectivityType GET,
+				connectivityResults GET,
+				establishmentTime GET;;;
+	CONDITIONAL PACKAGES
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		connectivityTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 2 };
+-- A.2.3 Data Integrity Test Object
+
+
+dataIntegrityTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":associatedObjectsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":actualTestTimePackage,
+		dataIntegrityResultsPkg,
+		dataIntegrityTestPkg PACKAGE
+			BEHAVIOUR
+				dataIntegrityTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!While in the Testing state the MORT transmits data to an Associated object. The 
+						Associated object, upon reception of the data, reflects a copy of the data back 
+						to the MORT.!;;
+			ATTRIBUTES
+				dataIntegrityType GET,
+				testPatterns GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		dataIntegrityTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!,
+		dataIntegrityThresholdPkg
+			PRESENT IF
+				!testThreshold is present in the initAttributeList parameter of the 
+				testRequestControlled request.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 3 };
+-- A.2.4 Loopback Test Object
+
+
+loopbackTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage,
+		loopbackResultsPkg,
+		loopbackTestPkg PACKAGE
+			BEHAVIOUR
+				loopbackTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!The mORTs attribute identifies a part of the communications path that is to be 
+						tested. The associatedObjects attribute identifies the loopback point. The 
+						startTime and stopTime attributes (when present) indicate the time that the 
+						manager desires that the test phase be started and stopped, respectively. The 
+						loopbackResults, loopbackType and testPattern attributes must be included as 
+						part of the monitoredAttributes parameter of the testResultNotification. The 
+						testThreshold should be included if it is present in the loopback test object. 
+						The errorRatioReportType attribute indicates in what form the test conductor 
+						wants the error ratio be reported, whether in the form of number of error bits 
+						or in percentage of error seconds.!;;
+			ATTRIBUTES
+				loopbackType GET-REPLACE,
+				testPatterns GET-REPLACE,
+				errorRatioReportType GET;;;
+	CONDITIONAL PACKAGES
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":associatedObjectsPackage
+			PRESENT IF
+				!The AO parameter is specified in the test request.!,
+		loopbackTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!,
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		testConditionsPkg
+			PRESENT IF
+				!testConditions is present in the initAttributeList parameter of the 
+				testRequestControlled request.!,
+		dataUnitsPkg
+			PRESENT IF
+				!the capability is implemented and parameter is present in the initAttributeList 
+				parameter of the testRequestControlled request.!,
+		resultIntervalPkg
+			PRESENT IF
+				!the capability is implemented and the parameter is present in the 
+				initAttributeList parameter of the testRequestControlled request.!,
+		loopbackTimeoutPkg
+			PRESENT IF
+				!loopbackTimeout is present in the test request of the testRequestControlled 
+				request.!,
+		loopbackThresholdPkg
+			PRESENT IF
+				!loopbackThreshold is present in the initAttributeList parameter of the 
+				testRequestControlled request.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 4 };
+-- A.2.5 Protocol Integrity Test Object
+
+
+protocolIntegrityTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":associatedObjectsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":actualTestTimePackage,
+		protocolIntegrityResultsPackage,
+		protocolIntegrityTestPkg PACKAGE
+			BEHAVIOUR
+				protocolIntegrityTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!The MORT transmits Protocol Elements to an Associated object. The Associated 
+						object exhibits its normal behaviour in reaction to the Protocol Elements 
+						received. The responses received by the MORT may be compared to the expected 
+						responses.!;;
+			ATTRIBUTES
+				pDUSequence GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		protocolIntegrityTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!,
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		waitingIntervalPackage
+			PRESENT IF
+				!The waitingInterval is specified in the protocolIntegrityTestInfo.!,
+		pDUReceptionPackage
+			PRESENT IF
+				!The waitingInterval is not specified in the protocolIntegrityTestInfo.!,
+		testConditionsPkg
+			PRESENT IF
+				!testConditions is present in the initAttributeList parameter of the 
+				testRequestControlled request.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 5 };
+-- A.2.6 Resource Boundary Test Object
+
+
+resourceBoundaryTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage,
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":associatedObjectsPackage,
+		resourceBoundaryTestResultPackage PACKAGE
+			NOTIFICATIONS
+				"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testResultNotification
+					resourceBoundaryControlledResultsParam;;,
+		resourceBoundaryTestPkg PACKAGE
+			BEHAVIOUR
+				resourceBoundaryTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!The mORT(s) attribute identifies the (part of a) resource(s) that will be 
+						tested. The Associated Objects identify the Points of Control and Observation at 
+						which the signals of the resource under test are observed and inserted. The 
+						signals that are inserted or expected as a response are indicated in the 
+						sequenceOfEvents attribute. The resultReportIndicator attribute indicates 
+						whether a result report is required when a sequence of test events was passed. 
+						The Resource boundary test results are defined by the 
+						resourceBoundaryControlledResultsParam parameter of the testResultNotification.!;;
+			ATTRIBUTES
+				resultReportIndicator GET-REPLACE,
+				sequenceOfEvents GET-REPLACE,
+				resourceBoundaryTestResults GET;;;
+	CONDITIONAL PACKAGES
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		testConditionsPkg
+			PRESENT IF
+				!testConditions is present in the initAttributeList parameter of the 
+				testRequestControlledRequest.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 6 };
+-- A.2.7 Resource Self Test Object
+
+
+resourceSelfTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		resourceSelfTestPkg PACKAGE
+			BEHAVIOUR
+				resourceSelfTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!Resource self tests (sometimes termed self-test) are used to investigate the 
+						ability of a resource (function or physical entities) to perform its allotted 
+						function at a given time. The nature of the resource(s) under test and the 
+						exercises involved is specific to the containing system.!;;
+			ATTRIBUTES
+				resourceSelfTestResults;;;
+	CONDITIONAL PACKAGES
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":mORTsPackage
+			PRESENT IF
+				!MORT id instance other than object with TARR functionality.!,
+		resourceSelfTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!,
+		timeoutPeriodPkg
+			PRESENT IF
+				!The timeout period is specified in the test request.!,
+		testConditionsPkg
+			PRESENT IF
+				!testConditions is present in the initAttributeList parameter of the 
+				testRequestControlled request.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 7 };
+-- A.2.8 Test Infrastructure Test Object
+
+
+testInfrastructureTestObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject;
+	CHARACTERIZED BY
+		testInfrastructureTestPkg PACKAGE
+			BEHAVIOUR
+				testInfrastructureTestBehaviour BEHAVIOUR
+					DEFINED AS
+						!The test infrastructure test is a null test whose purpose is solely to 
+						investigate the ability of a managed open system to behave as specified in ITU-T 
+						Rec. X.745 | ISO/IEC 10164-12 that is, to accept an incoming test request and 
+						generate appropriate responses. Not test exercises are performed on resources 
+						within or external to the managed open system. If a controlled test is 
+						requested, an instance of this class will be created which will exist for the 
+						time taken to progress through the test cases defined by ITU-T Rec. X.745 | 
+						ISO/IEC 10164-12. During this time, a test conductor may issue control messages 
+						(suspend, resume, terminate) to the instance. The time taken to progress through 
+						the states can be longer than the timeout value specified thereby deliberately 
+						causing the test outcome to be TIMEOUT and the instance to be deleted.!;;;;
+	CONDITIONAL PACKAGES
+		testInfrastructureTestResultPackage
+			PRESENT IF
+				!Unsolicited reporting is supported.!,
+		stateTransitionTimeIntervalPkg
+			PRESENT IF
+				!stateTransitionTimeInterval is present in the initAttributeList parameter of the 
+				testRequestControlled request.!;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) managedObjectClass(3) 8 };
+-- A.3 Package definitions
+
+
+connectionTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			connectionControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 1 };
+
+
+connectivityTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			connectivityControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 2 };
+
+
+connectivityThresholdPkg PACKAGE
+	BEHAVIOUR
+		connectivityThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				!The connectivity threshold is either defined explicitly in the test object or it 
+				is specified indirectly as an attribute in the MORT. It indicates the maximum 
+				acceptable error rate for the test. If the threshold is exceeded, the test is 
+				terminated and a fail outcome is returned.!;;
+	ATTRIBUTES
+		testThreshold GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 3 };
+
+
+dataIntegrityResultsPkg PACKAGE
+	BEHAVIOUR
+		dataIntegrityResultsBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute contains the test results of a data integrity test.!;;
+	ATTRIBUTES
+		dataIntegrityResults GET;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 4 };
+
+
+dataIntegrityTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			dataIntegrityControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 5 };
+
+
+dataIntegrityThresholdPkg PACKAGE
+	BEHAVIOUR
+		dataIntegrityThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				!The testThreshold attribute identifies the maximum Timeout period for the data 
+				to be transferred to the associated object and reflected back to the MORT. If 
+				the data is returned within this period, the test will terminate indicating that 
+				the test outcome is pass. If this threshold is exceeded, it will cause the 
+				termination of the data integrity test and will indicate that the test outcome 
+				is fail.!;;
+	ATTRIBUTES
+		testThreshold GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 6 };
+
+
+dataUnitsPkg PACKAGE
+	BEHAVIOUR
+		dataUnitsBehaviour BEHAVIOUR
+			DEFINED AS
+				!The type and quantity of test data units to be sent is specified by the 
+				dataUnits attribute of the test. This attribute is only used if the test 
+				supports manager specification of the type and/or the quantity of data units.!;;
+	ATTRIBUTES
+		dataUnits GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 7 };
+
+
+loopbackResultsPkg PACKAGE
+	BEHAVIOUR
+		loopbackResultsBehaviour BEHAVIOUR
+			DEFINED AS
+				!The loopbackResults attribute contains the test results of a loopback test. The 
+				resultTestDuration must be supplied if this result is for a period shorter than 
+				the test pattern duration. The meaning of not sending resultTestDuration is that 
+				the period of time covered by this result is the whole test pattern duration. 
+				The patternType is used to notify the Test Conductor of the type of data this 
+				result applies to, and is the same value as the DataUnits attribute. The error 
+				cause should be set if the Test Performer is able to determine a reason for the 
+				error.!;;
+	ATTRIBUTES
+		loopbackResult GET;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 8 };
+
+
+loopbackTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			loopbackControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 9 };
+
+
+loopbackThresholdPkg PACKAGE
+	BEHAVIOUR
+		loopbackThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				!The testThreshold attribute identifies an explicit error threshold which if 
+				crossed causes the termination of the loopback test.!;;
+	ATTRIBUTES
+		testThreshold GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 10 };
+
+
+loopbackTimeoutPkg PACKAGE
+	BEHAVIOUR
+		loopbackTimeoutBehaviour BEHAVIOUR
+			DEFINED AS
+				!The loopback timeout attribute contains the value for the timeout period which 
+				measures from the start of transmission of each test pattern to the start of the 
+				receipt of the corresponding pattern. When the loopback transmission delay time 
+				exceeds the loopackTimeout period, the whole test is terminated and the loopback 
+				timeout period must be returned as part of the monitoredAttribute parameter of 
+				the testResultNotification and the test outcome is set to Fail. The 
+				loopbackTxDelayParam should be returned in all testResultNotifications where the 
+				loopback delay time is less than the loopbackTimeout period.!;;
+	ATTRIBUTES
+		loopbackTimeout GET-REPLACE;
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testResultNotification
+			loopbackTxDelayParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 11 };
+
+
+pDUReceptionPackage PACKAGE
+	BEHAVIOUR
+		pDUReceptionBehaviour BEHAVIOUR
+			DEFINED AS
+				!The pDUReception attribute, if used, indicates the conditions for protocol 
+				element transmission. When the protocol element received by the MORT matches the 
+				conditions specified in the pDUReception, the next protocol element is 
+				transmitted. The pDUReception attribute should not be used if the 
+				waitingInterval attribute is used.!;;
+	ATTRIBUTES
+		pDUReception GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 12 };
+
+
+protocolIntegrityResultsPackage PACKAGE
+	ATTRIBUTES
+		protocolIntegrityResults GET;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 13 };
+
+
+protocolIntegrityTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			protocolIntegrityControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 14 };
+
+
+resourceSelfTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			resourceSelfTestControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 15 };
+
+
+resultIntervalPkg PACKAGE
+	BEHAVIOUR
+		resultIntervalBehaviour BEHAVIOUR
+			DEFINED AS
+				!A "zero" value means that there are no intermediate results. A value other than 
+				"zero" specifies the interval (in seconds) between the generation of 
+				intermediate results.!;;
+	ATTRIBUTES
+		resultInterval GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 16 };
+
+
+stateTransitionTimeIntervalPkg PACKAGE
+	BEHAVIOUR
+		stateTransitionTimeIntervalBehaviour BEHAVIOUR
+			DEFINED AS
+				!The stateTransitionTimeInterval attribute contains the time interval to be used 
+				to progress through the test states of a controlled test.!;;
+	ATTRIBUTES
+		stateTransitionTimeInterval GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 17 };
+
+
+testConditionsPkg PACKAGE
+	BEHAVIOUR
+		testConditionsBehaviour BEHAVIOUR
+			DEFINED AS
+				!The testConditions attribute specifies under what conditions the resources 
+				should be allocated to the test. In particular, it indicates whether the test 
+				should initiate if the MORT is busy and whether the user of the MORT can cause 
+				the test to abort.!;;
+	ATTRIBUTES
+		testConditions GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 18 };
+
+
+testInfrastructureTestResultPackage PACKAGE
+	NOTIFICATIONS
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":testResultNotification
+			testInfrastructureControlledResultsParam;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 19 };
+
+
+timeoutPeriodPkg PACKAGE
+	BEHAVIOUR
+		timeoutPeriodBehaviour BEHAVIOUR
+			DEFINED AS
+				!The timeoutPeriod attribute contains the value for the timeout period, measured 
+				from the initiation of the test. When the execution of a test exceeds the 
+				timeout period, the test is terminated and the timeout period is returned as 
+				part of the test result and the test outcome is set to TIMEOUT.!;;
+	ATTRIBUTES
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994 ":timeoutPeriod GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 20 };
+
+
+waitingIntervalPackage PACKAGE
+	ATTRIBUTES
+		waitingInterval GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) package(4) 21 };
+-- A.4 Name binding definitions
+
+
+testObject-System-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObject AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Rec. X.745 (1993) | ISO/IEC 10164-12:1994":testObjectId;
+	DELETE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) nameBinding(6) 1 };
+-- A.5 Parameter definitions
+-- A.5.1 Connection controlled results
+
+
+connectionControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		connectionTestResults;
+	BEHAVIOUR
+		connectionResultsParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!This parameter may be used to convey additional connection test result 
+				information that is related to the function being tested.!;;;
+-- A.5.2 Connection test info
+
+
+connectionTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.ConnectionTestInfo;
+	BEHAVIOUR
+		connectionTestInfoParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!This parameter is used to convey additional connection test information that is 
+				related to the function being tested.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 1 };
+-- A.5.3 Connection uncontrolled results
+
+
+connectionUncontrolledResultsParam PARAMETER
+	CONTEXT ACTION-REPLY;
+	WITH SYNTAX TestCategories-ASN1Module.ConnectionTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 2 };
+-- A.5.4 Connectivity controlled results
+
+
+connectivityControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		connectivityResults;
+	BEHAVIOUR
+		connectivityResultsParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!This parameter may be used to convey additional connectivity test result 
+				information that is related to the function being tested.!;;;
+-- A.5.5 Connectivity uncontrolled results
+
+
+connectivityUncontrolledResultsParam PARAMETER
+	CONTEXT ACTION-REPLY;
+	WITH SYNTAX TestCategories-ASN1Module.ConnectivityTestResults;
+	BEHAVIOUR
+		connectivityUncontrolledResultsParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!This parameter is used to convey connection test result information that is 
+				related to the function being tested.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 3 };
+-- A.5.6 Connectivity test info
+
+
+connectivityTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.ConnectivityTestInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 4 };
+-- A.5.7 Data integrity controlled results
+
+
+dataIntegrityControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		dataIntegrityResults;;
+-- A.5.8 Data integrity uncontrolled results
+
+
+dataIntegrityUncontrolledResultsParam PARAMETER
+	CONTEXT ACTION-REPLY;
+	WITH SYNTAX TestCategories-ASN1Module.DataIntegrityTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 5 };
+-- A.5.9 Data integrity test info
+
+
+dataIntegrityTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.DataIntegrityTestInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 6 };
+-- A.5.10 Loopback controlled results
+
+
+loopbackControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		loopbackResult;;
+-- A.5.11 Loopback uncontrolled results
+
+
+loopbackUncontrolledResultsParam PARAMETER
+	CONTEXT ACTION-REPLY;
+	WITH SYNTAX TestCategories-ASN1Module.LoopbackTestResult;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 7 };
+-- A.5.12 Loopback test info
+
+
+loopbackTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.LoopbackTestInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 8 };
+-- A.5.13 Loopback transmission delay
+
+
+loopbackTxDelayParam PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.LoopbackTxDelayInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 9 };
+-- A.5.14 Protocol integrity controlled results
+
+
+protocolIntegrityControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		protocolIntegrityResults;;
+-- A.5.15 Protocol integrity uncontrolled results
+
+
+protocolIntegrityUncontrolledResultsParam PARAMETER
+	CONTEXT ACTION-REPLY;
+	WITH SYNTAX TestCategories-ASN1Module.ProtocolIntegrityTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 10 };
+-- A.5.16 Protocol integrity test info
+
+
+protocolIntegrityTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.ProtocolIntegrityTestInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 11 };
+-- A.5.17 Resource boundary controlled results
+
+
+resourceBoundaryControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		resourceBoundaryTestResults;
+	BEHAVIOUR
+		resourceBoundaryControlledResultsParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!The resourceBoundaryControlledResultsParam parameter contains the Resource 
+				Boundary intermediate test results.!;;;
+-- A.5.18 Resource boundary test info
+
+
+resourceBoundaryTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.ResourceBoundaryTestInfo;
+	BEHAVIOUR
+		resourceBoundaryTestInfoParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!The resourceBoundaryTestInfoParam parameter contains the information of the 
+				Resource Boundary test, that may be filled in for the test. This is the initial 
+				content of the ResultReportIndicator and SequenceOfEvents attributes.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 12 };
+-- A.5.19 Resource self test info
+
+
+resourceSelfTestInfoParam PARAMETER
+	CONTEXT ACTION-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.ResourceSelfTestInfo;
+	BEHAVIOUR
+		resourceSelfTestInfoParamBehaviour BEHAVIOUR
+			DEFINED AS
+				!This parameter is used to convey additional resource self test information that 
+				is related to the function being tested.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 13 };
+-- A.5.20 Resource self test controlled results
+
+
+resourceSelfTestControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.ResourceSelfTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 14 };
+-- A.5.21 Test infrastructure controlled results
+
+
+testInfrastructureControlledResultsParam PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TestCategories-ASN1Module.TestInfrastructureTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) parameter(5) 15 };
+-- A.6 Attribute definitions
+-- A.6.1 Connection test results
+
+
+connectionTestResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ConnectionTestResults;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 1 };
+-- A.6.2 Connectivity results
+
+
+connectivityResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ConnectivityTestResults;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 2 };
+-- A.6.3 Connectivity type
+
+
+connectivityType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.Type;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		connectivityTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				!The connectivity attribute provides information to identify whether the test is 
+				connection oriented and is tested by establishing a connection or connectionless 
+				and is tested by a protocol exchange.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 3 };
+-- A.6.4 Data integrity results
+
+
+dataIntegrityResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.DataIntegrityTestResults;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 4 };
+-- A.6.5 Data integrity type
+
+
+dataIntegrityType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.Type;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 5 };
+-- A.6.6 Data units
+
+
+dataUnits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.DataUnits;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 6 };
+-- A.6.7 End connection test results
+
+
+endConnectionTestResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.EndConnectionTestResults;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 7 };
+-- A.6.8 Error ratio report type
+
+
+errorRatioReportType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ErrorRatioReportType;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 8 };
+-- A.6.9 Establishment time
+
+
+establishmentTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.EstablishmentTime;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 9 };
+-- A.6.10 Loopback results
+
+
+loopbackResult ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.LoopbackTestResult;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 10 };
+-- A.6.11 Loopback timeout
+
+
+loopbackTimeout ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.Timespec;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 11 };
+-- A.6.12 Loopback type
+
+
+loopbackType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.LoopbackType;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 12 };
+-- A.6.13 PDU sequence
+
+
+pDUSequence ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.PDUSequence;
+	BEHAVIOUR
+		pDUSequenceBehaviour BEHAVIOUR
+			DEFINED AS
+				!The pDUSquence specifies a sequence of protocol elements for transmission to the 
+				associated object during the protocol integrity test.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 13 };
+-- A.6.14 PDU reception
+
+
+pDUReception ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.PDUReception;
+	BEHAVIOUR
+		pDUReceptionBehaviour;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 14 };
+-- A.6.15 Protocol integrity results
+
+
+protocolIntegrityResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ProtocolIntegrityTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 15 };
+-- A.6.16 Resource Boundary Test Results
+
+
+resourceBoundaryTestResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ResourceBoundaryTestResults;
+	BEHAVIOUR
+		resourceBoundaryTestResultsBehaviour BEHAVIOUR
+			DEFINED AS
+				!The resource boundary test results attribute contains the intermediate results 
+				of the test. The information in the attribute depends on the event that triggers 
+				the reporting. There are four cases that trigger the reporting of intermediate 
+				test results:
+
+				  Case 1 Completion of last signal in sequence of test events (if indicated by 
+				  the Result Report Indicator).
+
+				  Case 2 Receipt of a signal at a PCO while no event sequence list is active and 
+				  therefore no receive signal is to be matched.
+
+				  Case 3 Receipt of a signal at a PCO while another receive signal is to be 
+				  matched according to the active event sequence list.
+
+				  Case 4 Wait duration timer expired in the case of a receive signal.
+
+				For these cases, the intermediate test results are as follows:
+
+				In case 1:
+
+				  Intermediate Resource Boundary Test outcome (passed)
+
+				In case 2:
+
+				  Intermediate Resource Boundary Test outcome (unexpected)
+
+				  Signal Type of the received signal
+
+				  Signal values of the signal type
+
+				  Identities of the MORTs from which the signal was received
+
+				  Identities of the AOs where the signal was received
+
+				In case 3:
+
+				  Intermediate Resource Boundary Test outcome (wrongSignalReceived)
+
+				  Event Id of failed test event
+
+				  Signal Type of the received signal
+
+				  Signal values of the signal type
+
+				  Identities of the AOs where the signal was received
+
+				In case 4:
+
+				  Intermediate Resource Boundary Test outcome (waitDurationTimerExpired).
+
+				This attribute contains either the details of a failed test and/or the 
+				information on the received signal at a PCO. It contains information on a 
+				received signal if a signal was received that was not specified as expected in a 
+				sequence of events. It contains the details of a failure in the case of a failed 
+				test. Two kind of failures may be reported:
+
+				1. A wrong signal was received: another signal was received than the signal as 
+				   specified in the sequence of events.
+
+				2. The wait duration timer expired: an expected signal was specified, but no 
+				   signal was received.
+
+				In both cases, also the event identifier of the failed test event is reported.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 16 };
+-- A.6.17 Resource self test results
+
+
+resourceSelfTestResults ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ResourceSelfTestResults;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 17 };
+-- A.6.18 Result interval
+
+
+resultInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ResultInterval;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 18 };
+-- A.6.19 Result Report Indicator
+
+
+resultReportIndicator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.ResultReportIndicator;
+	BEHAVIOUR
+		resultReportIndicatorBehaviour BEHAVIOUR
+			DEFINED AS
+				!The resultReportIndicator attribute indicates whether a result report is 
+				required when a sequence of test events was passed.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 19 };
+-- A.6.20 Sequence of Events
+
+
+sequenceOfEvents ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.SequenceOfEvents;
+	BEHAVIOUR
+		sequenceOfEventsBehaviour BEHAVIOUR
+			DEFINED AS
+				!The sequenceOfEvents attribute specifies a sequence of signals that have to be 
+				inserted or received at the specified MORT and AO. In the case of a send signal, 
+				it is inserted in the MORT via the specified AO. In the case of a receive 
+				signal, it is received at the indicated AO from the indicated MORT. Each event 
+				is numbered by an event identifier.
+
+				The sequence of test events may contain a single signal that has to be inserted 
+				or received, but also a sequence of events may be specified that consists of 
+				send and receive signals. The test performer shall then handle the events 
+				sequentially. In the case of a receive event, the test performer shall wait for 
+				the receipt of the indicated signal before continuing with the next event. It 
+				waits until the wait duration timer has expired. If expired, a failure occurred. 
+				In the case of a send signal, the wait duration timer specifies the time that is 
+				waited upon before the signal is inserted after the former event was completed. 
+				In the case of a failure the sequence of events is not completed, but is 
+				aborted.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 20 };
+-- A.6.21 State transition time interval
+
+
+stateTransitionTimeInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.StateTransitionTimeInterval;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 21 };
+-- A.6.22 Test conditions
+
+
+testConditions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.TestConditions;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 22 };
+-- A.6.23 Test pattern
+
+
+testPattern ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.TestPattern;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 23 };
+-- A.6.24 Test patterns
+
+
+testPatterns ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.TestPatternSequence;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 24 };
+-- A.6.25 Test threshold
+
+
+testThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.TestThreshold;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 25 };
+-- A.6.26 Waiting interval
+
+
+waitingInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.WaitingInterval;
+	MATCHES FOR EQUALITY, ORDERING;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part14(14) attribute(7) 26 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":connectionTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":connectivityTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":dataIntegrityTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":loopbackTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":protocolIntegrityTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":resourceBoundaryTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":resourceSelfTestObject
+--@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":testInfrastructureTestObject
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

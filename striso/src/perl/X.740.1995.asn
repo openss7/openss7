@@ -1,0 +1,32 @@
+-- A.1 Allocation of object identifiers
+-- This Recommendation | International Standard allocates the following object identifiers
+SecurityAuditTrailDefinitions {joint-iso-ccitt ms(9) function(2) part8(8) asn1Module(2) 1}
+DEFINITIONS ::= BEGIN
+securityAuditTrail-Object OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part8(8) managedObjectClass(3)}
+securityAuditTrail-Package OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part8(8) package(4)}
+securityAuditTrail-Attribute OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part8(8) attribute(7)}
+securityAuditTrail-Notification OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part8(8) notification(10)}
+serviceReportCause OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part8(8) standardSpecificExtension(0) 1}
+-- the following OBJECT IDENTIFIER values can be used as values for the service report cause parameter in A.5.
+serviceRequest ServiceReportCause ::= {serviceReportCause 1}
+serviceDenial ServiceReportCause ::= {serviceReportCause 2}
+serviceResponse ServiceReportCause ::= {serviceReportCause 3}
+serviceFailure ServiceReportCause ::= {serviceReportCause 4}
+serviceRecovery ServiceReportCause ::= {serviceReportCause 5}
+otherReason ServiceReportCause ::= {serviceReportCause 6}
+END
+-- A.5 Abstract syntax definitions
+SecurityAuditTrail-ASN1Module {joint-iso-ccitt ms(9) function(2) part8(8) asn1Module(2) 2}
+DEFINITIONS ::= BEGIN
+IMPORTS
+AdditionalText, AdditionalInformation, CorrelatedNotifications, NotificationIdentifier
+FROM Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1}
+SecurityAuditInfo ::= SEQUENCE { serviceReportCause ServiceReportCause OPTIONAL,
+notificationIdentifier NotificationIdentifier OPTIONAL,
+correlatedNotifications [1] IMPLICIT CorrelatedNotifications
+OPTIONAL,
+additionalText AdditionalText OPTIONAL,
+additionalInformation [2] IMPLICIT AdditionalInformation OPTIONAL
+}
+ServiceReportCause ::= OBJECT IDENTIFIER
+END

@@ -1,0 +1,590 @@
+-- Annex A
+-- Summarization management support objects
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.1 Managed object class definitions
+bufferedScanner MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner;
+CHARACTERIZED BY
+bufferedScannerPackage PACKAGE
+BEHAVIOUR
+bufferedScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.3.";;
+ATTRIBUTES
+bufferedObservationIdList GET-REPLACE ADD-REMOVE,
+reportPeriod GET-REPLACE,
+suppressObjectInstance GET-REPLACE;
+ACTIONS
+reportBuffer scanActionError;
+NOTIFICATIONS
+bufferedScanReport;;;
+CONDITIONAL PACKAGES
+timeStampReportPackage PRESENT IF "time stamping supported";
+REGISTERED AS { summarizationManagedObjectClass 1 };
+bufferedScanReportRecord MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+CHARACTERIZED BY
+bufferedScanReportPackage PACKAGE
+BEHAVIOUR
+bufferedScanReportRecordBehaviour BEHAVIOUR
+DEFINED AS "This managed object is used to represent logged information that resulted from buffered scan
+report notifications or event reports.";;
+ATTRIBUTES
+"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":granularityPeriod GET,
+bufferedObservationList GET;;;
+CONDITIONAL PACKAGES
+firstScanInitiationTimePackage PRESENT IF "the firstScanInitiationTime parameter is present in
+report", suspectIntervalsPackage PRESENT IF"the number
+of suspect intervals is non-zero and therefore present in the
+report.",
+incompleteScanPackage PRESENT IF "the scan could not be completed.";
+REGISTERED AS { summarizationManagedObjectClass 2 };
+dynamicScanner MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top;
+CHARACTERIZED BY
+dynamicScannerPackage PACKAGE
+BEHAVIOUR
+dynamicScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.10.3.";;
+ATTRIBUTES
+"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId GET,
+"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":operationalState GET,
+"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":administrativeState GET-REPLACE;;;
+REGISTERED AS { summarizationManagedObjectClass 3 };
+dynamicSimpleScanner MANAGED OBJECT CLASS
+DERIVED FROM dynamicScanner;
+CHARACTERIZED BY
+dynamicSimpleScannerPackage PACKAGE
+BEHAVIOUR
+dynamicSimpleScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.11.3.";;
+ACTIONS
+activateDynamicSimpleScanReport scanActionError;;;
+REGISTERED AS { summarizationManagedObjectClass 4 };
+ensembleStatisticScanner MANAGED OBJECT CLASS
+DERIVED FROM homogeneousScanner;
+CHARACTERIZED BY
+ensembleStatisticScannerPackage PACKAGE
+BEHAVIOUR
+ensembleBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.3.3.";;
+ATTRIBUTES
+numericAttributeIdList GET-REPLACE ADD-REMOVE,
+suppressObjectInstance GET-REPLACE;
+ACTIONS activateStatisticalReport scanActionError;
+NOTIFICATIONS statisticalReport;;;
+REGISTERED AS { summarizationManagedObjectClass 5 };
+heterogeneousScanner MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner;
+CHARACTERIZED BY
+heterogeneousScannerPackage PACKAGE
+BEHAVIOUR
+heterogeneousScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.8.3.";;
+ATTRIBUTES
+observationIdList GET-REPLACE ADD-REMOVE,
+suppressObjectInstance GET-REPLACE;
+ACTIONS
+activateScanReport scanActionError;
+NOTIFICATIONS
+scanReport;;;
+CONDITIONAL PACKAGES
+timeStampReportPackage PRESENT IF "time stamping supported",
+onceReportAttributeIdListPackage PRESENT IF "the once report attribute Id list mechanism is supported";
+REGISTERED AS { summarizationManagedObjectClass 6 };
+homogeneousScanner MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner;
+CHARACTERIZED BY
+homogeneousScannerPackage PACKAGE
+BEHAVIOUR
+homogeneousScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.1.3.";;
+ATTRIBUTES
+scanAttributeIdList GET-REPLACE ADD-REMOVE;;; -- this may be empty
+CONDITIONAL PACKAGES
+timeStampReportPackage PRESENT IF "time stamping supported",
+scopedSelectionPackage PRESENT IF "the managedObjectInstanceSelectionPackage is not present in an
+instance",
+timingSelectionPackage PRESENT IF "timing attributes present",
+managedObjectInstanceSelectionPackage PRESENT IF "the scopedSelectionPackage is not present in an
+instance";
+REGISTERED AS { summarizationManagedObjectClass 7 };
+meanScanner MANAGED OBJECT CLASS
+DERIVED FROM ensembleStatisticScanner;
+CHARACTERIZED BY
+meanScannerPackage PACKAGE
+BEHAVIOUR
+meanScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.4. 2and 8.1.4.3.";;;;
+REGISTERED AS { summarizationManagedObjectClass 8 };
+meanVarianceScanner MANAGED OBJECT CLASS
+DERIVED FROM meanScanner;
+CHARACTERIZED BY
+meanVarianceScannerPackage PACKAGE
+BEHAVIOUR
+meanVarianceScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.5.2 and 8.1.5.3.";;;;
+REGISTERED AS { summarizationManagedObjectClass 9 };
+minMaxScanner MANAGED OBJECT CLASS
+DERIVED FROM ensembleStatisticScanner;
+CHARACTERIZED BY
+minMaxScannerPackage PACKAGE
+BEHAVIOUR
+minMaxScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2 and 8.1.7.3.";;;;
+CONDITIONAL PACKAGES
+meanCalculationPackage PRESENT IF "mean calculation is supported";
+REGISTERED AS { summarizationManagedObjectClass 10 };
+percentileScanner MANAGED OBJECT CLASS
+DERIVED FROM ensembleStatisticScanner;
+CHARACTERIZED BY
+percentileScannerPackage PACKAGE
+BEHAVIOUR
+percentileScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.6.2 and 8.1.6.3.";;
+ATTRIBUTES
+"ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":configurablePCT GET-REPLACE;;;
+CONDITIONAL PACKAGES
+meanCalculationPackage PRESENT IF "mean calculation is supported";
+REGISTERED AS { summarizationManagedObjectClass 11 };
+scanReportRecord MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+CHARACTERIZED BY
+scanReportRecordPackage PACKAGE
+BEHAVIOUR
+scanReportRecordBehaviour BEHAVIOUR
+DEFINED AS "This managed object is used to represent logged information that resulted from scan report
+notifications or event reports.";;
+ATTRIBUTES
+observationScanList GET;;;
+CONDITIONAL PACKAGES
+scanInitiationTimePackage PRESENT IF "the scanInitiationTime parameter is present in report",
+onceReportAttributeListPackage PRESENT IF "the onceReportAttributeList parameter is present in
+report",
+incompleteScanPackage PRESENT IF "the scan could not be completed.";
+REGISTERED AS { summarizationManagedObjectClass 13 };
+simpleScanner MANAGED OBJECT CLASS
+DERIVED FROM homogeneousScanner;
+CHARACTERIZED BY
+simpleScannerPackage PACKAGE
+BEHAVIOUR
+simpleScannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.2.3.";;
+ATTRIBUTES
+numericAttributeIdArray GET-REPLACE,--This list may be empty.
+suppressObjectInstance GET-REPLACE;
+ACTIONS
+activateScanReport scanActionError;
+NOTIFICATIONS
+scanReport;;;
+CONDITIONAL PACKAGES
+onceReportAttributeIdListPackage PRESENT IF "once report is supported";
+REGISTERED AS { summarizationManagedObjectClass 14 };
+statisticalReportRecord MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+CHARACTERIZED BY
+statisticalReportPackage PACKAGE
+BEHAVIOUR
+statisticalReportRecordBehaviour BEHAVIOUR
+DEFINED AS "This managed object is used to represent logged information that resulted from statistical report
+notifications or event reports.";;
+ATTRIBUTES
+algorithmOutputs GET;;;
+CONDITIONAL PACKAGES
+scanInitiationTimePackage PRESENT IF "the scanInitiationTime parameter is present in the report",
+observationReportListPackage PRESENT IF "the observationReportList parameter is present in the report",
+algorithmParametersPackage PRESENT IF "the algorithmParameters parameter is present in the behaviour",
+incompleteScanPackage PRESENT IF "the scan could not be completed.";
+REGISTERED AS { summarizationManagedObjectClass 15 };
+-- A.2 Calculation package definition
+-- The following calculation package defines behaviour associated with calculation of statistics
+-- for each numeric attribute type across all selected managed objects.
+meanCalculationPackage PACKAGE
+BEHAVIOUR
+meanCalculationBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.4.3.";;
+REGISTERED AS { summarizationPackage 1 };
+-- A.3 Package definitions
+algorithmParametersPackage PACKAGE
+ATTRIBUTES
+algorithmParameters GET;
+REGISTERED AS { summarizationPackage 2 };
+firstScanInitiationTimePackage PACKAGE
+ATTRIBUTES
+firstScanInitiationTime GET;
+REGISTERED AS { summarizationPackage 3 };
+incompleteScanPackage PACKAGE
+ATTRIBUTES
+incompleteScan GET;
+REGISTERED AS { summarizationPackage 14 };
+managedObjectInstanceSelectionPackage PACKAGE
+ATTRIBUTES
+objectList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { summarizationPackage 4 };
+observationReportListPackage PACKAGE
+ATTRIBUTES
+observationReportList GET;
+REGISTERED AS { summarizationPackage 5 };
+onceReportAttributeIdListPackage PACKAGE
+ATTRIBUTES
+onceReportAttributeIdList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { summarizationPackage 6 };
+onceReportAttributeListPackage PACKAGE
+ATTRIBUTES
+onceReportAttributeList GET;
+REGISTERED AS { summarizationPackage 7 };
+scanInitiationTimePackage PACKAGE
+ATTRIBUTES
+scanInitiationTime GET;
+REGISTERED AS { summarizationPackage 9 };
+scopedSelectionPackage PACKAGE
+BEHAVIOUR
+scopedSelectionBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.1.3.";;
+ATTRIBUTES
+baseManagedObject GET-REPLACE,
+scope GET-REPLACE,
+scanningFilter
+DEFAULT VALUE SummarizationASN1Productions.scanningFilterDefault GET-REPLACE;
+REGISTERED AS { summarizationPackage 10 };
+suspectIntervalsPackage PACKAGE
+ATTRIBUTES
+suspectIntervals GET;
+REGISTERED AS { summarizationPackage 11 };
+timeStampReportPackage PACKAGE
+ATTRIBUTES
+timeStampReportMode
+DEFAULT VALUE SummarizationASN1Productions.timeStampingDefault GET-REPLACE;
+REGISTERED AS { summarizationPackage 12 };
+timingSelectionPackage PACKAGE
+BEHAVIOUR
+timingSelectionBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.1.3.";;
+ATTRIBUTES
+beginTimeOffset GET-REPLACE,
+endTimeOffset GET-REPLACE,
+timeAttributeIdentifier GET-REPLACE;
+REGISTERED AS { summarizationPackage 13 };
+-- A.4 Attribute definitions
+algorithmOutputs ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.AlgorithmOutputBuffer;
+BEHAVIOUR
+algorithmOutputsBehaviour BEHAVIOUR
+DEFINED AS "This attribute includes the outputs of a statistical algorithm that was applied to scanned attribute
+values. See 8.2.2.2.3.";;
+REGISTERED AS { summarizationAttribute 1 };
+algorithmParameters ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.AlgorithmParameters;
+BEHAVIOUR
+algorithmParametersBehaviour BEHAVIOUR
+DEFINED AS "This attribute includes one or more parameters of a statistical algorithm that was applied to
+scanned attribute values. See 8.2.2.2.4.";;
+REGISTERED AS { summarizationAttribute 2 };
+baseManagedObject ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObjectInstance;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+baseManagedObjectBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies an existing managed object which is the base of the scoping process for
+selecting managed objects. See 8.1.12.3";;
+REGISTERED AS { summarizationAttribute 3 };
+beginTimeOffset ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimePeriod;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+beginTimeOffsetBehaviour BEHAVIOUR
+DEFINED AS "The value of this attribute, subtracted from the current time, indicates the beginning of a time
+window. See 8.1.12.5.";;
+REGISTERED AS { summarizationAttribute 4 };
+bufferedObservationIdList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.BufferedObservationIdList;
+BEHAVIOUR
+bufferedObservationIdListBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies observed objects, and observed attributes within those managed objects, to
+be scanned. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 5 };
+bufferedObservationList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.BufferedObservationList;
+BEHAVIOUR
+bufferedObservationListBehaviour BEHAVIOUR
+DEFINED AS "See 8.2.2.3.4, A.4.";;
+REGISTERED AS { summarizationAttribute 6 };
+endTimeOffset ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimePeriod;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+endTimeOffsetBehaviour BEHAVIOUR
+DEFINED AS "The value of this attribute, subtracted from the current time, indicates the end of a time window.
+See 8.1.12.5.";;
+REGISTERED AS { summarizationAttribute 7 };
+firstScanInitiationTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.FirstScanInitiationTime;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+firstScanInitiationTimeBehaviour BEHAVIOUR
+DEFINED AS "This attribute indicates the start time of the first scan in buffer. See 8.2.2.3.2.";;
+REGISTERED AS { summarizationAttribute 8 };
+incompleteScan ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.IncompleteScan;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+incompleteScanBehaviour BEHAVIOUR
+DEFINED AS "The value of this attribute indicates the reason a scan could not be completed. See 8.2.2.1.4.";;
+REGISTERED AS { summarizationAttribute 30 };
+numericAttributeIdArray ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NumericAttributeIdArray;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+numericAttributeIdArrayBehaviour BEHAVIOUR
+DEFINED AS "This attribute is an ordered list of identifiers of attributes whose values are to be scanned. The
+identified attributes must be of either the integer or the real type. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 10 };
+numericAttributeIdList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NumericAttributeIdList;
+MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+BEHAVIOUR
+numericAttributeIdListBehaviour BEHAVIOUR
+DEFINED AS "This attribute is a list of identifiers of attributes whose values are to be scanned. The identified
+attributes must be of either the integer or the real type. See 8.1.3.2.";;
+REGISTERED AS { summarizationAttribute 11 };
+objectList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObjectList;
+MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+BEHAVIOUR
+objectListBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies the managed objects whose attributes are to be scanned.";;
+REGISTERED AS { summarizationAttribute 12 };
+observationIdList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObservationIdList;
+BEHAVIOUR
+observationIdListBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies observed objects, and observed attributes within those managed objects, to
+be scanned.";;
+REGISTERED AS { summarizationAttribute 13 };
+observationReportList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.NonStatisticalReportInformation;
+BEHAVIOUR
+observationReportListBehaviour BEHAVIOUR
+DEFINED AS "This attribute specifies the set of managed objects and their attributes values that were scanned.
+See 8.2.2.2.2.";;
+REGISTERED AS { summarizationAttribute 14 };
+observationScanList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ObservationScanList;
+BEHAVIOUR
+observationScanListBehaviour BEHAVIOUR
+DEFINED AS "This attribute specifies the set of managed objects and their attributes values that were scanned.
+See 8.2.2.1.3.";;
+REGISTERED AS { summarizationAttribute 15 };
+onceReportAttributeIdList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.OnceReportAttributeIdList;
+MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+BEHAVIOUR
+onceReportAttributeIdListBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.12.2.";;
+REGISTERED AS { summarizationAttribute 16 };
+onceReportAttributeList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.OnceReportAttributeList;
+MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+BEHAVIOUR
+onceReportAttributeListBehaviour BEHAVIOUR
+DEFINED AS "See 8.2.2.1.2.";;
+REGISTERED AS { summarizationAttribute 17 };
+reportPeriod ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ReportPeriod;
+MATCHES FOR EQUALITY, ORDERING ;
+BEHAVIOUR
+reportPeriodBehaviour BEHAVIOUR
+DEFINED AS "This attribute indicates the number of granularity periods in a report period. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 19 };
+scanAttributeIdList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ScanAttributeIdList;
+MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+BEHAVIOUR
+scanAttributeIdListBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies attributes of any ASN.1 type whose attribute identifiers are to be included
+in summary reports along with the attribute values. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 21 };
+scanInitiationTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.ScanInitiationTime;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+scanInitiationTimeBehaviour BEHAVIOUR
+DEFINED AS "See 8.2.2.1.1.";;
+REGISTERED AS { summarizationAttribute 22 };
+scanningFilter ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.CMISFilter;
+BEHAVIOUR
+scanningFilterBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies a set of criteria for selecting managed objects, used in the filtering process.
+See 8.1.12.3";;
+REGISTERED AS { summarizationAttribute 24 };
+scope ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.Scope;
+MATCHES FOR EQUALITY ;
+BEHAVIOUR
+scopeBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies a set of managed objects, used in the scoping process for selecting managed
+objects. See 8.1.12.3.";;
+REGISTERED AS { summarizationAttribute 25 };
+suppressObjectInstance ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.SuppressObjectInstance;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+suppressObjectInstanceBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies a boolean value which, if true, causes the observed object instance
+parameter to be suppressed from all summary reports. See 8.1.9.2.";;
+REGISTERED AS { summarizationAttribute 26 };
+suspectIntervals ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.SuspectIntervals;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+suspectIntervalsBehaviour BEHAVIOUR
+DEFINED AS "See 8.2.2.3.3.";;
+REGISTERED AS { summarizationAttribute 27 };
+timeAttributeIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimeAttributeIdentifier;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+timeAttributeIdBehaviour BEHAVIOUR
+DEFINED AS "This attribute identifies which attribute within an observed managed object is used for time-based
+selection. See 8.1.12.5.";;
+REGISTERED AS { summarizationAttribute 28 };
+timeStampReportMode ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SummarizationASN1Productions.TimeStampReportMode;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+timeStampReportModeBehaviour BEHAVIOUR
+DEFINED AS "The value of this attribute identifies which method of time stamping reports should be used:
+timeStampingOff (0), globalTimeStampOnly (1), or individualTimeStamping (2). See 8.1.12.4.";;
+REGISTERED AS { summarizationAttribute 29 };
+-- A.5 Notification definitions
+bufferedScanReport NOTIFICATION
+BEHAVIOUR
+bufferedScanReportBehaviour BEHAVIOUR
+DEFINED AS "This notification is emitted upon completion of the last scan in the report period, and includes
+attribute values scanned within the report period which has just completed.";;
+WITH INFORMATION SYNTAX SummarizationASN1Productions.BufferedScanReportInformation
+AND ATTRIBUTE IDS
+granularityPeriod "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":granularityPeriod,
+firstScanInitiationTime firstScanInitiationTime,
+suspectIntervals suspectIntervals,
+bufferedObservationList bufferedObservationList,
+incompleteScan incompleteScan,
+additionalText "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+additionalInformation "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { summarizationNotification 1 };
+scanReport NOTIFICATION
+BEHAVIOUR
+scanReportBehaviour BEHAVIOUR
+DEFINED AS "This notification is emitted upon completion of a scan, and includes attribute values observed
+during the scan.";;
+WITH INFORMATION SYNTAX SummarizationASN1Productions.ScanReportInformation
+AND ATTRIBUTE IDS
+scanInitiationTime scanInitiationTime,
+onceReportAttributeList onceReportAttributeList,
+observationScanList observationScanList,
+incompleteScan incompleteScan,
+additionalText "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+additionalInformation "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { summarizationNotification 2 };
+statisticalReport NOTIFICATION
+BEHAVIOUR
+statisticalReportBehaviour BEHAVIOUR
+DEFINED AS "This notification is emitted upon completion of a scan, and includes statistical summary
+information.";;
+WITH INFORMATION SYNTAX SummarizationASN1Productions.StatisticalScanReportInformation
+AND ATTRIBUTE IDS
+scanInitiationTime scanInitiationTime,
+observationReportList observationReportList,
+algorithmOutputs algorithmOutputs,
+algorithmParameters algorithmParameters,
+incompleteScan incompleteScan,
+additionalText "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+additionalInformation "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { summarizationNotification 3 };
+-- A.6 Action definitions
+activateDynamicSimpleScanReport ACTION
+BEHAVIOUR
+activateDynamicSimpleScanReportBehaviour BEHAVIOUR
+DEFINED AS "The contents of SummarizationASN1Productions.ScanReportInformation may be sent in multiple
+replies. See 8.3";;
+MODE CONFIRMED;
+WITH INFORMATION SYNTAX SummarizationASN1Productions.DynamicSimpleScanArgument;
+WITH REPLY SYNTAX SummarizationASN1Productions.ScanReportInformation;
+REGISTERED AS { summarizationAction 1 };
+activateScanReport ACTION
+BEHAVIOUR
+activateScanReportBehaviour BEHAVIOUR
+DEFINED AS "This action initiates a scan according to the current object and attribute selection attributes of the
+scanner. The reply includes all scanned attribute values. The contents of
+SummarizationASN1Productions.ScanReportInformation may be sent in multiple replies.";;
+MODE CONFIRMED;
+WITH REPLY SYNTAX SummarizationASN1Productions.ScanReportInformation;
+REGISTERED AS { summarizationAction 2 };
+activateStatisticalReport ACTION
+BEHAVIOUR
+activateStatisticalReportBehaviour BEHAVIOUR
+DEFINED AS "This action initiates a scan according to the current object and attribute selection attributes of the
+scanner. The reply includes scanned attribute values and/or statistical summary information
+calculated from those values. The contents of
+SummarizationASN1Productions.StatisticalScanReportInformation may be sent in multiple
+replies.";;
+MODE CONFIRMED;
+WITH REPLY SYNTAX SummarizationASN1Productions.StatisticalScanReportInformation;
+REGISTERED AS { summarizationAction 3 };
+reportBuffer ACTION
+BEHAVIOUR
+reportBufferBehaviour BEHAVIOUR
+DEFINED AS "The report buffer action initiates a scan of the attributes specified in the report time attribute Id
+list. The retained values of the previously scanned attributes together with the results of this scan are
+returned in the action result. The contents of
+SummarizationASN1Productions.BufferedScanReportInformation may be sent in multiple replies.
+See 8.1.9.3.";;
+MODE CONFIRMED;
+WITH REPLY SYNTAX SummarizationASN1Productions.BufferedScanReportInformation;
+REGISTERED AS { summarizationAction 4 };
+-- A.7 Name binding definitions
+dynamicSimpleScanner-system NAME BINDING
+SUBORDINATE OBJECT CLASS dynamicSimpleScanner AND SUBCLASSES;
+NAMED BY
+SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system
+AND SUBCLASSES;
+WITH ATTRIBUTE "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId;
+CREATE
+WITH-REFERENCE-OBJECT,
+WITH-AUTOMATIC-INSTANCE-NAMING conflictingPackagesRequestedError;
+DELETE
+ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { summarizationNameBinding 2 };
+conflictingPackagesScanner-system NAME BINDING
+SUBORDINATE OBJECT CLASS "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scanner
+AND SUBCLASSES;
+NAMED BY
+SUPERIOR OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992":system
+AND SUBCLASSES;
+WITH ATTRIBUTE "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994":scannerId;
+CREATE
+WITH-REFERENCE-OBJECT,
+WITH-AUTOMATIC-INSTANCE-NAMING conflictingPackagesRequestedError;
+DELETE
+ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { summarizationNameBinding 9 };
+-- A.8 Parameter Templates
+conflictingPackagesRequestedError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX SummarizationASN1Productions.PackageConflict;
+BEHAVIOUR
+conflictingPackagesRequestedErrorBehaviour BEHAVIOUR
+DEFINED AS "This error is returned when an object creation is requested either with attributes defined for
+conditional packages all of which shall not be present together or attributes of packages that have to
+be present together but are not specified in the request.";;
+REGISTERED AS { summarizationParameter 2 };
+scanActionError PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX SummarizationASN1Productions.ScannerActionError;
+BEHAVIOUR
+scannerActionErrorBehaviour BEHAVIOUR
+DEFINED AS "The scan action request to a summarization managed object was not performed because of one of
+the following reasons: administrative state is locked, administrative state is shutting down, scan is
+terminated because administrative state was set to locked when performing the scan action or an
+unspecified error occurred.";;
+REGISTERED AS { summarizationParameter 1 };

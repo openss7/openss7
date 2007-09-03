@@ -1,0 +1,2439 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 12:03:46 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994" >--
+--< GDMO.Alias "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994" "X.739",
+--  "Rec. X.739 (1993)",
+--  "ITU-T Rec. X.739 (1993)/Cor.1 (1998) | ISO/IEC 10164-11 : 1994/Cor.1 : 1999",
+--  "Recommendation X.739:1993",
+--  "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1993",
+--  "ITU-T Recommendation X.739 | ISO/IEC 10164-11",
+--  "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11:1994",
+--  "Recommendation X.739",
+--  "Rec. X.739 (1993) | ISO/IEC 10164-11:1994" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date$ by $Author$
+--  
+--  =============================================================================
+--  >--
+MODULE "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994"
+-- Annex A
+-- Metric objects
+-- (This annex forms an integral part of this Recommendation | International Standard.)
+-- NOTE  The definition of metric object classes does not prevent managed object definers from including management
+-- information defined in clause 8 within the definition of other managed object classes. When defining new managed object classes with
+-- metric attributes, the definers should consider the utilization of the metric object classes defined in this annex.
+-- A.1 Managed object class definitions
+
+algorithmIndicatingMeanMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		meanMonitor;
+	CHARACTERIZED BY
+		algorithmIndicatingMeanMonitorPackage PACKAGE
+			BEHAVIOUR
+				algorithmIndicatingMeanMonitorBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.4.3.
+
+						8.1.4.3 Behaviour of the algorithm indicating mean monitor
+
+						This managed object class has the same behaviour as the mean monitor managed 
+						object class. In addition, it provides the identifier of the algorithm used to 
+						derive the value of the estimate of the mean.!;;
+			ATTRIBUTES
+				algorithmIdentifier GET;;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 8 };
+
+
+meanAndMinMaxMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		movingAverageMeanMonitor;
+	CHARACTERIZED BY
+		meanAndMinMaxMonitorPackage PACKAGE
+			BEHAVIOUR
+				meanAndMinMaxMonitorBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.8.3.
+
+						8.1.8.3 Behaviour of the mean and min max monitor
+
+						The mean and min max monitor managed object inherits the properties of the 
+						moving average mean monitor managed object class.
+
+						The mean and min max monitor managed object calculates estimates of the mean, 
+						largest, and smallest values of the derived gauge. The initial value for the 
+						estimate of largest shall be set equal to the initial value of the estimate of 
+						the mean. The initial value for the estimate of the smallest is also set equal 
+						to the initial value for the estimate of the mean. For each granularity period, 
+						if the derived gauge value is less than the current estimate of the smallest, 
+						then the estimate of the smallest is set equal to this new value. If the derived 
+						gauge value is greater than the current estimate of the largest, then the 
+						estimate of the largest is set equal to this new value. The estimate of largest 
+						and estimate of smallest attribute values are placed in the monitored attributes 
+						parameter of the quality of service alarm notification.!;;
+			ATTRIBUTES
+				estimateOfLargest GET-REPLACE,-- See 8.1.8.2.
+				estimateOfSmallest GET-REPLACE;;;-- See 8.1.8.2.
+	REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 1 };
+
+
+meanAndPercentileMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		movingAverageMeanMonitor;
+	CHARACTERIZED BY
+		meanAndPercentileMonitorPackage PACKAGE
+			BEHAVIOUR
+				meanAndPercentileMonitorBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.7.3.
+
+						8.1.7.3Behaviour of the mean and percentile monitor
+
+						This metric object calculates the estimate of the mean and percentiles of the 
+						values of the derived gauge. PCT is an integer with a value from 1 to 49 
+						inclusive. If the configurable percentile package is not present, PCT shall be 
+						25, and the number of replications attribute shall be set by the manager to 8, 
+						16 or 32.
+
+						The mean of the derived gauge (in the estimate of mean attribute inherited from 
+						the mean monitor), estimate of median,estimate of largest in a replication, 
+						estimate of smallest in a replication, estimate of 100-PCTth percentile, and 
+						estimate of the PCTth percentile are calculated using the exponentially weighted 
+						moving average (EWMA) algorithm as described in B.2.2 and B.2.4.
+
+						The percentile estimates are only updated after a number of replications are 
+						observed, with one replication per granularity period. The estimate of mean is 
+						updated and the thresholds (if present) are applied at each granularity period. 
+						When the mean and percentile monitor metric object is created, the following 
+						shall be specified:
+
+						- The moving time period (MTP) and second moving time period (SMTP) required by 
+						  the EWMA algorithms;
+
+						- The EWMA gauge mean and EWMA gauge percentile behaviours are included and the 
+						  initial value for the estimate of mean, estimate of largest in a replication, 
+						  estimate of smallest in a replication, estimate of median, estimate of 100-PCT 
+						  percentile, estimate of PCT percentile, number of replications, and time 
+						  between replications attributes shall be specified.
+
+						Estimate of largest in replication, estimate of smallest in replication, 
+						estimate of median, estimate of 100-PCT percentile,estimate of PCT percentile, 
+						number of replications, and granularity period attribute values are placed in 
+						the monitored attributes parameter of the quality of service alarm notification.
+
+						The second moving time period attribute and attributes of the configurable 
+						percentile package may only be modified if the administrative state is locked. 
+						If the attribute value change notification package is present, modifications of 
+						these attributes shall result in an attribute value change notification.!;,
+				ewmaGaugePercentileBehaviour BEHAVIOUR
+					DEFINED AS
+						!See B.2.4
+
+						B.2.4 EWMA gauge percentile behaviour
+
+						The metric algorithms defined in this sub-clause include estimates of the 
+						smallest in a sample of size M, the largest in a sample of size M, the median, 
+						the PCTth percentile, and the 100-PCTth percentile of the relative frequency 
+						distribution of the observed attribute of the observed managed object. By 
+						definition, the Kth percentile is the pth fractile for p = K/100. For reasons of 
+						economy of notation, the fractile notation is used.
+
+						The procedure for calculation of percentile estimates are carried out in two 
+						phases:
+
+						- a set of M replications of the gauge is obtained, and coarse estimates are 
+						  calculated for the percentiles (as specified in B.2.4.1);
+
+						- each of these coarse estimates are applied in turn to an EWMA algorithm to 
+						  derive smoothed estimates of percentiles, which are used to update the metric 
+						  output attributes (as specified in B.2.4.2).
+
+						NOTE - Since percentiles are calculated for 100-PCT, when PCT is close to zero, 
+						those percentiles are correspondingly close to 100 (e.g. 98th percentile). For 
+						these large percentiles, if the distribution is such that there is a long tail, 
+						the coarse estimates may be significantly biased. The EWMA smoothing does not 
+						reduce this bias. Alternatives to reduce this bias are for further study.!;;
+			ATTRIBUTES
+				secondMovingTimePeriod GET-REPLACE,-- used in GaugePercentileBehaviour to calculate T2,
+				-- See B.2.4 and 8.1.7.2.
+				estimateOfLargestInReplication GET-REPLACE,-- See B.2.4 and 8.1.7.2.
+				estimateOfSmallestInReplication GET-REPLACE,-- See B.2.4 and 8.1.7.2.
+				estimateOfMedian GET-REPLACE,-- See B.2.4 and 8.1.7.2.
+				estimateOf100-PCTPercentile GET-REPLACE,-- See B.2.4 and 8.1.7.2.
+				estimateOfPCTPercentile GET-REPLACE,-- See B.2.4 and 8.1.7.2.
+				numberOfReplications GET-REPLACE-- See B.2.4 and 8.1.7.2.
+					;;;
+	CONDITIONAL PACKAGES
+		configurablePercentilePackage
+			PRESENT IF
+				!configurable percentiles is required.
+
+				See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				a) Second moving time period
+
+				   This attribute is used in calculating the time constant for calculating the 
+				   percentiles used in the EWMA. It represents the effective time interval over 
+				   which values are scanned to calculate an estimate of the percentile. (It is 
+				   used in the calculation of "h" in the calculations for percentiles as 
+				   described in B.2.1and B.2.4.) This attribute shall be initialised when the 
+				   metric object is created and may be modified.
+
+				      NOTE - The value of this attribute should be greater than or equal to the 
+				      value of the granularity periodattribute.
+
+				b) Estimate of largest in replication
+
+				   This attribute contains the calculated estimate of the largest value in a 
+				   replication of size equal to thevalue of the number of replications 
+				   attribute.
+
+				c) Estimate of smallest in replication
+
+				   This attribute contains the calculated estimate of the smallest value in a 
+				   replication of size equal to thevalue of the number of replications 
+				   attribute.
+
+				d) Estimate of median
+
+				   This attribute contains the calculated estimate of the median value.
+
+				e) Estimate of 100-PCT percentile
+
+				   This attribute contains the calculated estimate of the one hundred minus 
+				   PCTth percentile.
+
+				f) Estimate of PCT percentile
+
+				   This attribute contains the calculated estimate of the PCTth percentile.
+
+				g) Number of Replications
+
+				   This attribute contains the number of repeated statistically independent 
+				   samples (replications) to be usedfor the calculations. The number of 
+				   replications is represented by "M" in equations defining percentile 
+				   calculations. See Annex B.
+
+				The mean and percentile monitor metric object has the following conditional 
+				package:
+
+				- configurable percentile package, as defined in 8.1.9.8 (present if 
+				  configurable percentile calculation isrequired.)!;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 2 };
+
+
+meanAndVarianceMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		movingAverageMeanMonitor;
+	CHARACTERIZED BY
+		meanAndVarianceMonitorPackage PACKAGE
+			BEHAVIOUR
+				meanAndVarianceMonitorBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.6.3.
+
+						8.1.6.3 Behaviour of the mean and variance monitor
+
+						This managed object calculates estimates of the mean and variance on the values 
+						of the derived gauge. The estimated mean of the derived gauge (in estimate of 
+						mean attribute inherited from the mean monitor), and variance(estimate of 
+						variance) are calculated using the exponentially weighted moving average (EWMA) 
+						algorithm. (See B.2.2 and B.2.3.) The estimate of variance attribute is placed 
+						in the monitored attributes parameter of the quality of service alarm 
+						notification.
+
+						When the mean and variance monitor metric object is created, the following shall 
+						be specified:
+
+						- The moving time period and second moving time period required by the EWMA 
+						  algorithm;
+
+						- The EWMA gauge mean and EWMA gauge variance behaviours are included and the 
+						  initial value for the estimate of mean and estimate of variance shall be 
+						  specified.
+
+						The second moving time period attribute may only be modified if the 
+						administrative state is locked.
+
+						If the attribute value change notification package is present, modification of 
+						this attribute shall result in an attribute value change notification.!;,
+				ewmaGaugeVarianceBehaviour BEHAVIOUR
+					DEFINED AS
+						!See B.2.3.
+
+						 B.2.3 EWMA gauge variance behaviour
+
+						This algorithm calculates the estimate of the variance of the values of a gauge 
+						using the EWMA algorithm. This algorithm shall be used in combination with the 
+						EWMA gauge mean algorithm which is used to calculate W n.
+
+						The EWMA variance estimate is defined by the following iterative algorithm:
+
+						   Sn = g * (Vn - Wn)2 + (1 - g) * Sn-1
+
+						where
+
+						   Sn is an estimate of the variance of Vn.
+
+						   Sn-1 is the previous estimate of the variance.
+
+						   S 0 may be initialized by setting the attribute representing the estimate of 
+						   variance.
+
+						NOTES
+
+						1. The values of GP and SMTP can be reset by the managing system.
+
+						2. This algorithm has a predictable bias which can be shown to be:
+
+						   u = 2 * (1-f)2/(2-f), times the variance of Vn - Wn.
+
+						   These factors can be used to reduce a small amount of bias that is introduced 
+						   into the calculations, (e.g. for f = 0.05,u z. 0.93), which may be used in 
+						   the following equation:
+
+						   Sc'n = Sn/u
+
+						   This calculation may be performed by managing systems to correct any bias in 
+						   variance calculations. Alternatively, the bias may be ignored by managing 
+						   systems if it is considered negligible.
+
+						3. The units of S are the same as the units of V squared.!;;
+			ATTRIBUTES
+				secondMovingTimePeriod GET-REPLACE,-- used in EWMA Gauge Variance Behaviour to calculate "g".
+				estimateOfVariance GET-REPLACE;;;-- See B.2.3.
+	REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 3 };
+
+
+meanMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		monitorMetric;
+	CHARACTERIZED BY
+		meanMonitorPackage PACKAGE
+			BEHAVIOUR
+				meanMonitorBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.3.3.
+
+						8.1.3.3 Behaviour of the mean monitor
+
+						The estimate of mean attribute has the same units as the derived gauge 
+						attribute. The estimate of the mean of the derived gauge attribute is provided 
+						by the estimate of mean attribute. The algorithm usedto evaluate the estimate of 
+						the mean value is not specified. However, the time period that is used in the 
+						evaluation of the mean value is specified by the moving time period attribute.
+
+						    NOTE - Examples of two algorithms that may be used to do this are EWMA and 
+						    UWMA as specified in Annexes B and C.
+
+						There are two conditional packages used to apply thresholds to the value of 
+						derived gauge and estimate of mean attributevalues. If the derived 
+						gauge-threshold package (inherited from the monitor metric managed object class) 
+						is present, the severity indicating gauge-threshold is applied to the value of 
+						the derived gauge attribute. If the estimate of the meanthreshold package is 
+						present, the estimate of mean severity indicating gauge-threshold is applied to 
+						the value of the estimate of mean attribute. The managed object will emit a 
+						quality of service alarm notification whenever the value of the derived gauge or 
+						the estimate of the mean attribute triggers the corresponding threshold.
+
+						If either of the threshold packages is present, then the conditional specific 
+						problems indication package may also bepresent. If the specific problems 
+						indication package is present then the specific problems indicator attribute 
+						value shall be placed in the specific problems parameter of the quality of 
+						service notifications that are emitted, whether they aretriggered by either the 
+						derived gauge attribute or by the estimate of mean attribute.
+
+						When the mean monitor metric object is created, the moving time period required 
+						by the mean estimation algorithm shall be specified. When the mean monitor 
+						metric object is created, the estimate of mean severity indicating 
+						gauge-threshold levels (i.e. the threshold levels to be applied to the estimate 
+						of mean attribute value for generation of quality of service alarm 
+						notifications) may be specified. In addition, the presence of the derived gauge 
+						time stamp package requires metric object instances to report the derived gauge 
+						time stamp attribute as part of the monitored attributes parameter of the 
+						quality of service alarm notification.
+
+						The use of the quality of service alarm notification parameters is given in 
+						8.2.1. The value of the estimate of mean attribute will be in the observed value 
+						element of the threshold information parameterof the quality of service alarm 
+						notification.
+
+						The values of the observed object instance and observed attribute identifier 
+						will be in the monitored attributes parameterof the quality of service alarm 
+						notification. The moving time period attribute, estimate of the mean attribute 
+						and attributes of the estimate of mean threshold andspecific problems indication 
+						packages may only be modified if the administrative state is locked. If the 
+						attribute value change notification package is present, modifications of these 
+						attributes shall result in an attribute value changenotification.!;;
+			ATTRIBUTES
+				estimateOfMean GET-REPLACE,
+				movingTimePeriod GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		estimateOfMeanThresholdPackage
+			PRESENT IF
+				"threshold on estimateOfMean is required",
+		specificProblemsIndicationPackage
+			PRESENT IF
+				"specific problems indication behaviour is required and either the estimate of 
+				mean threshold package is present or the derived gauge-threshold package is 
+				present";
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 4 };
+
+
+monitorMetric MANAGED OBJECT CLASS
+	DERIVED FROM
+		scanner;
+	CHARACTERIZED BY
+		monitorMetricPackage PACKAGE
+			BEHAVIOUR
+				monitorMetricBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.2.3.
+
+						8.1.2.3 Behaviour of the monitor metric
+
+						The monitor metric managed object monitors values of an attribute in an observed 
+						managed object. The observed attribute is monitored at intervals specified by 
+						the granularity period. A gauge value (derived gauge) is derived from the values 
+						of the observed attribute. The value of the derived gauge attribute shall remain 
+						the same until the next observation.
+
+						The presence or absence of the difference packages (i.e. counter difference and 
+						gauge difference) determines how the output of the data conversion process is 
+						derived from the observed attribute. If neither package is present, the derived 
+						gauge attribute value contains the last observed value of the observed 
+						attribute. If either of the difference packages is present, the derived gauge 
+						value contains the value of the difference between two successive observations 
+						of observed attribute value. If a difference package is not present, the units 
+						of the derived gauge are the same as the units of the observed attribute. If a 
+						difference package is present, the units of the derived gauge is related to the 
+						interval between observations(granularity period). For example, if the derived 
+						gauge has a value of 60 and the observed attribute is a counter of the number of 
+						messages, with the granularity period at 15 minutes, the derived gauge 
+						represents a value of 60 messages per15 minutes.
+
+						The presence of the derived gauge time stamp package requires monitor metric 
+						instances to update the derived gauge time stamp attribute with the current 
+						time, whenever the derived gauge attribute value is updated. If the derived 
+						gauge-threshold package is present, the severity indicating gauge-threshold in 
+						the package is applied to the derived gauge attribute, and a threshold crossed 
+						quality of service alarm notification will be emitted when the derived gauge 
+						value crosses the threshold values. In addition, the presence of the derived 
+						gauge time stamp package requires managed object instances to report the derived 
+						gauge time stamp attribute as part of the monitored attributes parameter of any 
+						quality of service alarm notification. The quality of service alarm notification 
+						parameters shall be as specified in 8.2.1. The value of the derived gauge 
+						attribute shall be in the observed value element of the threshold information 
+						parameter of the quality of service alarm notification. The values of the 
+						observed object instance and observed attribute identifier shall be in the 
+						monitored attributes parameter of the quality of service alarm notification.
+
+						If the conditional specific problems indication package is present, the specific 
+						problems indicator attribute value (used to specify a specific type of metric 
+						monitoring) shall be placed into the specific problems parameter of the 
+						threshold crossed quality of service alarm notification. The observed attribute 
+						is specified by the observed attribute identifier of the managed object 
+						identified by observed object instance. If the counter difference package is 
+						absent, the observed attribute is treated as a gauge. If the gauge difference 
+						package is present, the observed attribute is treated as a gauge. When the 
+						monitor metric managed object is created, the following shall be specified:
+
+						- the scanner Id, observed object instance, observed attribute identifier;
+
+						- the granularity period (i.e. time between observations of the observed 
+						  attribute);
+
+						 - if the counter difference package is present, then the data conversion 
+						 process is calculated according to the counter difference package behaviour;
+
+						- if the counter overflow package is present, then the metric object shall 
+						  ensure that the value of the modulus value attribute is initialized before 
+						  entering the on-duty condition.;
+
+						- if the gauge difference package is present, then the data conversion process 
+						  is calculated according to the gauge difference package behaviour;
+
+						- a choice of at most one of the available scheduling packages. The scheduling 
+						  packages are defined in CCITT Rec. X.721 | ISO/IEC 10165-2;
+
+						- if the derived gauge-threshold package is present, then the severity 
+						  indicating gauge-threshold (i.e. the threshold levels to be applied to the 
+						  derived gauge attribute value for generation of quality of service alarm 
+						  notifications) shall be specified; and
+
+						- if the observed attribute identifier references an attribute that is not of 
+						  real or integer type, the creation shall fail and the CMIS error "invalid 
+						  attribute value" shall be returned.
+
+						If the state change notification package is present, then changes to the 
+						administrative state, operational state, and availability status shall cause 
+						state change notifications to be emitted.
+
+						The lifetime of the metric object may be controlled by the managing system by 
+						requesting the managed system to delete the metric object. If the managed system 
+						deletes a metric object and the create delete notifications package is present, 
+						a notification indicating managed object deletion is emitted. The notification 
+						shall include the values of the attributes of the metric object at the time of 
+						deletion.
+
+						Attributes of the counter difference, counter overflow, gauge difference, 
+						derived gauge-threshold, and specific problems indication packages may only be 
+						modified if the administrative state is locked. If the attribute value change 
+						notification package is present, then modifications of these attributes shall 
+						result in an attribute value change notification.!;;
+			ATTRIBUTES
+				observedObjectInstance GET,
+				observedAttributeId GET,
+				derivedGauge GET;;;
+	CONDITIONAL PACKAGES
+		counterDifferencePackage
+			PRESENT IF
+				"counter to gauge conversion is required and gaugeDifferencePackage is not 
+				present",
+		counterOverflowPackage
+			PRESENT IF
+				"the counterDifference package is present and modulo arithmetic is required to 
+				calculate the new value of the derived gauge on counter overflow",
+		gaugeDifferencePackage
+			PRESENT IF
+				"gauge to derivative conversion is required and counterDifferencePackage is not 
+				present",
+		derivedGaugeThresholdPackage
+			PRESENT IF
+				"threshold on derivedGauge is required",
+		specificProblemsIndicationPackage
+			PRESENT IF
+				"specific problems indication behaviour is required and the 
+				derivedGaugeThresholdPackage is present",
+		derivedGaugeTimestampPackage
+			PRESENT IF
+				"time stamping associated with updating the derivedGauge is required";
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 5 };
+
+
+movingAverageMeanMonitor MANAGED OBJECT CLASS
+	DERIVED FROM
+		meanMonitor;
+	CHARACTERIZED BY
+		movingAverageMeanMonitorPackage PACKAGE
+			BEHAVIOUR
+				movingAverageMeanMonitorBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.5.3.
+
+						8.1.5.3 Behaviour of the moving average mean monitor
+
+						An estimate of the mean of the derived gauge attribute is calculated using the 
+						exponentially weighted moving average(EWMA) algorithm as defined in B.2.2 and 
+						its value is placed into the estimate of mean attribute. The value of the 
+						estimate of mean remains the same until the next observation. When the moving 
+						average mean monitor metric object is created, the initial value for the 
+						estimate of mean shall be specified.!;;;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 6 };
+
+
+scanner MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		scannerPackage PACKAGE
+			BEHAVIOUR
+				scannerBehaviour BEHAVIOUR
+					DEFINED AS
+						!See 8.1.1.3.
+
+						8.1.1.3 Behaviour of the scanner
+
+						A managed object of this class represents the ability to retrieve values of 
+						attributes of managed objects and produce summary information from those values. 
+						This summary information may be made available in attributes, notifications, 
+						action replies, or some combination of these. Summary information may consist of 
+						observed attribute values or statistics calculated from these values (either 
+						over time or over managed objects).
+
+						Observed attribute values are retrieved during a "scan", which is initiated 
+						periodically, at the end of each granularity period, provided that the 
+						granularity period is non-zero. The granularity period attribute indicates the 
+						length of the granularity period. The granularity period in the scanner managed 
+						object class shall not be modified unless the value of the administrative state 
+						is "locked". If the period synchronization package is not present, the time at 
+						which a granularity period starts after the scanner is unlocked is a local 
+						matter.
+
+						The administrative state attribute is used to suspend or resume the scanning 
+						function. If administrative state has the value"unlocked", the scanner is 
+						administratively permitted to perform scans. If administrative state has the 
+						value "locked", the scanner is administratively prohibited from performing 
+						scans. The operational state attribute represents the operational capability of 
+						the scanner to perform its functions.
+
+						If present, the availability status attribute indicates whether the schedule 
+						inhibits the scanning function, consistent with the description of the 
+						availability status attribute in CCITT Rec. X.731 | ISO/IEC 10164-2. The 
+						scanning function can be suspended or resumed according to a schedule. If the 
+						schedule suspends the scanning function, any scan that is in progress continues. 
+						If the period synchronization package is present, the period synchronization 
+						time attribute, contained in this package, issued to determine the time to which 
+						the granularity period is synchronized. The period synchronization time 
+						attribute shall not be modified unless the value of the administrative state is 
+						locked. The start of each granularity period is an integral number of 
+						granularity periods before or after the time specified by this attribute.
+
+						If the attribute value change notification package is present, then changes to 
+						the granularity period or to the period synchronization time shall cause 
+						attribute value change notifications to be emitted. If the state change 
+						notification package is present, then changes to the operational state or 
+						administrative state shall cause state change notifications to be emitted.
+
+						NOTES
+
+						1. It is assumed that the observed attributes can be scanned within the 
+						   granularity period. If a scan is initiated when another scan is in progress, 
+						   then how the conflict is resolved is a local issue.
+
+						2. The scan may occur at slightly different times for each observed attribute, 
+						   but the time skew between the start of a scan and the scan time for a given 
+						   attribute in the scan should be approximately equal between successive scans.!;;
+			ATTRIBUTES
+				scannerId GET,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":administrativeState GET-REPLACE,
+				granularityPeriod GET-REPLACE,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":operationalState GET;;;
+	CONDITIONAL PACKAGES
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":availabilityStatusPackage
+			PRESENT IF
+				"the managed object can be scheduled",
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":duration
+			PRESENT IF
+				"the scanning function is to be enabled between specified start and stop times",
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":dailyScheduling
+			PRESENT IF
+				"daily scheduling is required and the weekly or external scheduling package is 
+				not present",
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":weeklyScheduling
+			PRESENT IF
+				"weekly scheduling is required and the daily or external scheduling package is 
+				not present",
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":externalScheduler
+			PRESENT IF
+				"reference to external scheduler is required and the daily or weekly scheduling 
+				package is not present",
+		periodSynchronizationPackage
+			PRESENT IF
+				"configurable agent internal synchronization of repeating time periods is 
+				required",
+		"Recommendation M.3100:1992":createDeleteNotificationsPackage
+			PRESENT IF
+				"notification of object creation and object deletion events is required",
+		"Recommendation M.3100:1992":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"notification of attribute value change events is required",
+		"Recommendation M.3100:1992":stateChangeNotificationPackage
+			PRESENT IF
+				"notification of state change event is required";
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 7 };
+-- A.2 Package definitions
+
+
+configurablePercentilePackage PACKAGE
+	BEHAVIOUR
+		configurablePercentilePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.8.
+
+				8.1.9.8 Configurable percentile package
+
+				8.1.9.8.1Overview
+
+				The configurable percentile package is used to allow a change from the default 
+				value of PCT. A particular value for PCT can be set so that the PCTth and 
+				100-PCTth percentiles can be calculated.
+
+				8.1.9.8.2 Attributes of the configurable percentile package
+
+				The configurable percentile package contains the following attribute:
+
+				- Configurable PCT
+
+				  This attribute contains the value of PCT used in the percentile calculations.
+
+				8.1.9.8.3 Behaviour of the configurable percentile package
+
+				Estimates of the percentiles are obtained by taking a set of statistically 
+				independent samples of the observations of V[t]within a specified time interval 
+				and sorting these statistically independent observations of V[t] from smallest 
+				to largest.
+
+				Repeated statistically independent samples are called replications. If the 
+				configurable percentile package is not present, PCT shall be 25, and the number 
+				of replications attribute shall be 8,16 or 32. If the configurable percentile 
+				package is present, PCT shall take the value of the configurable PCT attribute, 
+				and the number of replications shall admit arbitrary values (typically greater 
+				than 32 for PCT < 25, with a larger number of replications required for good 
+				performance for smaller PCT values).!;;
+	ATTRIBUTES
+		configurablePCT GET-REPLACE;-- Allowed values are 1 to 49, inclusive
+	REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 1 };
+
+
+counterDifferencePackage PACKAGE
+	BEHAVIOUR
+		counterDifferencePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.1.3.
+
+				8.1.9.1.3 Behaviour of the counter difference package
+
+				If this package is included in a managed object, the observed attribute shall be 
+				a counter. The gauge value derived is initially calculated using the following 
+				equation:
+
+				  V[t] = [counter[t] - counter[t-GP]] where
+
+				    V[t] is the difference between successive observations of the counter;
+
+				    counter[t] is the value of the counter at the current time t (not saved in 
+				    any attribute);
+
+				    counter[t-GP] is the previous value of the counter at time t-GP (i.e. 
+				    previous scan counter value);
+
+				    GP is the sampling interval in seconds, minutes, hours, or days (i.e. 
+				    granularity period).
+
+				The initial value of previous scan counter value determines the initial 
+				difference value. The value of the previous scan counter value attribute is 
+				considered valid if it was obtained at the end of the previous granularity 
+				period. Thus, for example, it is not considered valid in the first scan interval 
+				subsequent to creation, in the first scan interval subsequent to transition from 
+				"unlocked" to "locked" states or subsequent to transition from "off-duty"to 
+				"on-duty" states.
+
+				During the period in which the value of the previous scan counter value 
+				attribute is not valid, the value of the procedural status attribute shall have 
+				the value "Not initialized". During this period, the value of the derived gauge 
+				attribute is not usable as input to subsequent data enhancement or data analysis 
+				algorithms, and any attempt to read either the derived gauge attribute or the 
+				previous scan counter value attribute will result in the retrieval of invalid 
+				information.
+
+				If the value of the previous scan counter value attribute is valid, and
+
+				- if V[t] (i.e. the difference between successive observations) is not negative 
+				  then the value of derived gauge is set to V[t];
+
+				- if V[t] is negative and the counter overflow package (see 8.1.9.2) is present 
+				  in the managed object then the derived gauge value is calculated according to 
+				  the behaviour specified in 8.1.9.2.3;
+
+				- if V[t] is negative and the counter overflow package is not present in the 
+				  managed object, then the derived gauge is set to V[t]. This negative value of 
+				  the derived gauge attribute is not usable as input to subsequent data 
+				  enhancement or data analysis algorithms. The observed value is retained by the 
+				  metric object to be used in calculating the next difference, i.e. it becomes 
+				  the value of the previous scan counter value attribute.
+
+				During the period after which the previous scan counter value attribute is 
+				initialized but before the end of next granularity period, the value of the 
+				procedural status attribute shall have the value "Initializing". During this 
+				period, the value of the derived gauge attribute is not usable as input to 
+				subsequent data enhancement or data analysis algorithms,and any attempt to read 
+				the derived gauge attribute will result in the retrieval of invalid information.!;;
+	ATTRIBUTES
+		previousScanCounterValue GET,
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":proceduralStatus GET;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 2 };
+
+
+counterOverflowPackage PACKAGE
+	BEHAVIOUR
+		counterOverflowPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.2.3.
+
+				8.1.9.2.3 Behaviour of the counter overflow package
+
+				The gauge value derived (V[t]) is calculated using the following method:
+
+				  If [counter[t] - counter[t-GP]] is positive V[t] = counter[t] - counter[t-GP].
+
+				  If [counter[t] - counter[t-GP]] is negative V[t] = [counter[t] - counter[t-GP] 
+				  + MOD], where
+
+				    MOD is the value of the modulus attribute and
+
+				    counter[t-GP] is the value of the previous scan counter value attribute.
+
+				If the value of the modulus value attribute is zero the actual modulus value 
+				used to evaluate V[t] is a local matter.!;;
+	ATTRIBUTES
+		modulusValue GET-REPLACE;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 3 };
+
+
+derivedGaugeThresholdPackage PACKAGE
+	BEHAVIOUR
+		derivedGaugeThresholdPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.4.4.
+
+				8.1.9.4.3 Behaviour of the derived gauge-threshold package
+
+				The derived gauge-threshold package has no additional behaviour beyond the 
+				behaviour of the severity indicating gauge-threshold attribute.!;;
+	ATTRIBUTES
+		severityIndicatingGaugeThreshold GET-REPLACE ADD-REMOVE;
+	NOTIFICATIONS
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 4 };
+
+
+derivedGaugeTimestampPackage PACKAGE
+	BEHAVIOUR
+		derivedGaugeTimestampPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.6.
+
+				8.1.9.6 Derived gauge time stamp package
+
+				8.1.9.6.1 Overview
+
+				The derived gauge time stamp package enables time stamping associated with 
+				updates to derived gauge values.
+
+				8.1.9.6.2 Attributes of the derived gauge time stamp package The derived gauge 
+				  time stamp package contains the following attribute:
+
+				- Derived gauge time stamp
+
+				  This attribute contains the time that the observation was taken. The derived 
+				  gauge time stamp attribute is read-only.
+
+				8.1.9.6.3 Behaviour of the derived gauge time stamp package
+
+				The derived gauge time stamp package enables time stamping associated with 
+				updates to derived gauge values by including the time of the last observation in 
+				an attribute.!;;
+	ATTRIBUTES
+		derivedGaugeTimeStamp GET;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 5 };
+
+
+estimateOfMeanThresholdPackage PACKAGE
+	BEHAVIOUR
+		estimateOfMeanThresholdPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.5.3.
+
+				8.1.9.5.3 Behaviour of the estimate of mean threshold package
+
+				The estimate of mean threshold package has no additional behaviour beyond the 
+				behaviour of the estimate of mean severity indicating gauge-threshold attribute.!;;
+	ATTRIBUTES
+		estimateOfMeanSeverityIndicatingGaugeThreshold GET-REPLACE ADD-REMOVE;
+	NOTIFICATIONS
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 6 };
+
+
+gaugeDifferencePackage PACKAGE
+	BEHAVIOUR
+		gaugeDifferencePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.3.3.
+
+				8.1.9.3.3 Behaviour of the gauge difference package
+
+				The derived gauge value is initially calculated using the following equation:
+
+				  V[t] = gauge[t] - gauge[t-GP] where
+
+				    V[t] is the difference between successive observations of the gauge;
+
+				    gauge[t] is the value of the gauge at the current time t (not saved in any 
+				    attribute);
+
+				    gauge[t-GP] is the value of the gauge at time t minus GP (i.e. the value of 
+				    the previous scan gauge value attribute);
+
+				    GP is the sampling interval in seconds, minutes, hours, or days (i.e. 
+				    granularity period).
+
+				The initial value of the previous scan gauge value attribute determines the 
+				initial difference value. The value of the previous scan gauge value attribute 
+				is considered valid if it was obtained at the previous granularity period. Thus, 
+				for example, it is not considered valid in the first scan interval subsequent to 
+				creation, in the first scan interval subsequent to transition from "unlocked" to 
+				"locked" states or subsequent to transition from "off-duty" to "on-duty" states.
+
+				During the period in which the value of the previous scan gauge value attribute 
+				is not valid, the value of the procedural status attribute shall have the value 
+				"Not initialized". During this period, the value of the derived gauge attribute 
+				is not usable as input to subsequent data enhancement or data analysis 
+				algorithms, and any attempt to read either the derived gauge attribute or the 
+				previous scan gauge value attribute will result in the retrieval of invalid 
+				information.
+
+				The observed value is retained by the metric object to be used in calculating 
+				the next difference, i.e., it becomes the value of the previous scan gauge value 
+				attribute. During the period after which the previous scan gauge value attribute 
+				is initialized but before the end of next granularity period, the value of the 
+				procedural status attribute shall have the value "Initializing". During this 
+				period, the value of the derived gauge attribute is not usable as input to 
+				subsequent data enhancement or data analysis algorithms, and any attempt to read 
+				the derived gauge attribute will result in the retrieval of invalid information.!;;
+	ATTRIBUTES
+		previousScanGaugeValue GET,
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":proceduralStatus GET;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 8 };
+
+
+periodSynchronizationPackage PACKAGE
+	BEHAVIOUR
+		periodSynchronizationPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.9.3.
+
+				8.1.9.9.3 Behaviour of the period synchronization package
+
+				The period synchronization package has no additional behaviour beyond the 
+				behaviour of the period synchronization time attribute.!;;
+	ATTRIBUTES
+		periodSynchronizationTime GET-REPLACE;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 10 };
+
+
+specificProblemsIndicationPackage PACKAGE
+	BEHAVIOUR
+		specificProblemsIndicationPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!Included if specific problems indication is wanted in the metric object 
+				instance, See 8.1.9.7.3.
+
+				8.1.9.7.3 Behaviour of the specific problems indication package
+
+				The specific problems indication package enables the indication of a specific 
+				type of metric monitoring. A specific type of problem can be associated with a 
+				threshold crossing.!;;
+	ATTRIBUTES
+		specificProblemsIndicator GET-REPLACE;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 9 };
+-- A.3 Attribute definitions
+
+
+algorithmIdentifier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.AlgorithmIdentifier;
+	BEHAVIOUR
+		algorithmIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.4.2.
+
+				8.1.4.2 Attributes and packages of the algorithm indicating mean monitor
+
+				The algorithm indicating mean monitor has the following attribute:
+
+				- Algorithm identifier
+
+				  This attribute contains the identification of the algorithm used to derive the 
+				  estimate of the mean. The value of this attribute is provided by the managed 
+				  system at the time of object creation and is read-only.
+
+				  This attribute may not be specified by the manager on a create request. This 
+				  Recommendation | International Standard registers two algorithms for use in 
+				  this attribute in . Other identifiers for use in this attribute may be defined 
+				  outside this Recommendation | International Standard and registered using the 
+				  procedures defined for ASN.1 object identifier values in CCITT Rec. X.208 |ISO 
+				  8824.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 26 };
+
+
+configurablePCT ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.Integer;
+	BEHAVIOUR
+		configurablePCTBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.8.2.
+
+				8.1.9.8.2 Attributes of the configurable percentile package
+
+				The configurable percentile package contains the following attribute:
+
+				- Configurable PCT
+
+				  This attribute contains the value of PCT used in the percentile calculations.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 0 };
+
+
+derivedGauge ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		derivedGaugeBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.2.2.
+
+				8.1.2.2 Attributes and packages of the monitor metric
+
+				The monitor metric managed object class has the following attributes:
+
+				c) Derived gauge
+
+				   This attribute contains the gauge value derived from the values of the 
+				   observed attribute. If there is neither a counter difference nor a gauge 
+				   difference package present, the derived gauge attribute value contains the 
+				   last observed value of the observed attribute. If either of the difference 
+				   packages is present, the derived gauge value contains the value of the 
+				   difference between two successive observations of the observed attribute 
+				   value.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 2 };
+
+
+derivedGaugeTimeStamp ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.GlobalTime;
+	BEHAVIOUR
+		derivedGaugeTimeStampBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.6.2.
+
+				8.1.9.6.2 Attributes of the derived gauge time stamp package
+
+				The derived gauge time stamp package contains the following attribute:
+
+				- Derived gauge time stamp
+
+				  This attribute contains the time that the observation was taken. The derived 
+				  gauge time stamp attribute is read-only.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 3 };
+
+
+estimateOfLargest ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfLargestBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.8.3.
+
+				8.1.8.3 Behaviour of the mean and min max monitor
+
+				The mean and min max monitor managed object inherits the properties of the 
+				moving average mean monitor managed object class.
+
+				The mean and min max monitor managed object calculates estimates of the mean, 
+				largest, and smallest values of the derived gauge. The initial value for the 
+				estimate of largest shall be set equal to the initial value of the estimate of 
+				the mean. The initial value for the estimate of the smallest is also set equal 
+				to the initial value for the estimate of the mean. For each granularity period, 
+				if the derived gauge value is less than the current estimate of the smallest, 
+				then the estimate of the smallest is set equal to this new value. If the derived 
+				gauge value is greater than the current estimate of the largest, then the 
+				estimate of the largest is set equal to this new value. The estimate of largest 
+				and estimate of smallest attribute values are placed in the monitored attributes 
+				parameter of the quality of service alarm notification.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 4 };
+
+
+estimateOfLargestInReplication ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfLargestInReplicationBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				b) Estimate of largest in replication
+
+				   This attribute contains the calculated estimate of the largest value in a 
+				   replication of size equal to the value of the number of replications 
+				   attribute.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 21 };
+
+
+estimateOfMean ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfMeanBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.3.2.
+
+				8.1.3.2 Attributes and packages of the mean monitor
+
+				The mean monitor managed object class has the following attributes:
+
+				a) Estimate of mean
+
+				   This attribute contains the estimate of the mean calculated by the algorithm. 
+				   The initial value of this attribute shall be supplied upon creation of the 
+				   metric object for use in initialising the algorithm. The attribute may be 
+				   modified after creation of the metric object in order to re-initialise the 
+				   algorithm.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 5 };
+
+
+estimateOfMeanSeverityIndicatingGaugeThreshold ATTRIBUTE
+	DERIVED FROM
+		severityIndicatingGaugeThreshold;
+	BEHAVIOUR
+		estimateOfMeanSeverityIndicatingGaugeThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.5.2.
+
+				8.1.9.5.2 Attributes of the estimate of mean threshold package
+
+				The estimate of mean threshold package contains the following attribute:
+
+				- Estimate of mean severity indicating gauge-threshold
+
+				  This attribute contains the threshold levels which are to be applied to the 
+				  Estimate of the Mean attribute. It has the same syntax and behaviour as the 
+				  severity indicating gauge-threshold of the derived gauge threshold package 
+				  (see 8.1.9.4.2) except that the threshold levels are applied to the estimate 
+				  of mean attribute (instead of the derived gauge attribute) of the managed 
+				  object in which it is included.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 6 };
+
+
+estimateOfMedian ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfMedianBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				d) Estimate of median
+
+				   This attribute contains the calculated estimate of the median value.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 7 };
+
+
+estimateOfPCTPercentile ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfPCTPercentileBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				f) Estimate of PCT percentile
+
+				   This attribute contains the calculated estimate of the PCTth percentile.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 8 };
+
+
+estimateOfSmallest ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfSmallestBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.8.3.
+
+				8.1.8.3 Behaviour of the mean and min max monitor
+
+				The mean and min max monitor managed object inherits the properties of the 
+				moving average mean monitor managed object class.
+
+				The mean and min max monitor managed object calculates estimates of the mean, 
+				largest, and smallest values of the derived gauge. The initial value for the 
+				estimate of largest shall be set equal to the initial value of the estimate of 
+				the mean. The initial value for the estimate of the smallest is also set equal 
+				to the initial value for the estimate of the mean. For each granularity period, 
+				if the derived gauge value is less than the current estimate of the smallest, 
+				then the estimate of the smallest is set equal to this new value. If the derived 
+				gauge value is greater than the current estimate of the largest, then the 
+				estimate of the largest is set equal to this new value. The estimate of largest 
+				and estimate of smallest attribute values are placed in the monitored attributes 
+				parameter of the quality of service alarm notification.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 9 };
+
+
+estimateOfSmallestInReplication ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfSmallestInReplicationBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				c) Estimate of smallest in replication
+
+				   This attribute contains the calculated estimate of the smallest value in a 
+				   replication of size equal to the value of the number of replications 
+				   attribute.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 22 };
+
+
+estimateOfVariance ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOfVarianceBehaviour BEHAVIOUR
+			DEFINED AS
+				'See 8.1.6.2.
+
+				8.1.6.2 Attributes and packages of the mean and variance monitor
+
+				The mean and variance monitor managed object class has the following attributes:
+
+				a) Second moving time period
+
+				   This attribute is used for calculating the variance using the EWMA algorithm. 
+				   It represents the effectivetime interval over which values are scanned to 
+				   calculate an estimate of the variance. (It is used in the calculation of "g" 
+				   for variance as described in B.2.1 and B.2.3.) This attribute shall be 
+				   initialised when themetric object is created and may be modified.
+
+				   NOTE - The value of this attribute should be greater than or equal to the 
+				   value of the granularity periodattribute.
+
+				b) Estimate of variance
+
+				   This attribute contains the calculated estimate of variance.
+
+				The mean and variance monitor managed object class has one mandatory package and 
+				no conditional packages.';;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 10 };
+
+
+estimateOf100-PCTPercentile ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		estimateOf100-PCTPercentileBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				e) Estimate of 100-PCT percentile
+
+				   This attribute contains the calculated estimate of the one hundred minus 
+				   PCTth percentile.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 11 };
+
+
+granularityPeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		granularityPeriodBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute specifies the time between two successive scans.
+
+				See 8.1.1.3.
+
+				8.1.1.3 Behaviour of the scanner
+
+				A managed object of this class represents the ability to retrieve values of 
+				attributes of managed objects and producesummary information from those values. 
+				This summary information may be made available in attributes, notifications, 
+				action replies, or some combination of these. Summary information may consist of 
+				observed attribute values or statisticscalculated from these values (either over 
+				time or over managed objects).
+
+				Observed attribute values are retrieved during a "scan", which is initiated 
+				periodically, at the end of each granularityperiod, provided that the 
+				granularity period is non-zero. The granularity period attribute indicates the 
+				length of the granularity period. The granularity period in the scannermanaged 
+				object class shall not be modified unless the value of the administrative state 
+				is "locked". If the period synchronization package is not present, the time at 
+				which a granularity period starts after the scanner is unlocked is alocal 
+				matter.
+
+				The administrative state attribute is used to suspend or resume the scanning 
+				function. If administrative state has the value"unlocked", the scanner is 
+				administratively permitted to perform scans. If administrative state has the 
+				value "locked", the scanner is administratively prohibited from performing 
+				scans. The operational state attribute represents the operational capability of 
+				the scanner to perform its functions.
+
+				If present, the availability status attribute indicates whether the schedule 
+				inhibits the scanning function, consistent withthe description of the 
+				availability status attribute in CCITT Rec. X.731 | ISO/IEC 10164-2. The 
+				scanning function can be suspended or resumed according to a schedule. If the 
+				schedule suspends the scanningfunction, any scan that is in progress continues. 
+				If the period synchronization package is present, the period synchronization 
+				time attribute, contained in this package, isused to determine the time to which 
+				the granularity period is synchronized. The period synchronization time 
+				attribute shall not be modified unless the value of the administrative state is 
+				locked. The start of each granularity period is anintegral number of granularity 
+				periods before or after the time specified by this attribute.
+
+				If the attribute value change notification package is present, then changes to 
+				the granularity period or to the periodsynchronization time shall cause 
+				attribute value change notifications to be emitted. If the state change 
+				notification package is present, then changes to the operational state or 
+				administrative state shall cause state change notifications tobe emitted.
+
+				NOTES
+
+				1. It is assumed that the observed attributes can be scanned within the 
+				   granularity period. If a scan is initiated whenanother scan is in progress, 
+				   then how the conflict is resolved is a local issue.
+
+				2. The scan may occur at slightly different times for each observed attribute, 
+				   but the time skew between the start of ascan and the scan time for a given 
+				   attribute in the scan should be approximately equal between successive scans.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 23 };
+
+
+modulusValue ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":counter;
+	BEHAVIOUR
+		modulusValueBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.2.2.
+
+				8.1.9.2.2 Attributes of the counter overflow package
+
+				The counter overflow package contains the following attribute:
+
+				- Modulus value
+
+				  This attribute holds the value to be used as the modulus value when an 
+				  observed counter overflows.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 12 };
+
+
+movingTimePeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		movingTimePeriodBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.3.2.
+
+				8.1.3.2 Attributes and packages of the mean monitor
+
+				The mean monitor managed object class has the following attributes:
+
+				b) Moving time period
+
+				   This attribute contains the effective time interval over which values are 
+				   scanned to calculate an estimate of the mean. This attribute shall be 
+				   initialised when the metric object is created and may be modified.
+
+				   NOTE - The value of this attribute should be greater than or equal to the 
+				   value of the granularity period attribute.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 13 };
+
+
+numberOfReplications ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		numberOfReplicationsBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.7.2.
+
+				8.1.7.2 Attributes and packages of the mean and percentile monitor
+
+				The mean and percentile monitor managed object class has the following 
+				attributes:
+
+				g) Number of Replications
+
+				   This attribute contains the number of repeated statistically independent 
+				   samples (replications) to be used for the calculations. The number of 
+				   replications is represented by "M" in equations defining percentile 
+				   calculations. See Annex B.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 14 };
+
+
+observedAttributeId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.AttributeId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		observedAttributeIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.2.2.
+
+				8.1.2.2 Attributes and packages of the monitor metric
+
+				The monitor metric managed object class has the following attributes:
+
+				b) Observed attribute identifier
+
+				   This attribute is used to identify the observed attribute of the observed 
+				   managed object. Its value shall be specified when the monitor metric managed 
+				   object is created and may not be modified.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 15 };
+
+
+observedObjectInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		observedObjectInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.2.2.
+
+				8.1.2.2 Attributes and packages of the monitor metric
+
+				The monitor metric managed object class has the following attributes:
+
+				a) Observed object instance
+
+				   This attribute is used to identify the instance of the managed object that 
+				   contains the observed attribute. Its value shall be specified when the 
+				   monitor metric managed object is created and may not be modified.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 16 };
+
+
+periodSynchronizationTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.GlobalTime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		periodSynchronizationTimeBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute specifies the synchronization time for repeating periods. The 
+				start for each period is at a time which an integral number of periods before or 
+				after the periodSynchronizationTime.
+
+				See 8.1.9.9.
+
+				8.1.9.9 Period synchronization package
+
+				8.1.9.9.1 Overview
+
+				The period synchronization package provides a mechanism for specifying that 
+				synchronization of repeating time periodsis desired, and it specifies the time 
+				to which the repeating time periods is synchronized.
+
+				8.1.9.9.2 Attributes of the period synchronization package
+
+				The period synchronization package contains the following attribute:
+
+				- Period synchronization time
+
+				  This attribute contains the time to which a repeating time period is 
+				  synchronized. The attribute is ofASN.1 type GeneralizedTime. The start of each 
+				  time period is an integral number of periods before or after the time 
+				  specified by this attribute.
+
+				    NOTE - Clock synchronization may be needed across multiple systems.
+
+				8.1.9.9.3 Behaviour of the period synchronization package
+
+				The period synchronization package has no additional behaviour beyond the 
+				behaviour of the period synchronizationtime attribute.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 24 };
+
+
+previousScanCounterValue ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":counter;
+	BEHAVIOUR
+		previousScanCounterValueBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.1.2.
+
+				8.1.9.1.2 Attributes of the counter difference package
+
+				The counter difference package contains the following attributes:
+
+				a) Previous scan counter value
+
+				   This attribute is used in calculating counter differences for counters. It 
+				   contains the value of the countercaptured by the latest observation.
+
+				b) Procedural status
+
+				   This attribute is defined in CCITT Rec. X.731 | ISO/IEC 10164-2. It is used 
+				   to convey the initializationstatus of the counter difference package. An 
+				   empty value indicates that the counter difference package is fully 
+				   initialized.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 1 };
+
+
+previousScanGaugeValue ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+	BEHAVIOUR
+		previousScanGaugeValueBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.3.2.
+
+				8.1.9.3.2 Attributes of the gauge difference package
+
+				The gauge difference package contains the following attributes:
+
+				a) Previous scan gauge value
+
+				   This attribute is used in calculating gauge differences. It contains the 
+				   value of the gauge captured by thelatest observation.
+
+				b) Procedural status
+
+				   This attribute is defined in CCITT Rec. X.731 | ISO/IEC 10164-2. It is used 
+				   to convey the initializationstatus of the gauge difference package. An empty 
+				   value indicates that the gauge difference package is fully initialized.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 20 };
+
+
+scannerId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.SimpleNameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scannerIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.1.2.
+
+				8.1.1.2 Attributes and packages of the scanner
+
+				The scanner managed object class has the following attributes:
+
+				a) Scanner Id
+
+				   This attribute contains a value used to identify an instance of the scanner 
+				   managed object class (i.e. thescanner Id is used for naming).
+
+				b) Operational state
+
+				   This attribute is defined in CCITT Rec. X.731 | ISO/IEC 10164-2.
+
+				c) Administrative state
+
+				   This attribute is defined in CCITT Rec. X.731 | ISO/IEC 10164-2.
+
+				d) Granularity period
+
+				   This attribute contains the granularity period indicating the time between 
+				   scans.
+
+				The scanner managed object class has the following conditional packages:
+
+				- availability status package (present if the scanner can be scheduled);
+
+				- duration package (present if the managed object function is scheduled to start 
+				  at a specified time and stopat either a specified time or function 
+				  continuously);
+
+				- daily scheduling package (present if both the weekly scheduling package and 
+				  external scheduler packagesare not present in an instance and daily scheduling 
+				  is required);
+
+				- weekly scheduling package (present if both the daily scheduling package and 
+				  external scheduler packagesare not present in an instance and weekly 
+				  scheduling is required);
+
+				- external scheduling package (present if both the daily scheduling package and 
+				  weekly schedulingpackages are not present in an instance and a reference to an 
+				  external scheduler is required);
+
+				- period synchronization package (present if clock synchronization for the 
+				  granularity period is required. Ifthis package is not present then clock 
+				  synchronization is a local matter.);
+
+				- create delete notifications package (present if notification of managed object 
+				  creation and deletion eventsis required);
+
+				- attribute value change notification package (present if notification of 
+				  attribute value change events isrequired); and
+
+				- state change notification package (present if notification of state change 
+				  events is required).
+
+				NOTES
+
+				1. The first five packages are defined in CCITT Rec. X.721 | ISO/IEC 10165-2.
+
+				2. The period synchronization package is defined in 8.1.9.9.
+
+				3. The last three packages are defined in CCITT Recommendation M.3100.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 25 };
+
+
+secondMovingTimePeriod ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.TimePeriod;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		secondMovingTimePeriodBehaviour BEHAVIOUR
+			DEFINED AS
+				'See 8.1.6.2.
+
+				8.1.6.2 Attributes and packages of the mean and variance monitor
+
+				The mean and variance monitor managed object class has the following attributes:
+
+				a) Second moving time period
+
+				   This attribute is used for calculating the variance using the EWMA algorithm. 
+				   It represents the effectivetime interval over which values are scanned to 
+				   calculate an estimate of the variance. (It is used in the calculation of "g" 
+				   for variance as described in B.2.1 and B.2.3.) This attribute shall be 
+				   initialised when themetric object is created and may be modified.
+
+				   NOTE - The value of this attribute should be greater than or equal to the 
+				   value of the granularity periodattribute.
+
+				b) Estimate of variance
+
+				   This attribute contains the calculated estimate of variance.
+
+				The mean and variance monitor managed object class has one mandatory package and 
+				no conditional packages.';;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 17 };
+
+
+severityIndicatingGaugeThreshold ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.SeverityIndicatingGaugeThreshold;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		severityIndicatingGaugeThresholdBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.4.2.
+
+				8.1.9.4.2 Attributes of the derived gauge-threshold package
+
+				The derived gauge-threshold package contains the following attribute:
+
+				- Severity indicating gauge-threshold
+
+				  This attribute contains the threshold levels which are to be applied to the 
+				  derived gauge attribute. It shall be initialised when the managed object in 
+				  which it is included is created and may be modified. The attribute is 
+				  set-valued to allow multiple threshold levels to be specified. An optional 
+				  parameter is used toassociate the threshold level to the severity parameter of 
+				  the emitted notification. The generation of the notification can be switched 
+				  off using the boolean parameter notify-on-off. The severity parameter 
+				  ismandatory if notify-on-off is "true".
+
+				  This attribute has similar behaviour to the gauge-threshold attribute defined 
+				  in CCITT Rec. X.721 |ISO/IEC 10165-2 for triggering the related notifications. 
+				  The syntax has an added parameter for indicating the associated severity to 
+				  the notification triggered by the crossing of the correspondingthreshold 
+				  level. As an enhancement to the syntax of the gauge-threshold attribute type 
+				  it adds an optional severity indication parameter to the syntax of both the 
+				  notify-high and notify-low submembers withineach threshold level member.
+
+				  This attribute type has additional behaviour associated with these optional 
+				  perceived severity indication parameters, which is defined as follows:
+
+				   - If the notify-high's switch is on (true), the notify-high's severity 
+				   indication value shall be reported inthe perceived severity parameter of a 
+				   notification triggered by the gauge value crossing the notifyhigh's 
+				   gauge-threshold value in the positive going direction.
+
+				   - If the notify-low's switch is on (true), the notify-low's severity 
+				   indication value shall be reported inthe perceived severity parameter of a 
+				   notification triggered by the gauge value crossing the notifylow's 
+				   gauge-threshold value in the negative going direction.
+
+				  If both switches are on (true) for a single threshold level, one of the 
+				  severity indication values shallbe "clear". The severity indicating 
+				  gauge-threshold shall only emit a clear event notification if the 
+				  corresponding threshold level (either notify-high or notify-low) notification 
+				  has been emitted and noother clear notification for this threshold level pair 
+				  has been emitted since the previous corresponding threshold level notification 
+				  has been emitted.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 18 };
+
+
+specificProblemsIndicator ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX MetricModule.ObjectIdentifier;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		specificProblemsIndicatorBehaviour BEHAVIOUR
+			DEFINED AS
+				!See 8.1.9.7.2.
+
+				8.1.9.7.2 Attributes of the specific problems indication package
+
+				The specific problems indication package contains the following attribute:
+
+				- Specific problems indicator
+
+				  This attribute is used to indicate a specific type of metric monitoring. The 
+				  attribute is specified at themetric object creation time. The value of the 
+				  attribute is used to set the specific problems parameter of the quality of 
+				  service alarm notification. Three specific problems are registered for 
+				  workload monitoring:resource utilization, resource request rate and rejection 
+				  rate.!;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 19 };
+-- A.4 Name binding definitions
+
+
+scanner-system NAME BINDING
+	SUBORDINATE OBJECT CLASS scanner AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) nameBinding(6) 0 };
+
+END
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log$
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":scanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":statisticalReportRecord
+--@@ |  |  +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":operationResultRecord
+--@@ |  |  +- "Recommendation G.774.3":apsReportRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringDataObject
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":multiScheduler
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ +- "CCITT X.521":organization
+--@@ +- "CCITT X.521":organizationalUnit
+--@@ +- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ +- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ |  +- "ITU-T G.774.1 (02/2001)":pathTerminationHistoryData
+--@@ +- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSink
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSource
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "Recommendation G.774.3":protectionGroupR1
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionGroupR1
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  +- "Recommendation M.3100:1992":protectionGroupR2
+--@@ +- "Recommendation G.774.3":protectionUnit
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionUnit
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  +- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ +- "Recommendation M.3100:1992":abstractLink
+--@@ |  +- "Recommendation M.3100:1992":logicalLink
+--@@ |  +- "Recommendation M.3100:1992":topologicalLink
+--@@ +- "Recommendation M.3100:1992":abstractLinkEnd
+--@@ |  +- "Recommendation M.3100:1992":abstractLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":logicalLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":topologicalLinkEndR1
+--@@ +- "Recommendation M.3100:1992":accessGroup
+--@@ +- "Recommendation M.3100:1992":alarmReportingControlManager
+--@@ +- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ +- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ +- "Recommendation M.3100:1992":attributeRanges
+--@@ +- "Recommendation M.3100:1992":circuitEndPointSubgroup
+--@@ +- "Recommendation M.3100:1992":crossConnection
+--@@ |  +- "Recommendation M.3100:1992":crossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedCrossConnection
+--@@ +- "Recommendation M.3100:1992":equipment
+--@@ |  +- "Recommendation M.3100:1992":equipmentR1
+--@@ |  |  +- "Recommendation M.3100:1992":circuitPack
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":circuitPackR1
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentHolder
+--@@ +- "Recommendation M.3100:1992":externalPoint
+--@@ |  +- "Recommendation M.3100:1992":controlPoint
+--@@ |  +- "Recommendation M.3100:1992":scanPoint
+--@@ +- "Recommendation M.3100:1992":fabric
+--@@ |  +- "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ |  +- "Recommendation M.3100:1992":fabricR1
+--@@ |  |  +- "Recommendation M.3100:1992":fabricR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":fabricR3
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":fabricR4
+--@@ +- "Recommendation M.3100:1992":gtp
+--@@ |  +- "Recommendation M.3100:1992":gtpR1
+--@@ +- "Recommendation M.3100:1992":managedElement
+--@@ |  +- "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ |  +- "Recommendation M.3100:1992":managedElementR1
+--@@ |  |  +- "Recommendation M.3100:1992":managedElementR2
+--@@ +- "Recommendation M.3100:1992":managedElementComplex
+--@@ +- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  +- "Recommendation M.3100:1992":mpCrossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedMpCrossConnection
+--@@ +- "Recommendation M.3100:1992":network
+--@@ |  +- "Recommendation M.3100:1992":networkR1
+--@@ |  |  +- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  |  |  +- "Recommendation M.3100:1992":layerNetworkDomainR1
+--@@ +- "Recommendation M.3100:1992":physicalPort
+--@@ +- "Recommendation M.3100:1992":pipe
+--@@ |  +- "Recommendation M.3100:1992":connectionR1
+--@@ |  +- "Recommendation M.3100:1992":trailR1
+--@@ +- "Recommendation M.3100:1992":pipeR2
+--@@ |  +- "Recommendation M.3100:1992":linkConnection
+--@@ |  +- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  +- "Recommendation M.3100:1992":trailR2
+--@@ +- "Recommendation M.3100:1992":protectionUnitR1
+--@@ +- "Recommendation M.3100:1992":software
+--@@ |  +- "Recommendation M.3100:1992":softwareR1
+--@@ +- "Recommendation M.3100:1992":subNetwork
+--@@ +- "Recommendation M.3100:1992":terminationPoint
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":networkTerminationPoint
+--@@ |  |  +- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  |  |  +- "Recommendation M.3100:1992":genericTransportTTPR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPSinkR1
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSink
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ +- "Recommendation M.3100:1992":tpPool
+--@@ +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":heterogeneousScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":homogeneousScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":ensembleStatisticScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanScanner
+--@@ |  |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanVarianceScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":minMaxScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":percentileScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  +- "ITU-T Rec. Q.822 (1994)":currentData
+--@@ |  |  +- "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ |  |  |  +- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":monitorMetric
+--@@ |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":movingAverageMeanMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndMinMaxMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndPercentileMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndVarianceMonitor
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ "CCITT X.521":organization
+--@@ >- "Recommendation M.3100:1992":managedElement
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ |  >- "Recommendation G.774.3":protectionGroupR1
+--@@ |  |  >- "Recommendation G.774.3":protectionUnit
+--@@ |  >- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":attributeRanges
+--@@ |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  |  >- "Recommendation M.3100:1992":software
+--@@ |  |  |  >- "Recommendation M.3100:1992":software
+--@@ |  >- "Recommendation M.3100:1992":equipment +++
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":fabric
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":gtp
+--@@ |  |  >- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":tpPool
+--@@ |  >- "Recommendation M.3100:1992":fabric +++
+--@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
+--@@ |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  >- "Recommendation M.3100:1992":software +++
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++
+--@@ |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ |  |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "Recommendation M.3100:1992":managedElementComplex
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":network
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":connectionR1
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":network
+--@@ |  >- "Recommendation M.3100:1992":trailR1
+--@@ "CCITT X.521":organizationalUnit
+--@@ >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ >- "Recommendation M.3100:1992":network +++
+--@@ "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ >- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  >- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  >- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":mpCrossConnection +++
+--@@ "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Sink +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Source +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional +++
+--@@ >- "Recommendation G.774.3":protectedTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink +++
+--@@ >- "Recommendation G.774.3":protectedTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource +++
+--@@ "Recommendation M.3100:1992":networkR1
+--@@ >- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  >- "Recommendation M.3100:1992":accessGroup
+--@@ |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":logicalLink
+--@@ |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  >- "Recommendation M.3100:1992":subNetwork
+--@@ |  |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":topologicalLink
+--@@ |  |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":trailR2
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional +++
+--@@ "ITU-T Rec. Q.822 (1994)":currentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

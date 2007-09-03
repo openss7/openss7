@@ -1,0 +1,222 @@
+
+-- A.7 Supporting productions
+-- This subclause specifies the required ASN.1 value notation for the value reference used in the MANAGED OBJECT
+-- CLASS template.
+TestCategories-ASN1Module { joint-iso-ccitt ms(9) function(2) part14(14) asn1Module(2) 1}
+DEFINITION IMPLICIT TAGS
+::= BEGIN
+-- EXPORTS everything
+IMPORTS AttributeId
+FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules0(0) protocol(3) }
+ManagementExtension, StartTime, StopTime
+FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+TimeoutPeriod, TestOutcome, Timespec, MORTs, AssociatedObjects
+FROM Test-ASN1Module { joint-iso-ccitt ms(9) function(2) part12(12) asn1Module(2) 0 };
+part14ObjectClass OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part14(14) managedObjectClass(3) }
+part14Package OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part14(14) package(4) }
+part14Parameter OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part14(14) parameter(5) }
+part14NameBinding OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part14(14) nameBinding(6) }
+part14Attribute OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part14(14) attribute(7) }
+ConnectionTestInfo ::= SEQUENCE {
+testPattern [0] TestPattern OPTIONAL, -- test pattern sent
+testDirection [1] TestDirection OPTIONAL,
+testDuration [2] TestDuration OPTIONAL,
+reportingInterval [3] TimeSpec OPTIONAL }
+ConnectionTestResults ::= SEQUENCE {
+receivedTestPattern [0] TestPattern OPTIONAL,
+errorRatio [1] Real OPTIONAL,
+testDirection [2] TestDirection OPTIONAL,
+testDurationMade [3] Timespec OPTIONAL }
+ConnectivityTestInfo ::= SEQUENCE {
+timeoutPeriod [0] CHOICE {
+timeUnits Timespec,
+attributeId AttributeId },
+effectiveTime [1] Timespec }
+ConnectivityTestResults ::= CHOICE {
+establishmentTime [0] TimeSpec,
+timeoutPeriod [1] TimeoutPeriod,
+testThreshold [2] TestThreshold,
+specificError [3] OBJECT IDENTIFIER }
+ConnectivityThreshold ::= CHOICE {
+time [0] SEQUENCE {
+unitsType UnitsType,
+unitsTotal UnitsTotal },
+rawData [1] RawData }
+ContCond ::= CHOICE {
+intervalTime Timespec,
+pDUReception PDUReception }
+DataCategory ::= INTEGER {
+bits (0),
+octets (1),
+blocks (2),
+packets (3)
+-- ... }
+DataIntegrityTestInfo ::= SEQUENCE OF {
+dataUnits DataUnits }
+DataIntegrityTestResults ::= CHOICE {
+testResult [0] SEQUENCE {
+establishmentTime [1] EstablishmentTime OPTIONAL,
+originalData [2] DataUnits,
+corruptedData [3] DataUnits OPTIONAL },
+timeoutPeriod [4] TimeoutPeriod,
+testThreshold [5] TestThreshold
+}
+DataRate ::= CHOICE { REAL, OBJECT IDENTIFIER }
+DataSize ::= INTEGER
+DataType ::= CHOICE {
+integerDataType IntegerDataType,
+objectIdentifierDataType OBJECT IDENTIFER }
+DataUnits ::= SEQUENCE {
+dataType [0] DataType,
+dataCategory [1] DataCategory OPTIONAL,
+dataSize [2] DataSize OPTIONAL,
+dataNumber [3] UnitsTotal OPTIONAL,
+dataRate [4] DataRate OPTIONAL }
+ErrorRatioReportType ::= ENUMERATED {
+errorBitNumber (0),
+percentErrorSecond (1) }
+ErrorUnitThreshold ::= SEQUENCE {
+unitType [0] UnitType,
+unitsTotal [1] UnitsTotal }
+EstablishmentTime ::= Timespec
+FailedCase ::= ENUMERATED {
+lineDisconnected(0),
+counterOverflow(1) } -- error counter overflow
+IntegerDataType ::= INTEGER {
+allBitOn(0),
+allBitOff(1),
+incrementNumber(2),
+pn11(3), -- CCITT 0.152
+pn15(4), -- CCITT 0.151
+pn20(5)
+-- ...}
+IntermediateResourceBoundaryTestOutcome ::= ENUMERATED {
+passed (0),
+unexpected (1),
+wrongSignalReceived (2),
+waitDurationTimerExpired (3) }
+IntermediateResponse ::= ENUMERATED {
+inProgress (0),
+delayedMeasurement (1),
+interruptedMeasurement (2),
+repeatLater (3),
+noAcknowledgement (4) } -- abnormal condition, a correct response cannot be sent
+InternalResourceTestResults ::= SEQUENCE {
+functionTested OBJECT IDENTIFIER,
+testResult ANY DEFINED BY functionTested }
+LoopbackError ::= CHOICE { errorBitNo INTEGER, percent REAL }
+LoopbackTestInfo ::= SEQUENCE OF {
+loopbackData TestSignalSequence OPTIONAL,
+testStartTime GeneralizedTime OPTIONAL,
+testIntervalTime TimeSpec OPTIONAL,
+reportingIntervalTime TimeSpec OPTIONAL,
+loopbackType OBJECT IDENTIFIEROPTIONAL,
+loopbackTimeout TimeSpec OPTIONAL,
+loopbackErrorThreshold LoopbackError OPTIONAL }
+LoopbackTestResult ::= CHOICE {
+passed SEQUENCE
+{ loopbackDataReceived TestSignalSequence,
+loopbackErrorReceived LoopbackError },
+fail INTEGER (errorRatioThresholdExceeded (0), loopbackTimeoutExceeded (1)),
+timeout NULL, -- test timeout period exceeded --
+prematureTermination NULL,
+inconclusive NULL }
+LoopbackType ::= OBJECT IDENTIFIER
+Parameter ::= SEQUENCE {
+attributeType AttributeId,
+value ANY DEFINED BY attributeType }
+Pattern Type ::= DataType
+PDUReception ::= SEQUENCE {
+pDUType PDUType,
+parameter Parameter,
+responseTimeout ResponseTimeout OPTIONAL }
+PDUSequence ::= SEQUENCE {
+pDUType PDUType,
+parameter Parameter,
+contCond ContCond,
+waitDuration WaitDuration OPTIONAL}
+PDUType ::= OBJECT IDENTIFIER
+ProtocolIntegrityTestInfo ::= SEQUENCE { -- This ProtocolIntegrityTestInfo is optional.
+pDUSequence [0] PDUSequence,
+pDUReception [1] PDUReception OPTIONAL, -- one, and only one, of the pDUReception
+waitingInterval [2] WaitingInterval OPTIONAL, -- and the waitingInterval shall be present
+startTime [3] StartTime OPTIONAL,
+stopTime [4] StopTime OPTIONAL }
+ProtocolIntegrityTestResults ::= INTEGER {
+wrongPDUResponse (0),
+pDUResponseNotReceived (1) }
+ResourceBoundaryTestInfo ::= SEQUENCE {
+resultReportIndicator [0] IMPLICIT ResultReportIndicator OPTIONAL,
+sequenceOfEvents [1] IMPLICIT SequenceOfEvents OPTIONAL }
+ResourceBoundaryTestResults ::= SEQUENCE {
+signalReceived [0] IMPLICIT SignalReceived OPTIONAL,
+intermediateResourceBoundaryTestOutcome [1] IMPLICIT IntermediateResourceBoundaryTestOutcome
+OPTIONAL,
+eventId [2] IMPLICIT INTEGER OPTIONAL }
+ResourceSelfTestInfo ::= SEQUENCE {
+diagnosticType [0] INTEGER OPTIONAL, --type of diagnostic to be run
+phases SET OF INTEGER, -- phases to be run
+iteration [1] INTEGER -- number of iterations for each type
+timeoutPeriod [2] TimeoutPeriod }
+ResourceSelfTestResults ::= CHOICE {
+intermediateResponse IntermediateResponse,
+SEQUENCE {
+phases SET OF INTEGER,
+iteration [0] INTEGER,
+timeoutPeriod [1] TimeoutPeriod,
+finalResponse PrintableString OPTIONAL } }
+ResultInterval ::= INTEGER
+ResultReportIndicator ::= ENUMERATED {
+resultReportForPassedSequences (0),
+noResultReportForPassedSequences (1) }
+SequenceOfEvents ::= SET OF SEQUENCE {
+eventId INTEGER,
+signalType OBJECT IDENTIFIER,
+signalValue ANY DEFINED BY signalType,
+signalDirection SignalDirection,
+mORTs MORTs,
+associatedObjects AssociatedObjects,
+waitDuration WaitDuration }
+SignalDirection ::= ENUMERATED {
+send (0),
+receive (1) }
+SignalReceived ::= SET OF SEQUENCE {
+signalType OBJECT IDENTIFIER,
+signalValue ANY DEFINED BY signalType,
+mORTs MORTs,
+associatedObjects AssociatedObjects }
+StateTransitionTimeInterval ::= Timespec
+TerminationReason ::= OBJECT IDENTIFIER
+TestConditions::= SEQUENCE {
+INTEGER {
+testIfBusy (0),
+rejectIfBusy (1),
+waitIfBusy (2) },
+INTEGER {
+customerOverrideTest (0),
+noCustomerOverrideTest (1) } OPTIONAL }
+TestDirection ::= INTEGER { atoZ (0), ztoA (1), bothDirections (2), transmitFromNearEnd (3), receiveFromNearEnd (4) }
+TestDuration ::= CHOICE {
+signalDuration Timespec,
+signalLength SEQUENCE {
+size INTEGER
+dataRate dataRate OPTIONAL
+TestPatternSequence ::= SEQUENCE OF { TestSignal }-- There should be some size limitation here
+-- if test signal pattern is to fit in one pdu!!!!!
+TestPattern ::= CHOICE {
+rawData OCTET STRING,
+standardType DataType,
+undefinedType ManagementExtension }
+TestThreshold ::= CHOICE {
+bitErrorThreshold [0] INTEGER,
+percentageErrorThreshold [1] REAL,
+errorUnitThreshold [2] UnitErrorThreshold }
+Type ::= INTEGER {
+connectionOriented (0),
+connectionless (1) }
+UnitsTotal ::= INTEGER
+UnitType ::= OBJECT IDENTIFIER
+WaitDuration ::= Timespec
+WaitingInterval ::= Timespec
+END
+

@@ -1,0 +1,1291 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 12:03:50 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.740.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
+--< GDMO.Alias "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" "X.741",
+--  "ITU-T Rec. X.741 (1995)/Cor.2 (1998) | ISO/IEC 10164-9 : 1995/Cor.2 : 1999",
+--  "ITU-T Rec. X.741 (1995)/Cor.3 (2000) | ISO/IEC 10164-9 : 1995/Cor.3 : 2001" >--
+MODULE "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995"
+-- Annex A
+-- Definition of management information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.2 Definition of access control managed object classes
+-- A.2.1 Access control object class
+-- The access control managed object class is used to provide a common naming attribute and attribute value change
+-- reporting for managed objects representing access control information. It is not intended to be instantiated.
+
+accessControl MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		accessControlPackage PACKAGE
+			BEHAVIOUR
+				accessControlBehaviour BEHAVIOUR
+					DEFINED AS
+						!The access control managed object class shall emit the object creation and 
+						object deletion notifications. Specializations of the access control managed 
+						object class shall define the conditions under which attribute value change 
+						notifications are to be emitted.!;;
+			ATTRIBUTES
+				accessControlObjectName GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) accessControl(1) };
+-- A.2.2 Access control rules
+-- The accessControlRules managed object class is used to define a representation of access control rules. One
+-- accessControlRules managed object is required per access decision function within a security domain.
+
+
+accessControlRules MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessControl;
+	CHARACTERIZED BY
+		accessControlRulesPackage PACKAGE
+			BEHAVIOUR
+				accessControlRulesBehaviour BEHAVIOUR
+					DEFINED AS
+						!An access control rules managed object may contain rule managed objects, each of 
+						which represents a global or an item rule. It shall use those rules in the 
+						application of the procedures of 7.4 in accordance with the policy of the access 
+						control domain.
+
+						An attribute value change notification shall be emitted when any attribute of 
+						this object class is modified.
+
+						NOTE An access control rules managed object may contain rule managed objects 
+						which are in conflict for a given initiator, target pair. The procedures of 
+						7.4.3.1 ensure that the principle of least privilege applies.!;;
+			ATTRIBUTES
+				defaultAccess REPLACE-WITH-DEFAULT
+					DEFAULT VALUE AccessControl-ASN1Module.denyAll
+					GET-REPLACE,
+				domainIdentity GET-REPLACE,
+				denialGranularity GET-REPLACE,
+				defaultDenialResponse GET-REPLACE;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) accessControlRules(2) };
+-- A.2.3 Rule
+
+
+rule MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessControl;
+	CHARACTERIZED BY
+		rulePackage PACKAGE
+			BEHAVIOUR
+				ruleBehaviour BEHAVIOUR
+					DEFINED AS
+						!Each rule identifies its nature - to grant or deny access. In the case where the 
+						enforcement action attribute has a value of allow, then access is permitted, 
+						else the enforcement action attribute defines the type of denial response made 
+						to the initiator of the management operation.
+
+						A rule managed object may include characteristics to represent a context for the 
+						rule.
+
+						One such context is a scheduling capability. When included, the scheduling 
+						packages control the value of the availability status attribute which shall 
+						exhibit the value { off duty } when the schedule requires that the rule not be 
+						available and the value {} otherwise.
+
+						Another context is the state of other managed objects. When included, the state 
+						conditions package identifies managed objects and filters upon their attributes. 
+						This rule shall only pertain if the managed objects exist and the filters 
+						evaluate to TRUE.
+
+						The initiator list attribute identifies initiator managed objects which identify 
+						initiators within the context of one or more access control schemes. If the list 
+						is empty, the rule shall apply to all initiators.
+
+						The targets list attribute identifies the target managed objects which specify 
+						the targets to which the rule pertains. If the list is empty, the rule is a 
+						global rule otherwise it is an item rule. The creation and deletion of rules 
+						shall be signalled by object creation and object deletion notifications 
+						respectively.
+
+						An attribute value change notification shall be emitted when any attribute of 
+						this object class is modified.!;;
+			ATTRIBUTES
+				enforcementAction REPLACE-WITH-DEFAULT
+					DEFAULT VALUE AccessControl-ASN1Module.deny-- Corrigendum 2
+					GET-REPLACE,
+				initiatorsList GET-REPLACE ADD-REMOVE,
+				targetsList GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":availabilityStatusPackage
+			PRESENT IF
+				!Any of the scheduling packages (duration, daily, weekly, external) are present.!,
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":duration
+			PRESENT IF
+				!The object is to be available from a specified start time, indefinitely or until 
+				a specified stop time.!,-- Corrigendum 2
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":dailyScheduling
+			PRESENT IF
+				!Both the weekly scheduling package and external scheduler package are not 
+				present and daily scheduling is supported.!,-- Corrigendum 2
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":weeklyScheduling
+			PRESENT IF
+				!Both the daily scheduling package and external scheduler package are not present 
+				and weekly scheduling is supported.!,-- Corrigendum 2
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":externalScheduler
+			PRESENT IF
+				!Both the daily scheduling package and weekly scheduling package are not present 
+				and external scheduling is supported.!,-- Corrigendum 2
+		stateConditionsPackage PACKAGE
+			BEHAVIOUR
+				stateConditionsBehaviour BEHAVIOUR
+					DEFINED AS
+						!When this package is present in a rule managed object, the filters identified by 
+						the state conditions attribute shall be evaluated for the managed objects 
+						identified by that attribute. If the managed objects are not available or the 
+						filters evaluates to FALSE then the rule shall evaluate to FALSE. If the filters 
+						evaluate to TRUE, then the rule shall evaluate to TRUE.!;;
+			ATTRIBUTES
+				stateConditions GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) stateConditionsPackage(1) };
+			PRESENT IF
+				!The state of another managed object provides a context for this rule.!,
+		authenticationContextPackage PACKAGE
+			BEHAVIOUR
+				authenticationContextBehaviour BEHAVIOUR
+					DEFINED AS
+						!When this package is present in a rule managed object, then the authentication 
+						requirements specified by the authentication context attribute shall be 
+						satisfied before any further evaluation of the access rights of an initiator is 
+						performed. If the authentication requirements are not satisfied, then the rule 
+						shall evaluate to FALSE.!;;
+			ATTRIBUTES
+				authenticationContext GET-REPLACE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) authenticationContextPackage(2) };-- Corrigendum 2
+		PRESENT IF
+				!The authentication context is required.!;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) rule(3) };
+-- A.2.4 Notification emitter
+
+
+notificationEmitter MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessControl;
+	CHARACTERIZED BY
+		accessControlNotificationEmitterPkg PACKAGE
+			BEHAVIOUR
+				accessControlNotificationEmitterDefinition BEHAVIOUR
+					DEFINED AS
+						!This managed object class enables an access control scheme to report on 
+						potential or actual attacks on the security of management applications and 
+						management information. An instance of this managed object class shall support 
+						at least one of the conditional packages defined below.!;;;;-- Corrigendum 2
+	CONDITIONAL PACKAGES
+		securityViolationAlarmPkg PACKAGE
+			BEHAVIOUR
+				securityViolationAlarmBehaviour BEHAVIOUR
+					DEFINED AS
+						!This package enables a security alarm notification of type Security service or 
+						mechanism violationc and cause sunauthorized access attempti to be emitted if 
+						access control checks should fail.!;;
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2:1992":securityServiceOrMechanismViolation;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) securityViolationAlarmPkg(3) };
+			PRESENT IF
+				!the security policy requires that this security alarm type shall be emitted if 
+				the access control checks fail.!,-- bb Correction
+		timeViolationAlarmPkg PACKAGE
+			BEHAVIOUR
+				timeViolationAlarmBehaviour BEHAVIOUR
+					DEFINED AS
+						!This package enables a security alarm notification of type Time domain violation 
+						and causes pKey expiredl and sout of hours activitya to be emitted if access 
+						control checks should fail. The cause rkey expiredt shall be used when the key 
+						identified by the access control certificate seal is out of date. The eout of 
+						hours activitye cause shall be used when contextual time checks fail.!;;
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2:1992":timeDomainViolation;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) timeViolationAlarmPkg(4) };
+			PRESENT IF
+				!the security policy requires that this security alarm type shall be emitted when 
+				either out of hours activity is detected or an expired key has been used.!,-- bb Correction
+		operationalViolationAlarmPkg PACKAGE
+			BEHAVIOUR
+				operationalViolationAlarmBehaviour BEHAVIOUR
+					DEFINED AS
+						!This package enables a security alarm notification of type operational violation 
+						and causes out of servicee and sunspecified reasonn to be emitted if access 
+						control checks should fail. The cause fout of services shall be used when the 
+						access control mechanism identified is not available. The eunspecified reasone 
+						cause shall be used in other cases.!;;-- bb Correction
+			NOTIFICATIONS
+				"Rec. X.721 | ISO/IEC 10165-2:1992":operationalViolation;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) operationalViolationAlarmPkg(5) };
+			PRESENT IF
+				!the security policy requires that this security alarm type shall be emitted when 
+				either the access control mechanism is unavailable or the security policy 
+				identifies further causes.!,-- bb Correction
+		accessControlUsagePkg PACKAGE
+			BEHAVIOUR
+				accessControlUsagePkgBehaviour BEHAVIOUR
+					DEFINED AS
+						!This package is used to count the number of valid and invalid access attempts 
+						and to enable usage reports containing this information to be sent to a security 
+						audit trail log. The usage report is sent at a time interval defined by the 
+						security policy. The additional information field is used to convey the counter 
+						values.!;;
+			ATTRIBUTES
+				validAccessAttempts,
+				invalidAccessAttempts;
+			NOTIFICATIONS
+				"Rec. X.740 | ISO/IEC 10164-8:1992":usageReport;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) accessControlUsagePkg(6) };
+			PRESENT IF
+				!the security policy requires that the number of valid and invalid access 
+				attempts are logged.!,-- bb Correction
+		accessControlServiceReportPkg PACKAGE
+			BEHAVIOUR
+				accessControlServiceReportPkgBehaviour BEHAVIOUR
+					DEFINED AS
+						!This package allows security audit trail notifications of type service report to 
+						be emitted for possible inclusion in a security audit trail log.!;;
+			NOTIFICATIONS
+				"Rec. X.740 | ISO/IEC 10164-8:1992":serviceReport;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) accessControlServiceReportPkg(7) };
+			PRESENT IF
+				!the security policy requires that service reports are logged.!;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) notificationEmitter(4) };
+-- A.2.5 Targets
+-- The targets managed object class is used to identify managed objects to which access is controlled.
+
+
+targets MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessControl;
+	CHARACTERIZED BY
+		targetsPackage PACKAGE
+			BEHAVIOUR
+				targetsBehaviour BEHAVIOUR
+					DEFINED AS
+						!Targets identify managed objects within the security domain. These managed 
+						objects are identified according to the following rules:
+
+						a) all managed objects within the security domain and belonging to the managed 
+						   object classes identified by the managed object classes attribute are 
+						   identified with specified name bindings;
+
+						b) all managed objects within the security domain identified explicitly by the 
+						   managed object instances attribute are identified;
+
+						c) each managed object selected according to a) and b) shall be regarded as a 
+						   base managed object for selecting managed objects according to the scope and 
+						   filter attributes; and
+
+						d) all managed objects selected according to c) shall be regarded as the target 
+						   managed objects.
+
+						Unless the targets managed object contains operations managed objects, the 
+						targets managed object identifies all operations upon the selected managed 
+						objects.
+
+						An attribute value change notification shall be emitted when any attribute of 
+						this managed object is modified.!;;
+			ATTRIBUTES
+				managedObjectClasses GET-REPLACE ADD-REMOVE,
+				managedObjectInstances GET-REPLACE ADD-REMOVE,
+				scope GET-REPLACE,
+				filter GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		operationsListPackage PACKAGE
+			BEHAVIOUR
+				operationsListPackBehav BEHAVIOUR
+					DEFINED AS
+						!This package provides support for the operations list attribute as an 
+						alternative to the operations managed object. It may only be included in the 
+						targets managed object if the targets managed object contains no instantiation 
+						of the operations managed object.!;;
+			ATTRIBUTES
+				operationsList GET-REPLACE ADD-REMOVE;-- Corrigendum 2
+			REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) operationsListPackage(15) };-- Corrigendum 2
+		PRESENT IF
+				!No contained Operations object!;-- Corrigendum 2
+	REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) targets(5) };
+-- A.2.6 Operations
+-- Instantiations of the operations managed object identify which operations may be carried out on the specified
+-- management information (identified by the targets managed object).
+
+
+operations MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2 :1992":top;
+	CHARACTERIZED BY
+		operationsPackage PACKAGE
+			BEHAVIOUR
+				operationsBehaviour BEHAVIOUR
+					DEFINED AS
+						!The operations managed object identifies constraints on operation types for 
+						managed objects identified by the containing targets managed object.
+
+						The operation type is specified by the operation type attribute, which is also 
+						the naming attribute for the operations managed object class.
+
+						The constraints on the operation type, some of which are peculiar to the 
+						operation type, are specified by other attributes contained in conditional 
+						packages.
+
+						When a target managed object identifies the managed object specified in the 
+						access request, and contains one or more operations managed objects, then an 
+						access request shall satisfy the following conditions for the containing rule to 
+						be satisfied:
+
+						a) the access request matches the operation type for one of the operations 
+						   managed objects contained in the target; and
+
+						b) the constraints specified for the operation type are satisfied.
+
+						The operations managed object shall emit the object creation notification when 
+						it it is created and the object deletion notification when it is deleted. An 
+						attribute value change notification shall be emitted when any attribute of this 
+						managed object class is modified.!;;
+			ATTRIBUTES
+				operationType GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		attributeIdsPackage PACKAGE
+			BEHAVIOUR
+				attributeIdsBehaviour BEHAVIOUR
+					DEFINED AS
+						!The attributes identified by the attribute identifier list attribute shall be 
+						part of the target. If the attribute identifier list attribute is empty, then 
+						all attributes shall be part of the target for the identified operation for the 
+						managed objects identified by the containing targets managed object.!;;
+			ATTRIBUTES
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeIdentifierList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) attributeIdsPackage(8) };
+			PRESENT IF
+				!operation type is get, replace with default or filter!,
+		attributeModificationPackage PACKAGE
+			BEHAVIOUR
+				attributeModificationBehaviour BEHAVIOUR
+					DEFINED AS
+						!The attribute values identified by the attribute filter list attribute shall be 
+						part of the target. If the attribute filter list attribute is empty, then all 
+						attributes and their values shall be part of the target for the identified 
+						operation for the managed objects identified by the containing targets managed 
+						object. If the attribute filter list attribute identifies an attribute without 
+						constraining its value, then all values of that attribute shall be part of the 
+						target for the identified operation for the managed objects identified by the 
+						containing targets managed object.!;;
+			ATTRIBUTES
+				attributeFilterList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) attributeModificationPackage(9) };
+			PRESENT IF
+				!operation type is replace, add, remove or create!,
+		actionsPackage PACKAGE
+			BEHAVIOUR
+				actionsBehaviour BEHAVIOUR
+					DEFINED AS
+						!The action values identified by the action filter list attribute shall be part 
+						of the target. If the action filter list attribute is empty, then all actions 
+						and their information values shall be part of the target for the identified 
+						operation for the managed objects identified by the containing targets managed 
+						object. If the action filter list attribute identifies an action without 
+						constraining its information value, then all values of that action information 
+						shall be part of the target for the identified operation for the managed objects 
+						identified by the containing targets managed object.
+
+						NOTE For the purposes of filtering, parameters of actions may be identified as 
+						attributes using the parameter template defined in CCITT Rec. X.722 | ISO/IEC 
+						10165-4.!;;
+			ATTRIBUTES
+				actionFilterList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) actionsPackage(10) };
+			PRESENT IF
+				!operation type is action!,
+		scopePackage PACKAGE
+			BEHAVIOUR
+				scopeBehaviour BEHAVIOUR
+					DEFINED AS
+						!The scope and synchronization values identified by the scope and synchronization 
+						attributes shall be part of the target.!;;
+			ATTRIBUTES
+				scopeFilter GET-REPLACE,
+				synchronizationFilter GET-REPLACE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) scopePackage(11) };
+			PRESENT IF
+				!operation type is multiple object selection!;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) operations(6) };
+-- A.2.7 Initiators
+-- The initiators managed object class is used to identify a set of possible operation requestors. The precise means of
+-- identifying initiators depends upon the security policy. The initiators managed object class is not intended to be
+-- instantiated but is intended to be specialized to enable operation requestors to be identified in accordance with a given
+-- security policy. It is recommended that all packages which provide attributes to identify requestors be registered so that
+-- the packages attribute may be used to identify the policy.
+
+
+initiators MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessControl;
+	CHARACTERIZED BY
+		initiatorsPackage PACKAGE
+			BEHAVIOUR
+				initiatorsBehaviour BEHAVIOUR
+					DEFINED AS
+						!Initiators identify individual requestors of management operations in accordance 
+						with the applicable access control schemes. The diversity of possible schemes 
+						prohibits a single representation of initiators. Specializations of the 
+						initiators managed object class provide attributes to identify requestors in 
+						accordance with given access control schemes.
+
+						Where a specialization identifies more than one access control scheme, it shall 
+						also contain behaviour to resolve conflicts of rights associated with the 
+						different schemes.!;;
+			ATTRIBUTES
+				initiatorACImandated REPLACE-WITH-DEFAULT
+					DEFAULT VALUE AccessControl-ASN1Module.false
+					GET-REPLACE;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) initiators(7) };
+-- A.2.8 ACL initiators
+
+
+aclInitiators MANAGED OBJECT CLASS
+	DERIVED FROM
+		initiators;
+	CHARACTERIZED BY
+		aclPackage PACKAGE
+			BEHAVIOUR
+				aclInitiatorsBehaviour BEHAVIOUR
+					DEFINED AS
+						!This managed object class is used to support an ACL based access control scheme.
+
+						The ACL initiators managed object class contains a list of names or other 
+						identities that together form an access control list. The identity of a 
+						management operation requestor shall be matched with the entries of an access 
+						control list to evaluate whether the requestor is an authorized initiator. 
+						Multiple ACL initiators managed objects may be instantiated within a rule 
+						managed object.
+
+						An attribute value change notification shall be emitted when any attribute of 
+						this object class is modified.!;;
+			ATTRIBUTES
+				accessControlList GET-REPLACE ADD-REMOVE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) aclPackage(12) };;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) aclInitiators(8) };
+-- A.2.9 Capability initiators
+
+
+capabilityInitiators MANAGED OBJECT CLASS
+	DERIVED FROM
+		initiators;
+	CHARACTERIZED BY
+		capabilityPackage PACKAGE
+			BEHAVIOUR
+				capabilityInitiatorsBehaviour BEHAVIOUR
+					DEFINED AS
+						!The capability initiators managed object class contains a list of identities 
+						that are used to determine whether the security capability associated with the 
+						access request is allowed to be used by the initiator of the request.
+
+						The identity associated with the access request is matched with the contents of 
+						the capability identity list attribute to evaluate whether the security 
+						capability associated with the access request is allowed to be used by the 
+						initiator of the request.
+
+						The identities may be an individual name, group name, role name, or application 
+						name which may be associated with an optional set of security domain authority 
+						name and operation type pairs; or, the identity may be of a form unspecified 
+						within this Recommendation | International Standard. NOTE When a capability 
+						scheme is used, rule managed objects that specify deny permission are not 
+						required. The absence of the identity in the capability identities list 
+						attribute results in the capability not being valid. In addition, targets 
+						managed objects and associated operations managed objects are not required, 
+						unless further access constraints are required to enforce local security policy 
+						refinements of the containing security domain policy.
+
+						An attribute value change notification shall be emitted when any attribute of 
+						this object class is modified.!;;
+			ATTRIBUTES
+				capabilityIdentitiesList GET-REPLACE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) capabilityPackage(13) };;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) capabilityInitiators(9) };
+-- A.2.10 Label initiators
+
+
+labelInitiators MANAGED OBJECT CLASS
+	DERIVED FROM
+		initiators;
+	CHARACTERIZED BY
+		labelPackage PACKAGE
+			BEHAVIOUR
+				labelInitiatorsBehaviour BEHAVIOUR
+					DEFINED AS
+						!The labels initiators managed object may be used to specify constraints on 
+						management operations that are in addition to the constraint of requiring a 
+						compatibility match between the security label associated with the initiator and 
+						the security label associated with the target.
+
+						Access shall be granted or denied to an initiator in accordance with the 
+						containing rule only if the initiatoras security label is a member of the set of 
+						security labels identified by the security label attribute, the operation on the 
+						target conforms to the conditions specified by the relevant targets managed 
+						object and operations managed objects associated with the rule, and the security 
+						label of the initiator is compatible with the security label assigned to the 
+						target.
+
+						NOTE Association of a security label with a target must have occurred prior to 
+						the use of that label in the above procedure. Security labels are associated 
+						with targets using the assigned labels, attribute label, instance label, and 
+						class label managed objects and associated procedures described in 7.4.
+
+						An attribute value change notification shall be emitted when any attribute of 
+						this object class is modified.!;;
+			ATTRIBUTES
+				securityLabel GET-REPLACE;
+		REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) package(4) labelPackage(14) };;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) labelInitiators(10) };
+-- A.2.11 Assigned labels
+
+
+assignedLabels MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;-- Corrigendum 2
+	CHARACTERIZED BY
+		assignedLabelsPackage PACKAGE
+			BEHAVIOUR
+				assignedLabelsPkgBehav BEHAVIOUR
+					DEFINED AS
+						!This managed object contains the attribute label, instance label and class label 
+						managed objects that, in combination with precedence relationships, assign a 
+						single security label to targets.
+
+						There shall be only one managed object of this class per access control decision 
+						function.
+
+						To assure association of a single security label with a target, a precedence 
+						relationship is specified between and within attribute label, instance label and 
+						class label managed objects classes as follows:
+
+						 Between class precedence relationships
+
+						Attribute label managed object > instance label managed object > object label 
+						managed object
+
+						 Within class precedence relationships.
+
+						All attribute label, instance label, and class label managed objects shall be 
+						considered to be ordered within their respective managed object class according 
+						to the value of the naming attribute for the managed object.
+
+						The value of the security label attribute within the attribute label, instance 
+						label, or class label managed object which references the target, either 
+						directly or indirectly, has the greatest class precedence, and is first in the 
+						lexicographical order within the class, shall be associated with the target.
+
+						If a security label is not associated with a target by an attribute label, 
+						instance label, or class label managed object, the default security label 
+						contained in the security label attribute of this managed object shall be 
+						associated with the target.
+
+						The assigned labels managed object class shall emit the object creation 
+						notification when a managed object of this class is created, and shall emit the 
+						object deletion notification when a managed object of this class is deleted. An 
+						attribute value change notification shall be emitted when any attribute of this 
+						managed object class is modified.!;;
+			ATTRIBUTES
+				labelName GET,
+				securityLabel GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) assignedLabels(11) };
+-- A.2.12 Attribute label
+
+
+attributeLabel MANAGED OBJECT CLASS
+	DERIVED FROM
+		assignedLabels;
+	CHARACTERIZED BY
+		attributeLabelPackage PACKAGE
+			BEHAVIOUR
+				attributeLabelPkgBehav BEHAVIOUR
+					DEFINED AS
+						!This managed object associates a security label with specific attributes within 
+						a managed object.
+
+						The security label is the value contained in the security label attribute.
+
+						The attributes are the values contained in the attribute identifier list 
+						attribute.
+
+						The managed object is the value contained in the managed object instance 
+						attribute.
+
+						There may be multiple managed objects of this class contained within an assigned 
+						labels managed object.
+
+						The behaviour of attribute label managed objects relative to others within its 
+						class, and managed objects within the instance label and class label managed 
+						object classes, shall be as defined in the assigned labels managed object 
+						behaviour.!;;
+			ATTRIBUTES
+				"CCITT Rec. X.721 | ISO 10165-2:1992":managedObjectInstance GET,
+				"CCITT Rec. X.721 | ISO 10165-2:1992":attributeIdentifierList GET;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) attributeLabel(12) };
+-- A.2.13 Instance label
+
+
+instanceLabel MANAGED OBJECT CLASS
+	DERIVED FROM
+		assignedLabels;
+	CHARACTERIZED BY
+		instanceLabelPackage PACKAGE
+			BEHAVIOUR
+				instanceLabelPkgBehav BEHAVIOUR
+					DEFINED AS
+						!This managed object associates a security label with specific managed objects.
+
+						The security label is the value contained in the security label attribute.
+
+						The managed object identifiers are contained in the managed object instances 
+						attribute.
+
+						There may be multiple managed objects of this class contained within an assigned 
+						labels managed object.
+
+						The behaviour of instance label managed objects relative to others within its 
+						class, and managed objects within the attribute label and class label managed 
+						object classes, shall be as defined in the assigned labels managed object 
+						behaviour.!;;
+			ATTRIBUTES
+				managedObjectInstances GET;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) instanceLabel(13) };
+-- A.2.14 Class label
+
+
+classLabel MANAGED OBJECT CLASS
+	DERIVED FROM
+		assignedLabels;
+	CHARACTERIZED BY
+		classLabelPackage PACKAGE-- Corrigendum 2
+			BEHAVIOUR
+				classLabelPkgBehav BEHAVIOUR
+					DEFINED AS
+						!This managed object associates a security label with specific managed object 
+						classes.
+
+						The security label is the value contained in the security label attribute.
+
+						The managed object class identifiers are contained in the managed object classes 
+						attribute.
+
+						There may be multiple managed objects of this class contained within an assigned 
+						labels managed object.
+
+						The behaviour of class label managed objects relative to others within its 
+						class, and managed objects within the attribute label and instance label managed 
+						object classes, shall be as defined in the assigned labels managed object 
+						behaviour.!;;
+			ATTRIBUTES
+				managedObjectClasses GET;;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) managedObjectClass(3) classLabel(14) };
+-- A.3 Definition of name bindings
+-- A.3.1 Rule  Access control rule
+
+
+rule-accessControlRules NAME BINDING
+	SUBORDINATE OBJECT CLASS rule AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS accessControlRules AND SUBCLASSES;
+	WITH ATTRIBUTE
+		accessControlObjectName;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) rule-accessControlRules(1) };
+-- A.3.2 Operations  Targets
+
+
+operations-targets NAME BINDING
+	SUBORDINATE OBJECT CLASS operations AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS targets AND SUBCLASSES;
+	WITH ATTRIBUTE
+		operationType;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) operations-targets(2) };
+-- A.3.3 Notification emitter  Access control rules
+
+
+notificationEmitter-accessControlRules NAME BINDING
+	SUBORDINATE OBJECT CLASS notificationEmitter AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS accessControlRules AND SUBCLASSES;
+	WITH ATTRIBUTE
+		accessControlObjectName;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) notificationEmitter-accessControlRules(3) };
+-- A.3.4 Attribute label  Assigned labels
+
+
+attributeLabel-assignedLabels NAME BINDING
+	SUBORDINATE OBJECT CLASS attributeLabel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS assignedLabels AND SUBCLASSES;
+	WITH ATTRIBUTE
+		labelName;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) attributeLabel-assignedLabels(4) };
+-- A.3.5 Instance label  Assigned labels
+
+
+instanceLabel-assignedLabels NAME BINDING
+	SUBORDINATE OBJECT CLASS instanceLabel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS assignedLabels AND SUBCLASSES;
+	WITH ATTRIBUTE
+		labelName;
+	CREATE;
+	DELETE;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) instanceLabel-assignedLabels(5) };
+-- A.3.6 Class label  Assigned labels
+
+
+classLabel-assignedLabels NAME BINDING
+	SUBORDINATE OBJECT CLASS classLabel AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS assignedLabels AND SUBCLASSES;
+	WITH ATTRIBUTE
+		labelName;
+	CREATE;
+	DELETE;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) nameBinding(6) classLabel-assignedLabels(6) };
+-- A.4 Definition of parameters
+-- A.4.1 Invalid access control filter
+
+
+invalidAccessControlFilter PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX AccessControl-ASN1Module.InvalidAccessControlFilter;-- Corrigendum 2
+	BEHAVIOUR
+		invalidAccessControlFilterBehaviour BEHAVIOUR
+			DEFINED AS
+				!This CMIS processing failure specific error reports an error in a proposed 
+				access control filter element. Its value shall be a sequence of an error id, 
+				taking one of the values duplicateId, heterogeneousId, or invalidId, and an 
+				optional CMIS Filter containing the filter in error.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) parameter(5) invalidAccessControlFilter(1) };
+-- A.5 Definition of attributes
+-- A.5.1 Access control list
+
+
+accessControlList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.AccessControlList;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		aclBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute is used to specify a list of initiators for use in an access 
+				control list based scheme. Initiators are identified by individual name, 
+				anonymous reference or by group name, roles or application entity titles. 
+				Initiators may be associated with specified applications. Individual group names 
+				may be used in conjunction with the OSI Directory.
+
+				The attribute enables either an initiator name or a proxy name to be used. The 
+				initiator name form may be syntactically either a distinguished name or an 
+				application entity title, whilst the proxy name takes the form of an object 
+				identifier and value.
+
+				The distinguished name form may be used either to identify a specific initiator, 
+				a group of initiators or a particular role.
+
+				The application entity title name form identifies the application entity title, 
+				and by reference the system that initiated the request.
+
+				The proxy name form is used when the name form is not a specific initiator, a 
+				group of initiators, a role or an application entity title. The proxy therefore 
+				allows the initiator to be anonymous.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) accessControlList(1) };
+-- A.5.2 Access control filter
+-- The following attribute is defined for inheritance purposes.
+
+
+accessControlFilter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.FilterList;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		accessControlFilterBehaviour BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute provides a set of CMIS filters for constraining the 
+				parameters of management operations. If the set is empty, the CMIS filter shall 
+				be regarded as identifying all possible targets identifiable by the derived 
+				attribute.
+
+				For any given CMIS filter of the set, every CMIS filter item shall identify the 
+				same attribute. Attempts to violate this constraint shall result in the invalid 
+				access control filter specific error with error identifier of heterogenousIds.
+
+				No attribute shall be associated with more than one CMIS filter. Attempts to 
+				violate this constraint shall result in the invalid access control filter 
+				specific error with error identifier of duplicateIds.
+
+				All values of the attribute identifier fields of CMIS filter items shall 
+				identify management information that is valid for the given specialization of 
+				this attribute. Any violation shall result in the invalid access control filter 
+				specific error with the error identifier of invalid identifier.!;;
+	PARAMETERS
+		invalidAccessControlFilter;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) accessControlFilter(2) };
+-- A.5.3 Access control object name
+
+
+accessControlObjectName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.AccessControlObjectName;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		accessControlObjectNameBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute is used to identify instantiations of specializations of the 
+				access control managed object class.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) accessControlObjectName(3) };
+-- A.5.4 Action filter list
+
+
+actionFilterList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.ActionFilterList;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		actionFilterlistBehaviour BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute identifies actions and, optionally, constraints upon 
+				their argument values by means of a CMIS filter.
+
+				For any given CMIS filter of the set, every CMIS filter item shall identify the 
+				same attribute. Attempts to violate this constraint shall result in the invalid 
+				access control filter specific error with error identifier of heterogenousIds.
+
+				No attribute shall be associated with more than one CMIS filter. Attempts to 
+				violate this constraint shall result in the invalid access control filter 
+				specific error with error identifier of duplicateIds.
+
+				All values of the attribute identifier fields of CMIS filter items shall 
+				identify management information that is valid for the given specialization of 
+				this attribute. Any violation shall result in the invalid access control filter 
+				specific error with the error identifier of invalid identifier.!;;
+	PARAMETERS
+		invalidAccessControlFilter;-- Corrigendum 2
+	REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) actionFilterList(4) };
+-- A.5.5 Attribute filter list
+
+
+attributeFilterList ATTRIBUTE
+	DERIVED FROM
+		accessControlFilter;
+	BEHAVIOUR
+		attributeFilterListBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute identifies constraints upon the values of attributes.
+
+				If an attribute is identified without constraints upon its value e.g.
+
+				  { item : present : globalForm : accessControlList }
+
+				Then all values of the attribute are identified.
+
+				If the set is empty, then there are no constraints.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) attributeFilterList(5) };
+-- A.5.6 Authentication context
+
+
+authenticationContext ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.AuthenticationContext;-- Corrigendum 2
+	BEHAVIOUR
+		authenticationContextPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!The authentication context attribute is a sequence of authentication policy 
+				identifier and the requirements identified thereby.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) authenticationContext(6) };
+-- A.5.7 Capability identities list
+
+
+capabilityIdentitiesList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.CapabilityIdentitiesList;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		capabilityBehaviour BEHAVIOUR
+			DEFINED AS
+				!The capability identities list attribute contains a set of identities.
+
+				The identities may be an individual name, group name, role name, or application 
+				name, each of which may be associated with an optional set of security domain 
+				authority name and operation type pairs; or, the identity may be of a form 
+				unspecified within this Recommendation | International Standard.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) capabilityIdentitiesList(7) };
+-- A.5.8 Default access
+
+
+defaultAccess ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.DefaultAccess;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultAccessBehaviour BEHAVIOUR
+			DEFINED AS
+				!The default access attribute identifies, in accordance with 7.4.3.1.6, the 
+				default access rights for each operation type. Its value is a sequence 
+				enumerating the enforcement action for each operation type. The default value of 
+				the attribute shall be to deny all operations with the access denied response.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) defaultAccess(8) };
+-- A.5.9 Default denial response
+
+
+defaultDenialResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.DenialResponse;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		denialResponseBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute defines the denial response to be returned in the event that the 
+				denial has been made as a result of the default rule having been satisfied.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) defaultDenialResponse(9) };
+-- A.5.10 Denial granularity
+
+
+denialGranularity ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.DenialGranularity;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		denialGranularityBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute identifies the level at which denial of access shall be 
+				exhibited, if at all. It shall take one of the values request, object, and 
+				attribute. If the value is request, then the entire request shall be denied if 
+				any target in that request is denied. If the value is object, then the request 
+				for that managed object shall be denied if any target within the request for 
+				that object is denied. If the value is attribute, then the request shall be 
+				denied at the attribute level.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) denialGranularity(10) };
+-- A.5.11 Domain identity
+
+
+domainIdentity ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.DomainIdentity;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		domainNameBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute identifies the access control domain governing these access 
+				control rules.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) domainIdentity(11) };
+-- A.5.12 Enforcement action
+
+
+enforcementAction ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.EnforcementAction;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		enforcementActionBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute identifies the action to be taken by the enforcement function if 
+				the rule is satisfied. It shall take one of the values, deny with response (the 
+				default value), deny without response, abort association, deny with false 
+				response and allow.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) enforcementAction(12) };
+-- A.5.13 Filter
+
+
+filter ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":discriminatorConstruct;
+	BEHAVIOUR
+		filterBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute identifies a filter to be applied to managed objects identified 
+				by the other attributes of the targets managed object to determine their 
+				inclusion as a protected managed object.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) filter(13) };
+-- A.5.14 Initiator ACI mandated
+
+
+initiatorACImandated ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.Boolean;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		initiatorACImandatedBehaviour BEHAVIOUR
+			DEFINED AS
+				!The initiator ACI mandated attribute is of type boolean. The attribute is used 
+				to indicate whether, to satisfy the access control scheme in use, initiator ACI 
+				is required with each individual management operation request. An attribute 
+				value of TRUE indicates that initiator ACI is required in each management 
+				operation request, whilst a value of FALSE indicates that no initiator ACI is 
+				required. In the event that the attribute has a value of TRUE and the management 
+				operation request does not contain initiator ACI, then access will be denied.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) initiatorACImandated(14) };
+-- A.5.15 Initiators list
+
+
+initiatorsList ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":member;
+	BEHAVIOUR
+		initiatorsListBehaviour BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute identifies the sub-classes of initiator managed 
+				objects which specify the initiators to which the rule pertains. It shall be an 
+				error to attempt to include a value in the initiators list attribute that is not 
+				the name of an initiators managed object.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) initiatorsList(15) };
+-- A.5.16 Invalid access attempts
+
+
+invalidAccessAttempts ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2:1992":counter;
+	BEHAVIOUR
+		invalidAccessAttemptBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!This attribute is used to count the number of occasions that an access control 
+				decision function has not authorized the access. The attribute takes the form of 
+				a not-settable counter as defined by CCITT Rec. X.721 | ISO/IEC 10165-2.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) invalidAccessAttempts(16) };
+-- A.5.17 Label name
+
+
+labelName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.LabelName;-- Corrigendum 2
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		labelNameBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!This attribute assigns a name of type integer to security labels. This enables a 
+				check for ordering to take place.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) labelName(17) };
+-- A.5.18 Managed object classes
+
+
+managedObjectClasses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.ObjectClassList;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;-- Corrigendum 2
+	BEHAVIOUR
+		managedObjectClassesBehaviour BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute identifies protected managed object classes and 
+				optional associated name bindings.
+
+				Any attempt to include a value not known to be a managed object class within the 
+				domain shall result in the CMIS invalid attribute value error.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) managedObjectClasses(18) };
+-- A.5.19 Managed object instances
+
+
+managedObjectInstances ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":member;
+	BEHAVIOUR
+		managedObjectInstancesBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute identifies protected managed objects.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) managedObjectInstances(19) };
+-- A.5.20 Operation type
+
+
+operationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.OperationType;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operationTypeBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!This read-only attribute is used for naming operations managed objects. It may 
+				take one of the values: get, replace, add member, remove member, replace with 
+				default, multiple object selection, filter, create, delete, and action.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) operationType(20) };
+-- A.5.21 Operations list
+
+
+operationsList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.OperationsList;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		operationsListBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute identifies operations that are to be granted or 
+				denied, according to permissions in the containing rule managed object, on 
+				targets identified by the targets managed object. Operations are identified by 
+				the operation type. This attribute may be used when no conditional constraints 
+				are imposed on the parameters of the operation.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) operationsList(21) };
+-- A.5.22 Scope
+
+
+scope ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.Scope;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scopeBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!The scope attribute identifies a scope for the selection of protected managed 
+				objects.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) scope(22) };
+-- A.5.23 Scope filter
+
+
+scopeFilter ATTRIBUTE
+	DERIVED FROM
+		accessControlFilter;
+	BEHAVIOUR
+		scopeFilterBehaviour BEHAVIOUR
+			DEFINED AS
+				!For requests that select multiple managed objects the scope filter specifies 
+				constraints on the scope parameter of the request, and the scope attribute 
+				identifier is used for all the filter items in the filter. This attribute 
+				identifies a filter upon the scope parameter of management operations. It shall 
+				have none or one element.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) scopeFilter(23) };
+-- A.5.24 Security label
+
+
+securityLabel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.SecurityLabel;-- Corrigendum 2
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		securityLabelBehaviour BEHAVIOUR
+			DEFINED AS
+				!The security label attribute contains a security label.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) securityLabel(24) };
+-- A.5.25 State conditions
+
+
+stateConditions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.StateConditions;-- Corrigendum 2
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		stateConditionsPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute identifies a managed object and a filter upon the attributes of 
+				that managed object.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) stateConditions(25) };
+-- A.5.26 Synchronization
+-- This attribute provides an attribute identifier and syntax for filtering upon the synchronization parameter of management
+-- operations.
+
+
+synchronization ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX AccessControl-ASN1Module.CMISSync;-- Corrigendum 2
+	BEHAVIOUR
+		synchronizationBehaviour BEHAVIOUR
+			DEFINED AS
+				!This attribute value represents the synchronization parameter of management 
+				operations. It is used to represent filters upon this parameter.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) synchronization(26) };
+-- A.5.27 Synchronization filter
+
+
+synchronizationFilter ATTRIBUTE
+	DERIVED FROM
+		accessControlFilter;
+	BEHAVIOUR
+		synchronizationFilterBehaviour BEHAVIOUR
+			DEFINED AS
+				!For requests that select multiple managed objects the synchronization filter 
+				specifies constraints on the synchronization parameter of the request and the 
+				synchronization attribute identifier is used for all the filter items in the 
+				filter.
+
+				This attribute identifies a filter upon the synchronization parameter of 
+				management operations. It shall have none or one element.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) synchronizationFilter(27) };
+-- A.5.28 Targets list
+
+
+targetsList ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2:1992":member;
+	BEHAVIOUR
+		targetsListBehaviour BEHAVIOUR
+			DEFINED AS
+				!This set-valued attribute identifies the targets managed objects which 
+				themselves specify the targets to which the item rule pertains. It shall be an 
+				error to attempt to include a value which is not known to be the name of a 
+				targets managed object.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) targetsList(28) };
+-- A.5.29 Valid access attempts
+
+
+validAccessAttempts ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2:1992":counter;
+	BEHAVIOUR
+		validAccessAttemptBehaviourPkg BEHAVIOUR
+			DEFINED AS
+				!This attribute is used to count the number of occasions that an access control 
+				decision function has authorized the access. The attribute takes the form of a 
+				not-settable counter as defined by CCITT Rec. X.721 | ISO/IEC 10165-2.!;;
+REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) validAccessAttempts(29) };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993":securityAuditTrailRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":accessControl
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":accessControlRules
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":rule
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":notificationEmitter
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":targets
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":initiators
+--@@ |  |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":aclInitiators
+--@@ |  |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":capabilityInitiators
+--@@ |  |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":labelInitiators
+--@@ +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":operations
+--@@ +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":assignedLabels
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":attributeLabel
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":instanceLabel
+--@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":classLabel
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":accessControlRules
+--@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":rule
+--@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":notificationEmitter
+--@@ "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":targets
+--@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":operations
+--@@ "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":assignedLabels
+--@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":attributeLabel
+--@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":instanceLabel
+--@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":classLabel
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

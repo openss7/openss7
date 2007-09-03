@@ -1,0 +1,46 @@
+-- A.5 ASN.1 definitions
+MetricModule {joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+ObservedValue, PerceivedSeverity, SimpleNameType, SpecificIdentifier FROM
+Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1};
+-- Value assignments for the specific problems parameter
+moaSpecificProblems OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) 0}
+resourceRequestRate SpecificIdentifier ::= { moaSpecificProblems 1 }
+resourceUtilization SpecificIdentifier ::= { moaSpecificProblems 2 }
+rejectionRate SpecificIdentifier ::= { moaSpecificProblems 3 }
+moaAlgorithmIdentifiers OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) }
+ewmaAlgorithm AlgorithmIdentifier ::= { moaAlgorithmIdentifiers 0 }
+--This identifier is allocated to indicate that the EWMA algorithm is used for data smoothing.
+--The EWMA algorithm is defined in B.2.
+uwmaAlgorithm AlgorithmIdentifier ::= { moaAlgorithmIdentifiers 1 }
+--This identifier is allocated to indicate that the UWMA algorithm is used for data smoothing.
+--The UWMA algorithm is defined in C.2.
+AlgorithmIdentifier ::= OBJECT IDENTIFIER
+GlobalTime ::= GeneralizedTime
+Integer ::= INTEGER
+ObjectIdentifier ::= OBJECT IDENTIFIER
+SeverityIndicatingGaugeThreshold ::= SET OF SEQUENCE {
+notifyLow SeverityIndicatingThreshold,
+notifyHigh SeverityIndicatingThreshold
+}
+SeverityIndicatingThreshold ::= SEQUENCE {
+threshold ObservedValue,
+notifyOnOff BOOLEAN,
+severityIndication PerceivedSeverity OPTIONAL
+}
+TimePeriod ::= CHOICE {
+days [0] INTEGER,
+hours [1] INTEGER,
+minutes [2] INTEGER,
+seconds [3] INTEGER,
+milliSeconds [4] INTEGER,
+microSeconds [5] INTEGER,
+nanoSeconds [6] INTEGER,
+picoSeconds [7] INTEGER
+}
+END

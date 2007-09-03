@@ -1,0 +1,670 @@
+--< GDMO.Document "ITU-T Rec. X.744 (1996) | ISO/IEC 10164-18 : 1997"
+-- { joint-iso-itu-t { joint-iso-ccitt ms(9) function(2) part18(18) } >--
+--< GDMO.Version 1.3 "ITU-T Rec. X.744 (1996) | ISO/IEC 10164-18 : 1997" >--
+--< GDMO.Alias "ITU-T Rec. X.744 (1996) | ISO/IEC 10164-18 : 1997" "X.744" >--
+MODULE "ITU-T Rec. X.744 (1996) | ISO/IEC 10164-18 : 1997"
+-- Annex A
+-- Definition of management information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+--A.1 Managed Object Classes
+--A.1.1 Software
+-- This object class is defined in Rec. M.3100.
+-- (See Annex C.)
+--A.1.2 softwareUnit
+softwareUnit MANAGED OBJECT CLASS
+DERIVED FROM "Rec. M.3100:1995":software;
+CHARACTERIZED BY
+"Rec. M.3100:1995":administrativeOperationalStatesPackage,
+softwareUnitPackage PACKAGE
+BEHAVIOUR softwareUnitBehaviour;
+ATTRIBUTES
+"Rec. X.721 | ISO/IEC 10165-2:1992":availabilityStatus GET,
+"Rec. X.721 | ISO/IEC 10165-2:1992":proceduralStatus GET;;,
+processingErrorAlarmOnServicePackage;
+CONDITIONAL PACKAGES
+appliedPatchPackage PRESENT IF "an instance supports software patching",
+checkSumPackage PRESENT IF "an instance supports check sum validation",
+fileInformationPackage PRESENT IF "an instance supports file information",
+filePackage PRESENT IF "an instance supports representation of a file",
+informationAutoBackupPackage PRESENT IF "an instance supports automatic backup",
+informationAutoRestorePackage PRESENT IF "an instance supports automatic restore",
+informationBackupPackage PRESENT IF "an instance supports the backup operation",
+informationRestorePackage PRESENT IF "an instance supports the restore operation",
+installPackage PRESENT IF "an instance supports the install operation",
+noteFieldPackage PRESENT IF "an instance supports it",
+revertPackage PRESENT IF "an instance supports it",
+terminateValidationPackage PRESENT IF "the validationPackage is present and an instance supports it",
+usageStatePackage PRESENT IF "an instance supports it",
+validationPackage PRESENT IF "an instance supports it";
+REGISTERED AS {SWMF.softwareManagement managedObjectClass(3) softwareUnit(1)};
+softwareUnitBehaviour BEHAVIOUR
+DEFINED AS
+"The softwareUnit object class is a class of managed objects that provide administrable information associated with software
+(whether it be in the form of an executable file, such as program software, or a non-executable file, such as a data or crossconnect
+mapping table). The file type, file location, and file size are among the attributes identified in this object class. When
+the fileInformationPackage is present, the mandatory initial value of the dateOfCreation attribute is the time that the managed
+object is created.
+When the attribute value change notification package (inherited from the superclass software) is present, the
+attributeValueChange notification defined in Recommendation X.721 shall be emitted when the value of one of the following
+attribute changes:
+ futureAutoBackupTriggerThreshold;
+ futureAutoBackupDestination;
+ futureAutoRestoreSource; and
+ futureAutoRestoreAllowed.
+Because some of the above attributes are in conditional packages, the behaviour for emitting the attributeValueChange
+notification applies only when the corresponding conditional packages are present in the managed object.";
+--A.1.3 executableSoftware
+executableSoftware MANAGED OBJECT CLASS
+DERIVED FROM softwareUnit;
+CHARACTERIZED BY
+executableSoftwarePackage PACKAGE
+BEHAVIOUR executableSoftwareBehaviour;;,
+usageStatePackage;
+CONDITIONAL PACKAGES
+executeProgramPackage
+PRESENT IF "an instance supports it";
+REGISTERED AS { SWMF.softwareManagement managedObjectClass(3) executableSoftware(2)};
+executableSoftwareBehaviour BEHAVIOUR
+DEFINED AS
+"The executableSoftware object class is a class of managed objects that provide administrable information associated with an
+executable program in the managed system. The actual executable program (that may consist of code segments with or without
+data segments, etc.) may be in a non-standard, machine-dependent format that is generally unreadable by managing system
+and the rest of the outside world. An action called executeProgram (conditionally) can be used to execute the program
+represented by the executableSoftware object instance. The usageState attribute is used to indicate if there are any active
+executions of the program.";
+--A.1.4 softwareDistributor
+softwareDistributor MANAGED OBJECT CLASS
+DERIVED FROM "Rec. X.721 | ISO/IEC 10165-2:1992":top;
+CHARACTERIZED BY
+softwareDistributorPackage PACKAGE
+BEHAVIOUR softwareDistributorBehaviour;
+ATTRIBUTES
+"Rec. X.721 | ISO/IEC 10165-2:1992":administrativeState GET-REPLACE,
+"Rec. X.721 | ISO/IEC 10165-2:1992":operationalState GET,
+softwareDistributorId GET;
+ACTIONS
+deliver;
+NOTIFICATIONS
+deliverResultNotification,
+"Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation,
+"Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion,
+"Rec. X.721 | ISO/IEC 10165-2:1992":stateChange ;;;
+REGISTERED AS {SWMF.softwareManagement managedObjectClass(3) softwareDistributor(3)};
+softwareDistributorBehaviour BEHAVIOUR
+DEFINED AS
+"A Software distributor managed object is a managed object which distributes software to the target managed system when it
+receives a deliver operation from the managing system. This managed object notifies the result of the distribution when the
+distribution is terminated. The stateChangeNotification defined in Rec. X.721 | ISO/IEC 10165 2:1992 shall be emitted if the
+value of the administrative state or operational state changes. The Software distributor managed object class is a subclass of
+the top managed object class defined in Rec. X.721 | ISO/IEC 10165-2:1992.";
+--A.2 Packages
+--A.2.1 appliedPatchPackage
+appliedPatchPackage PACKAGE
+ATTRIBUTES
+appliedPatches GET;
+REGISTERED AS {SWMF.softwareManagement package(4) appliedPatchPackage(1)};
+--A.2.2 checkSumPackage
+checkSumPackage PACKAGE
+ATTRIBUTES
+checkSum
+GET;
+REGISTERED AS {SWMF.softwareManagement package(4) checkSumPackage(2)};
+--A.2.3 executeProgramPackage
+executeProgramPackage PACKAGE
+ACTIONS
+executeProgram;
+REGISTERED AS {SWMF.softwareManagement package(4) executeProgramPackage(3)};
+--A.2.4 fileInformationPackage
+fileInformationPackage PACKAGE
+ATTRIBUTES
+dateOfCreation GET,
+identityOfCreator GET,
+dateOfLastModification GET,
+identityOfLastModifier GET,
+dateDelivered GET,
+dateInstalled GET;
+REGISTERED AS {SWMF.softwareManagement package(4) fileInformationPackage(4)};
+--A.2.5 filePackage
+filePackage PACKAGE
+ATTRIBUTES
+fileLocation GET,
+fileSize GET,
+fileType GET;
+REGISTERED AS {SWMF.softwareManagement package(4) filePackage(5)};
+--A.2.6 informationAutoBackupPackage
+informationAutoBackupPackage PACKAGE
+ATTRIBUTES
+futureAutoBackupTriggerThreshold GET-REPLACE,
+futureAutoBackupDestination GET-REPLACE;
+NOTIFICATIONS
+autoBackupReport;
+REGISTERED AS {SWMF.softwareManagement package(4) informationAutoBackupPackage(6)};
+--A.2.7 informationAutoRestorePackage
+informationAutoRestorePackage PACKAGE
+ATTRIBUTES
+futureAutoRestoreSource GET-REPLACE,
+futureAutoRestoreAllowed GET-REPLACE;
+NOTIFICATIONS
+autoRestoreReport;
+REGISTERED AS {SWMF.softwareManagement package(4) informationAutoRestorePackage(7)};
+--A.2.8 informationBackupPackage
+informationBackupPackage PACKAGE
+ATTRIBUTES
+lastBackupTime GET,
+lastBackupDestination GET;
+ACTIONS
+backup softwareProcessingFailureParameter;
+REGISTERED AS {SWMF.softwareManagement package(4) informationBackupPackage(8)};
+--A.2.9 informationRestorePackage
+informationRestorePackage PACKAGE
+ATTRIBUTES
+lastRestoreTime GET,
+lastRestoreSource GET;
+ACTIONS
+restore;
+REGISTERED AS {SWMF.softwareManagement package(4) informationRestorePackage(9)};
+--A.2.10 installPackage
+installPackage PACKAGE
+ACTIONS
+install;
+REGISTERED AS {SWMF.softwareManagement package(4) installPackage(10)};
+--A.2.11 noteFieldPackage
+noteFieldPackage PACKAGE
+ATTRIBUTES
+noteField GET-REPLACE;
+REGISTERED AS {SWMF.softwareManagement package(4) noteFieldPackage(11)};
+--A.2.12 processingErrorAlarmOnServicePackage
+processingErrorAlarmOnServicePackage PACKAGE
+NOTIFICATIONS
+"Rec. X.721 | ISO/IEC 10165-2:1992":processingErrorAlarm
+alarmEffectOnServiceParameter;
+REGISTERED AS {SWMF.softwareManagement package(4) processingErrorAlarmOnServicePackage(12)};
+--A.2.13 revertPackage
+revertPackage PACKAGE
+ACTIONS
+revert softwareProcessingFailureParameter ;
+REGISTERED AS {SWMF.softwareManagement package(4) revertPackage(13)};
+--A.2.14 terminateValidationPackage
+terminateValidationPackage PACKAGE
+ACTIONS
+terminateValidation;
+REGISTERED AS {SWMF.softwareManagement package(4) terminateValidationPackage(14)};
+--A.2.15 usageStatePackage
+usageStatePackage PACKAGE
+ATTRIBUTES
+"Rec. X.721 | ISO/IEC 10165-2:1992":usageState GET;
+REGISTERED AS {SWMF.softwareManagement package(4) usageStatePackage(15)};
+--A.2.16 validationPackage
+validationPackage PACKAGE
+ACTIONS
+validate;
+REGISTERED AS {SWMF.softwareManagement package(4) validatePackage(16)};
+--A.3 Attributes
+--A.3.1 appliedPatches
+appliedPatches ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.AppliedPatches;
+MATCHES FOR EQUALITY;
+BEHAVIOUR appliedPatchesBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) appliedPatches(1)};
+appliedPatchesBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the patches that have been applied to and still exist in the software which is represented by the
+software unit object instance. Patches are updates to executable programs. The value of this attribute is read-only and
+automatically updated when a patch is applied to the software.";
+--A.3.2 checkSum
+checkSum ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.CheckSum;
+MATCHES FOR EQUALITY;
+BEHAVIOUR checkSumBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) checkSum(2)};
+checkSumBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the checksum of the software information represented by the softwareUnit object instance.";
+--A.3.3 dateDelivered
+dateDelivered ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Date;
+MATCHES FOR EQUALITY;
+BEHAVIOUR dateDeliveredBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) dateDelivered(3)};
+dateDeliveredBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the time that the information represented by the softwareUnit object instance was delivered to the
+managed system. Valid values for this attribute are ASN.1 GeneralizedTime or NULL if the information has not been
+delivered.";
+--A.3.4 dateInstalled
+dateInstalled ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Date;
+MATCHES FOR EQUALITY;
+BEHAVIOUR dateInstalledBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) dateInstalled(4)};
+dateInstalledBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the time that the information represented by the softwareUnit object instance was installed. Valid
+values for this attribute are ASN.1 GeneralizedTime or NULL if the information has not been installed.";
+--A.3.5 dateOfCreation
+dateOfCreation ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.GlobalTime;
+MATCHES FOR EQUALITY;
+BEHAVIOUR dateOfCreationBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) dateOfCreation(5)};
+dateOfCreationBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute indicates the time of creation of the managed object. The syntax of this attribute is of ASN.1 GeneralizedTime
+type.";
+--A.3.6 dateOfLastModification
+dateOfLastModification ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Date;
+MATCHES FOR EQUALITY;
+BEHAVIOUR dateOfLastModificationBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) dateOfLastModification(6)};
+dateOfLastModificationBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the time of the last, or most recent modification to the information represented by the softwareUnit
+object instance. Valid values for this attribute are ASN.1 GeneralizedTime or NULL if the information has not been
+modified.";
+--A.3.7 fileLocation
+fileLocation ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.FileLocation;
+MATCHES FOR EQUALITY;
+BEHAVIOUR fileLocationBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) fileLocation(7)};
+fileLocationBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute specifies the full address(es) (either logical or physical) of the softwareUnit object. The format of the address is
+implementation-dependent, conforming to the file-addressing conventions of the particular managed system in question. A null
+value of this attribute indicates that the information to which the softwareUnit managed object applies has not yet been
+installed in the managed system.";
+--A.3.8 fileSize
+fileSize ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.InformationSize;
+MATCHES FOR EQUALITY;
+BEHAVIOUR fileSizeBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) fileSize(8)};
+fileSizeBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute indicates the size of the softwareUnit managed object.";
+--A.3.9 fileType
+fileType ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.FileType;
+MATCHES FOR EQUALITY;
+BEHAVIOUR fileTypeBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) fileType(9)};
+fileTypeBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute indicates the type of the softwareUnit. Possible softwareUnit types are unstructured binary file (e.g. executable
+file), unstructured text file (e.g. non-executable file), and block special file, etc.";
+--A.3.10 futureAutoBackupDestination
+futureAutoBackupDestination ATTRIBUTE
+WITH ATTRIBUTE SYNTAX BackupRestoreASN1Module.BackupDestination;
+MATCHES FOR EQUALITY;
+BEHAVIOUR futureAutoBackupDestinationBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) futureAutoBackupDestination(10)};
+futureAutoBackupDestinationBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute specifies the destination to which the information represented by this object instance will be backup. The
+backup criteria is defined in the futureAutoBackupTriggerThreshold attribute of the object instance. The destination can be
+another object instance of the same object class exists in the same local managed system, a remote open system (by using a
+particular file transfer protocol, e.g. FTAM), or the managing system (by in-line using the autoBackupReport notification).";
+--A.3.11 futureAutoBackupTriggerThreshold
+futureAutoBackupTriggerThreshold ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Integer;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR futureAutoBackupTriggerThresholdBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) futureAutoBackupTriggerThreshold(11)};
+futureAutoBackupTriggerThresholdBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute specifies the threshold that will trigger an automatic backup for the information represented by the object
+instance. The threshold is defined as the number of time that the information has been modified. Once the information has been
+modified for that number of times, an automatic backup will be performed. The backup destination is specified in the attribute
+futureAutomacticBackupDestination. Such backups are carried out in addition to other scheduled periodic backup. At the
+completion of the automatic backup, an autoBackupReport notification shall be emitted from the object.";
+--A.3.12 futureAutoRestoreAllowed
+futureAutoRestoreAllowed ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Boolean;
+MATCHES FOR EQUALITY;
+BEHAVIOUR futureAutoRestoreAllowedBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) futureAutoRestoreAllowed(12)};
+futureAutoRestoreAllowedBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute specifies whether automatic restore of the information represented by this manage object instance is allowed.
+The syntax of this attribute is of ASN.1 BOOLEAN type with the value TRUE meaning allowed, and FALSE meaning not
+allowed. The criteria that triggers automatic information restore is system specific.";
+--A.3.13 futureAutoRestoreSource
+futureAutoRestoreSource ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.AutoRestoreSource;
+MATCHES FOR EQUALITY;
+BEHAVIOUR futureAutoRestoreSourceBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) futureAutoRestoreSource(13)};
+futureAutoRestoreSourceBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute specifies the source of the information to be restored to the information represented by the managed object
+instance. The source is either a local managed object or a remote system. The criteria of triggering an automatic restore of
+information is system specific.";
+--A.3.14 identityOfCreator
+identityOfCreator ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Identity;
+MATCHES FOR EQUALITY;
+BEHAVIOUR identityOfCreatorBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) identityOfCreator(14)};
+identityOfCreatorBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the entity that creates the managed object.";
+--A.3.15 identityOfLastModifier
+identityOfLastModifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Identity;
+MATCHES FOR EQUALITY;
+BEHAVIOUR identityOfLastModifierBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) identityOfLastModifier(15)};
+identityOfLastModifierBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the last, or most recent, modifier of the information represented by the softwareUnit object
+instance.";
+--A.3.16 lastBackupDestination
+lastBackupDestination ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.LastBackupDestination;
+MATCHES FOR EQUALITY;
+BEHAVIOUR lastBackupDestinationBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) lastBackupDestination(16)};
+lastBackupDestinationBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the destination, if exists, to which the information represented by the managed object is backed up.";
+--A.3.17 lastBackupTime
+lastBackupTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Date;
+MATCHES FOR EQUALITY;
+BEHAVIOUR lastBackupTimeBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) lastBackupTime(17)};
+lastBackupTimeBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the time of the last backup on the information represented by the managed object instance. Valid
+values for this attribute are ASN.1 GeneralizedTime or NULL (if no backup has been performed on the information).";
+--A.3.18 lastRestoreSource
+lastRestoreSource ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.LastRestoreSource;
+MATCHES FOR EQUALITY;
+BEHAVIOUR lastRestoreSourceBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) lastRestoreSource(18)};
+lastRestoreSourceBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the source, if exists, from which the information represented by the managed object is restored.";
+--A.3.19 lastRestoreTime
+lastRestoreTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.Date;
+MATCHES FOR EQUALITY;
+BEHAVIOUR lastRestoreTimeBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) lastRestoreTime(19)};
+lastRestoreTimeBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies the time of the last restore on the information represented by the managed object instance. Valid
+values for this attribute are ASN.1 GeneralizedTime or NULL (if no restore has been performed on the information).";
+--A.3.20 noteField
+noteField ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.NoteField;
+MATCHES FOR EQUALITY;
+BEHAVIOUR noteFieldBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) noteField(20)};
+noteFieldBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute contains any information or comments associated with the managed object, including any specific installation
+instructions, startup parameters and values, information necessary to activate features of the managed object, etc.";
+--A.3.21 softwareDistributorId
+softwareDistributorId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SWMF.SimpleNameType;
+MATCHES FOR EQUALITY;
+BEHAVIOUR softwareDistributorIdBehaviour;
+REGISTERED AS {SWMF.softwareManagement attribute(7) softwareDistributorId(21)};
+softwareDistributorIdBehaviour BEHAVIOUR
+DEFINED AS
+"This attribute identifies an instance of the software distributor managed object class.";
+--A.4 Name Bindings
+--A.4.1 softwareDistributor-subsystem
+softwareDistributor-subsystem NAME BINDING
+SUBORDINATE OBJECT CLASS softwareDistributor AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS
+"Rec. X.723 | ISO/IEC 10165-5":subsystem AND SUBCLASSES;
+WITH ATTRIBUTE softwareDistributorId;
+CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS {SWMF.softwareManagement nameBinding(6) softwareDistributor-subsystem(1)};
+--A.4.2 softwareDistributor-system
+softwareDistributor-system NAME BINDING
+SUBORDINATE OBJECT CLASS softwareDistributor AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS
+"Rec. X.721 | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+WITH ATTRIBUTE softwareDistributorId;
+CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS {SWMF.softwareManagement nameBinding(6) softwareDistributor-system(2)};
+--A.4.3 softwareUnit-subsystem
+softwareUnit-subsystem NAME BINDING
+SUBORDINATE OBJECT CLASS softwareUnit AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS
+"Rec. X.723 | ISO/IEC 10165-5":subsystem AND SUBCLASSES;
+WITH ATTRIBUTE "Rec. M.3100:1995":softwareId;
+CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS {SWMF.softwareManagement nameBinding(6) softwareUnit-subsystem(3)};
+--A.4.4 softwareUnit-system
+softwareUnit-system NAME BINDING
+SUBORDINATE OBJECT CLASS softwareUnit AND SUBCLASSES;
+NAMED BY SUPERIOR OBJECT CLASS
+"Rec. X.721 | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+WITH ATTRIBUTE "Rec. M.3100:1995":softwareId;
+CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS {SWMF.softwareManagement nameBinding(6) softwareUnit-system(4)};
+--A.5 Actions
+--A.5.1 deliver
+deliver ACTION
+BEHAVIOUR deliverBehaviour;
+MODE CONFIRMED;
+PARAMETERS softwareProcessingFailureParameter;
+WITH INFORMATION SYNTAX SWMF.DeliverInfo;
+REGISTERED AS {SWMF.softwareManagement action(9) deliver(1)};
+deliverBehaviour BEHAVIOUR
+DEFINED AS
+"The deliver service is used by a managing system to request distribution of a software or a set of software. A number of
+software units may be delivered together to a managed system. If the Deliver Info does not indicate a target destination, the
+system uses local means to determine the target destination. This service used the CMIS M-ACTION service and procedures
+defined in ISO/IEC 9595. The Action Type parameter shall indicate deliver.";
+--A.5.2 executeProgram
+executeProgram ACTION
+BEHAVIOUR executeProgramBehaviour;
+MODE CONFIRMED;
+PARAMETERS softwareProcessingFailureParameter;
+WITH INFORMATION SYNTAX SWMF.ExecuteProgramInfo;
+WITH REPLY SYNTAX SWMF.ExecuteProgramReply;
+REGISTERED AS {SWMF.softwareManagement action(9) executeProgram(2)};
+executeProgramBehaviour BEHAVIOUR
+DEFINED AS
+"The executeProgram service is used by a managing system to request an execution of the program represented by the
+executableSoftware object instance. A success request will be confirmed with information including the process Id, process
+owner, and the starting time of the execution.When the executableSoftware is in the busy usageState, any executeProgram
+request will be denied, until the usageState changes to active or idle. This service uses the CMIS M-ACTION service and
+procedures defined in ISO/IEC IS 9595.The Action Type parameter shall indicate executeProgram.";
+--A.5.3 install
+install ACTION
+BEHAVIOUR installBehaviour;
+MODE CONFIRMED;
+PARAMETERS
+softwareProcessingFailureParameter;
+WITH INFORMATION SYNTAX
+SWMF.InstallInfo;
+REGISTERED AS {SWMF.softwareManagement action(9) install(3)};
+installBehaviour BEHAVIOUR
+DEFINED AS
+"The install service is used by a managing system to instruct a managed system to install a softwareUnit object instance. If
+applicable, the install service will effect the automatic update the value of the appliedPatches attribute.This service uses the
+CMIS M-ACTION service and procedures defined in ISO/IEC 9595.The Action Type parameter shall indicate install.";
+--A.5.4 revert
+revert ACTION
+BEHAVIOUR revertBehaviour;
+MODE CONFIRMED;
+PARAMETERS
+softwareProcessingFailureParameter;
+WITH INFORMATION SYNTAX SWMF.RevertArgument;
+WITH REPLY SYNTAX SWMF.RevertReply;
+REGISTERED AS {SWMF.softwareManagement action(9) revert(4)};
+revertBehaviour BEHAVIOUR
+DEFINED AS
+"The revert service is used by a managing system (e.g. OS) to instruct a managed system to revert an applied patch or set of
+patches of the software represented by the software unit managed object or the executable software managed object.The revert
+service will automatically return the value of the appliedPatches attribute of the executableSoftware object instance to which
+the service is directed.
+This service uses the CMIS M-ACTION service and procedures defined in ISO/IEC 9595. The Action Type parameter shall
+indicate revert patches. The Action Information parameter shall identify the patch or patches to be reverted of the
+executableSoftware object instance. Each patch identifier is a choice of a system specific identifier (Printable String) or a
+software unit object instance (Object Instance).";
+--A.5.5 terminateValidation
+terminateValidation ACTION
+BEHAVIOUR terminateValidationBehaviour;
+MODE CONFIRMED;
+PARAMETERS
+softwareProcessingFailureParameter;
+WITH INFORMATION SYNTAX SWMF.TerminateValidationArgument;
+WITH REPLY SYNTAX SWMF.TerminateValidationReply;
+REGISTERED AS {SWMF.softwareManagement action(9) terminateValidation(5)};
+terminateValidationBehaviour BEHAVIOUR
+DEFINED AS
+"The terminateValidation service is used by a managing system to terminate a currently active (running) validation process on
+one or more objects. Two termination modes are provided for terminating a validation, namely, cancel-mode and truncatedmode.
+For the truncate-mode, the validation will be terminated and the result of the partially completed validation will be
+returned in the Action Reply parameter of the terminateValidation M-ACTION. For the cancel-mode, the validation will be
+terminated and the result of the partially completed validation will be discarded.This service uses the CMIS M-ACTION
+service and procedures defined in ISO/IEC 9595.The Action Type parameter shall indicate terminateValidation.The Action
+Information parameter shall indicate the mode of the termination, i.e. cancel-mode or truncate-mode. The Action Reply
+parameter shall indicate the result of the termination, i.e. terminated (for cancel-mode), terminated with partial result (for
+truncate-mode), or no active validation to be terminated.";
+--A.5.6 validate
+validate ACTION
+BEHAVIOUR validateBehaviour;
+MODE CONFIRMED;
+PARAMETERS
+softwareProcessingFailureParameter;
+WITH INFORMATION SYNTAX SWMF.ValidateInfo;
+WITH REPLY SYNTAX SWMF.ValidateReply;
+REGISTERED AS {SWMF.softwareManagement action(9) validate(6)};
+validateBehaviour BEHAVIOUR
+DEFINED AS
+"The validate service is used by a managing system to request performing an validation on the information represented by the
+softwareUnit object instance. This service uses the CMIS M-ACTION service and procedures defined in ISO/IEC 9595. The
+Action Type parameter shall indicate validate. If the validation process is terminated (by using the terminateValidation
+M-ACTION) before the normal completion of the validation, then the value iterminatede (with ASN.1 type NULL) shall be
+returned in the Action Reply of the validate M-ACTION.";
+--A.6 Notifications
+--A.6.1 autoBackupReport
+autoBackupReport NOTIFICATION
+BEHAVIOUR autoBackupReportBehaviour;
+WITH INFORMATION SYNTAX SWMF.AutoBackupReportInfo;
+REGISTERED AS {SWMF.softwareManagement notification(10) autoBackupReport(1)};
+autoBackupReportBehaviour BEHAVIOUR
+DEFINED AS
+"The autoBackupReport notification is emitted to report an automatic backup of the information represented by this object.
+The automatic backup criteria and backup destination are specified in the futureAutoBackupTriggerThreshold and
+futureAutoBackupDestination attributes of the object respectively. The backup destination may be local (i.e. backup to another
+object of the same class within the local managed system), the managing system, or off-line to a remote system by using a
+particular file transfer protocol (e.g. FTAM). For local and off-line backup, the result of the backup, i.e. success or failure, will
+be reported in this notification. For backup to the managing system, the backup information will be in-line included in the
+notification as a component of the Event Information parameter.";
+--A.6.2 autoRestoreReport
+autoRestoreReport NOTIFICATION
+BEHAVIOUR autoRestoreReportBehaviour;
+WITH INFORMATION SYNTAX SWMF.AutoRestoreReportInfo;
+REGISTERED AS {SWMF.softwareManagement notification(10) autoRestoreReport(2)};
+autoRestoreReportBehaviour BEHAVIOUR
+DEFINED AS
+"The autoRestoreReport notification is emitted from the managed object when an automatic restore is occurred on the
+information represented by this object instance. The criteria that triggers the automatic restore is system specific. The source of
+the restored information and the result of the restore operation (i.e. either success or failure) shall be reported in the
+notification.";
+--A.6.3 deliverResultNotification
+deliverResultNotification NOTIFICATION
+BEHAVIOUR deliverResultNotificationBehaviour;
+WITH INFORMATION SYNTAX SWMF.DeliverResultInfo;
+REGISTERED AS {SWMF.softwareManagement notification(10) deliverResultNotification(3)};
+deliverResultNotificationBehaviour BEHAVIOUR
+DEFINED AS
+"This notification type is used to report deliver results and is emitted from the managed object when the delivery is completed.
+The deliver result parameter may take one of the following values: pass, fail or unknown. This service uses the CMIS
+M-EVENT-REPORT service and procedures defined in ISO/IEC 9595. The Notification Type parameter shall indicate
+deliverResult.";
+--A.7 Parameters
+--A.7.1 alarmEffectOnServiceParameter
+alarmEffectOnServiceParameter PARAMETER
+CONTEXT EVENT-INFO;
+WITH SYNTAX
+SWMF.AlarmEffectOnServiceParameter;
+BEHAVIOUR alarmEffectOnServiceParameterBehaviour;
+REGISTERED AS {SWMF.softwareManagement parameter(5) alarmEffectOnServiceParameter(1)};
+alarmEffectOnServiceParameterBehaviour BEHAVIOUR
+DEFINED AS
+"The alarmEffectOnServiceParameter is a parameter to be included in the ManagementExtension parameter of the
+AdditionalInformation parameter of the AlarmInfo parameter in an Alarm Reporting service. This parameter indicates
+whether the service is affected by the alarm. The ManagementExtension is of the form (see Rec. X.721 | ISO/IEC 10165-2):
+ManagementExension ::= SEQUENCE {
+identifier OBJECT IDENTIFIER,
+significance [1] BOOLEAN DEFAULT FALSE,
+information [2] ANY DEFINED BY identifier}
+The OBJECT IDENTIFIER carried in identifier shall be the value under which this parameter definition is registered. The
+type carried in information shall be the type identified by the WITH SYNTAX construct of this parameter definition.";
+--A.7.2 softwareProcessingFailureParameter
+softwareProcessingFailureParameter PARAMETER
+CONTEXT SPECIFIC-ERROR;
+WITH SYNTAX SWMF.SoftwareProcessingFailure;
+BEHAVIOUR softwareProcessingFailureParameterBehaviour;
+REGISTERED AS {SWMF.softwareManagement parameter(5) softwareProcessingFailureParameter(2)};
+softwareProcessingFailureParameterBehaviour BEHAVIOUR
+DEFINED AS
+"The softwareProcessingFailureParameter defines the data syntax to be return in a CMIP ProcessingFailure error reply to a
+M-ACTION if a request for an operation on software is denied due to errors other than those already defined in CMIP-1. The
+attributes in the returned data syntax include the state attributes of the emitting object. Any other applicable attributes may be
+included but these are a local matter.";
+--A.9 Backup and Restore Actions--
+-- The backup and restore actions are generic actions --
+-- and intended for reuse outside the scope of this --
+-- Recommendation | International Standard as appropriate --
+-- for objects in addition to software objects. --
+--A.9.1 backup
+backup ACTION
+BEHAVIOUR backupBehaviour;
+MODE CONFIRMED;
+WITH INFORMATION SYNTAX BackupRestoreASN1Module.BackupArgument;
+WITH REPLY SYNTAX BackupRestoreASN1Module.BackupReply;
+REGISTERED AS {SWMF.softwareManagement action(9) backup(7)};
+backupBehaviour BEHAVIOUR
+DEFINED AS
+"The backup service is used by a managing system to request performing a backup on the information represented by the
+target object instance. This service uses the CMIS M-ACTION service and procedures defined in ISO/IEC 9595.
+The Action Type parameter shall indicate backup.
+The Action Information parameter shall indicate the destination to which the information will be backed up. Possible
+destinations are:
+� A local managed object of the same class as the one this action is applied to. In this case, the backup operation
+will be performed internally in the managed system.
+� The managing system from which this action is sent. In this case, a copy of the backup information will be sent
+in-line in the Action Reply.
+� A remote system. In this case, the backup information will be transferred off-line to the remote system by using
+a locally chosen file transfer protocol.
+The Action Reply parameter shall indicate the result of the backup. For local or off-line backup, a NULL value indicates the
+backup is success. For in-line backup, the backup information will be included in the Action Reply parameter.";
+--A.9.2 restore--
+restore ACTION
+BEHAVIOUR restoreBehaviour;
+MODE CONFIRMED;
+WITH INFORMATION SYNTAX BackupRestoreASN1Module.RestoreArgument;
+REGISTERED AS {SWMF.softwareManagement action(9) restore(8)};
+restoreBehaviour BEHAVIOUR
+DEFINED AS
+"The restore service is used by a managing system to request performing a restore on the information represented by the target
+object instance. This service uses the CMIS M-ACTION service and procedures defined in ISO/IEC 9595.
+The Action Type parameter shall indicate restore.
+The Action Information parameter shall indicate the source from which the information will be restored. Possible sources are:
+� A local managed object of the same class as the one this action is applied to. In this case, the restore operation
+will be performed internally in the managed system.
+� The managing system from which this action is sent. In this case, a copy of the restore information will be sent
+in-line in the Action Information parameter.
+� A remote system. In this case, the restore information will be transferred off-line from the remote system by
+using a locally chosen file transfer protocol.
+The Action Reply parameter shall indicate the result of the restore. A NULL value indicates the restore is success.";
+END
+--< GDMO.EndDocument "ITU-T Rec. X.744 (1996) | ISO/IEC 10164-18 : 1997"
+-- { joint-iso-itu-t { joint-iso-ccitt ms(9) function(2) part18(18) } >--
