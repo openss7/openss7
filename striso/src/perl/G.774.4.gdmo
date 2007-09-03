@@ -1,0 +1,918 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "G.774.gdmo" >--
+--< GDMO.Include "G.774.3.gdmo" >--
+--< GDMO.Document "ITU-T G.774.4 (02/2001)" >--
+--< GDMO.Alias "ITU-T G.774.4 (02/2001)" "ITU-T Recommendation G.774-04" >--
+MODULE "ITU-T G.774.4 (02/2001)"
+--6 Managed object class definitions
+--The following object class can be used to model an automatic 1 + 1 single-ended protection system
+--for subnetwork connection protection.
+--Revisions that require re-registration
+--This clause provides replacement managed object class definitions for the existing ITU-T G.774.4
+--(1995). Any managed object class replaced by one in this clause is considered to be deprecated. The
+--reasons for the replacement of a managed object class are as follows:
+--1) The replaced managed object class is faulty and must be fixed.
+--2) The replaced managed object class includes an attribute, package, notification or action
+--which has been re-registered in this or another Recommendation.
+--3) The replaced managed object class inherits from a managed object class which has been reregistered
+--in this or another Recommendation.
+--In each case where a class is replaced, the new class will be registered within this Recommendation.
+--The textual label for the class will be revised to include the text "R1". For example, in the revision of
+--the G.774.4 (1995) managed object class "connectionProtectionGroup", the revised label will
+--become "connectionProtectionGroupR1".
+--Below is a table of classes deprecated from ITU-T G.774.4 (1995) and the G.774.4 classes which
+--replace them:
+--Deprecated G.774.4 (1995) Classes Replacement G.774.4 Classes
+--connectionProtectionGroup connectionProtectionGroupR1
+--6.1 Connection protection group
+
+connectionProtectionGroupR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774.03":protectionGroupR1;
+	CHARACTERIZED BY
+		connectionProtectionGroupPkgR1 PACKAGE
+			BEHAVIOUR
+				connectionProtectionGroupR1Behaviour;
+			ATTRIBUTES
+				protectionCriteria GET-REPLACE ADD-REMOVE;
+			NOTIFICATIONS
+				"Recommendation G.774.03":protectionSwitchReportingR1
+					switchStatusParameter;;;
+	CONDITIONAL PACKAGES
+		holdOffTimePackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { g774-04MObjectClass 5 };
+
+
+connectionProtectionGroupR1Behaviour BEHAVIOUR
+	DEFINED AS
+		"This object class is used to model an automatic protection system for subnetwork 
+		connection protection. The protectionGroupType attribute indicates that the 
+		protection scheme used is 1+1 (plus). This object class is a focal point for 
+		management operations and notifications related to management of the protection 
+		system. Actual signal flow across the subnetwork connection protection is 
+		reflected by the connectivity pointers of the TPs involved in the subnetwork 
+		connection protection. At instantiation time of an instance of this class the 
+		protectionCriteria attribute is intitialized by local initial value.";
+--6.2 Connection protection
+
+
+connectionProtection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774.03":protectionUnit;
+	CHARACTERIZED BY
+		connectionProtectionPkg PACKAGE
+			BEHAVIOUR
+				connectionProtectionBehaviour;
+			ATTRIBUTES
+				switchStatus GET,
+				"Recommendation X.721":administrativeState GET-REPLACE,
+				"Recommendation X.721":operationalState GET,
+				"Recommendation M.3100":signalType GET,
+				"Recommendation M.3100":directionality GET;
+			NOTIFICATIONS
+				"Recommendation X.721":stateChange,
+				"Recommendation X.721":objectDeletion,
+				"Recommendation X.721":objectCreation;;;
+REGISTERED AS { g774-04MObjectClass 2 };
+
+
+connectionProtectionBehaviour BEHAVIOUR
+	DEFINED AS
+		"This object class is used to represent the assignment between an unreliable 
+		resource (TP) and a reliable resource (TP) for the purpose of subnetwork 
+		connection protection. This object class has properties of a crossconnection 
+		since it represents a flexible assignment of termination points in the context 
+		of subnetwork protection, according to Recommendation G.803. The directionality 
+		attribute represents the type of traffic which flows through the connection 
+		protection (CP). It can be either:
+
+		- Bidirectional - The traffic flow is passing between the unreliable and the 
+		  reliable resource in both directions.
+
+		- Unidirectional - The traffic flow is unidirectional and passing from the 
+		  unreliable to the reliable resource.
+
+		The Unreliable Resource Pointer (URP) points to one termination point which 
+		represents one of the alternatives for the protection system. The URP points to 
+		a TP according to the directionality of the CP, i.e.:
+
+		- the URP of a Bidirectional CP must point to a Bidirectional TP or GTP;
+
+		- the URP of an Unidirectional CP must point to a Sink TP or GTP, or to a 
+		  Bidirectional TP or GTP.
+
+		The Unreliable Resource Pointer points to Null when the corresponding 
+		(unreliable) TP has been temporarily disconnected from the connection 
+		protection. The crossConnectionObjectPointer of the corresponding TP points to 
+		the connectionProtection.
+
+		The Reliable Resource Pointer points either:
+
+		- to Null in the case of a Protecting Connection Protection; or
+
+		- to a Termination Point (CTP or TTP) or GTP instance that represents one end of 
+		  the subnetwork connection in the case of a protected Connection Protection.
+
+		This termination point shall have the same signal type than the CTP or GTP 
+		representing the unreliable resource used for protection. The 
+		crossConnectionObjectPointer of the corresponding TP points to the 
+		connectionProtection.
+
+		The attribute Signal Type describes the signal that is cross-connected. The 
+		termination points or GTPs that are cross-connected must have signal types that 
+		are compatible.
+
+		If the objects listed in the Unreliable Resource Pointer and Reliable Resource 
+		Pointer attributes are GTPs, the nth element of the Unreliable Resource GTP is 
+		related to the nth element of the Reliable Resource GTP (for every n).
+
+		Administrative state
+
+		- Unlocked - The Connection Protection object is administratively unlocked. 
+		  Traffic is allowed to pass through the Connection Protection.
+
+		- Locked - No traffic is allowed to pass through the Connection Protection. The 
+		  traffic flow is suspended between the termination points representing the 
+		  reliable and the unreliable resources. The connectivity pointers in the 
+		  corresponding unreliable resources and reliable resources are updated to 
+		  reflect the suspension of traffic flow.
+
+		Setting the administrative state to locked does not prevent the protection 
+		function from attempting to operate.
+
+		Operational state
+
+		The operational state reflects only the connection capability of the connection 
+		protection:
+
+		- Enabled - The Connection Protection is performing its normal crossconnection 
+		  function.
+
+		- Disabled - The Connection Protection is incapable of performing its normal 
+		  cross-connection function.
+
+		The operational state of Disabled is considered as a signal failure on the 
+		corresponding connection and as such it must be taken into account in the 
+		protection mechanism. The switchStatus indicates the status of the switching 
+		requests.";
+--6.3 Multipoint connection protection
+
+
+mpConnectionProtection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774.03":protectionUnit;
+	CHARACTERIZED BY
+		mpConnectionProtectionPkg PACKAGE
+			BEHAVIOUR
+				mpConnectionProtectionBehaviour;
+			ATTRIBUTES
+				switchStatus GET,
+				"Recommendation X.721":administrativeState GET-REPLACE,
+				"Recommendation X.721":operationalState GET,
+				"Recommendation X.721":availabilityStatus GET,
+				"Recommendation M.3100":signalType GET;
+			NOTIFICATIONS
+				"Recommendation X.721":stateChange,
+				"Recommendation X.721":objectDeletion,
+				"Recommendation X.721":objectCreation;;;
+REGISTERED AS { g774-04MObjectClass 3 };
+
+
+mpConnectionProtectionBehaviour BEHAVIOUR
+	DEFINED AS
+		"This object class is used to represent the assignment between an unreliable 
+		resource, which is the termination point or GTP object listed in the Unreliable 
+		Resource Pointer attribute, and a set of reliable resources for the purpose of 
+		protection of point-to-multipoint connection. The reliable resources are the 
+		termination point or GTP objects listed in the To Termination attributes of the 
+		crossConnectionmanaged objects contained by protected mp Connection Protection.
+
+		This object class has properties of a multipoint cross-connection since its 
+		represents a flexible assignment of termination points in the context of 
+		subnetwork protection according to Recommendation G.803.
+
+		The Unreliable Resource Pointer (URP) points to one termination point or GTP 
+		which represents one of the two alternatives for the protection system. The URP 
+		must point to a Sink CTP or GTP, or to a Bidirectional TP or GTP. The Unreliable 
+		Resource Pointer points to Null when the corresponding (unreliable) TP has been 
+		temporarily disconnected from the multipoint connection protection.
+
+		The crossConnectionObjectPointer of the corresponding TP points to the 
+		mpConnectionProtection.
+
+		The Reliable Resource Pointer has always the value NULL. The reliable resources 
+		are represented by all the termination point or GTP objects pointed to by the To 
+		Termination attribute of the crossConnection managed objects contained by the 
+		protected mpConnectionProtection.
+
+		The attribute Signal Type describes the signal that is cross-connected. The 
+		termination points or GTPs that are cross-connected must have signal types that 
+		are compatible.
+
+		Administrative state
+
+		- Unlocked - The Multipoint Connection Protection object is administratively 
+		  unlocked. It allows traffic to pass through each contained cross-connection 
+		  depending on its administrative state.
+
+		- Locked - No traffic is allowed to pass through the Cross-Connection between 
+		  the cross-connected termination points. The effect of this value overrides the 
+		  effect of the administrative state of each contained cross-connection.
+
+		Setting the administrative state to locked does not prevent the protection 
+		function from attempting to operate.
+
+		Operational state
+
+		The operational state of a Multipoint Connection Protection object reflects the 
+		overall health of the cross-connection including all the Cross-Connection 
+		objects contained in the Multipoint Connection Protection.
+
+		- Enabled - The Cross-Connection is performing its normal function. Note that 
+		  some (but not all) of the cross-connection objects contained in the protected 
+		  Multipoint Connection Protection may be disabled.
+
+		- Disabled - The Cross-Connection is incapable of performing its normal 
+		  crossconnection function. All the cross-connection objects contained in the 
+		  protected Multipoint Connection Protection are disabled.
+
+		The operational state of Disabled is considered as a signal failure on the 
+		corresponding connection and as such it must be taken into account in the 
+		protection mechanism.
+
+		Availability status
+
+		The supported values for this attribute are:
+
+		- Degraded - The Multipoint Connection Protection is degraded in some respect.
+
+		For instance, if one or more (but not all) Cross-Connection objects contained in 
+		the protected Multipoint Connection Protection are disabled, the Multipoint 
+		Connection Protection will be considered as degraded. The Multipoint Connection 
+		Protection remains available for service (i.e. its operational state is enabled) 
+		while it is degraded. No automatic protection switch occurs.
+
+		- Empty SET.
+
+		The switchStatus indicates the status of the switching requests.";
+--6.4 Subnetwork connection protection fabric
+
+
+sncpFabric MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100":fabric;
+	CHARACTERIZED BY
+		sncpFabricPackage PACKAGE
+			BEHAVIOUR
+				sncpFabricBehaviour;
+			ACTIONS
+				protectUnprotect,
+				protectedConnect;;;
+REGISTERED AS { g774-04MObjectClass 4 };
+
+
+sncpFabricBehaviour BEHAVIOUR
+	DEFINED AS
+		"The subnetwork connection protection fabric object represents the function of 
+		managing the establishment and release of protected crossconnections.";
+--7 Packages
+--7.1 Hold off time package
+
+
+holdOffTimePackage PACKAGE
+	ATTRIBUTES
+		holdOffTime GET-REPLACE;
+REGISTERED AS { g774-04Package 1 };
+--8 Attributes
+--8.1 Hold off time
+
+
+holdOffTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHSNCPASN1.HoldOffTime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		holdOffTimeBehaviour;
+REGISTERED AS { g774-04Attribute 1 };
+
+
+holdOffTimeBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute specifies the amount of 100 ms periods which represents the time 
+		to wait before performing a protection switch after a defect has occurred on 
+		either the protecting or protected protection unit. The minimum value is zero 
+		(no hold off time) and the maximum value is 100 (representing 10 seconds). The 
+		hold off time is defined in G.841.";
+--8.2 Protection criteria
+
+
+protectionCriteria ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHSNCPASN1.ProtectionCriteria;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		protectionCriteriaBehaviour;
+REGISTERED AS { g774-04Attribute 2 };
+
+
+protectionCriteriaBehaviour BEHAVIOUR
+	DEFINED AS
+		"This attribute specifies the list of configurable criteria that are to be used 
+		for automatic switch decision supplementing those criteria which are defined as 
+		mandatory and fixed within the SNCP function as stated in G.841.";
+--8.3 Switch status
+
+
+switchStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHSNCPASN1.ProtectionStatus;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		switchStatusBehaviour;
+REGISTERED AS { g774-04Attribute 3 };
+
+
+switchStatusBehaviour BEHAVIOUR
+	DEFINED AS
+		"The following is a list of all the possible status values of the switchStatus 
+		attribute for protected connection protection or protected 
+		mpConnectionProtection:
+
+		- No request - There is no outstanding request. An active switch hold off time 
+		  is considered a no request.
+
+		- Do Not Revert - The protected connection protection has been switched to the 
+		  protecting connection protection and the request to do so has been 
+		  subsequently cleared. This status is only applicable to 1 + 1 non-revertive 
+		  systems.
+
+		- Wait-to-Restore - The protected connection protection has recovered from an 
+		  auto switch condition and the WTR timer is activated.
+
+		- Manual switch to the protecting connection protection completed - The 
+		  protected connection protection has been switched to the protecting connection 
+		  protection by a manual switch request.
+
+		- Auto switch to the protecting connection completed - The protected connection 
+		  protection has been switched to the protecting connection protection due to an 
+		  auto switch condition.
+
+		- Auto switch pending - An auto switch request cannot been completed due to the 
+		  unavailability of the protecting connection protection.
+
+		- Forced switch to the protecting connection protection completed - The 
+		  protected connection protection has been forced to switch to the protecting 
+		  connection protection.
+
+		- Forced switch to the protecting connection protection completed - auto switch 
+		  pending - An auto switch request cannot be completed due to a completed forced 
+		  switch (to protecting connection protection).
+
+		- Lockout of protected connection protection - The protected connection 
+		  protection is prevented from switching to protection.
+
+		- Lockout of protected connection protection - auto switch pending - An auto 
+		  switch request cannot be completed due to the lockout of the protected 
+		  connection protection.
+
+		The following is a list of all the possible status values of the switchStatus 
+		attribute for protecting connection protection or protecting 
+		mpConnectionProtection:
+
+		- No request - There is no outstanding request. An active switch hold off time 
+		  is considered a no request.
+
+		- Do Not Revert - The protected connection protection has been switched to the 
+		  protecting connection protection and the request to do so has been cleared. 
+		  This status is only applicable to 1 + 1 non-revertive systems.
+
+		- Manual switch to the protecting connection protection completed - The 
+		  protected connection protection has been switched to the protecting connection 
+		  protection by a manual switch request.
+
+		- Auto switch to the protecting connection protection completed - A protected 
+		  connection protection has been switched to the protecting connection 
+		  protection due to an auto switch condition.
+
+		- Signal fail - A signal fail condition exists on the protecting connection 
+		  protection (no traffic is being carried on the protecting connection 
+		  protection).
+
+		- Forced switch to the protecting connection completed - The protected 
+		  connection protection has been forced to switch to the protecting connection 
+		  protection.
+
+		- Lockout of protection - The protecting connection protection is prevented from 
+		  providing protection.
+
+		- Lockout of protection - auto switch condition on protecting connection 
+		  protection - A lockout of protection is in place, and an auto switch condition 
+		  exists on the protecting connection protection.";
+--9 Actions
+--9.1 Protected connect action
+
+
+protectedConnect ACTION
+	BEHAVIOUR
+		protectedConnectBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX SDHSNCPASN1.ProtectedConnectInformation;
+	WITH REPLY SYNTAX SDHSNCPASN1.ProtectedConnectResult;
+REGISTERED AS { g774-04Action 1 };
+
+
+protectedConnectBehaviour BEHAVIOUR
+	DEFINED AS
+		"This action offers the capability, in a single action, to:
+
+		1) Establish a protected connection between termination points/GTPs (connect 
+		   Choice of the syntax). The connection to be established is part of a 
+		   subnetwork connection protection. The Termination Points/GTP involved in this 
+		   protected connection must not be already connected for the concerned 
+		   direction. In this case this connection establishment is done according to 
+		   the following rules:
+
+		- The protecting TP is used to describe the unreliable TP(s) of the protecting 
+		  connection. This must be done according to the description of the protection 
+		  Connection Type.
+
+		- The protection Connection Type is used to describe the type of connection to 
+		  be established, i.e. unidirectional or bidirectional. The protection 
+		  Connection Type describes the connection between the
+
+		  unreliable TPs and the reliable TPs for the protected connection.
+
+		- If the protection Connection Type is bidirectional, a 
+		  connectionProtectionGroupR1 is created. The To TP part of the syntax 
+		  represents the reliable resource.
+
+		- If the protection Connection Type is unidirectional, it can concern either:
+
+		- A unidirectional point-to-point subnetwork connection protection. In this case 
+		  a connectionProtectionGroupR1 is created.
+
+		- A unidirectional point-to-multipoint subnetwork connection protection where 
+		  all legs are protected altogether. In this case a connectionProtectionGroupR1 
+		  is created, containing:
+
+		a) the mpConnectionProtection of the working channel, connecting the unreliable 
+		   TP. The reliable TPs are connected by crossConnection objects contained by 
+		   the mpConnectionProtection.
+
+		b) the mpConnectionProtection of the protecting channel. This 
+		   mpConnectionProtection does not contain crossConnection object.
+
+		The administrative state of the created connections objects is specified as an 
+		optional parameter of this action. If this parameter is omitted, the 
+		administrative state will be set to 'unlocked'.
+
+		2) Add TPs/GTPs as destinations of a point-to-multipoint connection. (addLeg 
+		   Choice of the syntax).
+
+		The legs may be added as part of the protected legs (corresponding to the 
+		sub-choice protected Legs of the syntax). In that case each crossConnection 
+		object corresponding to each individual leg is created, these crossConnections 
+		are contained by the protected mpConnectionProtection contained by the 
+		connectionProtectionGroupR1.
+
+		The legs may be added as non-protected legs (corresponding to the subchoice 
+		unprotected Legs of the syntax). In that case each crossConnection object 
+		corresponding to each individual leg is created, these crossConnections are 
+		contained by the mpCrossConnection representing the unprotected broadcast. If no 
+		unprotected mpCrossConnection exists then an mpCrossConnection is created, 
+		containing all the specified unprotected legs (if only one unprotected leg 
+		exists, then a point-to-point unidirectional cross-connection is created). If 
+		this action concerns an existing unidirectional point-to-point cross-connection 
+		then a point-to-multipoint cross-connection is created which contains the 
+		crossConnections representing legs.
+
+		The administrative state of the created cross-connection or connection 
+		protection objects will be the same as that of the containing multipoint 
+		cross-connection or multipoint connection protection object unless otherwise 
+		specified in the action parameters.
+
+		3) Connect a TP as the unreliable resource of an existing protected connection 
+		   (protected or protecting connectionProtection or mpConnectionProtection 
+		   contained in a connectionProtectionGroupR1). (addUnreliable Choice of the 
+		   syntax)
+
+		If the specified TP is not already connected for the corresponding direction 
+		(notConnected sub-choice of the syntax), it will be connected by the specified 
+		connectionProtection or mpConnectionProtection. If the specified TP is already 
+		connected for the corresponding direction (connected sub-choice of the syntax) 
+		by a unidirectional connection (point-to-point or multipoint), the TP will point 
+		to the connectionProtection or mpConnectionProtection in addition to the 
+		existing connection(s).";
+--9.2 Protect unprotect connection action
+
+
+protectUnprotect ACTION
+	BEHAVIOUR
+		protectUnprotectBehaviour;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX SDHSNCPASN1.ProtectUnprotectInformation;
+	WITH REPLY SYNTAX SDHSNCPASN1.ProtectedConnectResult;
+REGISTERED AS { g774-04Action 2 };
+
+
+protectUnprotectBehaviour BEHAVIOUR
+	DEFINED AS
+		"This action offers the capability, in a single action, to:
+
+		1) Protect an existing unprotected connection (protect Choice of the syntax).
+
+		The description for protecting an existing connection uses the same syntax as 
+		the establishment of a new protected connection, and follows the same rules, 
+		except that all the TPs or GTP specified in the protectionConnectionType part 
+		must be explicitly specified by their object instances (i.e. no tpPool, no GTP 
+		expressed by a sequence of TPs). The connectivity specified by the 
+		protectionConnectionType part of the syntax must reflect the same connectivity 
+		(signal flow expressed by the connectivity pointers) as the existing one, i.e.:
+
+		- For a unidirectional point-to-point, the TP specified as the From and the To 
+		  must be already cross-connected the same way as described and they should not 
+		  be already protected for the concerned direction.
+
+		- For a bidirectional point-to-point, the TPs specified as the from and the To 
+		  must be already cross-connected the same way as described, i.e.: a 
+		  bidirectional cross-connection connecting the From TP and the To TP (reliable 
+		  TP) must already exist.
+
+		- For a point-to-multipoint, the TP specified as the From and all the TPs 
+		  specified as the To must be already cross-connected the same way and none of 
+		  them should be already part of a protection scheme for the concerned 
+		  direction. Only those legs which are specified as part of the protectedConnect 
+		  Information will be involved in the protection scheme. A 
+		  connectionProtectionGroupR1, two mpConnectionProtectionos and each 
+		  crossConnection representing each leg are created as the result of this 
+		  action. If all legs are involved in the protection scheme then the existing 
+		  mpCrossConnection is deleted. The administrative state of the new created 
+		  connection objects will be the same as that of the existing one they are to 
+		  replace, unless otherwise specified in the action parameters. The result, if 
+		  OK is given by the connected Choice of the syntax.
+
+		2) Unprotect an existing protected connection (unprotect Choice of the syntax). 
+		   The description for unprotecting an existing connection uses the same syntax 
+		   as the establishment of a new unprotected connection, i.e. the ConnectionType 
+		   and ConnectionTypeBi, and follows the same rules, except that all the 
+		   described connections must already exist, and all the TPs or GTP specified in 
+		   this action must be explicitly specified by their object instances. The 
+		   connectivity specified by the syntax must reflect the same connectivity as 
+		   the existing one for either the working or the protect part of the 
+		   ConnectionProtectionGroupR1, i.e.:
+
+		- For a unidirectional point-to-point connection protection, the TP specified as 
+		  the From and the To must be respectively the unreliable TP and the reliable TP 
+		  of the (protected or protecting) connectionProtection.
+
+		- For a bidirectional point-to-point, the TPs specified as the From and the To 
+		  must be respectively the unreliable TP of either the protected or protecting 
+		  connectionProtection and the reliable TP of the protected 
+		  connectionProtection. When the choice single of the syntax is used, a 
+		  bidirectional cross-connection is created (uniform route) connecting the 
+		  specified Unreliable TP and the Reliable TP. When the choice multiple of the 
+		  syntax is used, two unidirectional cross-connections are created (diverse 
+		  route), one connecting the specified Unreliable TP to the Reliable TP, and the 
+		  other connecting the Reliable TP to the specified Unreliable TP. For a 
+		  point-to-multipoint, the TP specified as the From and all the TPs specified as 
+		  the To must be respectively the unreliable TP of the protected mp Connection 
+		  Protection and the To TPs of the cross-connects contained in the mp connection 
+		  protection. If TPs are specified which do not pertain to the protection 
+		  scheme, the requests fail with the logical problem mismatching TP Instances. 
+		  Only those TPs which are explicitly specified as part of the 
+		  protectedUnprotectInformation will be unprotected, and if no mpCrossConnection 
+		  was already existing then one is created which holds each crossConnection 
+		  corresponding to each unprotected leg. If no other TP remains in the protected 
+		  scheme, then the connectionProtectionGroupR1 is deleted and consequently all 
+		  its contained objects. The administrative state of the new created connection 
+		  objects will be the same as that of the existing one they are to replace, 
+		  unless otherwise specified in the action parameters.";
+--10 Parameters
+--10.1 Switch status
+
+
+switchStatusParameter PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX SDHSNCPASN1.ProtectionStatusParameter;
+	BEHAVIOUR
+		switchStatusParameterBeh;
+REGISTERED AS { g774-04Parameter 1 };
+
+
+switchStatusParameterBeh BEHAVIOUR
+	DEFINED AS
+		"This parameter is included in the additional info parameters of the protection 
+		switching reporting notification. This notification is sent by the protection 
+		group according to the following rules. There are several cases:
+
+		- The switch from protected to protecting or protecting to protected has been 
+		  done without preempting an existing switch. In this case, the old and new 
+		  values of the Switch status attribute of the protecting channel shall be 
+		  reported in the notification by means of the oldSwitchStatus and 
+		  newSwitchStatus parameters respectively.
+
+		- A switch is performed by preemting an exiting one. In this case, the old and 
+		  new values of the Switch status attribute of the protecting channel shall be 
+		  reported in the notification by means of the oldSwitchStatus and 
+		  newSwitchStatus parameters respectively.
+
+		- An auto switch condition exists on a channel but the auto switch cannot be 
+		  served due to the unavailability of the channel that otherwise protects it. In 
+		  this case the oldSwitchStatus and newSwitchStatus parameters refer to the 
+		  switch status attribute value of the channel on which the auto switch 
+		  condition arises. The exception is when the channel is already forced or 
+		  locked out, in which case no notification is sent.
+
+		- A working channel (protected unit) has been locked out or released from 
+		  lockout without modifying any existing switch. In this case the 
+		  oldSwitchStatus and newSwitchStatus parameters refer to the switch status 
+		  attribute value of the working channel which has been locked out.
+
+		- A protection channel (protecting unit) has been locked out or released from 
+		  lockout without modifying the existing switch. In this case, the 
+		  oldSwitchStatus and newSwitchStatus parameters refer to the switch status 
+		  attribute value of the protection channel which has been locked out.
+
+		The protectionSwitchReporting is not sent when the automatic switch condition is 
+		toggling between SF and WTR condition. While in the lockout of forced switch 
+		state no notification is sent except for ending of release failure.";
+--11 Name bindings
+--Revisions that require re-registration
+--This clause provides replacement namebinding definitions for the existing ITU-T G.774.4 (1995).
+--Any namebinding replaced by one in this clause is considered to be deprecated. The reasons for the
+--replacement of a namebinding are as follows:
+--1) The replaced namebinding is faulty and must be fixed.
+--2) The replaced namebinding refers to a superior managed object class which has been
+--re-registered in this or another Recommendation.
+--3) The replaced namebinding refers to a subordinate managed object class which has been
+--re-registered in this or another Recommendation.
+--4) The replaced namebinding refers to a naming attribute which has been re-registered in this
+--or another Recommendation.
+--In each case where a namebinding is replaced, the new namebinding will be registered within this
+--Recommendation. The textual label for the namebinding will be revised to include the text "R1". For
+--example, in the revision of the G.774.4 (1995) namebinding "connectionProtectionconnectionProtectionGroup",
+--the revised label will become "connectionProtectionconnectionProtectionGroupR1".
+--Note the "R1" is placed immediately following the revised class
+--which impacts the namebinding.
+--Below is a table of namebindings deprecated from ITU-T G.774.4 (1995) and the G.774.4
+--namebindings which replace them:
+--Deprecated G.774.4 (1995) Namebindings
+--connectionProtection-connectionProtectionGroup
+--connectionProtectionGroup-sncpFabric
+--mpConnectionProtection-connectionProtectionGroup
+--Replacement G.774.4 Namebindings
+--connectionProtection-connectionProtectionGroupR1
+--connectionProtectionGroupR1-sncpFabric
+--mpConnectionProtection-connectionProtectionGroupR1
+--11.1 Connection protection
+
+
+connectionProtection-connectionProtectionGroupR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionProtection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS connectionProtectionGroupR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation G.774.03":protectionUnitId;
+	BEHAVIOUR
+		connectionProtection-connectionProtectionGroupR1Beh BEHAVIOUR
+			DEFINED AS
+				"The connection protection is contained by a connection protection Group managed 
+				object instance. There must be two and only two CP (Connection Protection) in 
+				the CPG (Connection Protection Group), with the same signal type and the same 
+				directionality. This is used to represent a point-to-point unidirectional or 
+				bidirectional connection protection. One of these CPs must be the protected one 
+				(protecting attribute with the value 'FALSE'), and the other must be the 
+				protecting one (protecting attribute with the value 'TRUE').";;
+REGISTERED AS { g774-04NameBinding 7 };
+--11.2 Connection protection group R1
+
+
+connectionProtectionGroupR1-sncpFabric NAME BINDING
+	SUBORDINATE OBJECT CLASS connectionProtectionGroupR1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sncpFabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation G.774.03":protectionGroupId;
+	BEHAVIOUR
+		connectionProtectionGroupR1-sncpFabricBeh BEHAVIOUR
+			DEFINED AS
+				"A Connection Protection Group is created as the result of the establishment of a 
+				protected connection (point-to-point or point-to-multipoint) or of the 
+				protection of an existing non-protected connection. When disconnecting a TP 
+				involved in a protected connection:
+
+				- if the TP is the reliable resource of a point-to-point connection protection, 
+				  or the last reliable resource (last leg) of a multipoint connection 
+				  protection, this leads to the disconnection of the protection, resulting in 
+				  the deletion of the connection protection group and all contained objects.
+
+				- if the TP is the unreliable resource of a connection protection or multipoint 
+				  connection protection, the corresponding Unreliable Resource Pointer is set to 
+				  NULL. Such a disconnection shall be considered as a signal failure. A new 
+				  unreliable resource (TP) may be connected using the capability to add a new 
+				  unreliable resource of the protected connect action. When both unreliable TPs 
+				  are disconnected, this leads to the disconnection of the protection, resulting 
+				  in the deletion of the connection protection group and all contained objects.";;
+REGISTERED AS { g774-04NameBinding 8 };
+--11.3 Cross connection
+
+
+crossConnection-mpConnectionProtection NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100":crossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mpConnectionProtection AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100":crossConnectionId;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { g774-04NameBinding 3 };
+
+
+crossConnection-sncpFabric NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100":crossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sncpFabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100":crossConnectionId;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { g774-04NameBinding 5 };
+--11.4 Multipoint connection protection
+
+
+mpConnectionProtection-connectionProtectionGroupR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS mpConnectionProtection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS connectionProtectionGroupR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation G.774.03":protectionUnitId;
+	BEHAVIOUR
+		mpConnectionProtection-connectionProtectionGroupR1Beh BEHAVIOUR
+			DEFINED AS
+				"MultiPoint Connection Protection are created as the result of the establishment 
+				of a protected multipoint connection or of the protection of an existing 
+				non-protected multipoint connection. The multipoint connection protections are 
+				contained directly by the connection protection Group managed object instance. 
+				There must be two and only two mpConnectionProtections in the 
+				connectionProtectionGroup, with the same signal type. This is used to represent 
+				the point to multipoint unidirectional connection protection. One of these 
+				mpConnectionProtection must be the protected one (protecting attribute with the 
+				value FALSE), and the other must be the protecting one (protecting attribute 
+				with the value TRUE).
+
+				Only the protected mpConnectionProtection can contain cross-connections 
+				representing the reliable resources. The configuration may be done prior to any 
+				existing cross-connection or on an existing multipoint cross-connection.";;
+REGISTERED AS { g774-04NameBinding 9 };
+--11.5 Multipoint cross connection
+
+
+mpCrossConnection-sncpFabric NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100":mpCrossConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sncpFabric AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation M.3100":mpCrossConnectionId;
+REGISTERED AS { g774-04NameBinding 6 };
+--12 Subordination rules
+--None.
+--13 Pointer constraints
+--None.
+--14 Supporting ASN.1 productions
+
+SDHSNCPASN1 { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) asn1Module(2) sdhsncp(0) }
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+-- EXPORTS everything --
+IMPORTS
+ObjectInstance
+FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+AdministrativeState, OperationalState
+FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1
+}
+AddLeg, Connected, ConnectionType, ConnectionTypeBi, Directionality,
+ExplicitPtoMP,
+ExplicitPtoP, ExplicitTP, Failed, PointToMultipoint, PointToPoint, PtoMPools,
+PtoTPPool
+FROM ASN1DefinedTypesModule { ccitt recommendation m(13) gnm(3100)
+informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+Boolean, Integer, ProtectionStatus, ProtectionStatusParameter
+FROM SDHProtASN1 { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) prot(03)
+informationModel(0) asn1Module(2) sdhmsp(0) };
+sdhSNCP OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) g(7) g774(774)
+hyphen(127)
+sncp(04) informationModel(0) }
+g774-04MObjectClass OBJECT IDENTIFIER ::= { sdhSNCP managedObjectClass(3) }
+g774-04Attribute OBJECT IDENTIFIER ::= { sdhSNCP attribute(7) }
+g774-04Action OBJECT IDENTIFIER ::= { sdhSNCP action(9) }
+g774-04NameBinding OBJECT IDENTIFIER ::= { sdhSNCP nameBinding(6) }
+g774-04Parameter OBJECT IDENTIFIER ::= { sdhSNCP parameter(5) }
+g774-04Package OBJECT IDENTIFIER ::= { sdhSNCP package(4) }
+g774-04StandardSpecificExtension OBJECT IDENTIFIER ::= { sdhSNCP
+standardSpecificExtension(0) }
+-- The following value assignments are for the Protection Criteria in the
+-- context of SDH.
+-- These values shall always be assigned by this Recommendation in the context
+-- of SDH.
+sncpProtectionCriteria OBJECT IDENTIFIER ::=
+{ g774-04StandardSpecificExtension 0 }
+sncpPathTraceMismatchCriteria OBJECT IDENTIFIER ::= { sncpProtectionCriteria 1 }
+sncpExcessiveErrorCriteria OBJECT IDENTIFIER ::= { sncpProtectionCriteria 2 }
+ConnectUnreliableTP ::= CHOICE {
+notConnected [0] UnreliableTp,
+connected [1] UnreliableTp
+}
+HoldOffTime ::= INTEGER
+PointToPointProtection ::= SEQUENCE {
+protectedPointToPoint PointToPoint,
+protectingPointToPoint ProtectingConnection
+}
+-- The object Instance of the xCon of PointToPoint represents the object
+-- instance of the created connectionProtection
+PointToMultipointProtection ::= SEQUENCE {
+protectedPointToMultipoint PointToMultipoint,
+protectingPointToMultipoint ProtectingConnection
+}
+-- The object Instance of the xConnections and mpXCon of PointToMultipoint
+-- represents the object instances of the created crossConnections and
+-- mpConnectionProtection
+-- The protectingPointToMultipoint represents the object instance of the
+-- unreliable TP and the object instance of the created mpConnectionProtection
+-- of the protecting connection
+ProtectedAddLeg ::= CHOICE {
+protected [0] AddLeg,
+unProtected [1] AddLeg
+}
+-- The object Instance of the mpXCon of AddLeg represents the object instance of
+-- the mpConnectionProtection to which new legs are added
+ProtectedConnectInformation ::= SEQUENCE OF SEQUENCE {
+CHOICE {
+connect [0] ProtectedConnection,
+addleg [1] ProtectedAddLeg,
+addUnreliable [2] ConnectUnreliableTP
+},
+administrativeState AdministrativeState OPTIONAL
+}
+ProtectedConnection ::= SEQUENCE {
+protectionConnectionType ProtectionConnectionType,
+protectingTP ExplicitTP,
+revertive Boolean,
+waitToRestore [0] Integer OPTIONAL,
+holdOffTime [1] HoldOffTime OPTIONAL
+}
+ProtectionConnectionType ::= CHOICE {
+unidirectional [0] ConnectionType,
+bidirectional [1] ConnectionTypeBi
+}
+ProtectedConnectionResult ::= SEQUENCE {
+CHOICE {
+pointToPoint [0] PointToPointProtection,
+pointToMultipoint [1] PointToMultipointProtection
+},
+connectionPG ObjectInstance
+}
+ProtectedConnectResult ::= SEQUENCE OF CHOICE {
+failed [0] Failed,
+protected [1] ProtectedConnectionResult,
+unprotected [2] Unprotected
+}
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the
+-- "SEQUENCE OF" of the "ProtectedConnectInformation" type.
+ProtectingConnection ::= SEQUENCE {
+unreliableTp ObjectInstance,
+conProt ObjectInstance
+}
+ProtectionCriteria ::= SET OF Criterion
+Criterion ::= OBJECT IDENTIFIER
+ProtectUnprotectInformation ::= SEQUENCE OF SEQUENCE {
+CHOICE {
+protect [3] ProtectedConnection,
+unprotect [4] UnprotectConnection
+},
+administrativeState AdministrativeState OPTIONAL
+}
+Unprotected ::= CHOICE {
+uniform [0] Connected,
+divers [1] UnprotectedMultiple
+}
+UnprotectedMultiple ::= SEQUENCE {
+sending PointToPoint,
+receiving PointToPoint
+}
+UnprotectConnection ::= CHOICE {
+uniPToP [0] ExplicitPtoP,
+pToMp [1] ExplicitPtoMP,
+bidirectional [2] UnprotectBi
+}
+UnprotectBi ::= CHOICE {
+uniformRoute [0] ExplicitPtoP,
+diverseRoute [1] UnprotectMultiple
+}
+UnprotectMultiple ::= SEQUENCE {
+firstXCon ExplicitPtoP,
+secondXCon ExplicitPtoP
+}
+UnreliableTp ::= SEQUENCE {
+unreliableTp ExplicitTP,
+connectionProtection ObjectInstance
+}
+END
+END
+--< GDMO.EndDocument "ITU-T G.774.4 (02/2001)" >--

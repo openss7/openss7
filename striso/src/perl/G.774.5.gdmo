@@ -1,0 +1,614 @@
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Include "G.774.gdmo" >--
+--< GDMO.Include "G.774.1.gdmo" >--
+--< GDMO.Document "ITU-T Rec. G.774.5" >--
+--< GDMO.Alias "ITU-T Rec. G.774.5" "Recommendation G.774.5",
+--  "Recommendation G.774.05",
+--  "Recommendation G.774.5",
+--  "Recommendation G.774.05" >--
+MODULE "ITU-T Rec. G.774.5"
+-- 6 Object classes
+-- This clause provides replacement managed object class definitions for the existing ITU-T G.774.5
+-- (1995). Any managed object class replaced by one in this clause is considered to be deprecated. The
+-- reasons for the replacement of a managed object class are as follows:
+-- 1) The replaced managed object class is faulty and must be fixed.
+-- 2) The replaced managed object class includes an attribute, package, notification or action
+-- which has been re-registered in this or another Recommendation.
+-- 3) The replaced managed object class inherits from a managed object class which has been reregistered
+-- in this or another Recommendation.
+-- In each case where a class is replaced the new class will be registered within this Recommendation.
+-- The textual label for the class will be revised to include the text "R1". For example in the revision of
+-- the G.774.5 (1995) managed object class "au4SupervisedCTPBidirectional", the revised label will
+-- become "au4SupervisedCTPBidirectionalR1".
+-- Below is a table of classes deprecated from ITU-T G.774.5 (1995) and the G.774.5 classes which
+-- replace them:
+-- Deprecated G.774.5 (1995) Classes Replacement G.774.5 Classes
+-- au4SupervisedCTPBidirectional au4SupervisedCTPBidirectionalR1
+-- au4SupervisedCTPSink au4SupervisedCTPSinkR1
+-- au3SupervisedCTPBidirectional au3SupervisedCTPBidirectionalR1
+-- au3SupervisedCTPSink au3SupervisedCTPSinkR1
+-- tu3SupervisedCTPBidirectional tu3SupervisedCTPBidirectionalR1
+-- tu3SupervisedCTPSink tu3SupervisedCTPSinkR1
+-- tu2SupervisedCTPBidirectional tu2SupervisedCTPBidirectionalR1
+-- tu2SupervisedCTPSink tu2SupervisedCTPSinkR1
+-- tu12SupervisedCTPBidirectional tu12SupervisedCTPBidirectionalR1
+-- tu12SupervisedCTPSink tu12SupervisedCTPSinkR1
+-- tu11SupervisedCTPBidirectional tu11SupervisedCTPBidirectionalR1
+-- tu11SupervisedCTPSink tu11SupervisedCTPSinkR1
+-- 6.1 Administrative unit 4 CTP bidirectional with HCS
+
+au4SupervisedCTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":au4CTPBidirectionalR1,
+		au4SupervisedCTPSinkR1,
+		au4SupervisedCTPSource;
+	CHARACTERIZED BY
+		vc3-4SupervisionBidirectionalPackage;
+REGISTERED AS { g774-05MObjectClass 19 };
+-- 6.2 Administrative unit 4 CTP sink with HPOM
+
+
+au4SupervisedCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":au4CTPSinkR1;
+	CHARACTERIZED BY
+		vc3-4SupervisionSinkPackageR1;
+REGISTERED AS { g774-05MObjectClass 20 };
+-- 6.3 Administrative unit 4 CTP source with HUG
+
+
+au4SupervisedCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":au4CTPSource;
+	CHARACTERIZED BY
+		vc3-4SupervisionSourcePackage;
+REGISTERED AS { g774-05MObjectClass 3 };
+-- 6.4 Administrative unit 3 CTP bidirectional with HCS
+
+
+au3SupervisedCTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":au3CTPBidirectionalR1,
+		au3SupervisedCTPSinkR1,
+		au3SupervisedCTPSource;
+	CHARACTERIZED BY
+		vc3-4SupervisionBidirectionalPackage;
+REGISTERED AS { g774-05MObjectClass 21 };
+-- 6.5 Administrative unit 3 CTP sink with HPOM
+
+
+au3SupervisedCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":au3CTPSinkR1;
+	CHARACTERIZED BY
+		vc3-4SupervisionSinkPackageR1;
+REGISTERED AS { g774-05MObjectClass 22 };
+-- 6.6 Administrative unit 3 CTP source with HUG
+
+
+au3SupervisedCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":au3CTPSource;
+	CHARACTERIZED BY
+		vc3-4SupervisionSourcePackage;
+REGISTERED AS { g774-05MObjectClass 6 };
+-- 6.7 Tributary unit 3 CTP bidirectional with LCS
+
+
+tu3SupervisedCTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu3CTPBidirectionalR1,
+		tu3SupervisedCTPSinkR1,
+		tu3SupervisedCTPSource;
+	CHARACTERIZED BY
+		vc3-4SupervisionBidirectionalPackage;
+REGISTERED AS { g774-05MObjectClass 23 };
+-- 6.8 Tributary unit 3 CTP sink with LPOM
+
+
+tu3SupervisedCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu3CTPSinkR1;
+	CHARACTERIZED BY
+		vc3-4SupervisionSinkPackageR1;
+REGISTERED AS { g774-05MObjectClass 24 };
+-- 6.9 Tributary unit 3 CTP source with LUG
+
+
+tu3SupervisedCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu3CTPSource;
+	CHARACTERIZED BY
+		vc3-4SupervisionSourcePackage;
+REGISTERED AS { g774-05MObjectClass 9 };
+-- 6.10 Tributary unit 2 CTP bidirectional with LCS
+
+
+tu2SupervisedCTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu2CTPBidirectionalR1,
+		tu2SupervisedCTPSinkR1,
+		tu2SupervisedCTPSource;
+	CHARACTERIZED BY
+		vc11-2SupervisionBidirectionalPackage;
+REGISTERED AS { g774-05MObjectClass 25 };
+-- 6.11 Tributary unit 2 CTP sink with LPOM
+
+
+tu2SupervisedCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu2CTPSinkR1;
+	CHARACTERIZED BY
+		vc11-2SupervisionSinkPackageR1;
+REGISTERED AS { g774-05MObjectClass 26 };
+-- 6.12 Tributary unit 2 CTP source with LUG
+
+
+tu2SupervisedCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu2CTPSource;
+	CHARACTERIZED BY
+		vc11-2SupervisionSourcePackage;
+REGISTERED AS { g774-05MObjectClass 12 };
+-- 6.13 Tributary unit 12 CTP bidirectional with LCS
+
+
+tu12SupervisedCTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu12CTPBidirectionalR1,
+		tu12SupervisedCTPSinkR1,
+		tu12SupervisedCTPSource;
+	CHARACTERIZED BY
+		vc11-2SupervisionBidirectionalPackage;
+REGISTERED AS { g774-05MObjectClass 27 };
+-- 6.14 Tributary unit 12 CTP sink with LPOM
+
+
+tu12SupervisedCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu12CTPSinkR1;
+	CHARACTERIZED BY
+		vc11-2SupervisionSinkPackageR1;
+REGISTERED AS { g774-05MObjectClass 28 };
+-- 6.15 Tributary unit 12 CTP source with LUG
+
+
+tu12SupervisedCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu12CTPSource;
+	CHARACTERIZED BY
+		vc11-2SupervisionSourcePackage;
+REGISTERED AS { g774-05MObjectClass 15 };
+-- 6.16 Tributary unit 11 CTP bidirectional with LCS
+
+
+tu11SupervisedCTPBidirectionalR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu11CTPBidirectionalR1,
+		tu11SupervisedCTPSinkR1,
+		tu11SupervisedCTPSource;
+	CHARACTERIZED BY
+		vc11-2SupervisionBidirectionalPackage;
+REGISTERED AS { g774-05MObjectClass 29 };
+-- 6.17 Tributary unit 11 CTP sink with LPOM
+
+
+tu11SupervisedCTPSinkR1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu11CTPSinkR1;
+	CHARACTERIZED BY
+		vc11-2SupervisionSinkPackageR1;
+REGISTERED AS { g774-05MObjectClass 30 };
+-- 6.18 Tributary unit 11 CTP source with LUG
+
+
+tu11SupervisedCTPSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation G.774":tu11CTPSource;
+	CHARACTERIZED BY
+		vc11-2SupervisionSourcePackage;
+REGISTERED AS { g774-05MObjectClass 18 };
+-- 7 Packages
+-- This clause provides replacement package definitions for the existing ITU-T G.774.5 (1995). Any
+-- package replaced by one in this clause is considered to be deprecated. The reasons for the
+-- replacement of a package are as follows:
+-- 1) The replaced package is faulty and must be fixed.
+-- 2) The replaced package includes an attribute, package, notification or action which has been
+-- re-registered in this Recommendation.
+-- In each case where a package is replaced, the new package will be registered within this
+-- Recommendation. The textual label for the package will be revised to include the text "R1". For
+-- example, in the revision of the G.774.5 (1995) package "vc11-2SupervisionSinkPackage", the
+-- revised label will become "vc11-2SupervisionSinkPackageR1".
+-- Below is a table of packages deprecated from ITU-T G.774.5 (1995) and the G.774.5 packages
+-- which replace them:
+-- Deprecated G.774.5 (1995) Packages Replacement G.774.5 Packages
+-- vc11-2SupervisionSinkPackage vc11-2SupervisionSinkPackageR1
+-- vc3-4SupervisionSinkPackage vc3-4SupervisionSinkPackageR1
+-- 7.1 Virtual container 11-2 supervision bidirectional package
+
+
+vc11-2SupervisionBidirectionalPackage PACKAGE
+	BEHAVIOUR
+		vc11-2SupervisionBidirectionalPackageBehaviour;
+REGISTERED AS { g774-05Package 1 };
+
+
+vc11-2SupervisionBidirectionalPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		*A communicationAlarm notification shall be issued if a far end receive failure 
+		(V5 Byte) is detected. The probableCause parameter of the notification shall 
+		indicate FERF (Far End Receive Failure).
+
+		If monitoring is suspended due to monitorActive an existing far end receive 
+		failure is cleared and removed from the current problem list.
+
+		If the (inherited) attributes monitorActive and generatorEnabled have the value 
+		TRUE and the upstreamConnectivityPointer has the value NULL (not connected), the 
+		originated supervisory unequipped VC can indicate in the V5 byte a far end 
+		receive failure according to the conditions given in the functional 
+		specification (Recommendation G.783: signal label mismatch, path trace mismatch, 
+		AIS or loss of pointer).*;
+-- 7.2 Virtual container 11-2 supervision sink package
+
+
+vc11-2SupervisionSinkPackageR1 PACKAGE
+	BEHAVIOUR
+		vc11-2SupervisionSinkPackageR1Behaviour;
+	ATTRIBUTES
+		monitorActive GET-REPLACE,
+		"Recommendation G.774":v5SignalLabelExpected GET-REPLACE,
+		"Recommendation G.774":v5SignalLabelReceive GET,
+		j2PathTraceExpected REPLACE-WITH-DEFAULT
+			DEFAULT VALUE SDHCSASN1.defaultNull
+			GET-REPLACE,
+		j2PathTraceReceive GET;
+REGISTERED AS { g774-05Package 7 };
+
+
+vc11-2SupervisionSinkPackageR1Behaviour BEHAVIOUR
+	DEFINED AS
+		*If a SDH-CTP has to be created and the underlying resource is able to provide 
+		connection supervision, a supervised CTP should be created. The attribute 
+		monitorActive of supervised CTPs does only influence the behaviour related to 
+		connection supervision. A SET-operation of monitorActive to TRUE may be rejected 
+		dependent from the dynamic situation of the specific network element. In case of 
+		rejection the "invalidAttributeValue" error should be returned. If the attribute 
+		monitorActive has the value TRUE, then the path overhead is monitored. A 
+		communicationAlarm notification shall be issued if the signal label received (V5 
+		Byte) does not match the signal label expected. The probableCause parameter of 
+		the notification shall indicate signal label mismatch. A communicationAlarm 
+		notification shall be issued if the path trace received (J2 Byte) does not match 
+		the path trace expected. The probableCause parameter of the notification shall 
+		indicate path trace mismatch.
+
+		If monitoring is suspended due to monitorActive, all outstanding alarms related 
+		to the connection supervision (see above) are cleared and removed from the 
+		current problem list. In this state the attributes v5SignalLabelReceive and 
+		j2PathTraceReceive may contain values which do not reflect the received signal 
+		and no alarms (see before) are emitted. If the attribute monitorActive has the 
+		value FALSE during a part of a PM period, the performance data is not reliable. 
+		This should be indicated by the attribute suspectIntervalFlag of a possibly 
+		contained currentData object.
+
+		If the network element supports LCS with restricted capability, the local 
+		initial value of the attribute monitorActive should be FALSE.*;
+-- 7.3 Virtual container 11-2 supervision source package
+
+
+vc11-2SupervisionSourcePackage PACKAGE
+	BEHAVIOUR
+		vc11-2SupervisionSourcePackageBehaviour;
+	ATTRIBUTES
+		generatorEnabled GET-REPLACE,
+		j2PathTraceSend GET-REPLACE;
+REGISTERED AS { g774-05Package 3 };
+
+
+vc11-2SupervisionSourcePackageBehaviour BEHAVIOUR
+	DEFINED AS
+		*If an SDH-CTP has to be created and the underlying resource is able to provide 
+		connection supervision, a supervised CTP should be created. The attribute 
+		generatorEnabled of supervised CTPs does only influence the behaviour related to 
+		connection supervision. A SET-operation of generatorEnabled to TRUE may be 
+		rejected dependent from the dynamic situation of the specific network element. 
+		In case of rejection, the invalidAttributeValue error should be returned. If 
+		the supervised CTP is not connected (the upstreamConnectivityPointer has the 
+		value NULL) and the attribute generatorEnabled has the value TRUE, then a 
+		supervisory unequipped signal with the current value of j2PathTraceSend is 
+		originated.
+
+		If the supervised CTP is connected (the upstreamConnectivityPointer does not 
+		have the value NULL), this package does not influence the transmitted VC 
+		(independent from generatorEnabled).
+
+		If the network element supports LCS with restricted capability, the local 
+		initial value of the attribute generatorEnabled should be FALSE.*;
+-- 7.4 Virtual container 3-4 supervision bidirectional package
+
+
+vc3-4SupervisionBidirectionalPackage PACKAGE
+	BEHAVIOUR
+		vc3-4SupervisionBidirectionalPackageBehaviour;
+REGISTERED AS { g774-05Package 4 };
+
+
+vc3-4SupervisionBidirectionalPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		*A communicationAlarm notification shall be issued if a far end receive failure 
+		(G1 Byte) is detected. The probableCause parameter of the notification shall 
+		indicate FERF (Far End Receive Failure). If monitoring is suspended due to 
+		monitorActive, an existing far end receive failure is cleared and removed from 
+		the current problem list.
+
+		If the (inherited) attributes monitorActive and generatorEnabled have the value 
+		TRUE and the upstreamConnectivityPointer has the value NULL (not connected), the 
+		originated supervisory unequipped VC can indicate in the G1 byte a far end 
+		receive failure according to the conditions given in the functional 
+		specification (Recommendation G.783: signal label mismatch, path trace mismatch, 
+		AIS or loss of pointer).*;
+-- 7.5 Virtual container 3-4 supervision sink package
+
+
+vc3-4SupervisionSinkPackageR1 PACKAGE
+	BEHAVIOUR
+		vc3-4SupervisionSinkPackageR1Behaviour;
+	ATTRIBUTES
+		monitorActive GET-REPLACE,
+		"Recommendation G.774":c2SignalLabelExpected GET-REPLACE,
+		"Recommendation G.774":c2SignalLabelReceive GET,
+		"Recommendation G.774":j1PathTraceExpected REPLACE-WITH-DEFAULT
+			DEFAULT VALUE SDHCSASN1.defaultNull
+			GET-REPLACE,
+		j1PathTraceReceive GET;
+REGISTERED AS { g774-05Package 8 };
+
+
+vc3-4SupervisionSinkPackageR1Behaviour BEHAVIOUR
+	DEFINED AS
+		*If a SDH-CTP has to be created and the underlying resource is able to provide 
+		connection supervision, a supervised CTP should be created. The attribute 
+		monitorActive of supervised CTPs does only influence the behaviour related to 
+		connection supervision. A SET-operation of monitorActive to TRUE may be rejected 
+		dependent from the dynamic situation of the specific network element. In case of 
+		rejection the "invalidAttributeValue" error should be returned.
+
+		If the attribute monitorActive has the value TRUE, then the path overhead is 
+		monitored. A communicationAlarm notification shall be issued if the signal label 
+		received (C2 Byte) does not match the signal label expected. The probableCause 
+		parameter of the notification shall indicate signal label mismatch. A 
+		communicationAlarm notification shall be issued if the path trace received (J1 
+		Byte) does not match the path trace expected. The probableCause parameter of the 
+		notification shall indicate path trace mismatch. If monitoring is suspended due 
+		to the attribute monitorActive, all outstanding alarms related to the connection 
+		supervision (see above) are cleared and removed from the current problem list. 
+		In this state the attributes c2SignalLabelReceive and j1PathTraceReceive may 
+		contain values which do not reflect the received signal and no alarms (see 
+		before) are emitted. If the attribute monitorActive has the value FALSE during a 
+		part of a PM period, the performance data is not reliable. This should be 
+		indicated by the attribute suspectIntervalFlag of a possibly contained 
+		currentData object. If the network element supports HCS with restricted 
+		capability, the local initial value of the attribute monitorActive should be 
+		FALSE.*;
+-- 7.6 Virtual container 3-4 supervision source package
+
+
+vc3-4SupervisionSourcePackage PACKAGE
+	BEHAVIOUR
+		vc3-4SupervisionSourcePackageBehaviour;
+	ATTRIBUTES
+		generatorEnabled GET-REPLACE,
+		j1PathTraceSend GET-REPLACE;
+REGISTERED AS { g774-05Package 6 };
+
+
+vc3-4SupervisionSourcePackageBehaviour BEHAVIOUR
+	DEFINED AS
+		*If an SDH-CTP has to be created and the underlying resource is able to provide 
+		connection supervision, a supervised CTP should be created. The attribute 
+		generatorEnabled of supervised CTPs does only influence the behaviour related to 
+		connection supervision. A SET-operation of generatorEnabled to TRUE may be 
+		rejected dependent from the dynamic situation of the specific network element. 
+		In case of rejection, the invalidAttributeValue error should be returned.
+
+		If the supervised CTP is not connected (the upstreamConnectivityPointer has the 
+		value NULL) and the attribute generatorEnabled has the value TRUE, then a 
+		supervisory unequipped signal with the current value of j1PathTraceSend is 
+		originated.
+
+		If the supervised CTP is connected (the upstreamConnectivityPointer does not 
+		have the value NULL), this package does not influence the transmitted VC 
+		(independent from generatorEnabled).
+
+		If the network element supports HCS with restricted capability, the local 
+		initial value of the attribute generatorEnabled should be FALSE.*;
+-- 8 Attributes
+-- 8.1 Generator enabled
+
+
+generatorEnabled ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.Boolean;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { g774-05Attribute 1 };
+-- 8.2 Monitor active
+
+
+monitorActive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.Boolean;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { g774-05Attribute 2 };
+-- 8.3 J1 Path trace receive
+
+
+j1PathTraceReceive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.PathTraceRS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		j1PathTraceReceiveBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the incoming J1 VC Path Trace 
+				byte message.*;;
+REGISTERED AS { g774-05Attribute 3 };
+-- 8.4 J1 Path trace send
+
+
+j1PathTraceSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.PathTraceRS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		j1PathTraceSendBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the outgoing J1 VC Path Trace 
+				byte message.*;;
+REGISTERED AS { g774-05Attribute 4 };
+-- 8.5 J2 Path trace expected
+
+
+j2PathTraceExpected ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.PathTrace;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		j2PathTraceExpectedBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to specify the value of the expected J2 VC Path Trace 
+				byte message. If the value of this attribute is set to NULL then any Received 
+				Path Trace shall be considered to match.*;;
+REGISTERED AS { g774-05Attribute 5 };
+-- 8.6 J2 Path trace receive
+
+
+j2PathTraceReceive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.PathTraceRS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		j2PathTraceReceiveBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the incoming J2 VC Path Trace 
+				byte message.*;;
+REGISTERED AS { g774-05Attribute 6 };
+-- 8.7 J2 Path trace send
+
+
+j2PathTraceSend ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHCSASN1.PathTraceRS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		j2PathTraceSendBehaviour BEHAVIOUR
+			DEFINED AS
+				*This attribute is used to indicate the value of the outgoing J2 VC Path Trace 
+				byte message.*;;
+REGISTERED AS { g774-05Attribute 7 };
+-- 9 Actions
+-- None.
+-- 10 Notifications
+-- None.
+-- 11 Parameters
+-- None.
+-- 12 Name bindings
+-- This clause provides replacement namebinding definitions for the existing ITU-T G.774.5 (1995).
+-- Any namebinding replaced by one in this clause is considered to be deprecated. The reasons for the
+-- replacement of a namebinding are as follows:
+-- 1) The replaced namebinding is faulty and must be fixed.
+-- 2) The replaced namebinding refers to a superior managed object class which has been
+-- re-registered in this Recommendation.
+-- 3) The replaced namebinding refers to a subordinate managed object class which has been
+-- re-registered in this Recommendation.
+-- 4) The replaced namebinding refers to a naming attribute which has been re-registered in this
+-- Recommendation.
+-- In each case where a namebinding is replaced, the new namebinding will be registered within this
+-- Recommendation. The textual label for the namebinding will be revised to include the text "R1". For
+-- example, in the revision of the G.774.5 (1995) namebinding "pathTerminationCurrentDataau4SupervisedCTPSink",
+-- the revised label will become "pathTerminationCurrentData-
+-- au4SupervisedCTPSinkR1". Note the "R1" is placed immediately following the revised class which
+-- impacts the namebinding.
+-- Below is a table of namebindings deprecated from ITU-T G.774.5 (1995) and the G.774.5
+-- namebindings which replace them:
+-- Deprecated G.774.5 (1995) Namebindings
+-- pathTerminationCurrentData-au4SupervisedCTPSink
+-- pathTerminationCurrentData-au3SupervisedCTPSink
+-- pathTerminationCurrentData-tu3SupervisedCTPSink
+-- pathTerminationCurrentData-tu2SupervisedCTPSink
+-- pathTerminationCurrentData-tu12SupervisedCTPSink
+-- pathTerminationCurrentData-tu11SupervisedCTPSink
+-- Replacement G.774.5 Namebindings
+-- pathTerminationCurrentData-au4SupervisedCTPSinkR1
+-- pathTerminationCurrentData-au3SupervisedCTPSinkR1
+-- pathTerminationCurrentData-tu3SupervisedCTPSinkR1
+-- pathTerminationCurrentData-tu2SupervisedCTPSinkR1
+-- pathTerminationCurrentData-tu12SupervisedCTPSinkR1
+-- pathTerminationCurrentData-tu11SupervisedCTPSinkR1
+-- For performance monitoring, name bindings which have supervised CTPs (Sink or Bidirectional) are
+-- defined as superior class and the subclass of currentData for path termination as subordinate class
+-- (defined in ITU-T G.774.1).
+
+
+pathTerminationCurrentData-au4SupervisedCTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation G.774.01":pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS au4SupervisedCTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-05NameBinding 7 };
+
+
+pathTerminationCurrentData-au3SupervisedCTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation G.774.01":pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS au3SupervisedCTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-05NameBinding 8 };
+
+
+pathTerminationCurrentData-tu3SupervisedCTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation G.774.01":pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS tu3SupervisedCTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-05NameBinding 9 };
+
+
+pathTerminationCurrentData-tu2SupervisedCTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation G.774.01":pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS tu2SupervisedCTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-05NameBinding 10 };
+
+
+pathTerminationCurrentData-tu12SupervisedCTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation G.774.01":pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS tu12SupervisedCTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-05NameBinding 11 };
+
+
+pathTerminationCurrentData-tu11SupervisedCTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation G.774.01":pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS tu11SupervisedCTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-05NameBinding 12 };
+-- 13 Constraint rules
+-- None.
+-- 14 Subordination rules
+-- None.
+
+END
+--< GDMO.EndDocument "ITU-T Rec. G.774.5" >--
