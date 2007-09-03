@@ -1,0 +1,114 @@
+--11.3 ASN1 modules
+ISIS{joint-iso-ccitt network-layer(13) management(0) iSIS(1) asn1Module(2) 0}
+DEFINITIONS ::= BEGIN
+--- object identifier definitions for identifier prefixes -
+isisoi OBJECT IDENTIFIER ::= {NLM.nl iSIS(1)}
+sseoi OBJECT IDENTIFIER ::= {isisoi standardSpecificExtensions(0)}
+moi OBJECT IDENTIFIER ::= {isisoi managedObjectClass (3)}
+poi OBJECT IDENTIFIER ::= {isisoi package (4)}
+proi OBJECT IDENTIFIER ::= {isisoi parameter (5)}
+nboi OBJECT IDENTIFIER ::= {isisoi nameBinding (6)}
+aoi OBJECT IDENTIFIER ::= {isisoi attribute (7)}
+agoi OBJECT IDENTIFIER ::= {isisoi attributeGroup (8)}
+acoi OBJECT IDENTIFIER ::= {isisoi action (9)}
+noi OBJECT IDENTIFIER ::= {isisoi notification (10)}
+---object identifiers for notification parameters -
+se OBJECT IDENTIFIER ::= {sseoi specificProblems(3)}
+areaMismatch OBJECT IDENTIFIER ::= {se areaMismatch(0)}
+attemptToExceedMaximumSequenceNumber OBJECT IDENTIFIER ::= {se attemptToExceedMaximumSequenceNumber(1)}
+authenticationFailure OBJECT IDENTIFIER ::= {se authenticationFailure(2)}
+corruptedLSPsDetected OBJECT IDENTIFIER ::= {se corruptedLSPsDetected(3)}
+iDFieldLengthMismatch OBJECT IDENTIFIER ::= {se iDFieldLengthMismatch(4)}
+lanL1DesignatedIntermediateSystemChange OBJECT IDENTIFIER ::= {se lanL1DesignatedIntermediateSystemChange(5)}
+lSPL1DatabaseOverload OBJECT IDENTIFIER ::= {se lSPL1DatabaseOverload(6)}
+lSPL2DatabaseOverload OBJECT IDENTIFIER ::= {se lSPL2DatabaseOverload(7)}
+manualAddressDroppedFromArea OBJECT IDENTIFIER ::= {se manualAddressDroppedFromArea(8)}
+maximumAreaAddressesMismatch OBJECT IDENTIFIER ::= {se maximumAreaAddressesMismatch(9)}
+ownLSPPurge OBJECT IDENTIFIER ::= {se ownLSPPurge(10)}
+partitionVirtualLinkChange OBJECT IDENTIFIER ::= {se partitionVirtualLinkChange(11)}
+rejectedAdjacency OBJECT IDENTIFIER ::= {se rejectedAdjacency(12)}
+sequenceNumberSkip OBJECT IDENTIFIER ::= {se sequenceNumberSkip(13)}
+versionSkew OBJECT IDENTIFIER ::= {se versionSkew(14)}
+--11.3.1 ASN.1 types and values
+AddressPrefix ::= BITSTRING(SIZE(0..160)) -- Size shall be a multiple of four, since the protocol represents these as semi-octets
+AdjacencyState ::= ENUMERATED{ initializing(0), up(1), failed(2), down(3)}
+AdjacencyUsage::= ENUMERATED{ undefined(0), level1(1), level2(2), level1and2(3)}
+AreaAddress ::= OCTETSTRING(SIZE(1..20))
+AreaAddresses ::= SET OF AreaAddress
+Boolean ::= BOOLEAN
+CircuitID ::= OCTETSTRING(SIZE(2..9))
+CircuitType ::= ENUMERATED{ broadcast(0), ptToPt(1), staticIn(2), staticOut(3), dA(4)}
+DatabaseState ::= ENUMERATED{ off(0), on(1), waiting(2)}
+DesignatedISChange ::= ENUMERATED{ resigned(0), elected(1)}
+GraphicString ::= GRAPHICSTRING
+HopMetric ::= INTEGER(0..maxLinkMetric)
+IDLength ::= INTEGER(0..8)
+IntermediateSystemPriority ::= INTEGER(1..127)
+ISType ::= ENUMERATED{ level1IS(1), level2IS(2)}
+LocalDistinguishedName ::= CMIP-1.BaseManagedObjectId
+LSPID ::= OCTETSTRING(SIZE(2..11))
+MappingType ::= ENUMERATED{ none(0), explicit(1), extractIDI(2) extractDSP(3)}
+MaximumAreaAddresses ::= INTEGER(0..254)
+MaximumPathSplits ::= INTEGER(1..32)
+MaximumVirtualAdjacencies ::= INTEGER(0..32)
+maxLinkMetric INTEGER ::= 63
+maxPathMetric INTEGER ::= 1023
+MetricType ::= ENUMERATED{ internal(0), external(1)}
+NAddress ::= NLM.NAddress
+NeighbourSystemType ::= ENUMERATED{ unknown(0), endSystem(1), intermediateSystem(2), l1IntermediateSystem(3), l2IntermediateSystem(4)}
+Null ::= NULL
+ObjectIdentifier ::= OBJECT IDENTIFIER
+OctetString ::= OCTETSTRING
+OriginatingLSPBufferSize ::= INTEGER(512..1492)
+OutputAdjacencies ::= SET OF LocalDistinguishedName
+OverloadStateChange ::= ENUMERATED{ on(0), waiting(1)}
+Password ::= OCTETSTRING(SIZE(0..254)
+Passwords ::= SET OF Password
+PathMetric ::= INTEGER(0..maxPathMetric)
+Reason ::= ENUMERATED{ holdingTimerExpired(0), checksumError(1), oneWayConnectivity(2), callRejected(3),
+reserveTimerExpired(4), circuitDisabled(5), versionSkew(6), areaMismatch(7),
+maximumBroadcastIntermediateSystemsExceeded(8), maximumBroadcastEndSystemsExceeded(9),
+wrongSystemType(10)}
+SNPAAddress ::= NLM.SNPAAddress
+SNPAAddresses ::= SET OF SNPAAddress
+SNPAPrefix ::= BITSTRING(SIZE(0..120))
+sNPAPrefix-Default SNPAPrefix ::= ''B
+sNPAMask-Default NAddress ::= ''B
+SourceId ::= OCTETSTRING(SIZE(1..10))
+SystemId ::= OCTETSTRING(SIZE(0..8))
+SystemIds ::= SET OF SystemId
+Version ::= GRAPHICSTRING
+VirtualLinkChange ::= ENUMERATED{ deleted(0), created(1)}
+zero INTEGER ::= 0
+--11.3.2 Defaults and permitted values
+callEstablishmentMetricIncrement-Default INTEGER ::= 0
+completeSNPInterval-Default Timer ::= {0,10}
+defaultMetric-Default INTEGER ::= 20
+DefaultMetric-Permitted ::= INTEGER(1..maxLinkMetric)
+dRISISHelloTimer-Default Timer ::= {0,1}
+externalDomain-Default BOOLEAN ::= TRUE
+iSISHelloTimer-Default Timer ::= {0,3}
+l1IntermediateSystemPriority-Default INTEGER ::= 64
+l2IntermediateSystemPriority-Default INTEGER ::= 64
+manualAreaAddresses-Default AreaAddresses ::= {}
+manualL2OnlyMode-Default BOOLEAN ::= FALSE
+maximumAreaAddresses-Default INTEGER ::= 3
+maximumPathSplits-Default INTEGER ::= 2
+maximumLSPGenerationInterval-Default Timer ::= {2,9}
+maximumVirtualAdjacencies-Default INTEGER ::= 2
+metricType-Default MetricType ::= Internal
+minimumBroadcastLSPTransmissionInterval-Default Timer ::= {-,33}
+minimumLSPGenerationInterval-Default Timer ::= {0,30}
+minimumLSPTransmissionInterval-Default Timer ::= {0,5}
+neighbourSNPAAddress-Default SNPAAddress ::= 0
+optionalMetric-Default INTEGER ::= 0
+originatingL1LSPBufferSize-Default INTEGER ::= receiveLSPBufferSize
+originatingL2LSPBufferSize-Default INTEGER ::= receiveLSPBufferSize
+partialSNPInterval-Default Timer ::= {0,2}
+password-Default Password ::= {}
+passwords-Default Passwords ::= {} -- The empty set
+pollESHelloRate-Default Timer ::= {0,50}
+reserveTimer-Default Timer ::= {2,6}
+sNPAAddresses-Default SNPAAddresses::= {}
+waitingTime-Default Timer ::= {0,60}
+END

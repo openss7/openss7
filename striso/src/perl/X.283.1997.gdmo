@@ -1,0 +1,4022 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "ISO10589.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Alias "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" "CCITT Rec. X.283 (1997) | ISO/IEC 10733 : 1998",
+--  "ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992",
+--  "ISO/IEC 10733" >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date$ by $Author$
+--  
+--  =============================================================================
+--  >--
+MODULE "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998"
+--5.2 Common behaviour templates
+
+commonCreationDeletion-B BEHAVIOUR
+	DEFINED AS
+		!Managed object class imports the ISO/IEC 10165-2 objectCreation and 
+		objectDeletion notifications. Used as follows: objectCreation - Generated 
+		whenever an instance of the managed object class is created. Implementations may 
+		optionally include the sourceIndicator parameter in the notification. If 
+		creation occurred as a result of internal operation of the resource, the value 
+		'resourceOperation' is used. If creation occurred in response to a management 
+		operation, the value 'managementOperation' is used. A value of 'unknown' may be 
+		returned if it is not possible to determine the source of the operation. None of 
+		the other optional parameters are used. objectDeletion - Generated whenever an 
+		instance of the managed object class is deleted. Implementations may optionally 
+		include the sourceIndicator parameter in the notification. If deletion occurred 
+		as a result of internal operation of the resource, the value 'resourceOperation' 
+		is used. If deletion occurred in response to a management operation, the value 
+		'managementOperation' is used. A value of 'unknown' may be returned if it is not 
+		possible to determine the source of the operation. None of the other optional 
+		parameters are used.!;
+
+
+commonStateChange-B BEHAVIOUR
+	DEFINED AS
+		!Managed object class imports the ISO/IEC 10165-2 stateChange notification. Used 
+		to report the changes to the operationalState attribute, and where present, the 
+		administrativeState attribute. A single parameter set is included in the State 
+		change definition field. Only the (mandatory) attributeId and (optional) 
+		newAttributeValue parameters are used.!;
+
+
+octetsSentReceivedCounter-B BEHAVIOUR
+	DEFINED AS
+		!The octetsSentCounter and octetsReceivedCounter shall count only user data 
+		octets in valid data packets. They shall not count user data octets in data 
+		packets which are rejected for any reason, nor user data octets in non data 
+		packets.!;
+
+
+successfulConnectionEstablishment-B BEHAVIOUR
+	DEFINED AS
+		!This Package imports the communicationsInformation notification from "GMI". It 
+		is used to report the following events. successfulConnectionEstablishment: 
+		Generated when a connection is successfully established. However, the precise 
+		synchronization between the notification and the corresponding protocol and 
+		service interface interactions is not defined by this Specification. The value 
+		NLM.successfulConnectionEstablishment shall be reported in the informationType 
+		field.!;
+
+
+deactivateConnection-B BEHAVIOUR
+	DEFINED AS
+		!The Deactivate action causes the connection to be terminated. The termination 
+		should occur as rapidly as practical, but no particular time constraints are 
+		implied. Typically, this action simulates a disconnect request received across 
+		the service interface. If a more rapid means for terminating the connection 
+		exists, then this should be used. The termination shall occur in conformance to 
+		the protocol standard. The Managed Object remains in existence after completion 
+		of the Deactivate action. It is subsequently deleted when the connection is 
+		terminated, in the same way as if the connection has been terminated by other 
+		means. A deactivate action may fail (with the ProcessingError response) if it is 
+		temporarily not possible to terminate the connection.!;
+
+
+resettingTimer-B BEHAVIOUR
+	DEFINED AS
+		!This attribute specifies the interval between certain events in the operation of 
+		the protocol state machine. If the value of this attribute is changed to a new 
+		value while the protocol state machine is in operation, the implementation shall 
+		take the necessary steps to ensure that for any time interval which was in 
+		progress when the corresponding attribute was changed, the next expiration of 
+		that interval takes place no later than the expiration of the interval in 
+		progress or the specified interval whichever is the sooner. The precision with 
+		which this time shall be implemented shall be the same as that associated with 
+		the basic operation of the timer attribute.!;
+--5.3 The network subsystem managed object
+-- Managed Object for Network Layer Subsystem
+--
+-- There is exactly one of these MOs within a system. It exists to provide a container for the
+-- Network Entity MOs, nSAP MOs and the 'SNPA' MOs as described in clause.
+--
+-- The networkSubsystem managed object cannot be created or deleted
+-- explicitly by management operation. It exists inherently in a system;
+-- created and deleted as part of system operation.
+
+
+networkSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":subsystem;
+	CHARACTERIZED BY
+		networkSubsystem-P PACKAGE
+			ATTRIBUTES
+				"GMI":subsystemId
+					INITIAL VALUE NLM.networkSubsystemId-Value
+					GET;;;
+REGISTERED AS { NLM.moi networkSubsystem(1) };
+-- Name Bindings
+
+
+networkSubsystem-system NAME BINDING
+	SUBORDINATE OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":subsystemId;
+REGISTERED AS { NLM.nboi networkSubsystem-system(1) };
+--5.4 The network entity managed object
+-- There may be multiple instances of these MOs within a system.
+-- Its definition permits it to be deleted and created explicitly by
+-- management operation, or to be created and deleted automatically
+-- as part of system operation.
+
+
+networkEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":communicationsEntity;
+	CHARACTERIZED BY
+		networkEntity-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				networkEntityTitles GET-REPLACE ADD-REMOVE,
+				systemTypes GET;
+			NOTIFICATIONS
+				"DMI":objectDeletion,
+				"DMI":objectCreation;;;
+REGISTERED AS { NLM.moi networkEntity(22) };
+-- Name Bindings
+
+
+networkEntity-networkSubsystem-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS networkEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":communicationsEntityId;
+	BEHAVIOUR
+		networkEntity-networkSubsystem-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!This name binding shall be used when the networkEntity MO is created 
+				automatically by the operation of the system. The details of these operations 
+				are outside the scope of this Specification.!;;
+REGISTERED AS { NLM.nboi networkEntity-networkSubsystem-Automatic(27) };
+
+
+networkEntity-networkSubsystem-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS networkEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":communicationsEntityId;
+	BEHAVIOUR
+		networkEntity-networkSubsystem-Management-B BEHAVIOUR
+			DEFINED AS
+				!This name binding shall be used when the networkEntity MO is created 
+				automatically by system management.!;;
+	CREATE;
+	DELETE;
+REGISTERED AS { NLM.nboi networkEntity-networkSubsystem-Management(28) };
+-- Attributes
+
+
+networkEntityTitles ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.NAddresses;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkEntityTitles-B BEHAVIOUR
+			DEFINED AS
+				!The set of Network Entity Titles (having the same abstract syntax as an NSAP 
+				address), which unambiguously identify the Network Entity in an End or 
+				Intermediate System. The value may be entered by a system management operation 
+				or it may be derived by some local means, for example by autoconfiguration.!;;
+REGISTERED AS { NLM.aoi networkEntityTitles(3) };
+
+
+systemTypes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.SystemTypes;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		systemTypes-B BEHAVIOUR
+			DEFINED AS
+				!The set of system roles supported by this Network Entity. This may be End 
+				System, Intermediate System or both. The actual role in which a particular 
+				instance of the protocol machine is operating is determined by the 
+				operationalSystemType attribute of the cLNS or cONS MO.!;;
+REGISTERED AS { NLM.aoi systemTypes(108) };
+--5.5 The NSAP managed object
+-- There is one nSAP MO for each set of NSAPs supported by the Network Subsystem
+-- associated with a single Transport layer client.
+-- Each NSAP MO corresponds to a set of one or more NSAPs
+-- supported by the Network Subsystem.
+--
+-- There is not more than one Transport layer client associated with a single nSAP MO,
+-- but there may be more than one nSAP MO, and corresponding sets of NSAPs,
+-- associated with a single Transport layer client.
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation or to be created and deleted automatically as
+-- part of system operation.
+
+
+nSAP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":sap2;
+	CHARACTERIZED BY
+		nSAP-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				"GMI":sap2Address
+					INITIAL VALUE DERIVATION RULE
+						nAddressesIV-B
+					GET;
+			NOTIFICATIONS
+				"DMI":objectDeletion,
+				"DMI":objectCreation;;;
+REGISTERED AS { NLM.moi nSAP(4) };
+-- Behaviours
+
+
+nAddressesIV-B BEHAVIOUR
+	DEFINED AS
+		!If the package is created using the nSAP-networkSubsystem-Automatic name binding 
+		the initial value of this attribute is not constrained by this Specification. 
+		However, if the package is created using the nSAP-networkSubsystem-Management 
+		name binding the initial value shall be specified in the CMIP create.!;
+-- Name Bindings
+
+
+nSAP-networkSubsystem-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS nSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":sapId;
+	BEHAVIOUR
+		nSAP-networkSubsystem-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!This name binding shall be used when the nSAP MO is created automatically by the 
+				operation of the network entity. For example, by the use of autoconfiguration or 
+				dynamic NSAP Address assignment techniques. The details of the operation of 
+				these techniques are outside the scope of this Specification.!;;
+REGISTERED AS { NLM.nboi nSAP-networkSubsystem-Automatic(4) };
+
+
+nSAP-networkSubsystem-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS nSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":sapId;
+	BEHAVIOUR
+		nSAP-networkSubsystem-Management-B BEHAVIOUR
+			DEFINED AS
+				!This name binding shall be used when the nSAP MO is created by system 
+				management. The value of the sap2Address attribute shall be specified in the 
+				CMIP create.!;;
+	CREATE;
+	DELETE;
+REGISTERED AS { NLM.nboi nSAP-networkSubsystem-Management(5) };
+--5.6 The connectionless-mode network service managed object
+-- There is no more than one of these MOs per network entity.
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation, but in some systems it will exist inherently
+-- and neither creation nor deletion by management operation will be
+-- possible. Name bindings are defined for both cases.
+--
+-- When the protocol machine is operable, the operationalState shall
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'.
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification. A cLNS MO may be created in the
+-- 'enabled' operational state.
+
+
+cLNS MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":clProtocolMachine;
+	CHARACTERIZED BY
+		cLNS-P PACKAGE
+			BEHAVIOUR
+				commonStateChange-B,
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				"DMI":administrativeState GET-REPLACE,
+				"GMI":clProtocolMachineId
+					INITIAL VALUE NLM.cLNSId-Value
+					GET,
+				supportedProtocols GET,
+				operationalSystemType
+					INITIAL VALUE DERIVATION RULE
+						operationalSystemTypeIV-B
+					GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":administrativeState
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+	CONDITIONAL PACKAGES
+		cLNS8473-P
+			PRESENT IF
+				!The protocol defined in ITU-T Rec. X.233 |ISO/IEC 8473-1 is used to implement 
+				the CLNS!,
+		cLNSChecksum-P
+			PRESENT IF
+				!The ITU-T Rec. X.233 |ISO/IEC 8473-1 Generate Checksum option is implemented!,
+		-- The following packages are associated with ISO/IEC 10589
+		"ISO/IEC 10589":cLNSISISBasic-P
+			PRESENT IF
+				!The system is an ISO 10589 IS!,
+		"ISO/IEC 10589":cLNSISISAuthentication-P
+			PRESENT IF
+				!The system is an ISO 10589 IS and the authentication procedures are implemented!,
+		"ISO/IEC 10589":cLNSISISPartitionRepair-P
+			PRESENT IF
+				!The system is an ISO 10589 Level 2 IS and the partition repair procedures are 
+				implemented!,
+		"ISO/IEC 10589":cLNSISISLevel2-P
+			PRESENT IF
+				!The system is an ISO 10589 Level 2 IS!,
+		"ISO/IEC 10589":cLNSISISLevel2Authentication-P
+			PRESENT IF
+				!The system is an ISO 10589 Level 2 IS and the authentication procedures are 
+				implemented!;
+REGISTERED AS { NLM.moi cLNS(21) };
+-- Packages
+
+
+cLNS8473-P PACKAGE
+	BEHAVIOUR
+		cLNS8473-P-B BEHAVIOUR
+			DEFINED AS
+				!Present when ITU-T Rec. X.233 |ISO/IEC 8473-1 is used to provide the CLNS.!;,
+		cLNS8473PImportedNotifications-B,
+		cLNS8473PImportedCounters-B;
+	ATTRIBUTES
+		"DMI":octetsSentCounter GET,
+		"DMI":octetsReceivedCounter GET,
+		segmentsReceived GET,
+		segmentsSent GET,
+		segmentsDiscarded GET,
+		assemblingSegmentsDiscarded GET,
+		errorReportsReceived GET,
+		pDUDiscards GET,
+		congestionDiscards GET,
+		maximumLifetime GET-REPLACE;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			"DMI":octetsSentCounter
+			"DMI":octetsReceivedCounter
+			segmentsReceived
+			segmentsDiscarded
+			assemblingSegmentsDiscarded
+			errorReportsReceived
+			pDUDiscards
+			congestionDiscards;
+	NOTIFICATIONS
+		"DMI":communicationsAlarm
+			notificationPDUHeader;
+REGISTERED AS { NLM.poi cLNS8473-P(20) };
+
+
+cLNSChecksum-P PACKAGE
+	BEHAVIOUR
+		cLNSChecksum-P-B BEHAVIOUR
+			DEFINED AS
+				!When present checksum generation is controlled by the enableChecksum attribute.!;;
+	ATTRIBUTES
+		enableChecksum REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.false
+			GET-REPLACE;
+REGISTERED AS { NLM.poi cLNSChecksum-P(1) };
+-- Behaviours
+
+
+cLNS8473PImportedCounters-B BEHAVIOUR
+	DEFINED AS
+		!The cLNS8473-P package imports octetsSentCounter and octetsReceivedCounter from 
+		ISO/IEC 10165-2. They are used to count the number of octets of data transmitted 
+		or received by the local network entity in ITU-T Rec. X.233 | ISO/IEC 8473-1 
+		Data PDUs. (i.e. those which which have a source or destination N-Address, 
+		respectively, which corresponds to that one of those of the local network 
+		entity.)!;
+
+
+cLNS8473PImportedNotifications-B BEHAVIOUR
+	DEFINED AS
+		!The cLNS8473-P package imports the communicationsAlarm notification from Rec. 
+		721 | ISO/IEC 10165-2. It is used to report the following cLNS managed object 
+		events.
+
+		pDUDiscard: Generated when a data NPDU is discarded due to any of the reasons 
+		specified in ITU-T Rec. X.233 | ISO/IEC 8473-1 Table 7, with the exception of 
+		'PDU Discarded due to Congestion' The header of the PDU in error shall be 
+		reported as a parameter in the additionalInformation field of the 
+		communicationsAlarm, using the notificationPDUHeader parameters. The 
+		significance sub-parameter of each item of additionalInformation shall be set to 
+		the value 'False' (i.e. not significant) so that a managing system receiving the 
+		event report will be less likely to reject it. The value NLM.pDUDiscard and that 
+		corresponding to the Reason For Discard shall both be reported in the 
+		specificProblems parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError. The 
+		perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm with 
+		a perceivedSeverity value of 'Cleared' shall not be generated. No other fields 
+		or parameters shall be used, with the exception of further parameters in the 
+		AdditionalInformation field.
+
+		A PDU which does not contain one of the protocol identifiers defined in ITU-T 
+		Rec. X.233 | ISO/IEC 8473-1 shall not cause this event.
+
+		A PDU with a protocol ID 1000 0001 shall not cause this event if it does not 
+		also contain the Version/Protocol Identifier extension in 7.2.4 of ITU-T Rec. 
+		X.233 | ISO/IEC 8473-1. If an error report PDU is generated, the PDU header and 
+		Discard Reason in the error report shall be the same as those in the 
+		corresponding notification.!;
+
+
+operationalSystemTypeIV-B BEHAVIOUR
+	DEFINED AS
+		!If the MO is created by management operation (using the 
+		cLNS-networkEntity-Management or cONS-networkEntity-Management name binding), 
+		the initial value of the operationalSystemType attribute shall be specified in 
+		the CMIP create. Otherwise, the value shall be determined in an implementation 
+		specific manner. The value shall be one of those present in the systemTypes 
+		attribute of the superior Network Entity MO.!;
+-- Name Bindings
+
+
+cLNS-networkEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS cLNS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":clProtocolMachineId;
+	BEHAVIOUR
+		cLNS-networkEntity-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the cLNS managed object can be created and 
+				deleted by management.!;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { NLM.nboi cLNS-networkEntity-Management(3) };
+
+
+cLNS-networkEntity-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS cLNS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":clProtocolMachineId;
+	BEHAVIOUR
+		cLNS-networkEntity-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the cLNS managed object cannot be created or 
+				deleted by management.!;;
+REGISTERED AS { NLM.nboi cLNS-networkEntity-Automatic(16) };
+-- Attributes
+
+
+assemblingSegmentsDiscarded ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		assemblingSegmentsDiscarded-B BEHAVIOUR
+			DEFINED AS
+				!Counter of segments discarded due to reassembly time expiry. This is the number 
+				of data and error report NPDUs discarded due to reassembly time expiry.!;;
+REGISTERED AS { NLM.aoi assemblingSegmentsDiscarded(8) };
+
+
+congestionDiscards ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		congestionDiscards-B BEHAVIOUR
+			DEFINED AS
+				!Counter of PDUs discarded due to congestion. This is the number of data or error 
+				report PDUs discarded due to congestion. This counter is incremented 
+				irrespective of the setting of the Error Report bit in the received PDU.!;;
+REGISTERED AS { NLM.aoi congestionDiscards(11) };
+
+
+enableChecksum ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		enableChecksum-B BEHAVIOUR
+			DEFINED AS
+				!When True, the generation of checksums is enabled.!;;
+REGISTERED AS { NLM.aoi enableChecksum(4) };
+
+
+errorReportsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		errorReportsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Counter of received error reports. This is the number of error report NPDUs 
+				received which were addressed to the local network entity.!;;
+REGISTERED AS { NLM.aoi errorReportsReceived(9) };
+
+
+maximumLifetime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Lifetime;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumLifetime-B BEHAVIOUR
+			DEFINED AS
+				!Maximum PDU lifetime (in half seconds). This attribute controls the maximum 
+				value (in half seconds) which may be placed in the lifetime field of any ITU-T 
+				Rec. X.233 | ISO/IEC 8473-1 data or error report PDU generated by the local 
+				network entity. It does not affect the lifetime field of any PDUs not generated 
+				by this network entity, for example those relayed by this system acting as an 
+				Intermediate System. PDUs generated by the local network entity are permitted to 
+				have a lower value of lifetime field than this attribute, but shall not have a 
+				larger value. The means by which the value of the lifetime field is determined 
+				for an individual PDU is outside the scope of this Specification, provided that 
+				it meets the above constraints.!;;
+REGISTERED AS { NLM.aoi maximumLifetime(102) };
+
+
+operationalSystemType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.SystemType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		operationalSystemType-B BEHAVIOUR
+			DEFINED AS
+				!The system role in which this instance is operating. A value of ES indicates 
+				that the system shall perform no forwarding operations upon non-local PDUs. A 
+				value of IS indicates that the system is permitted to perform forwarding 
+				operations, but the decision to forward individual PDUs, or not to forward them, 
+				shall be taken on the basis of the available routing information.!;;
+REGISTERED AS { NLM.aoi operationalSystemType(109) };
+
+
+pDUDiscards ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		pDUDiscards-B BEHAVIOUR
+			DEFINED AS
+				!Counter of PDUs discarded (except for congestion). This is the number of data or 
+				error report PDUs discarded for any of the reasons specified in ITU-T Rec. X.233 
+				| ISO/IEC 8473-1 Table 7 with the exception of `PDU discarded due to 
+				congestion'. This counter is incremented irrespective of the setting of the 
+				Error Report bit in the received PDU.!;;
+	-- NOTE  This counter is therefore a count of the number of
+	-- communicationsAlarm notifications with a specificProblem value of
+	-- pDUDiscard generated (as opposed to CMIP events,
+	-- may be suppressed) as required by GDMO subclause 9.8.5 (SC21 N4852).
+	REGISTERED AS { NLM.aoi pDUDiscards(10) };
+
+
+segmentsDiscarded ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		segmentsDiscarded-B BEHAVIOUR
+			DEFINED AS
+				!Counter of segments discarded. This is the number of data and error report NPDUs 
+				discarded without being delivered to a Network Service user or forwarded. This 
+				includes segments discarded for any reason except reassembly time expiry.!;;
+REGISTERED AS { NLM.aoi segmentsDiscarded(7) };
+
+
+segmentsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		segmentsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Counter of segments received. This is the number of data and error report NPDUs 
+				received prior to reassembly, including those which may subsequently be 
+				discarded.!;;
+REGISTERED AS { NLM.aoi segmentsReceived(6) };
+
+
+segmentsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		segmentsSent-B BEHAVIOUR
+			DEFINED AS
+				!Counter of segments Sent. This is the number of data and error report NPDUs sent 
+				after segmentation processing occurs.!;;
+REGISTERED AS { NLM.aoi segmentsSent(118) };
+
+
+supportedProtocols ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.SupportedProtocols;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		supportedProtocols-B BEHAVIOUR
+			DEFINED AS
+				!The set of Connectionless Network protocols supported by this instance of the 
+				cLNS protocol machine, expressed except where otherwise indicated (for example 
+				because there are more than one protocol described in a single International 
+				Standard) as the registered object identifiers of the relevant International 
+				Standard. The operation of a particular protocol over a particular linkage is 
+				determined by the linkage operationalProtocols attribute. The value of the 
+				supportedProtocols attribute is determined by the implementation.!;;
+REGISTERED AS { NLM.aoi supportedProtocols(110) };
+-- Parameters
+
+
+notificationPDUHeader PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX NLM.OctetString;
+	BEHAVIOUR
+		notificationPDUHeader-B BEHAVIOUR
+			DEFINED AS
+				!The header of the data NPDU header which caused this event.!;;
+REGISTERED AS { NLM.proi notificationPDUHeader(1) };
+--5.7 The linkage managed object
+-- Linkage Managed Object
+--
+-- There is one of these MOs associated with each separate provision
+-- of the underlying service to the superior protocol machine.
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation, but in some systems it will exist inherently
+-- and neither creation nor deletion by management operation will be
+-- possible. Name bindings are defined for both cases.
+--
+-- When the linkage is operable, the operationalState shall
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'.
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification. A linkage MO may be created in the
+-- 'enabled' operational state.
+--
+
+
+linkage MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		linkage-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B;
+			ATTRIBUTES
+				linkageId GET,
+				"DMI":operationalState GET,
+				"DMI":administrativeState GET-REPLACE,
+				sN-ServiceProvider
+					INITIAL VALUE DERIVATION RULE
+						sN-ServiceProviderIV-B
+					GET,
+				sN-SAP GET,
+				operationalProtocols
+					INITIAL VALUE DERIVATION RULE
+						operationalProtocolIV-B
+					GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":administrativeState
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":stateChange,
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		linkage-ISO9542IS-P
+			PRESENT IF
+				!support for ISO 9542 operating as an IS!,
+		linkage-ISO9542ES-P
+			PRESENT IF
+				!support for ISO 9542 operating as an ES!,
+		linkage-ISO9542Checksum-P
+			PRESENT IF
+				!support for ISO 9542 PDU Header Checksum Generation function!,
+		linkageInitialMinimumTimer-P
+			PRESENT IF
+				!support for the initial minimum timer attribute of the ITU-T Rec. X.233 | 
+				ISO/IEC 8473-1SNDCF when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over an 
+				ISO/IEC 8208 or ITU-T Rec.X.25 or CO Datalink Service!,
+		linkageReserveTimer-P
+			PRESENT IF
+				!support for the reserve timer attribute of the ITU-T Rec. X.233 | ISO/IEC 8473-1 
+				SNDCF when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over an ISO/IEC 8208 or 
+				ITU-T Rec. X.25 or CO Datalink Service!,
+		linkageIdleTimer-P
+			PRESENT IF
+				!support for the idle timer attribute of the ITU-T Rec. X.233 | ISO/IEC 8473-1 
+				SNDCF when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over an ISO/IEC 8208 or 
+				ITU-T Rec. X.25 or CO Datalink Service!,
+		linkage-ISO8473-ISO8208SNDCF-P
+			PRESENT IF
+				!operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over ISO/IEC 8208 or ITU-T Rec. X.25!,
+		linkageCODLService-P
+			PRESENT IF
+				!operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over the CO Datalink Service!,
+		-- The following packages are associated with ISO/IEC 10589
+		"ISO/IEC 10589":linkageISISBasic-P
+			PRESENT IF
+				!the system is an ISO 10589 IS!,
+		"ISO/IEC 10589":linkageISISAuthentication-P
+			PRESENT IF
+				!the authentication procedures are implemented on an ISO 10589 IS!,
+		"ISO/IEC 10589":linkageISISBroadcast-P
+			PRESENT IF
+				!the linkage is a broadcast circuit on an ISO 10589 IS!,
+		"ISO/IEC 10589":linkageISISDACallEstablishmentMetricIncrement-P
+			PRESENT IF
+				!the linkage is a DA Circuit and support is implemented for call establishment 
+				metric increment values greater than zero on an ISO/IEC 10589 IS!,
+		"ISO/IEC 10589":linkageISISPtToPt-P
+			PRESENT IF
+				!the linkage is a point to point circuit on an ISO 10589 IS!,
+		"ISO/IEC 10589":linkageISISStatic-P
+			PRESENT IF
+				!the linkage is an X.25 static circuit (IN or OUT) on an ISO 10589 IS!,
+		"ISO/IEC 10589":linkageISISLevel2-P
+			PRESENT IF
+				!the system is an ISO/IEC 10589 level 2 IS!,
+		"ISO/IEC 10589":linkageISISLevel2Broadcast-P
+			PRESENT IF
+				!the linkage is a broadcast circuit on an ISO 10589 level 2 IS!;
+REGISTERED AS { NLM.moi linkage(23) };
+-- Packages
+
+
+linkageCODLService-P PACKAGE
+	BEHAVIOUR
+		linkageCODLService-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of CO Datalink as an SNDCF for ITU-T Rec. X.233 | ISO/IEC 
+				8473-1.!;;
+	ATTRIBUTES
+		callsPlaced GET,
+		callsFailed GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			callsPlaced
+			callsFailed;
+REGISTERED AS { NLM.poi linkageCODLService-P(9) };
+
+
+linkageIdleTimer-P PACKAGE
+	BEHAVIOUR
+		linkageIdleTimer-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the ability, when implemented, of an ISO/IEC 8208 or ITU-T Rec. X.25 or 
+				CO Datalink SNDCF for ITU-T Rec. X.233 | ISO/IEC 8473-1 to close an established 
+				Virtual Call when it is idle.!;;
+	ATTRIBUTES
+		idleTimer REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { NLM.poi linkageIdleTimer-P(5) };
+
+
+linkageInitialMinimumTimer-P PACKAGE
+	BEHAVIOUR
+		linkageInitialMinimumTimer-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the ability, when implemented, of an ISO/IEC 8208 or ITU-T Rec. X.25 or 
+				CO Datalink SNDCF for ITU-T Rec. X.233 | ISO/IEC 8473-1 to close an established 
+				Virtual Call when it is idle, but only after a minimum time after its 
+				establishment.!;;
+	ATTRIBUTES
+		initialMinimumTimer REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { NLM.poi linkageInitialMinimumTimer-P(7) };
+
+
+linkage-ISO8473-ISO8208SNDCF-P PACKAGE
+	BEHAVIOUR
+		linkage-ISO8473-ISO8208SNDCF-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of ISO/IEC 8208 or ITU-T Rec. X.25 as an SNDCF for ITU-T 
+				Rec. X.233 | ISO/IEC 8473-1.!;;
+	ATTRIBUTES
+		callsPlaced GET,
+		callsFailed GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			callsPlaced
+			callsFailed;
+REGISTERED AS { NLM.poi linkage-ISO8473-ISO8208SNDCF-P(4) };
+
+
+linkage-ISO9542Checksum-P PACKAGE
+	BEHAVIOUR
+		linkage-ISO9542Checksum-P-B BEHAVIOUR
+			DEFINED AS
+				!When present, checksum generation is controlled by the enableChecksum attribute.!;;
+	ATTRIBUTES
+		enableChecksum REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.false
+			GET-REPLACE;
+REGISTERED AS { NLM.poi linkage-ISO9542Checksum-P(17) };
+
+
+linkage-ISO9542ES-P PACKAGE
+	BEHAVIOUR
+		linkage-ISO9542ES-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of ISO 9542 on an End System.!;,
+		linkage-ISO9542ImportedAlarmNotifications-B,
+		linkage-ISO9542ISReachabilityChange-B,
+		linkage-ISO9542ESReachabilityChange-B;
+	ATTRIBUTES
+		iSO9542OperationalSubsets GET-REPLACE,
+		holdingTimerMultiplier REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.holdingTimerMultiplierDefault
+			PERMITTED VALUES NLM.HoldingTimerMultiplierPermitted
+			REQUIRED VALUES NLM.HoldingTimerMultiplierRequired
+			GET-REPLACE,
+		manualISSNPAAddress REPLACE-WITH-DEFAULT GET-REPLACE ADD-REMOVE,
+		defaultESConfigTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+		activeESConfigTimer GET,
+		iSReachabilityChanges GET,
+		invalid9542PDUs GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			iSReachabilityChanges
+			invalid9542PDUs;
+	NOTIFICATIONS
+		"DMI":communicationsAlarm,
+		"GMI":communicationsInformation
+			reachabilityChange;
+REGISTERED AS { NLM.poi linkage-ISO9542ES-P(21) };
+
+
+linkage-ISO9542IS-P PACKAGE
+	BEHAVIOUR
+		linkage-ISO9542IS-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of ISO 9542 on an Intermediate System.!;,
+		linkage-ISO9542ImportedAlarmNotifications-B,
+		linkage-ISO9542ISReachabilityChange-B,
+		linkage-ISO9542ESReachabilityChange-B;
+	ATTRIBUTES
+		iSO9542OperationalSubsets GET-REPLACE,
+		holdingTimerMultiplier REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.holdingTimerMultiplierDefault
+			PERMITTED VALUES NLM.HoldingTimerMultiplierPermitted
+			REQUIRED VALUES NLM.HoldingTimerMultiplierRequired
+			GET-REPLACE,
+		iSConfigurationTimer REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.iSConfigurationTimerDefault
+			GET-REPLACE,
+		suggestedESConfigurationTimer REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.suggestedESConfigurationTimerDefault
+			GET-REPLACE,
+		redirectHoldingTime REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.redirectHoldingTime-Default
+			PERMITTED VALUES NLM.RedirectHoldingTime-Permitted
+			GET-REPLACE,
+		eSReachabilityChanges GET,
+		invalid9542PDUs GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			eSReachabilityChanges
+			invalid9542PDUs;
+	NOTIFICATIONS
+		"DMI":communicationsAlarm,
+		"GMI":communicationsInformation
+			reachabilityChange;
+REGISTERED AS { NLM.poi linkage-ISO9542IS-P(22) };
+
+
+linkageReserveTimer-P PACKAGE
+	BEHAVIOUR
+		linkageReserveTimer-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the ability, when implemented, of an ISO/IEC 8208 or ITU-T Rec. X.25 or 
+				CO Datalink SNDCF for ITU-T Rec. X.233 | ISO/IEC 8473-1 to close an established 
+				Virtual Call when it is idle, but retain resources for its re-establishment.!;;
+	ATTRIBUTES
+		reserveTimer REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { NLM.poi linkageReserveTimer-P(6) };
+-- Behaviours
+
+
+linkage-ISO9542ISReachabilityChange-B BEHAVIOUR
+	DEFINED AS
+		!This package imports the communicationsInformation notification from Rec. X.723 
+		| ISO/IEC 10165-5. It is used to report the following events.
+
+		iSReachabilityChange: Generated when an ES or IS detects a change in the 
+		reachability of a neighbouring IS. The value NLM.iSReachabilityChange shall be 
+		reported in the informationType field.
+
+		The new State, NET of the IS concerned, snpaAddress (where available) and the 
+		reason for the change shall be reported in the informationData field using the 
+		reachabilityChange PARAMETER.!;
+
+
+linkage-ISO9542ESReachabilityChange-B BEHAVIOUR
+	DEFINED AS
+		!This package imports the communicationsInformation notification from Rec. X.723 
+		| ISO/IEC 10165-5. It is used to report the following events.
+
+		eSReachabilityChange: Generated when an ES or IS detects a change in the 
+		reachability of a neighboring ES. The value NLM.eSReachabilityChange shall be 
+		reported in the informationType field.
+
+		The new State, set of NSAPAddresses of the IS concerned, the snpaAddress (where 
+		available) and the reason for the change shall be reported in the 
+		informationData field using the reachabilityChange PARAMETER.!;
+
+
+linkage-ISO9542ImportedAlarmNotifications-B BEHAVIOUR
+	DEFINED AS
+		!This package imports the communicationsAlarm notification from Rec. X.721 (1992) 
+		| ISO/IEC 10165-2. It is used to report the following events.
+
+		invalid9542PDU: Generated when an ISO 9542 PDU is received which is discarded as 
+		result of the PDU Header Error Detection or Protocol Error Processing Functions 
+		specified in ISO 9542.
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.iSO9542PDUDiscard shall be reported in the specificProblems parameter. The 
+		probableCause shall be set to NLM.communicationsProtocolError. The 
+		perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm with 
+		a perceivedSeverity value of 'Cleared' shall not be generated. No other fields 
+		or parameters shall be used, with the exception of further parameters in the 
+		AdditionalInformation field.!;
+
+
+operationalProtocolIV-B BEHAVIOUR
+	DEFINED AS
+		!If the linkage MO is created by management operation (using the 
+		linkage-cLNS-Management name binding), the initial value of the 
+		operationalProtocols attribute shall be specified in the CMIP create. Otherwise, 
+		the value shall be determined in an implementation specific manner.!;
+
+
+sN-ServiceProviderIV-B BEHAVIOUR
+	DEFINED AS
+		!If the linkage MO is created by management operation (using the 
+		linkage-cONS-Management or linkage-cONS-Management name bindings), the initial 
+		value of the sN-ServiceProvider attribute shall be specified in the CMIP create. 
+		Otherwise, the value shall be determined in an implementation specific manner.!;
+-- Name Bindings
+
+
+linkage-cLNS-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS linkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cLNS AND SUBCLASSES;
+	WITH ATTRIBUTE
+		linkageId;
+	BEHAVIOUR
+		sN-ServiceProviderIV-B,
+		operationalProtocolIV-B,
+		linkage-cLNS-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding which applies when the linkage managed object can be created 
+				and deleted by management as a subordinate object of the cLNS managed object 
+				class.!;;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE;
+REGISTERED AS { NLM.nboi linkage-cLNS-Management(20) };
+
+
+linkage-cONS-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS linkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cONS AND SUBCLASSES;
+	WITH ATTRIBUTE
+		linkageId;
+	BEHAVIOUR
+		sN-ServiceProviderIV-B,
+		linkage-cONS-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding which applies when the linkage managed object can be created 
+				and deleted by management as a subordinate object of the cONS managed object 
+				class.!;;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE;
+REGISTERED AS { NLM.nboi linkage-cONS-Management(21) };
+
+
+linkage-cLNS-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS linkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cLNS AND SUBCLASSES;
+	WITH ATTRIBUTE
+		linkageId;
+	BEHAVIOUR
+		sN-ServiceProviderIV-B,
+		operationalProtocolIV-B,
+		linkage-cLNS-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding which applies when the linkage managed object cannot be created 
+				and deleted by management as a subordinate object of the cLNS managed object 
+				class.!;;
+REGISTERED AS { NLM.nboi linkage-cLNS-Automatic(22) };
+
+
+linkage-cONS-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS linkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cONS AND SUBCLASSES;
+	WITH ATTRIBUTE
+		linkageId;
+	BEHAVIOUR
+		sN-ServiceProviderIV-B,
+		linkage-cONS-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding which applies when the linkage managed object cannot be created 
+				and deleted by management as a subordinate object of the cONS managed object 
+				class.!;;
+REGISTERED AS { NLM.nboi linkage-cONS-Automatic(23) };
+-- Attributes
+
+
+activeESConfigTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		activeESConfigTimer-B BEHAVIOUR
+			DEFINED AS
+				!Currently active value for the ISO 9542 ES configuration timer in seconds.!;;
+REGISTERED AS { NLM.aoi activeESConfigTimer(22) };
+
+
+callsFailed ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		callsFailed-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of X.25 call failures while attempting establishment by 
+				the SNDCF.!;;
+REGISTERED AS { NLM.aoi callsFailed(30) };
+
+
+callsPlaced ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		callsPlaced-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of X.25 VCs successfully established by the SNDCF.!;;
+REGISTERED AS { NLM.aoi callsPlaced(29) };
+
+
+defaultESConfigTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		resettingTimer-B,
+		defaultESConfigTimer-B BEHAVIOUR
+			DEFINED AS
+				!Default value for the ISO 9542 ES configuration timer in seconds. This value is 
+				used when the ES has not received, or has not chosen to accept, a suggested 
+				configuration timer value from an Intermediate System.!;;
+REGISTERED AS { NLM.aoi defaultESConfigTimer(21) };
+
+
+eSReachabilityChanges ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		eSReachabilityChanges-B BEHAVIOUR
+			DEFINED AS
+				!Count of the number of changes in reachability of End Systems from this system.!;;
+REGISTERED AS { NLM.aoi eSReachabilityChanges(27) };
+
+
+holdingTimerMultiplier ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	BEHAVIOUR
+		holdingTimerMultiplier-B BEHAVIOUR
+			DEFINED AS
+				!The factor to derive holding timer from configuration timer. This value, when 
+				multiplied by a configuration timer yields the value of the holding timer 
+				parameter issued with configuration information. The semantics of this parameter 
+				are such that it is permissible to also add a delta value to the result to 
+				compensate for possible delays and imprecision of timers. The result of the 
+				calculation is truncated, upon overflow, to the maximum value for the parameter 
+				permitted by the protocol (65535).!;;
+REGISTERED AS { NLM.aoi holdingTimerMultiplier(20) };
+
+
+idleTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		idleTimer-B BEHAVIOUR
+			DEFINED AS
+				!Time in seconds before release of an idle call. This timer determines the 
+				interval (in seconds) for which a call is permitted to remain idle (i.e. no data 
+				traffic in either direction) before being released by the SNDCF.!;;
+REGISTERED AS { NLM.aoi idleTimer(31) };
+
+
+initialMinimumTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		initialMinimumTimer-B BEHAVIOUR
+			DEFINED AS
+				!Minimum time in seconds to retain call after establishment. This timer 
+				determines the interval (in seconds) that a call shall remain connected after 
+				being established, irrespective of traffic. (NOTE This should be set small 
+				enough so that the call is cleared before the start of the next charging 
+				interval.)!;;
+REGISTERED AS { NLM.aoi initialMinimumTimer(33) };
+
+
+invalid9542PDUs ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		invalid9542PDUs-B BEHAVIOUR
+			DEFINED AS
+				!Counter of invalid 9542 PDUs received. This is the number of ISO 9542 PDUs 
+				received which are discarded as a result of the PDU Header Error Detection or 
+				Protocol Error Processing Functions specified in ISO 9542.!;;
+	-- NOTE  This counter is therefore a count of the number of
+	-- communicationsAlarm notifications with a specificProblem value of
+	-- NLM.iSO9542PDUDiscard generated.
+	REGISTERED AS { NLM.aoi invalid9542PDUs(101) };
+
+
+iSConfigurationTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		resettingTimer-B,
+		iSConfigurationTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value in seconds for the ISO 9542 IS configuration timer. It is used to 
+				determine how often an IS reports configuration information to ESs.!;;
+REGISTERED AS { NLM.aoi iSConfigurationTimer(24) };
+
+
+iSO9542OperationalSubsets ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.ISO9542Subsets;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		iSO9542OperationalSubsets-B BEHAVIOUR
+			DEFINED AS
+				!The set of ISO 9542 subsets operational on this linkage.!;;
+REGISTERED AS { NLM.aoi iSO9542OperationalSubsets(115) };
+
+
+iSReachabilityChanges ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		iSReachabilityChanges-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of changes in reachability of Intermediate Systems from 
+				this system.!;;
+REGISTERED AS { NLM.aoi iSReachabilityChanges(23) };
+
+
+linkageId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		linkageId-B BEHAVIOUR
+			DEFINED AS
+				!The naming attribute of the linkage MO instance.!;;
+REGISTERED AS { NLM.aoi linkageId(17) };
+
+
+manualISSNPAAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.ManualISSNPAAddress;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		manualISSNPAAddress-B BEHAVIOUR
+			DEFINED AS
+				!The set of SNPA Addresses to which calls associated with the SNDCF are to be 
+				established in the absence of any other information. The maximum set cardinality 
+				shall be implementation specific. An attempt to set the value of an element of 
+				this set to a type of SNPAAddress which is not supported by this linkage shall 
+				result in a failure of the SET operation.!;;
+REGISTERED AS { NLM.aoi manualISSNPAAddress(28) };
+
+
+operationalProtocols ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.SupportedProtocols;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		operationalProtocols-B BEHAVIOUR
+			DEFINED AS
+				!The set of network layer protocols supported by this instance of the linkage MO, 
+				expressed as the registered object identifiers of the relevant International 
+				Standard.!;;
+REGISTERED AS { NLM.aoi operationalProtocols(111) };
+
+
+redirectHoldingTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.RedirectHoldingTime;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		redirectHoldingTime-B BEHAVIOUR
+			DEFINED AS
+				!The holding time (in seconds) to be specified in Redirect PDUs generated by this 
+				system.!;;
+REGISTERED AS { NLM.aoi redirectHoldingTime(26) };
+
+
+reserveTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		reserveTimer-B BEHAVIOUR
+			DEFINED AS
+				!Time in seconds to reserve resources for call re-establishment. This timer 
+				determines the interval (in seconds) for which an attempt shall be made to 
+				retain those resources, as determined by the implementation, whose retention 
+				will increase the probability of successful re-establishment of an idled VC.!;;
+REGISTERED AS { NLM.aoi reserveTimer(32) };
+
+
+sN-SAP ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.LocalDistinguishedName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sN-SAP-B BEHAVIOUR
+			DEFINED AS
+				!Distinguished name of the service provider SAP MO (if present). This is obtained 
+				via an internal interface when the linkage is enabled. The sN-SAP may be a 
+				relationship to an SAP MO in the Datalink Layer, or it may be a relationship to 
+				another Managed Object within the Network Layer which is not an SAP MO. For 
+				example, when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over the ISO/IEC 8208 
+				or ITU-T Rec. X.25 SNDCF, it is a relationship to the same x25PLE-DTE MO which 
+				is pointed to by the sN-ServiceProvider Attribute.!;;
+REGISTERED AS { NLM.aoi sN-SAP(18) };
+
+
+sN-ServiceProvider ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.LocalDistinguishedName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sN-ServiceProvider-B BEHAVIOUR
+			DEFINED AS
+				!Distinguished name of the SN service provider MO. This attribute identifies the 
+				subnetwork entity to be used to support the linkage, when enabled. The 
+				subnetwork service provider may be in the Datalink Layer, or it may be in the 
+				Network Layer (for example when operating ITU-T Rec. X.233 | ISO/IEC 8473-1 over 
+				the ISO/IEC 8208 or ITU-T Rec. X.25 SNDCF).!;;
+REGISTERED AS { NLM.aoi sN-ServiceProvider(19) };
+
+
+suggestedESConfigurationTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		resettingTimer-B,
+		suggestedESConfigurationTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value to be used for the ISO 9542 suggested ES configuration timer value (in 
+				seconds), advertised in IS hellos generated by this network entity.!;;
+REGISTERED AS { NLM.aoi suggestedESConfigurationTimer(25) };
+-- Parameters
+
+
+reachabilityChange PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX NLM.ReachabilityChangeSyntax;
+REGISTERED AS { NLM.proi reachabilityChange(12) };
+--5.8 The connection-mode network service managed object
+-- There is no more than one of these MOs per network entity.
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation, but in some systems it will exist inherently
+-- and neither creation nor deletion by management operation will be
+-- possible. Name bindings are defined for both cases.
+--
+-- When the protocol machine is operable, the operationalState shall
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'.
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification. A cONS MO may be created in the
+-- 'enabled' operational state.
+--
+
+
+cONS MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":coProtocolMachine;
+	CHARACTERIZED BY
+		cONS-P PACKAGE
+			BEHAVIOUR
+				commonStateChange-B,
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				"DMI":administrativeState GET-REPLACE,
+				"GMI":coProtocolMachineId
+					INITIAL VALUE NLM.cONSId-Value
+					GET,
+				operationalSystemType
+					INITIAL VALUE DERIVATION RULE
+						operationalSystemTypeIV-B
+					GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":administrativeState
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate,
+				"GMI":deactivateWhenNoUsers;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { NLM.moi cONS(24) };
+-- Name Bindings
+
+
+cONS-networkEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS cONS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		cONS-networkEntity-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the cONS managed object can be created and 
+				deleted by management.!;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { NLM.nboi cONS-networkEntity-Management(8) };
+
+
+cONS-networkEntity-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS cONS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		cONS-networkEntity-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the cONS managed object cannot be created or 
+				deleted by management.!;;
+REGISTERED AS { NLM.nboi cONS-networkEntity-Automatic(17) };
+--5.9 The network connection managed object
+-- There is one instance of this MO corresponding to each network
+-- connection. It is created and deleted by the operation of the protocol
+-- machine.
+--
+-- In some configurations the underlyingConnectionNames attribute may
+-- contain more than one distinguished name. In this case, the type of
+-- the underlying MO (and hence the particular underlying resource)
+-- can only be determined by inspection of the MO pointed to by this
+-- distinguished name.
+
+
+networkConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":singlePeerConnection;
+	CHARACTERIZED BY
+		networkConnection-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				successfulConnectionEstablishment-B,
+				deactivateConnection-B,
+				networkConnection-P-B BEHAVIOUR
+					DEFINED AS
+						!The "GMI":underlyingConnectionNames attribute shall contain the distinguished 
+						name(s) of the other MO(s) which represent the resources used to support this 
+						connection. In the case of the CONS operating directly over X.25, this shall be 
+						the single distinguished name of the underlying virtual call or permanent 
+						virtual circuit MO.!;;
+			ATTRIBUTES
+				localNSAPMO GET,
+				remoteNSAPAddress GET;
+			ACTIONS
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"GMI":communicationsInformation;;;
+REGISTERED AS { NLM.moi networkConnection(13) };
+-- Name Bindings
+
+
+networkConnection-cONS NAME BINDING
+	SUBORDINATE OBJECT CLASS networkConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cONS AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":connectionId;
+	DELETE;
+REGISTERED AS { NLM.nboi networkConnection-cONS(19) };
+-- Attributes
+
+
+localNSAPMO ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.LocalDistinguishedName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localNSAPMO-B BEHAVIOUR
+			DEFINED AS
+				!Pointer to local nSAP MO. This is a relationship attribute which points to the 
+				local nSAP MO which is associated with the connection.!;;
+REGISTERED AS { NLM.aoi localNSAPMO(106) };
+
+
+remoteNSAPAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.NAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		remoteNSAPAddress-B BEHAVIOUR
+			DEFINED AS
+				!The remote NSAP Address associated with the connection.!;;
+REGISTERED AS { NLM.aoi remoteNSAPAddress(107) };
+--5.10 The X.25 PLE and related managed objects
+--5.10.1 The X.25 PLE managed object
+-- This MO class is never instantiated. It serves as a generic
+-- x25PLE MO from which both the x25PLE-DTE and x25PLE-DCE MO
+-- classes are derived.
+--
+-- Note that the values of the x25PLEId naming attribute are
+-- required to be unique across all instances of MOs derived from
+-- this, which have a common superior.
+--
+
+
+x25PLE MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		x25PLE-P PACKAGE
+			BEHAVIOUR
+				commonStateChange-B,
+				commonCreationDeletion-B,
+				logicalChannelAssignmentsX25PLE-P-B BEHAVIOUR
+					DEFINED AS
+						!The logicalChannelAssignments attribute shall not be replaceable when the value 
+						of the operationalState attribute is 'enabled'.!;;
+			ATTRIBUTES
+				x25PLEId GET,
+				"DMI":operationalState GET,
+				"DMI":administrativeState GET-REPLACE,
+				protocolVersionSupported GET,
+				localDTEAddress GET-REPLACE,
+				x25PLEMode GET-REPLACE,
+				defaultThroughputClasses REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullBidirectionalValues
+					GET-REPLACE,
+				flowControlParameterNegotiation REPLACE-WITH-DEFAULT GET-REPLACE,
+				defaultPacketSizes REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullBidirectionalValues
+					GET-REPLACE,
+				defaultWindowSizes REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullBidirectionalValues
+					GET-REPLACE,
+				throughputClassNegotiation REPLACE-WITH-DEFAULT GET-REPLACE,
+				sN-ServiceProvider REPLACE-WITH-DEFAULT GET-REPLACE,
+				sN-SAP GET,
+				logicalChannelAssignments GET-REPLACE;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":administrativeState
+					"DMI":operationalState;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":stateChange,
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { NLM.moi x25PLE(25) };
+--5.10.2 The X.25 PLE initial values managed object
+-- This MO class is never instantiated. It serves as a generic
+-- x25PLE IVMO from which both the x25PLEIVMO-DTE and x25PLEIVMO-DCE
+-- MO classes are derived.
+--
+-- Note that the values of the x25PLEIVMOId naming attribute are
+-- required to be unique across all instances of MOs derived from
+-- this, which have a common superior.
+
+
+x25PLEIVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		x25PLEIVMO-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				defaultPacketSizes REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullBidirectionalValues
+					GET-REPLACE,
+				defaultThroughputClasses REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullBidirectionalValues
+					GET-REPLACE,
+				defaultWindowSizes REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullBidirectionalValues
+					GET-REPLACE,
+				flowControlParameterNegotiation REPLACE-WITH-DEFAULT GET-REPLACE,
+				localDTEAddress GET-REPLACE,
+				logicalChannelAssignments GET-REPLACE,
+				sN-ServiceProvider GET-REPLACE,
+				throughputClassNegotiation REPLACE-WITH-DEFAULT GET-REPLACE,
+				x25PLEIVMOId GET,
+				x25PLEMode GET-REPLACE;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { NLM.moi x25PLEIVMO(26) };
+--5.10.3 The X.25 PLE DTE managed object
+-- There may be multiple instances of these MOs within a system,
+-- corresponding to Multiple X.25 PLEs.
+--
+-- The definition of this MO
+-- permits it to be created and deleted explicitly by
+-- management operation or to be created and deleted automatically as
+-- part of system operation. When an instance of this MO
+-- is created automatically, an instance of the
+-- x25PLEIVMO-DTE may be used as the source
+-- of the initial values for attributes of this MO.
+--
+-- When the x25 PLE is operable, the operationalState shall
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'.
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification.
+
+
+x25PLE-DTE MANAGED OBJECT CLASS
+	DERIVED FROM
+		x25PLE;
+	CHARACTERIZED BY
+		x25PLE-DTE-P PACKAGE
+			BEHAVIOUR
+				x25PLEPImportedNotifications-B;
+			ATTRIBUTES
+				callDeflectionSubscription REPLACE-WITH-DEFAULT GET-REPLACE,
+				callRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.callRequestResponseTimerDefault
+					GET-REPLACE,
+				extendedPacketSequenceNumbering REPLACE-WITH-DEFAULT GET-REPLACE,
+				maxActiveCircuits REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullChoiceInteger
+					GET-REPLACE,
+				minimumRecallTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+				resetRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.resetRequestResponseTimerDefault
+					GET-REPLACE,
+				restartRequestRetransmissionCount REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.restartRequestRetransmissionCountDefault
+					GET-REPLACE,
+				restartRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.restartRequestResponseTimerDefault
+					GET-REPLACE,
+				clearRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.clearRequestResponseTimerDefault
+					GET-REPLACE,
+				interruptResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.interruptResponseTimerDefault
+					GET-REPLACE,
+				resetRequestRetransmissionCount REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.resetRequestRetransmissionCountDefault
+					GET-REPLACE,
+				clearRequestRetransmissionCount REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.clearRequestRetransmissionCountDefault
+					GET-REPLACE,
+				callAttempts GET,
+				protocolErrorsDetectedLocally GET,
+				protocolErrorsAccusedOf GET,
+				callEstablishmentRetryCountsExceeded GET;
+			ATTRIBUTE GROUPS
+				"GMI":counters
+					callAttempts
+					protocolErrorsDetectedLocally
+					protocolErrorsAccusedOf
+					callEstablishmentRetryCountsExceeded;
+			NOTIFICATIONS
+				"DMI":communicationsAlarm
+					notificationData;;;
+	CONDITIONAL PACKAGES
+		dTEX25PLECounters-P
+			PRESENT IF
+				!the instance supports the dTEX25PLECounters-P capabilities!,
+		receivingWindowRotationRecoveryProcedures-P
+			PRESENT IF
+				!The optional window rotation recovery procedures are implemented at a receiving 
+				DTE!,
+		transmittingWindowRotationRecoveryProcedures-P
+			PRESENT IF
+				!The optional window rotation recovery procedures are implemented at a 
+				transmitting DTE!,
+		packetRetransmissionProcedures-P
+			PRESENT IF
+				!The optional packet retransmission procedures are implemented!,
+		onlineRegistration-P
+			PRESENT IF
+				!The optional online registration facility is implemented!;
+REGISTERED AS { NLM.moi x25PLE-DTE(17) };
+--5.10.4 The X.25 PLE DCE managed object
+-- There may be multiple instances of these MOs within a system,
+-- corresponding to Multiple X.25 PLEs.
+--
+-- The definition of this MO
+-- permits it to be created and deleted explicitly by
+-- management operation or to be created and deleted automatically as
+-- part of system operation. When an instance of this MO
+-- is created automatically, an instance of the
+-- x25PLEIVMO-DCE may be used as the source
+-- of the initial values for attributes of this MO.
+--
+-- When the x25 PLE is operable, the operationalState shall
+-- have the value 'enabled'; otherwise it shall have the value 'disabled'.
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification.
+
+
+x25PLE-DCE MANAGED OBJECT CLASS
+	DERIVED FROM
+		x25PLE;
+	CHARACTERIZED BY
+		x25PLE-DCE-P PACKAGE
+			ATTRIBUTES
+				callAttempts GET,
+				callsConnected GET,
+				cUG REPLACE-WITH-DEFAULT GET-REPLACE,
+				fastSelectAcceptance REPLACE-WITH-DEFAULT GET-REPLACE,
+				incomingCallsBarred REPLACE-WITH-DEFAULT GET-REPLACE,
+				oneWayLogicalChannelOutgoing REPLACE-WITH-DEFAULT GET-REPLACE,
+				outgoingCallsBarred REPLACE-WITH-DEFAULT GET-REPLACE;
+			ATTRIBUTE GROUPS
+				"GMI":counters
+					callAttempts
+					callsConnected;;;
+	CONDITIONAL PACKAGES
+		dCECommonVirtualCircuitCounters-P
+			PRESENT IF
+				!the instance supports the dCECommonVirtualCircuitCounters capabilities!,
+		dCEX25PLEFacilities-P
+			PRESENT IF
+				!the instance supports the dCEX25PLEFacilities capabilities!,
+		dCEX25PLETimers-P
+			PRESENT IF
+				!the instance supports the dCEX25PLETimers capabilities!;
+REGISTERED AS { NLM.moi x25PLE-DCE(27) };
+--5.10.5 The X.25 PLE DTE initial values managed object
+-- There may be multiple instances of the x25PLEIVMO-DTE in a system.
+-- An x25PLEIVMO-DTE may be used to supply initial
+-- values for the attributes of the x25PLE-DTE MO.
+-- Different instances of x25PLEIVMO-DTE may contain different initial values.
+--
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation.
+--
+
+
+x25PLEIVMO-DTE MANAGED OBJECT CLASS
+	DERIVED FROM
+		x25PLEIVMO;
+	CHARACTERIZED BY
+		x25PLEIVMO-DTE-P PACKAGE
+			ATTRIBUTES
+				callDeflectionSubscription REPLACE-WITH-DEFAULT GET-REPLACE,
+				callRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.callRequestResponseTimerDefault
+					GET-REPLACE,
+				clearRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.clearRequestResponseTimerDefault
+					GET-REPLACE,
+				clearRequestRetransmissionCount REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.clearRequestRetransmissionCountDefault
+					GET-REPLACE,
+				extendedPacketSequenceNumbering REPLACE-WITH-DEFAULT GET-REPLACE,
+				interruptResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.interruptResponseTimerDefault
+					GET-REPLACE,
+				maxActiveCircuits REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.nullChoiceInteger
+					GET-REPLACE,
+				minimumRecallTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+				resetRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.resetRequestResponseTimerDefault
+					GET-REPLACE,
+				resetRequestRetransmissionCount REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.resetRequestRetransmissionCountDefault
+					GET-REPLACE,
+				restartRequestResponseTimer REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.restartRequestResponseTimerDefault
+					GET-REPLACE,
+				restartRequestRetransmissionCount REPLACE-WITH-DEFAULT
+					DEFAULT VALUE NLM.restartRequestRetransmissionCountDefault
+					GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		receivingWindowRotationRecoveryProcedures-P
+			PRESENT IF
+				!The optional window rotation recovery procedures are implemented at a receiving 
+				DTE!,
+		transmittingWindowRotationRecoveryProcedures-P
+			PRESENT IF
+				!The optional window rotation recovery procedures are implemented at a 
+				transmitting DTE!,
+		packetRetransmissionProcedures-P
+			PRESENT IF
+				!The optional packet retransmission procedures are implemented!,
+		onlineRegistration-P
+			PRESENT IF
+				!The optional online registration facility is implemented!;
+REGISTERED AS { NLM.moi x25PLEIVMO-DTE(20) };
+--5.10.6 The X.25 PLE DCE initial values managed object
+-- There may be multiple instances of the x25PLEIVMO-DCE in a system.
+-- An x25PLEIVMO-DCE may be used to supply initial
+-- values for the attributes of the x25PLE-DCE MO.
+-- Different instances of x25PLEIVMO-DCE may contain different initial values.
+--
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation.
+--
+
+
+x25PLEIVMO-DCE MANAGED OBJECT CLASS
+	DERIVED FROM
+		x25PLEIVMO;
+REGISTERED AS { NLM.moi x25PLEIVMO-DCE(28) };
+-- Packages
+
+
+dCECommonVirtualCircuitCounters-P PACKAGE
+	BEHAVIOUR
+		dCECommonVirtualCircuitCounters-P-B BEHAVIOUR
+			DEFINED AS
+				!provides the set of common counters used in the normal operation of a DCE 
+				environment, as defined in the appropriate clauses.!;,
+		octetsSentReceivedCounter-B;
+	ATTRIBUTES
+		dataPacketsReceived GET,
+		dataPacketsSent GET,
+		interruptPacketsReceived GET,
+		interruptPacketsSent GET,
+		interruptTimerExpiries GET,
+		"DMI":octetsReceivedCounter GET,
+		"DMI":octetsSentCounter GET,
+		providerInitiatedDisconnects GET,
+		providerInitiatedResets GET,
+		remotelyInitiatedRestarts GET,
+		remotelyInitiatedResets GET,
+		resetTimeouts GET,
+		x25SegmentsReceived GET,
+		x25SegmentsSent GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			dataPacketsReceived
+			dataPacketsSent
+			interruptPacketsReceived
+			interruptPacketsSent
+			interruptTimerExpiries
+			"DMI":octetsReceivedCounter
+			"DMI":octetsSentCounter
+			providerInitiatedDisconnects
+			providerInitiatedResets
+			remotelyInitiatedRestarts
+			remotelyInitiatedResets
+			resetTimeouts
+			x25SegmentsReceived
+			x25SegmentsSent;
+REGISTERED AS { NLM.poi dCECommonVirtualCircuitCounters-P(23) };
+
+
+dCEX25PLEFacilities-P PACKAGE
+	BEHAVIOUR
+		dCEX25PLEFacilities-P-B BEHAVIOUR
+			DEFINED AS
+				!provides the set of Facilities which are optional, and may be implemented in a 
+				DCE environment, as defined in the appropriate clauses.!;;
+	ATTRIBUTES
+		bilateralCUG REPLACE-WITH-DEFAULT GET-REPLACE,
+		bilateralCUGWithOutgoingAccess REPLACE-WITH-DEFAULT GET-REPLACE,
+		callDeflectionSubscription REPLACE-WITH-DEFAULT GET-REPLACE,
+		callRedirection REPLACE-WITH-DEFAULT GET-REPLACE,
+		chargingInformation REPLACE-WITH-DEFAULT GET-REPLACE,
+		cUGWithIncomingAccess REPLACE-WITH-DEFAULT GET-REPLACE,
+		cUGWithOutgoingAccess REPLACE-WITH-DEFAULT GET-REPLACE,
+		dBitModification REPLACE-WITH-DEFAULT GET-REPLACE,
+		defaultThroughputClassesAssignment REPLACE-WITH-DEFAULT GET-REPLACE,
+		extendedPacketSequenceNumbering REPLACE-WITH-DEFAULT GET-REPLACE,
+		huntGroup REPLACE-WITH-DEFAULT GET-REPLACE,
+		incomingCallBarredWithinCUG REPLACE-WITH-DEFAULT GET-REPLACE,
+		localChargingPrevention REPLACE-WITH-DEFAULT GET-REPLACE,
+		nonStandardDefaultPacketSizes REPLACE-WITH-DEFAULT GET-REPLACE,
+		nonStandardDefaultWindowSizes REPLACE-WITH-DEFAULT GET-REPLACE,
+		nUIOverride REPLACE-WITH-DEFAULT GET-REPLACE,
+		nUISubscription REPLACE-WITH-DEFAULT GET-REPLACE,
+		oneWayLogicalChannelIncoming REPLACE-WITH-DEFAULT GET-REPLACE,
+		onlineFacilityRegistration REPLACE-WITH-DEFAULT GET-REPLACE,
+		outgoingCallBarredWithinCUG REPLACE-WITH-DEFAULT GET-REPLACE,
+		packetRetransmission REPLACE-WITH-DEFAULT GET-REPLACE,
+		reverseChargingAcceptance REPLACE-WITH-DEFAULT GET-REPLACE,
+		rOASubscription REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { NLM.poi dCEX25PLEFacilities-P(26) };
+
+
+dCEX25PLETimers-P PACKAGE
+	BEHAVIOUR
+		dCEX25PLETimers-P-B BEHAVIOUR
+			DEFINED AS
+				!provides the set of timers used during the normal operation in a DCE 
+				environment, as defined in the appropriate clauses.!;;
+	ATTRIBUTES
+		clearIndication GET-REPLACE,
+		-- T13 timer.
+		incomingCall GET-REPLACE,
+		-- T11 timer.
+		resetIndication GET-REPLACE,
+		-- T12 timer.
+		restartIndication GET-REPLACE;
+	-- T10 timer.
+	REGISTERED AS { NLM.poi dCEX25PLETimers-P(25) };
+
+
+dTEX25PLECounters-P PACKAGE
+	BEHAVIOUR
+		dTEX25PLECounters-P-B BEHAVIOUR
+			DEFINED AS
+				!Provides the set of counters which may be associated with the x25PLE-DTE MO.!;,
+		octetsSentReceivedCounter-B;
+	ATTRIBUTES
+		"DMI":octetsReceivedCounter GET,
+		-- Note that the DMI definition is in terms of user data octets.
+		"DMI":octetsSentCounter GET,
+		-- Note that the DMI definition is in terms of user data octets.
+		callTimeouts GET,
+		callsConnected GET,
+		clearCountsExceeded GET,
+		clearTimeouts GET,
+		dataPacketsReceived GET,
+		dataPacketsSent GET,
+		-- Note that the "DMI":PDUsSentCounter
+		-- cannot be used here since it is defined as total number of PDUs sent,
+		-- not just data PDUs.
+		dataRetransmissionTimerExpiries GET,
+		providerInitiatedResets GET,
+		providerInitiatedDisconnects GET,
+		remotelyInitiatedResets GET,
+		remotelyInitiatedRestarts GET,
+		resetTimeouts GET,
+		restartCountsExceeded GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			"DMI":octetsSentCounter
+			"DMI":octetsReceivedCounter
+			callTimeouts
+			callsConnected
+			clearCountsExceeded
+			clearTimeouts
+			dataPacketsReceived
+			dataPacketsSent
+			dataRetransmissionTimerExpiries
+			providerInitiatedDisconnects
+			providerInitiatedResets
+			remotelyInitiatedResets
+			remotelyInitiatedRestarts
+			resetTimeouts
+			restartCountsExceeded;
+REGISTERED AS { NLM.poi dTEX25PLECounters-P(18) };
+
+
+packetRetransmissionProcedures-P PACKAGE
+	BEHAVIOUR
+		packetRetransmissionProcedures-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of the optional packet retransmission procedures as 
+				described in 13.4 of ISO/IEC 8208 or ITU-T Rec. X.25 (2nd Edition).!;;
+	ATTRIBUTES
+		rejectResponseTimer REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.rejectResponseTimerDefault
+			GET-REPLACE,
+		rejectRetransmissionCount REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.rejectRetransmissionCountDefault
+			GET-REPLACE;
+REGISTERED AS { NLM.poi packetRetransmissionProcedures-P(14) };
+
+
+receivingWindowRotationRecoveryProcedures-P PACKAGE
+	BEHAVIOUR
+		receivingWindowRotationRecoveryProcedures-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of the optional window rotation recovery procedures at a 
+				receiving DTE as described in 11.2.2 of ISO/IEC 8208 or ITU-T Rec. X.25 (2nd 
+				Edition).!;;
+	ATTRIBUTES
+		windowStatusTransmissionTimer REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.windowStatusTransmissionTimerDefault
+			GET-REPLACE;
+REGISTERED AS { NLM.poi receivingWindowRotationRecoveryProcedures-P(12) };
+
+
+transmittingWindowRotationRecoveryProcedures-P PACKAGE
+	BEHAVIOUR
+		transmittingWindowRotationRecoveryProcedures-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of the optional window rotation recovery procedures at a 
+				transmitting DTE as described in 11.2.1 of ISO/IEC 8208 or ITU-T Rec. X.25 (2nd 
+				Edition).!;;
+	ATTRIBUTES
+		windowRotationTimer REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.windowRotationTimerDefault
+			GET-REPLACE,
+		dataPacketRetransmissionCount REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.dataPacketRetransmissionCountDefault
+			GET-REPLACE;
+REGISTERED AS { NLM.poi transmittingWindowRotationRecoveryProcedures-P(13) };
+
+
+onlineRegistration-P PACKAGE
+	BEHAVIOUR
+		onlineRegistration-P-B BEHAVIOUR
+			DEFINED AS
+				!Controls the operation of the optional online registration facility as described 
+				in 13.1 of ISO/IEC 8208 or ITU-T Rec. X.25 (2nd Edition).!;;
+	ATTRIBUTES
+		registrationRequestResponseTimer REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.registrationRequestResponseTimerDefault
+			GET-REPLACE,
+		registrationRequestRetransmissionCount REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.registrationRequestRetransmissionCountDefault
+			GET-REPLACE,
+		registrationPermitted REPLACE-WITH-DEFAULT
+			DEFAULT VALUE NLM.registrationPermittedDefault
+			GET-REPLACE;
+REGISTERED AS { NLM.poi onlineRegistration-P(11) };
+-- Behaviours
+
+
+x25PLEPImportedNotifications-B BEHAVIOUR
+	DEFINED AS
+		!The x25PLE-P package imports the communicationsAlarm notification from Rec. 
+		X.721 (1992) | ISO/IEC 10165-2. It is used to report the following x25PLE 
+		managed object events.
+
+		providerInitiatedDisconnect: Issued upon receipt of a clear packet with a cause 
+		code other than 'DTE originated'.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER.
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.providerInitiatedDisconnect shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError. The 
+		perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm with 
+		a perceivedSeverity value of 'Cleared' shall not be generated. No other fields 
+		or parameters shall be used, with the exception of further parameters in the 
+		additionalInformation field.
+
+		remotelyInitiatedReset: Issued upon occurrence of a remotely initiated reset. 
+		This event is issued in lieu of a 'providerInitiatedReset' when operating in a 
+		DTE-DXE environment.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.remotelyInitiatedDisconnect shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		providerInitiatedReset: Issued upon occurrence of a provider initiated reset. 
+		This event is issued when operating in a DTE-DCE environment.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.providerInitiatedReset shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		remotelyInitiatedRestart: Issued upon receipt of a remotely (including provider) 
+		initiated restart.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.remotelyInitiatedRestart shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		restartCountExceeded: Issued on restart failure due to restart count (R20) 
+		exceeded.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.restartCountExceeded shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		protocolErrorDetectedLocally: Issued upon receipt of a packet which causes the 
+		"A=Error" action in the ISO/IEC 8208 or ITU-T Rec. X.25 state tables to be 
+		taken.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER.
+
+		The values of cause and diagnostic codes shall be those which would have been 
+		placed in a diagnostic packet had one been generated by the DTE (i.e. as if it 
+		were a DTE). The actual generation of such a packet is not required.
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.communicationsProtocolErrorDetectedLocally shall be reported in the 
+		specificProblems parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		accusedOfProtocolError: Issued upon receipt of a diagnostic packet or a clear, 
+		reset or restart packet with a cause code equal to one of the following: Remote 
+		Procedure Error, Incompatible Destination, Invalid Facility Request, Local 
+		Procedure Error.
+
+		No other x25PLE communication alarm shall be generated as a result of this 
+		particular instance of packet.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.accusedOfProtocolError shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		callEstablishmentRetryCountExceeded: Issued on retry failure during call 
+		establishment due to retry limit exceeded.
+
+		The information relating to the call shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.callEstablishmentRetryCountExceeded shall be reported in the 
+		specificProblems parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.
+
+		clearCountExceeded: Issued on retry failure due to clear limit (R23) exceeded.
+
+		The information relating to the call shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value 'False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.clearCountExceeded shall be reported in the specificProblems 
+		parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to 'Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of 'Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformation field.!;
+-- Name Bindings
+
+
+x25PLEIVMO-networkSubsystem NAME BINDING
+	SUBORDINATE OBJECT CLASS x25PLEIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		x25PLEIVMOId;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE;
+REGISTERED AS { NLM.nboi x25PLEIVMO-networkSubsystem(10) };
+
+
+x25PLE-networkSubsystem-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS x25PLE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		x25PLEId;
+	BEHAVIOUR
+		x25PLE-networkSubsystem-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the x25PLE Managed Object or its subclasses 
+				are created by management operation.!;;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { NLM.nboi x25PLE-networkSubsystem-Management(9) };
+
+
+x25PLE-networkSubsystem-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS x25PLE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		x25PLEId;
+	BEHAVIOUR
+		x25PLE-networkSubsystem-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the x25PLE Managed Object or its subclasses 
+				are created by automatic operation of the system. The creation of an instance of 
+				the x25PLE MO or its subclass using this name binding may reference an instance 
+				of the x25PLEIVMO (or of its subclass). The means by which such an instance (if 
+				any) of the x25PLEIVMO (or its subclass) is identified a local matter. When this 
+				occurs, some of the initial values of the attributes of the instance of the 
+				x25PLE MO (or its subclass) may be supplied by the values of the attributes in 
+				the specified instance of the x25PLEIVMO. However, any such value may be 
+				overridden by a value supplied by local means (for example across an internal 
+				interface). Where values are supplied by the IVMO, the initial value of an 
+				attribute of the x25PLE MO (or its subclass) shall be the value of the 
+				corresponding attribute in the x25PLEIVMO (that is, which has the same attribute 
+				template label). The naming attribute of the x25PLE MO (or its subclass) is 
+				assigned a value according to local mechanisms.!;;
+	DELETE;
+REGISTERED AS { NLM.nboi x25PLE-networkSubsystem-Automatic(18) };
+-- Attributes
+
+
+bilateralCUG ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bilateralCUG-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the bilateral closed user group facility as described in 
+				ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi bilateralCUG(125) };
+
+
+bilateralCUGWithOutgoingAccess ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bilateralCUGWithOutgoingAccess-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the bilateral CUG with outgoing access facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi bilateralCUGWithOutgoingAccess(127) };
+
+
+callAttempts ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		callAttempts-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the total number of calls attempted.!;;
+REGISTERED AS { NLM.aoi callAttempts(52) };
+
+
+callDeflectionSubscription ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callDeflectionSubscription-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the call deflection facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of "False" indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi callDeflectionSubscription(114) };
+
+
+callEstablishmentRetryCountsExceeded ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		callEstablishmentRetryCountsExceeded-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the callEstablishmentRetryCountExceeded event which 
+				generates a communications alarm notification.!;;
+REGISTERED AS { NLM.aoi callEstablishmentRetryCountsExceeded(65) };
+
+
+callRedirection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callRedirection-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the call redirection facility as described in ITU-T 
+				Recommendation X.2 Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi callRedirection(129) };
+
+
+callRequestResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		callRequestResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T21 (Call Request Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi callRequestResponseTimer(77) };
+
+
+callTimeouts ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		callTimeouts-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of times timer T21 expiry is experienced by the PLE.!;;
+REGISTERED AS { NLM.aoi callTimeouts(55) };
+
+
+callsConnected ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		callsConnected-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the total number of calls which have reached the open state.!;;
+REGISTERED AS { NLM.aoi callsConnected(53) };
+
+
+chargingInformation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		chargingInformation-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the charging information facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi chargingInformation(132) };
+
+
+clearCountsExceeded ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		clearCountsExceeded-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the clearCountExceeded event which generates a 
+				communications alarm notification.!;;
+REGISTERED AS { NLM.aoi clearCountsExceeded(66) };
+
+
+clearIndication ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		clearIndication-B BEHAVIOUR
+			DEFINED AS
+				!Value for the Clear Indication, T13 timer, in seconds.!;;
+REGISTERED AS { NLM.aoi clearIndication(133) };
+
+
+clearRequestResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		clearRequestResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T23 (Clear Request Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi clearRequestResponseTimer(79) };
+
+
+clearRequestRetransmissionCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		clearRequestRetransmissionCount-B BEHAVIOUR
+			DEFINED AS
+				!Value for count R23 (Clear Request Retransmission Count).!;;
+REGISTERED AS { NLM.aoi clearRequestRetransmissionCount(81) };
+
+
+clearTimeouts ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		clearTimeouts-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of times timer T23 expiry is experienced by the PLE.!;;
+REGISTERED AS { NLM.aoi clearTimeouts(56) };
+
+
+cUG ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cUG-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the closed user group facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi cUG(134) };
+
+
+cUGWithIncomingAccess ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cUGWithIncomingAccess-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the closed user group with incoming access facility as 
+				described in ITU-T Recommendation X.2. Expressed as a boolean where a value of 
+				'True' indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi cUGWithIncomingAccess(136) };
+
+
+cUGWithOutgoingAccess ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cUGWithOutgoingAccess-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the CUG with outgoing access facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi cUGWithOutgoingAccess(137) };
+
+
+dBitModification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dBitModification-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the D bit modification facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi dBitModification(139) };
+
+
+dataPacketRetransmissionCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		dataPacketRetransmissionCount-B BEHAVIOUR
+			DEFINED AS
+				!Value for count R25 (Data Packet Retransmission Count).!;;
+REGISTERED AS { NLM.aoi dataPacketRetransmissionCount(85) };
+
+
+dataPacketsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		dataPacketsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the total number of data packets received.!;;
+REGISTERED AS { NLM.aoi dataPacketsReceived(51) };
+
+
+dataPacketsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		dataPacketsSent-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the total number of data packets sent.!;;
+REGISTERED AS { NLM.aoi dataPacketsSent(50) };
+
+
+dataRetransmissionTimerExpiries ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		dataRetransmissionTimerExpiries-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of expiries of timer T25. Returns zero if the option is 
+				not implemented.!;;
+REGISTERED AS { NLM.aoi dataRetransmissionTimerExpiries(58) };
+
+
+defaultPacketSizes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.BidirectionalValues;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultPacketSizes-B BEHAVIOUR
+			DEFINED AS
+				!The default value of the packet sizes. A value of NULL indicates the ISO/IEC 
+				8208 or ITU-T Rec. X.25 default value of 128. Any other value indicates the 
+				value agreed by the nonstandard default packet sizes facility.!;;
+REGISTERED AS { NLM.aoi defaultPacketSizes(103) };
+
+
+defaultThroughputClasses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.BidirectionalValues;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultThroughputClasses-B BEHAVIOUR
+			DEFINED AS
+				!The default throughput class values. A value of NULL indicates the normal 
+				default. Any other value indicates the value agreed by the 
+				defaultThroughputClassesAssignment facility.!;;
+REGISTERED AS { NLM.aoi defaultThroughputClasses(112) };
+
+
+defaultThroughputClassesAssignment ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.DefaultTCA;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultThroughputClassesAssignment-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the default throughput classes assignment facility as 
+				described in ITU-T Recommendation X.2. Expressed as a boolean where a value of 
+				'True' indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi defaultThroughputClassesAssignment(144) };
+
+
+defaultWindowSizes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.BidirectionalValues;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultWindowSizes-B BEHAVIOUR
+			DEFINED AS
+				!The default value of the window sizes. A value of NULL indicates the ITU-T 
+				Recommendation | International Standard default value of 2. Any other value 
+				indicates the value agreed by the nonstandard default window sizes facility.!;;
+REGISTERED AS { NLM.aoi defaultWindowSizes(104) };
+
+
+extendedPacketSequenceNumbering ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.PacketSequencing;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		extendedPacketSequenceNumbering-B BEHAVIOUR
+			DEFINED AS
+				!The modulo of the packet sequence number space. Expressed as an integer. The 
+				ITU-T Recommendation | International Standard only requires support for at least 
+				one of the two values 8 and 128, but it is possible that some future revision 
+				may extend the range. A system is only required to support the setting of values 
+				which are also required by the protocol standard. A system shall return an error 
+				when an attempt is made to set the value to a value which is not supported by 
+				that system.!;;
+REGISTERED AS { NLM.aoi extendedPacketSequenceNumbering(49) };
+
+
+fastSelectAcceptance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		fastSelectAcceptance-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the fast select acceptance as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi fastSelectAcceptance(145) };
+
+
+flowControlParameterNegotiation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		flowControlParameterNegotiation-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the flow control parameter negotiation facility as described 
+				in ITU-T Recommendation X.2. When this has the value 'true', the use of flow 
+				control parameter negotiation (by specifying values for the window and packet 
+				size in call request and accept packets) is permitted. When it has the value 
+				'false', no such values shall be specified in call request and accept packets, 
+				and any values specified in an IVMO or via an internal interface shall be 
+				ignored.!;;
+REGISTERED AS { NLM.aoi flowControlParameterNegotiation(119) };
+
+
+huntGroup ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		huntGroup-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the hunt group facility as described in ITU-T Recommendation 
+				X.2. Expressed as a boolean where a value of 'True' indicates subscription and a 
+				value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi huntGroup(146) };
+
+
+incomingCall ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		incomingCall-B BEHAVIOUR
+			DEFINED AS
+				!Value for the Incoming Call, T11 timer, in seconds.!;;
+REGISTERED AS { NLM.aoi incomingCall(147) };
+
+
+incomingCallBarredWithinCUG ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		incomingCallBarredWithinCUG-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the incoming call barred within a CUG facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi incomingCallBarredWithinCUG(149) };
+
+
+incomingCallsBarred ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		incomingCallsBarred-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the incoming calls barred facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi incomingCallsBarred(148) };
+
+
+interruptPacketsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		interruptPacketsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of interrupt packets received by the PLE or over the 
+				PVC/VC.!;;
+REGISTERED AS { NLM.aoi interruptPacketsReceived(68) };
+
+
+interruptPacketsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		interruptPacketsSent-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of interrupt packets sent by the PLE or over the PVC/VC.!;;
+REGISTERED AS { NLM.aoi interruptPacketsSent(67) };
+
+
+interruptResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		interruptResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T26 (Interrupt Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi interruptResponseTimer(82) };
+
+
+interruptTimerExpiries ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		interruptTimerExpiries-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of expiries of timer T26 experienced by the PLE or over 
+				the PVC/VC.!;;
+REGISTERED AS { NLM.aoi interruptTimerExpiries(69) };
+
+
+localChargingPrevention ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localChargingPrevention-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the local charging prevention facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi localChargingPrevention(150) };
+
+
+localDTEAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.DTEAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localDTEAddress-B BEHAVIOUR
+			DEFINED AS
+				!The full DTE address of this PLE expressed as an X.121, E.164, etc. address.!;;
+REGISTERED AS { NLM.aoi localDTEAddress(39) };
+
+
+logicalChannelAssignments ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.LogicalChannelAssignments;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		logicalChannelAssignments-B BEHAVIOUR
+			DEFINED AS
+				!Represents the logical channel assignments of this PLE, expressed as a 
+				four-tuple where the values represent the set (with maximum permitted 
+				cardinality (LIC - 1), minimum required cardinality of zero) of PVC channels 
+				(with maximum value (LIC - 1), and minimum value 1) assigned, the incoming 
+				channel range, the two-way channel range, the outgoing channel range, 
+				respectively. The presence of each of the ranges shall be optional. Absence of a 
+				particular range shall signify that there are no channels of that type assigned. 
+				Within each range, the low value shall be less than or equal to the high value, 
+				and there shall be no value in any set or range which is greater than or equal 
+				to a value in a subsequent range when ordered as above. This attribute is 
+				subject to the rules for logical assignments described in 3.7 of ISO/IEC 8208 or 
+				ITU-T Rec. X.25.!;;
+REGISTERED AS { NLM.aoi logicalChannelAssignments(48) };
+
+
+maxActiveCircuits ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.MaxActiveCircuits;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxActiveCircuits-B BEHAVIOUR
+			DEFINED AS
+				!The maximum number of active circuits permitted on this PLE. When the NULL value 
+				is specified, the maximum number of active circuits shall be limited only by the 
+				resources available to the entity.!;;
+REGISTERED AS { NLM.aoi maxActiveCircuits(41) };
+
+
+minimumRecallTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minimumRecallTimer-B BEHAVIOUR
+			DEFINED AS
+				!Minimum time in seconds before recall permitted. This timer determines the 
+				minimum interval (in seconds) which shall elapse following an unsuccessful first 
+				call attempt before a subsequent call attempt is permitted.!;;
+REGISTERED AS { NLM.aoi minimumRecallTimer(43) };
+
+
+nonStandardDefaultPacketSizes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.NonStandardDPS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nonStandardDefaultPacketSizes-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the non standard default packet sizes facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi nonStandardDefaultPacketSizes(151) };
+
+
+nonStandardDefaultWindowSizes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.NonStandardDWS;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nonStandardDefaultWindowSizes-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the non standard default window sizes facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi nonStandardDefaultWindowSizes(152) };
+
+
+nUIOverride ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nUIOverride-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the NUI override facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi nUIOverride(154) };
+
+
+nUISubscription ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nUISubscription-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the NUI subscription facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi nUISubscription(153) };
+
+
+oneWayLogicalChannelIncoming ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		oneWayLogicalChannelIncoming-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the one way logical channel incoming facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi oneWayLogicalChannelIncoming(156) };
+
+
+oneWayLogicalChannelOutgoing ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		oneWayLogicalChannelOutgoing-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the one way logical channel outgoing facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi oneWayLogicalChannelOutgoing(157) };
+
+
+onlineFacilityRegistration ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		onlineFacilityRegistration-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the on-line facility registration facility as described in 
+				ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non subscription.!;;
+REGISTERED AS { NLM.aoi onlineFacilityRegistration(158) };
+
+
+outgoingCallBarredWithinCUG ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		outgoingCallBarredWithinCUG-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the outgoing call barred within a CUG facility as described 
+				in ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi outgoingCallBarredWithinCUG(160) };
+
+
+outgoingCallsBarred ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		outgoingCallsBarred-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the outgoing calls barred facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi outgoingCallsBarred(159) };
+
+
+packetRetransmission ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		packetRetransmission-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the packet retransmissions facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription. If 
+				non-subscription, then the attributes for rejectTimer and rejectCount will have 
+				NULL values.!;;
+REGISTERED AS { NLM.aoi packetRetransmission(161) };
+
+
+protocolErrorsAccusedOf ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		protocolErrorsAccusedOf-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the accusedOfProtocolError event which generates a 
+				communications alarm notification.!;;
+REGISTERED AS { NLM.aoi protocolErrorsAccusedOf(64) };
+
+
+protocolErrorsDetectedLocally ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		protocolErrorsDetectedLocally-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the protocolErrorDetectedLocally event which generates a 
+				communications alarm notification.!;;
+REGISTERED AS { NLM.aoi protocolErrorsDetectedLocally(63) };
+
+
+protocolVersionSupported ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.ProtocolVersion;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		protocolVersionSupported-B BEHAVIOUR
+			DEFINED AS
+				!The supported ITU-T Recommendation | International Standard protocol version 
+				available on the PLE interface.!;;
+REGISTERED AS { NLM.aoi protocolVersionSupported(38) };
+
+
+providerInitiatedDisconnects ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		providerInitiatedDisconnects-B BEHAVIOUR
+			DEFINED AS
+				!Counter for the providerInitiatedDisconnect events which generate communication 
+				alarm notifications.!;;
+REGISTERED AS { NLM.aoi providerInitiatedDisconnects(54) };
+
+
+providerInitiatedResets ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		providerInitiatedResets-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the providerInitiatedReset event which generates a 
+				communication alarm notification.!;;
+REGISTERED AS { NLM.aoi providerInitiatedResets(59) };
+
+
+rOASubscription ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rOASubscription-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the ROA Subscription facility as described in ITU-T 
+				Recommendation X.2. Expressed as a boolean where a value of 'True' indicates 
+				subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi rOASubscription(167) };
+
+
+registrationPermitted ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		registrationPermitted-B BEHAVIOUR
+			DEFINED AS
+				!When true, the use of online facility registration is permitted.!;;
+REGISTERED AS { NLM.aoi registrationPermitted(105) };
+
+
+registrationRequestResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		registrationRequestResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T28 (Registration Request Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi registrationRequestResponseTimer(44) };
+
+
+registrationRequestRetransmissionCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		registrationRequestRetransmissionCount-B BEHAVIOUR
+			DEFINED AS
+				!Value for count R28 (Registration Request Retransmission Count).!;;
+REGISTERED AS { NLM.aoi registrationRequestRetransmissionCount(46) };
+
+
+rejectResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		rejectResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T27 (Reject Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi rejectResponseTimer(86) };
+
+
+rejectRetransmissionCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		rejectRetransmissionCount-B BEHAVIOUR
+			DEFINED AS
+				!Value for count R27 (Reject Retransmission Count).!;;
+REGISTERED AS { NLM.aoi rejectRetransmissionCount(87) };
+
+
+remotelyInitiatedResets ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		remotelyInitiatedResets-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the remotelyInitiatedReset event which generates a 
+				communication alarm notification.!;;
+REGISTERED AS { NLM.aoi remotelyInitiatedResets(57) };
+
+
+remotelyInitiatedRestarts ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		remotelyInitiatedRestarts-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of remotely initiated restarts. This is the total number 
+				of remotely initiated (including provider initiated) restarts experienced by the 
+				PLE, excluding the restart associated with bringing up the PLE interface.!;;
+REGISTERED AS { NLM.aoi remotelyInitiatedRestarts(61) };
+
+
+resetIndication ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		resetIndication-B BEHAVIOUR
+			DEFINED AS
+				!Value for the Reset Indication, T12 timer, in seconds.!;;
+REGISTERED AS { NLM.aoi resetIndication(163) };
+
+
+resetRequestResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		resetRequestResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T22 (Reset Request Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi resetRequestResponseTimer(78) };
+
+
+resetRequestRetransmissionCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		resetRequestRetransmissionCount-B BEHAVIOUR
+			DEFINED AS
+				!Value for count R22 (Reset Request Retransmission Count).!;;
+REGISTERED AS { NLM.aoi resetRequestRetransmissionCount(80) };
+
+
+resetTimeouts ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		resetTimeouts-B BEHAVIOUR
+			DEFINED AS
+				!Counter of the number of timer T22 expiries experienced by the PLE.!;;
+REGISTERED AS { NLM.aoi resetTimeouts(60) };
+
+
+restartCountsExceeded ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		restartCountsExceeded-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the restartCountExceeded event which generates a 
+				communication alarm notification.!;;
+REGISTERED AS { NLM.aoi restartCountsExceeded(62) };
+
+
+restartIndication ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		restartIndication-B BEHAVIOUR
+			DEFINED AS
+				!Value for the Restart Indication, T10 timer, in seconds.!;;
+REGISTERED AS { NLM.aoi restartIndication(164) };
+
+
+restartRequestResponseTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		restartRequestResponseTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T20 (Restart Request Response Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi restartRequestResponseTimer(42) };
+
+
+restartRequestRetransmissionCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		restartRequestRetransmissionCount-B BEHAVIOUR
+			DEFINED AS
+				!Value for count R20 (Restart Request Retransmission Count).!;;
+REGISTERED AS { NLM.aoi restartRequestRetransmissionCount(45) };
+
+
+reverseChargingAcceptance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		reverseChargingAcceptance-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the reverse charging acceptance facility as described in 
+				ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi reverseChargingAcceptance(165) };
+
+
+throughputClassNegotiation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		throughputClassNegotiation-B BEHAVIOUR
+			DEFINED AS
+				!The subscription of the throughput class negotiation facility as described in 
+				ITU-T Recommendation X.2. Expressed as a boolean where a value of 'True' 
+				indicates subscription and a value of 'False' indicates non-subscription.!;;
+REGISTERED AS { NLM.aoi throughputClassNegotiation(168) };
+
+
+windowRotationTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		windowRotationTimer-B BEHAVIOUR
+			DEFINED AS
+				!Default for Timer T25 (Window Rotation Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi windowRotationTimer(84) };
+
+
+windowStatusTransmissionTimer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		windowStatusTransmissionTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value for Timer T24 (Window Status Transmission Timer) in seconds.!;;
+REGISTERED AS { NLM.aoi windowStatusTransmissionTimer(83) };
+
+
+x25PLEId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		x25PLEId-B BEHAVIOUR
+			DEFINED AS
+				!The name of this instance of x25PLE MO.!;;
+REGISTERED AS { NLM.aoi x25PLEId(36) };
+
+
+x25PLEMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.X25PLEMode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		x25PLEMode-B BEHAVIOUR
+			DEFINED AS
+				!The DCE/DTE mode in which the X.25 PLE is currently operating. One of the 
+				following modes of operation may be indicated. (0) DTE mode applying to both 
+				ITU-T Rec. X.25 and ISO/IEC 8208 operation, (1) DCE mode applying to ITU-T Rec. 
+				X.25 operation only, and (2) DTE acting as a DCE applying to ISO/IEC 8208 
+				operation only.!;;
+REGISTERED AS { NLM.aoi x25PLEMode(120) };
+
+
+x25PLEIVMOId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		x25PLEIVMOId-B BEHAVIOUR
+			DEFINED AS
+				!The name of this instance of x25PLE IVMO.!;;
+REGISTERED AS { NLM.aoi x25PLEIVMOId(37) };
+
+
+x25SegmentsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		x25SegmentsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Value for count of X.25 Segments Received.!;;
+REGISTERED AS { NLM.aoi x25SegmentsReceived(171) };
+
+
+x25SegmentsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		x25SegmentsSent-B BEHAVIOUR
+			DEFINED AS
+				!Value for count of X.25 Segments Sent.!;;
+REGISTERED AS { NLM.aoi x25SegmentsSent(170) };
+-- Parameters
+
+
+notificationData PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX NLM.NotificationDataSyntax;
+	BEHAVIOUR
+		notificationData-B BEHAVIOUR
+			DEFINED AS
+				!Information relating to the call which resulted in the notification.!;;
+REGISTERED AS { NLM.proi notificationData(7) };
+--5.11 The virtual circuit and related managed objects
+--5.11.1 The virtual managed object
+-- This MO Class is never instantiated. It serves as a generic Virtual Circuit MO from which both the
+-- Virtual Circuit DTE and Virtual Circuit DCE MOs are derived.
+-- Note that the values of the virtualCircuitId naming attribute are
+-- required to be unique across all instances of MOs derived from this
+-- which have a common superior.
+--
+
+
+virtualCircuit MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		virtualCircuit-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				virtualCircuitNaming-B;
+			ATTRIBUTES
+				virtualCircuitId GET,
+				logicalChannel GET,
+				packetSizes GET,
+				throughputClasses GET,
+				windowSizes GET;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { NLM.moi virtualCircuit(14) };
+--5.11.2 The virtual circuit DTE managed object
+-- This MO Class is never instantiated. It serves as a generic Virtual Circuit DTE MO from which both the
+-- Virtual Call DTE and the Permanent Virtual Circuit DTE MOs are derived.
+-- Note that the values of the virtualCircuitId naming attribute are
+-- required to be unique across all instances of MOs derived from this
+-- which have a common superior.
+--
+
+
+virtualCircuit-DTE MANAGED OBJECT CLASS
+	DERIVED FROM
+		virtualCircuit;
+	CONDITIONAL PACKAGES
+		dTEVirtualCircuitCounters-P
+			PRESENT IF
+				!the instance supports the dTEVirtualCircuitCounters capabilities!;
+REGISTERED AS { NLM.moi virtualCircuit-DTE(18) };
+--5.11.3 The virtual circuit DCE managed object
+-- This MO Class is never instantiated. It serves as a generic Virtual Circuit DCE MO from which both the
+-- Virtual Call DCE and the Permanent Virtual Circuit DCE MOs are derived.
+-- Note that the values of the virtualCircuitId naming attribute are
+-- required to be unique across all instances of MOs derived from this
+-- which have a common superior.
+--
+
+
+virtualCircuit-DCE MANAGED OBJECT CLASS
+	DERIVED FROM
+		virtualCircuit;
+	CONDITIONAL PACKAGES
+		dCECommonVirtualCircuitCounters-P
+			PRESENT IF
+				!the instance supports the dCECommonVirtualCircuitCounters capabilities!;
+REGISTERED AS { NLM.moi virtualCircuit-DCE(29) };
+--5.11.4 The permanent virtual circuit DTE managed object
+-- An instance of this MO exists for each Permanent Virtual Circuit.
+-- It may be both created and deleted by management.
+--
+
+
+permanentVirtualCircuit-DTE MANAGED OBJECT CLASS
+	DERIVED FROM
+		virtualCircuit-DTE;
+	CHARACTERIZED BY
+		permanentVirtualCircuit-DTE-P PACKAGE
+			BEHAVIOUR
+				permanentVirtualCircuit-DTE-P-B BEHAVIOUR
+					DEFINED AS
+						!When the MO is created, the protocol machine shall be reinitialized and a reset 
+						PDU with a cause code of DTE originated (encoded as 00000000) and a diagnostic 
+						code of DTE operational (161) shall be transmitted. When the MO is deleted, the 
+						protocol machine shall be reinitialized and a reset PDU with a cause code of DTE 
+						originated (encoded as 00000000) and a diagnostic code of DTE not operational 
+						(162) shall be transmitted.!;;
+			ATTRIBUTES
+				logicalChannel
+					INITIAL VALUE DERIVATION RULE
+						logicalChannelIV-B
+					,
+				packetSizes
+					INITIAL VALUE DERIVATION RULE
+						optionalCMIPIV-B
+					,
+				throughputClasses
+					INITIAL VALUE DERIVATION RULE
+						optionalCMIPIV-B
+					,
+				windowSizes
+					INITIAL VALUE DERIVATION RULE
+						optionalCMIPIV-B
+					;;;
+REGISTERED AS { NLM.moi permanentVirtualCircuit-DTE(19) };
+--5.11.5 The permanent virtual circuit DCE managed object
+-- An instance of this MO exists for each Permanent Virtual Circuit. It may be both created and
+-- deleted by management.
+--
+
+
+permanentVirtualCircuit-DCE MANAGED OBJECT CLASS
+	DERIVED FROM
+		virtualCircuit-DCE;
+	CHARACTERIZED BY
+		permanentVirtualCircuit-DCE-P PACKAGE
+			BEHAVIOUR
+				permanentVirtualCircuit-DCE-P-B BEHAVIOUR
+					DEFINED AS
+						!When the MO is created, the protocol machine shall be re-initialized and a reset 
+						PDU shall be transmitted. A cause code of remote DTE Operational (encoded as 
+						X000 1001) or Network Operational (encoded as X000 1111) may, for example, be 
+						included. When the MO is deleted the protocol machine shall be reinitialized and 
+						a reset PDU shall be transmitted. A cause code of Out of Order (encoded as X000 
+						0001) or Network Out of Order (encoded as X001 1101) may, for example, be 
+						included.!;,
+				commonStateChange-B;
+			ATTRIBUTES
+				chargingDirection GET,
+				logicalChannel
+					INITIAL VALUE DERIVATION RULE
+						logicalChannelIV-B
+					,
+				packetSizes
+					INITIAL VALUE DERIVATION RULE
+						optionalCMIPIV-B
+					,
+				throughputClasses
+					INITIAL VALUE DERIVATION RULE
+						optionalCMIPIV-B
+					,
+				windowSizes
+					INITIAL VALUE DERIVATION RULE
+						optionalCMIPIV-B
+					,
+				"DMI":operationalState GET,
+				remoteDTEAddress GET,
+				remoteLogicalChannel GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":operationalState;
+			NOTIFICATIONS
+				"DMI":stateChange;;;
+REGISTERED AS { NLM.moi permanentVirtualCircuit-DCE(30) };
+--5.11.6 The virtual call initial values managed object
+-- There may be multiple instances of the virtualCallIVMO in a system.
+-- A virtualCallIVMO may be used to supply initial
+-- values for the attributes of the virtualCall-DTE or virtualCall-DCE MO.
+-- Different instances of virtualCallIVMO may contain different initial values.
+--
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation.
+
+
+virtualCallIVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		virtualCallIVMO-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				virtualCallIVMOId GET,
+				fastSelect REPLACE-WITH-DEFAULT GET-REPLACE,
+				packetSizes REPLACE-WITH-DEFAULT GET-REPLACE,
+				reverseCharging REPLACE-WITH-DEFAULT GET-REPLACE,
+				throughputClasses REPLACE-WITH-DEFAULT GET-REPLACE,
+				windowSizes REPLACE-WITH-DEFAULT GET-REPLACE;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { NLM.moi virtualCallIVMO(15) };
+--5.11.7 The virtual call DTE managed object
+-- An instance of this MO exists for each Virtual Call. It is not created by
+-- management, but by the operation of the protocol state machine.
+-- An existing instance may, however, be deactivated by management action,
+-- which will cause the associated VC to be cleared.
+--
+-- An instance of this MO is created and exists as long as real resources
+-- are consumed by the existence of the virtual call. It is an implementation
+-- matter to determine the point during call establishment when real
+-- resources are consumed, and conversely, when during call clearing,
+-- when they are released.
+
+
+virtualCall-DTE MANAGED OBJECT CLASS
+	DERIVED FROM
+		virtualCircuit-DTE;
+	CHARACTERIZED BY
+		virtualCall-DTE-P PACKAGE
+			BEHAVIOUR
+				deactivateConnection-B,
+				successfulConnectionEstablishment-B;
+			ATTRIBUTES
+				callingAddressExtension GET,
+				calledAddressExtension GET,
+				direction GET,
+				fastSelect GET,
+				originallyCalledAddress GET,
+				redirectReason GET,
+				remoteDTEAddress GET,
+				reverseCharging GET;
+			ACTIONS
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"GMI":communicationsInformation;;;
+REGISTERED AS { NLM.moi virtualCall-DTE(16) };
+--5.11.8 The virtual call DCE managed object
+-- An instance of this MO is created and exists as long as real resources are consumed by the existence
+-- of the Virtual Call. It is an implementation matter to determine the point during a call establishment
+-- when real resources are consumed, and conversely, when during call clearing, when they are released.
+
+
+virtualCall-DCE MANAGED OBJECT CLASS
+	DERIVED FROM
+		virtualCircuit-DCE;
+	CHARACTERIZED BY
+		virtualCall-DCE-P PACKAGE
+			BEHAVIOUR
+				deactivateConnection-B,
+				successfulConnectionEstablishment-B;
+			ATTRIBUTES
+				chargingDirection GET,
+				cUGSelection GET,
+				direction GET,
+				fastSelect GET,
+				remoteDTEAddress GET,
+				transitDelaySelectionAndIndication GET;
+			ACTIONS
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"GMI":communicationsInformation;;;
+	CONDITIONAL PACKAGES
+		dCEVirtualCallFacilities-P
+			PRESENT IF
+				!the instance supports the dCEVirtualCallFacilities capabilities!;
+REGISTERED AS { NLM.moi virtualCall-DCE(31) };
+--5.11.9 The Recommendation D Series counts managed object
+-- There is one instance of this MO created by management action or
+-- automatically for each instance of a virtual call where the Tariff
+-- Principles applying to Data Communications Services over dedicated
+-- Public Data Networks are applicable. The provisions of the tariff
+-- principles are defined in Recommendations D.10, D.11 and D.12.
+
+
+dSeriesCounts MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		dSeriesCounts-P PACKAGE
+			BEHAVIOUR
+				dSeriesCounts-P-B BEHAVIOUR
+					DEFINED AS
+						!provides the set of packet and segment counts required to collect the charges 
+						levied according to the tariff principles contained in Recommendations D.10, 
+						D.11 and D.12 for international packet switched public data communications 
+						services. The values collected are reported at object deletion.!;;
+			ATTRIBUTES
+				dSeriesId GET,
+				dSeriesResetRequestIndicationPackets GET,
+				dSeriesSegmentsSent GET,
+				dSeriesSegmentsReceived GET;
+			ATTRIBUTE GROUPS
+				"GMI":counters
+					dSeriesResetRequestIndicationPackets
+					dSeriesSegmentsSent
+					dSeriesSegmentsReceived;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { NLM.moi dSeriesCounts(32) };
+-- Packages
+
+
+dTEVirtualCircuitCounters-P PACKAGE
+	BEHAVIOUR
+		octetsSentReceivedCounter-B;
+	ATTRIBUTES
+		"DMI":octetsSentCounter GET,
+		-- Note that the DMI definition is in terms of user data octets.
+		"DMI":octetsReceivedCounter GET,
+		-- Note that the DMI definition is in terms of user data octets.
+		dataPacketsReceived GET,
+		dataPacketsSent GET,
+		-- Note the "DMI":PDUsSentCounter
+		-- cannot be used here since it is defined as total number of PDUs sent,
+		-- not just data PDUs.
+		dataRetransmissionTimerExpiries GET,
+		interruptPacketsReceived GET,
+		interruptPacketsSent GET,
+		interruptTimerExpiries GET,
+		providerInitiatedResets GET,
+		remotelyInitiatedResets GET,
+		resetTimeouts GET;
+	ATTRIBUTE GROUPS
+		"GMI":counters
+			"DMI":octetsReceivedCounter
+			"DMI":octetsSentCounter
+			dataPacketsReceived
+			dataPacketsSent
+			dataRetransmissionTimerExpiries
+			interruptPacketsReceived
+			interruptPacketsSent
+			interruptTimerExpiries
+			providerInitiatedResets
+			remotelyInitiatedResets
+			resetTimeouts;
+REGISTERED AS { NLM.poi dTEVirtualCircuitCounters-P(19) };
+
+
+dCEVirtualCallFacilities-P PACKAGE
+	BEHAVIOUR
+		dCEVirtualCallFacilities-P-B BEHAVIOUR
+			DEFINED AS
+				!provides the set of optional facilities used during the normal operation of a 
+				DCE, as defined in the appropriate clauses.!;;
+	ATTRIBUTES
+		bilateralCUGSelection GET,
+		callRedirectionDeflectionNotification GET,
+		calledLineAddressModifiedNotification GET,
+		cUGWithOutgoingAccessSelection GET,
+		nUISelection GET,
+		reverseCharging GET,
+		rOASelection GET;
+REGISTERED AS { NLM.poi dCEVirtualCallFacilities-P(24) };
+-- Behaviours
+
+
+logicalChannelIV-B BEHAVIOUR
+	DEFINED AS
+		!The initial value of the logical channel attribute shall be specified in the 
+		CMIP create.!;
+
+
+optionalCMIPIV-B BEHAVIOUR
+	DEFINED AS
+		!The initial value of this attribute may be supplied in the CMIP create. When not 
+		so supplied, the default value shall be used.!;
+
+
+virtualCircuitNaming-B BEHAVIOUR
+	DEFINED AS
+		!A system shall ensure that all instances of MOs derived from the virtualCircuit 
+		MO which have a common x25PLE or subclass as their superior MO, shall have 
+		unique values for the virtualCircuitId attribute. This applies to both 
+		automatically generated names and those supplied by means of a CMIP create.!;
+-- Name Bindings
+
+
+permanentVirtualCircuit-DTE-x25PLE-DTE NAME BINDING
+	SUBORDINATE OBJECT CLASS permanentVirtualCircuit-DTE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE-DTE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		virtualCircuitId;
+	BEHAVIOUR
+		logicalChannelIV-B;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { NLM.nboi permanentVirtualCircuit-DTE-x25PLE-DTE(26) };
+
+
+permanentVirtualCircuit-DCE-x25PLE-DCE NAME BINDING
+	SUBORDINATE OBJECT CLASS permanentVirtualCircuit-DCE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE-DCE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		virtualCircuitId;
+	BEHAVIOUR
+		logicalChannelIV-B;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { NLM.nboi permanentVirtualCircuit-DCE-x25PLE-DCE(29) };
+
+
+virtualCall-DTE-x25PLE-DTE NAME BINDING
+	SUBORDINATE OBJECT CLASS virtualCall-DTE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE-DTE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		virtualCircuitId;
+	BEHAVIOUR
+		virtualCall-DTE-x25PLE-DTE-B BEHAVIOUR
+			DEFINED AS
+				!Created only by the operation of the protocol or local interface. The instance 
+				name is derived automatically (as for CREATE WITH-AUTOMATIC-INSTANCE-NAMING). 
+				The creation of an instance of the virtualCall-DTE MO using this name binding 
+				may reference an instance of the virtualCallIVMO. The means by which such an 
+				instance (if any) of the virtualCallIVMO is identified is a local matter. When 
+				this occurs, some of the initial values of the attributes of the instance of the 
+				virtualCall-DTE MO may be supplied by the values of the attributes in the 
+				specified instance of the virtualCallIVMO. However, any such value may be 
+				overridden by a value supplied by local means (for example, across an internal 
+				interface). Where values are supplied by the IVMO, the initial value of an 
+				attribute of the virtualCall-DTE MO shall be the value of the corresponding 
+				attribute in the virtualCallIVMO (that is, which has the same attribute template 
+				label). The naming attribute of the virtualCall-DTE is assigned a value 
+				according to local mechanisms.!;;
+REGISTERED AS { NLM.nboi virtualCall-DTE-x25PLE-DTE(24) };
+
+
+virtualCall-DCE-x25PLE-DCE-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS virtualCall-DCE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE-DCE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		virtualCircuitId;
+	BEHAVIOUR
+		virtualCall-DCE-x25PLE-DCE-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the virtualCall-DCE Managed Object is created 
+				automatically by the operation of the system. The instance name is derived 
+				automatically (as for CREATE WITH-AUTOMATIC-INSTANCE-NAMING). The creation of an 
+				instance of the virtualCall-DCE MO using this name binding may reference an 
+				instance of the virtualCallIVMO. The means by which such an instance (if any) of 
+				the virtualCallIVMO is identified is a local matter. When this occurs, some of 
+				the initial values of the attributes of the instance of the virtualCall-DCE MO 
+				may be supplied by the values of the attributes in the specified instance of the 
+				virtualCallIVMO. However, any such value may be overridden by a value supplied 
+				by local means (for example, across an internal interface). Where values are 
+				supplied by the IVMO, the initial value of an attribute of the virtualCall-DCE 
+				MO shall be the value of the corresponding attribute in the virtualCallIVMO 
+				(that is, which has the same attribute template label). The naming attribute of 
+				the virtualCall-DCE is assigned a value according to local mechanisms.!;;
+	DELETE;
+REGISTERED AS { NLM.nboi virtualCall-DCE-x25PLE-DCE-Automatic(30) };
+
+
+virtualCall-DCE-x25PLE-DCE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS virtualCall-DCE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE-DCE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		virtualCircuitId;
+	BEHAVIOUR
+		virtualCall-DCE-x25PLE-DCE-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the virtualCall-DCE Managed Object is created 
+				by management
+				operation.!;;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE;
+REGISTERED AS { NLM.nboi virtualCall-DCE-x25PLE-DCE-Management(31) };
+
+
+virtualCallIVMO-x25PLE NAME BINDING
+	SUBORDINATE OBJECT CLASS virtualCallIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		virtualCallIVMOId;
+	CREATE;
+	DELETE;
+REGISTERED AS { NLM.nboi virtualCallIVMO-x25PLE(25) };
+
+
+dSeriesCounts-virtualCall-DCE-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS dSeriesCounts AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS virtualCall-DCE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		dSeriesId;
+	BEHAVIOUR
+		dSeriesCounts-virtualCall-DCE-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!Created only by the operation of the protocol or local interface. The instance 
+				name is derived automatically (as for CREATE WITH-AUTOMATIC-INSTANCE-NAMING).!;;
+	CREATE;
+	DELETE;
+REGISTERED AS { NLM.nboi dSeriesCounts-virtualCall-DCE-Automatic(32) };
+
+
+dSeriesCounts-virtualCall-DCE-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS dSeriesCounts AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS virtualCall-DCE AND SUBCLASSES;
+	WITH ATTRIBUTE
+		dSeriesId;
+	BEHAVIOUR
+		dSeriesCounts-virtualCall-DCE-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the dSeriesCounts Managed Object is created 
+				by management operation.!;;
+	CREATE;
+	DELETE;
+REGISTERED AS { NLM.nboi dSeriesCounts-virtualCall-DCE-Management(33) };
+-- Attributes
+
+
+bilateralCUGSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bilateralCUGSelection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the bilateral closed user group selection facility for that 
+				call.!;;
+REGISTERED AS { NLM.aoi bilateralCUGSelection(126) };
+
+
+calledAddressExtension ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.NAddress;
+	-- In the OSI context this will always be an NSAP address but in other uses
+	-- it may not. In any case it may be null, for example, when used by ITU-T Rec. X.233 | ISO/IEC 8473-1.
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		calledAddressExtension-B BEHAVIOUR
+			DEFINED AS
+				!The contents of the called address extension field.!;;
+REGISTERED AS { NLM.aoi calledAddressExtension(100) };
+
+
+calledLineAddressModifiedNotification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		calledLineAddressModifiedNotification-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the called line address modified notification facility for 
+				that call.!;;
+REGISTERED AS { NLM.aoi calledLineAddressModifiedNotification(128) };
+
+
+callingAddressExtension ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.NAddress;
+	-- In the OSI context this will always be an NSAP address but in other uses
+	-- it may not. In any case it may be null, for example, when used by ITU-T Rec. X.233 | ISO/IEC 8473-1.
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		callingAddressExtension-B BEHAVIOUR
+			DEFINED AS
+				!The contents of the calling address extension field.!;;
+REGISTERED AS { NLM.aoi callingAddressExtension(99) };
+
+
+callRedirectionDeflectionNotification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callRedirectionDeflectionNotification-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the call redirection deflection notification facility for 
+				that call.!;;
+REGISTERED AS { NLM.aoi callRedirectionDeflectionNotification(130) };
+
+
+chargingDirection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		chargingDirection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the charging direction facility for that call.!;;
+REGISTERED AS { NLM.aoi chargingDirection(131) };
+
+
+cUGSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cUGSelection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the closed user group selection facility for that call.!;;
+REGISTERED AS { NLM.aoi cUGSelection(135) };
+
+
+cUGWithOutgoingAccessSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cUGWithOutgoingAccessSelection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the Closed User Group With Outgoing Access Selection 
+				facility for that call. It may only take the value 'True' if the DTE does not 
+				have a preferential closed user group, as described in ITU-T Recommendation X.25 
+				and ISO/IEC 8208.!;;
+REGISTERED AS { NLM.aoi cUGWithOutgoingAccessSelection(138) };
+
+
+dSeriesId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		dSeriesId-B BEHAVIOUR
+			DEFINED AS
+				!The name of this instance of the dSeriesCounts MO.!;;
+REGISTERED AS { NLM.aoi dSeriesId(140) };
+
+
+dSeriesResetRequestIndicationPackets ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		dSeriesResetRequestIndicationPackets-B BEHAVIOUR
+			DEFINED AS
+				!Value for count of Reset Request or Indication Packets with restrictions defined 
+				in Recommendation D.11.!;;
+REGISTERED AS { NLM.aoi dSeriesResetRequestIndicationPackets(141) };
+
+
+dSeriesSegmentsReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		dSeriesSegmentsReceived-B BEHAVIOUR
+			DEFINED AS
+				!Value for count of Segments Received, in 64 octets, as per Recommendation D.12.!;;
+REGISTERED AS { NLM.aoi dSeriesSegmentsReceived(143) };
+
+
+dSeriesSegmentsSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		dSeriesSegmentsSent-B BEHAVIOUR
+			DEFINED AS
+				!Value for count of Segments Sent, in 64 octets, as per Recommendation D.12.!;;
+REGISTERED AS { NLM.aoi dSeriesSegmentsSent(142) };
+
+
+direction ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Direction;
+	-- Enumerated( Incoming, Outgoing)
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		direction-B BEHAVIOUR
+			DEFINED AS
+				!The direction (incoming or outgoing) of the call.!;;
+REGISTERED AS { NLM.aoi direction(92) };
+
+
+fastSelect ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.FastSelect;
+	-- Enumerated( Not Specified, Fast Select, Fast Select With Restricted Response, No Fast Select)
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		fastSelect-B BEHAVIOUR
+			DEFINED AS
+				!Type of fast select used or to be used for call. In the case of an IVMO, this 
+				specifies that one of 'fast select', 'fast select with restricted response', or 
+				no fast select facility is to be used for the call. It includes a value 'not 
+				specified' which indicates that no preference is expressed in the IVMO. In the 
+				case of a non-IVMO MO, this specifies that one of 'fast select' or 'no fast 
+				select' was used for the call.!;;
+REGISTERED AS { NLM.aoi fastSelect(76) };
+
+
+logicalChannel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.LogicalChannelId;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		logicalChannel-B BEHAVIOUR
+			DEFINED AS
+				!The actual Logical Channel ID used for the call.!;;
+REGISTERED AS { NLM.aoi logicalChannel(89) };
+
+
+nUISelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nUISelection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the network user identification selection facility for that 
+				call.!;;
+REGISTERED AS { NLM.aoi nUISelection(155) };
+
+
+originallyCalledAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.DTEAddress;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		originallyCalledAddress-B BEHAVIOUR
+			DEFINED AS
+				!The originally called address.!;;
+REGISTERED AS { NLM.aoi originallyCalledAddress(98) };
+
+
+packetSizes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.BidirectionalValues;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		packetSizes-B BEHAVIOUR
+			DEFINED AS
+				!The packet sizes for this VC. In the case of an IVMO MO it is the proposed value 
+				of the packet sizes (incoming and outgoing) to be used when establishing the 
+				virtual call, expressed in octets. The value of NULL indicates that the default 
+				packet size for that direction (as indicated by the defaultPacketSizes attribute 
+				of the containing X.25 PLE MO), is to be used. In the case of a non-IVMO MO it 
+				is the actual packet sizes in use for this VC.!;;
+REGISTERED AS { NLM.aoi packetSizes(121) };
+
+
+redirectReason ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.RedirectReason;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		redirectReason-B BEHAVIOUR
+			DEFINED AS
+				!The reason why the call has been redirected. This is the reason why the call has 
+				been offered or has been connected to an address different from the originally 
+				called address. That is, the value of the first octet of the Facility Parameter 
+				Field of the CRCDN or CLAMN facility, indicating the reason for call redirection 
+				or call deflection. The zero value indicates that the call was not redirected.!;;
+REGISTERED AS { NLM.aoi redirectReason(97) };
+
+
+remoteDTEAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.DTEAddress;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		remoteDTEAddress-B BEHAVIOUR
+			DEFINED AS
+				!The DTE Address of the remote DTE. In the case of an outgoing call, this is the 
+				remote DTE address from the called address of the transmitted call request 
+				packet. In the case of an incoming call, it is the calling address from the 
+				received call request packet.!;;
+REGISTERED AS { NLM.aoi remoteDTEAddress(93) };
+
+
+remoteLogicalChannel ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.LogicalChannelId;
+	-- 12 bit Channel ID
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		remoteLogicalChannel-B BEHAVIOUR
+			DEFINED AS
+				!The Remote Logical Channel ID for the Permanent Virtual Circuit.!;;
+REGISTERED AS { NLM.aoi remoteLogicalChannel(162) };
+
+
+reverseCharging ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		reverseCharging-B BEHAVIOUR
+			DEFINED AS
+				!Use of reverse charging. When 'True' for an outgoing call, it shall be (for an 
+				IVMO), or was (for a non-IVMO), initiated requesting reverse charging. When 
+				'True' for an incoming call associated with a virtualCall MO, it indicates that 
+				reverse charging was accepted.!;;
+REGISTERED AS { NLM.aoi reverseCharging(75) };
+
+
+rOASelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		rOASelection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the registered operating agency selection facility for that 
+				call.!;;
+REGISTERED AS { NLM.aoi rOASelection(166) };
+
+
+throughputClasses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.BidirectionalValues;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		throughputClasses-B BEHAVIOUR
+			DEFINED AS
+				!The throughput classes in use or to be used. For an IVMO, this is the throughput 
+				classes to be proposed. For a non-IVMO it is the actual throughput classes in 
+				use. For Virtual Calls this is the result of negotiation.!;;
+REGISTERED AS { NLM.aoi throughputClasses(96) };
+
+
+transitDelaySelectionAndIndication ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		transitDelaySelectionAndIndication-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the use of the transit delay selection and indication facility for 
+				that call.!;;
+REGISTERED AS { NLM.aoi transitDelaySelectionAndIndication(169) };
+
+
+virtualCallIVMOId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		virtualCallIVMOId-B BEHAVIOUR
+			DEFINED AS
+				!The name of this instance of virtualCallIVMO.!;;
+REGISTERED AS { NLM.aoi virtualCallIVMOId(117) };
+
+
+virtualCircuitId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		virtualCircuitId-B BEHAVIOUR
+			DEFINED AS
+				!The name of this instance of virtualCircuit MO or subclass.!;;
+REGISTERED AS { NLM.aoi virtualCircuitId(116) };
+
+
+windowSizes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX NLM.BidirectionalValues;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		windowSizes-B BEHAVIOUR
+			DEFINED AS
+				!The actual window sizes in use for this VC.!;;
+REGISTERED AS { NLM.aoi windowSizes(124) };
+
+END
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log$
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" >--

@@ -1,0 +1,636 @@
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Include "G.774.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "Q.822.gdmo" >--
+--< GDMO.Document "ITU-T G.774.1 (02/2001)" >--
+--< GDMO.Alias "ITU-T G.774.1 (02/2001)" "Recommendation G.774.01" >--
+MODULE "ITU-T G.774.1 (02/2001)"
+-- 6  Managed Object Classes Definitions 
+-- NOTE 1 See Appendix III for a list of the managed object classes that have been moved to ITU-T G.774.6 
+-- for unidirectional performance monitoring. 
+-- NOTE 2 See Appendix IV for the managed object classes that are no longer required. 
+-- 6.1  SDH Current Data 
+
+sdhCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":currentData;
+	CHARACTERIZED BY
+		"Recommendation Q.822":zeroSuppressionPkg,
+		"Recommendation Q.822":thresholdPkg,
+		sdhCurrentDataPackage PACKAGE
+			BEHAVIOUR
+				sdhCurrentDataBehaviour;
+			ATTRIBUTES
+				"Recommendation M.3100":currentProblemList GET;;;
+	CONDITIONAL PACKAGES
+		historyPackage
+			PRESENT IF
+				"an instance does not support flexible assignment of the history length",
+		unavailableTimeAlarmPackage
+			PRESENT IF
+				"starting and ending of unavailable period has to be reported and the
+				granularity period is 24 hours";
+REGISTERED AS { g774-01MObjectClass 1 };
+
+
+sdhCurrentDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"The sdhCurrentData class is used to define generic characteristic for SDH 
+		performance monitoring from which subclasses are defined in order to hold 
+		performance event counts for a specific monitoring point. Subclasses of this 
+		class are used in order to support performance monitoring of SDH paths at 
+		various layers as described in Recommendation G.803. The performance monitoring 
+		events ES, SES and BBE which are monitored by some of the subclasses of this 
+		subclass are defined in 4.1.1/G.826. The granularityPeriod attribute can only be 
+		assigned a value at creation time.
+
+		This class can only contain one reference to an instance of the thresholdData 
+		object class in the thresholdDataInstance attribute.
+
+		The 15' and 24 hours granularity period must be supported fully. If a threshold 
+		is reached or crossed then the currentProblemList attribute shall indicate it 
+		with the probable cause 'Threshold crossed'. Subclass of this class is used to 
+		monitor the near end of the path in case of bidirectional path the far end of 
+		the path shall be supported additionaly. In case of monitoring of a 
+		bidirectional path and Far End unavailability is monitored, an unavailable 
+		period starts if either the near end or the far end is in an unavailable 
+		condition. In case of monitoring of a unidirectional path only the near end is 
+		considered.
+
+		An unavailable condition starts when 10 consecutive severely errored seconds 
+		have been detected; these 10 seconds belong to the unavailable time. An 
+		unavailable condition ends when 10 consecutive seconds with no severely errored 
+		second are detected. These 10 seconds belong to the available time. The 
+		unavailable period entry/exit criteria are described in Annex A/G.826.
+
+		For threshold reset subclasses of this object class the following rules apply:
+
+		- No more than one QOS alarm shall be generated until there has been a 15-minute 
+		  rectangular fixed window with less error count than the low error count 
+		  threshold and no unavailable period exists.
+
+		- To provision the high and low threshold value, the 
+		  counterThresholdAttributList attribute of the Q.822-ThresholdDataInstance is 
+		  used.
+
+		In this attribute all the thresholds (high and low) for each necessary counter 
+		are stored in a list. This means for example, that the high threshold for ES and 
+		the low threshold for ES are individually stored in the same list. It is up to 
+		the network element to recognize which is the high and which is the low one.
+
+		If the unavailableTimeAlarmPackage is present and if an unavailable period 
+		starts, then a communication alarm shall be sent with a probable cause of 
+		'Unavailable' and the presence of this unavailable condition is indicated by the 
+		currentProblemList attribute. If an unavailable period is ending, then a 
+		communication alarm shall be sent with a probable cause of 'Unavailable' and a 
+		severity of 'Cleared'. An available condition is indicated by the absence of the 
+		unavailable condition in the current problem list. The unavailable condition has 
+		no effect on the operationalState. Each subclass of this class shall define the 
+		performance attributes required to hold the mandatory or optional performance 
+		events. These performance event counts are inhibited during unavailable time. 
+		Attributes which are defined in a subclass of this class shall be included in 
+		history information using the historyData, or one of its subclass, unless it is 
+		explicitly specified in the subclass of this class that a particular attribute 
+		be not included. Each subclass of this class shall indicate which subclass of 
+		the history data is used for history retention. The following conditional 
+		packages are not used in this class: filterSuppressionPkg, 
+		observedManagedObjectPkg.
+
+		Concerning the subclasses of this class the following rule applies:
+
+		If a subclass of this class has a granularity period of 15 minutes, it should be 
+		either an instance with the threshold reset functionality or an instance without 
+		this functionality instantiated (per termination point), but not both.";
+-- 6.2  Regenerator Section Current Data 
+-- This managed object class was moved to ITU-T G.774.6. 
+-- 6.3  Regenerator Section Current Data Threshold Reset 
+-- This managed object class was moved to ITU-T G.774.6. 
+-- 6.4  Path Termination Current Data 
+
+
+pathTerminationCurrentData MANAGED OBJECT CLASS
+	DERIVED FROM
+		sdhCurrentData;
+	CHARACTERIZED BY
+		pathTerminationCurrentDataPackage PACKAGE
+			BEHAVIOUR
+				pathTerminationCurrentDataBehaviour;
+			ATTRIBUTES
+				"Recommendation X.739":granularityPeriod
+					REQUIRED VALUES SDHPMASN1.SDHGranularityPeriod
+					,
+				-- According to ITU-G.784 (1999), only the 24 h (one day) granularity period has
+				-- to be supported.
+				bBE REPLACE-WITH-DEFAULT GET,
+				eS REPLACE-WITH-DEFAULT GET,
+				sES REPLACE-WITH-DEFAULT GET;;;
+	CONDITIONAL PACKAGES
+		cSESCurrentDataPackage
+			PRESENT IF
+				"an instance supports it",
+		farEndCSESCurrentDataPackage
+			PRESENT IF
+				"an instance supports it",
+		uASCurrentDataPackage
+			PRESENT IF
+				"an instance supports it",
+		farEndCurrentDataPackage
+			PRESENT IF
+				"monitoring of the far end is supported and the monitored point is
+				Bidirectional";
+REGISTERED AS { g774-01MObjectClass 9 };
+
+
+pathTerminationCurrentDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of the pathTerminationCurrentData managed object Class are used to 
+		hold the current register counts for a High Order Path and or Low Order Path 
+		during a collection period. An instance of this object class, for a monitored 
+		managed object instance, holds the current register counts of each performance 
+		events (BBE, ES, SES, FEBBE, FEES, FESES, UAS).
+
+		This managed object class uses the pathTerminationHistoryData managed object 
+		class for history retention.
+
+		A QOS alarm shall be sent as soon as a threshold is reached or crossed. At the 
+		end of the granularity period the QOS alarm is implictly cleared and, provided 
+		there are no other outstanding threshold crossing QOS alarms, 'Threshold 
+		crossing' removed from the currentProblemList (i.e. No Notification is Sent) and 
+		a new QOS alarm shall be sent if the threshold is reached or crossed again 
+		during the next granularity period. Only one threshold value per performance 
+		counter will be supported.";
+-- 6.5  Multiplex Section Adaptation Current Data 
+-- This managed object class was moved to ITU-T G.774.6. 
+-- 6.6  Regenerator Section History Data 
+-- This managed object class was moved to ITU-T G.774.6. 
+-- 6.7  Path Termination History Data 
+
+
+pathTerminationHistoryData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation Q.822":historyData;
+	CHARACTERIZED BY
+		pathTerminationHistoryDataPackage PACKAGE
+			BEHAVIOUR
+				pathTerminationHistoryDataBehaviour;
+			ATTRIBUTES
+				bBE GET,
+				eS GET,
+				sES GET;;;
+	CONDITIONAL PACKAGES
+		uASHistoryDataPackage
+			PRESENT IF
+				"the containing pathTerminationCurrentData or contains the
+				uASCurrentDataPackage",
+		farEndHistoryDataPackage
+			PRESENT IF
+				"the containing pathTerminationCurrentData or pathTerminationCurrentDataTR
+				instance contains the farEndCurrentDataPackage";
+REGISTERED AS { g774-01MObjectClass 17 };
+
+
+pathTerminationHistoryDataBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of this class are used to store the observed events of a 
+		pathTerminationCurrentData or pathTerminationCurrentDataTR object at the end of 
+		an observation interval. An instance of this managed object is contained by a 
+		pathTerminationCurrentData or pathTerminationCurrentDataTR managed object 
+		instance.";
+-- 6.8  Multiplex Section Adaptation History Data 
+-- This managed object class was moved to ITU-T G.774.6. 
+-- 7  Package definitions 
+-- 7.1  Consecutive Severely Errored Second Current Data Package 
+
+
+cSESCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		cSESCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		cSESEvent GET,
+		nCSES
+			PERMITTED VALUES SDHPMASN1.NCSESRange
+			GET-REPLACE;
+REGISTERED AS { g774-01Package 1 };
+
+
+cSESCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to hold Consecutive Severely Errored Second (CSES) events. 
+		A CSES is detected each time x consecutive SES appear. The number of consecutive 
+		SES that generate a CSES is given by the nCSES attribute, in the range of 2 to 
+		9.
+
+		The cSES events are not detected during unavailable time. The CSES events are 
+		recorded in the cSESEvent attribute, this attribute contains the time at which 
+		the consecutive severely errored seconds started and the value of the nCSES 
+		attribute at the time the event has occured. The cSESEvent attribute shall at 
+		least support recording of 6 CSES events. When the cSESEvent attribute is full, 
+		a wrapping mechanism is used to discard the oldest CSES event. These attributes 
+		are not reset and are not stored in history data objects at the end of the 
+		granularity period. The cSESEvent attribute is initialized as an empty set when 
+		the corresponding object that holds this attribute is created. The CSES event is 
+		described in Recommendation G.784.";
+-- 7.2  Far End Consecutive Severely Errored Second Current Data Package 
+
+
+farEndCSESCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		farEndCSESCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		fECSESEvent GET,
+		nCSES
+			PERMITTED VALUES SDHPMASN1.NCSESRange
+			GET-REPLACE;
+REGISTERED AS { g774-01Package 2 };
+
+
+farEndCSESCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to hold Far End Consecutive Severely Errored Second 
+		(FECSES) events. A fECSES is detected each time x consecutive fESES appear. The 
+		number of consecutive fESES that generate a fECSES is given by the nCSES 
+		attribute, in the range of 2 to 9. The fECSES events are not detected during 
+		unavailable time.
+
+		The fECSES events are recorded in the fECSESEvent attribute, this attribute 
+		contains the time at which the far end consecutive severely errored seconds 
+		started and the value of the nCSES attribute at the time the event has occured. 
+		The fECSESEvent attribute shall at least support recording of 6 fECSES events. 
+		When the fECSESEvent attribute is full, a wrapping mechanism is used to discard 
+		the oldest fECSES event . These attributes are not reset and are not stored in 
+		history data objects at the end of the granularity period. The fECSESEvent 
+		attribute is initialized as an empty set when the corresponding object that 
+		holds this attribute is created.";
+-- 7.3  Far End Current Data Package 
+--  
+
+
+farEndCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		farEndCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		fEBBE REPLACE-WITH-DEFAULT GET,
+		fEES REPLACE-WITH-DEFAULT GET,
+		fESES REPLACE-WITH-DEFAULT GET;
+REGISTERED AS { g774-01Package 3 };
+
+
+farEndCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to record the far end performance event counts.";
+-- 7.4  Far End History Data Package 
+
+
+farEndHistoryDataPackage PACKAGE
+	BEHAVIOUR
+		farEndHistoryDataPackageBehaviour;
+	ATTRIBUTES
+		fEBBE GET,
+		fEES GET,
+		fESES GET;
+REGISTERED AS { g774-01Package 4 };
+
+
+farEndHistoryDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to record the corresponding current data attribute values
+		at the end of the granularity period.";
+-- 7.5 History Package 
+
+
+historyPackage PACKAGE
+	BEHAVIOUR
+		historyPackageBehaviour;
+REGISTERED AS { g774-01Package 5 };
+
+
+historyPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"At the end of each performance interval an instance of historyData or one of its 
+		subclass shall be created if history retention was not suppressed by other means 
+		such as zero suppression. The values of the historyData object or one of its 
+		subclass is the copy of the values of the corresponding attributes of the 
+		currentData or one of its subclass at the end of each performance interval. Once 
+		the new historyData instance is created or one of its subclass this instance 
+		shall be retained in the Network Element at least for 16 periods of 15 minutes 
+		for 15' performance interval and 1 period of 1 day for 1 day performance 
+		interval. The storing of history data is described in 5.3.2/G.784.";
+-- 7.6  Threshold Reset Package 
+
+
+thresholdResetPackage PACKAGE
+	BEHAVIOUR
+		thresholdResetPackageBehaviour;
+REGISTERED AS { g774-01Package 14 };
+
+
+thresholdResetPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"The following rules apply to the thresholds mechanism:
+
+		ES thresholds:
+
+		Two thresholds are defined: The upper ES threshold and the low ES threshold No 
+		more than one QOS alarm shall be generated until there has been a 15-minute 
+		rectangular fixed window with less ES than the low ES threshold and no 
+		unavailable period. At the end of the first 15-minute rectangular period with 
+		less ES than the low ES threshold and no unavailable period, if a threshold 
+		crossing has been previously generated, then a QOS alarm shall be sent which 
+		indicates the clearing of the low ES threshold, and the 'Threshold crossing' 
+		removed from the currentProblemList. If the upper ES threshold is reached or 
+		crossed, after a 15-minute rectangular fixed window with less ES than the low ES 
+		threshold, then a QOS alarm shall be sent.
+
+		SES threshold:
+
+		One threshold is defined No more than one QOS alarm shall be generated until 
+		there has been a 15-minute rectangular fixed window with zero SES. At the end of 
+		the first 15-minute rectangular period with zero SES, a QOS alarm shall be sent 
+		which indicates the clearing of a zero threshold. If after a 15-minute 
+		rectangular fixed window with zero SES the SES threshold is reached or crossed 
+		then a QOS alarm shall be sent.
+
+		BBE threshold:
+
+		refer to the ES threshold.
+
+		For any of the above thresholds, A QOS clear will not be sent if the Performance 
+		Monitoring Data is suspect, as defined by the suspectIntervalFlag attribute.";
+-- 7.7  Unavailable Second Current Data Package 
+
+
+uASCurrentDataPackage PACKAGE
+	BEHAVIOUR
+		uASCurrentDataPackageBehaviour;
+	ATTRIBUTES
+		uAS REPLACE-WITH-DEFAULT GET;
+REGISTERED AS { g774-01Package 15 };
+
+
+uASCurrentDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to store the counter of one second intervals pertaining to 
+		an Unavailable Time.";
+-- 7.8  Unavailable Second History Data Package 
+
+
+uASHistoryDataPackage PACKAGE
+	BEHAVIOUR
+		uASHistoryDataPackageBehaviour;
+	ATTRIBUTES
+		uAS GET;
+REGISTERED AS { g774-01Package 16 };
+
+
+uASHistoryDataPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used to record the corresponding current data attribute values 
+		at the end of the granularity period.";
+-- 7.9  Unavailable Time Alarm Package 
+
+
+unavailableTimeAlarmPackage PACKAGE
+	BEHAVIOUR
+		unavailableTimeAlarmPackageBehaviour;
+	NOTIFICATIONS
+		"Recommendation X.721 ":communicationsAlarm;
+REGISTERED AS { g774-01Package 17 };
+
+
+unavailableTimeAlarmPackageBehaviour BEHAVIOUR
+	DEFINED AS
+		"This package is used when a Communication Alarm Notification with the probable 
+		cause. Unavailable is to be emitted to indicate the beginning of an unavailable 
+		time period. The end of an unavailable time period shall be indicated by the 
+		clearing of this alarm.";
+-- 8  Attributes definitions 
+-- 8.1  Consecutive Severely Errored Second Event 
+
+
+cSESEvent ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHPMASN1.CSES;
+	BEHAVIOUR
+		cSESEventBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of the cSESEvent attribute represents the recording of at least 6 cSES 
+				events. A cSES event is generated each time x consecutive SES appear during the 
+				available time of the monitored resource.";;
+REGISTERED AS { g774-01Attribute 1 };
+-- 8.2 Errored Second 
+
+
+eS ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		eSBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the eS attribute represents the count of seconds with one or more 
+				errored blocks during the available time of the monitored resource during the 
+				corresponding granularity period. The ES performance event is described in 
+				3.1.1/G.826.";;
+REGISTERED AS { g774-01Attribute 2 };
+-- 8.3  Far End Errored Second 
+
+
+fEES ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		ffEESBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the fEES attribute represents the count of seconds with one or more 
+				far end errored blocks detected at the remote terminal during the available time 
+				of the monitored resource during the corresponding granularity period.";;
+REGISTERED AS { g774-01Attribute 3 };
+-- 8.4  Far End Background Block Error 
+
+
+fEBBE ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		fEBBEBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the fEBBE attribute represents the count of errored blocks 
+				(Estimate Errored Block on Bip-n violation) not occuring as part of an fESES.";;
+REGISTERED AS { g774-01Attribute 4 };
+-- 8.5  Far End Consecutive Severely Errored Second Event 
+
+
+fECSESEvent ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHPMASN1.CSES;
+	BEHAVIOUR
+		fECSESEventBehaviour BEHAVIOUR
+			DEFINED AS
+				"The value of the fECSESEvent attribute represents the recording of at least 6 
+				fECSES events. A fECSES event is generated each time x consecutive fESES appear 
+				during the available time of the monitored resource during the corresponding 
+				granularity period.";;
+REGISTERED AS { g774-01Attribute 5 };
+-- 8.6  Number of Consecutive Severely Errored Second 
+
+
+nCSES ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX SDHPMASN1.NCSESRange;
+	BEHAVIOUR
+		nCSESBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the nCSES attribute represents the number of consecutive (near or 
+				far end) SES which will lead to the generation of a (near or far end) cSES 
+				event. The nCSES is in the range 2 to 9.";;
+REGISTERED AS { g774-01Attribute 12 };
+-- 8.7  Background Block Error 
+
+
+bBE ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		bBEBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the BBE attribute represents the count of errored blocks (Estimate 
+				Errored Block on Bip-n violation) not occuring as part of an SES. The BBE 
+				performance event is described in 3.1.1/G.826.";;
+REGISTERED AS { g774-01Attribute 13 };
+-- 8.8  Severely Errored Seconds 
+
+
+sES ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		sESBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the sES attribute represents the count of one second periods 
+				containing greater than or equal to 30% of errored blocks, or at least one 
+				Severely Disturbed Period (SDP) that is one second containing one or more 
+				defects during the available time of the monitored resource during the 
+				corresponding granularity period. An SES is also counted as an ES. The SES 
+				performance event is described in Recommendation G.826.";;
+REGISTERED AS { g774-01Attribute 17 };
+-- 8.9  Far End Severely Errored Seconds 
+
+
+fESES ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		fESESBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the fESES attribute represents the count of one second periods 
+				containing greater than or equal to 30% of far end errored blocks as detected at 
+				the remote terminal (fEBC), or at least one Far End Severely Disturbed Period 
+				(SDP) that is one second containing one or more far end defects as detected at 
+				the remote terminal (FERF) during the available time of the monitored resource 
+				during the corresponding granularity period. An fESES is also counted as an 
+				fEES.";;
+REGISTERED AS { g774-01Attribute 18 };
+-- 8.10  Unavailable Seconds 
+
+
+uAS ATTRIBUTE
+	DERIVED FROM
+		"Rec. X.721 | ISO/IEC 10165-2":counter;
+	BEHAVIOUR
+		uASBeh BEHAVIOUR
+			DEFINED AS
+				"The value of the uAS attribute represents the count of one second intervals 
+				pertaining to an UnavailableTime. A period of unavailable time begins when the 
+				SES continues for a period of ten consecutive seconds. These seconds are 
+				considered to be unavailable time. A new period of available time begins with 
+				the first second of ten consecutive non-SES. The unavailable time entry/exit 
+				criteria is described in Annex A/G.826.";;
+REGISTERED AS { g774-01Attribute 22 };
+-- 9 Actions 
+-- None. 
+-- 10 Notifications 
+-- None. 
+-- 11 Parameters 
+-- None. 
+-- 12  Name binding definitions 
+-- 12.1  History Data – SDH Current Data 
+
+
+historyData-sdhCurrentData NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation Q.822":historyData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS sdhCurrentData AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation Q.822":historyDataId;
+	BEHAVIOUR
+		historyData-sdhCurrentDataBehaviour BEHAVIOUR
+			DEFINED AS
+				"Instance of the historyData object class or one of its subclass is created at 
+				the end of the granularity period of an instance of the sdhCurrentData object or 
+				one of its subclass and is directly contained by that instance.";;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 1 };
+-- 12.2  Path Termination Current Data – VC4 TTP SinkR1 
+
+
+pathTerminationCurrentData-vc4TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc4TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 23 };
+-- 12.3  Path Termination Current Data – VC3 TTP SinkR1 
+
+
+pathTerminationCurrentData-vc3TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc3TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 24 };
+-- 12.4  Path Termination Current Data – VC2 TTP SinkR1 
+
+
+pathTerminationCurrentData-vc2TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc2TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 25 };
+-- 12.5  Path Termination Current Data – VC12 TTP SinkR1 
+
+
+pathTerminationCurrentData-vc12TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc12TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 26 };
+-- 12.6  Path Termination Current Data – VC11 TTP SinkR1 
+
+
+pathTerminationCurrentData-vc11TTPSinkR1 NAME BINDING
+	SUBORDINATE OBJECT CLASS pathTerminationCurrentData AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation G.774":vc11TTPSinkR1 AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"Recommendation X.739":scannerId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { g774-01NameBinding 27 };
+-- 13  Subordination rules 
+-- None. 
+-- 14 Pointer constraints 
+-- None. 
+
+END
+--< GDMO.EndDocument "ITU-T G.774.1 (02/2001)" >--
