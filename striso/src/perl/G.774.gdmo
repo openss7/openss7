@@ -1,3 +1,11 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 11:52:16 MDT 2007
+--@@ 
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Include "G.774.5.gdmo" >--
 --< GDMO.Document "ITU-T Rec. G.774 : 2001" >--
@@ -4205,8 +4213,7 @@ downstreamConnectivityPointer-au3CTPSinkR1 CONSTRAINT RULE
 			SET SIZE(1..N) OF
 			CHOICE {
 				vc4TTPSinkR1,
-				vc4TTPBidirectionalR1 } } };
-;
+				vc4TTPBidirectionalR1 } } };;
 
 
 upstreamConnectivityPointerR1-au3CTPSource CONSTRAINT RULE
@@ -4234,8 +4241,7 @@ upstreamConnectivityPointerR1-au3CTPSource CONSTRAINT RULE
 			tu3CTPSinkR1,
 			tu3CTPBidirectionalR1,
 			vc4TTPSourceR1,
-			vc4TTPBidirectionalR1 } };
-;
+			vc4TTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-au4CTPSinkR1 CONSTRAINT RULE
@@ -4262,8 +4268,7 @@ downstreamConnectivityPointer-au4CTPSinkR1 CONSTRAINT RULE
 			vc4TTPSinkR1,
 			vc4TTPBidirectionalR1,
 			au4CTPSource,
-			au4CTPBidirectionalR1 } };
-;
+			au4CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointerR1-au4CTPSource CONSTRAINT RULE
@@ -4283,8 +4288,7 @@ upstreamConnectivityPointerR1-au4CTPSource CONSTRAINT RULE
 			vc4TTPSourceR1,
 			vc4TTPBidirectionalR1,
 			au4CTPSinkR1,
-			au4CTPBidirectionalR1 } };
-;
+			au4CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-msCTPSink CONSTRAINT RULE
@@ -4304,8 +4308,7 @@ downstreamConnectivityPointer-msCTPSink CONSTRAINT RULE
 			msTTPSink,
 			msTTPBidirectional,
 			msCTPSource,
-			msCTPBidirectional } };
-;
+			msCTPBidirectional } };;
 
 
 upstreamConnectivityPointer-msCTPSource CONSTRAINT RULE
@@ -4325,8 +4328,7 @@ upstreamConnectivityPointer-msCTPSource CONSTRAINT RULE
 			msTTPSource,
 			msTTPBidirectional,
 			msCTPSink,
-			msCTPBidirectional } };
-;
+			msCTPBidirectional } };;
 
 
 upstreamConnectivityPointer-msTTPSink CONSTRAINT RULE
@@ -4342,8 +4344,7 @@ upstreamConnectivityPointer-msTTPSink CONSTRAINT RULE
 		SET SIZE(1) OF
 		CHOICE {
 			msCTPSink,
-			msCTPBidirectional } };
-;
+			msCTPBidirectional } };;
 
 
 downstreamConnectivityPointer-msTTPSource CONSTRAINT RULE
@@ -4359,8 +4360,7 @@ downstreamConnectivityPointer-msTTPSource CONSTRAINT RULE
 		SET SIZE(1) OF
 		CHOICE {
 			msCTPSource,
-			msCTPBidirectional } };
-;
+			msCTPBidirectional } };;
 
 
 downstreamConnectivityPointer-rsCTPSink CONSTRAINT RULE
@@ -4384,8 +4384,7 @@ downstreamConnectivityPointer-rsCTPSink CONSTRAINT RULE
 			rsTTPTrailTraceSink,
 			rsTTPTrailTraceBidirectional,
 			rsCTPSource,
-			rsCTPBidirectional } };
-;
+			rsCTPBidirectional } };;
 
 
 upstreamConnectivityPointer-rsCTPSource CONSTRAINT RULE
@@ -4409,8 +4408,7 @@ upstreamConnectivityPointer-rsCTPSource CONSTRAINT RULE
 			rsTTPTrailTraceSource,
 			rsTTPTrailTraceBidirectional,
 			rsCTPSink,
-			rsCTPBidirectional } };
-;
+			rsCTPBidirectional } };;
 
 
 upstreamConnectivityPointer-rsTTPSink CONSTRAINT RULE
@@ -4426,8 +4424,7 @@ upstreamConnectivityPointer-rsTTPSink CONSTRAINT RULE
 		SET SIZE(1) OF
 		CHOICE {
 			rsCTPSink,
-			rsCTPBidirectional } };
-;
+			rsCTPBidirectional } };;
 
 
 downstreamConnectivityPointer-rsTTPSource CONSTRAINT RULE
@@ -4443,8 +4440,7 @@ downstreamConnectivityPointer-rsTTPSource CONSTRAINT RULE
 		SET SIZE(1) OF
 		CHOICE {
 			rsCTPSource,
-			rsCTPBidirectional } };
-;
+			rsCTPBidirectional } };;
 
 
 downstreamConnectivityPointer-tu11CTPSinkR1 CONSTRAINT RULE
@@ -4471,8 +4467,7 @@ downstreamConnectivityPointer-tu11CTPSinkR1 CONSTRAINT RULE
 			vc11TTPSinkR1,
 			vc11TTPBidirectionalR1,
 			tu11CTPSource,
-			tu11CTPBidirectionalR1 } };
-;
+			tu11CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointerR1-tu11CTPSource CONSTRAINT RULE
@@ -4492,8 +4487,7 @@ upstreamConnectivityPointerR1-tu11CTPSource CONSTRAINT RULE
 			vc11TTPSource,
 			vc11TTPBidirectionalR1,
 			tu11CTPSinkR1,
-			tu11CTPBidirectionalR1 } };
-;
+			tu11CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-tu12CTPSinkR1 CONSTRAINT RULE
@@ -4520,8 +4514,7 @@ downstreamConnectivityPointer-tu12CTPSinkR1 CONSTRAINT RULE
 			vc12TTPSinkR1,
 			vc12TTPBidirectionalR1,
 			tu12CTPSource,
-			tu12CTPBidirectionalR1 } };
-;
+			tu12CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointerR1-tu12CTPSource CONSTRAINT RULE
@@ -4541,8 +4534,7 @@ upstreamConnectivityPointerR1-tu12CTPSource CONSTRAINT RULE
 			vc12TTPSource,
 			vc12TTPBidirectionalR1,
 			tu12CTPSinkR1,
-			tu12CTPBidirectionalR1 } };
-;
+			tu12CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-tu2CTPSinkR1 CONSTRAINT RULE
@@ -4569,8 +4561,7 @@ downstreamConnectivityPointer-tu2CTPSinkR1 CONSTRAINT RULE
 			vc2TTPSinkR1,
 			vc2TTPBidirectionalR1,
 			tu2CTPSource,
-			tu2CTPBidirectionalR1 } };
-;
+			tu2CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointerR1-tu2CTPSource CONSTRAINT RULE
@@ -4590,8 +4581,7 @@ upstreamConnectivityPointerR1-tu2CTPSource CONSTRAINT RULE
 			vc2TTPSource,
 			vc2TTPBidirectionalR1,
 			tu2CTPSinkR1,
-			tu2CTPBidirectionalR1 } };
-;
+			tu2CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-tu3CTPSinkR1 CONSTRAINT RULE
@@ -4624,8 +4614,7 @@ downstreamConnectivityPointer-tu3CTPSinkR1 CONSTRAINT RULE
 			au3CTPSource,
 			au3CTPBidirectionalR1,
 			tu3CTPSource,
-			tu3CTPBidirectionalR1 } };
-;
+			tu3CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointerR1-tu3CTPSource CONSTRAINT RULE
@@ -4649,8 +4638,7 @@ upstreamConnectivityPointerR1-tu3CTPSource CONSTRAINT RULE
 			au3CTPSinkR1,
 			au3CTPBidirectionalR1,
 			tu3CTPSinkR1,
-			tu3CTPBidirectionalR1 } };
-;
+			tu3CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointer-vc11TTPSinkR1 CONSTRAINT RULE
@@ -4670,8 +4658,7 @@ upstreamConnectivityPointer-vc11TTPSinkR1 CONSTRAINT RULE
 			vc11TTPSource,
 			vc11TTPBidirectionalR1,
 			tu11CTPSinkR1,
-			tu11CTPBidirectionalR1 } };
-;
+			tu11CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointerR1-vc11TTPSource CONSTRAINT RULE
@@ -4698,8 +4685,7 @@ downstreamConnectivityPointerR1-vc11TTPSource CONSTRAINT RULE
 			vc11TTPSinkR1,
 			vc11TTPBidirectionalR1,
 			tu11CTPSource,
-			tu11CTPBidirectionalR1 } };
-;
+			tu11CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointer-vc12TTPSinkR1 CONSTRAINT RULE
@@ -4719,8 +4705,7 @@ upstreamConnectivityPointer-vc12TTPSinkR1 CONSTRAINT RULE
 			vc12TTPSource,
 			vc12TTPBidirectionalR1,
 			tu12CTPSinkR1,
-			tu12CTPBidirectionalR1 } };
-;
+			tu12CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointerR1-vc12TTPSource CONSTRAINT RULE
@@ -4747,8 +4732,7 @@ downstreamConnectivityPointerR1-vc12TTPSource CONSTRAINT RULE
 			vc12TTPSinkR1,
 			vc12TTPBidirectionalR1,
 			tu12CTPSource,
-			tu12CTPBidirectionalR1 } };
-;
+			tu12CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointer-vc2TTPSinkR1 CONSTRAINT RULE
@@ -4768,8 +4752,7 @@ upstreamConnectivityPointer-vc2TTPSinkR1 CONSTRAINT RULE
 			vc2TTPSource,
 			vc2TTPBidirectionalR1,
 			tu2CTPSinkR1,
-			tu2CTPBidirectionalR1 } };
-;
+			tu2CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointerR1-vc2TTPSource CONSTRAINT RULE
@@ -4796,8 +4779,7 @@ downstreamConnectivityPointerR1-vc2TTPSource CONSTRAINT RULE
 			vc2TTPSinkR1,
 			vc2TTPBidirectionalR1,
 			tu2CTPSource,
-			tu2CTPBidirectionalR1 } };
-;
+			tu2CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointer-vc3TTPSinkR1 CONSTRAINT RULE
@@ -4821,8 +4803,7 @@ upstreamConnectivityPointer-vc3TTPSinkR1 CONSTRAINT RULE
 			au3CTPSinkR1,
 			au3CTPBidirectionalR1,
 			tu3CTPSinkR1,
-			tu3CTPBidirectionalR1 } };
-;
+			tu3CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-vc3TTPSourceR1 CONSTRAINT RULE
@@ -4855,8 +4836,7 @@ downstreamConnectivityPointer-vc3TTPSourceR1 CONSTRAINT RULE
 			au3CTPSource,
 			au3CTPBidirectionalR1,
 			tu3CTPSource,
-			tu3CTPBidirectionalR1 } };
-;
+			tu3CTPBidirectionalR1 } };;
 
 
 upstreamConnectivityPointer-vc4TTPSinkR1 CONSTRAINT RULE
@@ -4885,8 +4865,7 @@ upstreamConnectivityPointer-vc4TTPSinkR1 CONSTRAINT RULE
 			SEQUENCE SIZE(3) OF
 			au3CTPSinkR1,
 			SEQUENCE SIZE(3) OF
-			au3CTPBidirectionalR1 } };
-;
+			au3CTPBidirectionalR1 } };;
 
 
 downstreamConnectivityPointer-vc4TTPSourceR1 CONSTRAINT RULE
@@ -4929,8 +4908,7 @@ downstreamConnectivityPointer-vc4TTPSourceR1 CONSTRAINT RULE
 			SEQUENCE SIZE(3) OF
 			au3CTPSource,
 			SEQUENCE SIZE(3) OF
-			au3CTPBidirectionalR1 } };
-;
+			au3CTPBidirectionalR1 } };;
 --11.3  Naming constraints 
 --This clause defines the allowable combinations  of subordinate object class  instances that may  be 
 --named  by a superior object class  instance, using the object classes contained  in this 
@@ -4994,8 +4972,7 @@ augSinkSubordinationR1 SUBORDINATION RULE
 			SET SIZE(1) OF
 			au4CTPSinkR1,
 			SET SIZE(3) OF
-			au3CTPSinkR1 };
-;
+			au3CTPSinkR1 };;
 
 
 augSourceSubordination SUBORDINATION RULE
@@ -5009,8 +4986,7 @@ augSourceSubordination SUBORDINATION RULE
 			SET SIZE(1) OF
 			au4CTPSource,
 			SET SIZE(3) OF
-			au3CTPSource };
-;
+			au3CTPSource };;
 
 
 augBidirectionalSubordinationR1 SUBORDINATION RULE
@@ -5034,8 +5010,7 @@ augBidirectionalSubordinationR1 SUBORDINATION RULE
 			CHOICE {
 				au3CTPSinkR1,
 				au3CTPSource,
-				au3CTPBidirectionalR1 } };
-;
+				au3CTPBidirectionalR1 } };;
 
 
 electricalSPITTPSinkSubordination SUBORDINATION RULE
@@ -5045,8 +5020,7 @@ electricalSPITTPSinkSubordination SUBORDINATION RULE
 		rsCTPSink;
 	ACCORDING TO RULE
 		SET SIZE(1) OF
-		rsCTPSink;
-;
+		rsCTPSink;;
 
 
 electricalSPITTPSourceSubordination SUBORDINATION RULE
@@ -5056,8 +5030,7 @@ electricalSPITTPSourceSubordination SUBORDINATION RULE
 		rsCTPSource;
 	ACCORDING TO RULE
 		SET SIZE(1) OF
-		rsCTPSource;
-;
+		rsCTPSource;;
 
 
 electricalSPITTPBidirectionalSubordination SUBORDINATION RULE
@@ -5072,8 +5045,7 @@ electricalSPITTPBidirectionalSubordination SUBORDINATION RULE
 		CHOICE {
 			rsCTPSink,
 			rsCTPSource,
-			rsCTPBidirectional };
-;
+			rsCTPBidirectional };;
 
 
 opticalSPITTPSinkSubordination SUBORDINATION RULE
@@ -5083,8 +5055,7 @@ opticalSPITTPSinkSubordination SUBORDINATION RULE
 		rsCTPSink;
 	ACCORDING TO RULE
 		SET SIZE(1) OF
-		rsCTPSink;
-;
+		rsCTPSink;;
 
 
 opticalSPITTPSourceSubordination SUBORDINATION RULE
@@ -5094,8 +5065,7 @@ opticalSPITTPSourceSubordination SUBORDINATION RULE
 		rsCTPSource;
 	ACCORDING TO RULE
 		SET SIZE(1) OF
-		rsCTPSource;
-;
+		rsCTPSource;;
 
 
 opticalSPITTPBidirectionalSubordination SUBORDINATION RULE
@@ -5110,8 +5080,7 @@ opticalSPITTPBidirectionalSubordination SUBORDINATION RULE
 		CHOICE {
 			rsCTPSink,
 			rsCTPSource,
-			rsCTPBidirectional };
-;
+			rsCTPBidirectional };;
 
 
 msTTPSinkSubordination SUBORDINATION RULE
@@ -5128,8 +5097,7 @@ msTTPSinkSubordination SUBORDINATION RULE
 			SET SIZE(0.. 1) OF
 			msDatacomCTPSink,
 			SET SIZE(0.. 1) OF
-			msOrderwireCTPSink };
-;
+			msOrderwireCTPSink };;
 
 
 msTTPSourceSubordination SUBORDINATION RULE
@@ -5146,8 +5114,7 @@ msTTPSourceSubordination SUBORDINATION RULE
 			SET SIZE(0.. 1) OF
 			msDatacomCTPSource,
 			SET SIZE(0.. 1) OF
-			msOrderwireCTPSource };
-;
+			msOrderwireCTPSource };;
 
 
 msTTPBidirectionalSubordination SUBORDINATION RULE
@@ -5174,8 +5141,7 @@ msTTPBidirectionalSubordination SUBORDINATION RULE
 			CHOICE {
 				msOrderwireCTPSink,
 				msOrderwireCTPSource,
-				msOrderwireCTPBidirectional } };
-;
+				msOrderwireCTPBidirectional } };;
 
 
 rsTTPSinkSubordination SUBORDINATION RULE
@@ -5195,8 +5161,7 @@ rsTTPSinkSubordination SUBORDINATION RULE
 			SET SIZE(0.. 1) OF
 			rsOrderwireCTPSink,
 			SET SIZE(0.. 1) OF
-			rsUserChannelCTPSink };
-;
+			rsUserChannelCTPSink };;
 
 
 rsTTPSourceSubordination SUBORDINATION RULE
@@ -5216,8 +5181,7 @@ rsTTPSourceSubordination SUBORDINATION RULE
 			SET SIZE(0.. 1) OF
 			rsOrderwireCTPSource,
 			SET SIZE(0.. 1) OF
-			rsUserChannelCTPSource };
-;
+			rsUserChannelCTPSource };;
 
 
 rsTTPBidirectionalSubordination SUBORDINATION RULE
@@ -5257,8 +5221,7 @@ rsTTPBidirectionalSubordination SUBORDINATION RULE
 			CHOICE {
 				rsUserChannelCTPSink,
 				rsUserChannelCTPSource,
-				rsUserChannelCTPBidirectional } };
-;
+				rsUserChannelCTPBidirectional } };;
 
 
 sdhNESubordinationR1 SUBORDINATION RULE
@@ -5356,8 +5319,7 @@ sdhNESubordinationR1 SUBORDINATION RULE
 			SET SIZE(0..N) OF
 			vc4TTPSourceR1,
 			SET SIZE(0..N) OF
-			vc4TTPBidirectionalR1 };
-;
+			vc4TTPBidirectionalR1 };;
 
 
 tug2SinkSubordinationR1 SUBORDINATION RULE
@@ -5374,8 +5336,7 @@ tug2SinkSubordinationR1 SUBORDINATION RULE
 			SET SIZE(3) OF
 			tu12CTPSinkR1,
 			SET SIZE(4) OF
-			tu11CTPSinkR1 };
-;
+			tu11CTPSinkR1 };;
 
 
 tug2SourceSubordination SUBORDINATION RULE
@@ -5392,8 +5353,7 @@ tug2SourceSubordination SUBORDINATION RULE
 			SET SIZE(3) OF
 			tu12CTPSource,
 			SET SIZE(4) OF
-			tu11CTPSource };
-;
+			tu11CTPSource };;
 
 
 tug2BidirectionalSubordinationR1 SUBORDINATION RULE
@@ -5425,8 +5385,7 @@ tug2BidirectionalSubordinationR1 SUBORDINATION RULE
 			CHOICE {
 				tu11CTPSinkR1,
 				tu11CTPSource,
-				tu11CTPBidirectionalR1 } };
-;
+				tu11CTPBidirectionalR1 } };;
 
 
 tug3SinkSubordinationR1 SUBORDINATION RULE
@@ -5440,8 +5399,7 @@ tug3SinkSubordinationR1 SUBORDINATION RULE
 			SET SIZE(1) OF
 			tu3CTPSinkR1,
 			SET SIZE(7) OF
-			tug2Sink };
-;
+			tug2Sink };;
 
 
 tug3SourceSubordination SUBORDINATION RULE
@@ -5455,8 +5413,7 @@ tug3SourceSubordination SUBORDINATION RULE
 			SET SIZE(1) OF
 			tu3CTPSource,
 			SET SIZE(7) OF
-			tug2Source };
-;
+			tug2Source };;
 
 
 tug3BidirectionalSubordinationR1 SUBORDINATION RULE
@@ -5480,8 +5437,7 @@ tug3BidirectionalSubordinationR1 SUBORDINATION RULE
 			CHOICE {
 				tug2Sink,
 				tug2Source,
-				tug2Bidirectional } };
-;
+				tug2Bidirectional } };;
 
 
 vc3TTPSinkR1Subordination SUBORDINATION RULE
@@ -5495,8 +5451,7 @@ vc3TTPSinkR1Subordination SUBORDINATION RULE
 			SET SIZE(7) OF
 			tug2Sink,
 			SET SIZE(1) OF
-			vcnUserChannelCTPSink };
-;
+			vcnUserChannelCTPSink };;
 
 
 vc3TTPSourceSubordinationR1 SUBORDINATION RULE
@@ -5510,8 +5465,7 @@ vc3TTPSourceSubordinationR1 SUBORDINATION RULE
 			SET SIZE(7) OF
 			tug2Source,
 			SET SIZE(1) OF
-			vcnUserChannelCTPSource };
-;
+			vcnUserChannelCTPSource };;
 
 
 vc3TTPBidirectionalR1Subordination SUBORDINATION RULE
@@ -5530,8 +5484,7 @@ vc3TTPBidirectionalR1Subordination SUBORDINATION RULE
 			CHOICE {
 				vcnUserChannelCTPSink,
 				vcnUserChannelCTPSource,
-				vcnUserChannelCTPBidirectional } };
-;
+				vcnUserChannelCTPBidirectional } };;
 
 
 vc4TTPSinkR1Subordination SUBORDINATION RULE
@@ -5545,8 +5498,7 @@ vc4TTPSinkR1Subordination SUBORDINATION RULE
 			SET SIZE(3) OF
 			tug3Sink,
 			SET SIZE(1) OF
-			vcnUserChannelCTPSink };
-;
+			vcnUserChannelCTPSink };;
 
 
 vc4TTPSourceR1Subordination SUBORDINATION RULE
@@ -5560,8 +5512,7 @@ vc4TTPSourceR1Subordination SUBORDINATION RULE
 			SET SIZE(3) OF
 			tug3Source,
 			SET SIZE(1) OF
-			vcnUserChannelCTPSource };
-;
+			vcnUserChannelCTPSource };;
 
 
 vc4TTPBidirectionalR1Subordination SUBORDINATION RULE
@@ -5580,8 +5531,7 @@ vc4TTPBidirectionalR1Subordination SUBORDINATION RULE
 			CHOICE {
 				vcnUserChannelCTPSink,
 				vcnUserChannelCTPSource,
-				vcnUserChannelCTPBidirectional } };
-;
+				vcnUserChannelCTPBidirectional } };;
 
 END
 --< GDMO.ChangeLog
@@ -5591,3 +5541,682 @@ END
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ITU-T Rec. G.774 : 2001" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":scanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":statisticalReportRecord
+--@@ |  |  +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":operationResultRecord
+--@@ |  |  +- "Recommendation G.774.3":apsReportRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":monitorMetric
+--@@ |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":movingAverageMeanMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndMinMaxMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndPercentileMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndVarianceMonitor
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":heterogeneousScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":homogeneousScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":ensembleStatisticScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanScanner
+--@@ |  |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanVarianceScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":minMaxScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":percentileScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  +- "ITU-T Rec. Q.822 (1994)":currentData
+--@@ |  |  +- "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ |  |  |  +- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringDataObject
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":multiScheduler
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ +- "CCITT X.521":organization
+--@@ +- "CCITT X.521":organizationalUnit
+--@@ +- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ +- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ +- "Recommendation G.774.3":protectionGroupR1
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionGroupR1
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  +- "Recommendation M.3100:1992":protectionGroupR2
+--@@ +- "Recommendation G.774.3":protectionUnit
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionUnit
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  +- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ +- "Recommendation M.3100:1992":abstractLink
+--@@ |  +- "Recommendation M.3100:1992":logicalLink
+--@@ |  +- "Recommendation M.3100:1992":topologicalLink
+--@@ +- "Recommendation M.3100:1992":abstractLinkEnd
+--@@ |  +- "Recommendation M.3100:1992":abstractLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":logicalLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":topologicalLinkEndR1
+--@@ +- "Recommendation M.3100:1992":accessGroup
+--@@ +- "Recommendation M.3100:1992":alarmReportingControlManager
+--@@ +- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ +- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ +- "Recommendation M.3100:1992":attributeRanges
+--@@ +- "Recommendation M.3100:1992":circuitEndPointSubgroup
+--@@ +- "Recommendation M.3100:1992":crossConnection
+--@@ |  +- "Recommendation M.3100:1992":crossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedCrossConnection
+--@@ +- "Recommendation M.3100:1992":equipment
+--@@ |  +- "Recommendation M.3100:1992":equipmentR1
+--@@ |  |  +- "Recommendation M.3100:1992":circuitPack
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":circuitPackR1
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentHolder
+--@@ +- "Recommendation M.3100:1992":externalPoint
+--@@ |  +- "Recommendation M.3100:1992":controlPoint
+--@@ |  +- "Recommendation M.3100:1992":scanPoint
+--@@ +- "Recommendation M.3100:1992":fabric
+--@@ |  +- "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ |  +- "Recommendation M.3100:1992":fabricR1
+--@@ |  |  +- "Recommendation M.3100:1992":fabricR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":fabricR3
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":fabricR4
+--@@ +- "Recommendation M.3100:1992":gtp
+--@@ |  +- "Recommendation M.3100:1992":gtpR1
+--@@ +- "Recommendation M.3100:1992":managedElement
+--@@ |  +- "Recommendation M.3100:1992":managedElementR1
+--@@ |  |  +- "Recommendation M.3100:1992":managedElementR2
+--@@ |  +- "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ +- "Recommendation M.3100:1992":managedElementComplex
+--@@ +- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  +- "Recommendation M.3100:1992":mpCrossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedMpCrossConnection
+--@@ +- "Recommendation M.3100:1992":network
+--@@ |  +- "Recommendation M.3100:1992":networkR1
+--@@ |  |  +- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  |  |  +- "Recommendation M.3100:1992":layerNetworkDomainR1
+--@@ +- "Recommendation M.3100:1992":physicalPort
+--@@ +- "Recommendation M.3100:1992":pipe
+--@@ |  +- "Recommendation M.3100:1992":connectionR1
+--@@ |  +- "Recommendation M.3100:1992":trailR1
+--@@ +- "Recommendation M.3100:1992":pipeR2
+--@@ |  +- "Recommendation M.3100:1992":linkConnection
+--@@ |  +- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  +- "Recommendation M.3100:1992":trailR2
+--@@ +- "Recommendation M.3100:1992":protectionUnitR1
+--@@ +- "Recommendation M.3100:1992":software
+--@@ |  +- "Recommendation M.3100:1992":softwareR1
+--@@ +- "Recommendation M.3100:1992":subNetwork
+--@@ +- "Recommendation M.3100:1992":terminationPoint
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":networkTerminationPoint
+--@@ |  |  +- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  |  |  +- "Recommendation M.3100:1992":genericTransportTTPR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPSinkR1
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSink
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ +- "Recommendation M.3100:1992":tpPool
+--@@ +- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ |  +- "ITU-T G.774.1 (02/2001)":pathTerminationHistoryData
+--@@ +- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSink
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSource
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ "ITU-T Rec. Q.822 (1994)":currentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "CCITT X.521":organization
+--@@ >- "Recommendation M.3100:1992":managedElement
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation G.774.3":protectionGroupR1
+--@@ |  |  >- "Recommendation G.774.3":protectionUnit
+--@@ |  >- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":attributeRanges
+--@@ |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  |  >- "Recommendation M.3100:1992":software
+--@@ |  |  |  >- "Recommendation M.3100:1992":software
+--@@ |  >- "Recommendation M.3100:1992":equipment +++
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":fabric
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":gtp
+--@@ |  |  >- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":tpPool
+--@@ |  >- "Recommendation M.3100:1992":fabric +++
+--@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
+--@@ |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  >- "Recommendation M.3100:1992":software +++
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++
+--@@ |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ |  |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ |  >- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ >- "Recommendation M.3100:1992":managedElementComplex
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":network
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":connectionR1
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":network
+--@@ |  >- "Recommendation M.3100:1992":trailR1
+--@@ "CCITT X.521":organizationalUnit
+--@@ >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ >- "Recommendation M.3100:1992":network +++
+--@@ "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ >- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  >- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  >- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":mpCrossConnection +++
+--@@ "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ >- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ >- "Recommendation G.774.3":protectedTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ >- "Recommendation G.774.3":protectedTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Sink +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Source +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ "Recommendation M.3100:1992":networkR1
+--@@ >- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  >- "Recommendation M.3100:1992":accessGroup
+--@@ |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":logicalLink
+--@@ |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  >- "Recommendation M.3100:1992":subNetwork
+--@@ |  |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":topologicalLink
+--@@ |  |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":trailR2
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
