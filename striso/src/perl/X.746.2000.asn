@@ -1,0 +1,176 @@
+-- A.6 ASN.1 definitions
+Schedulerev1-ASN1Module { joint-iso-itu-t ms(9) function(2) part15(15) modules (2)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+CMIP-ATTRIBUTE, AttributeSet,
+Attribute,AttributeId,ObjectClass,ObjectInstance,ActionResult,SetResult,SetListError,ActionError,ModifyOperator,ActionI
+nfo,GetResult,GetListError,GetArgument FROM CMIP-1
+{ joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3) }
+DMI-TYPE-IDENTIFIER, SimpleNameType,defaultStopTime FROM Attribute-ASN1Module
+{ joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1}
+TimePeriod FROM MetricModule
+{ joint-iso-itu-t ms(9) function(2) part11(11) asn1Module(2) 0};
+schedMo OBJECT IDENTIFIER ::=
+{joint-iso-itu-t ms(9) function(2) part15(15) managedObjectClass(3)}
+schedAtt OBJECT IDENTIFIER ::=
+{joint-iso-itu-t ms(9) function(2) part15(15) attribute(7)}
+schedNotif OBJECT IDENTIFIER ::=
+{joint-iso-itu-t ms(9) function(2) part15(15) notification(10)}
+schedPkg OBJECT IDENTIFIER ::=
+{joint-iso-itu-t ms(9) function(2) part15(15) package(4)}
+schedNb OBJECT IDENTIFIER ::=
+{joint-iso-itu-t ms(9) function(2) part15(15) nameBinding(6)}
+-- default value definitions
+defaultDateTranslationList DateTranslationList ::= {}
+defaultDaysOfMonth DaysOfMonth ::= {
+daysFromFirst '1111111111111111111111111111111'B,
+daysFromLast '1111111111111111111111111111111'B }
+defaultDefaultIndex DefaultIndex ::=0
+defaultIntervalsOfDayWps IntervalsOfDayWps ::= {{
+intervalStart {hour 0, minute 0, second 0},
+intervalEnd {hour 0, minute 0, second 0}}}
+defaultResynchronizeMode ResynchronizeMode ::= FALSE
+defaultSequenceOfDays SequenceOfDays ::= { intervalsOfDayWps:defaultIntervalsOfDayWps }
+defaultSequenceOfMonths SequenceOfMonths ::= {{{
+daysOfMonth defaultDaysOfMonth,
+timesOfDayWps intervalsOfDayWps:defaultIntervalsOfDayWps }}}
+defaultSequenceOfWeeks SequenceOfWeeks ::= {defaultWeekMaskWps}
+defaultTimePeriod TimePeriod ::= seconds: 0
+defaultWeekDayTranslationList WeekDayTranslationList ::= {
+{weekDay sunday, typeOfDay workday},
+{weekDay monday, typeOfDay workday},
+{weekDay tuesday, typeOfDay workday},
+{weekDay wednesday, typeOfDay workday},
+{weekDay thursday, typeOfDay workday},
+{weekDay friday, typeOfDay workday},
+{weekDay saturday, typeOfDay weekend}}
+defaultWeekMaskWps WeekMaskWps ::= {{
+daysOfWeek '1111111'B,
+timesOfDayWps intervalsOfDayWps:defaultIntervalsOfDayWps }}
+-- supporting productions
+Date ::= VisibleString (SIZE(8))
+-- i.e. YYYYMMDD
+-- according to example in ITU-T Rec. X.680 | ISO/IEC 8824-1
+DateTranslationList ::= SET OF SEQUENCE {
+date [1] Date,
+typeOfDay [2] TypeOfDay }
+DaysOfMonth ::= SEQUENCE {
+daysFromFirst [0] BIT STRING (SIZE(31)),
+daysFromLast [1] BIT STRING (SIZE(31))}
+DaysOfWeek ::= BIT STRING {
+sunday(0),monday(1),tuesday(2),wednesday(3),thursday(4),
+friday(5),saturday(6)} (SIZE(7))
+DefaultIndex ::= INTEGER
+ExternalSchedulerName ::= SET OF ObjectInstance
+IndexOrOperSpec ::= CHOICE {
+index [0] INTEGER,
+operation [1] OperationSpecifications}
+IntervalsOfDayWps ::= SET OF SEQUENCE {
+intervalStart Time24Wps,
+intervalEnd Time24Wps}
+MonthMask ::= SET OF SEQUENCE {
+daysOfMonth DaysOfMonth,
+timesOfDayWps TimesOfDayWps}
+-- Specifies the TimesOfDayWps for different days of the same month if
+-- they have different intervals.
+ModificationList ::= SET OF SEQUENCE{
+modifyOperator [2] IMPLICIT ModifyOperator DEFAULT replace,
+attributeId CMIP-ATTRIBUTE.&id({AttributeSet}),
+attributeValue CMIP-ATTRIBUTE.&Value ({AttributeSet} {@.attributeId}) OPTIONAL
+-- absent for setToDefault -- }
+OnDuty ::= BOOLEAN
+OperationSpecifications ::= SET OF SEQUENCE{
+scheduledObjects SET OF ObjectInstance,
+scheduledOperations CHOICE{
+set [0] IMPLICIT ModificationList,
+action [1] IMPLICIT ActionInfo,
+get [2] IMPLICIT GetArgument}}
+OperationResult ::= SET OF CHOICE{
+getResult [0] IMPLICIT GetResult,
+getListError [1] IMPLICIT GetListError,
+setResult [2] IMPLICIT SetResult,
+setListError [3] IMPLICIT SetListError,
+actionResult [4] IMPLICIT ActionResult,
+commonError [5] IMPLICIT CommonError}
+SCHED-ERROR ::= CLASS {
+&id ErrorId UNIQUE,
+&Value }
+CommonError ::= SEQUENCE{
+managedObjectClass ObjectClass,
+managedObjectInstance ObjectInstance,
+errorId SCHED-ERROR.&id ({CommonErrorSet}),
+errorValue SCHED-ERROR.&Value ({CommonErrorSet} {@.errorId}) OPTIONAL}
+CommonErrorSet SCHED-ERROR ::= {...}
+ErrorId ::= CHOICE {
+localValue INTEGER,
+globalValue OBJECT IDENTIFIER}
+Schedule ::= CHOICE {
+daily [0] SequenceOfDays,
+weekly [1] SequenceOfWeeks,
+monthly [2] SequenceOfMonths,
+typeOfDay [3] SequenceOfTypeOfDays}
+ScheduledManagedObjectsList ::= SET OF SEQUENCE {
+objectInstance ObjectInstance,
+activity AttributeId OPTIONAL}
+SchedulingData ::= SET OF SEQUENCE {
+indexOrOperSpec [0] IndexOrOperSpec,
+schedule [1] Schedule,
+priority [2] INTEGER OPTIONAL}
+ResynchronizeMode ::= BOOLEAN
+SequenceOfDays ::= SEQUENCE OF TimesOfDayWps
+SequenceOfWeeks ::= SEQUENCE OF WeekMaskWps
+SequenceOfMonths ::= SEQUENCE OF MonthMask
+SequenceOfTypeOfDays ::= SEQUENCE SIZE(1) OF TypeOfDaysMaskWps
+-- SIZE(1) because more has no meaning because there is no implied periodicity, contrary to
+-- SequenceOfDays, SequenceOfWeeks, SequenceOfMonths.
+Time24Wps ::= SEQUENCE {
+hour [1] INTEGER (0..23),
+minute [2] INTEGER (0..59) OPTIONAL,
+second [3] INTEGER (0..59) OPTIONAL,
+milliseconds [4] INTEGER (0..999) OPTIONAL,
+microseconds [5] INTEGER (0..999999) OPTIONAL,
+nanoseconds [6] INTEGER (0..999999999) OPTIONAL,
+picoseconds [7] INTEGER (0..999999999999) OPTIONAL}
+TimesOfDayWps ::= CHOICE {
+intervalsOfDayWps [0] IMPLICIT IntervalsOfDayWps,
+triggerTimes [1] IMPLICIT TriggerTimes}
+TriggerTimes ::= SET OF Time24Wps
+TypeOfDay ::= INTEGER {
+workday (0),
+weekend (1),
+specialDay1 (2),
+specialDay2 (3),
+specialDay3 (4),
+specialDay4 (5),
+specialDay5 (6),
+specialDay6 (7),
+specialDay7 (8),
+specialDay8 (9),
+specialDay9 (10),
+specialDay10 (11),
+specialDay11 (12),
+specialDay12 (13),
+specialDay13 (14),
+specialDay14 (15),
+specialDay15 (16),
+specialDay16 (17) }
+TypeOfDaysMaskWps ::= SET OF SEQUENCE {
+typeOfDay TypeOfDay,
+timesOfDay TimesOfDayWps}
+WeekDay ::= ENUMERATED {
+sunday (0),
+monday (1),
+tuesday (2),
+wednesday (3),
+thursday (4),
+friday (5),
+saturday (6)}
+WeekDayTranslationList ::= SET OF SEQUENCE {
+weekDay [1] WeekDay,
+typeOfDay [2] TypeOfDay}
+WeekMaskWps ::= SET OF SEQUENCE {
+daysOfWeek DaysOfWeek,
+timesOfDayWps TimesOfDayWps}
+END -- end of supporting productions

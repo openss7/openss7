@@ -1,0 +1,61 @@
+-- A.7 ASN.1 definitions
+RTMModule { joint-iso-itu-t ms(9) function(2) part22(22) asn1Module(2) 0}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+InvokeIDType
+FROM Remote-Operations-APDUs{joint-iso-itu-t remote-operations(4) notation(0)}
+AttributeID, ObjectInstance
+FROM CMIP-1{joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)}
+AdditionalText, AdditionalInformation, CorrelatedNotifications, GroupObjects, Member, NotificationIdentifier
+FROM Attribute-ASN1Module{joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1}
+Integer, TimePeriod
+FROM MetricModule{joint-iso-itu-t ms(9) function(2) part11(11) asn1Module(2) 0} ;
+rTM-ManagedObjectClass OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3)}
+rTM-Package OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2) part22(22) package(4)}
+rTM-Attribute OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2) part22(22) attribute(7)}
+rTM-Notification OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2) part22(22) notification(10)}
+-- default value definitions
+defaultResponseSync ResponseSync ::= singleCast
+noEstimateOnResponseTimeError ResponseTime ::= seconds : -1
+notYetResponded ResponseTime ::= seconds : -1
+-- supporting productions
+RangeOneToOne ::= INTEGER(1..1)
+RangeZeroToMax ::= INTEGER(0..MAX)
+RequestIdentifier ::= CHOICE{ number [0]INTEGER,
+invokeID [1]InvokeIDType,
+identifier ANY -- defined by the type of request}
+ResponseConfirmationInfo ::= SEQUENCE{
+responseMonitor Subject,
+responseRequester ObjectInstance,
+responseConfirmationObject ObjectInstance,
+routeList GroupObjects,
+requestIdentifier ResponseRequestId,
+notificationIdentifier [1]NotificationIdentifier OPTIONAL,
+correlatedNotifications [2]CorrelatedNotifications OPTIONAL,
+responseTime [3]ResponseTime,
+maximumResponseTimeError [4]ResponseTime OPTIONAL,
+responseRequestLength [5]Integer
+OPTIONAL,
+responseLength [6]Integer OPTIONAL,
+responseSync ResponseSync,
+responseDelayTime [7]TimePeriod OPTIONAL,
+responseTimeout [8]TimePeriod OPTIONAL,
+additionalText [9]AdditionalText OPTIONAL,
+additionalInformation [10]AdditionalInformation OPTIONAL}
+ResponseSync ::= ENUMERATED {singleCast (-1),
+bestEffort (0),
+atomic (1)}
+ResponseTime ::= CHOICE {
+seconds
+[3]INTEGER,
+milliSeconds [4]INTEGER,
+microSeconds [5]INTEGER,
+nanoSeconds [6]INTEGER,
+picoSeconds [7]INTEGER,
+secondsPerBit [8]REAL }
+ResponseTimeSummarizationMode ::= ENUMERATED {
+rawResponseTime(0),
+responseTimePerBit (1) }
+END -- of RTMModule

@@ -1,0 +1,64 @@
+--< GDMO.Document "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993" >--
+--< GDMO.Alias "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993" "X.740",
+--  "ITU-T Rec. X.740 (1992)/Cor.1 (1995) | ISO/IEC 10164-8 : 1993/Cor.1 : 1995" >--
+MODULE "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993"
+-- Annex A
+-- Definition of management information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.2 Definition of managed object classes
+-- The securityAuditTrailRecord object class is used to define the information stored in a log as the result of security audit
+-- trail notifications or event reports.
+securityAuditTrailRecord MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2 : 1992":eventLogRecord;
+CONDITIONAL PACKAGES
+serviceReportCausePackage PACKAGE
+BEHAVIOUR
+serviceReportCausePackageBehaviour BEHAVIOUR
+DEFINED AS "This package provides further qualification as to the probable cause of a service
+report.";
+;
+ATTRIBUTES serviceReportCause GET;
+REGISTERED AS {securityAuditTrail-Package 1};
+PRESENT IF "This package shall be present if the notification concerns a service report.";
+REGISTERED AS {securityAuditTrail-Object 1};
+-- A.3 Definition of attributes
+serviceReportCause ATTRIBUTE
+WITH ATTRIBUTE SYNTAX SecurityAuditTrail-ASN1Module.ServiceReportCause;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+serviceReportCauseBehaviour BEHAVIOUR
+DEFINED AS "This attribute is used to provide the reason for the service report. The value of this attribute is
+an OBJECT IDENTIFIER that has been registered by a registration authority. Some of the possible values of
+this attribute are specified by, and registered in this Recommendation | International Standard.";
+;
+REGISTERED AS {securityAuditTrail-Attribute 1};
+-- A.4 Definition of notification types
+-- A.4.1 Service Report
+serviceReport NOTIFICATION
+BEHAVIOUR serviceReportBehaviour;
+WITH INFORMATION SYNTAX SecurityAuditTrail-ASN1Module.SecurityAuditInfo
+AND ATTRIBUTE IDS
+serviceReportCause serviceReportCause,
+notificationIdentifier notificationIdentifier,
+correlatedNotifications correlatedNotifications,
+additionalText additionalText,
+additionalInformation additionalInformation;
+REGISTERED AS {securityAuditTrail-Notification 1};
+serviceReportBehaviour BEHAVIOUR
+DEFINED AS "This notification type is used to report information about a service request, denial, response,
+recovery or other information which is relevant to the security administrator.";
+-- A.4.2 Usage Report
+usageReport NOTIFICATION
+BEHAVIOUR usageReportBehaviour;
+WITH INFORMATION SYNTAX SecurityAuditTrail-ASN1Module.SecurityAuditInfo
+AND ATTRIBUTE IDS
+notificationIdentifier notificationIdentifier,
+correlatedNotifications correlatedNotifications,
+additionalText additionalText,
+additionalInformation additionalInformation;
+REGISTERED AS {securityAuditTrail-Notification 2};
+usageReportBehaviour BEHAVIOUR
+DEFINED AS "This notification type is used to report information of a statistical nature which is relevant to the
+security administrator.";
+END
+--< GDMO.EndDocument "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993" >--

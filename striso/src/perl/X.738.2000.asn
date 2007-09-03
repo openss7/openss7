@@ -1,0 +1,168 @@
+-- A.9 ASN.1 definitions
+SummarizationASN1Productions { joint-iso-ccitt ms(9) function(2) part13(13) asn1Module(2) 0 }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+--EXPORTS everything
+IMPORTS
+AdditionalText, AdditionalInformation, ObservedValue, Packages, SimpleNameType
+FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+CMIP-ATTRIBUTE, AttributeSet, AttributeId, ObjectInstance, Attribute, Scope, CMISFilter
+FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+TimePeriod FROM MetricModule
+{ joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0 };
+summarizationManagedObjectClass OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt ms(9) function(2) part13(13) managedObjectClass(3) }
+summarizationPackage OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part13(13) package(4) }
+summarizationAttribute OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part13(13) attribute(7) }
+summarizationNotification OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part13(13) notification(10) }
+summarizationAction OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part13(13) action(9) }
+summarizationNameBinding OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt ms(9) function(2) part13(13) nameBinding(6) }
+summarizationParameter OBJECT IDENTIFIER ::=
+{ joint-iso-ccitt ms(9) function(2) part13(13) parameter (5) }
+AlgorithmOutputBuffer ::= SET OF SEQUENCE {
+attributeId AttributeId,
+algorithmOutput SEQUENCE OF ObservedValue
+}
+AlgorithmParameters ::= SEQUENCE OF ObservedValue
+AttributeMeasure ::= SEQUENCE {
+attributeId AttributeId,
+attributeValue [2] ANY DEFINED BY attributeId OPTIONAL,
+-- not present implies missing data
+timeStamp [3] TimePeriod OPTIONAL,
+-- time offset forward from scan initiation time in report.
+-- Required if timeStampReportMode attribute is present with value = 2
+suspectFlag BOOLEAN DEFAULT FALSE
+}
+BufferedObservationId ::= SEQUENCE {
+observedObject ObjectInstance,
+scanAttributeIdList [0] SET OF AttributeId OPTIONAL,
+numericAttributeIdArray [1] NumericAttributeIdArray OPTIONAL,
+reportTimeAttributeIdList [2] ReportTimeAttributeIdList OPTIONAL
+}
+BufferedObservationIdList ::= SET OF BufferedObservationId
+BufferedObservationList ::= SET OF BufferedObservationScan
+BufferedObservationScan ::= SEQUENCE {
+objectInstance ObjectInstance OPTIONAL,
+reportTimeAttributeList [0] SET OF AttributeMeasure OPTIONAL,
+attributesBuffer [1] SET OF SEQUENCE OF -- ordered by time
+AttributeMeasure OPTIONAL,
+numericAttributesBuff [5] SEQUENCE OF -- ordered by numericAttributeIdArray
+SEQUENCE OF -- ordered by time
+NumericMeasure OPTIONAL
+}
+BufferedScanReportInformation ::= SEQUENCE {
+granularityPeriod TimePeriod,
+firstScanInitiationTime [1] GeneralizedTime OPTIONAL,
+-- time of first scan initiation. Required if timeStampReportMode attribute
+-- is present with non-zero value.
+suspectIntervals [4] SuspectIntervals DEFAULT 0,
+-- count of number of scheduled scans which have data missing or suspect for any attribute
+bufferedObservationList [6] BufferedObservationList,
+incompleteScan [7] IncompleteScan OPTIONAL,
+-- presence indicates that the scan was incomplete.
+additionalText [8] AdditionalText OPTIONAL,
+additionalInformation [9] AdditionalInformation OPTIONAL
+}
+DynamicSimpleScanArgument ::= SEQUENCE {
+scanAttributeIdList [0] ScanAttributeIdList OPTIONAL,
+numericAttributeIdArray [1] NumericAttributeIdArray OPTIONAL,
+-- at least one should be present
+scopeOrListChoice CHOICE {
+scopedSelection [2] SEQUENCE {
+baseManagedObject ObjectInstance,
+scope Scope,
+scanningFilter CMISFilter },
+objectList [3] ObjectList
+},
+suppressObjectInstance SuppressObjectInstance OPTIONAL,
+onceReportAttributeIdList OnceReportAttributeIdList OPTIONAL,
+timeStampReportMode TimeStampReportMode OPTIONAL
+}
+FirstScanInitiationTime ::= GlobalTime
+GlobalTime ::= GeneralizedTime
+IncompleteScan ::= INTEGER { sizeExceeded(0), timeExceeded(1), other(2) }
+NonStatisticalReportInformation ::= SET OF NonStatisticalScan
+NonStatisticalScan ::= SEQUENCE { objectInstance ObjectInstance OPTIONAL,
+-- not present if suppress object instance suppression is on
+attributeValues SET OF AttributeMeasure OPTIONAL
+-- not present if scan attribute identifier list is empty
+}
+NumericAttributeIdArray ::= SEQUENCE OF AttributeId
+NumericAttributeIdList ::= SET OF AttributeId
+NumericMeasure ::= CHOICE {
+missingData NULL,
+valueOnly ObservedValue,
+qualifiedValue SEQUENCE {
+value ObservedValue,
+timeStamp TimePeriod OPTIONAL,
+-- time offset forward from scan initiation time in report.
+-- This CHOICE type required if timeStampReportMode attribute is present with value = 2
+suspectFlag BOOLEAN DEFAULT FALSE
+-- at least one of timeStamp or suspectFlag shall be present
+}
+}
+ObjectList ::= SET OF ObjectInstance
+ObservationIdList ::= SET OF ObservationId
+ObservationId ::= SEQUENCE {
+observedObject ObjectInstance,
+scanAttributeIdList ScanAttributeIdList OPTIONAL,
+numericAttributeIdArray NumericAttributeIdArray OPTIONAL
+}
+ObservationScan ::= SEQUENCE {
+observedObjectInstance ObjectInstance OPTIONAL,
+attributeMeasureList [0] SET OF AttributeMeasure OPTIONAL,
+numericValueArray [1] SEQUENCE OF NumericMeasure OPTIONAL
+}
+ObservationScanList ::= SET OF ObservationScan
+OnceReportAttributeIdList ::= SET OF AttributeId
+OnceReportAttributeList ::= SET OF Attribute
+PackageConflict ::= SET OF CHOICE {
+conflictingPackagesPresent [0] Packages,
+packagesMissing [1] Packages }
+ReportPeriod ::= INTEGER (1..MAX)
+-- number of granularity periods in a report period
+ReportTimeAttributeIdList ::= SET OF AttributeId
+ScanAttributeIdList ::= SET OF AttributeId
+ScanInitiationTime ::= GlobalTime
+ScannerActionError ::= ENUMERATED
+{ unspecified(0), administrativeStateLocked(1), administrativeStateShuttingDown(2), scanTerminated(3) }
+scanningFilterDefault CMISFilter ::= and : { }
+ScanReportInformation ::= SEQUENCE {
+scanInitiationTime GeneralizedTime OPTIONAL,
+-- time of scan initiation. Required if the time stamp report mode
+-- attribute is present with a non-zero value.
+onceReportAttributeList [1] OnceReportAttributeList OPTIONAL,
+observationScanList ObservationScanList,
+incompleteScan [7] IncompleteScan OPTIONAL,
+-- presence indicates that the scan was incomplete.
+additionalText [8] AdditionalText OPTIONAL,
+additionalInformation [9] AdditionalInformation OPTIONAL
+}
+StatisticalScanReportInformation ::= SEQUENCE{
+scanInitiationTime GeneralizedTime OPTIONAL,
+-- time of scan initiation. Required if the time stamp report mode
+-- attribute is present with a non-zero value.
+observationReportList [6] NonStatisticalReportInformation OPTIONAL,
+-- which objects passed filter, with optional attribute values
+-- not present if object suppression is on and there are no scan attributes
+algorithmOutputs [7] AlgorithmOutputBuffer,
+-- contents of positions for each attribute depend on algorithm type
+algorithmParameters [8] AlgorithmParameters OPTIONAL,
+-- present only if algorithm has configurable parameters
+-- contents of positions for each attribute depend on algorithm type
+incompleteScan [9] IncompleteScan OPTIONAL,
+-- presence indicates that the scan was incomplete.
+additionalText [10] AdditionalText OPTIONAL,
+additionalInformation [11] AdditionalInformation OPTIONAL
+}
+SuppressObjectInstance ::= BOOLEAN
+SuspectIntervals ::= INTEGER
+TimeAttributeIdentifier ::= AttributeId
+TimeStampReportMode ::= ENUMERATED {
+timeStampingOff (0),
+globalTimeStampOnly (1),
+individualTimeStamping (2)
+}
+timeStampingDefault TimeStampReportMode ::= timeStampingOff
+END

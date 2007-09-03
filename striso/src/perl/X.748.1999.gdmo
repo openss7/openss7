@@ -1,0 +1,564 @@
+MODULE "ITU-T Rec. X.478 (1999) | ISO/IEC 10164-22 : 1999"
+-- Annex A
+-- Management Information Definitions for Response Time Monitoring
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.1 Relationship class definition
+responseMonitoring RELATIONSHIP CLASS
+BEHAVIOUR responseMonitoringBehaviour BEHAVIOUR DEFINED AS "
+The response monitoring relationship class defines the relationship between one response requester role, one response 
+confirmation role and one response monitor role and optionally route role. In this relationship, the response monitor 
+role object monitors the response request sent from the response requester role object and the response received by the 
+response confirmation role object. The response monitor role object may summarize the response times between the 
+response requester role object and the response confirmation role object.
+An instance of this relationship class instance may bind one or more route role objects. In the case that one response 
+monitoring relationship class instance binds one or more route role objects, the monitor role object binding with this 
+relationship class instance monitors only the responses that passed through the resources represented by all these route 
+role objects.
+";;
+ROLE responseRequesterRole
+COMPATIBLE WITH responseRequester;
+PERMITTED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+REQUIRED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT RTMModule.RangeZeroToMax;
+REGISTERED AS {joint-iso-itu-t ms(9) function(2) part22(22) relationshipRole(13) 1};
+ROLE responseConfirmationRole
+COMPATIBLE WITH responseConfirmationObject;
+PERMITTED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+REQUIRED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT RTMModule.RangeZeroToMax;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) relationshipRole(13) 2};
+ROLE responseMonitorRole
+COMPATIBLE WITH responseMonitor;
+PERMITTED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+REQUIRED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT RTMModule.RangeOneToOne;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) relationshipRole(13) 3};
+ROLE routeRole
+COMPATIBLE WITH route;
+PERMITTED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeZeroToMax;
+REQUIRED-ROLE-CARDINALITY-CONSTRAINT RTMModule.RangeZeroToMax;
+PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT RTMModule.RangeZeroToMax;
+BIND-SUPPORT routeRoleBind
+UNBIND-SUPPORT routeRoleUnbind
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) relationshipRole(13) 4};
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) relationshipClass(11) 1};
+-- A.2 Managed object classes
+responseConfirmationObject MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+CHARACTERIZED BY
+responseConfirmationObjectPackage PACKAGE
+BEHAVIOUR
+responseConfirmationBehaviour BEHAVIOUR
+DEFINED AS"
+The response confirmation object managed object class must be instantiated before the associated response monitoring
+relationship managed object class is instantiated. This managed object class supports the response confirmation object id
+attribute and optionally the response requester indication list attribute which represents the list of response requester objects
+that may issue response requests to the response confirmation object.
+This managed object class is compatible with the sap1 and sap2 managed object classes defined in ITU-T Rec. X.723 |
+ISO/IEC 10165-5 if none of the conditional packages are supported in the response confirmation object instance. In this case,
+the sapId attribute in sap1 or sap2 has the same behaviour as the responseConfirmationObjectId attribute.";;
+ATTRIBUTES
+responseConfirmationObjectId SET-BY-CREATE GET;;;
+CONDITIONAL PACKAGES
+responseRequesterListPkg PRESENT IF "the requester-responseConfirmationObject relationship is one-way from
+confirmation object to requester or reciprocal.";
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3) 1};
+responseConfirmationRecord MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992":eventLogRecord;
+CHARACTERIZED BY
+responseConfirmationRecordPackage PACKAGE
+BEHAVIOUR
+responseConfirmationRecordBehaviour BEHAVIOUR
+DEFINED AS "This managed object is used to represent logged information that resulted from response confirmation
+notifications or event reports.";;
+ATTRIBUTES
+muximumResponseTimeError GET,
+responseMonitorId GET,
+responseRequesterInd GET,
+responseConfirmationObjectInd GET,
+requestIdentifier GET,
+responseTime GET,
+responseSync GET;;;
+CONDITIONAL PACKAGES
+reqResLengthPkg PRESENT IF "lengths of response requests and responses are not uniform and needed to be summarized.",
+responseTimeoutPkg PRESENT IF "the response time-out parameter is present";
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3) 2};
+responseDelayMonitor MANAGED OBJECT CLASS
+DERIVED FROM responseMonitor;
+CHARACTERIZED BY
+responseDelayMonitorPackage PACKAGE
+BEHAVIOUR
+responseDelayMonitorBehaviour BEHAVIOUR
+DEFINED AS"
+The responseTimeoutPkg package must be supported in this managed object class instance.
+A value of the responseDelayTime attribute indicates a response delay time which is calculated by subtracting the response
+timeout attribute value from the response time attribute value. Whenever a response arrives responseDelayMonitor, this
+attribute value is set to the new response delay time.
+";;
+ATTRIBUTES
+responseDelayTime GET;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3) 3};
+responseMonitor MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+CHARACTERIZED BY
+responseMonitorPackage PACKAGE
+BEHAVIOUR
+responseMonitorBehaviour BEHAVIOUR
+DEFINED AS"
+The response monitor managed object class may be instantiated before or after the ESTABLISH operation is received. But if
+an ESTABLISH operation has a new parameter set of response requester, response confirmation object and routes, and the
+response monitor managed object instance for monitoring its set does not exist, a new instance compatible with the response
+monitor managed object class must be created immediately. Through an ESTABLISH operation, one instance compatible with
+response monitor managed object class is bound with a new response monitoring relationship instance. After this binding, if the
+operational state is enabled and the availability status is not offDuty in the monitor object, the response monitor compatible
+class instance starts monitoring responses as indicated by the ESTABLISH parameters.
+If the response monitoring relationship instance identified by the parameter set of a new ESTABLISH operation already exists,
+the monitoring is started without new bindings.
+The responseRrequesterInd attribute in this managed object class identifies the response requester compatible object
+monitored by the response monitor object. This attribute value is modified by the UNBIND and BIND operations. Its default
+value is NULL, representing that this instance has no binding with a response requester object.
+The responseConfirmationObjectInd attribute in this managed object class identifies the object being compatible with response
+confirmation object monitored by the response monitor object. This attributes value is modified by the UNBIND and BIND
+operation. Its default value is NULL, representing that this instance has no binding with a response confirmation role object.
+The routeList attribute in this managed object class identifies the route role objects monitored by the response monitor object.
+The elements of this attribute can be added or removed. This attribute's element values are added by the BIND operation and
+removed by the UNBIND operation. Its default value is NULL, representing that the response monitor role object instance has
+no binding with a route role object. If route role cardinality is 0 (zero, default cardinality), the response times of all PDUs are
+monitored regardless of their responders, connections or routes.
+The responseTime attribute in this managed object class represents the most recent response time between the indicated
+response requester and response confirmation object. This attribute value is read-only. The initial value of this attribute is
+notYetResponded (1). If the responseTimeSummarizationMode attribute value is rawResponseTime (0), the responseTime
+attribute value indicates the raw response time and is an INTEGER type. If the mode value is responseTimePerBit (1), the
+responseTime attribute value is calculated according to the following expression as a REAL type.
+(RTraw * 2) / (Ls + Lr)
+where:
+RT raw is the raw response time of any PDU of any length.
+Ls is the response request length, the bit length of the response request PDU.
+Lr is the response length, the bit length of the response PDU.
+The maximumResponseTimeError attribute in this managed object identifies the precision of the measured response time. If
+this attribute value is noEstimateOnResponseTimeError (1), it indicates that the precision of the response time is unknown.
+This class has a response synchronization attribute whose value is singleCast, atomic or bestEffort. If the value is singleCast,
+the response monitor role object monitors only the first response to a response request. If the value is atomic or bestEffort, the
+monitor object can monitor more than one response to a response request. If the value is atomic, the response time is monitored
+as the time until all the responses return. If the value is bestEffort, the response time is monitored as the time until the first
+response returns. The default value of this attribute is singleCast.
+This class also has an operational state attribute. If this attribute's value is disabled, it indicates that the response monitoring is
+stopped by the local system.
+If the responseConfirmationNotifPkg is present, a response confirmation notification is issued when the associated response
+confirmation role object receives a response monitored by the response monitor object.
+To support cases where lengths of response requests and responses are not uniform, the response monitor role managed object
+class conditionally supports request/response length package. This package has response request length attribute and response
+length attribute. If this request/response length package is supported, response request length and response length are carried
+by response confirmation notification.
+If the responseTimeoutPkg is present, the quality of service alarm is issued when the time-out time indicated by the
+responseTimeout attribute is over after the associated response request is issued.
+The response monitor managed object class supports several conditional packages that provide various levels of sophistication
+in scheduling the activity of the response monitor role object. These packages are characterized by the following:
+ the time during which monitoring is active, this property is supported by time-related attributes in the conditional packages
+that contain information related to scheduling.
+";;
+ATTRIBUTES
+responseMonitorId SET-BY-CREATE GET,
+responseRequesterInd SET-BY-CREATE GET,
+responseConfirmationObjectInd SET-BY-CREATE GET,
+routeList ADD-REMOVE,
+responseTimeSummarizationMode GET-REPLACE,
+responseTime GET
+DEFAULT VALUE RTMModule.notYetResponded,
+maximumResponseTimeError GET
+DEFAULT VALUE RTMModule.noEstimateOnResponseTimeError,
+responseSync GET-REPLACE
+DEFAULT VALUE RTMModule.defaultResponseSync,
+"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992": operationalState GET;;;
+CONDITIONAL PACKAGES
+responseConfirmationNotifPkg PRESENT IF "the response confirmation notification is needed",
+reqResLengthPkg PRESENT IF "lengths of response requests and responses are not uniform and need to be summarized",
+responseTimeoutPkg PRESENT IF "the time-out of responses is monitored",
+"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":availabilityStatusPackage PRESENT IF "any of the scheduling
+packages including duration, dailyScheduling, weeklyScheduling and externalScheduler package, are present",
+"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":duration PRESENT IF "the response time monitoring function is
+scheduled to start at a specified time and stop at either a specified time or function continuously",
+"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":dailyScheduling PRESENT IF "both the weekly scheduling package
+and external scheduler packages are not present in an instance and daily scheduling is supported by that instance",
+"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":weeklyScheduling PRESENT IF "both the daily scheduling package and
+external scheduler packages are not present in an instance and weekly scheduling is supported by that instance",
+"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":externalScheduler PRESENT IF "both the weekly scheduling package
+and daily scheduling package are not present in an instance and external scheduling is supported by that instance",
+"ITU-T Recommendation M.3100:1995": createDeleteNotificationsPackage PRESENT IF "notification of object creation and
+object deletion events is required",
+"ITU-T Recommendation M.3100:1995": attributeValueChangeNotificationsPackage PRESENT IF "notification of attribute
+value change events is required",
+"ITU-T Recommendation M.3100:1995": stateChangeNotificationsPackage PRESENT IF "notification of state change events
+is required";
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3) 4};
+responseRequester MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+CHARACTERIZED BY
+responseRequesterPackage PACKAGE
+BEHAVIOUR
+responseRequesterBehaviour BEHAVIOUR
+DEFINED AS "
+The response requester managed object class must be instantiated before the associated response monitoring relationship
+managed object class is instantiated. This managed object class supports the responseRequesterId attribute and optionally the
+responseConfirmationObjectIndList attribute which represents the list of response confirmation objects that may return
+responses to the response requester.
+This managed object class is compatible with the sap1 and sap2 managed object classes defined in ITU-T Rec. X.723 (1993) |
+ISO/IEC 10165-5 : 1994 if none of the conditional packages are supported in the response requester managed object instance.
+In this case, sapId attribute in sap1 or sap2 may have the same behaviour as the responseRequesterID attribute.
+";;
+ATTRIBUTES
+responseRequesterId SET-BY-CREATE GET;;;
+CONDITIONAL PACKAGES
+responseConfirmationObjListPkg PRESENT IF "the requester-confirmation object relationship is one-way from requester to
+confirmation object or reciprocal.";
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3) 5};
+route MANAGED OBJECT CLASS
+DERIVED FROM "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top;
+CHARACTERIZED BY
+routePackage PACKAGE
+BEHAVIOUR
+routeBehaviour BEHAVIOUR
+DEFINED AS"
+Route managed object class must be instantiated before the associated response monitoring relationship managed object class is
+instantiated. This managed object class supports routeId attribute.
+This managed object class is compatible with sap1 and sap2 managed object class defined in ITU-T Rec. X.723 |
+ISO/IEC 10165-5. So, sapId attribute in sap1 or sap2 may has same behaviour as the routeId attribute.
+This managed object class is also compatible with singlePeerConnection managed object class defined in ITU-T Rec. X.723 |
+ISO/IEC 10165-5. So, connectionId attribute in singlePeerConnection may has also same behaviour as the routeId attribute.
+";;
+ATTRIBUTES
+routeId GET;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) managedObjectClass(3) 6};
+-- A.3 Packages
+responseConfirmationObjListPkg PACKAGE
+BEHAVIOUR responseConfirmationObjListBehaviour BEHAVIOUR
+DEFINED AS"
+The response confirmation object list package supports the response confirmation object indication list attribute.
+This package is conditionally supported by the response requester role object class. If a response requester role object supports
+this package, all the response confirmation objects bound with the response requester role object coordinated by response
+monitoring relationship are indicated by the response confirmation object indication list attribute.
+";;
+ATTRIBUTES
+responseConfirmationObjectIndList GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) package(4) 1};
+responseConfirmationNotifPkg PACKAGE
+BEHAVIOUR responseConfirmationNotifBehaviour BEHAVIOUR
+DEFINED AS"
+The response confirmation notification package supports the response confirmation notification.
+This package is conditionally supported by the response monitor role object class. If a response monitor role object supports
+this package, information defined in subclause 8.5.1 is emitted in a response confirmation notification whenever the response
+confirmation role object receives a response.
+";;
+NOTIFICATIONS
+responseConfirmation;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) package(4) 2};
+responseRequesterListPkg PACKAGE
+BEHAVIOUR responseRequesterListBehaviour BEHAVIOUR
+DEFINED AS"
+The response requester list package supports the response requester indication list attribute.
+This package is conditionally supported by the response confirmation role object class. If a response confirmation role object
+supports this package, all the response requester objects bound with the response confirmation role object coordinated by
+response monitoring relationship are indicated by the response requester indication list attribute.
+";;
+ATTRIBUTES
+responseRequesterIndList GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) package(4) 3};
+responseTimeoutPkg PACKAGE
+BEHAVIOUR
+responseTimeoutBehaviour BEHAVIOUR
+DEFINED AS"
+The response timeout package supports the response timeout attribute and quality of service alarm. The response timeout
+attribute is writeable and the default value is NULL.
+This package is conditionally supported by the response monitor role object class. If the response timeout attribute value is not
+NULL and the response which response time is more than the response timeout attribute value, a responseTimeExcessive error
+is carried by the probable cause field of the quality of service alarm emitted.
+";;
+ATTRIBUTES
+responseTimeout GET-REPLACE;
+NOTIFICATIONS
+"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":qualityofServiceAlarm;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) package(4) 4};
+reqResLengthPkg PACKAGE
+BEHAVIOUR
+reqResLengthBehaviour BEHAVIOUR
+DEFINED AS"
+The request response length package supports the monitored unit length, response request length and response length
+attributes. The first one is writeable and the others are read-only.
+This package is conditionally supported by the response monitor role object class. Response request length and response length
+attributes are updated when the response monitor receives a response. ";;
+ATTRIBUTES
+responseRequestLength GET,
+responseLength GET;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) package(4) 5};
+-- A.4 Attributes
+maximumResponseTimeError ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.ResponseTime;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+maximumResponseTimeErrorBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a response time type. This attribute is supported by a responseMonitor managed object class. A value of this
+attribute indicates the precision of the response time value represented by the responseTime attribute.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 1};
+requestIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.RequestIdentifier;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+requestIdentifierBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a choice of integer type, invoke ID or ANY. If the request is an APDU request defined according with OSI
+standards, invoke ID is used. This attribute value is used to identify each response request.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 2};
+responseConfirmationObjectId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.SimpleNameType;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseConfirmationObjectIdBehaviour BEHAVIOUR
+DEFINED AS " This attribute value is used to identify each instance of the response confirmation object managed object
+class.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 3};
+responseConfirmationObjectInd ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.ObjectInstance;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseConfirmationObjectIndBehaviour BEHAVIOUR
+DEFINED AS ". This attribute is supported by a response monitor role object. This identifies a response confirmation object
+where response time is monitored by the response monitor.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 4};
+responseConfirmationObjectIndList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.GroupObjects;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseConfirmationObjectIndListBehaviour BEHAVIOUR
+DEFINED AS "This attribute is a SET OF object instance type. This attribute is supported by a response requester role object.
+Its value is a list of response confirmation objects with the response requester role bound to the same response monitor by the
+response monitoring relationship.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 5};
+responseDelayTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.TimePeriod;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseDelayTimeBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a time period type. This attribute is supported by a response delay monitor object. It indicates the response
+delay time which is calculated by subtracting response timeout attribute value from response time attribute value.
+.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 6};
+responseLength ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.Integer;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseLengthBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is an INTEGER and greater than 0. This attribute is optionally supported by a response monitor
+managed object class. This attribute value represents the bit length of response PDU.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 7};
+responseMonitorId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.SimpleNameType;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseMonitorIdBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute value is used to identify each instance of the response monitor managed object class.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 8};
+responseRequesterId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.SimpleNameType;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseRequesterIdBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a simple name type. This attribute's value is used to identify each instance of the response requester managed
+object class.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 9};
+responseRequesterInd ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.ObjectInstance;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseRequesterIndBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is an object instance type. This attribute is supported by a response monitor role object. It identifies a response
+requester whose response time is monitored by the response monitor.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 10};
+responseRequesterIndList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.GroupObjects;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseRequesterIndListBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a SET OF object instance type. This attribute is supported by a response confirmation role object. It identifies
+a set of response response requesters with which the response confirmation role is bound to the same response monitor by the
+response monitoring relationship.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 11};
+responseRequestLength ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.Integer;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseRequestLengthBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is an INTEGER and greater than 0. This attribute is optionally supported by a response monitor managed
+object class. This attribute value represents the bit length of requested PDU.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 12};
+responseSync ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.ResponseSync;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseSyncBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is an enumerated type whose value is one of a singleCast(1), bestEffort(0) or atomic(1). This attribute is
+supported by a response monitor object. If the value is singleCast , the response monitor role object monitors the only one
+response to one response request. If the value is atomic or bestEffort, the monitor object can monitor more than one response
+to a response request. If the value is atomic, the response time is monitored as the time until all the responses are returned. If
+the value is bestEffort, the response time is monitored as the time until the first response returns. ";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 13};
+responseTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.ResponseTime;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseTimeBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a time period type. This attribute is supported by the response monitor managed object class. A value of this
+attribute indicates a response time from when a response request is sent by the monitored response requester to when that
+response is arrived at the monitored response confirmation object.
+This attribute is a choice of seconds, milli seconds, micro seconds, nano seconds, pico seconds, and seconds per bit value. The
+last one is a REAL type and the others are INTEGER type. The seconds per bit value is calculated according to the following
+expression.
+(RTraw * 2) / (Ls + Lr)
+where:
+RTraw is the raw response time of any PDU of any length.
+Ls is the bit length of the response request PDU.
+Lr is the bit length of the response PDU.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 14};
+responseTimeout ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.TimePeriod;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseTimeoutAttributeBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a time period type. This attribute is supported by a response monitor managed object class. A value of this
+attribute indicates a response timeout value which is compared with the response time which is summarized by the response
+monitor.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 15};
+responseTimeSummarizationMode ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule. ResponseTimeSummarizationMode;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+responseTimeSummarizationModeBehaviour BEHAVIOUR
+DEFINED AS "
+If this attribute value is rawResponseTime (0), the response time attribute value in the same object indicates the raw
+response time and is an INTEGER type. If this attribute value is responseTimePerBit (1), the response time attribute
+value is set by the response time per a bit length of PDU as a REAL type.
+";;
+REGISTERED AS { joint-iso-ccittjoint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 16};
+routeId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.SimpleNameType;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+routeIdBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a simple name type. This attribute value is used to identify each instance of the route role managed object
+class.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 17};
+routeList ATTRIBUTE
+WITH ATTRIBUTE SYNTAX RTMModule.GroupObjects;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+routeListBehaviour BEHAVIOUR
+DEFINED AS "
+This attribute is a SET OF object instance type. This attribute is supported by a response monitor managed object class. A
+value of this attribute lists a set of objects compatible with a route role object.
+";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) attribute(7) 18};
+-- A.5 Notification
+responseConfirmation NOTIFICATION
+BEHAVIOUR
+responseConfirmationNotificationBehaviour BEHAVIOUR
+DEFINED AS "
+This notification is issued whenever the response to a response request sent from the monitored response request role object
+arrives at the monitored response confirmation role object. This notification carries the information related with that response
+as its parameters.
+";;
+WITH INFORMATION SYNTAX RTMModule.ResponseConfirmationInfo
+AND ATTRIBUTE IDS
+responseMonitor responseMonitorId,
+responseRequester responseRequesterInd,
+responseConfirmationObject responseConfirmationObjectInd,
+routeList routeList,
+requestIdentifier requestIdentifier,
+notificationIdentifier "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992":notificationIdentifier,
+correlatedNotifications "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992":correlatedNotifications,
+responseTime responseTime,
+maximumResponseTimeError maximumResponseTimeError,
+responseRequestLength responseRequestLength,
+responseLength responseLength,
+responseSync responseSync,
+responseDelayTime responseDelayTime,
+responseTimeout responseTimeout,
+additionalText "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalText,
+additionalInformation "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2:1992":additionalInformation;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) notification(10) 1};
+-- A.6 Relationship mapping definition
+responseMonitoringRelationshipMapping RELATIONSHIP MAPPING
+RELATIONSHIP CLASS responseMonitoring;
+BEHAVIOUR responseMonitoringRelationshipMappingBehaviour BEHAVIOUR
+DEFINED AS
+"
+The response monitoring relationship mapping defines the following mapping:
+ Mapping each role to the related managed object class.
+ Mapping each identification to the object instance identifier attribute supported by the mapped managed object class.
+ Mapping each relationship operation to the GDMO operations on the mapped managed object class instance.
+";;
+ROLE responseRequesterRole
+RELATED-CLASSES responseRequester
+REPRESENTED BY ATTRIBUTE responseRequesterId,
+ROLE responseRequesterRole
+RELATED-CLASSES "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sap1
+"ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sap2
+REPRESENTED BY ATTRIBUTE "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sapId,
+ROLE responseConfirmationRole
+RELATED-CLASSES responseConfirmationObject
+REPRESENTED BY ATTRIBUTE responseConfirmationObjectId,
+ROLE responseConfirmationRole
+RELATED-CLASSES "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sap1
+"ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sap2
+REPRESENTED BY ATTRIBUTE "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sapId,
+ROLE responseMonitorRole
+RELATED-CLASSES responseMonitor
+REPRESENTED BY ATTRIBUTE responseMonitorId,
+ROLE routeRole
+RELATED-CLASSES route
+REPRESENTED BY ATTRIBUTE routeId,
+ROLE routeRole
+RELATED-CLASSES "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sap1
+"ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":sap2
+REPRESENTED BY ATTRIBUTE sapId,
+ROLE routeRole
+RELATED-CLASSES "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994":singlePeerConnection
+REPRESENTED BY ATTRIBUTE connectionId;
+OPERATIONS MAPPING
+ESTABLISH MAPS-TO-OPERATION
+CREATE responseMonitor OF responseMonitorRole resReq-resConf-routeIndication
+TERMINATE MAPS-TO-OPERATION
+DELETE responseMonitor OF responseMonitorRole
+BIND routeRoleBind MAPS-TO-OPERATION
+ADD routeList
+UNBIND routeRoleUnbind MAPS-TO-OPERATION
+REMOVE routeList
+NOTIFY objectCreationNotification MAPS-TO-OPERATION
+NOTIFICATION objectCreationNotification OF responseMonitor
+NOTIFY objectDeletionNotification MAPS-TO-OPERATION
+NOTIFICATION objectDeletionNotification OF responseMonitor
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part22(22) relationshipMapping(12) 1};
+END
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

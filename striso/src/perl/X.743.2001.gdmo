@@ -1,0 +1,707 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Mon Sep  3 12:03:54 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" { joint-iso-ccitt ms(9) function(2) part20(20) } >--
+--< GDMO.Version 1.3 >--
+MODULE "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
+-- Annex A
+-- Definition of Time Management Information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- A.1 Managed object classes
+-- A.1.1 clockSource
+-- This object class provides information concerning the dynamic state of a clock within a system. Two subclasses are also
+-- defined to further distinguish between internal system clocks and external reference clock interfaces. An instantiation of
+-- this object is required for each manageable clock.
+
+clockSource MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		clockSourcePkg PACKAGE
+			BEHAVIOUR
+				clockSourceBeh BEHAVIOUR
+					DEFINED AS
+						"The clockSource object provides access to and information about a source of time 
+						within a system. Clock status attribute is identified as state attribute. A 
+						change in the value of the operationalState attribute causes a stateChange 
+						notification to be emitted.";;
+			ATTRIBUTES
+				clockID GET SET-BY-CREATE NO-MODIFY,
+				"Rec. CCITT X.721 | ISO/IEC 10165-2":operationalState GET NO-MODIFY,
+				clockStatus GET,
+				clockValue GET,
+				clockEventCounter GET,
+				clockEventCode GET,
+				clockEventTime GET;
+			ACTIONS
+				clockReset;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":stateChange;;;
+	CONDITIONAL PACKAGES
+		clockSourceDetailPkg PACKAGE
+			BEHAVIOUR
+				clockSourceDetailBeh BEHAVIOUR
+					DEFINED AS
+						"The clockSourceDetailPkg package provides detailed information about a source of 
+						time within a system.";;
+			ATTRIBUTES
+				clockPrecision GET,
+				clockDrift GET,
+				clockMaximumError GET,
+				clockEstimatedError GET;
+		REGISTERED AS { TimeMF.clockSourceDetailPkgOID };
+			PRESENT IF
+				!an instance supports it.!,
+		leapSecondPkg PACKAGE
+			BEHAVIOUR
+				leapSecondBeh BEHAVIOUR
+					DEFINED AS
+						"The leapSecondPkg package provides access to and information about the leap 
+						seconds of a source of time within a system.";;
+			ATTRIBUTES
+				leapSecondIndication GET-REPLACE SET-BY-CREATE,
+				leapSecondCount GET-REPLACE SET-BY-CREATE;
+		REGISTERED AS { TimeMF.leapSecondPkgOID };
+			PRESENT IF
+				!an instance supports it.!;
+REGISTERED AS { TimeMF.clockSourceOID };
+-- A.1.2 localClock
+-- This object class provides information concerning the dynamic state of a local clock internal to a system.
+
+
+localClock MANAGED OBJECT CLASS
+	DERIVED FROM
+		clockSource;
+	CHARACTERIZED BY
+		localClockPkg PACKAGE
+			BEHAVIOUR
+				localClockBeh BEHAVIOUR
+					DEFINED AS
+						"The localClock object provides access to and information about an internal 
+						source of time within a system.";;
+			ATTRIBUTES
+				localClockAddress GET,
+				peerClockAddresses GET-REPLACE ADD-REMOVE SET-BY-CREATE,
+				synchronizationSourceAddress GET,
+				clockStratum GET,
+				clockAdjustmentInterval GET-REPLACE SET-BY-CREATE;;;
+REGISTERED AS { TimeMF.localClockOID };
+-- A.1.3 referenceClock
+-- This object class provides information concerning the dynamic state of a clock interface residing in a system and
+-- providing that system access to an external time reference.
+
+
+referenceClock MANAGED OBJECT CLASS
+	DERIVED FROM
+		clockSource;
+	CHARACTERIZED BY
+		referenceClockPkg PACKAGE
+			BEHAVIOUR
+				referenceClockBeh BEHAVIOUR
+					DEFINED AS
+						"The referenceClock object provides access to and information about a source of 
+						external time information within a system.";;
+			ATTRIBUTES
+				referenceClockType GET;;;
+REGISTERED AS { TimeMF.referenceClockOID };
+-- A.1.4 synchronizationProtocol
+-- This object provides access to the basic parameters of the time synchronization protocol.
+
+
+synchronizationProtocol MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		synchronizationProtocolPkg PACKAGE
+			BEHAVIOUR
+				synchronizationProtocolBeh BEHAVIOUR
+					DEFINED AS
+						"The synchronizationProtocol object provides general information about clock 
+						coordination service present in a system.";;
+			ATTRIBUTES
+				synchronizationProtocolID GET SET-BY-CREATE NO-MODIFY,
+				synchronizationProtocolType GET,
+				synchronizedClock GET,
+				synchronizingClocks GET;
+			ACTIONS
+				leapSecond,
+				protocolReset;;;
+REGISTERED AS { TimeMF.synchronizationProtocolOID };
+-- A.2 Attribute definitions
+-- A.2.1 clockAdjustmentInterval
+
+
+clockAdjustmentInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.AdjustmentInterval;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockAdjustmentIntervalBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the interval over which gradual phase adjustments to 
+				the local clock are to be applied.";;
+REGISTERED AS { TimeMF.clockAdjustmentIntervalOID };
+-- A.2.2 clockDrift
+
+
+clockDrift ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockDrift;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockDriftBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the clock manufacturers specified value of drift.";;
+REGISTERED AS { TimeMF.clockDriftOID };
+-- A.2.3 clockEstimatedError
+
+
+clockEstimatedError ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockEstimatedError;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockEstimatedErrorBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the estimated error of the clock.";;
+REGISTERED AS { TimeMF.clockEstimatedErrorOID };
+-- A.2.4 clockEventCode
+
+
+clockEventCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockEventCode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockEventCodeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the latest system exception event.";;
+REGISTERED AS { TimeMF.clockEventCodeOID };
+-- A.2.5 clockEventCounter
+
+
+clockEventCounter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockEventCounter;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		clockEventCounterBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies a counter indicating the number of system exception 
+				events that have occurred since the last time the counter was checked and 
+				cleared.";;
+REGISTERED AS { TimeMF.clockEventCounterOID };
+-- A.2.6 clockEventTime
+
+
+clockEventTime ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockEventTime;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockEventTimeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the time at which the latest system exception event 
+				occurred.";;
+REGISTERED AS { TimeMF.clockEventTimeOID };
+-- A.2.7 clockID
+
+
+clockID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockID;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockIDBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the clock being modeled by the managed object.";;
+REGISTERED AS { TimeMF.clockIDOID };
+-- A.2.8 clockMaximumError
+
+
+clockMaximumError ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockMaximumError;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockMaximumErrorBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the maximum error of the clock.";;
+REGISTERED AS { TimeMF.clockMaximumErrorOID };
+-- A.2.9 clockPrecision
+
+
+clockPrecision ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.Precision;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockPrecisionBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the precision of the clock.";;
+REGISTERED AS { TimeMF.clockPrecisionOID };
+-- A.2.10 clockStatus
+
+
+clockStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.Status;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockStatusBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the current status of the clock";;
+REGISTERED AS { TimeMF.clockStatusOID };
+-- A.2.11 clockStratum
+
+
+clockStratum ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.Stratum;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		clockStratumBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the current stratum value for this local clock in this 
+				node.";;
+REGISTERED AS { TimeMF.clockStratumOID };
+-- A.2.12 clockValue
+
+
+clockValue ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clockValueBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the current time of the clock.";;
+REGISTERED AS { TimeMF.clockValueOID };
+-- A.2.13 leapSecondCount
+
+
+leapSecondCount ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.CumLeapSeconds;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		leapSecondCountBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the cumulative number of leap seconds that have 
+				occurred since January 1, 1972.";;
+REGISTERED AS { TimeMF.leapSecondCountOID };
+-- A.2.14 leapSecondIndication
+
+
+leapSecondIndication ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.LeapIndication;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		leapSecondIndicationBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates that a leap second is going to occur at the end of the 
+				current day.";;
+REGISTERED AS { TimeMF.leapSecondIndicationOID };
+-- A.2.15 localClockAddress
+
+
+localClockAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ClockAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localClockAddressBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the network address of this node.";;
+REGISTERED AS { TimeMF.localClockAddressOID };
+-- A.2.16 peerClockAddresses
+
+
+peerClockAddresses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.PeerClockAddresses;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		peerClockAddressesBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute lists the network addresses of the peers currently being 
+				maintained by this node.";;
+REGISTERED AS { TimeMF.peerClockAddressesOID };
+-- A.2.17 referenceClockType
+
+
+referenceClockType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ReferenceClockType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		referenceClockTypeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the type of reference clock or external source that 
+				this object represents.";;
+REGISTERED AS { TimeMF.referenceClockTypeOID };
+-- A.2.18 synchronizationProtocolID
+
+
+synchronizationProtocolID ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SynchronizationProtocolID;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		syncronizationProtocolIDBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the synchronization protocol being modeled by the 
+				managed object. This attribute is used for naming";;
+REGISTERED AS { TimeMF.synchronizationProtocolIDOID };
+-- A.2.19 synchronizationProtocolType
+
+
+synchronizationProtocolType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SynchronizationProtocolType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		syncronizationProtocolTypeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the synchronization protocol type being modeled by the 
+				managed object.";;
+REGISTERED AS { TimeMF.synchronizationProtocolTypeOID };
+-- A.2.20 synchronizationSourceAddress
+
+
+synchronizationSourceAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.CurrSynchSourceAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		synchronizationSourceAddressBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the network address or the reference clock type of the 
+				current synchronization source for this node.";;
+REGISTERED AS { synchronizationSourceAddressOID };
+-- A.2.21 synchronizedClock
+
+
+synchronizedClock ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SynchronizedClock;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		syncronizedClockBeh BEHAVIOUR
+			DEFINED AS
+				"The clock being synchronized by this instance of the time synchronization 
+				protocol.";;
+REGISTERED AS { TimeMF.synchronizedClockOID };
+-- A.2.22 synchronizingClocks
+
+
+synchronizingClocks ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SynchronizingClocks;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		syncronizingClocksBeh BEHAVIOUR
+			DEFINED AS
+				"The set of clocks exchanging information with this clock for the purposes of 
+				synchronization.";;
+REGISTERED AS { TimeMF.synchronizingClocksOID };
+-- A.3 Action definitions
+-- A.3.1 clockReset
+
+
+clockReset ACTION
+	BEHAVIOUR
+		clockResetBeh BEHAVIOUR
+			DEFINED AS
+				"The BEHAVIOUR of this action is undefined in this Recommendation | International 
+				Standard. It provides the capability to distribute an indication to all 
+				instances of the time service to restart the time synchronization protocol.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TimeMF.ClockResetInfo;
+REGISTERED AS { TimeMF.clockResetActionOID };
+-- A.3.2 leapSecond
+
+
+leapSecond ACTION
+	BEHAVIOUR
+		leapSecondActionBeh BEHAVIOUR
+			DEFINED AS
+				"The BEHAVIOUR of this action is undefined in this Recommendation | International 
+				Standard. It provides the capability to distribute an indication that a leap 
+				second is about to occur. It includes a mechanism to set the appropriate 
+				parameters in the protocol.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TimeMF.LeapSecondInfo;
+REGISTERED AS { TimeMF.leapSecondActionOID };
+-- A.3.3 protocolReset
+
+
+protocolReset ACTION
+	BEHAVIOUR
+		protocolResetBeh BEHAVIOUR
+			DEFINED AS
+				"The BEHAVIOUR of this action is undefined in this Recommendation | International 
+				Standard. It provides the capability to distribute an indication to all 
+				instances of the time service to restart the time synchronization protocol.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX TimeMF.ProtocolResetInfo;
+REGISTERED AS { TimeMF.protocolResetActionOID };
+-- A.4 Name binding definitions
+-- A.4.1 clockSource-system
+
+
+clockSource-system NAME BINDING
+	SUBORDINATE OBJECT CLASS clockSource AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		clockID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { TimeMF.clockSource-systemOID };
+-- A.4.2 synchronizationProtocol-system
+
+
+synchronizationProtocol-system NAME BINDING
+	SUBORDINATE OBJECT CLASS synchronizationProtocol AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		synchronizationProtocolID;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { TimeMF.synchronizationProtocol-systemOID };
+-- Annex B
+-- The Network Time Protocol and Time Management Information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- B.1 The Network Time Protocol
+-- The Network Time Protocol may be implemented as the time synchronization service underlying this Time Management
+-- Function. If so, it is implemented in accordance with RFC 1305 (see [5] in H.4). The NTP managed object class is
+-- intended to be used with the Network Time Protocol time synchronization service.
+-- B.2 The ntpProtocol managed object class definition
+-- The ntpProtocol object provides access to the basic parameters of the Network Time Protocol (NTP) time
+-- synchronization protocol. It is a subclass of the synchronization protocol managed object class. The basic parameters of
+-- NTP include both the protocol to exchange time information and the procedures and algorithms used to process and act
+-- on the time information gathered. The ntpProtocol object includes attributes to indicate:
+--  the current state of the time synchronization protocol (polling intervals, modes of service, etc.) (specific to
+-- particular subclass);
+--  the offset, delay, maximum error (and other relevant data) associated with each clock with which time
+-- information has been exchanged.
+
+
+ntpProtocol MANAGED OBJECT CLASS
+	DERIVED FROM
+		synchronizationProtocol;
+	CHARACTERIZED BY
+		ntpProtocolPkg PACKAGE
+			BEHAVIOUR
+				ntpProtocolBeh BEHAVIOUR
+					DEFINED AS
+						"This object provides general information about the Network Time Protocol (ntp) 
+						time synchronization protocol.";;
+			ATTRIBUTES
+				maximumStratum GET,
+				maximumClockAge GET,
+				maximumSkew GET,
+				maximumDistance GET,
+				minimumPollInterval GET,
+				maximumPollInterval GET,
+				minimumSelectClock GET,
+				maximumSelectClock GET,
+				minimumDispersion GET,
+				maximumDispersion GET,
+				reachabilityRegisterSize GET,
+				filterSize GET,
+				filterWeight GET,
+				selectWeight GET;;;
+REGISTERED AS { TimeMF.ntpProtocolOID };
+-- B.3 Attribute definitions
+-- B.3.1 filterSize
+
+
+filterSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.FilterSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		filterSizeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the size of the clock filter shift register.";;
+REGISTERED AS { TimeMF.filterSizeOID };
+-- B.3.2 filterWeight
+
+
+filterWeight ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.FilterWeight;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		filterWeightBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the weight used to compute the filter dispersion.";;
+REGISTERED AS { TimeMF.filterWeightOID };
+-- B.3.3 maximumClockAge
+
+
+maximumClockAge ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.MaxClockAge;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumClockAgeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum interval without an update that a reference 
+				clock will be considered valid.";;
+REGISTERED AS { TimeMF.maximumClockAgeOID };
+-- B.3.4 maximumDispersion
+
+
+maximumDispersion ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.Dispersion;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumDispersionBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum dispersion increment allowable, also 
+				specifies the dispersion assumed for missing data.";;
+REGISTERED AS { TimeMF.maximumDispersionOID };
+-- B.3.5 maximumDistance
+
+
+maximumDistance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.MaxDistance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumDistanceBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum acceptable synchronization distance.";;
+REGISTERED AS { TimeMF.maximumDistanceOID };
+-- B.3.6 maximumPollInterval
+
+
+maximumPollInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.PollInterval;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumPollIntervalBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum polling interval allowable in the system.";;
+REGISTERED AS { TimeMF.maximumPollIntervalOID };
+-- B.3.7 maximumSelectClock
+
+
+maximumSelectClock ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SelectClock;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumSelectClockBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum number of peers considered for selection.";;
+REGISTERED AS { TimeMF.maximumSelectClockOID };
+-- B.3.8 maximumSkew
+
+
+maximumSkew ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.MaxSkew;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maximumSkewBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum offset error caused by the skew of a local 
+				clock over the interval specified by maximumClockAge.";;
+REGISTERED AS { TimeMF.maximumSkewOID };
+-- B.3.9 maximumStratum
+
+
+maximumStratum ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.Stratum;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumStratumBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum stratum value that can be encoded as a 
+				packet variable, also interpreted as network unreachable.";;
+REGISTERED AS { TimeMF.maximumStratumOID };
+-- B.3.10 minimumDispersion
+
+
+minimumDispersion ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.Dispersion;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		minimumDispersionBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the minimum dispersion increment for each stratum 
+				level.";;
+REGISTERED AS { TimeMF.minimumDispersionOID };
+-- B.3.11 minimumPollInterval
+
+
+minimumPollInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.PollInterval;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minimumPollIntervalBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the minimum polling interval allowable in the system.";;
+REGISTERED AS { TimeMF.minimumPollIntervalOID };
+-- B.3.12 minimumSelectClock
+
+
+minimumSelectClock ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SelectClock;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		minimumSelectClockBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the minimum number of peers acceptable for 
+				synchronization.";;
+REGISTERED AS { TimeMF.minimumSelectClockOID };
+-- B.3.13 reachabilityRegisterSize
+
+
+reachabilityRegisterSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.ReachRegSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		reachabilityRegisterSizeBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the size of the reachability register.";;
+REGISTERED AS { TimeMF.reachabilityRegisterSizeOID };
+-- B.3.14 selectWeight
+
+
+selectWeight ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TimeMF.SelectWeight;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		selectWeightBeh BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the weight used to compute the selection dispersion.";;
+REGISTERED AS { TimeMF.selectWeightOID };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" { joint-iso-ccitt ms(9) function(2) part20(20) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":clockSource
+--@@ |  +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":localClock
+--@@ |  +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":referenceClock
+--@@ +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":synchronizationProtocol
+--@@ |  +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":ntpProtocol
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":clockSource
+--@@ >- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":synchronizationProtocol
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

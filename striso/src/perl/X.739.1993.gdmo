@@ -1,0 +1,416 @@
+--< GDMO.Document "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994" >--
+MODULE "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994"
+-- Annex A
+-- Metric objects
+-- (This annex forms an integral part of this Recommendation | International Standard.)
+-- NOTE  The definition of metric object classes does not prevent managed object definers from including management
+-- information defined in clause 8 within the definition of other managed object classes. When defining new managed object classes with
+-- metric attributes, the definers should consider the utilization of the metric object classes defined in this annex.
+-- A.1 Managed object class definitions
+algorithmIndicatingMeanMonitor MANAGED OBJECT CLASS
+DERIVED FROM meanMonitor;
+CHARACTERIZED BY
+algorithmIndicatingMeanMonitorPackage PACKAGE
+BEHAVIOUR
+algorithmIndicatingMeanMonitorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.4.3.";;
+ATTRIBUTES
+algorithmIdentifier GET;;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 8};
+meanAndMinMaxMonitor MANAGED OBJECT CLASS
+DERIVED FROM movingAverageMeanMonitor;
+CHARACTERIZED BY
+meanAndMinMaxMonitorPackage PACKAGE
+BEHAVIOUR
+meanAndMinMaxMonitorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.8.3.";;
+ATTRIBUTES
+estimateOfLargest GET-REPLACE, -- See 8.1.8.2.
+estimateOfSmallest GET-REPLACE;;; -- See 8.1.8.2.
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 1};
+meanAndPercentileMonitor MANAGED OBJECT CLASS
+DERIVED FROM movingAverageMeanMonitor;
+CHARACTERIZED BY
+meanAndPercentileMonitorPackage PACKAGE
+BEHAVIOUR
+meanAndPercentileMonitorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.3.";,
+ewmaGaugePercentileBehaviour BEHAVIOUR
+DEFINED AS "See B.2.4";;
+ATTRIBUTES
+secondMovingTimePeriod GET-REPLACE, -- used in GaugePercentileBehaviour to calculate T2,
+-- See B.2.4 and 8.1.7.2.
+estimateOfLargestInReplication GET-REPLACE, -- See B.2.4 and 8.1.7.2.
+estimateOfSmallestInReplication GET-REPLACE, -- See B.2.4 and 8.1.7.2.
+estimateOfMedian GET-REPLACE, -- See B.2.4 and 8.1.7.2.
+estimateOf100-PCTPercentile GET-REPLACE, -- See B.2.4 and 8.1.7.2.
+estimateOfPCTPercentile GET-REPLACE, -- See B.2.4 and 8.1.7.2.
+numberOfReplications GET-REPLACE -- See B.2.4 and 8.1.7.2.
+;;;
+CONDITIONAL PACKAGES
+configurablePercentilePackage PRESENT IF "configurable percentiles is required. See 8.1.7.2.";
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 2};
+meanAndVarianceMonitor MANAGED OBJECT CLASS
+DERIVED FROM movingAverageMeanMonitor;
+CHARACTERIZED BY
+meanAndVarianceMonitorPackage PACKAGE
+BEHAVIOUR
+meanAndVarianceMonitorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.6.3.";,
+ewmaGaugeVarianceBehaviour BEHAVIOUR
+DEFINED AS "See B.2.3." ;;
+ATTRIBUTES
+secondMovingTimePeriod GET-REPLACE, -- used in EWMA Gauge Variance Behaviour to calculate "g".
+estimateOfVariance GET-REPLACE ;;; -- See B.2.3.
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 3};
+meanMonitor MANAGED OBJECT CLASS
+DERIVED FROM monitorMetric;
+CHARACTERIZED BY
+meanMonitorPackage PACKAGE
+BEHAVIOUR
+meanMonitorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.3.3." ;;
+ATTRIBUTES
+estimateOfMean GET-REPLACE,
+movingTimePeriod GET-REPLACE;;;
+CONDITIONAL PACKAGES
+estimateOfMeanThresholdPackage
+PRESENT IF "threshold on estimateOfMean is required",
+specificProblemsIndicationPackage
+PRESENT IF "specific problems indication behaviour is required and either the estimate of mean threshold
+package is present or the derived gauge-threshold package is present";
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 4};
+monitorMetric MANAGED OBJECT CLASS
+DERIVED FROM scanner;
+CHARACTERIZED BY
+monitorMetricPackage PACKAGE
+BEHAVIOUR
+monitorMetricBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.2.3.";;
+ATTRIBUTES
+observedObjectInstance GET,
+observedAttributeId GET,
+derivedGauge GET;;;
+CONDITIONAL PACKAGES
+counterDifferencePackage PRESENT IF "counter to gauge conversion is required and
+gaugeDifferencePackage is not present",
+counterOverflowPackage PRESENT IF "the counterDifference package is present and modulo
+arithmetic is required to calculate the new value of the derived
+gauge on counter overflow",
+gaugeDifferencePackage PRESENT IF "gauge to derivative conversion is required and
+counterDifferencePackage is not present",
+derivedGaugeThresholdPackage PRESENT IF "threshold on derivedGauge is required",
+specificProblemsIndicationPackage PRESENT IF "specific problems indication behaviour is required and the
+derivedGaugeThresholdPackage is present",
+derivedGaugeTimestampPackage PRESENT IF "timestamping associated with updating the derivedGauge is
+required";
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 5};
+movingAverageMeanMonitor MANAGED OBJECT CLASS
+DERIVED FROM meanMonitor;
+CHARACTERIZED BY
+movingAverageMeanMonitorPackage PACKAGE
+BEHAVIOUR
+movingAverageMeanMonitorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.5.3." ;;;;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 6};
+scanner MANAGED OBJECT CLASS
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;
+CHARACTERIZED BY
+scannerPackage PACKAGE
+BEHAVIOUR
+scannerBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.1.3.";;
+ATTRIBUTES
+scannerId GET,
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": administrativeState GET-REPLACE,
+granularityPeriod GET-REPLACE,
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": operationalState GET;;;
+CONDITIONAL PACKAGES
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": availabilityStatusPackage
+PRESENT IF "the managed object can be scheduled",
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": duration
+PRESENT IF "the scanning function is to be enabled between specified start
+and stop times",
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": dailyScheduling
+PRESENT IF "daily scheduling is required and the weekly or external
+scheduling package is not present",
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": weeklyScheduling
+PRESENT IF "weekly scheduling is required and the daily or external
+scheduling package is not present",
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992": externalScheduler
+PRESENT IF "reference to external scheduler is required and the daily or
+weekly scheduling package is not present",
+periodSynchronizationPackage
+PRESENT IF "configurable agent internal synchronization of repeating time
+periods is required",
+"Recommendation M.3100:1992":createDeleteNotificationsPackage
+PRESENT IF "notification of object creation and object deletion events is
+required",
+"Recommendation M.3100:1992":attributeValueChangeNotificationPackage
+PRESENT IF "notification of attribute value change events is required",
+"Recommendation M.3100:1992":stateChangeNotificationPackage
+PRESENT IF "notification of state change event is required"
+;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) managedObjectClass(3) 7};
+-- A.2 Package definitions
+configurablePercentilePackage PACKAGE
+BEHAVIOUR
+configurablePercentilePackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.8." ;;
+ATTRIBUTES
+configurablePCT GET-REPLACE ; -- Allowed values are 1 to 49, inclusive
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 1};
+counterDifferencePackage PACKAGE
+BEHAVIOUR
+counterDifferencePackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.1.3." ;;
+ATTRIBUTES
+previousScanCounterValue GET,
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":proceduralStatus GET;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 2};
+counterOverflowPackage PACKAGE
+BEHAVIOUR
+counterOverflowPackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.2.3.";;
+ATTRIBUTES
+modulusValue GET-REPLACE;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 3};
+derivedGaugeThresholdPackage PACKAGE
+BEHAVIOUR
+derivedGaugeThresholdPackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.4.4.";;
+ATTRIBUTES
+severityIndicatingGaugeThreshold GET-REPLACE ADD-REMOVE;
+NOTIFICATIONS
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 4};
+derivedGaugeTimestampPackage PACKAGE
+BEHAVIOUR
+derivedGaugeTimestampPackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.6.";;
+ATTRIBUTES
+derivedGaugeTimestamp GET;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 5};
+estimateOfMeanThresholdPackage PACKAGE
+BEHAVIOUR
+estimateOfMeanThresholdPackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.5.3.";;
+ATTRIBUTES
+estimateOfMeanSeverityIndicatingGaugeThreshold GET-REPLACE ADD-REMOVE;
+NOTIFICATIONS
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 6};
+gaugeDifferencePackage PACKAGE
+BEHAVIOUR
+gaugeDifferencePackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.3.3.";;
+ATTRIBUTES
+previousScanGaugeValue GET,
+"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":proceduralStatus GET;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 8};
+periodSynchronizationPackage PACKAGE
+BEHAVIOUR
+periodSynchronizationPackageBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.9.3." ;;
+ATTRIBUTES
+periodSynchronizationTime GET-REPLACE;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 10};
+specificProblemsIndicationPackage PACKAGE
+BEHAVIOUR
+specificProblemsIndicationPackageBehaviour BEHAVIOUR
+DEFINED AS "Included if specific problems indication is wanted in the metric object instance,
+See 8.1.9.7.3.";;
+ATTRIBUTES
+specificProblemsIndicator GET-REPLACE;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) package(4) 9};
+-- A.3 Attribute definitions
+algorithmIdentifier ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.AlgorithmIdentifier;
+BEHAVIOUR
+algorithmIdBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.4.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 26};
+configurablePCT ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.Integer;
+BEHAVIOUR
+configurablePCTBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.8.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 0};
+derivedGauge ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+derivedGaugeBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.2.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 2};
+derivedGaugeTimeStamp ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.GlobalTime;
+BEHAVIOUR
+derivedGaugeTimeStampBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.6.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 3};
+estimateOfLargest ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfLargestBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.8.3.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 4};
+estimateOfLargestInReplication ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfLargestInReplicationBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 21};
+estimateOfMean ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfMeanBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.3.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 5};
+estimateOfMeanSeverityIndicatingGaugeThreshold ATTRIBUTE
+DERIVED FROM severityIndicatingGaugeThreshold;
+BEHAVIOUR
+estimateOfMeanSeverityIndicatingGaugeThresholdBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.5.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 6};
+estimateOfMedian ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfMedianBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 7};
+estimateOfPCTPercentile ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfPCTPercentileBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 8};
+estimateOfSmallest ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfSmallestBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.8.3.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 9};
+estimateOfSmallestInReplication ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfSmallestInReplicationBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 22};
+estimateOfVariance ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOfVarianceBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.6.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 10};
+estimateOf100-PCTPercentile ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+estimateOf100-PCTPercentileBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 11};
+granularityPeriod ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.TimePeriod;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+granularityPeriodBehaviour BEHAVIOUR
+DEFINED AS "This attribute specifies the time between two successive scans. See 8.1.1.3.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 23};
+modulusValue ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":counter;
+BEHAVIOUR
+modulusValueBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.2.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 12};
+movingTimePeriod ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.TimePeriod;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+movingTimePeriodBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.3.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 13};
+numberOfReplications ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.Integer;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+numberOfReplicationsBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 14};
+observedAttributeId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX CMIP-1.AttributeId;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+observedAttributeIdBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.2.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 15};
+observedObjectInstance ATTRIBUTE
+WITH ATTRIBUTE SYNTAX CMIP-1.ObjectInstance;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+observedObjectInstanceBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.2.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 16};
+periodSynchronizationTime ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.GlobalTime;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+periodSynchronizationTimeBehaviour BEHAVIOUR
+DEFINED AS "This attribute specifies the synchronization time for repeating periods. The start for each
+period is at a time which an integral number of periods before or after the
+periodSynchronizationTime. See 8.1.9.9.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 24};
+previousScanCounterValue ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":counter;
+BEHAVIOUR
+previousScanCounterValueBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.1.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 1};
+previousScanGaugeValue ATTRIBUTE
+DERIVED FROM "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":gauge;
+BEHAVIOUR
+previousScanGaugeValueBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.3.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 20};
+scannerId ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.SimpleNameType;
+MATCHES FOR EQUALITY ;
+BEHAVIOUR
+scannerIdBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.1.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 25};
+secondMovingTimePeriod ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.TimePeriod;
+MATCHES FOR EQUALITY, ORDERING;
+BEHAVIOUR
+secondMovingTimePeriodBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.6.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 17};
+severityIndicatingGaugeThreshold ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.SeverityIndicatingGaugeThreshold;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+severityIndicatingGaugeThresholdBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.4.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 18};
+specificProblemsIndicator ATTRIBUTE
+WITH ATTRIBUTE SYNTAX MetricModule.ObjectIdentifier;
+MATCHES FOR EQUALITY;
+BEHAVIOUR
+specificProblemsIndicatorBehaviour BEHAVIOUR
+DEFINED AS "See 8.1.9.7.2.";;
+REGISTERED AS { joint-iso-ccitt ms(9) function(2) part11(11) attribute(7) 19};
+-- A.4 Name binding definitions
+scanner-system NAME BINDING
+SUBORDINATE OBJECT CLASS scanner AND SUBCLASSES;
+NAMED BY
+SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":system AND SUBCLASSES;
+WITH ATTRIBUTE scannerId;
+CREATE
+WITH-REFERENCE-OBJECT,
+WITH-AUTOMATIC-INSTANCE-NAMING;
+DELETE
+ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS {joint-iso-ccitt ms(9) function(2) part11(11) nameBinding(6) 0};
+END
+--< GDMO.EndDocument "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994" >--
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120

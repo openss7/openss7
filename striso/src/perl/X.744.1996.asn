@@ -1,0 +1,181 @@
+--A.8 Supporting Productions
+SWMF {joint-iso-ccitt ms(9) function(2) part18(18) asn1Module(2) 0}
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+-- EXPORTS everything
+IMPORTS
+AE-title
+FROM
+ACSE-1 {joint-iso-itu-t(2) association-control(2) modules(0) apdus(0) version1(1)}
+Attribute, AttributeId, ObjectInstance
+FROM
+CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+Destination, ManagementExtension, SimpleNameType
+FROM
+Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1};
+--object identifier values--
+softwareManagement OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part18(18)}
+-- supporting productions
+AlarmEffectOnServiceParameter ::= BOOLEAN -- TRUE = affected --
+AppliedPatches ::= SEQUENCE OF Patch
+AutoBackupReportInfo ::= SEQUENCE {
+backupResult [0] BackupResult,
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+AutoRestoreReportInfo ::= SEQUENCE {
+source AutoRestoreSource,
+success BOOLEAN, -- TRUE for success
+additionalInfo SET OF ManagementExtension OPTIONAL }
+AutoRestoreSource ::= CHOICE { localObject ObjectInstance,
+remoteSystem GraphicString -- off-line from remote system --}
+BackupResult ::= CHOICE {
+inLine [0] CHOICE {
+success BIT STRING,
+fail-pduSizeLimitation [3] NULL,
+fail-securityLicensing [4] NULL,
+fail-unknown [5] NULL}
+local [1] SEQUENCE {
+destination ObjectInstance, -- in the managed system --
+success BOOLEAN -- TRUE for success --
+},
+offLine [2] SEQUENCE {
+destination GraphicString, --the remote system
+result CHOICE {
+success [6] NULL,
+fail-securityLicensing [7] NULL,
+fail-unknown [8] NULL}
+}}
+Boolean ::= BOOLEAN
+CheckSum ::= BIT STRING
+Date ::= CHOICE {
+time GeneralizedTime ,
+noSuchInformation NULL}
+DeliverId ::= CHOICE {
+globalValue OBJECT IDENTIFIER,
+localValue INTEGER}
+DeliverInfo ::= SEQUENCE {
+deliverId [0] DeliverId OPTIONAL,
+-- each delivery may have an id to correlate action and event --
+targetSoftware SET OF DistributedSoftware,
+targetSystem [1] Destination OPTIONAL,
+transferInfo [2] TransferInfo OPTIONAL,
+additionalInfo [3] SET OF ManagementExtension OPTIONAL }
+DeliverResult ::= INTEGER {
+pass (0),
+communicationError (1),
+equipmentError (2),
+qosError (3),
+accessDenied (4),
+notFound (5),
+insufficientSpace (6),
+alreadyDelivered (7),
+inProgress (8),
+unknown (9) }
+DeliverResultInfo ::= SEQUENCE {
+deliverId [0] DeliverId OPTIONAL,
+deliverResult [1] DeliverResult,
+additionalInfo SET OF ManagementExtension OPTIONAL}
+DistributedSoftware ::= CHOICE {
+distibutedSoftwareId GraphicString,
+distributedSoftwarePointer ObjectInstance }
+ExecuteProgramInfo ::= SET OF ManagementExtension
+ExecuteProgramReply ::= SEQUENCE {
+processId INTEGER,
+processOwner Identity,
+startTime GeneralizedTime,
+additionalInfo SET OF ManagementExtension OPTIONAL }
+FileLocation ::= SET OF GraphicString -- Empty set means file is not installed --
+FileType ::= INTEGER{
+unstructuredText (0), -- FTAM-1
+unstructuredBinary (1), -- FTAM-3
+blockSpecial (2)}
+GlobalTime ::= GeneralizedTime
+Identity ::= GraphicString
+InformationSize ::= CHOICE {
+numberOfBits [0] INTEGER,
+numberOfBytes [1] INTEGER}
+Integer ::= INTEGER
+InstallInfo ::= SEQUENCE {
+targetSoftware SET OF DistributedSoftware,
+installInfo SET OF ManagementExtension }
+LastBackupDestination ::= CHOICE {
+notBackedUp NULL,
+localObject ObjectInstance,
+managingSystem AE-title,
+remoteSystem GraphicString}
+LastRestoreSource ::= CHOICE {
+notRestored NULL,
+localObject ObjectInstance,
+managingSystem AE-title,
+remoteSystem GraphicString}
+NoteField ::= GraphicString
+Null ::= NULL
+Patch ::= CHOICE {
+patchId GraphicString, -- system specific identifier --
+patchPointer ObjectInstance } -- of Software Unit object class --
+RevertArgument ::= SEQUENCE {
+revertInfo [0] RevertInfo,
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+RevertInfo ::= SEQUENCE OF CHOICE {
+patchId GraphicString, -- system specific identifier --
+patchPointer ObjectInstance } -- Executable Software object class --
+RevertReply ::= SEQUENCE {
+revertedPatches [0] AppliedPatches,
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+SoftwareProcessingFailure ::= SET OF Attribute -- state attributes --
+TerminateValidationArgument ::= SEQUENCE {
+terminateValidationInfo [0] TerminateValidationInfo,
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+TerminateValidationInfo ::= ENUMERATED {
+cancel (0), -- discard the result of the partial audit --
+truncate (1) } -- report the result of the partially completed audit --
+TerminateValidationReply ::= CHOICE {
+noOutStandingValidation [0] NULL,
+validationCancelled [1] NULL,
+resultOfPartialValidation [2] ValidateReply}
+TransferInfo ::= SEQUENCE {
+transferProtocol TransferProtocol,
+protocolSpecificInfo ANY DEFINED BY transferProtocol OPTIONAL}
+TransferProtocol ::= OBJECT IDENTIFIER
+ValidateInfo ::= CHOICE {
+instanceDefaultValidationType [0] NULL, -- local matter --
+registeredValidationType [1] OBJECT IDENTIFIER,
+systemSpecificValidationType [2] SET OF ManagementExtension }
+ValidateReply ::= CHOICE {
+validationTerminated [0] NULL,
+passValidation [1] NULL,
+passValidationWithResult [2] SET OF ManagementExtension,
+failValidation [3] NULL,
+failValidationWithResult [4] SET OF ManagementExtension }
+END -- end of SWMF supporting productions --
+--A.9.3 Backup Restore Supporting Productions--
+BackupRestoreASN1Module {joint-iso-ccitt ms(9) function(2) part18(18) asn1Module(2) 1}
+DEFINITIONS IMPLICIT TAGS ::= BEGIN
+-- EXPORTS everything
+IMPORTS
+ObjectInstance
+FROM
+CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+ManagementExtension
+FROM
+Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1};
+--supporting productions--
+BackupArgument ::= SEQUENCE {
+backupDestination [0] BackupDestination,
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+BackupDestination ::= CHOICE {
+localObject ObjectInstance,
+inLine NULL, -- in-line in the notification in additionalInfo --
+offLine GraphicString -- remote system by, e.g. FTAM --}
+BackupReply ::= SEQUENCE {
+reply [0] CHOICE {
+success NULL, -- for local or off-line backup
+inLine BIT STRING },
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+RestoreArgument ::= SEQUENCE {
+restoreSource [0] RestoreSource,
+additionalInfo [1] SET OF ManagementExtension OPTIONAL }
+RestoreSource ::= CHOICE {
+localObject ObjectInstance,
+inLine BIT STRING ,
+offLine GraphicString -- remote system via some other transfer protocol, e.g. FTAM --
+}
+END -- of BackupRestoreASN1Module supporting productions 
