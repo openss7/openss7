@@ -9825,6 +9825,7 @@ sub gdmo {
 		printf 'NOTIFY'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		if (($s = $self->{notification})) { $s->gdmo(); }
 	}
 }
