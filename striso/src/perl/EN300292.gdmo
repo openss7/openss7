@@ -4,7 +4,7 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 04:43:19 MDT 2007
+--@@ Date: Mon Sep  3 14:38:57 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
@@ -29,8 +29,8 @@ analysisCriteria MANAGED OBJECT CLASS
 
 						Value combination of attributes (key-attributes) destinationCode, 
 						callingPartyCategory, analysisOrigin, nationalDestinationInstance, 
-						destinationType, numberOfDigits, carrierDataInstance shall be unique 
-						among all instances of this object class.";;
+						destinationType, numberOfDigits, carrierDataInstance shall be unique among all 
+						instances of this object class.";;
 			ATTRIBUTES
 				analysisCriteriaId GET,
 				destinationCode GET-REPLACE,
@@ -48,7 +48,8 @@ analysisCriteria MANAGED OBJECT CLASS
 				nationalDestinationInstance GET SET-BY-CREATE;
 		REGISTERED AS { package 1 };
 			PRESENT IF
-				"the destinationCode value has to be assigned unambiguously to a national destination.",
+				"the destinationCode value has to be assigned unambiguously to a national 
+				destination.",
 		destinationTypePackage
 			PRESENT IF
 				"the destination type has to be used to unambiguously identify the destination in 
@@ -57,8 +58,8 @@ analysisCriteria MANAGED OBJECT CLASS
 			BEHAVIOUR
 				extSchedulingPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package is used in the SMO to enable external scheduling e.g. as 
-						with OC multiScheduler from EN 301 098 [3].";;
+						"This package is used in the SMO to enable external scheduling e.g. as with OC 
+						multiScheduler from EN 301 098 [3].";;
 			ATTRIBUTES
 				extSchedulingAttribute GET-REPLACE;
 		REGISTERED AS { package 2 };
@@ -71,9 +72,9 @@ analysisCriteria MANAGED OBJECT CLASS
 			BEHAVIOUR
 				activeDestinationPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package allows to perform a REPLACE operation additionally to the 
-						GET operation on the activeDestination attribute, in case the scheduling 
-						packages are not instantiated.";;
+						"This package allows to perform a REPLACE operation additionally to the GET 
+						operation on the activeDestination attribute, in case the scheduling packages 
+						are not instantiated.";;
 			ATTRIBUTES
 				activeDestination REPLACE;
 		REGISTERED AS { package 3 };
@@ -107,8 +108,7 @@ callHistory MANAGED OBJECT CLASS
 						"See subclause 7.0
 
 						Value combination of attributes (key-attributes) echoSuppressor, 
-						numberOfSatLinks shall be unique among all instances of this object 
-						class.";;
+						numberOfSatLinks shall be unique among all instances of this object class.";;
 			ATTRIBUTES
 				callHistoryId GET;;,
 		"ITU-T Recommendation M.3100":createDeleteNotificationsPackage;
@@ -180,8 +180,8 @@ cep MANAGED OBJECT CLASS
 			BEHAVIOUR
 				officeEquipmentPackageBeh BEHAVIOUR
 					DEFINED AS
-						"Value of attribute (key-attribute) officeEquipment shall be unique 
-						among all instances of this object class";;
+						"Value of attribute (key-attribute) officeEquipment shall be unique among all 
+						instances of this object class";;
 			ATTRIBUTES
 				officeEquipment GET SET-BY-CREATE;
 		REGISTERED AS { package 9 };
@@ -201,11 +201,10 @@ cepsg MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0.
 
-						This OC represents a set of circuit end points with similar 
-						characteristics. A circuit end point subgroup can be of type one-way 
-						incoming, one-way outgoing, or two-way. For type two-way, conditional 
-						packages incomingCepsgPackage and outgoingCepsgPackage have both to be 
-						instantiated";;
+						This OC represents a set of circuit end points with similar characteristics. A 
+						circuit end point subgroup can be of type one-way incoming, one-way outgoing, or 
+						two-way. For type two-way, conditional packages incomingCepsgPackage and 
+						outgoingCepsgPackage have both to be instantiated";;
 			ATTRIBUTES
 				"ITU-T Recommendation M.3100":transmissionCharacteristics REPLACE,
 				"ITU-T Recommendation M.3100":labelOfFarEndExchange REPLACE,
@@ -237,36 +236,36 @@ cepsg MANAGED OBJECT CLASS
 				originForRebuilding GET-REPLACE;
 		REGISTERED AS { package 12 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
-				digit rebuilding is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin 
+				dependent digit rebuilding is required.",
 		originForAnalysisPackage PACKAGE
 			ATTRIBUTES
 				originForAnalysis GET-REPLACE;
 		REGISTERED AS { package 13 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
-				digit analysis is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin 
+				dependent digit analysis is required.",
 		originForRoutingPackage PACKAGE
 			ATTRIBUTES
 				originForRouting GET-REPLACE;
 		REGISTERED AS { package 14 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
-				call routing is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin 
+				dependent call routing is required.",
 		originForPreparationPackage PACKAGE
 			ATTRIBUTES
 				originForPreparation GET-REPLACE;
 		REGISTERED AS { package 15 };
 			PRESENT IF
-				"the circuit end point subgroup is of type incoming or two-way and if origin dependent 
-				digit preparation is required.",
+				"the circuit end point subgroup is of type incoming or two-way and if origin 
+				dependent digit preparation is required.",
 		termForPreparationPackage PACKAGE
 			ATTRIBUTES
 				termForPreparation GET-REPLACE;
 		REGISTERED AS { package 16 };
 			PRESENT IF
-				"the circuit end point subgroup is of type outgoing or two-way and if outgoing cepsg 
-				dependent digit preparation is required.",
+				"the circuit end point subgroup is of type outgoing or two-way and if outgoing 
+				cepsg dependent digit preparation is required.",
 		specificSignSystemPackage PACKAGE
 			ATTRIBUTES
 				languageDigitProc REPLACE-WITH-DEFAULT
@@ -286,8 +285,8 @@ cepsg MANAGED OBJECT CLASS
 				suppressOwnCac GET-REPLACE;
 		REGISTERED AS { package 19 };
 			PRESENT IF
-				"the option to administer suppression of own carrier has to be provided and if the 
-				circuit end point subgroup is of type incoming or two-way.";
+				"the option to administer suppression of own carrier has to be provided and if 
+				the circuit end point subgroup is of type incoming or two-way.";
 REGISTERED AS { managedObjectClass 5 };
 --8.1.6 cepsgComb
 
@@ -365,8 +364,8 @@ digitPreparationCriteria MANAGED OBJECT CLASS
 						"See subclause 7.0
 
 						Value combination of attributes (key-attributes) preparationOrigin, 
-						preparationTerm and analysisCriteriaInstance shall be unique among all 
-						instances of this object class.";;
+						preparationTerm and analysisCriteriaInstance shall be unique among all instances 
+						of this object class.";;
 			ATTRIBUTES
 				digitPreparationCriteriaId GET,
 				preparationOrigin REPLACE-WITH-DEFAULT
@@ -393,8 +392,8 @@ digitRebuildingCriteria MANAGED OBJECT CLASS
 						"See subclause 7.0
 
 						Value combination of attributes (key-attributes) rebuildingOrigin, 
-						natureOfAddress and calledNumberingPlan shall be unique among all 
-						instances of this object class.";;
+						natureOfAddress and calledNumberingPlan shall be unique among all instances of 
+						this object class.";;
 			ATTRIBUTES
 				digitRebuildingCriteriaId GET,
 				rebuildingOrigin REPLACE-WITH-DEFAULT
@@ -418,8 +417,8 @@ exception MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Any particular set-element value of attribute (key-attribute) matchesIf 
-						shall be unique among all instances of this object class.";;
+						Any particular set-element value of attribute (key-attribute) matchesIf shall be 
+						unique among all instances of this object class.";;
 			ATTRIBUTES
 				exceptionId GET,
 				matchesIf GET-REPLACE ADD-REMOVE,
@@ -447,47 +446,38 @@ localDestination MANAGED OBJECT CLASS
 					BEHAVIOUR
 						modifyNumberingSchemeBeh BEHAVIOUR
 							DEFINED AS
-								"This action operation modifies data of OC 
-								localDestination instance and the DN instances which 
-								belong to it. This action does not change the implicit 
-								relationship between the DNs and the local destination: 
-								a DN that belonged/did not belong to the local 
-								destination before the ACTION belongs/does not belong to 
-								it after the ACTION is executed on the localDestination 
-								instance. To keep this relationship, the 
-								initialSubscriberCodes attribute is a SEQUENCE OF i.o. a 
-								SET OF value.
+								"This action operation modifies data of OC localDestination instance and the DN 
+								instances which belong to it. This action does not change the implicit 
+								relationship between the DNs and the local destination: a DN that belonged/did 
+								not belong to the local destination before the ACTION belongs/does not belong to 
+								it after the ACTION is executed on the localDestination instance. To keep this 
+								relationship, the initialSubscriberCodes attribute is a SEQUENCE OF i.o. a SET 
+								OF value.
 
 								Information components (see ASN1TypeModule definitions):
 
 								newNationalDestInstance:
 
-								This component describes the value for the new local 
-								area code for the localDestination instance. If the 
-								excludedSubscriberCodesPackage is present, the members 
-								of the excludedSubscriberCodes attribute have to be 
-								adapted accordingly in their digit string part, 
-								representing the local area code. The local area code 
-								related attribute parts of the DNs of OC E164DN, which 
-								belong to the local destination, have to be updated 
-								accordingly.
+								This component describes the value for the new local area code for the 
+								localDestination instance. If the excludedSubscriberCodesPackage is present, the 
+								members of the excludedSubscriberCodes attribute have to be adapted accordingly 
+								in their digit string part, representing the local area code. The local area 
+								code related attribute parts of the DNs of OC E164DN, which belong to the local 
+								destination, have to be updated accordingly.
 
 								newInitialSubscriberCodes:
 
-								This component describes the new value of the attribute 
-								initialSubscriberCodes in the addressed object instance 
-								of the OC localDestination. The initial subscriber code 
-								related attribute parts of the DNs of OC E164DN, which 
-								belong to the local destination, have to be updated 
-								accordingly. The newInitialSubscriberCodes component 
-								must contain the same number of elements as the 
-								initialSubscriberCodes attribute of the addressed object 
-								instance.
+								This component describes the new value of the attribute initialSubscriberCodes 
+								in the addressed object instance of the OC localDestination. The initial 
+								subscriber code related attribute parts of the DNs of OC E164DN, which belong to 
+								the local destination, have to be updated accordingly. The 
+								newInitialSubscriberCodes component must contain the same number of elements as 
+								the initialSubscriberCodes attribute of the addressed object instance.
 
 								Reply component:
 
-								All attribute values of the local destination instance 
-								after the execution of the ACTION operation.";;
+								All attribute values of the local destination instance after the execution of 
+								the ACTION operation.";;
 					MODE CONFIRMED;
 					WITH INFORMATION SYNTAX ASN1TypeModule.ModifyNumberingSchemeInfo;
 					WITH REPLY SYNTAX ASN1TypeModule.ModifyNumberingSchemeReply;
@@ -514,8 +504,8 @@ nationalDestination MANAGED OBJECT CLASS
 					DEFINED AS
 						"See subclause 7.0
 
-						Value of attribute (key-attribute) nationalDestinationCode shall be 
-						unique among all instances of this object class.";;
+						Value of attribute (key-attribute) nationalDestinationCode shall be unique among 
+						all instances of this object class.";;
 			ATTRIBUTES
 				nationalDestinationId GET,
 				nationalDestinationCode GET SET-BY-CREATE;;,
@@ -535,9 +525,8 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 						"See subclause 7.0
 
 						Value combination of attributes (key-attributes) destinationGroupLabel, 
-						callHistoryInstance, routingOrigin, reqBearerCapability, 
-						reqSignCapability and callingPartyCategory shall be unique among all 
-						instances of this object class.";;
+						callHistoryInstance, routingOrigin, reqBearerCapability, reqSignCapability and 
+						callingPartyCategory shall be unique among all instances of this object class.";;
 			ATTRIBUTES
 				postAnalysisEvaluationId GET,
 				destinationGroupLabel GET-REPLACE,
@@ -583,8 +572,8 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 			BEHAVIOUR
 				schedulingAttributePackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package is used in the SMO to enable external scheduling e.g. as 
-						with OC timeControlledSelector from EN 301 098 [3].";;
+						"This package is used in the SMO to enable external scheduling e.g. as with OC 
+						timeControlledSelector from EN 301 098 [3].";;
 			ATTRIBUTES
 				schedulingAttribute GET-REPLACE;
 		REGISTERED AS { package 25 };
@@ -597,9 +586,8 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 			BEHAVIOUR
 				activeRoutingPossibilitiesPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This attribute contains the value of the instance of OC 
-						routingPossibilities which is applicable (or also treatment instance 
-						when required).";;
+						"This attribute contains the value of the instance of OC routingPossibilities 
+						which is applicable (or also treatment instance when required).";;
 			ATTRIBUTES
 				activeRoutingPossibilities GET;
 		REGISTERED AS { package 26 };
@@ -609,15 +597,15 @@ postAnalysisEvaluation MANAGED OBJECT CLASS
 			BEHAVIOUR
 				replaceActiveRoutingPossibilitiesPackageBeh BEHAVIOUR
 					DEFINED AS
-						"This package allows to perform a REPLACE operation additionally to the 
-						GET operation on the activeRoutingPossibilities attribute, in case the 
-						scheduling packages are not instantiated.";;
+						"This package allows to perform a REPLACE operation additionally to the GET 
+						operation on the activeRoutingPossibilities attribute, in case the scheduling 
+						packages are not instantiated.";;
 			ATTRIBUTES
 				activeRoutingPossibilities REPLACE;
 		REGISTERED AS { package 27 };
 			PRESENT IF
-				"activeRoutingPossibilitiesPackage is instantiated and if scheduling packages are not 
-				instantiated.";
+				"activeRoutingPossibilitiesPackage is instantiated and if scheduling packages are 
+				not instantiated.";
 REGISTERED AS { managedObjectClass 14 };
 --8.1.15 prefixDigitAnalysis
 
@@ -747,20 +735,21 @@ routingPossRestrict MANAGED OBJECT CLASS
 			BEHAVIOUR
 				skipGroupSignal1Beh BEHAVIOUR
 					DEFINED AS
-						"It is not allowed that a routing possibility is present in different 
-						instances of OC routingPossRestrict contained in the same instance of OC 
+						"It is not allowed that a routing possibility is present in different instances 
+						of OC routingPossRestrict contained in the same instance of OC 
 						routingPossibilities.";;
 			ATTRIBUTES
 				skipGroupSignal1 GET-REPLACE ADD-REMOVE;
 		REGISTERED AS { package 33 };
 			PRESENT IF
-				"crankback with one or two signals (see ITU-T Recommendation E.170 [5]) is supported",
+				"crankback with one or two signals (see ITU-T Recommendation E.170 [5]) is 
+				supported",
 		skipGroupSignal2Package PACKAGE
 			BEHAVIOUR
 				skipGroupSignal2Beh BEHAVIOUR
 					DEFINED AS
-						"It is not allowed that a routing possibility is present in different 
-						instances of OC routingPossRestrict contained in the same instance of OC 
+						"It is not allowed that a routing possibility is present in different instances 
+						of OC routingPossRestrict contained in the same instance of OC 
 						routingPossibilities.";;
 			ATTRIBUTES
 				skipGroupSignal2 GET-REPLACE ADD-REMOVE;
@@ -783,40 +772,38 @@ trafficDistribution MANAGED OBJECT CLASS
 				trafficDistributionPackageBeh BEHAVIOUR
 					DEFINED AS
 						"See subclause 7.0. The number of list elements in attributes 
-						trafficDistributionData, selectedInstances and 
-						inputCriteriaDataForAlgorithm has to be identical. The data with 
-						corresponding list positions in these attributes belong together.
+						trafficDistributionData, selectedInstances and inputCriteriaDataForAlgorithm has 
+						to be identical. The data with corresponding list positions in these attributes 
+						belong together.
 
 						The sum of the percentage values within each of the attributes 
-						trafficDistributionData and inputCriteriaDataForAlgorithm has to be 100 
-						%.
+						trafficDistributionData and inputCriteriaDataForAlgorithm has to be 100 %.
 
 						The trafficDistributionData attribute is derived from the value of the 
 						inputCriteriaDataForAlgorithm attribute at creation of the instance or 
-						modification of the attribute inputCriteriaDataForAlgorithm. 
-						Modification of the userLabels in the attribute 
-						inputCriteriaDataForAlgorithm triggers an update of userLabel specified 
-						in the attribute trafficDistributionData. It does not trigger an update 
-						of the percentage values contained in the trafficDistributionData 
-						Component of attribute inputCriteriaDataForAlgorithm being:
+						modification of the attribute inputCriteriaDataForAlgorithm. Modification of the 
+						userLabels in the attribute inputCriteriaDataForAlgorithm triggers an update of 
+						userLabel specified in the attribute trafficDistributionData. It does not 
+						trigger an update of the percentage values contained in the 
+						trafficDistributionData Component of attribute inputCriteriaDataForAlgorithm 
+						being:
 
-						- out: causes percentage calculation from outgoing circuit subgroup 
-						capacity for the component 'percentage' of attribute 
-						trafficDistributionData;
+						- out: causes percentage calculation from outgoing circuit subgroup capacity for 
+						  the component 'percentage' of attribute trafficDistributionData;
 
-						- perc: causes transfer of percentage value for component 'percentage' 
-						of attribute trafficDistributionData
+						- perc: causes transfer of percentage value for component 'percentage' of 
+						  attribute trafficDistributionData
 
 						- inc: causes transfer of percentage value, periodical recalculation of 
-						percentage values according to the incoming carried traffic on specified 
-						incoming circuit subgroups after defined intervals for component 
-						'percentage' of attribute trafficDistributionData.
+						  percentage values according to the incoming carried traffic on specified 
+						  incoming circuit subgroups after defined intervals for component 'percentage' 
+						  of attribute trafficDistributionData.
 
-						The attribute selectedInstances references instances of OC 
-						routingPossibilities or (exclusive or) OC postAnalysisEvaluation (this 
-						last choice is possible, if this instance shall not be referred by any 
-						instances of OC postAnalysisEvaluation). All referenced instances of 
-						this attribute belong to the same OC.";;
+						The attribute selectedInstances references instances of OC routingPossibilities 
+						or (exclusive or) OC postAnalysisEvaluation (this last choice is possible, if 
+						this instance shall not be referred by any instances of OC 
+						postAnalysisEvaluation). All referenced instances of this attribute belong to 
+						the same OC.";;
 			ATTRIBUTES
 				trafficDistributionId GET,
 				inputCriteriaDataForAlgorithm GET-REPLACE,
@@ -828,8 +815,8 @@ trafficDistribution MANAGED OBJECT CLASS
 			BEHAVIOUR
 				destinationGroupLabelBeh BEHAVIOUR
 					DEFINED AS
-						"Value of attribute (key-attribute) destinationGroupLabel shall be 
-						unique among all instances of this object class.";;
+						"Value of attribute (key-attribute) destinationGroupLabel shall be unique among 
+						all instances of this object class.";;
 			ATTRIBUTES
 				destinationGroupLabel GET-REPLACE;
 		REGISTERED AS { package 35 };
@@ -894,8 +881,8 @@ activeDestination ATTRIBUTE
 	BEHAVIOUR
 		activeDestinationBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute either references an object instance or selects a group of instances via 
-				a label.";;
+				"This attribute either references an object instance or selects a group of 
+				instances via a label.";;
 REGISTERED AS { attribute 1 };
 --8.3.2 activeRoutingPossibilities
 
@@ -906,7 +893,8 @@ activeRoutingPossibilities ATTRIBUTE
 	BEHAVIOUR
 		activeRoutingPossibilitiesBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute points to an instance of OC routingPossibilities or of OC treatment.";;
+				"This attribute points to an instance of OC routingPossibilities or of OC 
+				treatment.";;
 REGISTERED AS { attribute 2 };
 --8.3.3 analysisCriteriaId
 
@@ -954,9 +942,9 @@ boundaryCrossing ATTRIBUTE
 	BEHAVIOUR
 		boundaryCrossingBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates whether the circuit end point subgroup contains only circuit 
-				end points terminating circuits which cross international or organisational 
-				boundaries.";;
+				"This attribute indicates whether the circuit end point subgroup contains only 
+				circuit end points terminating circuits which cross international or 
+				organisational boundaries.";;
 REGISTERED AS { attribute 7 };
 --8.3.8 calledNumberingPlan
 
@@ -999,8 +987,9 @@ carrierCode ATTRIBUTE
 	BEHAVIOUR
 		carrierCodeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute describes the unambiguous carrier specific code used to distinguish from 
-				other carriers. It can be dialled by the customer or supplied by the exchange.";;
+				"This attribute describes the unambiguous carrier specific code used to 
+				distinguish from other carriers. It can be dialled by the customer or supplied 
+				by the exchange.";;
 REGISTERED AS { attribute 12 };
 --8.3.13 carrierCodePresent
 
@@ -1025,8 +1014,9 @@ carrierDataInstance ATTRIBUTE
 	BEHAVIOUR
 		carrierDataInstanceBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute references an instance of the OC carrierData. It allows the selection of 
-				destinations depending on the dialled or assigned carrier code of the call.";;
+				"This attribute references an instance of the OC carrierData. It allows the 
+				selection of destinations depending on the dialled or assigned carrier code of 
+				the call.";;
 REGISTERED AS { attribute 15 };
 --8.3.16 cepId
 
@@ -1058,8 +1048,8 @@ cepsgCombListSelection ATTRIBUTE
 	BEHAVIOUR
 		cepsgCombListSelectionBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute gives a list of instances on which an algorithm is to apply. These 
-				instances can be instances of OC routingPossData or of the OC cepsgComb.";;
+				"This attribute gives a list of instances on which an algorithm is to apply. 
+				These instances can be instances of OC routingPossData or of the OC cepsgComb.";;
 REGISTERED AS { attribute 19 };
 --8.3.20 cepsgCombOrCepsgInstance
 
@@ -1070,9 +1060,9 @@ cepsgCombOrCepsgInstance ATTRIBUTE
 	BEHAVIOUR
 		cepsgCombOrCepsgInstanceBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute points to an instance of OC cepsgComb or to an instance of OC cepsg 
-				(beside it remains possible for this attribute to point to other OCs as e.g. test 
-				equipment).";;
+				"This attribute points to an instance of OC cepsgComb or to an instance of OC 
+				cepsg (beside it remains possible for this attribute to point to other OCs as 
+				e.g. test equipment).";;
 REGISTERED AS { attribute 20 };
 --8.3.21 cepsgCombSelection
 
@@ -1095,8 +1085,8 @@ cic ATTRIBUTE
 	BEHAVIOUR
 		cicBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the circuit identification code (CIC) of a circuit and is 
-				applicable for SS No.7.";;
+				"This attribute indicates the circuit identification code (CIC) of a circuit and 
+				is applicable for SS No.7.";;
 REGISTERED AS { attribute 22 };
 --8.3.23 circuitNumber
 
@@ -1107,8 +1097,8 @@ circuitNumber ATTRIBUTE
 	BEHAVIOUR
 		circuitNumberBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute indicates the logical circuit end point number within the containing 
-				circuit end point subgroup.";;
+				"This attribute indicates the logical circuit end point number within the 
+				containing circuit end point subgroup.";;
 REGISTERED AS { attribute 23 };
 --8.3.24 crankbackAdminState
 
@@ -1142,9 +1132,9 @@ destinationCode ATTRIBUTE
 	BEHAVIOUR
 		destinationCodeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute characterises a destination of a call by specifying the country code, 
-				or/and area code, or/and exchange identifying code, or/and individual line number 
-				etc.";;
+				"This attribute characterises a destination of a call by specifying the country 
+				code, or/and area code, or/and exchange identifying code, or/and individual line 
+				number etc.";;
 REGISTERED AS { attribute 26 };
 --8.3.27 destinationGroupLabel
 
@@ -1155,8 +1145,8 @@ destinationGroupLabel ATTRIBUTE
 	BEHAVIOUR
 		destinationGroupLabelBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute specifies - via a label - the destination group the instance belongs 
-				to";;
+				"This attribute specifies - via a label - the destination group the instance 
+				belongs to";;
 REGISTERED AS { attribute 27 };
 --8.3.28 destinationType
 
@@ -1168,9 +1158,10 @@ destinationType ATTRIBUTE
 		destinationTypeBeh BEHAVIOUR
 			DEFINED AS
 				"This attribute indicates the type of destination as a named integer value. The 
-				destinationType is either derived from the called party number information element 
-				(nature of address indicator in ITU-T Recommendation Q.763 or type of number in ITU-T 
-				Recommendation Q.931) or determined by the prefix digit analysis.";;
+				destinationType is either derived from the called party number information 
+				element (nature of address indicator in ITU-T Recommendation Q.763 or type of 
+				number in ITU-T Recommendation Q.931) or determined by the prefix digit 
+				analysis.";;
 REGISTERED AS { attribute 28 };
 --8.3.29 digitCombInsert
 
@@ -1255,8 +1246,8 @@ extSchedulingAttribute ATTRIBUTE
 	BEHAVIOUR
 		extSchedulingAttributeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute provides the scheduling information in the SMO, for external index 
-				scheduling as in EN 301 098[3].";;
+				"This attribute provides the scheduling information in the SMO, for external 
+				index scheduling as in EN 301 098[3].";;
 REGISTERED AS { attribute 39 };
 --8.3.40 initialSubscriberCodes
 
@@ -1293,11 +1284,11 @@ languageDigitProc ATTRIBUTE
 		languageDigitProcBeh BEHAVIOUR
 			DEFINED AS
 				"This attribute indicates whether the language digit has to be extracted from the 
-				transmitted digit string for incoming calls and has to be included into the transmitted 
-				digit string for outgoing calls on the position specified by the signalling systems R2 
-				or C5 for international transit or terminating traffic. The attribute is applicable if 
-				the circuit end point subgroup is of type incoming or two-way and one of the above 
-				signalling systems is used.";;
+				transmitted digit string for incoming calls and has to be included into the 
+				transmitted digit string for outgoing calls on the position specified by the 
+				signalling systems R2 or C5 for international transit or terminating traffic. 
+				The attribute is applicable if the circuit end point subgroup is of type 
+				incoming or two-way and one of the above signalling systems is used.";;
 REGISTERED AS { attribute 43 };
 --8.3.44 localDestinationId
 
@@ -1373,9 +1364,10 @@ officeEquipment ATTRIBUTE
 	BEHAVIOUR
 		officeEquipmentBeh BEHAVIOUR
 			DEFINED AS
-				" This attribute references the physical equipment the circuit end point is associated 
-				with. If the inst choice is used, it references an instance of OC ITU-T Recommendation 
-				M.3100: circuitPack. If the string choice is used, the value is technology specific.";;
+				" This attribute references the physical equipment the circuit end point is 
+				 associated with. If the inst choice is used, it references an instance of OC 
+				 ITU-T Recommendation M.3100: circuitPack. If the string choice is used, the 
+				 value is technology specific.";;
 REGISTERED AS { attribute 52 };
 --8.3.53 originForAnalysis
 
@@ -1386,8 +1378,8 @@ originForAnalysis ATTRIBUTE
 	BEHAVIOUR
 		originForAnalysisBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the circuit end point subgroup for 
-				digit analysis purpose.";;
+				"This attribute determines the group assigned to the circuit end point subgroup 
+				for digit analysis purpose.";;
 REGISTERED AS { attribute 53 };
 --8.3.54 originForPreparation
 
@@ -1398,8 +1390,8 @@ originForPreparation ATTRIBUTE
 	BEHAVIOUR
 		originForPreparationBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the incoming circuit end point subgroup 
-				for digit preparation purpose.";;
+				"This attribute determines the group assigned to the incoming circuit end point 
+				subgroup for digit preparation purpose.";;
 REGISTERED AS { attribute 54 };
 --8.3.55 originForRebuilding
 
@@ -1410,8 +1402,8 @@ originForRebuilding ATTRIBUTE
 	BEHAVIOUR
 		originForRebuidingBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the circuit end point subgroup for 
-				digit rebuilding purpose.";;
+				"This attribute determines the group assigned to the circuit end point subgroup 
+				for digit rebuilding purpose.";;
 REGISTERED AS { attribute 55 };
 --8.3.56 originForRouting
 
@@ -1422,8 +1414,8 @@ originForRouting ATTRIBUTE
 	BEHAVIOUR
 		originForRoutingBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the circuit end point subgroup for 
-				post-analysis evaluation purpose.";;
+				"This attribute determines the group assigned to the circuit end point subgroup 
+				for post-analysis evaluation purpose.";;
 REGISTERED AS { attribute 56 };
 --8.3.57 ownCac
 
@@ -1434,8 +1426,8 @@ ownCac ATTRIBUTE
 	BEHAVIOUR
 		ownCacBeh BEHAVIOUR
 			DEFINED AS
-				" This attribute describes whether the carrier access code identifies the network where 
-				the exchange is located.";;
+				" This attribute describes whether the carrier access code identifies the network 
+				 where the exchange is located.";;
 REGISTERED AS { attribute 57 };
 --8.3.58 postAnalysisEvaluationId
 
@@ -1467,9 +1459,10 @@ prefixDigits ATTRIBUTE
 	BEHAVIOUR
 		prefixDigitsBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute defines the digits which have to be inserted in front of the dialled 
-				digits. An empty string means that no digits have to be inserted. The attribute is 
-				present if the circuit end point subgroup is of type incoming or two-way.";;
+				"This attribute defines the digits which have to be inserted in front of the 
+				dialled digits. An empty string means that no digits have to be inserted. The 
+				attribute is present if the circuit end point subgroup is of type incoming or 
+				two-way.";;
 REGISTERED AS { attribute 61 };
 --8.3.62 prefTrafficDirect
 
@@ -1501,8 +1494,9 @@ rDNId ATTRIBUTE
 	BEHAVIOUR
 		rDNIdBeh BEHAVIOUR
 			DEFINED AS
-				"If the string choice for the syntax is used, matching on substrings is permitted. If 
-				the number choice for the syntax is used, then matching on ordering is permitted.";;
+				"If the string choice for the syntax is used, matching on substrings is 
+				permitted. If the number choice for the syntax is used, then matching on 
+				ordering is permitted.";;
 REGISTERED AS { attribute 65 };
 --8.3.66 rebuildingOrigin
 
@@ -1555,9 +1549,9 @@ routingPossibilitiesSelection ATTRIBUTE
 	BEHAVIOUR
 		routingPossBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute gives a list of instances on which an algorithm is to apply. These 
-				instances can be instances of OC routingPossData or of OC localDestination or of OC 
-				cepsgComb or of OC cepsg or of OC routingPossibilities.";;
+				"This attribute gives a list of instances on which an algorithm is to apply. 
+				These instances can be instances of OC routingPossData or of OC localDestination 
+				or of OC cepsgComb or of OC cepsg or of OC routingPossibilities.";;
 REGISTERED AS { attribute 72 };
 --8.3.73 routingPossRestrictId
 
@@ -1575,8 +1569,8 @@ schedulingAttribute ATTRIBUTE
 	BEHAVIOUR
 		schedulingAttributeBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute provides the scheduling information in the SMO, for external index 
-				scheduling as in EN 301 098[3].";;
+				"This attribute provides the scheduling information in the SMO, for external 
+				index scheduling as in EN 301 098[3].";;
 REGISTERED AS { attribute 74 };
 --8.3.75 searchMethod
 
@@ -1598,9 +1592,9 @@ selectedInstances ATTRIBUTE
 	BEHAVIOUR
 		selectedInstancesBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute references object instances with an ordered list. Instances are of OC 
-				routingPossibilities or postAnalysisEvaluation. All referenced instances of this 
-				attribute belong to the same OC.";;
+				"This attribute references object instances with an ordered list. Instances are 
+				of OC routingPossibilities or postAnalysisEvaluation. All referenced instances 
+				of this attribute belong to the same OC.";;
 REGISTERED AS { attribute 76 };
 --8.3.77 skipGroupSignal1
 
@@ -1611,9 +1605,9 @@ skipGroupSignal1 ATTRIBUTE
 	BEHAVIOUR
 		skipGroupSignal1Beh BEHAVIOUR
 			DEFINED AS
-				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to 
-				be skipped if signal1 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg 
-				reachable via one of these routing possibilities.";;
+				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that 
+				have to be skipped if signal1 (refer to ITU-T Recommendation E.170 [5]) arrives 
+				from a cepsg reachable via one of these routing possibilities.";;
 REGISTERED AS { attribute 77 };
 --8.3.78 skipGroupSignal2
 
@@ -1624,9 +1618,9 @@ skipGroupSignal2 ATTRIBUTE
 	BEHAVIOUR
 		skipGroupSignal2Beh BEHAVIOUR
 			DEFINED AS
-				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that have to 
-				be skipped if signal2 (refer to ITU-T Recommendation E.170 [5]) arrives from a cepsg 
-				reachable via one of these routing possibilities.";;
+				"This attribute lists routing possibilities (e.g. routingPossData, cepsg) that 
+				have to be skipped if signal2 (refer to ITU-T Recommendation E.170 [5]) arrives 
+				from a cepsg reachable via one of these routing possibilities.";;
 REGISTERED AS { attribute 78 };
 --8.3.79 suppressCac
 
@@ -1648,7 +1642,8 @@ suppressOwnCac ATTRIBUTE
 	BEHAVIOUR
 		suppressOwnCacBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute describes whether the network's own CAC has to be suppressed or not.";;
+				"This attribute describes whether the network's own CAC has to be suppressed or 
+				not.";;
 REGISTERED AS { attribute 80 };
 --8.3.81 termForPreparation
 
@@ -1659,8 +1654,8 @@ termForPreparation ATTRIBUTE
 	BEHAVIOUR
 		termForPreparationBeh BEHAVIOUR
 			DEFINED AS
-				"This attribute determines the group assigned to the outgoing circuit end point subgroup 
-				for digit preparation purpose.";;
+				"This attribute determines the group assigned to the outgoing circuit end point 
+				subgroup for digit preparation purpose.";;
 REGISTERED AS { attribute 81 };
 --8.3.82 trafficCategory
 
@@ -1675,20 +1670,20 @@ trafficCategory ATTRIBUTE
 				attribute is not the same as the parameter calling party's category of ITU-T 
 				Recommendation Q.763.
 
-				The Abstract Syntax Notation One (ASN.1) type TrafficCategory comprises the following 
-				values:
+				The Abstract Syntax Notation One (ASN.1) type TrafficCategory comprises the 
+				following values:
 
-				- nationalTraffic: This value is used for traffic that does not cross international 
-				  boundaries and when no other specific value of the ASN.1 type TrafficCategory is 
-				  appropriate.
+				- nationalTraffic: This value is used for traffic that does not cross 
+				  international boundaries and when no other specific value of the ASN.1 type 
+				  TrafficCategory is appropriate.
 
-				- internationalTransitTraffic: This value is used for traffic that crosses international 
-				  boundaries and when the adjacent exchange serves as international transit exchange for 
-				  the traffic.
+				- internationalTransitTraffic: This value is used for traffic that crosses 
+				  international boundaries and when the adjacent exchange serves as 
+				  international transit exchange for the traffic.
 
 				- internationalTerminatingTraffic: This value is used for traffic that crosses 
-				  international boundaries and when the adjacent exchange serves as an international 
-				  terminating exchange.";;
+				  international boundaries and when the adjacent exchange serves as an 
+				  international terminating exchange.";;
 REGISTERED AS { attribute 82 };
 --8.3.83 trafficDistributionData
 
@@ -2016,7 +2011,7 @@ END
 --@@ |  |  +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringRecord
 --@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
 --@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
---@@ |  |  +- "Rec. X.746 (1995)":operationResultRecord
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":operationResultRecord
 --@@ |  |  +- "Recommendation G.774.3":apsReportRecord
 --@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
 --@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
@@ -2053,17 +2048,17 @@ END
 --@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringDataObject
 --@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
 --@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
---@@ +- "Rec. X.746 (1995)":scheduler
---@@ |  +- "Rec. X.746 (1995)":dailyScheduler
---@@ |  |  +- "Rec. X.746 (1995)":dailyOperationScheduler
---@@ |  +- "Rec. X.746 (1995)":weeklyScheduler
---@@ |  |  +- "Rec. X.746 (1995)":weeklyOperationScheduler
---@@ |  +- "Rec. X.746 (1995)":monthlyScheduler
---@@ |  |  +- "Rec. X.746 (1995)":monthlyOperationScheduler
---@@ |  +- "Rec. X.746 (1995)":periodicScheduler
---@@ |  |  +- "Rec. X.746 (1995)":periodicOperationScheduler
---@@ |  +- "Rec. X.746 (1995)":multiScheduler
---@@ +- "Rec. X.746 (1995)":typeOfDayController
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":multiScheduler
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
 --@@ +- "CCITT X.521":organization
 --@@ +- "CCITT X.521":organizationalUnit
 --@@ +- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
@@ -2433,16 +2428,16 @@ END
 --@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
 --@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
 --@@ >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
---@@ >- "Rec. X.746 (1995)":scheduler
---@@ >- "Rec. X.746 (1995)":typeOfDayController
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
 --@@ "ITU-T Rec. Q.822 (1994)":currentData
 --@@ >- "ITU-T Rec. Q.822 (1994)":historyData
 --@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
 --@@ >- "ITU-T Rec. Q.822 (1994)":historyData
 --@@ "CCITT X.521":organization
 --@@ >- "Recommendation M.3100:1992":managedElement
---@@ |  >- "Rec. X.746 (1995)":scheduler
---@@ |  >- "Rec. X.746 (1995)":typeOfDayController
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
 --@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
 --@@ |  >- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
 --@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
@@ -2476,7 +2471,7 @@ END
 --@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
 --@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
 --@@ |  >- "Recommendation M.3100:1992":physicalPort
---@@ |  >- "Rec. X.746 (1995)":scheduler
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
 --@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
 --@@ |  >- "Recommendation M.3100:1992":software +++
 --@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++

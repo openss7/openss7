@@ -68,13 +68,11 @@ module MANAGED OBJECT CLASS
 						direct consequences on the states but only a general reduction of the module 
 						capacity (currently not defined in the object). On the other side the locking of 
 						the module should directly affect in the same way the resources administrative 
-						states."
-				;;
+						states.";;
 			ATTRIBUTES
 				moduleId GET,
 				moduleType GET,
-				"M.3100:1995":supportedByObjectList GET;
-		;;
+				"M.3100:1995":supportedByObjectList GET;;;
 	CONDITIONAL PACKAGES
 		"M.3100:1995":createDeleteNotificationsPackage
 			PRESENT IF
@@ -131,13 +129,11 @@ externalPoint MANAGED OBJECT CLASS
 						relate the external state of the external point to its internal state. Instances 
 						of subclasses of this object class are automatically created/deleted by the 
 						managed element when the object instance associated with equipment is 
-						created/deleted."
-				;;
+						created/deleted.";;
 			ATTRIBUTES
 				externalPointId GET,
 				"M.3100:1995":supportedByObjectList GET,
-				polarity GET-REPLACE;
-		;;
+				polarity GET-REPLACE;;;
 	CONDITIONAL PACKAGES
 		"M.3100:1995":alarmSeverityAssignmentPointerPackage
 			PRESENT IF
@@ -169,14 +165,12 @@ externalInputPoint MANAGED OBJECT CLASS
 						default value for the probableCause attribute shall be 'indeterminate' A change 
 						in the externalState to On will generate an alarm notification. If the 
 						alarmSeverityAssignmentProfilePointer is NULL or not present, then the perceived 
-						severity shall be indeterminate."
-				;;
+						severity shall be indeterminate.";;
 			ATTRIBUTES
 				externalState GET,
 				"X.721":probableCause GET-REPLACE;
 			NOTIFICATIONS
-				"M.3100:1995":environmentalAlarm;
-		;;
+				"M.3100:1995":environmentalAlarm;;;
 REGISTERED AS { managedObjectClass 5 };
 --5.5.1.6 External Output Point
 
@@ -201,11 +195,9 @@ externalOutputPoint MANAGED OBJECT CLASS
 						externalState attribute and the state can be changed using this attribute. If a 
 						'short-circuit' (or other problem) can be detected and the 
 						equipmentsEquipmentAlarmPackage is present, then it is reported as an equipment 
-						alarm with a probable cause of externalIFDeviceProblem"
-				;;
+						alarm with a probable cause of externalIFDeviceProblem";;
 			ATTRIBUTES
-				externalState GET-REPLACE;
-		;;
+				externalState GET-REPLACE;;;
 	CONDITIONAL PACKAGES
 		"M.3100:1995":equipmentsEquipmentAlarmR1Package
 			PRESENT IF
@@ -236,8 +228,7 @@ REGISTERED AS { attribute 1 };
 externalPointIdBehaviour BEHAVIOUR
 	DEFINED AS
 		"This attribute is used to name instances of the external point managed object 
-		class"
-;
+		class";
 --5.5.3.2 External State
 
 
@@ -251,8 +242,7 @@ REGISTERED AS { attribute 2 };
 
 externalStateBehaviour BEHAVIOUR
 	DEFINED AS
-		"This attribute is used to describe the state of an external point."
-;
+		"This attribute is used to describe the state of an external point.";
 --5.5.3.3 Polarity
 
 
@@ -267,8 +257,7 @@ REGISTERED AS { attribute 3 };
 polarityBehaviour BEHAVIOUR
 	DEFINED AS
 		"the polarity attribute is used to assign the sensing polarity of an input or 
-		output point."
-;
+		output point.";
 --5.5.3.4 Module Id
 
 
@@ -282,8 +271,7 @@ REGISTERED AS { attribute 4 };
 
 moduleIdBehaviour BEHAVIOUR
 	DEFINED AS
-		"This attribute is used to name instances of the module managed object class"
-;
+		"This attribute is used to name instances of the module managed object class";
 --5.5.3.5 Module Type
 
 
@@ -298,8 +286,7 @@ REGISTERED AS { attribute 5 };
 moduleIdBehaviour BEHAVIOUR
 	DEFINED AS
 		"This attribute is used to classify the module managed object class according 
-		their types."
-;
+		their types.";
 --5.5.3.6 Physical Connector List
 
 
@@ -314,8 +301,7 @@ REGISTERED AS { attribute 6 };
 physicalConnectorListBehaviour BEHAVIOUR
 	DEFINED AS
 		"This attribute indicates the set of physical connectors supported by a physical 
-		resource."
-;
+		resource.";
 --5.5.3.7 Physical Connection List
 
 
@@ -330,8 +316,7 @@ REGISTERED AS { attribute 7 };
 physicalConnectionListBehaviour BEHAVIOUR
 	DEFINED AS
 		"This attribute is used to relate external cabling to the appropriate connectors 
-		(local and far). There is an entry per each local connector"
-;
+		(local and far). There is an entry per each local connector";
 --5.5.4 Name binding definitions
 --5.5.4.1 External Point - Managed Element
 

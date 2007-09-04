@@ -8,8 +8,9 @@
 --@@ 
 --< GDMO.Document "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" >--
 --< GDMO.Version 1.3 >--
---< GDMO.Alias "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992",
+--< GDMO.Alias "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992" "X.721"
 --  "CCITT Rec. X.721 (1992)",
+--  "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992",
 --  "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
 --  "CCITT Rec. X.721 | ISO 10165-2:1992",
 --  "CCITT Rec X.721 | ISO/IEC 10165-2",
@@ -39,7 +40,6 @@
 --  "Rec. X.721 (1992) | ISO/IEC 10165-2:1992",
 --  "Rec. X.721 | ISO/IEC 10165-2",
 --  "Rec. X.721 | ISO/IEC 10165-2 : 1992",
---  "Rec. X.721 | ISO/IEC 10165-2:1992",
 --  "Rec. X.721 | ISO/IEC 10165-2:1992",
 --  "X.721:1992",
 --  "DMI" >--

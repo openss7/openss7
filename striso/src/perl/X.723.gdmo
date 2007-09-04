@@ -9,15 +9,17 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" >--
 --< GDMO.Version 1.3 >--
---< GDMO.Alias "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
---  "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
---  "ITU-T Rec. X.723 | ISO/IEC 10165-5",
---  "CCITT Rec. X.723 | ISO/IEC 10165-5",
---  "Rec. X.723 | ISO/IEC 10165-5",
---  "ITU-T Rec. X.723 (1993)",
+--< GDMO.Alias "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993" "X.723",
 --  "CCITT Rec. X.723 (1993)",
+--  "CCITT Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
+--  "CCITT Rec. X.723 | ISO/IEC 10165-5",
+--  "ITU-T Rec. X.723 (1993)",
+--  "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1994",
+--  "ITU-T Rec. X.723 | ISO/IEC 10165-5",
 --  "Rec. X.723 (1993)",
+--  "Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993",
 --  "Rec. X. 723 | ISO/IEC 10165-5",
+--  "Rec. X.723 | ISO/IEC 10165-5",
 --  "GMI" >--
 --< GDMO.Copyright
 --  =============================================================================

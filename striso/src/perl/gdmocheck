@@ -468,6 +468,30 @@ sub gdmo {
 }
 
 # -------------------------------------
+package CommaListUnindented;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s,$c,$i);
+		#$::indent.="\t";
+		foreach $s (@{$self->{items}}) {
+			if ($i) {
+				printf ','; $::first = 0;
+				if ($c) { $c->gdmo(@_); }
+			} else { $i = 1; }
+			$s->gdmo(@_);
+			$c = $s->{commentplus};
+		}
+		#$::indent=~s/^.//s;
+	}
+}
+
+# -------------------------------------
 package SimpleList;
 use strict;
 use vars qw(@ISA);
@@ -839,7 +863,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	my @names = ( 'bindings', 'subordinates', 'objects', 'objects', 'packages', 'actions', 'notifications', 'groups', 'constraints', 'attributes', 'parameters', 'behaviours' );
+	my @names = ( 'relations', 'bindings', 'subordinates', 'objects', 'objects', 'packages', 'actions', 'notifications', 'groups', 'constraints', 'attributes', 'parameters', 'mappings', 'behaviours' );
 	my @headers = ( 'Name Binding', 'Subordination Rule', 'Managed Object Class Factory', 'Managed Object Class', 'Package', 'Action', 'Notification', 'Attribute Group', 'Constraint Rule', 'Attribute', 'Parameter', 'Behaviour' );
 	my @suffixes = ( '', '', 'Factory', '', '', '', '', '', '', '', '', '' );
 	if (0) {
@@ -970,6 +994,25 @@ sub gdmo {
 				}
 			}
 			unless ($i) { print "--@@\n--@@ This module references no PARAMETER."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{relations}}) {
+				if ($g->{relations}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					print "--@@ This module defines RELATIONSHIP CLASS $l.";
+					$i++;
+				}
+			}
+			unless ($i) { print "--@@\n--@@ This module defines no RELATIONSHIP CLASS."; }
+			$i = 0;
+			foreach $l (sort keys %{$g->{relations}}) {
+				if (!$g->{relations}->{$l}->{defn}) {
+					unless ($i) { print "--@@"; }
+					foreach $id (sort keys %{$g->{relations}->{$l}->{docs}}) {
+						print "--@@ This module references RELATIONSHIP CLASS $l in module \"$id\".";
+					}
+					$i++;
+				}
+			}
 			$i = 0;
 			foreach $l (sort keys %{$g->{bindings}}) {
 				if ($g->{bindings}->{$l}->{defn}) {
@@ -1201,6 +1244,28 @@ sub gdmo {
 					}
 				}
 				unless ($i) { print "--@@\n--@@ These modules define no PARAMETER."; }
+			}
+			$i = 0;
+			foreach $l (sort keys %{$g->{relations}}) {
+				if (!$g->{relations}->{$l}->{defn}) {
+					foreach $id (sort keys %{$g->{relations}->{$l}->{docs}}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules reference RELATIONSHIP CLASS $l in module \"$id\".";
+						$i++;
+					}
+				}
+			}
+			# unless ($i) { print "--@@\n--@@ These modules reference no NAME BINDING."; }
+			if ($i) {
+				$i = 0;
+				foreach $l (sort keys %{$g->{relations}}) {
+					if ($g->{relations}->{$l}->{defn}) {
+						unless ($i) { print "--@@"; }
+						print "--@@ These modules define RELATIONSHIP CLASS $l.";
+						$i++;
+					}
+				}
+				unless ($i) { print "--@@\n--@@ These modules define no NAME BINDING."; }
 			}
 			$i = 0;
 			foreach $l (sort keys %{$g->{bindings}}) {
@@ -7313,8 +7378,8 @@ sub read {
 		if (($self->{qualifiedby} = QualifiedBy->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{qualifiedby};
 		}
-		last TEST unless (($self->{rolespecifier} = RoleSpecifierList->parse($line,@_[1,-1],$self)));
-		push @{$self->{children}}, $self->{rolespecifier};
+		last TEST unless (($self->{rolespecifiers} = RoleSpecifiers->parse($line,@_[1,-1],$self)));
+		push @{$self->{children}}, $self->{rolespecifiers};
 		if (($self->{registration} = RegisteredAs->parse($line,@_[1,-1],$self))) {
 			push @{$self->{children}}, $self->{registration};
 		}
@@ -7358,7 +7423,7 @@ sub read {
 			push @{$self->{children}}, $self->{operations};
 		}
 		if (($self->{registered} = RegisteredAs->parse($line,@_[1,-1]))) {
-			push @{$self->{children}}, $self->{operations};
+			push @{$self->{children}}, $self->{registered};
 		}
 		last TEST unless ($line=~s/^;//s);
 		$self->{comments2} = Comments->parse($line,@_[1,-1],$self);
@@ -8666,6 +8731,35 @@ sub gdmo {
 }
 
 # -------------------------------------
+package RoleSpecifiers;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless (($self->{list} = RoleSpecifierList->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{list};
+		last TEST unless ($line=~s/^;//s);
+		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		$self->{list}->gdmo();
+		printf ';'; $::first = 0;
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
 package RoleSpecifierList;
 use strict;
 use vars qw(@ISA);
@@ -8696,20 +8790,20 @@ sub read {
 		if (($self->{requiredrole} = RequiredRoleCardinalityConstraint->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{requiredrole};
 		}
-		if (($self->{permittedrel} = PermittedRelationshipCardinalityConstraint->parse($line,@_[1,-1]))) {
-			push @{$self->{children}}, $self->{permittedrel};
-		}
 		if (($self->{bindsupport} = BindSupport->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{bindsupport};
 		}
 		if (($self->{unbindsupport} = UnbindSupport->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{unbindsupport};
 		}
+		if (($self->{permittedrel} = PermittedRelationshipCardinalityConstraint->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{permittedrel};
+		}
 		if (($self->{registeredas} = RegisteredAs->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{registeredas};
 		}
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		#last TEST unless ($line=~s/^;//s);
+		#$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8734,8 +8828,8 @@ sub gdmo {
 			$::indent=~s/^.//s;
 		}
 		if (($s = $self->{registeredas})) { $s->gdmo(); }
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		#printf ';'; $::first = 0;
+		#if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -8754,8 +8848,8 @@ sub read {
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{class} = ClassReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{class};
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		#last TEST unless ($line=~s/^;//s);
+		#$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8768,9 +8862,10 @@ sub gdmo {
 		printf 'COMPATIBLE-WITH'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{class}->gdmo();
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		#printf ';'; $::first = 0;
+		#if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -8789,8 +8884,8 @@ sub read {
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{type} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		#last TEST unless ($line=~s/^;//s);
+		#$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8804,8 +8899,8 @@ sub gdmo {
 		my $s;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
 		$self->{type}->gdmo();
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		#printf ';'; $::first = 0;
+		#if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -8824,8 +8919,8 @@ sub read {
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{type} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		#last TEST unless ($line=~s/^;//s);
+		#$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8839,8 +8934,8 @@ sub gdmo {
 		my $s;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
 		$self->{type}->gdmo();
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		#printf ';'; $::first = 0;
+		#if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -8921,8 +9016,8 @@ sub read {
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{type} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{type};
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		#last TEST unless ($line=~s/^;//s);
+		#$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8936,8 +9031,8 @@ sub gdmo {
 		my $s;
 		if (($s = $self->{comments1})) { $s->gdmo(); }
 		$self->{type}->gdmo();
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		#printf ';'; $::first = 0;
+		#if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -9076,7 +9171,7 @@ sub gdmo {
 package RoleMappingSpecificationList;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(CommaList);
+@ISA = qw(CommaListUnindented);
 # -------------------------------------
 
 # -------------------------------------
@@ -9103,6 +9198,22 @@ sub read {
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		my $s;
+		$self->{role}->gdmo();
+		{
+			$::indent.="\t";
+			$self->{classes}->gdmo();
+			if (($s = $self->{representedby})) { $s->gdmo(); }
+			if (($s = $self->{qualifies})) { $s->gdmo(); }
+			$::indent=~s/^.//s;
+		}
+	}
 }
 
 # -------------------------------------
@@ -9161,8 +9272,9 @@ sub gdmo {
 	PRINT: {
 		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		my $s;
-		printf "RELATED-CLASES"; $::first = 0;
+		printf "RELATED-CLASSES"; $::first = 0;
 		$::indent.="\t"; if (($s = $self->{comments1})) { $s->gdmo(); } $::indent=~s/^.//s;
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{classes}->gdmo();
 	}
 }
@@ -9209,10 +9321,10 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		last TEST unless (
-			($self->{representarion} = Naming->parse($line,@_[1,-1])) ||
-			($self->{representarion} = AttributeRepresentation->parse($line,@_[1,-1])) ||
-			($self->{representarion} = RelationshipObjectUsingPointer->parse($line,@_[1,-1])) ||
-			($self->{representarion} = Operation->parse($line,@_[1,-1]))
+			($self->{representation} = Naming->parse($line,@_[1,-1])) ||
+			($self->{representation} = AttributeRepresentation->parse($line,@_[1,-1])) ||
+			($self->{representation} = RelationshipObjectUsingPointer->parse($line,@_[1,-1])) ||
+			($self->{representation} = Operation->parse($line,@_[1,-1]))
 		);
 		push @{$self->{children}}, $self->{representation};
 		$_[0] = $line; return $self;
@@ -9244,11 +9356,13 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		my $s;
-		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		if (!$::first) { printf ' '; }
+		#if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		printf 'ATTRIBUTE'; $::first = 0;
 		{
 			$::indent.="\t";
 			if (($s = $self->{comments})) { $s->gdmo(); }
+			if (!$::first) { printf ' '; $::first = 1; }
 			$self->{attribute}->gdmo();
 			$::indent=~s/.$//s;
 		}
@@ -9475,6 +9589,14 @@ sub read {
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		$self->call('gdmo',@_);
+	}
 }
 
 # -------------------------------------
@@ -10112,7 +10234,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		last TEST unless ($line=~s/^CREATE//s);
+		last TEST unless ($line=~s/^NOTIFICATION//s);
 		$self->{comments} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{notification} = NotificationReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{notification};
@@ -10128,7 +10250,7 @@ sub gdmo {
 	my $self = shift;
 	PRINT: {
 		if (!$::first) { printf ' '; }
-		printf 'CREATE'; $::first = 0;
+		printf 'NOTIFICATION'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
 		$self->{notification}->gdmo();
