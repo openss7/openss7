@@ -82,6 +82,7 @@ GDMOS = \
 	X.744.gdmo \
 	X.745.gdmo \
 	X.746.gdmo \
+	X.748.gdmo \
 	EN300292.gdmo \
 	ES200653.gdmo \
 	ES201097-1.gdmo
