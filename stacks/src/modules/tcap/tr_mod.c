@@ -416,7 +416,7 @@ tr_restore_state(struct tr *tr)
 	return (tr_set_state(tr, tr->oldstate));
 }
 
-static inline const char *
+static const char *
 sc_primname(uint prim)
 {
 	switch (prim) {
