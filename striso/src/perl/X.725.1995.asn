@@ -1,0 +1,23 @@
+-- B.1 Allocation of object identifiers
+-- This Recommendation | International Standard allocates the following object identifiers:
+GRMD {joint-iso-itu-t ms(9) smi(3) part7(7) asn1Module(2) 1}
+DEFINITIONS ::= BEGIN
+grm-Object OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) managedObjectClass(3)}
+grm-Package OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) package(4)}
+grm-Parameter OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) parameter(5)}
+grm-NameBinding OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) nameBinding(6)}
+grm-Attribute OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) attribute(7)}
+grm-RelationshipClass OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) relationshipClass(11)}
+grm-RelationshipMapping OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) relationshipMapping(12)}
+grm-RelationshipRole OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) smi(3) part7(7) relationshipRole(13)}
+END
+-- B.6 Abstract syntax definitions
+GRM-ASN1Module {joint-iso-itu-t ms(9) smi(3) part7(7) asn1Module(2) 2}
+DEFINITIONS ::= BEGIN
+IMPORTS ObjectInstance FROM CMIP-1 {joint-iso-itu-t ms(9) cmip(1) version(1) protocol(3) }
+SimpleNameType, GroupObjects
+FROM Attribute-ASN1Module {joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1}
+RelationshipClass ::= OBJECT IDENTIFIER
+RelationshipMapping ::= OBJECT IDENTIFIER
+Null ::= NULL
+END

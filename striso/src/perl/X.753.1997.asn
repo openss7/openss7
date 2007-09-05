@@ -1,0 +1,93 @@
+-- A.8 ASN.1 definitions
+CSModule {joint-iso-itu-t ms(9) function(2) part21(21) asn1Module(2) 0}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+SimpleNameType
+FROM Attribute-ASN1Module {joint-iso-itu-t ms(9) smi(3) part2(2)
+asn1Module(2) 1 }
+ObjectInstance, Attribute, CMISSync, CMISFilter, ModifyOperator, Scope,
+BaseManagedObjectId FROM CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0)
+protocol(3)}
+AE-title FROM ACSE-1 {joint-iso-itu-t association-control(2) abstract-syntax(1)
+apdus(0) version(1)};
+cmdSeqRelationshipClasses OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2)
+part21(21) relationshipClass(11) }
+cmdSeqRelationshipMappings OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2)
+part21(21) relationshipMapping(12)}
+cmdSeqRelationshipRoles OBJECT IDENTIFIER ::= {joint-iso-itu-t ms(9) function(2)
+part21(21) relationshipRole(13)}
+--
+-- Range Constraints used for relationship class definitions
+--
+RangeFromOneToOne ::= INTEGER (1 .. 1)
+RangeFromZeroToMax ::= INTEGER (0 .. MAX)
+--
+-- Counter size constraint
+--
+MaxCounterSize ::= INTEGER{unlimited(0)} -- size in octets
+ExecutionResultInfo ::= SEQUENCE {triggerId TriggerId,
+scriptId ScriptId,
+threadId ThreadId,
+errorCode ErrorCode,
+executionResultType ExecutionResultType,
+executionResult SET OF Attribute}
+TriggerResultInfo ::= SEQUENCE {triggerId TriggerId,
+CHOICE {singleTriggerResult ResultInfoFromThread,
+sequentialTriggerResult SEQUENCE OF
+ResultInfoFromThread,
+parallelTriggerResult SET OF ResultInfoFromThread}}
+ResultInfoFromThread ::= SEQUENCE{executionType ExecutionType,
+errorCode ErrorCode,
+executionResultType ExecutionResultType,
+executionResult SET OF Attribute}
+ExecutionType : := CHOICE {singleExecution ScriptThreadSet,
+parallelExecution SET OF ScriptThreadSet,
+sequentialExecution SEQUENCE OF ScriptThreadSet}
+ScriptThreadSet ::= SEQUENCE {scriptId ScriptId,
+threadId ThreadId}
+SpawnerObjectId ::= SEQUENCE {triggerId TriggerId,
+CHOICE { threadId ThreadId,
+launchPadId LaunchPadId}}
+ExecutionResultType ::= OBJECT IDENTIFIER
+CommandSequencerId ::= ObjectInstance
+ScriptId ::= ObjectInstance
+ThreadId ::= ObjectInstance
+TriggerId ::= ObjectInstance
+LaunchPadId ::= ObjectInstance
+ScriptList ::= CHOICE {scriptId ScriptId,
+sequentialScriptList SEQUENCE OF ScriptId,
+parallelScriptList SET OF ScriptId}
+AvailableScriptList ::= SET OF ScriptList
+emptyScriptList AvailableScriptList ::= {}
+emptyExecutionParameterList ExecutionParameterList ::= sequentialExecutionList:{}
+TriggerParameters ::= SEQUENCE {triggerId TriggerId,
+executionParameterList ExecutionParameterList}
+ExecutionParameterList ::= CHOICE {executionParameter ExecutionParameter,
+sequentialExecutionList SEQUENCE OF
+ExecutionParameter,
+parallelExecutionList SET OF
+ExecutionParameter}
+ExecutionParameter ::= SEQUENCE {scriptId ScriptId,
+scriptParameters SEQUENCE OF Attribute}
+emptyParameterList ExecutionParameterList ::= sequentialExecutionList:{ }
+ErrorCode ::= SET OF INTEGER {noError(0),
+noScriptError(1),
+scriptRejectedError(2),
+invalidParameterTypeError(3),
+invalidParameterValueError(4),
+scriptSyntaxError(5),
+scriptExecutionFailedError(6),
+invalidParmeterNumber(7),
+unauthorizedAccessError(8)}
+ScriptLanguageName ::= OBJECT IDENTIFIER
+ScriptContent ::= GeneralString
+ModificationList ::= SET OF SEQUENCE{modifyOperator [2] IMPLICIT
+ModifyOperator DEFAULT replace,
+attributeId AttributeId,
+attributeValue ANY DEFINED BY
+attributeId OPTIONAL
+-- absent for setToDefault
+}
+END

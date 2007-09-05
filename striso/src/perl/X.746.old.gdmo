@@ -4,24 +4,68 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 12:05:55 MDT 2007
+--@@ Date: Mon Sep  3 04:42:36 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.738.gdmo" >--
---< GDMO.Include "X.739.gdmo" >--
---< GDMO.Include "M.3100.gdmo" >--
---< GDMO.Document "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002" { joint-iso-itu-t ms(9) function(2) part15(15) } >--
---< GDMO.Version 1.3 "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002" >--
---< GDMO.Alias "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002" "X.746",
---  "ITU-T Rec. X.746 | ISO/IEC 10164-15",
---  "Rec. X.746 (1995)",
---  "ITU-T Recommendation X.746" >--
-MODULE "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002"
--- Annex A
--- Definition of management information
--- (This annex forms an integral part of this Recommendation | International Standard)
+--< GDMO.Document "Rec. X.746 (1995)" >--
+--< GDMO.Alias "Rec. X.746 (1995)" "ITU-T Recommendation X.746" >--
+--< GDMO.Version 1.3 >--
+--< GDMO.Copyright
+--  =============================================================================
+--  
+--  @(#) $RCSfile$ $Name$($Revision$) $Date$
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date$ by $Author$
+--  
+--  =============================================================================
+--  >--
 -- A.1 Object class definitions
 -- A.1.1 Scheduler object definition
+MODULE "Rec. X.746 (1995)"
 
 scheduler MANAGED OBJECT CLASS
 	DERIVED FROM
@@ -173,14 +217,18 @@ multiScheduler MANAGED OBJECT CLASS
 						the possibility exists that none of the intervals are valid. In that situation, 
 						the value indicated by the default index is applicable. The following 
 						restrictions apply to the schedulingData attribute:
+
 						- index is the only valid component of IndexOrOperSpec,
+
 						- intervalsOfDayWps is the only valid component of TimeOfDayWps.
+
 						When the interval scheduler is created or resumed at a time that is within the 
 						scheduler's defined duration, the activity within the SMO will be set according 
-						to the index defined by the interval scheduler's schedule. When the interval 
-						scheduler is deleted or suspended, or the scheduler exists at a time outside the 
-						scheduler's defined duration, the activity within the SMO will be set according 
-						to the default index.";;
+						to the index defined by the interval scheduler's schedule.
+
+						When the interval scheduler is deleted or suspended, or the scheduler exists at 
+						a time outside the scheduler's defined duration, the activity within the SMO 
+						will be set according to the default index.";;
 			ATTRIBUTES
 				defaultIndex REPLACE-WITH-DEFAULT
 					DEFAULT VALUE Schedulerev1-ASN1Module.defaultDefaultIndex
@@ -193,17 +241,22 @@ multiScheduler MANAGED OBJECT CLASS
 				triggerSchedulingPackageBeh BEHAVIOUR
 					DEFINED AS
 						"The following restrictions apply to the schedulingData attribute:
+
 						- TimesOfDayWps shall have the component triggerTimes;
+
 						- the optional component priority shall be absent.
+
 						When the trigger scheduler is created or resumed at a time that is within the 
 						scheduler's defined duration, the first triggering of an activity within the SMO 
-						will occur according to the schedule. When the trigger scheduler is deleted or 
-						suspended, or the scheduler exists at a time outside the scheduler's defined 
-						duration, the scheduled activities within the SMO will not be triggered.";;
+						will occur according to the schedule.
+
+						When the trigger scheduler is deleted or suspended, or the scheduler exists at a 
+						time outside the scheduler's defined duration, the scheduled activities within 
+						the SMO will not be triggered.";;
 		REGISTERED AS { schedPkg 2 };
 			PRESENT IF
 				"Instance provides trigger scheduling",
-		typeOfDayControllerInstancePackage PACKAGE-- bb Correction
+		typeOfDayControllerInstancePackage PACKAGE
 			BEHAVIOUR
 				typeOfDayControllerInstancePackageBeh BEHAVIOUR
 					DEFINED AS
@@ -295,7 +348,7 @@ REGISTERED AS { schedNb 3 };
 
 
 typeOfDayController-system NAME BINDING
-	SUBORDINATE OBJECT CLASS typeOfDayController AND SUBCLASSES;-- bb Correction
+	SUBORDINATE OBJECT CLASS typeOfDayController AND SUBCLASSES;
 	NAMED BY
 	SUPERIOR OBJECT CLASS "Rec. X.721 | ISO/IEC 10165-2 : 1992":system AND SUBCLASSES;
 	WITH ATTRIBUTE
@@ -522,13 +575,13 @@ schedulingData ATTRIBUTE
 	BEHAVIOUR
 		schedulingDataBeh BEHAVIOUR
 			DEFINED AS
-				"As in section 8.2.10 Multi-scheduler.
-				Intervals within one member of the set shall be non-overlapping, but intervals 
-				defined in different members of the set can overlap. In that case, the 
-				(optional) sequence member 'priority' shall be present in each member of the set 
-				containing an interval that overlaps. The priority associated with each member 
-				of the set determines which activity will be scheduled. The higher priority 
-				numerical value has precedence on the lower one.";;
+				"As in section 8.2.10 Multi-scheduler. Intervals within one member of the set 
+				shall be non-overlapping, but intervals defined in different members of the set 
+				can overlap. In that case, the (optional) sequence member 'priority' shall be 
+				present in each member of the set containing an interval that overlaps. The 
+				priority associated with each member of the set determines which activity will 
+				be scheduled. The higher priority numerical value has precedence on the lower 
+				one.";;
 REGISTERED AS { schedAtt 15 };
 -- A.4.7 Sequence of days attribute
 -- This structured attribute defines a sequence of intervals of day.
@@ -657,7 +710,13 @@ operationResultNotification NOTIFICATION
 REGISTERED AS { schedNotif 1 };
 
 END
---< GDMO.EndDocument "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002" { joint-iso-itu-t ms(9) function(2) part15(15) } >--
+--< GDMO.ChangeLog
+--  =============================================================================
+--  
+--  $Log$
+--  =============================================================================
+--  >--
+--< GDMO.EndDocument "Rec. X.746 (1995)" >--
 --@@ 
 --@@ end of gdmos
 --@@ 
@@ -687,7 +746,7 @@ END
 --@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanReportRecord
 --@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":scanReportRecord
 --@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":statisticalReportRecord
---@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":operationResultRecord
+--@@ |  |  +- "Rec. X.746 (1995)":operationResultRecord
 --@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
 --@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
 --@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
@@ -1051,17 +1110,17 @@ END
 --@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
 --@@ +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicScanner
 --@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
---@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
---@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyScheduler
---@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyOperationScheduler
---@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyScheduler
---@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyOperationScheduler
---@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyScheduler
---@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyOperationScheduler
---@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicScheduler
---@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicOperationScheduler
---@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":multiScheduler
---@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ +- "Rec. X.746 (1995)":scheduler
+--@@ |  +- "Rec. X.746 (1995)":dailyScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":dailyOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":weeklyScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":weeklyOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":monthlyScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":monthlyOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":periodicScheduler
+--@@ |  |  +- "Rec. X.746 (1995)":periodicOperationScheduler
+--@@ |  +- "Rec. X.746 (1995)":multiScheduler
+--@@ +- "Rec. X.746 (1995)":typeOfDayController
 --@@
 
 --@@
@@ -1083,8 +1142,8 @@ END
 --@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
 --@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
 --@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
---@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
---@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ >- "Rec. X.746 (1995)":scheduler
+--@@ >- "Rec. X.746 (1995)":typeOfDayController
 --@@ "CCITT X.521":organization
 --@@ >- "Recommendation M.3100:1992":managedElement
 --@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
@@ -1120,7 +1179,7 @@ END
 --@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
 --@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
 --@@ |  >- "Recommendation M.3100:1992":physicalPort
---@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "Rec. X.746 (1995)":scheduler
 --@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
 --@@ |  >- "Recommendation M.3100:1992":software +++
 --@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++
@@ -1131,8 +1190,8 @@ END
 --@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSource
 --@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSource
 --@@ |  >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
---@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
---@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ |  >- "Rec. X.746 (1995)":scheduler
+--@@ |  >- "Rec. X.746 (1995)":typeOfDayController
 --@@ >- "Recommendation M.3100:1992":managedElementComplex
 --@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
 --@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile

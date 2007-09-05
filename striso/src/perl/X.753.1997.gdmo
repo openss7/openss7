@@ -1,0 +1,2075 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep  5 01:18:16 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.725.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998" >--
+MODULE "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998"
+-- Annex A
+-- Definition of Management Information
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- ISO/IEC 10164-21 : 1998 (E)
+-- ITU-T Rec. X.753 (1997 E)
+-- A.1 Managed object class definitions
+-- A.1.1 Basic objects
+
+basicSpawnerClass MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		basicSpawnerPackage;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx1(1) };
+
+
+commandSequencer MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		commandSequencerPackage PACKAGE
+			BEHAVIOUR
+				commandSequencerBehaviour BEHAVIOUR
+					DEFINED AS
+						"An instance of this class represents a resource acting in a manager role as an 
+						invoker of operations determined by its launch scripts.";;
+			ATTRIBUTES
+				commandSequencerId GET,
+				"CCITT Rec. X.721|ISO/IEC 10165-2":administrativeState GET-REPLACE,
+				"CCITT Rec. X.721|ISO/IEC 10165-2":operationalState GET;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":stateChange;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx2(2) };
+
+
+generalStringScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		launchScript;
+	CHARACTERIZED BY
+		generalStringScriptPackage;-- correction
+	REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx3(3) };
+
+
+asynchronousLaunchPad MANAGED OBJECT CLASS
+	DERIVED FROM
+		launchPad;
+	CHARACTERIZED BY
+		triggerAsynchronousResultPackage;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx4(4) };
+
+
+synchronousLaunchPad MANAGED OBJECT CLASS
+	DERIVED FROM
+		launchPad;
+	CHARACTERIZED BY
+		triggerSynchronousResultPackage;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx5(5) };
+
+
+launchPad MANAGED OBJECT CLASS
+	DERIVED FROM
+		basicSpawnerClass,
+		scriptReferencer;
+	CHARACTERIZED BY
+		launchPadPackage,
+		triggerActionAccepter,
+		parameterPasser,
+		triggerResultPackage,
+		triggerEventAccepter,
+		terminateAccepter,
+		"CCITT Rec. 721 | ISO/IEC 10165-2:1992":externalScheduler,
+		suspendResumeAccepter;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx6(6) };
+
+
+launchScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":top;
+	CHARACTERIZED BY
+		launchScriptPackage PACKAGE
+			BEHAVIOUR
+				launchScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						"This managed object represents instructions to be carried out by a command 
+						sequencer.";;
+			ATTRIBUTES
+				scriptId GET,
+				executionResultType GET,
+				"CCITT Rec. X.721 | ISO /IEC 10165-2:1992":administrativeState GET-REPLACE;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx7(7) };
+--
+-- The following non-instantiable superclass simplifies the description of the
+-- relationship between a launch pad and its scripts, along with the description
+-- of the relationship between threads and scripts. Both the launch pad and
+-- thread classes include it in their inheritance hierarchies.
+--
+
+
+scriptReferencer MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.725 | ISO/IEC 10165-7":genericRelationshipObject;
+	CHARACTERIZED BY
+		scriptReferencerPackage;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx8(8) };
+
+
+thread MANAGED OBJECT CLASS
+	DERIVED FROM
+		basicSpawnerClass,
+		scriptReferencer;
+	CHARACTERIZED BY
+		threadPackage,
+		executionResultPackage;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx9(9) };
+
+
+suspendableThread MANAGED OBJECT CLASS
+	DERIVED FROM
+		thread;
+	CHARACTERIZED BY
+		suspendResumeAccepter;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx10(10) };
+-- A.2 Package definitions
+-- A.2.1 Basic packages
+
+
+basicSpawnerPackage PACKAGE
+	BEHAVIOUR
+		spawnerBehaviour;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx1(1) };
+
+
+generalStringScriptPackage PACKAGE
+	BEHAVIOUR
+		generalStringScriptBehaviour;
+	ATTRIBUTES
+		scriptLanguageName GET-REPLACE,
+		scriptContent GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx2(2) };
+
+
+parameterPasser PACKAGE
+	BEHAVIOUR
+		parameterPasserBehaviour;
+	ATTRIBUTES
+		"CCITT Rec. X.721 | ISO /IEC 10165-2:1992":administrativeState,
+		"CCITT Rec. X.721 | ISO /IEC 10165-2:1992":operationalState,
+		"CCITT Rec. X.721 | ISO /IEC 10165-2:1992":usageState,
+		"CCITT Rec. X.721 | ISO /IEC 10165-2:1992":availabilityStatus;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx3(3) };
+
+
+executionResultPackage PACKAGE
+	BEHAVIOUR
+		executionResultBehaviour;-- correction
+	NOTIFICATIONS
+		executionResultInfo;-- correction
+	REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx4(4) };
+
+
+launchPadPackage PACKAGE
+	--	BEHAVIOUR
+	--		launchPadBehaviour;
+	ATTRIBUTES
+		launchPadId GET;
+	NOTIFICATIONS
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":processingErrorAlarm;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx5(5) };
+
+
+scriptReferencerPackage PACKAGE
+	BEHAVIOUR
+		scriptReferencerBehaviour;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx6(6) };
+
+
+suspendResumeAccepter PACKAGE
+	BEHAVIOUR
+		suspendResumeBehaviour;
+	ATTRIBUTES
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":controlStatus GET;
+	ACTIONS
+		suspend,
+		resume;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx7(7) };
+
+
+terminateAccepter PACKAGE
+	ACTIONS
+		terminate;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx8(8) };
+
+
+threadPackage PACKAGE
+	BEHAVIOUR
+		threadBehaviour,
+		simpleScriptExecutionBehaviour;
+	ATTRIBUTES
+		scriptId GET,
+		threadId GET,
+		executingParameters GET SET-BY-CREATE,
+		"CCITT Rec. X.721|ISO/IEC 10165-2":operationalState GET;
+	NOTIFICATIONS
+		"CCITT Rec. X.721|ISO/IEC 10165-2":processingErrorAlarm;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx9(9) };
+
+
+triggerActionAccepter PACKAGE
+	BEHAVIOUR
+		spawnerBehaviour,
+		triggerActionAccepterBehaviour;-- correction
+	ATTRIBUTES
+		defaultExecutionParameterList REPLACE-WITH-DEFAULT GET-REPLACE SET-BY-CREATE
+			DEFAULT VALUE CSModule.emptyExecutionParameterList
+			,--correction
+		availableScriptList REPLACE-WITH-DEFAULT ADD-REMOVE GET-REPLACE SET-BY-CREATE
+			DEFAULT VALUE CSModule.emptyScriptList
+			;
+	ACTIONS
+		trigger;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx10(10) };
+
+
+triggerEventAccepter PACKAGE
+	BEHAVIOUR
+		triggerEventAccepterBehaviour;
+	ATTRIBUTES
+		"ITU-T Rec. X.739 (1993)|ISO/IEC 10164-11:1994":observedObjectInstance GET-REPLACE,
+		"ITU-T Rec. X.739 (1993)|ISO/IEC 10164-11:1994":observedAttributeId GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx11(11) };
+
+
+triggerAsynchronousResultPackage PACKAGE
+	BEHAVIOUR
+		triggerAsynchronousResultBehaviour;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx12(12) };
+
+
+triggerSynchronousResultPackage PACKAGE
+	BEHAVIOUR
+		triggerSynchronousResultBehaviour;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx13(13) };
+
+
+triggerResultPackage PACKAGE
+	BEHAVIOUR
+		triggerResultBehaviour;-- correction
+	NOTIFICATIONS
+		triggerResultInfo;-- correction
+	REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx14(14) };
+-- A.3 Behaviour definitions
+
+
+spawnerBehaviour BEHAVIOUR
+	DEFINED AS
+		!Instances of this class are capable of causing the creation of new object 
+		instances. The newly created instances will be contained by this instance, and 
+		their names will be automatically generated. Until all created objects are 
+		complete, this objectbs usage status will be "in use". If this object's 
+		administrative state is "locked" such new objects cannot be created. If, due to 
+		local resource limitations, this object is incapable of supporting more 
+		contained objects, its usage status will be "busy".
+
+		When an instance of this class causes the creation of new objects, it serves as 
+		an IVMO during the creation by supplying values for the new objectts attributes 
+		based on its own defaultExecutionParameterList attribute or any parameters which 
+		were supplied to it as part of the action or local mechanism which triggered the 
+		spawning of the new instance.
+
+		An instance of this class may cause the creation of new object instances from a 
+		single script id, from a set of script ids in any order or from a sequence of 
+		script ids in the order specified in the list, i.e. after the first has been 
+		created the second may not be created until after the first is completed, and so 
+		on. The value of the created objectes scriptId attribute gets its value from the 
+		corresponding element of this objectss script list.!;
+
+
+executionResultBehaviour BEHAVIOUR
+	DEFINED AS
+		"Instances of a class supporting this behaviour report intermediate and final 
+		results from execution of a thread.";
+
+
+triggerAsynchronousResultBehaviour BEHAVIOUR
+	DEFINED AS
+		"As soon as all threads that must be launched by one trigger is launched, the 
+		launch pad issues the triggerResultInfo notification.";
+
+
+triggerSynchronousResultBehaviour BEHAVIOUR
+	DEFINED AS
+		"As soon as all threads that must be launched by one trigger have completed, the 
+		launch pad issues the triggerResultInfo notification which contains execution 
+		results or errors.";
+
+
+triggerResultBehaviour BEHAVIOUR
+	DEFINED AS
+		"The launch pad issues the triggerResultInfo notification.";
+
+
+scriptReferencerBehaviour BEHAVIOUR
+	DEFINED AS
+		"A script referencer is a non-instantiable object class which defines a reference 
+		relationship mapping from instances of the launch pad and the launch script 
+		managed object classes and from instances of the thread and the launch script 
+		managed object classes.";
+
+
+suspendResumeBehaviour BEHAVIOUR
+	DEFINED AS
+		"Execution of a script by a thread may be suspended by a suspend action directed 
+		at the thread or launch pad and subsequently resumed by a resume action. Default 
+		value of controlStatus is empty. If the suspend action is performed, the value 
+		changes to suspended. After the resume action is performed, the value changes 
+		back to empty.";
+
+
+triggerEventAccepterBehaviour BEHAVIOUR
+	DEFINED AS
+		"The launch pad has attributes to monitor a specific attribute in a specific 
+		object instance. If the value of the monitored attribute is changed, a trigger 
+		to launch the scripts specified by the script ids specified by the default 
+		execution parameter list attribute is generated. In the case that the monitored 
+		attribute is a counter of EDC (Event Discrimination Counter) defined in Annex C, 
+		the notifications through the EDC trigger the launching of script execution by 
+		the launch pad.";
+
+
+triggerActionAccepterBehaviour BEHAVIOUR
+	DEFINED AS
+		"When an instance of this class which is on duty receives a trigger, from a 
+		trigger activator, if its scriptId attribute is not empty, a new object is 
+		created in which the script id and class of the new instance come from the value 
+		of this instanceis scriptId attribute and any of its other attributes and any 
+		parameters carried by the trigger.";
+
+
+threadBehaviour BEHAVIOUR
+	DEFINED AS
+		"When an instance of an object of this class is created, it begins execution of 
+		the command sequence specified through its attributes, using its parameter list 
+		to supply any parameters needed by the script. When execution of this sequence 
+		is complete, the object is deleted. If execution of the script causes the 
+		creation of contained threads, this thread is not considered complete until all 
+		contained threads are complete.";
+
+
+parameterPasserBehaviour BEHAVIOUR
+	DEFINED AS
+		"An instance of an object of this class passes a set of parameters to an instance 
+		of an object of another class.";
+
+
+simpleScriptExecutionBehaviour BEHAVIOUR
+	DEFINED AS
+		"A script is executed or interpreted by local means. Its execution status mirrors 
+		the following states:
+
+		-  activated (spontaneous transition to next state: executing);
+
+		-  executing (next state: timed out or completed);
+
+		-  timed out (spontaneous transition to next state: completed);
+
+		-  completed.
+
+		NOTE Timeout value is implementation dependent.";
+
+
+generalStringScriptBehaviour BEHAVIOUR
+	DEFINED AS
+		"The syntax and semantics of scripting language which can be represented as 
+		general string. See Annexes F and G for details on one such language, SMSL.";
+-- A.4 Attribute definitions
+
+
+availableScriptList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.AvailableScriptList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		availableScriptListBehaviour BEHAVIOUR
+			DEFINED AS
+				"A set of managed object instance names of the script instructions which can be 
+				executed by a launch pad.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx1(1) };
+
+
+commandSequencerId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.CommandSequencerId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		commandSequencerIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object instance name of the command sequencer.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx2(2) };
+
+
+executionResultType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ExecutionResultType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		executionResultTypeBehaviour BEHAVIOUR
+			DEFINED AS
+				"This indicates the type of execution result.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx3(3) };
+
+
+scriptContent ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ScriptContent;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scriptContentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The contents of a launch script represented by a general string.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx4(4) };
+
+
+scriptId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ScriptId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scriptIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object instance name of the script to be executed.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx5(5) };
+
+
+launchPadId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.LaunchPadId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		launchPadIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object instance name of the launch pad.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx6(6) };
+
+
+scriptLanguageName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ScriptLanguageName;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scriptLanguageNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object instance name of a launch script represented by a general 
+				string.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx7(7) };
+
+
+defaultExecutionParameterList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ExecutionParameterList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		defaultExecutionParameterListBehaviour BEHAVIOUR
+			DEFINED AS
+				"A set of managed object instance names of the script instructions and parameter 
+				values (if required) as inputs to instances to be executed by default.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx8(8) };
+
+
+executingParameters ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ExecutionParameter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		executingParametersBehaviour BEHAVIOUR
+			DEFINED AS
+				"A set of managed object instance names of the script instructions and parameter 
+				values (if required) as inputs to script executions.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx9(9) };
+
+
+threadId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ThreadId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		threadIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object instance name of a thread executing script
+				instruction(s).";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx10(10) };
+
+
+triggerId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.TriggerId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		triggerIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"The managed object instance name of a trigger initiating the execution
+				of a launch script.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx11(11) };
+-- correction
+
+
+scriptList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ScriptList;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx12(12) };
+-- A.5 Notification definitions
+
+
+executionResultInfo NOTIFICATION
+	WITH INFORMATION SYNTAX CSModule.ExecutionResultInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) notification(10) xx1(1) };
+
+
+triggerResultInfo NOTIFICATION
+	WITH INFORMATION SYNTAX CSModule.TriggerResultInfo;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) notification(10) xx2(2) };
+-- A.6 Action definitions
+
+
+resume ACTION
+	BEHAVIOUR
+		resumeBehaviour BEHAVIOUR
+			DEFINED AS
+				"An action directed at a basicSpawnerClass object, causing unconditional 
+				resumption of all script executions by the basicSpawnerClass object which were 
+				initiated by a particular trigger. The value of
+				controlStatus becomes empty as the result of a resume action.";;
+	WITH INFORMATION SYNTAX CSModule.SpawnerObjectId;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) action(9) xx1(1) };
+
+
+suspend ACTION
+	BEHAVIOUR
+		suspendBehaviour BEHAVIOUR
+			DEFINED AS
+				"An action directed at a basicSpawnerClass object, causing unconditional 
+				suspension of all script executions by the basicSpawnerClass object which were 
+				initiated by a particular trigger. The value of controlStatus becomes suspendede 
+				as a result of a suspend action .";;
+	WITH INFORMATION SYNTAX CSModule.SpawnerObjectId;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) action(9) xx2(2) };
+
+
+terminate ACTION
+	BEHAVIOUR
+		terminateBehaviour BEHAVIOUR
+			DEFINED AS
+				"An action directed at a launch pad, causing unconditional termination of all 
+				scripts by the launch pad, which was initiated by a particular trigger.";;
+	WITH INFORMATION SYNTAX CSModule.TriggerId;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) action(9) xx3(3) };
+
+
+trigger ACTION
+	BEHAVIOUR
+		triggerBehaviour BEHAVIOUR
+			DEFINED AS
+				"An initiator of script execution by causing a launch pad to spawn one or more 
+				threads.";;
+	WITH INFORMATION SYNTAX CSModule.TriggerParameters;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) action(9) xx4(4) };
+-- A.7 Name binding definitions
+
+
+commandSequencer-system NAME BINDING
+	SUBORDINATE OBJECT CLASS commandSequencer AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		commandSequencerId;
+	BEHAVIOUR
+		csSystemContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"Superior object class is system and subordinate object
+				class is commandSequencer.";;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx1(1) };
+
+
+launchPad-commandSequencer NAME BINDING
+	SUBORDINATE OBJECT CLASS launchPad AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS commandSequencer AND SUBCLASSES;
+	WITH ATTRIBUTE
+		launchPadId;
+	BEHAVIOUR
+		lpCsContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"Naming a command sequence launch pad with respect to a command sequencer 
+				indicates that the command sequencer is the service provider for the launch pad.";;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx2(2) };
+
+
+thread-synchronousLaunchPad NAME BINDING
+	SUBORDINATE OBJECT CLASS thread AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS synchronousLaunchPad AND SUBCLASSES;
+	WITH ATTRIBUTE
+		threadId;
+	BEHAVIOUR
+		threadSyncLpContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The superior object class synchronousLaunchPad acts as an IVMO for the 
+				subordinate object class thread.";;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx3(3) };
+
+
+suspendableThread-asynchronousLaunchPad NAME BINDING
+	SUBORDINATE OBJECT CLASS suspendableThread AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS asynchronousLaunchPad AND SUBCLASSES;
+	WITH ATTRIBUTE
+		threadId;
+	BEHAVIOUR
+		threadAsyncLpContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The superior object class asynchronousLaunchPad acts as an IVMO for the 
+				subordinate object class suspendable thread.";;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx4(4) };
+
+
+thread-thread NAME BINDING
+	SUBORDINATE OBJECT CLASS thread AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS thread AND SUBCLASSES;
+	WITH ATTRIBUTE
+		threadId;
+	BEHAVIOUR
+		threadContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The superior object class thread acts as a spawner of the subordinate object 
+				class thread.";;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx5(5) };
+
+
+suspendableThread-suspendableThread NAME BINDING
+	SUBORDINATE OBJECT CLASS suspendableThread AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS suspendableThread AND SUBCLASSES;
+	WITH ATTRIBUTE
+		threadId;
+	BEHAVIOUR
+		suspendableThreadContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The superior object class suspendable thread acts as a spawner of the 
+				subordinate object class suspendable thread.";;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx6(6) };
+
+
+launchScript-system NAME BINDING
+	SUBORDINATE OBJECT CLASS launchScript AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		scriptId;
+	BEHAVIOUR
+		lsSystemContainmentBehaviour BEHAVIOUR
+			DEFINED AS
+				"The superior object class is system and subordinate object class is 
+				launchScript.";;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) nameBinding(6) xx7(7) };
+-- Annex B
+-- General Relationship Model
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- This following is the GRM for the command sequencer.
+--
+-- The following relationship classes support the command sequencer model
+--
+
+
+commandSequencer-launchPadRelationshipClassBehaviour BEHAVIOUR
+	DEFINED AS
+		!
+		The relationship class is concerned with the relationship between a command 
+		sequencer and its launch pads used to initiate the execution of scripts by means 
+		of threads requiring the support services provided by the command sequencer.!;
+
+
+commandSequencer-LaunchPad-bindingBehaviour BEHAVIOUR
+	DEFINED AS
+		!
+		This notification occurs upon the binding of a launch pad into the command 
+		sequencer / launch pad relationship.!;
+
+
+commandSequencer-LaunchPad-unbindingBehaviour BEHAVIOUR
+	DEFINED AS
+		!
+		This notification occurs when a launch pad is removed from the command sequencer 
+		/ launch pad relationship. A launch pad may be removed from the relationship 
+		only if its administrative state is locked.!;
+
+
+commandSequencer-launchPad-RelationshipClass RELATIONSHIP CLASS
+	BEHAVIOUR
+		commandSequencer-launchPadRelationshipClassBehaviour,
+		commandSequencer-LaunchPad-bindingBehaviour,
+		commandSequencer-LaunchPad-unbindingBehaviour;
+	SUPPORTS ESTABLISH, QUERY, TERMINATE, NOTIFY commandSequencer-LaunchPad-binding, NOTIFY commandSequencer-LaunchPad-unbinding;
+	ROLE commandSequencerRole
+		COMPATIBLE-WITH commandSequencer
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT CASN1.RangeFromOneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT CASN1.RangeFromOneToOne
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT CASN1.RangeFromOneToOne
+	REGISTERED AS { CSModule.cmdSeqRelationshipRoles 1 }
+	ROLE launchPadRole
+		COMPATIBLE-WITH launchPad
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeFromZeroToMax
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeFromZeroToMax
+		BIND-SUPPORT
+		UNBIND-SUPPORT
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT CSModule.RangeFromOneToOne
+	REGISTERED AS { CSModule.cmdSeqRelationshipRoles 2 };
+REGISTERED AS { CSModule.cmdSeqRelationshipClasses 1 };
+
+
+commandSequencer-launchPad-RelationshipMapping-Behaviour BEHAVIOUR-- correction
+	DEFINED AS
+		!
+		This relationship mapping describes how the command sequencer to launch pad 
+		relationship class may be represented using containment. In this relationship 
+		mapping, the command sequencer is the superior object for the purposes of 
+		naming, and launch pads are contained by it. Participation in this relationship 
+		implies that the launch pad and its spawn may use the services provided by the 
+		resource represented by the command sequencer.!;
+
+
+commandSequencer-launchPad-RelationshipMapping RELATIONSHIP MAPPING
+	RELATIONSHIP CLASS
+		commandSequencer-launchPad-RelationshipClass;
+	BEHAVIOUR
+		commandSequencer-launchPad-RelationshipMapping-Behaviour;
+	ROLE commandSequencerRole
+		RELATED-CLASSES commandSequencer
+		REPRESENTED-BY
+		NAMING launchPad-commandSequencer-NameBinding USING SUPERIOR,
+	ROLE launchPadRole
+		RELATED-CLASSES launchPad
+		REPRESENTED-BY
+		NAMING launchPad-commandSequencer-NameBinding USING SUBORDINATE;
+	OPERATIONS MAPPING
+		ESTABLISH MAPS-TO-OPERATION
+			CREATE commandSequencer OF commandSequencerRole,-- correction
+		TERMINATE MAPS-TO-OPERATION
+			DELETE OF commandSequencerRole,-- correction
+		NOTIFY commandSequencer-launchPad-binding MAPS-TO-OPERATION
+			NOTIFICATION "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation OF commandSequencerRole,-- correction
+		NOTIFY commandSequencer-launchPad-unbinding MAPS-TO-OPERATION
+			NOTIFICATION "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion OF commandSequencerRole,-- correction
+		BIND MAPS-TO-OPERATION
+			CREATE launchPad OF launchPadRole,-- correction
+		UNBIND MAPS-TO-OPERATION
+			DELETE OF launchPadRole;-- correction
+	--QUERY MAPS-TO-OPERATION
+	--GET OF commandSequencerRole
+	--GET OF launchPadRole;
+	REGISTERED AS { CSModule.cmdSeqRelationshipMappings 1 };-- correction
+
+
+scriptReferencerRelationshipClassBehaviour BEHAVIOUR-- correction
+	DEFINED AS
+		!
+		This relationship class describes the relationship existing between scripts and 
+		an object which references them for the purposes of identifying task(s) to be 
+		carried out.!;
+
+
+scriptReferencerRelationshipClass RELATIONSHIP CLASS
+	BEHAVIOUR
+		scriptReferencerRelationshipClassBehaviour;
+	SUPPORTS ESTABLISH, TERMINATE, QUERY;
+	ROLE scriptUserRole
+		COMPATIBLE-WITH scriptReferencer
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeFromOneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeFromOneToOne
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT CSModule.RangeFromZeroToMax
+	REGISTERED AS { CSModule.cmdSeqRelationshipRoles 3 }
+	ROLE scriptRole
+		COMPATIBLE-WITH launchScript
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeFromOneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeFromOneToOne
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT CSModule.RangeFromZeroToMax-- correction
+		REGISTERED AS { CSModule.cmdSeqRelationshipRoles 4 };-- correction
+	REGISTERED AS { CSModule.cmdSeqRelationshipClasses 2 };-- correction
+
+
+launchPad-launchScriptMappingBehaviour BEHAVIOUR-- correction
+	DEFINED AS
+		!
+		This relationship mapping describes the relationship between the launch pad and 
+		the launch script. The launch pad initiates execution of the launch script and 
+		references it for the purposes of execution.!;
+
+
+launchPad-LaunchScriptMapping RELATIONSHIP MAPPING
+	RELATIONSHIP CLASS
+		scriptReferencerRelationshipClass;
+	BEHAVIOUR
+		launchPad-launchScriptMappingBehaviour;
+	ROLE scriptUserRole
+		RELATED-CLASSES launchPad
+		REPRESENTED-BY ATTRIBUTE scriptList,-- correction
+	ROLE scriptRole
+		RELATED-CLASSES launchScript;
+	OPERATIONS MAPPING
+		ESTABLISH MAPS-TO-OPERATION
+			CREATE launchPad OF scriptUserRole
+			-- using SET-BY-CREATE of scriptList --
+			REPLACE scriptList OF scriptUserRole-- correction
+			-- which effectively adds a scriptId to scriptList --
+			ADD scriptList OF scriptUserRole,-- correction
+		TERMINATE MAPS-TO-OPERATION
+			DELETE OF scriptUserRole
+			REPLACE scriptList OF scriptUserRole
+			-- which effectively removes a scriptId from scriptList --
+			REMOVE scriptList OF scriptUserRole,
+		QUERY MAPS-TO-OPERATION
+			GET scriptList OF scriptUserRole;
+REGISTERED AS { CSModule.cmdSeqRelationshipMappings 2 };
+
+
+thread-launchScriptRelationshipMappingBehaviour BEHAVIOUR
+	DEFINED AS
+		!
+		This relationship class describes the relationship between a thread and launch 
+		script. The launch script is referenced by the thread by means of the scriptId 
+		attribute from the scriptIds in the scriptList.!;
+
+
+thread-launchScriptMapping RELATIONSHIP MAPPING
+	RELATIONSHIP CLASS
+		scriptReferencerRelationshipClass;
+	BEHAVIOUR
+		thread-launchScriptRelationshipMappingBehaviour;
+	ROLE scriptUserRole
+		RELATED-CLASSES thread
+		REPRESENTED-BY ATTRIBUTE scriptId
+		QUALIFIES
+		scriptList,-- correction
+	ROLE scriptRole
+		RELATED-CLASSES launchScript;
+	OPERATIONS MAPPING
+		ESTABLISH MAPS-TO-OPERATION
+			CREATE OF scriptUserRole,
+		TERMINATE MAPS-TO-OPERATION
+			DELETE OF scriptUserRole,
+		QUERY MAPS-TO-OPERATION
+			GET scriptId OF scriptUserRole;
+REGISTERED AS { CSModule.cmdSeqRelationshipMappings 3 };
+
+
+spawner-progeny-RelationshipClass RELATIONSHIP CLASS
+	BEHAVIOUR
+		spawner-progenyRelationshipClassBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+
+				When an instance of this class causes the creation of new objects, it serves as 
+				an IVMO during the creation by supplying values for the new object's attributes 
+				based on its own defaultExecutionParameterList attribute and any parameters 
+				which were supplied to it as part of the action or local Instances of this class 
+				are capable of causing the creation of new object instances. The newly created 
+				instances will be contained by this instance, and their names will be 
+				automatically generated. Until all created objects are complete, this objectus 
+				usage status will be "in use". If this objectss administrative state is "locked" 
+				such new objects cannot be created. If, due to local resource limitations, this 
+				object is incapable of supporting more contained objects, its usage status will 
+				be "busy".
+
+				An instance of this class may cause the creation of new object instances from a 
+				single scriptId, from a set of scriptIds in any order or from a sequence of 
+				scriptIds in the order specified in the list i.e. after the first has been 
+				created the second may not be created until after the first is completed, and so 
+				on. The value of the created objectis scriptId attribute gets its value from the 
+				corresponding element of this objects scriptList.!;;-- correction
+	SUPPORTS ESTABLISH,--correction
+		TERMINATE;
+	ROLE spawnerRole
+		COMPATIBLE-WITH basicSpawnerClass
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeOneToOne
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeOneToOne
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT CSModule.RangeOneToOne
+	REGISTERED AS { CSModule.cmdSeqRoles 5 }
+	ROLE progenyRole
+		COMPATIBLE-WITH thread
+		PERMITTED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeZeroToMax
+		REQUIRED-ROLE-CARDINALITY-CONSTRAINT CSModule.RangeZeroToMax
+		PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT CSModule.RangeOneToOne
+	REGISTERED AS { CSModule.cmdSeqRoles 6 };-- correction
+	REGISTERED AS { CSModule.cmdSeqRelationshipClasses 3 };
+-- Annex C
+-- Management Information Definitions for Event Discrimination Counting
+-- (This annex does not form an integral part of this Recommendation | International Standard)
+-- The Event Discrimination Counter (EDC) class object counts the number of input events. Before counting up, the EDC
+-- tests values of attributes related to the event or an object generating the event and discriminates the event.
+-- C.1 Managed object class
+
+
+eventDiscriminationCounter MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":discriminator;
+	CHARACTERIZED BY
+		edcPackage PACKAGE
+			BEHAVIOUR
+				edcBehaviour BEHAVIOUR
+					DEFINED AS
+						"If the result of discrimination of a potential event report evaluates to TRUE 
+						and the event discrimination counter is in the Unlocked and Enabled state and 
+						does not exhibit the off-duty availability status, then the counter value of the 
+						counter attribute is incremented.";;
+			ATTRIBUTES
+				"CCITT Rec. 721 | ISO/IEC 10165-2:1992":counter GET,
+				maxCounterSize GET;
+			NOTIFICATIONS
+				"CCITT Rec. 721 | ISO/IEC10162:1992":processingErrorAlarm;;;
+	CONDITIONAL PACKAGES
+		counterAlarmPackage
+			PRESENT IF
+				"a counter is of finite size and a notification is triggered by a capacity alarm 
+				threshold.";
+REGISTERED AS { joint-iso-itu-t ms(9) ms(9) function(2) part21(21) managedObjectClass(3) xx11(11) };
+-- C.2 Package
+
+
+counterAlarmPackage PACKAGE
+	BEHAVIOUR
+		counterAlarmBehaviour BEHAVIOUR
+			DEFINED AS
+				"When the counter value reaches the capacity alarm threshold(as a percentage of 
+				maximum counter size), the EDC(Event Discrimination Counter) generates an event 
+				indicating that a capacity threshold has been reached or exceeded. In reporting 
+				the capacity threshold event, use is made of the alarm report defined in CCITT 
+				Rec. X.733 | ISO/IEC 10164-4. Only the following parameters of the alarm report 
+				shall be used and all parameters are mandatory when used for reporting counter 
+				capacity threshold alarms. Managed Object Class - This parameter shall identify 
+				the counter class.
+
+				Managed Object Instance - This parameter shall identify the instance of the 
+				counter that generated the event.
+
+				Alarm Type - This parameter shall indicate that a processing error alarm has 
+				occurred.
+
+				Event time - This parameter carries the time at which the capacity threshold 
+				event occurred.
+
+				Perceived Severity - This parameter will indicate the severity assigned to the 
+				capacity threshold event. When the 100% counter full condition is reached, a 
+				severity value of critical shall be assigned to this event.
+
+				Monitored Attributes - This parameter shall carry the maximum counter size 
+				attribute of the EDC.
+
+				Probable Cause - This parameter shall carry the value congestion.
+
+				Threshold Info - This parameter shall carry the capacity threshold value (as 
+				percentage of total capacity) that was reached or exceeded in generating this 
+				event.";;
+	ATTRIBUTES
+		"CCITT Rec. 721| ISO/IEC 10165-2:1992":capacityAlarmThreshold GET-REPLACE ADD-REMOVE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx15(15) };
+-- C.3 Attribute
+
+
+maxCounterSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.MaxCounterSize;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxSizeOrderingBehaviour BEHAVIOUR
+			DEFINED AS
+				"This Attribute represent the largest value of the counter. The ordering in the 
+				same as for sequentially increasing positive integers except that a value of 
+				zero is largest and denotes infinite size.";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx12(12) };
+-- Annex D
+-- cmisScript Management Support Object Class
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- The following is a script managed object class, CMIS script, which can be defined to handle the invocation of CMIS
+-- operations.
+-- D.1 Attributes
+-- D.1.1 Attributes imported from the definition of management information
+-- This Specification references the following management attributes, whose abstract syntax is specified in CCITT
+-- Rec. X.721 | ISO/IEC 10165-2:
+-- a) attributeIdentifierList;
+-- b) objectClass;
+-- c) attributeList.
+-- This Specification references the following management attributes, whose abstract syntax is specified in ITU-T
+-- Rec. X.711 | ISO/IEC 9596-1:
+-- a) synchronization;
+-- b) scope;
+-- c) filter;
+-- d) baseManagedObjectId;
+-- e) modificationList.
+-- D.2 Definitions
+-- D.2.1 cmisScript: A management support object, which directs the invocation of a single CMIS operation.
+-- Five types CMIS scripts are specified:
+-- D.2.2 getCmisScript: A CMIS script that represents a GET operation.
+-- D.2.3 set CmisScript: A CMIS script that represents a SET operation.
+-- D.2.4 actionCmisScript: A CMIS script that represents an ACTION operation.
+-- D.2.5 createCmisScript: A CMIS script that represents a CREATE operation.
+-- D.2.6 deleteCmisScript: A CMIS script that represents a DELETE operation.
+-- CMIS scripts are single-instruction scripts which give operational details to threads. For example, the script languages
+-- may refer to appropriate command records in order to make a CMIS requests to an agent.
+-- D.3 getCmisScript
+-- D.3.1 Characteristics of getCmisScript
+-- The following attributes are defined in the getCmisScript:
+--  baseManagedObjectId;
+--  synchronization;
+--  scope;
+--  filter;
+--  attributeIdentifierList.
+-- D.3.2 Packages of getCmisScript
+-- getCmisScript has the following mandatory package:
+--  getCmisScriptPackage.
+-- D.4 setCmisScript
+-- D.4.1 Characteristics of setCmisScript
+-- setCmisScript has the following attributes definitions:
+--  baseManagedObjectId;
+--  synchronization;
+--  scope;
+--  filter;
+--  modificationList.
+-- D.4.2 Packages of setCmisScript
+-- The setCmisScript has the following mandatory package:
+--  setCmisScriptPackage.
+-- D.5 actionCmisScript
+-- D.5.1 Characteristics of actionCmisScript
+-- The actionCmisScript has the following attribute definitions:
+--  baseManagedObjectId;
+--  synchronization;
+--  scope;
+--  filter.
+-- D.5.2 Packages of the actionCmisScript
+-- The action command record class has the following mandatory package:
+--  actionCmisScriptPackage.
+-- D.6 createCmisScript
+-- D.6.1 Characteristics of createCmisScript
+-- The action command record has the following attribute definitions:
+--  objectClass;
+--  attributeList.
+-- D.6.2 Packages of createCmisScript
+-- The create command record class has the following mandatory package:
+--  createCmisScriptPackage.
+-- It has the following conditional packages:
+--  managedObjectInstancePackage;
+--  superiorObjectInstancePackage;
+--  referenceObjectInstancePackage.
+-- D.7 deleteCmisScript
+-- D.7.1 Characteristics of the deleteCmisScript
+-- The deleteCmisScript has the following attribute definitions:
+--  baseManagedObjectId;
+--  synchronization;
+--  scope;
+--  filter.
+-- D.7.2 Packages of the deleteCmisScript
+-- The deleteCmisScript has the following mandatory package:
+--  deleteCmisScriptPackage.
+-- D.8 Services
+-- D.8.1 Get reporting service definition
+-- This clause specifies the get reporting service, and maps it onto the CMIS M-EVENT-REPORT services.
+-- D.8.2 Set reporting service definition
+-- This clause specifies the set reporting service, and maps it onto the CMIS M-EVENT-REPORT services.
+-- D.8.3 Action reporting service definition
+-- This clause specifies the action reporting service, and maps it onto the CMIS M-EVENT-REPORT services.
+-- D.8.4 Creation reporting service definition
+-- This service allows an MIS-user, in agent role, to report the creation of a managed object. It is defined as both a
+-- confirmed and as a non-confirmed service and mapped onto the CMIS M-EVENT-REPORT services. This service is
+-- defined in CCITT Rec. X.730 | ISO/IEC 10164-1.
+-- D.8.5 Deletion report service definition
+-- This service allows an MIS-user, in agent role, to report the deletion of a managed object. It is defined as both a
+-- confirmed and as a non-confirmed service and mapped onto the CMIS M-EVENT-REPORT services. This service is
+-- defined in CCITT Rec. X.730 | ISO/IEC 10164-1.
+-- D.9 GDMO template
+-- D.9.1 Managed object definitions
+
+
+cmisScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		launchScript;
+	CHARACTERIZED BY
+		cmisScriptPackage PACKAGE
+			BEHAVIOUR
+				cmisScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						An instance of this managed object class models information necessary to execute 
+						a single CMIS operation.!;;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx12(12) };
+
+
+getCmisScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		cmisScript;
+	CHARACTERIZED BY
+		getCmisScriptPackage PACKAGE
+			BEHAVIOUR
+				getCmisScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						An instance of this managed object class models information necessary to execute 
+						a single CMIS GET operation.!;;
+			ATTRIBUTES
+				baseManagedObjectId GET,
+				synchronization GET-REPLACE,
+				scopeGET-REPLACE,
+				filter GET-REPLACE,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeIdentifierList GET-REPLACE ADD-REMOVE;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx13(13) };
+
+
+setCmisScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		cmisScript;
+	CHARACTERIZED BY
+		setCmisScriptPackage PACKAGE
+			BEHAVIOUR
+				setCmisScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						An instance of this managed object class models information necessary to execute 
+						a single CMIS SET operation.!;;
+			ATTRIBUTES
+				baseManagedObjectId GET,
+				synchronization GET-REPLACE,
+				scope GET-REPLACE,
+				filter GET-REPLACE,
+				modificationList GET-REPLACE ADD-REMOVE;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx14(14) };
+
+
+actionCmisScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		cmisScript;
+	CHARACTERIZED BY
+		actionCmisScriptPackage PACKAGE
+			BEHAVIOUR
+				actionCmisScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						An instance of this managed object class models information necessary to execute 
+						a single CMIS ACTION operation.!;;
+			ATTRIBUTES
+				baseManagedObjectId GET,
+				synchronization GET-REPLACE,
+				scope GET-REPLACE,
+				filter GET-REPLACE;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx15(15) };
+
+
+createCmisScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		cmisScript;
+	CHARACTERIZED BY
+		createCmisScriptPackage PACKAGE
+			BEHAVIOUR
+				createCmisScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						An instance of this managed object class models information necessary to execute 
+						a single CMIS CREATE operation.!;;
+			ATTRIBUTES
+				"CCITT Rec. 721 | ISO/IEC 10165-2:1992":objectClass GET,
+				"CCITT Rec. 721 | ISO/IEC 10165-2:1992":attributeList GET-REPLACE ADD-REMOVE;;;
+	CONDITIONAL PACKAGES
+		managedObjectInstancePackage
+			PRESENT IF
+				"the superiorObjectInstancePackage is not present.",
+		superiorObjectInstancePackage
+			PRESENT IF
+				"the managedObjectInstance Package is not present.",
+		referenceObjectInstancePackage
+			PRESENT IF
+				"the manager has the specified value.";
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx16(16) };
+
+
+deleteCmisScript MANAGED OBJECT CLASS
+	DERIVED FROM
+		cmisScript;
+	CHARACTERIZED BY
+		deleteCmisScriptPackage PACKAGE
+			BEHAVIOUR
+				deleteCmisScriptBehaviour BEHAVIOUR
+					DEFINED AS
+						!
+						An instance of this managed object class models information necessary to execute 
+						a single CMIS DELETE operation.!;;
+			ATTRIBUTES
+				baseManagedObjectId GET,
+				synchronization GET-REPLACE,
+				scope GET-REPLACE,
+				filter GET-REPLACE;;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx17(17) };
+-- D.9.2 Package definitions
+
+
+managedObjectInstancePackage PACKAGE
+	ATTRIBUTES
+		managedObjectInstance GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx16(16) };
+
+
+superiorObjectInstancePackage PACKAGE
+	ATTRIBUTES
+		superiorObjectInstance GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx17(17) };
+
+
+referenceObjectInstancePackage PACKAGE
+	ATTRIBUTES
+		referenceObjectInstance GET-REPLACE;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx18(18) };
+-- D.9.3 Attribute definitions
+
+
+baseManagedObjectId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.BaseManagedObjectId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		baseManagedObjectIdBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This is the identifier for the information on the CMIS operation to be executed.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx13(13) };
+
+
+scope ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.Scope;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		scopeBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This is the first phase in the selection of managed object(s) to which the CMIS 
+				script operations should be directed. It indicates the managed object(s) to 
+				which a filter should be applied.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx14(14) };
+
+
+filter ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.CMISFilter;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		filterBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This is the second phase in the selection of managed object(s) to which the CMIS 
+				script operations should be directed. A set of tests is applied to each of the 
+				previously scoped managed objects to extract a subset.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx15(15) };
+
+
+synchronization ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.CMISSync;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		synchronizationBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This indicates the manner in which operations are to be synchronized across 
+				managed object instances when multiple managed objects have been selected by the 
+				scoping and filtering mechanisms.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx16(16) };
+
+
+modificationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ModificationList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		modificationListBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This represents the list of attributes to be modified by the CMISSet script and 
+				contains the values to which these attributes should be set.;;!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx17(17) };
+
+
+superiorObjectInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		superiorObjectInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				This attribute identifies the existing managed object instance which is 
+				supplied, the managedObjectInstance attribute shall not be supplied.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx18(18) };
+
+
+referenceObjectInstance ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		referenceObjectInstanceBehaviour BEHAVIOUR
+			DEFINED AS
+				!
+				The managed object instance name of the same class as the managed object to be 
+				created. Attribute values associated with the reference object instance become 
+				default values for those not specified by the attribute list attribute.!;;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx19(19) };
+-- Annex E
+-- CMIP_CS managed object class
+-- (This annex does not form an integral part of this Recommendation | International Standard)
+-- The following is an example of how additional subclasses may be defined in order to contain attributes such as AE title.
+-- E.1 cmipCS
+-- E.1.1 Overview
+--  Subclass of cmip protocol machine and command sequencer.
+--  Defines the calling AE title for the command sequencer.
+-- E.1.2 Characteristics of the cmipCS managed object class
+--  aetitle.
+-- E.1.3 Packages of cmipCS
+-- The cmipCS managed object class has the following mandatory package:
+--  aetitle package.
+-- E.1.4 GDMO definitions
+
+
+cmipCS MANAGED OBJECT CLASS
+	DERIVED FROM
+		commandSequencer;
+	CHARACTERIZED BY
+		aeTitlePackage;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) managedObjectClass(3) xx18(18) };
+
+
+aeTitlePackage PACKAGE
+	ATTRIBUTES
+		aetitle GET;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) package(4) xx19(19) };
+-- E.1.5 Attribute definitions
+
+
+aetitle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CSModule.AE-title;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		aeTitleBehaviour BEHAVIOUR
+			DEFINED AS
+				"An instance of this managed object class defines the
+				calling AE title for the command sequencer";;
+REGISTERED AS { joint-iso-itu-t ms(9) function(2) part21(21) attribute(7) xx20(20) };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":eventDiscriminationCounter
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":scanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":statisticalReportRecord
+--@@ |  |  +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":operationResultRecord
+--@@ |  |  +- "Recommendation G.774.3":apsReportRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996":genericRelationshipObject
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":scriptReferencer
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":launchPad
+--@@ |  |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":asynchronousLaunchPad
+--@@ |  |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":synchronousLaunchPad
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":thread
+--@@ |  |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":suspendableThread
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringDataObject
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":multiScheduler
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ +- "CCITT X.521":organization
+--@@ +- "CCITT X.521":organizationalUnit
+--@@ +- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ +- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ |  +- "ITU-T G.774.1 (02/2001)":pathTerminationHistoryData
+--@@ +- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSink
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSource
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "Recommendation G.774.3":protectionGroupR1
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionGroupR1
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  +- "Recommendation M.3100:1992":protectionGroupR2
+--@@ +- "Recommendation G.774.3":protectionUnit
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionUnit
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  +- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ +- "Recommendation M.3100:1992":abstractLink
+--@@ |  +- "Recommendation M.3100:1992":logicalLink
+--@@ |  +- "Recommendation M.3100:1992":topologicalLink
+--@@ +- "Recommendation M.3100:1992":abstractLinkEnd
+--@@ |  +- "Recommendation M.3100:1992":abstractLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":logicalLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":topologicalLinkEndR1
+--@@ +- "Recommendation M.3100:1992":accessGroup
+--@@ +- "Recommendation M.3100:1992":alarmReportingControlManager
+--@@ +- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ +- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ +- "Recommendation M.3100:1992":attributeRanges
+--@@ +- "Recommendation M.3100:1992":circuitEndPointSubgroup
+--@@ +- "Recommendation M.3100:1992":crossConnection
+--@@ |  +- "Recommendation M.3100:1992":crossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedCrossConnection
+--@@ +- "Recommendation M.3100:1992":equipment
+--@@ |  +- "Recommendation M.3100:1992":equipmentR1
+--@@ |  |  +- "Recommendation M.3100:1992":circuitPack
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":circuitPackR1
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentHolder
+--@@ +- "Recommendation M.3100:1992":externalPoint
+--@@ |  +- "Recommendation M.3100:1992":controlPoint
+--@@ |  +- "Recommendation M.3100:1992":scanPoint
+--@@ +- "Recommendation M.3100:1992":fabric
+--@@ |  +- "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ |  +- "Recommendation M.3100:1992":fabricR1
+--@@ |  |  +- "Recommendation M.3100:1992":fabricR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":fabricR3
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":fabricR4
+--@@ +- "Recommendation M.3100:1992":gtp
+--@@ |  +- "Recommendation M.3100:1992":gtpR1
+--@@ +- "Recommendation M.3100:1992":managedElement
+--@@ |  +- "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ |  +- "Recommendation M.3100:1992":managedElementR1
+--@@ |  |  +- "Recommendation M.3100:1992":managedElementR2
+--@@ +- "Recommendation M.3100:1992":managedElementComplex
+--@@ +- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  +- "Recommendation M.3100:1992":mpCrossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedMpCrossConnection
+--@@ +- "Recommendation M.3100:1992":network
+--@@ |  +- "Recommendation M.3100:1992":networkR1
+--@@ |  |  +- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  |  |  +- "Recommendation M.3100:1992":layerNetworkDomainR1
+--@@ +- "Recommendation M.3100:1992":physicalPort
+--@@ +- "Recommendation M.3100:1992":pipe
+--@@ |  +- "Recommendation M.3100:1992":connectionR1
+--@@ |  +- "Recommendation M.3100:1992":trailR1
+--@@ +- "Recommendation M.3100:1992":pipeR2
+--@@ |  +- "Recommendation M.3100:1992":linkConnection
+--@@ |  +- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  +- "Recommendation M.3100:1992":trailR2
+--@@ +- "Recommendation M.3100:1992":protectionUnitR1
+--@@ +- "Recommendation M.3100:1992":software
+--@@ |  +- "Recommendation M.3100:1992":softwareR1
+--@@ +- "Recommendation M.3100:1992":subNetwork
+--@@ +- "Recommendation M.3100:1992":terminationPoint
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":networkTerminationPoint
+--@@ |  |  +- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  |  |  +- "Recommendation M.3100:1992":genericTransportTTPR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPSinkR1
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSink
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ +- "Recommendation M.3100:1992":tpPool
+--@@ +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":heterogeneousScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":homogeneousScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":ensembleStatisticScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanScanner
+--@@ |  |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanVarianceScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":minMaxScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":percentileScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  +- "ITU-T Rec. Q.822 (1994)":currentData
+--@@ |  |  +- "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ |  |  |  +- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":monitorMetric
+--@@ |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":movingAverageMeanMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndMinMaxMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndPercentileMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndVarianceMonitor
+--@@ +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":basicSpawnerClass
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":launchPad
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":asynchronousLaunchPad
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":synchronousLaunchPad
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":thread
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":suspendableThread
+--@@ +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":commandSequencer
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":cmipCS
+--@@ +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":launchScript
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":generalStringScript
+--@@ |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":cmisScript
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":getCmisScript
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":setCmisScript
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":actionCmisScript
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":createCmisScript
+--@@ |  |  +- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":deleteCmisScript
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996":genericRelationshipObject
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":commandSequencer
+--@@ |  >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":launchPad
+--@@ >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":launchScript
+--@@ "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":asynchronousLaunchPad
+--@@ >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":suspendableThread
+--@@ |  >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":suspendableThread
+--@@ "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":synchronousLaunchPad
+--@@ >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":thread
+--@@ |  >- "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":thread
+--@@ "CCITT X.521":organization
+--@@ >- "Recommendation M.3100:1992":managedElement
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ |  >- "Recommendation G.774.3":protectionGroupR1
+--@@ |  |  >- "Recommendation G.774.3":protectionUnit
+--@@ |  >- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":attributeRanges
+--@@ |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  |  >- "Recommendation M.3100:1992":software
+--@@ |  |  |  >- "Recommendation M.3100:1992":software
+--@@ |  >- "Recommendation M.3100:1992":equipment +++
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":fabric
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":gtp
+--@@ |  |  >- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":tpPool
+--@@ |  >- "Recommendation M.3100:1992":fabric +++
+--@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
+--@@ |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  >- "Recommendation M.3100:1992":software +++
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++
+--@@ |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ |  |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "Recommendation M.3100:1992":managedElementComplex
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":network
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":connectionR1
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":network
+--@@ |  >- "Recommendation M.3100:1992":trailR1
+--@@ "CCITT X.521":organizationalUnit
+--@@ >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ >- "Recommendation M.3100:1992":network +++
+--@@ "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ >- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  >- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  >- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":mpCrossConnection +++
+--@@ "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Sink +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Source +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional +++
+--@@ >- "Recommendation G.774.3":protectedTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink +++
+--@@ >- "Recommendation G.774.3":protectedTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource +++
+--@@ "Recommendation M.3100:1992":networkR1
+--@@ >- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  >- "Recommendation M.3100:1992":accessGroup
+--@@ |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":logicalLink
+--@@ |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  >- "Recommendation M.3100:1992":subNetwork
+--@@ |  |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":topologicalLink
+--@@ |  |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":trailR2
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional +++
+--@@ "ITU-T Rec. Q.822 (1994)":currentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":asynchronousLaunchPad +++
+--@@ "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998":synchronousLaunchPad +++
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
