@@ -1,0 +1,138 @@
+--@@ GDMOCHECK $Revision$
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Tue Sep  4 13:40:10 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" >--
+--< GDMO.Alias "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" "X.725",
+--  "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996",
+--  "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7:1996",
+--  "ITU-T Rec. X.725 | ISO/IEC 10165-7",
+--  "ITU-T Rec. X.725 (1996) | ISO/IEC 10165-7: 1996" >--
+MODULE "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996"
+-- Annex B
+-- Definition of management information4)
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- B.2 Definition of managed object classes
+
+genericRelationshipObject MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		genericRelationshipObjectPackage PACKAGE
+			ATTRIBUTES
+				relationshipName GET,
+				relationshipClass GET,
+				relationshipMapping GET;
+			ATTRIBUTE GROUPS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2":relationships;;;
+REGISTERED AS { GRMD.grm-Object 1 };
+-- B.3 Definition of name bindings
+
+
+genericRelationshipObject-system NAME BINDING
+	SUBORDINATE OBJECT CLASS genericRelationshipObject AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. X.721 | ISO/IEC 10165-2":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		relationshipName;
+REGISTERED AS { GRMD.grm-NameBinding 1 };
+-- B.4 Definition of attributes
+
+
+relationshipName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GRM-ASN1Module.SimpleNameType;
+REGISTERED AS { GRMD.grm-Attribute 1 };
+
+
+relationshipClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GRM-ASN1Module.RelationshipClass;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { GRMD.grm-Attribute 2 };
+
+
+relationshipMapping ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GRM-ASN1Module.RelationshipMapping;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { GRMD.grm-Attribute 3 };
+
+
+participantPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX GRM-ASN1Module.GroupObjects;
+	MATCHES FOR EQUALITY, SET-INTERSECTION, SET-COMPARISON;
+	PARAMETERS
+		noSuchObject,
+		roleInstanceConflict,
+		roleCardinalityViolation,
+		relationshipCardinalityViolation;;
+-- An implementation may choose to apply ASN.1 subtyping restrictions to the attribute syntax of the
+-- participantPointer attribute to reflect the permitted role cardinality constraints defined in a
+-- specification.
+-- B.5 Definition of parameters
+
+
+noSuchObject PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX GRM-ASN1Module.ObjectInstance;
+REGISTERED AS { GRMD.grm-Parameter 1 };
+
+
+roleCardinalityViolation PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX GRM-ASN1Module.Null;
+REGISTERED AS { GRMD.grm-Parameter 3 };
+
+
+roleInstanceConflict PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX GRM-ASN1Module.ObjectInstance;
+REGISTERED AS { GRMD.grm-Parameter 2 };
+
+
+relationshipCardinalityViolation PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX GRM-ASN1Module.Null;
+REGISTERED AS { GRMD.grm-Parameter 4 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996":genericRelationshipObject
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996":genericRelationshipObject
+--@@
+--@@ vim: comments=\b\:--
+--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi

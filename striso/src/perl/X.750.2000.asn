@@ -1,0 +1,786 @@
+-- A.1 Allocation of object identifiers
+-- This Recommendation | International Standard allocates the following object identifiers.
+--< ASN1.Version 1990,1994 MKMD >--
+MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+dmiAttribute OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) smi(3) part2(2) attribute(7)}
+dmiNotification OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) smi(3) part2(2) notification(10)}
+mkmDirectoryAttributeType OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) standardSpecificExtension(0)
+directoryAttributeTypes(4)}
+mkmDirectoryObjectClass OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) standardSpecificExtension(0) directoryObjectClasses(6)}
+mkmDirectoryNameForm OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) standardSpecificExtension(0) directoryNameForms(7)}
+mkmMObjectClass OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) managedObjectClass(3)}
+mkmPackage OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) package(4)}
+mkmParameter OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) parameter(5)}
+mkmNameBinding OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) nameBinding(6)}
+mkmAttribute OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) attribute(7)}
+mkmAction OBJECT IDENTIFIER ::=
+{joint-iso-ccitt(2) ms(9) function(2) part16(16) action(9)}
+END
+-- A.2.4 Abstract syntax
+--< ASN1.Version 1990,1994 RepertoireASN1Module >--
+RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+DMI-TYPE-IDENTIFIER, NameBinding, Packages
+FROM Attribute-ASN1Module {joint-iso-ccitt(2) ms(9) smi(3) part2(2) asn1Module(2) 1} -- Ammendment 1
+-- CCITT Rec. X.721 | ISO/IEC 10165-2
+;
+GdmoObjectClass ::= OBJECT IDENTIFIER
+MKMF-VALUES ::= DMI-TYPE-IDENTIFIER
+ImplementedValues ::= SET OF SEQUENCE {
+attributeId MKMF-VALUES&.id ({ImplementedValuesSet}),
+defaultValue [1] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL,
+initialValue [2] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL,
+minValue [3] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL,
+maxValue [4] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL
+}
+ImplementedValuesSet MKMF-VALUES ::= {...}
+ManagedObjectClassRepertoireId ::= GdmoObjectClass
+RepertoireId ::= GraphicString
+SupportedCmipProfiles ::= BIT STRING {
+aom10(0), -- the managed system supports ISP 11183-1
+aom11(1), -- the managed system supports ISP 11183-3
+aom12(2)} -- the managed system supports ISP 11183-2
+SupportedConditionalPackageList ::= Packages
+SupportedManagedObjectClassList ::= SET OF GdmoObjectClass
+SupportedNameBindingList ::= SET OF NameBinding
+SupportedRelationshipClassList ::= SET OF OBJECT IDENTIFIER
+END
+-- A.3.5 Abstract syntax
+--< ASN1.Version 1990,1994 DefinitionASN1Module >--
+DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+ManagementExtension
+FROM Attribute-ASN1Module {joint-iso-ccitt(2) ms(9) smi(3) part2(2) asn1Module(2) 1} -- Ammendment 1
+-- CCITT Rec. X.721 | ISO/IEC 10165-2
+;
+Actions ::= SET OF SEQUENCE {
+action [0] TemplateLabel,
+parameter [1] TemplateList OPTIONAL}
+AdditionalProperties ::= SET OF ManagementExtension
+AndAttributeIds ::= SET OF SEQUENCE{
+fieldName Identifier,
+attribute TemplateLabel}
+ASN1ModuleContents ::= TextualRepresentation
+ASN1Version ::= BIT STRING {v1990(0), v1994(1)}
+AttributeGroups ::= SET OF SEQUENCE {
+group TemplateLabel,
+attributes TemplateList OPTIONAL}
+AttributeId ::= OBJECT IDENTIFIER
+Attributes ::= SET OF SEQUENCE{
+attributeLabel TemplateLabel,
+property PropertyList,
+parameterLabel TemplateList OPTIONAL}
+Behaviour ::= TemplateList
+CharacterizedBy ::= TemplateList
+ConditionalPackages ::= SET OF SEQUENCE { label TemplateLabel,
+condition GraphicString}
+Context ::= CHOICE {
+keyword SEQUENCE{ type-reference DefinedType,
+field Identifier},
+representation ENUMERATED{ aCTION-INFO(0),
+aCTION-REPLY(1),
+eVENT-INFO(2),
+eVENT-REPLY(3),
+sPECIFIC-ERROR(4)}}
+Create ::= CHOICE {present CreateSpecification, absent NULL}
+CreateSpecification ::= SEQUENCE {
+createModifier BIT STRING{ withReferenceObject(0),
+withAutomaticInstanceNaming(1)}
+OPTIONAL,
+parameter TemplateList OPTIONAL}
+DefinedAs ::= TextualRepresentation
+DefinedType ::= SEQUENCE { module [0] Identifier OPTIONAL,
+reference [1] Identifier}
+DefinedValue ::= SEQUENCE { module [0] Identifier OPTIONAL,
+reference [1] Identifier}
+Delete ::= CHOICE {present DeleteSpecification, absent NULL}
+DeleteSpecification ::= SEQUENCE {
+deleteModifier ENUMERATED{ onlyIfNoContainedObjects(0),
+deletesContainedObjects(1)} OPTIONAL,
+parameter TemplateList OPTIONAL}
+DerivedFrom ::= TemplateList
+DerivedOrWithSyntaxChoice ::= CHOICE {
+derivedFrom [0] TemplateLabel,
+withSyntaxChoice [1] DefinedType}
+Description ::= TextualRepresentation
+DocumentName ::= GraphicString
+DocumentObjectIdentifier ::= OptionallyRegisteredAs
+Fixed ::= BOOLEAN
+GroupElements ::= TemplateList
+Identifier ::= PrintableString(FROM("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" |
+"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+"N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+"a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+"n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "-"))
+LineImage ::= GraphicString -- each value of this type represents one complete line of text
+MatchesFor ::= BIT STRING{ equality(0),
+ordering(1),
+substrings(2),
+setComparison(3),
+setIntersection(4)}
+ModeConfirmed ::= BOOLEAN
+NamingObjectClass ::= SEQUENCE{class TemplateLabel,
+andSubclasses BOOLEAN DEFAULT FALSE}
+Notifications ::= SET OF SEQUENCE {
+notification [0] TemplateLabel,
+parameter [1] TemplateList OPTIONAL}
+Null ::= NULL
+OptionallyRegisteredAs ::= CHOICE {present OBJECT IDENTIFIER, absent NULL}
+Parameters ::= TemplateList
+PropertyList ::= SEQUENCE {
+replaceWithDefault [0] BOOLEAN DEFAULT FALSE,
+defaultValue [1] EXPLICIT ValueSpecifier OPTIONAL,
+initialValue [2] EXPLICIT ValueSpecifier OPTIONAL,
+permittedValues [3] DefinedType OPTIONAL,
+requiredValues [4] DefinedType OPTIONAL,
+getReplace [5] ENUMERATED{
+gET(0),
+rEPLACE(1),
+gET-REPLACE(2)} OPTIONAL,
+addRemove [6] ENUMERATED{
+aDD(0),
+rEMOVE(1),
+aDD-REMOVE(2)} OPTIONAL,
+setByCreate [7] BOOLEAN DEFAULT FALSE,
+additionalProperties [8] AdditionalProperties OPTIONAL}
+RegisteredAs ::= OBJECT IDENTIFIER
+Specification ::= TextualRepresentation
+SyntaxOrAttribute ::= CHOICE {withSyntax [0] DefinedType,
+attribute [1] TemplateLabel}
+TemplateDefinition ::= TextualRepresentation
+TemplateList ::= SET OF TemplateLabel
+TemplateLabel::= SEQUENCE{
+localName TemplateName,
+documentId CHOICE {
+documentName DocumentName,
+documentObjectIdentifier DocumentObjectIdentifier
+} OPTIONAL -- align with GDMO document
+identifier
+}
+TemplateName::= PrintableString(FROM("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" |
+"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+"N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+"a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+"n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "-" |
+"/"))
+TextualRepresentation ::= SEQUENCE OF LineImage
+ValueSpecifier ::= CHOICE{ valueReference [0] DefinedValue,
+derivationRule [1] TemplateLabel}
+WithAttribute ::= TemplateLabel
+WithSyntax ::= CHOICE { present DefinedType, absent NULL}
+END
+--< ASN1.Version 1990, 1994 GrmAttributeDefinitionModule >--
+GrmAttributeDefinitionModule {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 6}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+DefinedType, Identifier, OptionallyRegisteredAs, TemplateLabel, TemplateList
+FROM DefinitionASN1Module {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 1}
+-- this Recommendation | International Standard
+;
+LabelAndParameters ::= SEQUENCE {
+label TemplateLabel,
+parameters TemplateList OPTIONAL}
+MappedRelationshipClass ::= TemplateLabel
+MappingPair ::= SEQUENCE {
+relationshipOperation RelationshipOperation,
+mapsTo MapsTo}
+MapsTo ::= SET OF MapsToPair
+MapsToPair ::= SEQUENCE {
+systemsMgtOperation SystemsMgtOperation,
+roleOrRelationshipObject RoleOrRelationshipObject}
+OperationsMapping ::= SET OF MappingPair
+OptionalIdentifier ::= CHOICE {
+present Identifier,
+absent NULL}
+OptionalIdentifierAndRole ::= SEQUENCE {
+optionalOperationName OptionalIdentifier,
+optionalRoleName Identifier OPTIONAL}
+OptionalLabelAndParameters ::= SEQUENCE {
+label TemplateLabel OPTIONAL,
+parameters TemplateList OPTIONAL}
+QualifiedBy ::= TemplateList
+RelationshipObject ::= SEQUENCE {
+class TemplateLabel,
+qualifies TemplateList OPTIONAL}
+RelationshipOperation ::= CHOICE {
+establish [0] EXPLICIT OptionalIdentifier,
+terminate [1] EXPLICIT OptionalIdentifier,
+query [2] OptionalIdentifierAndRole,
+notify [3] EXPLICIT OptionalIdentifier,
+userDefined [4] EXPLICIT OptionalIdentifier,
+bind [5] OptionalIdentifierAndRole,
+unbind [6] OptionalIdentifierAndRole}
+Representation ::= CHOICE {
+nameBindingSuperior [0] TemplateLabel,
+nameBindingSubordinate [1] TemplateLabel,
+attribute [2] TemplateLabel,
+relationshipObjectPointer [3] TemplateLabel,
+operation NULL}
+RoleMappingSpecification ::= SEQUENCE {
+role Identifier,
+relatedClasses TemplateList,
+representedBy [0] EXPLICIT Representation OPTIONAL,
+qualifies [1] TemplateList OPTIONAL}
+RoleMappingSpecificationSet ::= SET OF RoleMappingSpecification
+RoleOrRelationshipObject ::= CHOICE {
+role Identifier,
+relationshipObject NULL}
+RoleSpecifier ::= SEQUENCE {
+role Identifier,
+compatibleWith [0] TemplateLabel OPTIONAL,
+permittedRoleCardinality [1] DefinedType OPTIONAL,
+requiredRoleCardinality [2] DefinedType OPTIONAL,
+bindingSupport [3] EXPLICIT OptionalIdentifier OPTIONAL,
+unbindingSupport [4] EXPLICIT OptionalIdentifier OPTIONAL,
+permittedRelationshipCardinality [5] DefinedType OPTIONAL,
+optionalRegisteredAs OptionallyRegisteredAs}
+SupportedChoice ::= CHOICE {
+establish [0] EXPLICIT OptionalIdentifier,
+terminate [1] EXPLICIT OptionalIdentifier,
+query [2] EXPLICIT OptionalIdentifier,
+notify [3] EXPLICIT OptionalIdentifier,
+userDefined [4] EXPLICIT OptionalIdentifier}
+Supports ::= SET OF SupportedChoice
+SystemsMgtOperation ::= CHOICE {
+get [0] LabelAndParameters,
+replace [1] LabelAndParameters,
+add [2] LabelAndParameters,
+remove [3] LabelAndParameters,
+create [4] OptionalLabelAndParameters,
+delete [5] TemplateList,
+action [6] LabelAndParameters,
+notification [7] LabelAndParameters}
+END
+-- A.4.5 Abstract syntax
+--%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= {v1990, v1994}
+--< ASN1.Version 1990, 1994 DiscoveryASN1Module >--
+DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+GdmoObjectClass
+FROM RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0}
+-- this Recommendation | International Standard
+ObjectInstance, RelativeDistinguishedName, Scope
+FROM CMIP-1 {joint-iso-ccitt(2) ms(9) cmip(1) modules(0) protocol(3)}
+-- ITU-T Rec. X.711 and ISO/IEC 9596-1
+;
+DiscoveryId ::= GraphicString
+MITSearch ::= SEQUENCE {
+base ObjectInstance,
+discoveryScope Scope,
+classRequest BOOLEAN DEFAULT FALSE
+-- if true, include class with
+MITSearchResponse
+}
+MITSearchResponse ::= SET OF RootedNameTree
+NameTree ::= SEQUENCE {
+rdnInfo RDNInfo,
+subordinates SET OF NameTree OPTIONAL}
+RDNInfo ::= SEQUENCE {
+rdn RelativeDistinguishedName,
+moClass GdmoObjectClass OPTIONAL}
+RootedNameTree ::= SEQUENCE {
+rootObject ObjectInstance,
+classOfRoot GdmoObjectClass OPTIONAL,
+subordinates SET OF NameTree OPTIONAL}
+END
+-- Annex B
+-- Management knowledge Directory objects
+-- (This annex forms an integral part of this Recommendation | International Standard)
+-- B.1 Repertoire Directory object definitions
+--< ASN1.Version 1994 RepertoireDirectoryASN1Module >--
+RepertoireDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 3}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+ATTRIBUTE, OBJECT-CLASS CONTENT-RULE
+FROM InformationFramework {joint-iso-ccitt(2) ds(5) modules(1) informationFramework(1) 2}
+-- ITU-T Rec. X.501 | ISO/IEC 9594-2
+applicationEntity
+FROM SelectedObjectClasses {joint-iso-ccitt(2) ds(5) modules(1) selectedObjectClasses(6) 2}
+-- ITU-T Rec. X.521 | ISO/IEC 9594-7
+bitStringMatch
+FROM SelectedAttributeTypes {joint-iso-ccitt(2) ds(5) modules(1) selectedAttributeTypes(5) 2}
+-- ITU-T Rec. X.520 | ISO/IEC 9594-6
+ObjectInstance
+FROM CMIP-1 {joint-iso-ccitt(2) ms(9) cmip(1) modules(0) protocols(3)}
+-- CCITT Rec. X.711 and ISO/IEC 9596-1
+FunctionalUnits, ProtocolVersion
+FROM CMIP-A-ASSOCIATE-Information {joint-iso-ccitt(2) ms(9) cmip(1) modules (0)
+AssociateUserInfo(1)} -- CCITT Rec. X.711 and ISO/IEC 9596-1
+FunctionalUnitPackage
+FROM SMASE-A-ASSOCIATE-Information {joint-iso-ccitt(2) ms(9) smo(0) negotiationAbstractSyntax(1)
+version1(1)} -- CCITT Rec. X.701 | ISO/IEC 10040
+mkmDirectoryObjectClass, mkmDirectoryAttributeType
+FROM MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5}
+-- this Recommendation | International Standard
+GdmoObjectClass
+FROM RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0}
+-- this Recommendation | International Standard
+;
+cMISE OBJECT-CLASS ::= {
+KIND auxiliary
+MUST CONTAIN { supportedCmipVersion |
+supportedCmipProfiles |
+supportedCmisFunctionalUnits}
+ID { mkmDirectoryObjectClass 1}}
+sMASE OBJECT-CLASS ::= {
+KIND auxiliary
+MUST CONTAIN { supportedSmaseFunctionalUnits}
+MAY CONTAIN { mitMoList |
+supportsMKMglobalNames}
+ID { mkmDirectoryObjectClass 2}}
+-- The "cMISE" and "sMASE" Directory auxiliary object
+-- classes should be used together with the Directory
+-- structural object class "applicationEntity".
+InstanceIdList ::= SET OF ObjectInstance
+managementServiceElementsCR CONTENT-RULE ::= {
+STRUCTURAL OBJECT CLASS applicationEntity
+AUXILIARY OBJECT CLASS { sMASE | cMISE}}
+mitMoList ATTRIBUTE ::= {
+WITH SYNTAX MitMo
+ID { mkmDirectoryAttributeType 1}}
+MitMo ::= SEQUENCE {
+objectClass GdmoObjectClass,
+instances InstanceIdList OPTIONAL}
+supportedCmipProfiles ATTRIBUTE ::= {
+WITH SYNTAX BIT STRING
+EQUALITY MATCHING RULE bitStringMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 43}}
+supportedCmipVersion ATTRIBUTE ::= {
+WITH SYNTAX ProtocolVersion
+EQUALITY MATCHING RULE bitStringMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 2}}
+supportedCmisFunctionalUnits ATTRIBUTE ::= {
+WITH SYNTAX FunctionalUnits
+EQUALITY MATCHING RULE bitStringMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 3}}
+supportedSmaseFunctionalUnits ATTRIBUTE ::= {
+WITH SYNTAX FunctionalUnitPackage
+ID { mkmDirectoryAttributeType 5}}
+supportsMKMglobalNames ATTRIBUTE ::= {
+WITH SYNTAX BOOLEAN
+EQUALITY MATCHING RULE booleanMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 44}}
+END
+-- B.2 Definition Directory object definitions
+--< ASN1.Version 1994 DefinitionDirectoryASN1Module >--
+DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+ATTRIBUTE, OBJECT-CLASS, CONTENT-RULE, NAME-FORM, objectIdentifierMatch
+FROM InformationFramework {joint-iso-ccitt(2) ds(5) modules(1) informationFramework(1) 2}
+-- ITU-T Rec. X.501 | ISO/IEC 9594-2
+bitStringMatch, booleanMatch, caseExactMatch, commonName, directoryStringFirstComponentMatch, integerMatch
+FROM SelectedAttributeTypes {joint-iso-ccitt(2) ds(5) modules(1) selectedAttributeTypes(5) 2}
+-- ITU-T Rec. X.520 | ISO/IEC 9594-6
+-- Because directoryStringFirstComponentMatch is a case-ignore matching rule, some matches
+-- found by its use could fail an exact-case matching test.
+Actions, AndAttributeIds, Attributes, AttributeGroups, ConditionalPackages, Context, Create, Delete,
+DerivedOrWithSyntaxChoice, Identifier, NamingObjectClass, Notifications, OptionallyRegisteredAs, RegisteredAs,
+SyntaxOrAttribute, TemplateLabel, TextualRepresentation, WithSyntax
+FROM DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1}
+-- this Recommendation | International Standard
+mkmDirectoryObjectClass, mkmDirectoryAttributeType, mkmDirectoryNameForm
+FROM MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5}
+-- this Recommendation | International Standard
+;
+-- Definition of the required Directory object classes
+asn1Module OBJECT-CLASS ::= {
+KIND auxiliary
+MUST CONTAIN { moduleReference |
+asn1ModuleContents |
+asn1Version |
+optionallyRegisteredAs}
+ID { mkmDirectoryObjectClass 15}}
+managementAction OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { behaviour |
+modeConfirmed |
+parameters |
+withInformationSyntax |
+withReplySyntax |
+registeredAs}
+ID { mkmDirectoryObjectClass 13}}
+managementAttributeGroup OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { groupElements |
+fixed |
+description |
+registeredAs}
+ID { mkmDirectoryObjectClass 11}}
+managementAttribute OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { derivedOrWithSyntaxChoice |
+matchesFor |
+behaviour |
+parameters |
+optionallyRegisteredAs}
+ID { mkmDirectoryObjectClass 10}}
+managementBehaviour OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { definedAs}
+ID { mkmDirectoryObjectClass 12}}
+managementDocument OBJECT-CLASS ::= {
+KIND auxiliary
+MUST CONTAIN { documentName |
+documentObjectIdentifier}
+MAY CONTAIN { specification}
+ID { mkmDirectoryObjectClass 4}}
+managementNameBinding OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { subordinateObjectClass |
+namedBySuperiorObjectClass |
+withAttribute |
+behaviour |
+create |
+delete |
+registeredAs}
+ID { mkmDirectoryObjectClass 9}}}
+managementNotification OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { behaviour |
+modeConfirmed |
+parameters |
+withInformationSyntax |
+andAttributeIds |
+withReplySyntax |
+registeredAs}
+ID { mkmDirectoryObjectClass 14}}
+managementObjectClass OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { derivedFrom |
+characterizedBy |
+conditionalPackages |
+registeredAs}
+ID { mkmDirectoryObjectClass 6}}
+managementPackage OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { behaviour |
+attributes |
+attributeGroups |
+actions |
+notifications |
+optionallyRegisteredAs}
+ID { mkmDirectoryObjectClass 7}}
+managementParameter OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { context |
+syntaxOrAttribute |
+behaviour |
+optionallyRegisteredAs}
+ID { mkmDirectoryObjectClass 8}}
+managementTemplate OBJECT-CLASS ::= {
+KIND auxiliary
+MUST CONTAIN { templateName}
+MAY CONTAIN { templateDefinition}
+ID { mkmDirectoryObjectClass 5}}
+registeredInformation OBJECT-CLASS ::= {
+SUBCLASS OF top
+MUST CONTAIN { commonName}
+MAY CONTAIN { nameForm |
+informationStatus |
+additionalInformation}
+ID { mkmDirectoryObjectClass 3}}
+-- Example structure rules for the registeredInformation Directory object class
+-- using this name form are provided in Annex H
+registeredInformationNameForm NAME-FORM ::= {
+NAMES registeredInformation
+WITH ATTRIBUTES { commonName}
+ID { mkmDirectoryNameForm 1}}
+-- Definition of DIT content rules
+-- Only one of the specified auxiliary object classes can be
+-- included in a given entry of class registeredInformation
+registeredManagementInformationCR CONTENT-RULE ::= {
+STRUCTURAL OBJECT CLASS registeredInformation
+AUXILIARY OBJECT CLASS { managementDocument |
+managementTemplate |
+managementObjectClass |
+managementPackage |
+managementParameter |
+managementNameBinding |
+managementAttribute |
+managementAttributeGroup |
+managementBehaviour |
+managementAction |
+managementNotification |
+asn1Module}}
+-- Definition of used attributes
+actions ATTRIBUTE ::= {
+WITH SYNTAX Actions
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 6}}
+additionalInformation ATTRIBUTE ::= {
+WITH SYNTAX AdditionalInformation
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 7}}
+AdditionalInformation ::= SEQUENCE {
+creationDate GeneralizedTime OPTIONAL,
+comment GraphicString OPTIONAL}
+andAttributeIds ATTRIBUTE ::= {
+WITH SYNTAX AndAttributeIds
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 8}}
+asn1ModuleContents ATTRIBUTE ::= {
+WITH SYNTAX TextualRepresentation
+ID { mkmDirectoryAttributeType 14}}
+asn1Version ATTRIBUTE ::= {
+WITH SYNTAX BIT STRING
+EQUALITY MATCHING RULE bitStringMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 45}}
+attributeGroups ATTRIBUTE ::= {
+WITH SYNTAX AttributeGroups
+ID { mkmDirectoryAttributeType 9}}
+attributes ATTRIBUTE ::= {
+WITH SYNTAX Attributes
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 10}}
+behaviour ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+ID { mkmDirectoryAttributeType 11}}
+characterizedBy ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+ID { mkmDirectoryAttributeType 12}}
+conditionalPackages ATTRIBUTE ::= {
+WITH SYNTAX ConditionalPackages
+ID { mkmDirectoryAttributeType 13}}
+context ATTRIBUTE ::= {
+WITH SYNTAX Context
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 15}}
+create ATTRIBUTE::= {
+WITH SYNTAX Create
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 16}}
+definedAs ATTRIBUTE ::= {
+WITH SYNTAX TextualRepresentation
+ID { mkmDirectoryAttributeType 17}}
+delete ATTRIBUTE ::= {
+WITH SYNTAX Delete
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 18}}
+derivedFrom ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+ID { mkmDirectoryAttributeType 19}}
+derivedOrWithSyntaxChoice ATTRIBUTE ::= {
+WITH SYNTAX DerivedOrWithSyntaxChoice
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 20}}
+description ATTRIBUTE::= {
+WITH SYNTAX TextualRepresentation
+ID { mkmDirectoryAttributeType 21}}
+documentName ATTRIBUTE ::= {
+WITH SYNTAX GraphicString
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 22}}
+documentObjectIdentifier ATTRIBUTE ::= {
+WITH SYNTAX OBJECT IDENTIFIER
+EQUALITY MATCHING RULE objectIdentifierMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 23}}
+fixed ATTRIBUTE ::= {
+WITH SYNTAX booleanSyntax
+EQUALITY MATCHING RULE booleanMatch
+SINGLE VALUE TRUE
+ID { mkmDirectoryAttributeType 24}}
+groupElements ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+ID { mkmDirectoryAttributeType 25}}
+informationStatus ATTRIBUTE ::= {
+WITH SYNTAX InformationStatus
+EQUALITY MATCHING RULE integerMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 34}}
+InformationStatus ::= ENUMERATED {
+active(0), deleted(1), preliminary(2)}
+matchesFor ATTRIBUTE ::= {
+WITH SYNTAX MatchesFor
+EQUALITY MATCHING RULE bitStringMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 26}}
+modeConfirmed ATTRIBUTE ::= {
+WITH SYNTAX booleanSyntax
+EQUALITY MATCHING RULE booleanMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 27}}
+moduleReference ATTRIBUTE ::= {
+WITH SYNTAX Identifier
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 28}}
+namedBySuperiorObjectClass ATTRIBUTE ::= {
+WITH SYNTAX NamingObjectClass
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 29}}
+nameForm ATTRIBUTE ::= {
+WITH SYNTAX PrintableString
+EQUALITY MATCHING RULE caseExactMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 30}}
+notifications ATTRIBUTE ::= {
+WITH SYNTAX Notifications
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 31}}
+optionallyRegisteredAs ATTRIBUTE ::= {
+WITH SYNTAX OptionallyRegisteredAs
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 46}}
+parameters ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+ID { mkmDirectoryAttributeType 32}}
+registeredAs ATTRIBUTE ::= {
+WITH SYNTAX RegisteredAs
+EQUALITY MATCHING RULE objectIdentifierMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 33}}
+specification ATTRIBUTE ::= {
+WITH SYNTAX TextualRepresentation
+ID { mkmDirectoryAttributeType 35}}
+subordinateObjectClass ATTRIBUTE ::= {
+WITH SYNTAX NamingObjectClass
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 36}}
+syntaxOrAttribute ATTRIBUTE ::= {
+WITH SYNTAX SyntaxOrAttribute
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 37}}
+templateDefinition ATTRIBUTE ::= {
+WITH SYNTAX TextualRepresentation
+ID { mkmDirectoryAttributeType 38}}
+templateName ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 39}}
+withAttribute ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+EQUALITY MATCHING RULE directoryStringFirstComponentMatch
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 40}}
+withInformationSyntax ATTRIBUTE ::= {
+WITH SYNTAX WithSyntax
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 41}}
+withReplySyntax ATTRIBUTE ::= {
+WITH SYNTAX WithSyntax
+SINGLE VALUETRUE
+ID { mkmDirectoryAttributeType 42}}
+END
+-- Ammendment 1
+--< ASN1.Version 1994 GrmDefinitionDirectoryASN1Module >--
+GrmDefinitionDirectoryASN1Module {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 7}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything;
+IMPORTS
+ATTRIBUTE, OBJECT-CLASS, CONTENT-RULE
+FROM InformationFramework {joint-iso-itu-t(2) ds(5) modules(1) informationFramework(1) 2}
+-- ITU-T Rec. X.501 | ISO/IEC 9594-2
+behaviour, derivedFrom, managementTemplate, registeredAs, registeredInformation
+FROM DefinitionDirectoryASN1Module
+{joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 4}
+-- this Recommendation | International Standard
+MappedRelationshipClass, MappingPair, RelationshipObject, RoleMappingSpecification, RoleSpecifier, SupportedChoice
+FROM GrmAttributeDefinitionModule
+{joint-iso- itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 6}
+-- this Recommendation | International Standard
+mkmDirectoryObjectClass, mkmDirectoryAttributeType
+FROM MKMD {joint-iso- itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 5}
+-- this Recommendation | International Standard
+;
+managementRelationshipClass OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { derivedFrom |
+behaviour }
+MAY CONTAIN { supports |
+qualifiedBy |
+roleSpecifier }
+ID { mkmDirectoryObjectClass 16 }}
+managementRelationshipMapping OBJECT-CLASS ::= {
+SUBCLASS OF managementTemplate
+KIND auxiliary
+MUST CONTAIN { mappedRelationshipClass |
+behaviour |
+roleMappingSpecificationSet |
+registeredAs }
+MAY CONTAIN { relationshipObject |
+operationsMapping }
+ID { mkmDirectoryObjectClass 17 }}
+-- Definition of DIT content rules
+-- Only one of the specified auxiliary object classes can be
+-- included in a given entry of class registeredInformation
+registeredManagementRelationshipInformationCR CONTENT-RULE ::= {
+STRUCTURAL OBJECT CLASS registeredInformation
+AUXILIARY OBJECT CLASS { managementRelationshipClass |
+managementRelationshipMapping }}
+-- Definition of used attributes
+mappedRelationshipClass ATTRIBUTE ::= {
+WITH SYNTAX MappedRelationshipClass
+SINGLE VALUE TRUE
+ID { mkmDirectoryAttributeType 47 }}
+operationsMapping ATTRIBUTE ::= {
+WITH SYNTAX MappingPair
+ID { mkmDirectoryAttributeType 48 }}
+qualifiedBy ATTRIBUTE ::= {
+WITH SYNTAX TemplateLabel
+ID { mkmDirectoryAttributeType 49 }}
+relationshipObject ATTRIBUTE ::= {
+WITH SYNTAX RelationshipObject
+SINGLE VALUE TRUE
+ID { mkmDirectoryAttributeType 50 }}
+roleMappingSpecificationSet ATTRIBUTE ::= {
+WITH SYNTAX RoleMappingSpecification
+ID { mkmDirectoryAttributeType 51 }}
+roleSpecifier ATTRIBUTE ::= {
+WITH SYNTAX RoleSpecifier
+SINGLE VALUE TRUE
+ID { mkmDirectoryAttributeType 52 }}
+supports ATTRIBUTE ::= {
+WITH SYNTAX SupportedChoice
+ID { mkmDirectoryAttributeType 53 }}
+END

@@ -1,0 +1,60 @@
+-- Annex B
+-- Abstract syntax definitions
+-- (This annex forms an integral part of this Recommendation | International Standard)
+ChangeOverASN1Productions {joint-iso-ccitt ms(9) function(2) part17(17) asn1Module(2) 0}
+DEFINITIONS ::=
+BEGIN
+IMPORTS ObjectInstance, Attribute, AttributeId, ModifyOperator
+FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) version(1) protocol(3)};
+part17Action OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) action(9)}
+part17Attribute OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) attribute(7)}
+part17MObjectClass OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) managedObjectClass(3)}
+part17Package OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) package(4)}
+part17Parameter OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) parameter(5)}
+part17MRelClass OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) relationshipClass(11)}
+part17Role OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part17(17) relationshipRole(13)}
+BackUpInfo ::= SEQUENCE{
+backedUpObjectSpecified [0] IMPLICIT OptionalObject DEFAULT noObject:NULL,
+backUpObjectSpecified [1] IMPLICIT OptionalObject DEFAULT noObject:NULL,
+backedUpObjectExisting [2] IMPLICIT OptionalObject DEFAULT noObject:NULL,
+backUpObjectExisting [3] IMPLICIT OptionalObject DEFAULT noObject:NULL}
+BackUpObject::= OptionalObject DEFAULT NULL
+ChangeBackInfo ::= SEQUENCE{
+backedUpObject [0] IMPLICIT ObjectInstance,
+backUpObject [1] IMPLICIT OptionalObject DEFAULT noObject:NULL,
+backedUpObjectChanges [2] IMPLICIT ExpectedAttributeList OPTIONAL,
+backUpObjectChanges [3] IMPLICIT ExpectedAttributesList OPTIONAL}
+ChangeOverInfo ::= SEQUENCE{
+primary [0] IMPLICIT ObjectInstance,
+secondary [1] IMPLICIT OptionalObject DEFAULT noObject:NULL,
+primaryChanges [2] IMPLICIT ExpectedAttributeList OPTIONAL,
+secondaryChanges [3] IMPLICIT ExpectedAttributesList OPTIONAL}
+Condition ::= SEQUENCE{
+object ObjectInstance,
+details SET OF Attribute}
+-- At least one of the two components of Conditions must be present
+Conditions ::= SEQUENCE{
+primary [0] IMPLICIT Condition OPTIONAL,
+secondary [1] IMPLICIT Condition OPTIONAL}
+ExpectedAttributeList ::= SET OF SEQUENCE{
+modifyOperator [0] IMPLICIT ModifyOperator DEFAULT replace,
+attributeId AttributeId,
+attributeValue ANY DEFINED BY attributeId OPTIONAL}
+NoSuchParticipant::= SEQUENCE{
+role [0] OBJECT IDENTIFIER,
+objectInstance [1] ObjectInstance}
+NoSuchRelationship::= SEQUENCE{
+relationshipClass [0] OBJECT IDENTIFIER,
+relationshipBinding [0] OBJECT IDENTIFIER OPTIONAL,
+relationshipInstance [0] RelationshipInstance OPTIONAL}
+OptionalObject ::= CHOICE{
+noObject NULL,
+object ObjectInstance}
+PrimaryObject ::= ObjectInstance
+PrimaryObjectSpecified ::= OptionalObject
+-- At least one of the two components of UnattainableAttributeList must be present
+RelationshipInstance::= SET OF ObjectInstance
+UnattainableAttributeList ::= SEQUENCE{
+primaryChanges [0] IMPLICIT ExpectedAttributeList OPTIONAL,
+secondaryChanges [1] IMPLICIT ExpectedAttributeList OPTIONAL}
+END

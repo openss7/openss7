@@ -8417,6 +8417,77 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
 # -------------------------------------
+# This construct shall be used to specify the superclass(es) from which the managed relationsihp
+# class inherits its characteristics including any which may, in turn, have been inherited from
+# other managed relationship class(es).  The managed relationship calss is a specialization of the
+# inherited characteristics and those specified in the balance of the completed template; the
+# specialization is such that the subclass is consistent with its superclass(es). If this construct
+# is absent, the managed relationship class is not specialized from other relationship classes.
+#
+# Specification of characteristics that are inherited from other managed relationship classes shall
+# not be repeated in the specification of the subclass unless on eof the techniques described in
+# CCITT Rec. X.722 | ISO/IEC 10165-4 for extending a specification inherited from a superclass is
+# being used.
+#
+# The rules for specifying managed relationship subclasses to ensure consistency are as follows:
+#
+# a) SUPPORTS: The specialized relationship management operation shall be the union of the
+#    relationship management operations of the superclass and those specified in the subclass;
+#    inheritance and specialization shall not introduce additional relationship management
+#    notificiations into a subclass.
+#
+# b) QUALIFIED BY: Permitted and required value-sets of atrribute ranges shall not be changed in a
+#    subclass behaviour.
+#
+# c) BEHAVIOUR: The behaviour of a subclass shall be:
+#
+#    - the disjunctive combination of the pre-conditions inherited from its superclass(es) and those
+#      specified in the sublcass;
+#
+#    - the conjunctive combination of the post-conditions inherited from its superclass(es) and
+#      those specified in the subclass;
+#
+#    - the conjunctive combination of the invariants inherited from its superclass(es) and those
+#      specified in the subclass; if the invariants are mutually contradictory, a subclass cannot be
+#      specified.
+#
+# d) ROLE:
+#
+#    - Additional role specifications may be included in the subclass definition.
+#
+#    - A managed objects class introduced by the COMPATIBLE WITH clause in the subclass shall be
+#      compatible to those referenced in similar clauses in the superclass(es).
+#
+#    - The inherited PERMITTED-ROLE-CARDINALITY-CONSTRAINT value of a role inherited from more than
+#      one superclass shall be the set intersection of the values specified for that role in the
+#      superclasses; any permitted role cardinality constraint value specified in the subclass shall
+#      be a subset of, or equal to, the inherited permitted role cardinality constraint value; the
+#      specialized permitted role cardinality constraint value shall be the set intersection of the
+#      inherited values and that specified in the subclass.
+#
+#    - The inherited REQUIRED-ROLE-CARDINALITY-CONSTRAINT value of a rule inherited from more than
+#      one superclass hsall be the set union of the values specified for the role in the
+#      superclasses set-intersected with the inherited permitted role cardinality constraint value;
+#      any required role cardinality constraint value specified in the subclass shall be a superset
+#      of, or equal to, the inherited required role cardinality constraint value; the specialized
+#      required role cardinality constraint value shall be the set union of the inherited value and
+#      that specified in the subclass set-intersected with the value of the specialized permitted
+#      rold cardinality constraint.
+#
+#    - BIND-SUPPORT may be added in the subclass specification.
+#
+#    - UNBIND-SUPPORT may be added in the subclass specification.
+#
+#    - The inherited PERMITTED-RELATIONSHIP-CARDINALITY-CONSTRAINT value of a rule inherited from
+#      more than one superclass shall be the set intersection of the values sepecified for the role
+#      in the superclasses; any permitted relationship cardinality constraint value specified in the
+#      subclass shall be a subset of, or equal to, the inherited permitted relationship cardinality
+#      constraint value; the specialized permitted relationship cardinality constraint value shall
+#      be the set intersection of the inherited value and that specified in the subclass.
+#
+# e) REGISTERED AS: The subclass registration shall replace any registration inherited from other
+#    definiitons.
+#
 
 sub read {
 	my $self = shift;
@@ -8510,6 +8581,19 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
 # -------------------------------------
+# A.1.3.3  SUPPORTS supported [, supported]*
+#
+# This construct shall be used to define the relationship management operaitons and notifications
+# that a managed relationship supports.  The 'supported' production shall be used to specifiy the
+# prototypical operation or notification on which the relationship mangement operation or
+# notification is based, namely:
+#
+# - ESTABLISH [operation-name];
+# - TERMINATE [operation-name];
+# - QUERY [operation-name];
+# - NOTIFY [notification-name];
+# - USER DEFINED [operation-name];
+#
 
 sub read {
 	my $self = shift;
@@ -8772,6 +8856,12 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
 # -------------------------------------
+# A.1.3.5 ROLE role-name
+#
+# This construct shall be used to specify the roles associated with the managed relationship calss;
+# the label 'role-name' shll be used as a reference name o the role.
+#
+#
 
 sub read {
 	my $self = shift;
@@ -8952,8 +9042,9 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^BIND\s*-?\s*SUPPORT//s);
 		$self->{comments} = Comments->parse($line,@_[1,-1]);
-		last TEST unless (($self->{operation} = OperationName->parse($line,@_[1,-1])));
-		push @{$self->{children}}, $self->{operation};
+		if (($self->{operation} = OperationName->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{operation};
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8966,7 +9057,7 @@ sub gdmo {
 		printf 'BIND-SUPPORT'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
-		$self->{operation}->gdmo();
+		if (($s = $self->{operation})) { $s->gdmo(); }
 	}
 }
 
@@ -8983,8 +9074,9 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^UNBIND\s*-?\s*SUPPORT//s);
 		$self->{comments} = Comments->parse($line,@_[1,-1]);
-		last TEST unless (($self->{operation} = OperationName->parse($line,@_[1,-1])));
-		push @{$self->{children}}, $self->{operation};
+		if (($self->{operation} = OperationName->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{operation};
+		}
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -8997,7 +9089,7 @@ sub gdmo {
 		printf 'UNBIND-SUPPORT'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
-		$self->{operation}->gdmo();
+		if (($s = $self->{operation})) { $s->gdmo(); }
 	}
 }
 
@@ -9042,6 +9134,11 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(ParserGenerator);
 # -------------------------------------
+# This construct shall be used to specify attributes that are associated with the managed
+# relationship as a whole.  Qualifying attributes shall be made available in all implementations of
+# the managed relationship irrespective of the representation method used.  The relationship mapping
+# template shall be used to specify how these attributes are made available by a paticular
+# representation.
 
 sub read {
 	my $self = shift;
@@ -9406,6 +9503,7 @@ sub gdmo {
 		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{binding}->gdmo();
 		$self->{using}->gdmo();
+		$self->{suporsub}->gdmo();
 	}
 }
 
@@ -9458,8 +9556,8 @@ sub read {
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{attribute} = AttributeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{attribute};
-		last TEST unless ($line=~s/^;//s);
-		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		#last TEST unless ($line=~s/^;//s);
+		#$self->{comments2} = Comments->parse($line,@_[1,-1]);
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -9477,8 +9575,8 @@ sub gdmo {
 			$self->{attribute}->gdmo();
 			$::indent=~s/.$//s;
 		}
-		printf ';'; $::first = 0;
-		if (($s = $self->{comments2})) { $s->gdmo(); }
+		#printf ';'; $::first = 0;
+		#if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
@@ -9868,6 +9966,16 @@ use strict;
 use vars qw(@ISA);
 @ISA = qw(Identifier);
 # -------------------------------------
+# The operation-name and notification-name shall be used, where necessary, to:
+#
+# - provide a link to an optional specificaiton, in behaviour templates referenced  by the BEHAVIOUR
+#   construct, of behaviour additional to the  referenced prototypical operation;
+#
+# - disambiguate relationship management operations or notifications that are based on the same
+#   prototypical operation or notification respectively;
+#
+# - provide a link to the related systems management operations and notifications specified in the
+#   relationship mapping template.
 
 # -------------------------------------
 package RoleName;
@@ -9946,11 +10054,11 @@ sub read {
 sub gdmo {
 	my $self = shift;
 	PRINT: {
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
 		$self->{operation}->gdmo();
-		my $s;
 		if (!$::first) { printf ' '; }
 		printf "OF"; $::first = 0;
-		if (($s = $self->{comments})) { $s->gdmo(); }
+		my $s; if (($s = $self->{comments})) { $s->gdmo(); }
 		$self->{roleorobj}->gdmo();
 	}
 }
@@ -10012,6 +10120,7 @@ sub gdmo {
 		printf 'GET'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{attribute}->gdmo();
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
@@ -10047,6 +10156,7 @@ sub gdmo {
 		printf 'REPLACE'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{attribute}->gdmo();
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
@@ -10082,6 +10192,7 @@ sub gdmo {
 		printf 'ADD'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{attribute}->gdmo();
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
@@ -10117,6 +10228,7 @@ sub gdmo {
 		printf 'REMOVE'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{attribute}->gdmo();
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
@@ -10135,8 +10247,9 @@ sub read {
 	TEST: {
 		last TEST unless ($line=~s/^CREATE//s);
 		$self->{comments} = Comments->parse($line,@_[1,-1]);
-		last TEST unless (($self->{class} = ClassReference->parse($line,@_[1,-1])));
-		push @{$self->{children}}, $self->{class};
+		if (($self->{class} = ClassReference->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{class};
+		}
 		if (($self->{parameters} = ParameterReferenceSimpleList->parse($line,@_[1,-1]))) {
 			push @{$self->{children}}, $self->{parameters};
 		}
@@ -10152,7 +10265,8 @@ sub gdmo {
 		printf 'CREATE'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
-		$self->{class}->gdmo();
+		if (!$::first) { printf ' '; $::first = 1; }
+		if (($s = $self->{class})) { $s->gdmo(); }
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
 }
@@ -10219,6 +10333,7 @@ sub gdmo {
 		printf 'CREATE'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{action}->gdmo();
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
@@ -10254,6 +10369,7 @@ sub gdmo {
 		printf 'NOTIFICATION'; $::first = 0;
 		my $s;
 		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (!$::first) { printf ' '; $::first = 1; }
 		$self->{notification}->gdmo();
 		if (($s = $self->{parameters})) { $s->gdmo(); }
 	}
@@ -11123,7 +11239,7 @@ sub gdmo {
 				$l=~s/^\t+//s;
 				$l=~s/\s+$//s;
 				$l=~s/\t/ /sg;
-				$l=~s/^(\s+|\s*-\s+|\s*[\(\[\{]?[a-zA-Z1-9][ivxIVX0-9]*[\.:]??[\.:\)\]\}]\s*)//;
+				$l=~s/^(\s+|\s*(?:-|\xB7)\s+|\s*[\(\[\{]?[a-zA-Z1-9][ivxIVX0-9]*[\.:]??[\.:\)\]\}]\s*)//;
 				$lws = $1;
 				my @words = ( split(/\s+/s,$l) );
 				my $w; foreach $w (@words) {
@@ -14136,7 +14252,10 @@ sub read {
 	TEST: {
 		last TEST unless (($self->{typereference} = ExternalTypeReference->parse($line,@_[1,-1])));
 		push @{$self->{children}}, $self->{typereference};
-		$self->{comments} = Comments->parse($line,@_[1,-1]);
+		$self->{comments1} = Comments->parse($line,@_[1,-1]);
+		last TEST unless ($line=~s/^\.//s);
+		$self->{comments2} = Comments->parse($line,@_[1,-1]);
+		last TEST unless (($self->{identifier} = Identifier->parse($line,@_[1,-1])));
 		$_[0] = $line; return $self;
 	}
 	return $self->error($line);
@@ -14147,7 +14266,10 @@ sub gdmo {
 	PRINT: {
 		my $s;
 		$self->{typereference}->gdmo();
-		if (($s = $self->{comments})) { $s->gdmo(); }
+		if (($s = $self->{comments1})) { $s->gdmo(); }
+		printf '.'; $::first = 1;
+		$self->{identifier}->gdmo();
+		if (($s = $self->{comments2})) { $s->gdmo(); }
 	}
 }
 
