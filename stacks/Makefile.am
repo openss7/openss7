@@ -144,7 +144,8 @@ sbin_PROGRAMS			= \
 				  slconfig \
 				  slconfd \
 				  slmon \
-				  ss7capd
+				  ss7capd \
+				  test-sl
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -206,6 +207,12 @@ ss7capd_LDADD			= $(STREAMS_LDADD)
 ss7capd_LDFLAGS			= $(STREAMS_LDFLAGS)
 ss7capd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"ss7capd\"
 ss7capd_CFLAGS			= $(USER_CFLAGS)
+
+test_sl_SOURCES			= src/test/sl/test-sl.c
+test_sl_LDADD			= $(STREAMS_LDADD)
+test_sl_LDFLAGS			= $(STREAMS_LDFLAGS)
+test_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test_sl\"
+test_sl_CFLAGS			= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD)
@@ -505,7 +512,8 @@ sbin_PROGRAMS			= \
 				  slconfig \
 				  slconfd \
 				  slmon \
-				  ss7capd
+				  ss7capd \
+				  test-sl
 
 @PACKAGE_TARNAME@_mknod_SOURCES		= @PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_DEPENDENCIES	= $(CONFIG_HEADER) $(STRCONF_CONFIG)
@@ -567,6 +575,12 @@ ss7capd_LDADD			= $(STREAMS_LDADD)
 ss7capd_LDFLAGS			= $(STREAMS_LDFLAGS)
 ss7capd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"ss7capd\"
 ss7capd_CFLAGS			= $(USER_CFLAGS)
+
+test_sl_SOURCES			= src/test/sl/test-sl.c
+test_sl_LDADD			= $(STREAMS_LDADD)
+test_sl_LDFLAGS			= $(STREAMS_LDFLAGS)
+test_sl_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DNAME=\"test_sl\"
+test_sl_CFLAGS			= $(USER_CFLAGS)
 
 test_tcpc_SOURCES		= src/test/inet/test-tcpc.c
 test_tcpc_LDADD			= $(STREAMS_LDADD)
