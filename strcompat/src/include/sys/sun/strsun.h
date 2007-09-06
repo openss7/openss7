@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsun.h,v 0.9.2.13 2007/08/12 15:51:13 brian Exp $
+ @(#) $Id: strsun.h,v 0.9.2.14 2007/09/06 09:45:21 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/12 15:51:13 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 09:45:21 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsun.h,v $
+ Revision 0.9.2.14  2007/09/06 09:45:21  brian
+ - correction to MBLKIN
+
  Revision 0.9.2.13  2007/08/12 15:51:13  brian
  - header and extern updates, GPLv3, 3 new lock functions
 
@@ -67,7 +70,7 @@
 #ifndef __SYS_SUN_STRSUN_H__
 #define __SYS_SUN_STRSUN_H__
 
-#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: strsun.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2006 OpenSS7 Corporation."
 
 #ifndef _SYS_STRSUN_H
 #warning "Do not include sys/sun/strsun.h directly, include sys/strsun.h instead."
@@ -145,7 +148,7 @@ MBLKIN(mblk_t *mp, ssize_t off, size_t len)
 {
 	return ((off >= 0) && (mp->b_rptr + off + len < mp->b_wptr));
 }
-#define MBLKIN(mp,off,len) ((off >= 0) && (mp->b_rptr + off + len < mp->b_wptr))
+#define MBLKIN(mp,off,len) ((off >= 0) && (mp->b_rptr + off + len <= mp->b_wptr))
 __SUN_EXTERN_INLINE long
 OFFSET(void *p, void *base)
 {
