@@ -1675,7 +1675,7 @@ main(int argc, char **argv)
 
 	sl_conf = sl_conf_ansi;
 	sdt_conf = sdt_conf_ansi;
-	sdl_conf = sdl_conf_ansi;
+	sdl_conf = sdl_conf_t1;
 
 	while (1) {
 		int option_index = 0;
