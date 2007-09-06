@@ -9,18 +9,32 @@
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
- the terms of the GNU General Public License as published by the Free Software
- Foundation, version 3 of the license.
+ Unauthorized distribution or duplication is prohibited.
 
- This program is distributed in the hope that it will be useful, but WITHOUT
- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
- details.
+ This software and related documentation is protected by copyright and
+ distributed under licenses restricting its use, copying, distribution and
+ decompilation.  No part of this software or related documentation may be
+ reproduced in any form by any means without the prior written authorization
+ of the copyright holder, and licensors, if any.
 
- You should have received a copy of the GNU General Public License along with
- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ The recipient of this document, by its retention and use, warrants that the
+ recipient will protect this information and keep it confidential, and will
+ not disclose the information contained in this document without the written
+ permission of its owner.
+
+ The author reserves the right to revise this software and documentation for
+ any reason, including but not limited to, conformity with standards
+ promulgated by various agencies, utilization of advances in the state of the
+ technical arts, or the reflection of changes in the design of any techniques,
+ or procedures embodied, described, or referred to herein.  The author is
+ under no obligation to provide any feature listed herein.
+
+ -----------------------------------------------------------------------------
+
+ As an exception to the above, this software may be distributed under the GNU
+ General Public License (GPL) Version 3, so long as the software is distributed
+ with, and only used for the testing of, OpenSS7 modules, drivers, and
+ libraries.
 
  -----------------------------------------------------------------------------
 
@@ -57,7 +71,8 @@
 
 #ident "@(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $"
 
-static char const ident[] = "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $";
+static char const ident[] =
+    "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -101,7 +116,7 @@ lmi_option_t lmi_conf = {
 #define HZ 100
 #endif
 
-const sl_config_t sl_conf_itu = {
+const sl_config_t sl_conf_itut = {
 	.t1 = 45 * 1000,
 	.t2 = 5 * 1000,
 	.t2l = 20 * 1000,
@@ -158,7 +173,7 @@ const sl_config_t sl_conf_ansi = {
 
 sl_config_t sl_conf, sl_conf_read;
 
-const sdt_config_t sdt_conf_itu = {
+const sdt_config_t sdt_conf_itut = {
 	.Tin = 4,
 	.Tie = 1,
 	.T = 64,
@@ -198,7 +213,7 @@ const sdt_config_t sdt_conf_ansi = {
 };
 sdt_config_t sdt_conf, sdt_conf_read;
 
-const sdl_config_t sdl_conf_itu = {
+const sdl_config_t sdl_conf_e1 = {
 	.ifflags = 0,
 	.iftype = SDL_TYPE_DS0,
 	.ifrate = 64000,
@@ -218,25 +233,45 @@ const sdl_config_t sdl_conf_itu = {
 	.ifsync = 0,
 	.ifsyncsrc = {1, 2, 0, 0}
 };
-const sdl_config_t sdl_conf_ansi = {
+const sdl_config_t sdl_conf_t1 = {
 	.ifflags = 0,
-	.iftype = SDL_TYPE_DS0A,
+	.iftype = SDL_TYPE_DS0,
 	.ifrate = 56000,
-	.ifgtype = SDL_GTYPE_NONE,
-	.ifgrate = 0,
-	.ifmode = SDL_MODE_NONE,
+	.ifgtype = SDL_GTYPE_T1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
 	.ifgmode = SDL_GMODE_NONE,
-	.ifgcrc = SDL_GCRC_NONE,	/* T1 only */
-	.ifclock = SDL_CLOCK_NONE,
-	.ifcoding = SDL_CODING_NONE,	/* T1 only */
-	.ifframing = SDL_FRAMING_NONE,	/* T1 only */
-	.ifblksize = 0,
+	.ifgcrc = SDL_GCRC_CRC6,	/* T1 only */
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,	/* T1 only */
+	.ifframing = SDL_FRAMING_ESF,	/* T1 only */
+	.ifblksize = 8,
 	.ifleads = 0,
 	.ifalarms = 0,
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {0, 0, 0, 0}
+	.ifsyncsrc = {1, 2, 0, 0}
+};
+const sdl_config_t sdl_conf_j1 = {
+	.ifflags = 0,
+	.iftype = SDL_TYPE_DS0,
+	.ifrate = 56000,
+	.ifgtype = SDL_GTYPE_J1,
+	.ifgrate = 1544000,
+	.ifmode = SDL_MODE_PEER,
+	.ifgmode = SDL_GMODE_NONE,
+	.ifgcrc = SDL_GCRC_CRC6J,	/* J1 only */
+	.ifclock = SDL_CLOCK_LOOP,
+	.ifcoding = SDL_CODING_B8ZS,	/* J1 only */
+	.ifframing = SDL_FRAMING_ESF,	/* J1 only */
+	.ifblksize = 8,
+	.ifleads = 0,
+	.ifalarms = 0,
+	.ifrxlevel = 0,
+	.iftxlevel = 0,
+	.ifsync = 0,
+	.ifsyncsrc = {1, 2, 0, 0}
 };
 sdl_config_t sdl_conf, sdl_conf_read;
 
@@ -340,9 +375,9 @@ Usage:\n\
 Arguments:\n\
     (none)\n\
 General Options:\n\
-    -q, --quiet						(default: off)\n\
+    -q, --quiet							(default: off)\n\
 	suppress output\n\
-    -v, --verbose					(default: off)\n\
+    -v, --verbose						(default: off)\n\
 	increase verbosity of output\n\
 Command Options:\n\
     -h, --help\n\
@@ -352,22 +387,26 @@ Command Options:\n\
     -C, --copying\n\
 	prints the copying permissions and exits\n\
 Setting Options:\n\
-    -b, --board board					(default: %2$d)\n\
+    -b, --board board						(default: %2$d)\n\
 	board specifies the board number to open\n\
-    -s, --span span					(default: %3$d)\n\
+    -s, --span span						(default: %3$d)\n\
 	span specifies the span on the card to open\n\
-    -c, --channel channel				(default: %4$d)\n\
+    -c, --channel channel					(default: %4$d)\n\
 	channel specifies the time slot in the span to open\n\
-    --flags number					(default: %5$d)\n\
+    --flags number						(default: %5$d)\n\
 	number specifies the number of flags (0 means 1)\n\
-    --crc4, --crc5, --crc6				(default: crc6)\n\
+    --crc4, --crc5, --crc6					(default: crc6)\n\
 	specifies the crc to use\n\
-    --hdb3, --ami, --b8zs				(default: b8zs)\n\
+    --hdb3, --ami, --b8zs					(default: b8zs)\n\
 	specifies the line coding to use\n\
-    --cas, --ccs, --sf, --esf				(default: esf)\n\
+    --cas, --ccs, --sf, --esf					(default: esf)\n\
 	specifies the framing to use\n\
-    --t1, --e1						(default: t1)\n\
+    --t1, --e1							(default: t1)\n\
 	sets default settings for T1 or E1 operation\n\
+    --ds0, --ds0a						(default: ds0)\n\
+	sets for DS0 or DS0A operation\n\
+    --asni, --itut						(default: ansi)\n\
+	set for ANSI or ITU-T link operation\n\
 \n\
 This program opens and attaches a Signalling Link channel, activates the\n\
 links, and reads and writes SLTM/SLTA to and from the channel.  The program\n\
@@ -1336,7 +1375,8 @@ mymain(int argc, char **argv)
 	case LMI_OK_ACK:
 		break;
 	case LMI_ERROR_ACK:
-		fprintf(stderr, "%s: LMI_ERROR_ACK %s\n", argv[0], print_lmi_error(m->error_ack.lmi_reason));
+		fprintf(stderr, "%s: LMI_ERROR_ACK %s\n", argv[0],
+			print_lmi_error(m->error_ack.lmi_reason));
 		exit(1);
 	default:
 		fprintf(stderr, "%s: failed with event %d\n", argv[0], ret);
@@ -1659,6 +1699,9 @@ main(int argc, char **argv)
 			{"e1",		no_argument,		NULL, 13 },
 			{"ds0",		no_argument,		NULL, 14 },
 			{"ds0a",	no_argument,		NULL, 15 },
+			{"ansi",	no_argument,		NULL, 16 },
+			{"itut",	no_argument,		NULL, 17 },
+			{"j1",		no_argument,		NULL, 18 },
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
@@ -1717,25 +1760,30 @@ main(int argc, char **argv)
 		case 11:	/* flags */
 			sdt_conf.f = atoi(optarg);
 			break;
-		case 14: /* ds0 */
+		case 14:	/* ds0 */
 			sdl_conf.iftype = SDL_TYPE_DS0;
 			sdl_conf.ifrate = 64000;
 			break;
-		case 15: /* ds0a */
+		case 15:	/* ds0a */
 			sdl_conf.iftype = SDL_TYPE_DS0A;
 			sdl_conf.ifrate = 56000;
 			break;
+		case 16:	/* ansi */
+			sdt_conf = sdt_conf_ansi;
+			sl_conf = sl_conf_ansi;
+			break;
+		case 17:	/* itut */
+			sdt_conf = sdt_conf_itut;
+			sl_conf = sl_conf_itut;
+			break;
+		case 18:	/* j1 */
+			sdl_conf = sdl_conf_j1;
+			break;
 		case 12:	/* t1 */
-			sdl_conf.ifgrate = 1540000;
-			sdl_conf.ifgcrc = SDL_GCRC_CRC6;
-			sdl_conf.ifcoding = SDL_CODING_B8ZS;
-			sdl_conf.ifframing = SDL_FRAMING_ESF;
+			sdl_conf = sdl_conf_t1;
 			break;
 		case 13:	/* e1 */
-			sdl_conf.ifgrate = 2048000;
-			sdl_conf.ifgcrc = SDL_GCRC_CRC5;
-			sdl_conf.ifcoding = SDL_CODING_HDB3;
-			sdl_conf.ifframing = SDL_FRAMING_CCS;
+			sdl_conf = sdl_conf_e1;
 			break;
 		case 'q':	/* -q, --quiet */
 			output -= output > 0 ? 1 : output;
