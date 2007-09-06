@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sl_mux.h,v 0.9.2.5 2007/08/14 12:17:10 brian Exp $
+ @(#) $Id: sl_mux.h,v 0.9.2.6 2007/09/06 11:16:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:10 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 11:16:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.h,v $
+ Revision 0.9.2.6  2007/09/06 11:16:17  brian
+ - testing updates
+
  Revision 0.9.2.5  2007/08/14 12:17:10  brian
  - GPLv3 header updates
 
@@ -70,7 +73,7 @@
 #ifndef __SS7_SL_MUX_H__
 #define __SS7_SL_MUX_H__
 
-#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 0.9.2.5 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sl_mux.h,v $ $Name:  $($Revision: 0.9.2.6 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 #define SLMUX_CLEI_MAX	    32
 
@@ -91,7 +94,7 @@ struct slmux_mon {
 	int mon_dir;
 	unsigned char mon_msg_type;
 	unsigned char mon_msg_band;
-	unsigned char mon_msg_flags;
+	unsigned short mon_msg_flags;
 	unsigned char mon_msg_data[0];
 	/* followed by encapsulated control part */
 };

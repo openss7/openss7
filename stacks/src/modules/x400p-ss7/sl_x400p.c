@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/19 11:56:00 $
+ @(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/09/06 11:16:20 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:56:00 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 11:16:20 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_x400p.c,v $
+ Revision 0.9.2.48  2007/09/06 11:16:20  brian
+ - testing updates
+
  Revision 0.9.2.47  2007/08/19 11:56:00  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -151,10 +154,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/19 11:56:00 $"
+#ident "@(#) $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/09/06 11:16:20 $"
 
 static char const ident[] =
-    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/19 11:56:00 $";
+    "$RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/09/06 11:16:20 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -206,7 +209,7 @@ static char const ident[] =
 
 #define SL_X400P_DESCRIP	"X400P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define SL_X400P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.47 $) $Date: 2007/08/19 11:56:00 $"
+#define SL_X400P_REVISION	"OpenSS7 $RCSfile: sl_x400p.c,v $ $Name:  $($Revision: 0.9.2.48 $) $Date: 2007/09/06 11:16:20 $"
 #define SL_X400P_COPYRIGHT	"Copyright (c) 1997-2006 OpenSS7 Corporation.  All Rights Reserved."
 #define SL_X400P_DEVICE		"Supports the V40XP E1/T1/J1 (Tormenta II/III) PCI boards."
 #define SL_X400P_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -5675,9 +5678,12 @@ xp_tx_block(struct xp *xp, uchar *bp, uchar *be, sdt_stats_t * stats, const sl_u
 				switch (type) {
 				default:
 				case SDL_TYPE_DS0:
-				case SDL_TYPE_DS0A:
-					_printd(("Tx: %p: 0x%02x\n", xp, xp_rev(*bp)));
+					/* is this & 0xFE or & 0x7F ? */
 					*bp = tx->residue >> tx->rbits;
+					break;
+				case SDL_TYPE_DS0A:
+					*bp = tx->residue >> tx->rbits;
+					tx->rbits += 1;
 					break;
 				case SDL_TYPE_T1:
 				case SDL_TYPE_J1:

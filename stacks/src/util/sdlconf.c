@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:57:40 $
+ @(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/09/06 11:16:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:57:40 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 11:16:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdlconf.c,v $
+ Revision 0.9.2.10  2007/09/06 11:16:27  brian
+ - testing updates
+
  Revision 0.9.2.9  2007/08/19 11:57:40  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -64,10 +67,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:57:40 $"
+#ident "@(#) $RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/09/06 11:16:27 $"
 
 static char const ident[] =
-    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.9 $) $Date: 2007/08/19 11:57:40 $";
+    "$RCSfile: sdlconf.c,v $ $Name:  $($Revision: 0.9.2.10 $) $Date: 2007/09/06 11:16:27 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -359,7 +362,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.9 $ $Date: 2007/08/19 11:57:40 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.10 $ $Date: 2007/09/06 11:16:27 $");
 }
 
 void

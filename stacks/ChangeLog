@@ -1,5 +1,24 @@
 2007-09-06  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: added test-sl to build
+	* src/include/ss7/sdli_ioctl.h: correction
+	* src/include/ss7/sl_mux.h:  correct unavailiable typenames
+	* src/modules/tcap/tr_mod.c: gcc 3.4.3 bug workaround
+	* src/modules/x400p-ss7/sl_x400p.c: correction for DS0A operation
+	* src/util/sdlconf.c: more verbose error output
+	* src/util/slconf.old.c: updated copyright header
+	* src/util/ss7statsd.c: workup of stats daemon
+
+	* src/test/sl/test-call.c: added old zurich test files
+	* src/test/sl/test-call2.c: added old zurich test files
+	* src/test/sl/test-crc.c: added old zurich test files
+	* src/test/sl/test-mgmt.c: added old zurich test files
+	* src/test/sl/test-sdl.c: added old zurich test files
+	* src/test/sl/test-sl-data.c: added old zurich test files
+	* src/test/sl/test-sl-start.c: added old zurich test files
+	* src/test/sl/test-sl-stop.c: added old zurich test files
+	* src/test/sl/test-sl.c: added old zurich test files
+
 	* src/test/sl/test-sl.c: print errors, ds0-ds0a options
 	* src/util/sdlconf.c: more detailed error report
 
