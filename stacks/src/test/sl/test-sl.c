@@ -621,10 +621,117 @@ handle_message_ansi(void)
 	case 0:		/* SNMM */
 		switch (tag) {
 		case 0x11:	/* coo */
+			/* send back */
+			ctrl.maxlen = BUFSIZE;
+			ctrl.len = sizeof(p->pdu_req);
+			ctrl.buf = cbuf;
+			p->pdu_req.sl_primitive = SL_PDU_REQ;
+			p->pdu_req.sl_mp = 0x3;
+			if (putmsg(fd, &ctrl, &data, 0) < 0)
+				perror(__FUNCTION__);
+			q = dbuf;
+			h0 = 2;
+			h1 = 2;
+			q++;
+			*q++ = opc;
+			*q++ = opc >> 8;
+			*q++ = opc >> 16;
+			*q++ = dpc;
+			*q++ = dpc >> 8;
+			*q++ = dpc >> 16;
+			*q++ = sls;
+			*q++ = h0 | (h1 << 4);
+			data.len--;
+			printf("Responding: ");
+			for (i = 0; i < data.len; i++)
+				printf("%02x ", dbuf[i] & 0xff);
+			printf("\n");
+			printf("DPC = %06x, OPC = %06x\n", dpc, opc);
+			fflush(stdout);
+			/* send back */
+			ctrl.maxlen = BUFSIZE;
+			ctrl.len = sizeof(p->pdu_req);
+			ctrl.buf = cbuf;
+			p->pdu_req.sl_primitive = SL_PDU_REQ;
+			p->pdu_req.sl_mp = 0x3;
+			if (putmsg(fd, &ctrl, &data, 0) < 0)
+				perror(__FUNCTION__);
+			break;
 		case 0x12:	/* coa */
+			break;
 		case 0x15:	/* cbd */
+			/* send back */
+			ctrl.maxlen = BUFSIZE;
+			ctrl.len = sizeof(p->pdu_req);
+			ctrl.buf = cbuf;
+			p->pdu_req.sl_primitive = SL_PDU_REQ;
+			p->pdu_req.sl_mp = 0x3;
+			if (putmsg(fd, &ctrl, &data, 0) < 0)
+				perror(__FUNCTION__);
+			q = dbuf;
+			h1 = 6;
+			q++;
+			*q++ = opc;
+			*q++ = opc >> 8;
+			*q++ = opc >> 16;
+			*q++ = dpc;
+			*q++ = dpc >> 8;
+			*q++ = dpc >> 16;
+			*q++ = sls;
+			*q++ = h0 | (h1 << 4);
+			printf("Responding: ");
+			for (i = 0; i < data.len; i++)
+				printf("%02x ", dbuf[i] & 0xff);
+			printf("\n");
+			printf("DPC = %06x, OPC = %06x\n", dpc, opc);
+			fflush(stdout);
+			/* send back */
+			ctrl.maxlen = BUFSIZE;
+			ctrl.len = sizeof(p->pdu_req);
+			ctrl.buf = cbuf;
+			p->pdu_req.sl_primitive = SL_PDU_REQ;
+			p->pdu_req.sl_mp = 0x3;
+			if (putmsg(fd, &ctrl, &data, 0) < 0)
+				perror(__FUNCTION__);
+			break;
 		case 0x16:	/* cba */
+			break;
 		case 0x21:	/* eco */
+			/* send back */
+			ctrl.maxlen = BUFSIZE;
+			ctrl.len = sizeof(p->pdu_req);
+			ctrl.buf = cbuf;
+			p->pdu_req.sl_primitive = SL_PDU_REQ;
+			p->pdu_req.sl_mp = 0x3;
+			if (putmsg(fd, &ctrl, &data, 0) < 0)
+				perror(__FUNCTION__);
+			q = dbuf;
+			h0 = 2;
+			h1 = 2;
+			q++;
+			*q++ = opc;
+			*q++ = opc >> 8;
+			*q++ = opc >> 16;
+			*q++ = dpc;
+			*q++ = dpc >> 8;
+			*q++ = dpc >> 16;
+			*q++ = sls;
+			*q++ = h0 | (h1 << 4);
+			printf("Responding: ");
+			for (i = 0; i < data.len; i++)
+				printf("%02x ", dbuf[i] & 0xff);
+			printf("\n");
+			printf("DPC = %06x, OPC = %06x\n", dpc, opc);
+			fflush(stdout);
+			/* send back */
+			ctrl.maxlen = BUFSIZE;
+			ctrl.len = sizeof(p->pdu_req);
+			ctrl.buf = cbuf;
+			p->pdu_req.sl_primitive = SL_PDU_REQ;
+			p->pdu_req.sl_mp = 0x3;
+			if (putmsg(fd, &ctrl, &data, 0) < 0)
+				perror(__FUNCTION__);
+			break;
 		case 0x22:	/* eca */
 		case 0x31:	/* rct */
 		case 0x32:	/* tfc */
@@ -701,7 +808,7 @@ handle_message_ansi(void)
 		for (i = 0; i < data.len; i++)
 			printf("%02x ", dbuf[i] & 0xff);
 		printf("\n");
-		printf("DPC = %04x, OPC = %04x\n", dpc, opc);
+		printf("DPC = %06x, OPC = %06x\n", dpc, opc);
 		fflush(stdout);
 		/* send back */
 		ctrl.maxlen = BUFSIZE;
@@ -1464,7 +1571,7 @@ mymain(int argc, char **argv)
 				show_time();
 				printf("Got pdu.\n");
 				fflush(stdout);
-				handle_message();
+				handle_message_ansi();
 				break;
 			case SL_OUT_OF_SERVICE_IND:
 				show_time();
