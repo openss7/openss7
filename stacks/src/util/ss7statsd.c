@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $
+ @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/06 11:16:27 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/19 11:57:41 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 11:16:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7statsd.c,v $
+ Revision 0.9.2.3  2007/09/06 11:16:27  brian
+ - testing updates
+
  Revision 0.9.2.2  2007/08/19 11:57:41  brian
  - move stdbool.h, obviate need for YFLAGS, general workup
 
@@ -58,10 +61,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $"
+#ident "@(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/06 11:16:27 $"
 
 static char const ident[] =
-    "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/08/19 11:57:41 $";
+    "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/06 11:16:27 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -248,7 +251,7 @@ regulations).\n\
 Commercial licensing and  support  of  this  software is available from  OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
 \n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.3 $ $Date: 2007/09/06 11:16:27 $");
 }
 
 /** @brief Print version.
@@ -277,7 +280,7 @@ Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/08/19 11:57:41 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.3 $ $Date: 2007/09/06 11:16:27 $");
 }
 
 void
@@ -570,7 +573,7 @@ stats_header(void)
 
 	ftimestamp();
 	fprintf_time(stdout);
-	fprintf(stdout, " # SLSTATSD $Id$ Output Header\n");
+	fprintf(stdout, " # SLSTATSD $Id: ss7statsd.c,v 0.9.2.3 2007/09/06 11:16:27 brian Exp $ Output Header\n");
 	uname(&uts);
 	fprintf_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,

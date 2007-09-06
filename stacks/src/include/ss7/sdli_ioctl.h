@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sdli_ioctl.h,v 0.9.2.13 2007/08/14 12:17:10 brian Exp $
+ @(#) $Id: sdli_ioctl.h,v 0.9.2.14 2007/09/06 11:16:17 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/14 12:17:10 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 11:16:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdli_ioctl.h,v $
+ Revision 0.9.2.14  2007/09/06 11:16:17  brian
+ - testing updates
+
  Revision 0.9.2.13  2007/08/14 12:17:10  brian
  - GPLv3 header updates
 
@@ -64,7 +67,7 @@
 #ifndef __SDLI_IOCTL_H__
 #define __SDLI_IOCTL_H__
 
-#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.13 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
+#ident "@(#) $RCSfile: sdli_ioctl.h,v $ $Name:  $($Revision: 0.9.2.14 $) Copyright (c) 2001-2007 OpenSS7 Corporation."
 
 /* This file can be processed by doxygen(1). */
 

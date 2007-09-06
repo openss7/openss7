@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:41 $
+ @(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $
 
  -----------------------------------------------------------------------------
 
@@ -45,11 +45,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/08/15 05:20:41 $ by $Author: brian $
+ Last Modified $Date: 2007/09/06 11:16:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tr_mod.c,v $
+ Revision 0.9.2.4  2007/09/06 11:16:18  brian
+ - testing updates
+
  Revision 0.9.2.3  2007/08/15 05:20:41  brian
  - GPLv3 updates
 
@@ -61,10 +64,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:41 $"
+#ident "@(#) $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $"
 
 static char const ident[] =
-    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:41 $";
+    "$RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $";
 
 /*
  * This is TR-MOD.  It is a simplified Transaction Interface (TRI) module for TCAP that can be
@@ -109,7 +112,7 @@ static char const ident[] =
 #include <ss7/tcap_ioctl.h>
 
 #define TR_DESCRIP	"SS7/TCAP-TR (TCAP Transaction Handling) STREAMS MODULE."
-#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/08/15 05:20:41 $"
+#define TR_REVISION	"OpenSS7 $RCSfile: tr_mod.c,v $ $Name:  $($Revision: 0.9.2.4 $) $Date: 2007/09/06 11:16:18 $"
 #define TR_COPYRIGHT	"Copyright (c) 1997-2007 OpenSS7 Corporation.  All Rights Reserved."
 #define TR_DEVICE	"Provides OpenSS7 TCAP-TR module."
 #define TR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

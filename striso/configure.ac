@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/19 11:21:27 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 0.9.2.14 $) $Date: 2007/09/06 11:16:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/19 11:21:27 $ by $Author: brian $
+# Last Modified $Date: 2007/09/06 11:16:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ([2.61])
 AC_INIT([striso],[0.9.2],[bugs@openss7.org])
-AC_REVISION([$Name:  $($Revision: 0.9.2.13 $) $Date: 2007/08/19 11:21:27 $])
+AC_REVISION([$Name:  $($Revision: 0.9.2.14 $) $Date: 2007/09/06 11:16:29 $])
 
 _OPENSS7_DIRCHANGE
 
@@ -190,6 +190,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 0.9.2.14  2007/09/06 11:16:29  brian
+# - yac/lex updates
+#
 # Revision 0.9.2.13  2007/08/19 11:21:27  brian
 # - instead of hardcoding directories
 #

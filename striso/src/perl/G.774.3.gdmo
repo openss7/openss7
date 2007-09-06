@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision$
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -16,7 +16,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile$ $Name$($Revision$) $Date$
+--  @(#) $RCSfile: G.774.3.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:58:55 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -61,7 +61,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date$ by $Author$
+--  Last Modified $Date: 2007/09/06 10:58:55 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -1469,7 +1469,10 @@ unprotectedCTPSource-msTTPSourceBeh BEHAVIOUR
 --< GDMO.ChangeLog
 --  =============================================================================
 --  
---  $Log$
+--  $Log: G.774.3.gdmo,v $
+--  Revision 0.9.2.1  2007/09/06 10:58:55  brian
+--  - added new gdmo files
+--
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ITU-T Rec. G.774.3 : 2001" >--
