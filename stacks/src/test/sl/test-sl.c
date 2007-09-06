@@ -104,6 +104,7 @@ static char const ident[] =
 int board = 1;
 int span = 1;
 int channel = 16;
+int slc = -1;
 
 int output = 1;
 
@@ -407,6 +408,9 @@ Setting Options:\n\
 	sets for DS0 or DS0A operation\n\
     --asni, --itut						(default: ansi)\n\
 	set for ANSI or ITU-T link operation\n\
+    --slc							(default: %6$d)\n\
+	specifies the signalling link code,\n\
+	minus one for any\n\
 \n\
 This program opens and attaches a Signalling Link channel, activates the\n\
 links, and reads and writes SLTM/SLTA to and from the channel.  The program\n\
@@ -808,7 +812,9 @@ handle_message_ansi(void)
 	case 1:		/* SNTM */
 		switch (tag) {
 		case 0x11:	/* sltm */
-			goto send_slta;
+			if (slc == -1 || (*q & 0x0f) == slc)
+				goto send_slta;
+			break;
 		case 0x12:	/* slta */
 		default:
 			break;
@@ -817,7 +823,9 @@ handle_message_ansi(void)
 	case 2:		/* SSNTM */
 		switch (tag) {
 		case 0x11:	/* ssltm */
-			goto send_slta;
+			if (slc == -1 || (*q & 0x0f) == slc)
+				goto send_slta;
+			break;
 		case 0x12:	/* sslta */
 		default:
 			break;
@@ -1702,6 +1710,7 @@ main(int argc, char **argv)
 			{"ansi",	no_argument,		NULL, 16 },
 			{"itut",	no_argument,		NULL, 17 },
 			{"j1",		no_argument,		NULL, 18 },
+			{"slc",		required_argument,	NULL, 19 },
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
@@ -1775,6 +1784,9 @@ main(int argc, char **argv)
 		case 17:	/* itut */
 			sdt_conf = sdt_conf_itut;
 			sl_conf = sl_conf_itut;
+			break;
+		case 19:	/* slc */
+			slc = atoi(optarg);
 			break;
 		case 18:	/* j1 */
 			sdl_conf = sdl_conf_j1;
