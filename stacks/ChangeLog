@@ -1,3 +1,8 @@
+2007-09-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/test/sl/test-sl.c: print errors, ds0-ds0a options
+	* src/util/sdlconf.c: more detailed error report
+
 2007-08-19  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: tell program its own name

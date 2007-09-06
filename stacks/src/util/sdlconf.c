@@ -643,6 +643,9 @@ sdlconf_get(void)
 		if (p->lmi_primitive == LMI_ERROR_ACK) {
 			fprintf(stderr, "%s: %s: could not attach (LMI_ERROR_ACK)\n", "sdlconf",
 				__FUNCTION__);
+			fprintf(stderr, "%s: %s: reason %08x, errno %08x\n", "sdlconf",
+					__FUNCTION__, (uint) p->error_ack.lmi_reason,
+					(uint) p->error_ack.lmi_errno);
 		} else
 			fprintf(stderr, "%s: %s: could not attach\n", "sdlconf", __FUNCTION__);
 		exit(1);

@@ -185,7 +185,7 @@ const sdt_config_t sdt_conf_ansi = {
 	.Ue = 144292000,
 	.N = 16,
 	.m = 272,
-	.b = 8,
+	.b = 7,
 	.f = SDT_FLAGS_ONE,
 #if 0
 	.f = SDT_FLAGS_SHARED,
@@ -217,23 +217,23 @@ const sdl_config_t sdl_conf_itu = {
 };
 const sdl_config_t sdl_conf_ansi = {
 	.ifflags = 0,
-	.iftype = SDL_TYPE_DS0,
-	.ifrate = 64000,
-	.ifgtype = SDL_GTYPE_T1,
-	.ifgrate = 1544000,
-	.ifmode = SDL_MODE_PEER,
+	.iftype = SDL_TYPE_DS0A,
+	.ifrate = 56000,
+	.ifgtype = SDL_GTYPE_NONE,
+	.ifgrate = 0,
+	.ifmode = SDL_MODE_NONE,
 	.ifgmode = SDL_GMODE_NONE,
-	.ifgcrc = SDL_GCRC_CRC6,	/* T1 only */
-	.ifclock = SDL_CLOCK_LOOP,
-	.ifcoding = SDL_CODING_B8ZS,	/* T1 only */
-	.ifframing = SDL_FRAMING_ESF,	/* T1 only */
-	.ifblksize = 8,
+	.ifgcrc = SDL_GCRC_NONE,	/* T1 only */
+	.ifclock = SDL_CLOCK_NONE,
+	.ifcoding = SDL_CODING_NONE,	/* T1 only */
+	.ifframing = SDL_FRAMING_NONE,	/* T1 only */
+	.ifblksize = 0,
 	.ifleads = 0,
 	.ifalarms = 0,
 	.ifrxlevel = 0,
 	.iftxlevel = 0,
 	.ifsync = 0,
-	.ifsyncsrc = {1, 2, 0, 0}
+	.ifsyncsrc = {0, 0, 0, 0}
 };
 sdl_config_t sdl_conf, sdl_conf_read;
 
@@ -1095,6 +1095,91 @@ get_stats(void)
 	}
 }
 
+const char *
+print_lmi_error(int err)
+{
+	switch (err) {
+	case LMI_UNSPEC:
+		return ("Unknown or unspecified");
+	case LMI_BADADDRESS:
+		return ("Address was invalid");
+	case LMI_BADADDRTYPE:
+		return ("Invalid address type");
+	case LMI_BADDIAL:
+		return ("(not used)");
+	case LMI_BADDIALTYPE:
+		return ("(not used)");
+	case LMI_BADDISPOSAL:
+		return ("Invalid disposal parameter");
+	case LMI_BADFRAME:
+		return ("Defective SDU received");
+	case LMI_BADPPA:
+		return ("Invalid PPA identifier");
+	case LMI_BADPRIM:
+		return ("Unregognized primitive");
+	case LMI_DISC:
+		return ("Disconnected");
+	case LMI_EVENT:
+		return ("Protocol-specific event ocurred");
+	case LMI_FATALERR:
+		return ("Device has become unusable");
+	case LMI_INITFAILED:
+		return ("Link initialization failed");
+	case LMI_NOTSUPP:
+		return ("Primitive not supported by this device");
+	case LMI_OUTSTATE:
+		return ("Primitive was issued from invalid state");
+	case LMI_PROTOSHORT:
+		return ("M_PROTO block too short");
+	case LMI_SYSERR:
+		return ("UNIX system error");
+	case LMI_WRITEFAIL:
+		return ("Unitdata request failed");
+	case LMI_CRCERR:
+		return ("CRC or FCS error");
+	case LMI_DLE_EOT:
+		return ("DLE EOT detected");
+	case LMI_FORMAT:
+		return ("Format error detected");
+	case LMI_HDLC_ABORT:
+		return ("Aborted frame detected");
+	case LMI_OVERRUN:
+		return ("Input overrun");
+	case LMI_TOOSHORT:
+		return ("Frame too short");
+	case LMI_INCOMPLETE:
+		return ("Partial frame received");
+	case LMI_BUSY:
+		return ("Telephone was busy");
+	case LMI_NOANSWER:
+		return ("Connection went unanswered");
+	case LMI_CALLREJECT:
+		return ("Connection rejected");
+	case LMI_HDLC_IDLE:
+		return ("HDLC line went idle");
+	case LMI_HDLC_NOTIDLE:
+		return ("HDLC link no longer idle");
+	case LMI_QUIESCENT:
+		return ("Line being reassigned");
+	case LMI_RESUMED:
+		return ("Line has been reassigned");
+	case LMI_DSRTIMEOUT:
+		return ("Did not see DSR in time");
+	case LMI_LAN_COLLISIONS:
+		return ("LAN excessive collisions");
+	case LMI_LAN_REFUSED:
+		return ("LAN message refused");
+	case LMI_LAN_NOSTATION:
+		return ("LAN no such station");
+	case LMI_LOSTCTS:
+		return ("Lost Clear to Send signal");
+	case LMI_DEVERR:
+		return ("Start of device-specific error codes");
+	default:
+		return ("(unknown)");
+	}
+}
+
 void
 show_time(void)
 {
@@ -1128,6 +1213,8 @@ mymain(int argc, char **argv)
 	ctrl.len = sizeof(m->attach_req) + sizeof(ppa_t);
 	ctrl.buf = cbuf;
 	m->attach_req.lmi_primitive = LMI_ATTACH_REQ;
+	m->attach_req.lmi_ppa_length = sizeof(ppa_t);
+	m->attach_req.lmi_ppa_offset = sizeof(m->attach_req);
 	bcopy(&ppa, m->attach_req.lmi_ppa, sizeof(ppa_t));
 	printf("Attaching device.\n");
 	fflush(stdout);
@@ -1138,6 +1225,9 @@ mymain(int argc, char **argv)
 	switch ((ret = wait_event(100))) {
 	case LMI_OK_ACK:
 		break;
+	case LMI_ERROR_ACK:
+		fprintf(stderr, "%s: LMI_ERROR_ACK %s\n", argv[0], print_lmi_error(m->error_ack.lmi_reason));
+		exit(1);
 	default:
 		fprintf(stderr, "%s: failed with event %d\n", argv[0], ret);
 		exit(1);
@@ -1457,6 +1547,8 @@ main(int argc, char **argv)
 			{"flags",	required_argument,	NULL, 11 },
 			{"t1",		no_argument,		NULL, 12 },
 			{"e1",		no_argument,		NULL, 13 },
+			{"ds0",		no_argument,		NULL, 14 },
+			{"ds0a",	no_argument,		NULL, 15 },
 			{"quiet",	no_argument,		NULL, 'q'},
 			{"verbose",	optional_argument,	NULL, 'v'},
 			{"help",	no_argument,		NULL, 'h'},
@@ -1515,11 +1607,19 @@ main(int argc, char **argv)
 		case 11:	/* flags */
 			sdt_conf.f = atoi(optarg);
 			break;
+		case 14: /* ds0 */
+			sdl_conf.iftype = SDL_TYPE_DS0;
+			sdl_conf.ifrate = 64000;
+			break;
+		case 15: /* ds0a */
+			sdl_conf.iftype = SDL_TYPE_DS0A;
+			sdl_conf.ifrate = 56000;
+			break;
 		case 12:	/* t1 */
 			sdl_conf.ifgrate = 1540000;
 			sdl_conf.ifgcrc = SDL_GCRC_CRC6;
 			sdl_conf.ifcoding = SDL_CODING_B8ZS;
-			sdl_conf.ifframing = SDL_FRAMING_SF;
+			sdl_conf.ifframing = SDL_FRAMING_ESF;
 			break;
 		case 13:	/* e1 */
 			sdl_conf.ifgrate = 2048000;
