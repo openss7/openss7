@@ -415,7 +415,7 @@ Setting Options:\n\
 This program opens and attaches a Signalling Link channel, activates the\n\
 links, and reads and writes SLTM/SLTA to and from the channel.  The program\n\
 prints continuous information to stdout.\n\
-\n", argv[0], board, span, channel, (int) sdt_conf.f);
+\n", argv[0], board, span, channel, (int) sdt_conf.f, slc);
 };
 
 int fd;
