@@ -1,0 +1,502 @@
+'\" rtp
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: test-sl.8.man,v 0.9.2.1 2007/09/07 07:04:06 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/07 07:04:06 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: test-sl.8.man,v $
+.\" Revision 0.9.2.1  2007/09/07 07:04:06  brian
+.\" - added manual page for test-sl program
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database strss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+.R2
+.so strss7.macros
+.\"
+.\"
+.TH TEST-SL 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B test-sl
+\- a signalling link test program for the x400p(4) STREAMS driver
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+\fBtest-sl\fR [\fIoptions\fR] \fB-b\fR \fICARD\fR \fB-s\fR \fISPAN\fR \fB-c\fR \fICHAN\fR
+.PD 0
+.HP
+\fBtest-sl\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBtest-sl\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBtest-sl\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B test-sl
+is a signalling link test program for the
+.BR x400p (4)
+driver.  Its purpose is to provide the ability to perform manual testing on signalling links without
+linking the signalling link under the
+.BR mtp (4)
+multipelxing driver.
+.PP
+When executed successfully,
+.B test-sl
+opens a signalling link Stream, attaches it to the specified PPA (Physical Point of Attachement) and
+activates the SS7 link.  If the activation fails, statistics are printed and then immediate restoration
+is attempted.  Once the SS7 link reaches the in-service state,
+.B test-sl
+responds to various mangement messges as follows:
+.TP
+.I Signalling Link Test Message (SLTM)
+.B test-sl
+responds to signalling link test messages by sending a signalling link test acknowledgement.
+However, the STLA is only sent if the SLTM contains the appropriate signalling link code per the
+.B --slc
+option.  The SLTA is identical the received SLTM with the exception that the point codes are
+reversed and the H1 signal is 2 instead of 1.
+This mimics MTP with respect to the response to signalling link test messages.
+.TP
+.I Special Signalling Link Test Message (SSLTM)
+.B test-sl
+responds to special signalling link test messages by sending a special signalling link test acknowledgement.
+However, the SSTLA is only sent if the SSLTM contains the appropriate signalling link code per the
+.B --slc
+option.  The SSLTA is identical the received SSLTM with the exception that the point codes are
+reversed and the H1 signal is 2 instead of 1.
+This mimics MTP with respect to the response to special signalling link test messages.
+.TP
+.I Change Back Declaration (CBD)
+.B test-sl
+responds to all changeback declarations with a changeback acknowledgement.  The CBA message response
+is identical to the CBD except that the point codes are reversed and signal H1 is 6 instead of 5.
+This mimics MTP with respect to the response to changeback declaration messages.
+.TP
+.I Changeover Order (COO)
+.B test-sl
+responds to all changeover orders with an emergency changeover acknowledgement.  The ECA message
+response is identical to the COO, except that the point codes are reversed and the FSNC value is not
+included in the ECA response.  The H0-H1 codes for the ECA is x-X instead of Y-Y.
+This mimics MTP with respect to the response to changeover order messages.
+.TP
+.I Emergency Changeover Order (ECO)
+.B test-sl
+response to all emergency changeover orders with an emergency changeover acknowledgement.  The ECO
+message response is identical to the ECO, except that the point codes are reversed and the H1 signal
+is X instead of Y.
+This mimics MTP with respect to the response to emergency changeover order messages.
+.TP
+.I Traffic Restart Allowed (TRA)
+.B test-sl
+response to a traffic restart allowed message is to send a traffic restart allowed message.  The
+send TRA message is identical to the received TRA message, with the exception that the send TRA
+message contains reversed signlling point codes.
+This mimics MTP with respect to the response to transfer allowed messages.
+.PP
+With these functions, the
+.B test-sl
+program effectivley mimics the presence of an MTP above the signalling links.
+.\"
+.\"
+.SH FORMAT
+.PP
+Whenever
+.B test-sl
+receives a message on an in-service signalling link, it prints a hex dump of that message to
+.IR stdout .
+Whenever
+.B test-sl
+responds with a message on an in-service signalling link, it prints a hex dump of that message to
+.IR stdout .
+In addition, the signalling point codes associated with the local and remote signalling points (from
+the point of view of the indivudual message exchagnge) is printed.
+.B test-sl
+continues to print and respond to messages continuously, util the program is terminated.
+.PP
+An example of the output format of the
+.B test-sl
+program is given below under
+.RI \(lq EXAMPLES .\(rq
+.\"
+.\"
+.SH USAGE
+.PP
+An additional invocation of the
+.B test-sl
+program is required for each signalling link tested.  So, for example, if 2 signalling links within
+a A-Link Link Set are to be tested,
+.B test-sl
+must be executed once for each of the two signalling links.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B test-sl
+options fall into several categories as detailed in the subsections below.  If
+.B test-sl
+is executed without any options, it print a usage report and exit with a non-zero status.
+.SS Command Options
+.PP
+These command options determine whether the link is initiated or whether an informative function is
+performed instead.  If none of these ocmmand options are specified, then it is assumed that link
+initiation is requested.
+.TP
+\fB-h\fR, \fB--help\fR, \fB-?\fR, \fB--?\fR
+When this option is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-V\fR, \fB--version\fR
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.TP
+\fB-C\fR, \fB--copying\fR
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all options specified following this option are ignored.
+.SS General Options
+.PP
+The following options are applicable to all command options.  For other than link initiation command
+options, these general options must appear ahead of the command option.
+.TP
+\fB-q\fR, \fB--quiet\fR
+Specifies that the caller is interested only in the return code and error diagnostics and that
+normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.BR 1 .
+This option is equivalent to
+.BR --verbose=0 .
+.TP
+\fB-v\fR, \fB--verbose\fR [\fILEVEL\fR]
+Increases or sets the verbosity level.  When this option is given without the
+.I LEVEL
+argument, it specifies that the verbosity level should be increased by one.  If the
+.I LEVEL
+argument is specified, the verbosity level is set to that integer value.  This option can be
+repeated.
+The default verbosity level if this option is not specified is
+.BR 1 .
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+.SS Link Intiation Options
+.PP
+The following options are only applicable link intiation is in effect.  That is, these options are
+only effective if link initiation is being executed and are used to modify the manner in which link
+initiation is performed.
+.TP
+\fB-d\fR, \fB--device\fR \fIDEVICE\fR
+Specifies the device name to open for the tests.  The default device name if
+.I DEVICE
+is not specified is
+.BR /dev/streams/clone/x400p-sl .
+.TP
+\fB-b\fR, \fB--board\fR \fIBOARD\fR
+Specifies the driver board number on which the signalling link is to be activated.  Boards (or
+cards) are numbered by the driver beginning with 1 and are specified as 1, 2, etc.
+If the board number is not specified, the default board is board 1.
+.TP
+\fB-s\fR, \fB--span\fR \fISPAN\fR
+Specifies span number on the board for which the signalling link is to be activated.  Spans are
+numbered by the driver beginning with 1 and are specified as 1, 2, 3, or 4.
+if the span number is not specified, the default span number is 1.
+.TP
+\fB-c\fR, \fB--channel\fR \fICHAN\fR
+Specifies the channel number in the span for which the signalling links is to be activated.
+Channels are numbered by the driver beginning with 1 and are specified as 1, 2, ..., 24 for T1 or J1
+and 1, 2, ..., 31 for E1.  A channel number of zero (0) specifies that the link is to be activated
+as a high-speed link using the entire E1, T1, J1.
+If the channel number is not specified, the default channel number is 16. (Channel 16 is the
+default signalling channel for E1 operation.  T1 and J1 do not have a default signalling channel,
+so 16 is assumed for T1 and J1 as well.)
+.TP
+\fB--flags\fR \fIFLAGS\fR
+Specifies the number of flags to place between frames.  \fIFLAGS\fP is a number greater than zero 0
+and is interpreted as follows:
+.sp
+.RS
+.IP 0\ \(em \w'00\ \(em'u
+One flag between frames.
+.PD 0
+.IP 1\ \(em
+Shared flag between frames.
+.IP 2\ \(em
+Two flags between frames.
+.IP 3\ \(em
+Three flags between frames.
+.PD
+.RE
+.TP
+\fB--t1\fR, \fB--e1\fR, \fB--j1\fR
+Specifies the group mode for the span.  This also has the effect of resetting all other options to
+their default values for the mode.
+.TP
+\fB--crc4\fR, \fB--crc5\fR, \fB--crc6\fR
+Specifies which CRC calculation to use on the span.  CRC4 and CRC5 are applicable to E1.  CRC6 is
+applicable to T1.  CRC6J is applicable to J1.
+.TP
+\fB--hdb3\fR, \fB--ami\fR, \fB--b8zs\fR
+Specifies which coding to use on the span.  HDB3 is applicable to E1 only.  AMI and B8ZS is
+applicable to T1 and J1.
+.TP
+\fB--cas\fR, \fB--ccs\fR, \fB--sf\fR, \fB--esf\fR
+Specifies the framing to use on the span.  CAS and CCS are applicable to E1.  SF (D4) and ESF are
+applicable to T1 and J1.
+.TP
+\fB--ds0\fR, \fB--ds0a\fR
+Specifies whether DS0 or DS0A channel format is to be used.  DS0A is really only applicable to T1
+and J1, but can be set for E1 if really desired.
+.TP
+\fB--ansi\fR, \fB--itut\fR
+Specifies whether ANSI or ITU-T protocol variants are to be used for the signalling link.  The has
+the effect of setting timer values to their defaults for ANSI or ITU-T operation.  The ITU protocol
+variant is SS7_PVAR_ITUT_00 and the ANSI protocol variant is SS7_PVAR_ANSI_96.
+.TP
+\fB--slc\fR \fISLC\fR
+Specifies the signalling link code for the signalling link.  This can be any integer value.  The
+special value minus one,
+.RB ( -1 ),
+which is also  the default, means
+.I any
+signalling link code.  When set to a specific signalling link code (a number other than minus one
+.RB ( -1 )),
+.B test-sl
+will only respond to SLTM and SSLTM messages for the specified signalling link code value.  Setting
+.I SLC
+to a value greater than the maximum SLC for the protocol (16 for ITU-T, 32 for ANSI), has the effect
+of causing
+.B test-sl
+to not respond to any SLTM or SSLTM messages.  Setting
+.I SLC
+to minus one,
+.RB ( -1 ),
+has the affecto f causing
+.B test-sl
+to response to any SLTM or SSLTM message, regardless of the SLC value contained within the message.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When the
+.B test-sl
+command fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.
+The following return codes are generated under the following conditions:
+.IP 0 4
+Execution was successful.
+.IP 1
+Execution failed due an error.
+.IP 2
+Execution failed due to an options or command line syntax error.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B test-sl
+is intended for specialized manual testing of SS7 signalling links.
+.PP
+.\"
+.\"
+.SH EXAMPLES
+.PP
+In the following example,
+.B test-sl
+is started against the signalling link on X400P card 1, span 1 and channel 1:
+.sp
+.RS
+.nf
+\fC\s-1\
+#> test-sl -b 1 -s 1 -c 1 >testsl1.log </dev/null 2>&1 &
+\s+1\fP
+.fi
+.RE
+.PP
+The following example shows two
+.B test-sl
+program instances started, one on X400P PPA 1:1:1 and another on 1:2:1, both for DS0A operation:
+.sp
+.RS
+.nf
+\fC\s-1\
+#> test-sl -b 1 -s 1 -c 1 --ds0a >testsl1.log </dev/null 2>&1 &
+#> test-sl -b 1 -s 2 -c 1 --ds0a >testsl2.log </dev/null 2>&1 &
+\s+1\fP
+.fi
+.RE
+.PP
+The following is an excerpt from testsl2.log in the above example:
+.sp
+.RS
+.nf
+\fC\s-1\
+Thu Sep  6 22:40:36 2007
+Got pdu.
+Received:   b2 0a 6b 02 01 6b 02 00 11 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+Responding: b2 01 6b 02 0a 6b 02 00 21 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+DPC = 026b0a, OPC = 026b01
+
+Thu Sep  6 22:41:36 2007
+Got pdu.
+Received:   b2 0a 6b 02 01 6b 02 00 11 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+Responding: b2 01 6b 02 0a 6b 02 00 21 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+DPC = 026b0a, OPC = 026b01
+
+Thu Sep  6 22:42:36 2007
+Got pdu.
+Received:   b2 0a 6b 02 01 6b 02 00 11 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+Responding: b2 01 6b 02 0a 6b 02 00 21 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+DPC = 026b0a, OPC = 026b01
+
+Thu Sep  6 22:43:36 2007
+Got pdu.
+Received:   b2 0a 6b 02 01 6b 02 00 11 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+Responding: b2 01 6b 02 0a 6b 02 00 21 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+DPC = 026b0a, OPC = 026b01
+
+Thu Sep  6 22:44:36 2007
+Got pdu.
+Received:   b2 0a 6b 02 01 6b 02 00 11 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+Responding: b2 01 6b 02 0a 6b 02 00 21 f1 ff ee dd cc bb aa 99 88 77 66 55 44 33 22 11 
+DPC = 026b0a, OPC = 026b01
+\s+1\fP
+.fi
+.RE
+.\"
+.\"
+.SH DRIVERS
+.PP
+.BR x400p (4).
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /usr/sbin/test-sl
+contains the
+.B test-sl
+command.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR x400p (4),
+.IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
+.\"
+.\"
+.SH BUGS
+.PP
+.B test-sl
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B test-sl
+is an OpenSS7-specific utility.  It is compatible with the
+.BR x400p (4)
+driver and other drivers based on the
+.BR sli (4),
+.BR sdti (4)
+and
+.BR sdli (4)
+interfaces an input output controls.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B test-sl
+is an OpenSS7-specific utility and is not subject to stnadardization.
+.B test-sl
+conforms to OpenSS7 coding practices.
+.\"
+.\"
+.SH HISTORY
+.PP
+.B test-sl
+is provided with the
+.I @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
