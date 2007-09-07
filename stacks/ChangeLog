@@ -1,3 +1,9 @@
+2007-09-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/Makefile.am: added manual page for test-sl program
+	* src/test/sl/test-sl.c: added manual page for test-sl program
+	* doc/man/man8/test-sl.8.man: added manual page for test-sl program
+
 2007-09-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added test-sl to build
