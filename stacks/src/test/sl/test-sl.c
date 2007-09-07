@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $
+ @(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/07 07:05:37 $
 
  -----------------------------------------------------------------------------
 
@@ -59,20 +59,23 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/06 10:57:48 $ by $Author: brian $
+ Last Modified $Date: 2007/09/07 07:05:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sl.c,v $
+ Revision 0.9.2.2  2007/09/07 07:05:37  brian
+ - added manual page for test-sl program
+
  Revision 0.9.2.1  2007/09/06 10:57:48  brian
  - added old zurich test files
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $"
+#ident "@(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/07 07:05:37 $"
 
 static char const ident[] =
-    "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:57:48 $";
+    "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/07 07:05:37 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -345,7 +348,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.1 $ $Date: 2007/09/06 10:57:48 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/09/07 07:05:37 $");
 }
 
 void

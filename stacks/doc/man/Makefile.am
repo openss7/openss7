@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.42 $) $Date: 2007/08/13 15:21:57 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 0.9.2.43 $) $Date: 2007/09/07 07:05:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,7 +46,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/08/13 15:21:57 $ by $Author: brian $
+# Last Modified $Date: 2007/09/07 07:05:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -570,6 +570,7 @@ ss7_man_MANS = \
 	man8/test-q781.8 \
 	man8/test-q781-pipe.8 \
 	man8/test-q784.8 \
+	man8/test-sl.8 \
 	man8/test-x100p.8 \
 	man8/test-x400p.8 \
 	man8/test-x400p-cap2.8 \
@@ -2249,6 +2250,7 @@ ss7_dist_noinst_MANS = \
 	man8/test-q781.8.man \
 	man8/test-q781-pipe.8.man \
 	man8/test-q784.8.man \
+	man8/test-sl.8.man \
 	man8/test-x100p.8.man \
 	man8/test-x400p.8.man \
 	man8/test-x400p-cap2.8.man \
@@ -3476,6 +3478,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 0.9.2.43  2007/09/07 07:05:32  brian
+## - added manual page for test-sl program
+##
 ## Revision 0.9.2.42  2007/08/13 15:21:57  brian
 ## - header updates, added references
 ##
