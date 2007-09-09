@@ -1,14 +1,15 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 12:03:50 MDT 2007
+--@@ Date: Sun Sep  9 06:07:38 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.740.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
+--< GDMO.Namespace x741 >--
 --< GDMO.Alias "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" "X.741",
 --  "ITU-T Rec. X.741 (1995)/Cor.2 (1998) | ISO/IEC 10164-9 : 1995/Cor.2 : 1999",
 --  "ITU-T Rec. X.741 (1995)/Cor.3 (2000) | ISO/IEC 10164-9 : 1995/Cor.3 : 2001" >--
@@ -1287,5 +1288,4 @@ END
 --@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":instanceLabel
 --@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":classLabel
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

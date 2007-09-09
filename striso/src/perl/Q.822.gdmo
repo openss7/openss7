@@ -1,10 +1,10 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 11:57:56 MDT 2007
+--@@ Date: Sun Sep  9 06:01:47 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.738.gdmo" >--
@@ -12,6 +12,7 @@
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Include "Q.821.gdmo" >--
 --< GDMO.Document "ITU-T Rec. Q.822 (1994)" >--
+--< GDMO.Namespace q822 >--
 --< GDMO.Alias "ITU-T Rec. Q.822 (1994)" "Recommendation Q.822:1994",
 --  "Recommendation Q.822",
 --  "ITU-T Recommendation Q.822",
@@ -20,7 +21,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: Q.822.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:00 $
+--  @(#) $RCSfile: Q.822.gdmo,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:48 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -65,7 +66,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/06 10:59:00 $ by $Author: brian $
+--  Last Modified $Date: 2007/09/09 22:58:48 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -754,9 +755,12 @@ END
 --  =============================================================================
 --  
 --  $Log: Q.822.gdmo,v $
+--  Revision 0.9.2.2  2007/09/09 22:58:48  brian
+--  - updates for namespace
+--
 --  Revision 0.9.2.1  2007/09/06 10:59:00  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument >--
@@ -1437,5 +1441,4 @@ END
 --@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
 --@@ >- "ITU-T Rec. Q.822 (1994)":historyData
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

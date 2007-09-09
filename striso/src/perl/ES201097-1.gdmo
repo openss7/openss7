@@ -1,14 +1,15 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 11:40:45 MDT 2007
+--@@ Date: Sun Sep  9 06:13:45 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Document "ES 201 097-1 V1.1.1 (1998-01)" >--
+--< GDMO.Namespace es201097_1 >--
 --< GDMO.Alias "ES 201 097-1 V1.1.1 (1998-01)" "ES 201 097-1" >--
 MODULE "ES 201 097-1 V1.1.1 (1998-01)"
 --5.5 Physical resources fragment
@@ -278,8 +279,6 @@ moduleIdBehaviour BEHAVIOUR
 moduleType ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX PhysicalResourceManagementModule.ModuleType;
 	MATCHES FOR EQUALITY;
-	BEHAVIOUR
-		moduleTypeBehaviour;
 REGISTERED AS { attribute 5 };
 
 
@@ -355,8 +354,6 @@ END
 --@@ end of gdmos
 --@@ 
 --@@ 
---@@ behaviours moduleTypeBehaviour referenced but never defined!
---@@ BehaviourReference references undefined "":moduleTypeBehaviour
 
 --@@
 --@@ Derivation Tree:
@@ -1034,5 +1031,4 @@ END
 --@@ >- "Recommendation M.3100:1992":connectionTerminationPointSource
 --@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional +++
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

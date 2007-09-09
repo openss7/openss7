@@ -1,15 +1,16 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 04:32:56 MDT 2007
+--@@ Date: Sun Sep  9 05:56:11 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
 --< GDMO.Include "X.283.gdmo" >--
 --< GDMO.Document "ISO/IEC 10589: 2001" >--
+--< GDMO.Namespace iso10589_2 >--
 --< GDMO.Alias "ISO/IEC 10589: 2001" "ISO 10589: 2001",
 --  "ISO/IEC 10589",
 --  "ISIS" >--
@@ -17,7 +18,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: ISO10589.2.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:58:57 $
+--  @(#) $RCSfile: ISO10589.2.gdmo,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:47 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -62,29 +63,33 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/06 10:58:57 $ by $Author: brian $
+--  Last Modified $Date: 2007/09/09 22:58:47 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
 MODULE "ISO/IEC 10589: 2001"
---11 System management
---11.1 General
---The operation of the Intra-domain ISIS routeing functions may
---be monitored and controlled using System Management. This
---clause is the management specification for this International
---Standard in the GDMO notation as defined in ISO/IEC 10165-4.
---Generic managed object and attribute definitions are imported
---from ISO/IEC 10165-5 and from ISO/IEC 10733.
---The containment hierarchy for this International Standard is
---illustrated below in figure 8.
---Annex E contains a number of definitions which are intended to
---be incorporated in ISO/IEC 10165-5. In those cases where a
---GDMO imported definition cannot be found by consulting
---ISO/IEC 10165-5, or conflicts with the definition in Annex E, the
---definition in Annex E shall be used.
---11.2 GDMO definition
---11.2.1 Common GDMO definitions
---11.2.1.1 Behaviours
+--
+-- 11 System management
+--
+-- 11.1 General
+--
+-- The operation of the Intra-domain ISIS routeing functions may be monitored and controlled using 
+-- System Management. This clause is the management specification for this International Standard in 
+-- the GDMO notation as defined in ISO/IEC 10165-4.  Generic managed object and attribute 
+-- definitions are imported from ISO/IEC 10165-5 and from ISO/IEC 10733.
+--
+-- The containment hierarchy for this International Standard is illustrated below in figure 8.
+--
+-- Annex E contains a number of definitions which are intended to be incorporated in ISO/IEC 
+-- 10165-5. In those cases where a GDMO imported definition cannot be found by consulting ISO/IEC 
+-- 10165-5, or conflicts with the definition in Annex E, the definition in Annex E shall be used.
+--
+-- 11.2 GDMO definition
+--
+-- 11.2.1 Common GDMO definitions
+--
+-- 11.2.1.1 Behaviours
+--
 
 supplyValueOnCreate-B BEHAVIOUR
 	DEFINED AS
@@ -141,7 +146,9 @@ resourceLimiting-B BEHAVIOUR
 		attempt to perform a REPLACE operation fails either because the MO is enabled, 
 		or because an attempt has been made to decrease the value, the REPLACE operation 
 		shall fail with the generation of the constraintViolation specific error.;
---11.2.1.2 Common attributes
+--
+-- 11.2.1.2 Common attributes
+--
 
 
 addressPrefix ATTRIBUTE
@@ -168,7 +175,9 @@ networkEntityTitle ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX ISIS.NAddress;
 	MATCHES FOR EQUALITY;
 REGISTERED AS { ISIS.aoi networkEntityTitle(88) };
---11.2.1.3 Common parameters
+--
+-- 11.2.1.3 Common parameters
+--
 
 
 constraintViolation PARAMETER
@@ -325,8 +334,11 @@ notificationLSPHeader PARAMETER
 			DEFINED AS
 				The header of the LSP;;
 REGISTERED AS { ISIS.proi notificationLSPHeader(28) };
---11.2.2 Conditional packages attached to objects defined in ISO/IEC 10733
---11.2.2.1 Basis ISIS package attached to cLNS managed object
+--
+-- 11.2.2 Conditional packages attached to objects defined in ISO/IEC 10733
+--
+-- 11.2.2.1 Basis ISIS package attached to cLNS managed object
+--
 
 
 cLNSISISBasic-P PACKAGE
@@ -489,7 +501,7 @@ cLNSISISBasic-P PACKAGE
 		iSType
 			INITIAL VALUE DERIVATION RULE
 				supplyValueOnCreate-B
-			GET,
+			GET SET-BY-CREATE,
 		systemId GET,
 		maximumPathSplits REPLACE-WITH-DEFAULT
 			DEFAULT VALUE ISIS.maximumPathSplits-Default
@@ -503,13 +515,13 @@ cLNSISISBasic-P PACKAGE
 		minimumBroadcastLSPTransmissionInterval REPLACE-WITH-DEFAULT
 			DEFAULT VALUE ISIS.minimumBroadcastLSPTransmissionInterval-Default
 			GET-REPLACE,
-		-- Note: this is defined for all Circuits, but would only be required if
-		-- one of them were a broadcast Circuit
+		-- Note: this is defined for all Circuits, but would only be required if one of them 
+		-- were a broadcast Circuit
 		completeSNPInterval REPLACE-WITH-DEFAULT
 			DEFAULT VALUE ISIS.completeSNPInterval-Default
 			GET-REPLACE,
-		-- Note: this is defined for all linkages, but would only be required if
-		-- one of them were a broadcast linkage
+		-- Note: this is defined for all linkages, but would only be required if one of them 
+		-- were a broadcast linkage
 		originatingL1LSPBufferSize REPLACE-WITH-DEFAULT
 			DEFAULT VALUE ISIS.originatingL1LSPBufferSize-Default
 			GET-REPLACE,
@@ -571,7 +583,9 @@ cLNSISISBasic-P PACKAGE
 		--notificationlSPTooLargeToPropagate,
 		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation;
 REGISTERED AS { ISIS.poi cLNSISISBasic-P(1) };
---11.2.2.2 Level 2 ISIS package attached to cLNS managed object
+--
+-- 11.2.2.2 Level 2 ISIS package attached to cLNS managed object
+--
 
 
 cLNSISISLevel2-P PACKAGE
@@ -612,7 +626,9 @@ cLNSISISLevel2-P PACKAGE
 			notificationOverloadStateChange
 			notificationSourceId;
 REGISTERED AS { ISIS.poi cLNSISISLevel2-P(2) };
---11.2.2.3 ISIS partition repair package attached to the cLNS managed object
+--
+-- 11.2.2.3 ISIS partition repair package attached to the cLNS managed object
+--
 
 
 cLNSISISPartitionRepair-P PACKAGE
@@ -647,7 +663,9 @@ cLNSISISPartitionRepair-P PACKAGE
 			notificationVirtualLinkChange
 			notificationVirtualLinkAddress;
 REGISTERED AS { ISIS.poi cLNSISISPartitionRepair-P(3) };
---11.2.3 ISIS authentication package attached to the cLNS managed object
+--
+-- 11.2.3 ISIS authentication package attached to the cLNS managed object
+--
 
 
 cLNSISISAuthentication-P PACKAGE
@@ -685,7 +703,9 @@ cLNSISISAuthentication-P PACKAGE
 		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
 			notificationSystemId;
 REGISTERED AS { ISIS.poi cLNSISISAuthentication-P(4) };
---11.2.3.1 ISIS Level 2 Authentication package attached to the cLNS managed object
+--
+-- 11.2.3.1 ISIS Level 2 Authentication package attached to the cLNS managed object
+--
 
 
 cLNSISISLevel2Authentication-P PACKAGE
@@ -697,7 +717,9 @@ cLNSISISLevel2Authentication-P PACKAGE
 			DEFAULT VALUE ISIS.passwords-Default
 			GET-REPLACE ADD-REMOVE;
 REGISTERED AS { ISIS.poi cLNSISISLevel2Authentication-P(5) };
---11.2.4 Attributes of cLNS object added by conditional packages
+--
+-- 11.2.4 Attributes of cLNS object added by conditional packages
+--
 
 
 areaAddresses ATTRIBUTE
@@ -1140,8 +1162,11 @@ lSPTooLargeToPropagate ATTRIBUTE
 			DEFINED AS
 				Count of lSPTooLargeToPropagate events;;
 REGISTERED AS { ISIS.aoi lSPTooLargeToPropagate(125) };
---11.2.5 Conditional packages for linkage MO defined in ISO 10733
---11.2.5.1 Basic ISIS linkage package
+--
+-- 11.2.5 Conditional packages for linkage MO defined in ISO 10733
+--
+-- 11.2.5.1 Basic ISIS linkage package
+--
 
 
 linkageISISBasic-P PACKAGE
@@ -1225,7 +1250,7 @@ linkageISISBasic-P PACKAGE
 		type
 			INITIAL VALUE DERIVATION RULE
 				supplyValueOnCreate-B
-			GET,
+			GET SET-BY-CREATE,
 		iSISHelloTimer REPLACE-WITH-DEFAULT
 			DEFAULT VALUE ISIS.iSISHelloTimer-Default
 			GET-REPLACE,
@@ -1269,7 +1294,9 @@ linkageISISBasic-P PACKAGE
 			notificationSystemId
 			notificationVersion;
 REGISTERED AS { ISIS.poi linkageISISBasic-P(6) };
---11.2.5.2 ISIS broadcast linkage package
+--
+-- 11.2.5.2 ISIS broadcast linkage package
+--
 
 
 linkageISISBroadcast-P PACKAGE
@@ -1302,14 +1329,18 @@ linkageISISBroadcast-P PACKAGE
 		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation
 			notificationDesignatedIntermediateSystemChange;
 REGISTERED AS { ISIS.poi linkageISISBroadcast-P(7) };
---11.2.5.3 ISIS point-to-point linkage package
+--
+-- 11.2.5.3 ISIS point-to-point linkage package
+--
 
 
 linkageISISPtToPt-P PACKAGE
 	ATTRIBUTES
 		ptPtCircuitID GET;
 REGISTERED AS { ISIS.poi linkageISISPtToPt-P(8) };
---11.2.5.4 ISIS call establishment metric increment linkage package
+--
+-- 11.2.5.4 ISIS call establishment metric increment linkage package
+--
 
 
 linkageISISDACallEstablishmentMetricIncrement-P PACKAGE
@@ -1332,7 +1363,9 @@ linkageISISDACallEstablishmentMetricIncrement-P PACKAGE
 			DEFAULT VALUE ISIS.callEstablishmentMetricIncrement-Default
 			GET-REPLACE;
 REGISTERED AS { ISIS.poi linkageISISDACallEstablishmentMetricIncrement-P(9) };
---11.2.5.5 ISIS static linkage package
+--
+-- 11.2.5.5 ISIS static linkage package
+--
 
 
 linkageISISStatic-P PACKAGE
@@ -1341,7 +1374,9 @@ linkageISISStatic-P PACKAGE
 		ptPtCircuitID GET,
 		neighbourSNPAAddress REPLACE-WITH-DEFAULT GET-REPLACE;
 REGISTERED AS { ISIS.poi linkageISISStatic-P(11) };
---11.2.5.6 ISIS level 2 linkage package
+--
+-- 11.2.5.6 ISIS level 2 linkage package
+--
 
 
 linkageISISLevel2-P PACKAGE
@@ -1363,7 +1398,9 @@ linkageISISLevel2-P PACKAGE
 			DEFAULT VALUE ISIS.manualL2OnlyMode-Default
 			GET-REPLACE;
 REGISTERED AS { ISIS.poi linkageISISLevel2-P(13) };
---11.2.5.7 ISIS level 2 broadcast linkage package
+--
+-- 11.2.5.7 ISIS level 2 broadcast linkage package
+--
 
 
 linkageISISLevel2Broadcast-P PACKAGE
@@ -1396,7 +1433,9 @@ linkageISISLevel2Broadcast-P PACKAGE
 		"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation
 			notificationDesignatedIntermediateSystemChange;
 REGISTERED AS { ISIS.poi linkageISISLevel2Broadcast-P(14) };
---11.2.5.8 ISIS linkage authentication package
+--
+-- 11.2.5.8 ISIS linkage authentication package
+--
 
 
 linkageISISAuthentication-P PACKAGE
@@ -1434,7 +1473,9 @@ linkageISISAuthentication-P PACKAGE
 		"Rec. X.721 | ISO/IEC 10165-2 : 1992":communicationsAlarm
 			notificationSystemId;
 REGISTERED AS { ISIS.poi linkageISISAuthentication-P(15) };
---11.2.5.9 Attributes for the linkage MO from ISO 10733 added by ISIS conditional packages
+--
+-- 11.2.5.9 Attributes for the linkage MO from ISO 10733 added by ISIS conditional packages
+--
 
 
 callEstablishmentDefaultMetricIncrement ATTRIBUTE
@@ -1804,11 +1845,13 @@ type ATTRIBUTE
 				The type of the circuit. This attribute may only be set when the linkage MO is 
 				created. Subsequently it is read-only;;
 REGISTERED AS { ISIS.aoi type(33) };
---11.2.6 Adjacency managed object
--- Created either through the adjacency-linkage Name binding for
--- adjacencies instantiated by protocol operation, or the
--- adjacency-linkage-management name binding for adjacencies created
--- via explicit system management operation
+--
+-- 11.2.6 Adjacency managed object
+--
+-- Created either through the adjacency-linkage Name binding for adjacencies instantiated by 
+-- protocol operation, or the adjacency-linkage-management name binding for adjacencies created via 
+-- explicit system management operation.
+--
 
 
 adjacency MANAGED OBJECT CLASS
@@ -1830,12 +1873,12 @@ adjacency MANAGED OBJECT CLASS
 				neighbourSNPAAddress
 					INITIAL VALUE DERIVATION RULE
 						supplyValueOnCreate-B
-					GET,
+					GET SET-BY-CREATE,
 				neighbourSystemType GET,
 				neighbourSystemIds
 					INITIAL VALUE DERIVATION RULE
 						supplyValueOnCreate-B
-					GET;
+					GET SET-BY-CREATE;
 			NOTIFICATIONS
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":stateChange;;;
 	CONDITIONAL PACKAGES
@@ -1847,7 +1890,9 @@ adjacency MANAGED OBJECT CLASS
 			PRESENT IF
 				the parent Linkage MO is of type broadcast and is to an IS as above;
 REGISTERED AS { ISIS.moi adjacency(1) };
---11.2.6.1 IS adjacency package of the adjacency managed object
+--
+-- 11.2.6.1 IS adjacency package of the adjacency managed object
+--
 
 
 iSAdjacency-P PACKAGE
@@ -1856,14 +1901,18 @@ iSAdjacency-P PACKAGE
 		areaAddressesOfNeighbour GET,
 		holdingTimer GET;
 REGISTERED AS { ISIS.poi iSAdjacency-P(19) };
---11.2.6.2 Broadcast IS adjacency package of the adjacency managed object
+--
+-- 11.2.6.2 Broadcast IS adjacency package of the adjacency managed object
+--
 
 
 broadcastISAdjacency-P PACKAGE
 	ATTRIBUTES
 		priorityOfNeighbour GET;
 REGISTERED AS { ISIS.poi broadcastISAdjacency-P(20) };
---11.2.6.3 Name bindings for the adjacency managed object
+--
+-- 11.2.6.3 Name bindings for the adjacency managed object
+--
 
 
 adjacency-linkage NAME BINDING
@@ -1896,7 +1945,9 @@ adjacency-linkage-management NAME BINDING
 	reservedName;
 	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { ISIS.nboi adjacency-linkage-management(8) };
---11.2.6.4 Attributes of the adjacency managed object
+--
+-- 11.2.6.4 Attributes of the adjacency managed object
+--
 
 
 adjacencyId ATTRIBUTE
@@ -2008,7 +2059,9 @@ neighbourSystemType ATTRIBUTE
 				"The type of the neighbour system one of: Unknown, End system, Intermediate 
 				system, L1 Intermediate system, L2 Intermediate system";;
 REGISTERED AS { ISIS.aoi neighbourSystemType(80) };
---11.2.7 Virtual adjacency managed object
+--
+-- 11.2.7 Virtual adjacency managed object
+--
 
 
 virtualAdjacency MANAGED OBJECT CLASS
@@ -2020,7 +2073,9 @@ virtualAdjacency MANAGED OBJECT CLASS
 				networkEntityTitle GET,
 				metric GET;;;
 REGISTERED AS { ISIS.moi virtualAdjacency(2) };
---11.2.7.1 Name bindings for the virtual adjacency managed object
+--
+-- 11.2.7.1 Name bindings for the virtual adjacency managed object
+--
 
 
 virtualAdjacency-cLNS NAME BINDING
@@ -2035,7 +2090,9 @@ virtualAdjacency-cLNS NAME BINDING
 				This name binding is only applicable where the superior object has an iSType of 
 				Level2;;
 REGISTERED AS { ISIS.nboi virtualAdjacency-cLNS(3) };
---11.2.7.2 Attributes of the virtual adjacency managed object
+--
+-- 11.2.7.2 Attributes of the virtual adjacency managed object
+--
 
 
 metric ATTRIBUTE
@@ -2046,9 +2103,12 @@ metric ATTRIBUTE
 			DEFINED AS
 				Cost of least cost L2 path(s) to destination area based on the default metric;;
 REGISTERED AS { ISIS.aoi metric(89) };
---11.2.8 Destination managed object
--- This MO class is never instantiated. It exists only to allow the destinationSystem and destinationArea
--- MO classes to be derived from it.
+--
+-- 11.2.8 Destination managed object
+--
+-- This MO class is never instantiated. It exists only to allow the destinationSystem and 
+-- destinationArea MO classes to be derived from it.
+--
 
 
 destination MANAGED OBJECT CLASS
@@ -2066,7 +2126,9 @@ destination MANAGED OBJECT CLASS
 				errorMetricPathCost GET,
 				errorMetricOutputAdjacencies GET;;;
 REGISTERED AS { ISIS.moi destination(3) };
---11.2.9 Attributes of the destination managed object
+--
+-- 11.2.9 Attributes of the destination managed object
+--
 
 
 defaultMetricOutputAdjacencies ATTRIBUTE
@@ -2155,7 +2217,9 @@ expenseMetricPathCost ATTRIBUTE
 			DEFINED AS
 				Cost of least cost path(s) using the expense metric to destination;;
 REGISTERED AS { ISIS.aoi expenseMetricPathCost(94) };
---11.2.10 Destination system managed object
+--
+-- 11.2.10 Destination system managed object
+--
 
 
 destinationSystem MANAGED OBJECT CLASS
@@ -2166,7 +2230,9 @@ destinationSystem MANAGED OBJECT CLASS
 			ATTRIBUTES
 				networkEntityTitle GET;;;
 REGISTERED AS { ISIS.moi destinationSystem(4) };
---11.2.10.1 Name bindings
+--
+-- 11.2.10.1 Name bindings
+--
 
 
 destinationSystem-cLNS NAME BINDING
@@ -2176,7 +2242,9 @@ destinationSystem-cLNS NAME BINDING
 	WITH ATTRIBUTE
 		networkEntityTitle;
 REGISTERED AS { ISIS.nboi destinationSystem-cLNS(1) };
---11.2.11 Destination area managed object
+--
+-- 11.2.11 Destination area managed object
+--
 
 
 destinationArea MANAGED OBJECT CLASS
@@ -2187,7 +2255,9 @@ destinationArea MANAGED OBJECT CLASS
 			ATTRIBUTES
 				addressPrefix GET;;;
 REGISTERED AS { ISIS.moi destinationArea(7) };
---11.2.11.1 Name bindings
+--
+-- 11.2.11.1 Name bindings
+--
 
 
 destinationArea-cLNS NAME BINDING
@@ -2202,13 +2272,14 @@ destinationArea-cLNS NAME BINDING
 				This name binding is only applicable where the superior object has an iSType of 
 				Level2;;
 REGISTERED AS { ISIS.nboi destinationArea-cLNS(2) };
---11.2.12 Reachable address managed object
--- Created either through the reachableAddress-linkage-imported
--- Name binding for reachable addresses instantiated by
--- the importation of routeing information from another
--- routeing protocol (such as the interdomain routeing protocol), or the
--- reachableAddress-linkage-management name binding for adjacencies created
--- via explicit system management operation.
+--
+-- 11.2.12 Reachable address managed object
+--
+-- Created either through the reachableAddress-linkage-imported Name binding for reachable addresses 
+-- instantiated by the importation of routeing information from another routeing protocol (such as 
+-- the interdomain routeing protocol), or the reachableAddress-linkage-management name binding for 
+-- adjacencies created via explicit system management operation.
+--
 
 
 reachableAddress MANAGED OBJECT CLASS
@@ -2224,11 +2295,11 @@ reachableAddress MANAGED OBJECT CLASS
 				addressPrefix
 					INITIAL VALUE DERIVATION RULE
 						supplyValueOnCreate-B
-					GET,
+					GET SET-BY-CREATE,
 				mappingType
 					INITIAL VALUE DERIVATION RULE
 						supplyValueOnCreate-B
-					GET,
+					GET SET-BY-CREATE,
 				defaultMetric REPLACE-WITH-DEFAULT
 					DEFAULT VALUE ISIS.defaultMetric-Default
 					PERMITTED VALUES ISIS.DefaultMetric-Permitted
@@ -2270,14 +2341,18 @@ reachableAddress MANAGED OBJECT CLASS
 			PRESENT IF
 				the value of mappingType is "extractDSP";
 REGISTERED AS { ISIS.moi reachableAddress(8) };
---11.2.12.1 Explicit SNPA package
+--
+-- 11.2.12.1 Explicit SNPA package
+--
 
 
 explicitSNPA-P PACKAGE
 	ATTRIBUTES
 		sNPAAddresses GET-REPLACE;
 REGISTERED AS { ISIS.poi explicitSNPA-P(22) };
---11.2.12.2 Extract DSP package
+--
+-- 11.2.12.2 Extract DSP package
+--
 
 
 extractDSP-P PACKAGE
@@ -2295,7 +2370,9 @@ extractDSP-P PACKAGE
 			DEFAULT VALUE ISIS.sNPAPrefix-Default
 			GET-REPLACE;
 REGISTERED AS { ISIS.poi extractDSP-P(23) };
---11.2.12.3 Name bindings
+--
+-- 11.2.12.3 Name bindings
+--
 
 
 reachableAddress-linkage-imported NAME BINDING
@@ -2331,7 +2408,9 @@ reachableAddress-linkage-management NAME BINDING
 	reservedName;
 	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { ISIS.nboi reachableAddress-linkage-management(6) };
---11.2.12.4 Attributes of the reachable address managed object
+--
+-- 11.2.12.4 Attributes of the reachable address managed object
+--
 
 
 defaultMetric ATTRIBUTE
@@ -2517,9 +2596,12 @@ END
 --  =============================================================================
 --  
 --  $Log: ISO10589.2.gdmo,v $
+--  Revision 0.9.2.2  2007/09/09 22:58:47  brian
+--  - updates for namespace
+--
 --  Revision 0.9.2.1  2007/09/06 10:58:57  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ISO/IEC 10589: 2001" >--
@@ -2634,5 +2716,4 @@ END
 --@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":dSeriesCounts
 --@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DCE +++
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

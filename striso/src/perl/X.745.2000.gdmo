@@ -1,13 +1,14 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 12:04:56 MDT 2007
+--@@ Date: Sun Sep  9 06:08:43 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" >--
+--< GDMO.Namespace x745 >--
 --< GDMO.Alias "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" "X.745",
 --  "ITU-T Rec. X.745 (1993)/Cor.1 (1997) | ISO/IEC 10164-12 : 1993/Cor.1 : 1998",
 --  "ITU-T Rec. X.745 (1993)/Cor.2 (1998) | ISO/IEC 10164-12 : 1993/Cor.2 : 1999",
@@ -20,7 +21,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: X.745.2000.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:07 $
+--  @(#) $RCSfile: X.745.2000.gdmo,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:51 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -65,7 +66,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/06 10:59:07 $ by $Author: brian $
+--  Last Modified $Date: 2007/09/09 22:58:51 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -807,9 +808,12 @@ END
 --  =============================================================================
 --  
 --  $Log: X.745.2000.gdmo,v $
+--  Revision 0.9.2.2  2007/09/09 22:58:51  brian
+--  - updates for namespace
+--
 --  Revision 0.9.2.1  2007/09/06 10:59:07  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" >--
@@ -849,5 +853,4 @@ END
 --@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
 --@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

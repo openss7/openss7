@@ -1,10 +1,10 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 11:47:14 MDT 2007
+--@@ Date: Sun Sep  9 05:50:59 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
@@ -12,6 +12,7 @@
 --< GDMO.Include "M.3100.gdmo" >--
 --< GDMO.Include "Q.822.gdmo" >--
 --< GDMO.Document "ITU-T G.774.1 (02/2001)" >--
+--< GDMO.Namespace g774_1 >--
 --< GDMO.Alias "ITU-T G.774.1 (02/2001)" "Recommendation G.774.01" >--
 MODULE "ITU-T G.774.1 (02/2001)"
 -- 6  Managed Object Classes Definitions 
@@ -1319,5 +1320,4 @@ END
 --@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
 --@@ >- "ITU-T Rec. Q.822 (1994)":historyData
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

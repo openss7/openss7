@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # =============================================================================
 # 
-# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:10 $
+# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:52 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/09/06 10:59:10 $ by $Author: brian $
+# Last Modified $Date: 2007/09/09 22:58:52 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: gdmocheck,v $
+# Revision 0.9.2.2  2007/09/09 22:58:52  brian
+# - updates for namespace
+#
 # Revision 0.9.2.1  2007/09/06 10:59:10  brian
 # - added new gdmo files
 #
@@ -889,7 +892,7 @@ sub head {
 
 sub gdmo {
 	my $self = shift;
-	print '--@@ GDMOCHECK $Revision: 0.9.2.1 $';
+	print '--@@ GDMOCHECK $Revision: 0.9.2.2 $';
 	print '--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>';
 	print '--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>';
 	print '--@@ ';
@@ -1509,8 +1512,7 @@ sub gdmo {
 		$d->showcontained();
 		printf "\n--@@\n";
 	}
-	print "--@@ vim: comments=\\b\\:--";
-	print "--@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi";
+	print "--@@ vim: comments=\\b\\:\\-\\-,\\:\\-\\-,\\f\\b\\:- fo+=tcqlornw tw=120 nocin nosi";
 }
 
 
@@ -1685,6 +1687,7 @@ sub read {
 		last TEST unless ($line=~s/^GDMO\s*\.\s*(\w*)\s*//s);
 		$self->{directive} = $1;
 		if ($self->{directive}=~/^Version$/) {
+		} elsif ($self->{directive}=~/^Namespace$/) {
 		} elsif ($self->{directive}=~/^Copyright$/) {
 		} elsif ($self->{directive}=~/^Document$/) {
 		} elsif ($self->{directive}=~/^Alias$/) {
@@ -1816,7 +1819,7 @@ sub gdmo {
 package Asn1Definitions;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(SimpleToken);
+@ISA = qw(DashedTokenIndented);
 # -------------------------------------
 
 sub read {
@@ -1928,7 +1931,7 @@ sub read {
 package End;
 use strict;
 use vars qw(@ISA);
-@ISA = qw(SimpleToken);
+@ISA = qw(DashedTokenIndented);
 # -------------------------------------
 
 sub read {
@@ -5760,6 +5763,44 @@ sub gdmo {
 }
 
 # -------------------------------------
+package GdmoNamespaceDirective;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		$self->{namespace} = Namespace->parse($line,@_[1,-1]);
+		push @{$self->{children}}, $self->{namespace};
+		if (($self->{documentstring} = DocumentIdentifier->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{documentstring};
+		}
+		if (($self->{documentoid} = ObjectIdentifierValue->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{documentoid};
+		}
+		$line=~s/^(?:\s|\n)*//s;
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if ($::first) { printf '-- '; $::first = 0; }
+		if (($s = $self->{namespace})) { $s->gdmo(); }
+		if ($::first) { printf '-- '; $::first = 0; }
+		if (($s = $self->{documentstring})) { $s->gdmo(); }
+		if ($::first) { printf '-- '; $::first = 0; }
+		if (($s = $self->{documentoid})) { $s->gdmo(); }
+	}
+}
+
+# -------------------------------------
 package GdmoCopyrightDirective;
 use strict;
 use vars qw(@ISA);
@@ -5946,6 +5987,36 @@ sub gdmo {
 }
 
 # -------------------------------------
+package Namespace;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	my $gdmo = $_[-1];
+	TEST: {
+		last TEST unless ($line=~s/^"?([a-zA-Z_][0-9a-zA-Z_]*)"?//s);
+		$self->{namespace} = $1;
+		$gdmo->{namespace} = $self->{namespace};
+		$line=~s/^(?:\s|\n)*//s;
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (!$::first) { printf ' '; }
+		printf "$self->{namespace}"; $::first = 0;
+	}
+}
+
+# -------------------------------------
 package Directives;
 use strict;
 use vars qw(@ISA);
@@ -6064,18 +6135,17 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		my $s;
-		if (($s = Comment->parse($line,@_[1,-1]))) {
+		last TEST unless (($s = Comment->parse($line,@_[1,-1])));
+		push @{$self->{comments}}, $s;
+		while (($s = Comment->parse($line,@_[1,-1]))) {
 			push @{$self->{comments}}, $s;
-			while (($s = Comment->parse($line,@_[1,-1]))) {
-				push @{$self->{comments}}, $s;
-			}
-			$line=~s/^(\s|\n)*//s;
-			$_[0] = $line; return $self;
-		} else {
-			$line=~s/^(\s|\n)*//s;
-			$_[0] = $line;
 		}
+		# always eat leading whitespace
+		$line=~s/^(\s|\n)*//s;
+		$_[0] = $line; return $self;
 	}
+	# always eat leading whitespace
+	$_[0]=~s/^(\s|\n)*//s;
 	return $self->error($line);
 }
 
@@ -6253,17 +6323,13 @@ sub pushscope {
 	$suffix=~s/ConstraintRule/Constraint/;
 	$self->{label} = $label;
 	$self->{name} = $self->xform('',$label,$suffix);
-	$self->{scope} = $::scope;
-	if (length $::scope > 0) {
-		$::scope.='::'.$self->{name};
-	} else {
-		$::scope = $self->{name};
-	}
-	$self->{scopedname} = $::scope;
+	$self->{scope} = join('::',@::scopes);
+	push @::scopes, $self->{name};
+	$self->{scopedname} = join('::',@::scopes);
 }
 sub popscope {
 	my $self = shift;
-	$::scope = $self->{scope};
+	pop @::scopes;
 }
 sub definition {
 	my $self = shift;
@@ -6350,7 +6416,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -6609,7 +6675,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -6682,7 +6748,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -6773,7 +6839,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -6877,7 +6943,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -6974,7 +7040,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7041,7 +7107,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7099,7 +7165,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7172,7 +7238,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7242,7 +7308,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7303,7 +7369,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7366,7 +7432,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*RELATIONSHIP(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
@@ -7409,7 +7475,7 @@ sub read {
 	my $self = shift;
 	my $line = $_[0];
 	TEST: {
-		$self->{scope} = $::scope;
+		$self->{scope} = join('::',@::scopes);
 		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*RELATIONSHIP(?:\s|\n)*((-)?)(?:\s|\n)*MAPPING//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
@@ -14384,6 +14450,7 @@ $context = 50; # number of lines to report on error
 @objects = ();
 $root = {}; # root object
 $scope = '';
+@scopes = ();
 @backtrack = ();
 $oid = 0;
 

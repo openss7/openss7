@@ -1,4 +1,4 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
@@ -10,6 +10,7 @@
 --< GDMO.Include "X.725.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998" >--
+--< GDMO.Namespace "x753" >--
 MODULE "ITU-T Rec. X.753 (1997) | ISO/IEC 10164-21 : 1998"
 -- Annex A
 -- Definition of Management Information
