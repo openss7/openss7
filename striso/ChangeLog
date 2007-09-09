@@ -1,3 +1,61 @@
+2007-09-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/perl/EN300292.gdmo: updates for namespace
+	* src/perl/ES200653.gdmo: updates for namespace
+	* src/perl/ES201097-1.gdmo: updates for namespace
+	* src/perl/G.774.03.gdmo: updates for namespace
+	* src/perl/G.774.04.gdmo: updates for namespace
+	* src/perl/G.774.1.gdmo: updates for namespace
+	* src/perl/G.774.2.gdmo: updates for namespace
+	* src/perl/G.774.3.gdmo: updates for namespace
+	* src/perl/G.774.4.gdmo: updates for namespace
+	* src/perl/G.774.5.gdmo: updates for namespace
+	* src/perl/G.774.gdmo: updates for namespace
+	* src/perl/ISO10589.1.gdmo: updates for namespace
+	* src/perl/ISO10589.2.gdmo: updates for namespace
+	* src/perl/ISO10733.gdmo: updates for namespace
+	* src/perl/ISO10733D.gdmo: updates for namespace
+	* src/perl/M.3100.2005.gdmo: updates for namespace
+	* src/perl/M3100.gdmo: updates for namespace
+	* src/perl/MTP.gdmo: updates for namespace
+	* src/perl/MTPacct.gdmo: updates for namespace
+	* src/perl/Makefile: updates for namespace
+	* src/perl/Q.751.1.gdmo: updates for namespace
+	* src/perl/Q.751.2.gdmo: updates for namespace
+	* src/perl/Q.821.gdmo: updates for namespace
+	* src/perl/Q.822.gdmo: updates for namespace
+	* src/perl/Q.826.gdmo: updates for namespace
+	* src/perl/SCCP.gdmo: updates for namespace
+	* src/perl/T1.116.1.gdmo: updates for namespace
+	* src/perl/T1.116.1D.gdmo: updates for namespace
+	* src/perl/X.283.1997.gdmo: updates for namespace
+	* src/perl/X.521.gdmo: updates for namespace
+	* src/perl/X.721.gdmo: updates for namespace
+	* src/perl/X.723.gdmo: updates for namespace
+	* src/perl/X.725.1995.gdmo: updates for namespace
+	* src/perl/X.737.2001.gdmo: updates for namespace
+	* src/perl/X.738.2000.gdmo: updates for namespace
+	* src/perl/X.739.1998.gdmo: updates for namespace
+	* src/perl/X.740.1998.gdmo: updates for namespace
+	* src/perl/X.741.2000.gdmo: updates for namespace
+	* src/perl/X.742.2000.gdmo: updates for namespace
+	* src/perl/X.743.2001.gdmo: updates for namespace
+	* src/perl/X.744.1998.gdmo: updates for namespace
+	* src/perl/X.745.2000.gdmo: updates for namespace
+	* src/perl/X.746.2000.gdmo: updates for namespace
+	* src/perl/X.748.1999.gdmo: updates for namespace
+	* src/perl/X.749.1997.gdmo: updates for namespace
+	* src/perl/X.750.2000.gdmo: updates for namespace
+	* src/perl/X.751.2000.gdmo: updates for namespace
+	* src/perl/X.753.1997.gdmo: updates for namespace
+	* src/perl/X.754.2000.gdmo: updates for namespace
+	* src/perl/example.gdmo: updates for namespace
+	* src/perl/full.gdmo: updates for namespace
+	* src/perl/gdmocheck: updates for namespace
+
+	* src/perl/G.855.1.asn: added GDMO files
+	* src/perl/G.855.1.gdmo: added GDMO files
+
 2007-09-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added yac programs to build

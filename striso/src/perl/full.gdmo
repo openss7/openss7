@@ -25,3 +25,4 @@
 --< GDMO.Include "G.774.03.gdmo" >--
 --< GDMO.Include "G.774.04.gdmo" >--
 --< GDMO.Include "ISO10733.gdmo" >--
+--< GDMO.Namespace "full" >--

@@ -1,13 +1,14 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 12:03:48 MDT 2007
+--@@ Date: Sun Sep  9 06:07:36 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993" >--
+--< GDMO.Namespace x740 >--
 --< GDMO.Alias "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993" "X.740",
 --  "ITU-T Rec. X.740 (1992)/Cor.1 (1995) | ISO/IEC 10164-8 : 1993/Cor.1 : 1995",
 --  "ITU-T Rec. X.740 (1992)/Cor.2 (1996) | ISO/IEC 10164-8 : 1993/Cor.2 : 1996",
@@ -137,5 +138,4 @@ END
 --@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
 --@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

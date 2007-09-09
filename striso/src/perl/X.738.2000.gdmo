@@ -1,14 +1,15 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 12:02:47 MDT 2007
+--@@ Date: Sun Sep  9 06:06:35 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.739.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995" >--
+--< GDMO.Namespace x738 >--
 --< GDMO.Alias "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995" "Rec. X.738 (1993)",
 --  "Recommendation X.738:1993",
 --  "Rec. X.738|ISO/IEC 10164-13:1992",
@@ -18,7 +19,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: X.738.2000.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:03 $
+--  @(#) $RCSfile: X.738.2000.gdmo,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:50 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -63,7 +64,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/06 10:59:03 $ by $Author: brian $
+--  Last Modified $Date: 2007/09/09 22:58:50 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -930,9 +931,12 @@ END
 --  =============================================================================
 --  
 --  $Log: X.738.2000.gdmo,v $
+--  Revision 0.9.2.2  2007/09/09 22:58:50  brian
+--  - updates for namespace
+--
 --  Revision 0.9.2.1  2007/09/06 10:59:03  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995" >--
@@ -1613,5 +1617,4 @@ END
 --@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
 --@@ >- "ITU-T Rec. Q.822 (1994)":historyData
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

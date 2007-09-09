@@ -1,15 +1,16 @@
---@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
 --@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
 --@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Mon Sep  3 12:01:40 MDT 2007
+--@@ Date: Sun Sep  9 06:05:29 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
 --< GDMO.Include "ISO10589.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" >--
+--< GDMO.Namespace x283 >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Alias "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" "CCITT Rec. X.283 (1997) | ISO/IEC 10733 : 1998",
 --  "ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992",
@@ -17,7 +18,7 @@
 --< GDMO.Copyright
 --  =============================================================================
 --  
---  @(#) $RCSfile: X.283.1997.gdmo,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:02 $
+--  @(#) $RCSfile: X.283.1997.gdmo,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:49 $
 --  
 --  -----------------------------------------------------------------------------
 --  
@@ -62,7 +63,7 @@
 --  
 --  -----------------------------------------------------------------------------
 --  
---  Last Modified $Date: 2007/09/06 10:59:02 $ by $Author: brian $
+--  Last Modified $Date: 2007/09/09 22:58:49 $ by $Author: brian $
 --  
 --  =============================================================================
 --  >--
@@ -142,15 +143,17 @@ resettingTimer-B BEHAVIOUR
 		progress or the specified interval whichever is the sooner. The precision with 
 		which this time shall be implemented shall be the same as that associated with 
 		the basic operation of the timer attribute.!;
---5.3 The network subsystem managed object
+--
+-- 5.3 The network subsystem managed object
+--
 -- Managed Object for Network Layer Subsystem
 --
--- There is exactly one of these MOs within a system. It exists to provide a container for the
+-- There is exactly one of these MOs within a system. It exists to provide a container for the 
 -- Network Entity MOs, nSAP MOs and the 'SNPA' MOs as described in clause.
 --
--- The networkSubsystem managed object cannot be created or deleted
--- explicitly by management operation. It exists inherently in a system;
--- created and deleted as part of system operation.
+-- The networkSubsystem managed object cannot be created or deleted explicitly by management 
+-- operation. It exists inherently in a system; created and deleted as part of system operation.
+--
 
 
 networkSubsystem MANAGED OBJECT CLASS
@@ -173,11 +176,13 @@ networkSubsystem-system NAME BINDING
 	WITH ATTRIBUTE
 		"GMI":subsystemId;
 REGISTERED AS { NLM.nboi networkSubsystem-system(1) };
---5.4 The network entity managed object
--- There may be multiple instances of these MOs within a system.
--- Its definition permits it to be deleted and created explicitly by
--- management operation, or to be created and deleted automatically
--- as part of system operation.
+--
+-- 5.4 The network entity managed object
+--
+-- There may be multiple instances of these MOs within a system.  Its definition permits it to be 
+-- deleted and created explicitly by management operation, or to be created and deleted 
+-- automatically as part of system operation.
+--
 
 
 networkEntity MANAGED OBJECT CLASS
@@ -253,18 +258,18 @@ systemTypes ATTRIBUTE
 				instance of the protocol machine is operating is determined by the 
 				operationalSystemType attribute of the cLNS or cONS MO.!;;
 REGISTERED AS { NLM.aoi systemTypes(108) };
---5.5 The NSAP managed object
--- There is one nSAP MO for each set of NSAPs supported by the Network Subsystem
--- associated with a single Transport layer client.
--- Each NSAP MO corresponds to a set of one or more NSAPs
--- supported by the Network Subsystem.
 --
--- There is not more than one Transport layer client associated with a single nSAP MO,
--- but there may be more than one nSAP MO, and corresponding sets of NSAPs,
--- associated with a single Transport layer client.
--- Its definition permits it to be created and deleted explicitly by
--- management operation or to be created and deleted automatically as
--- part of system operation.
+-- 5.5 The NSAP managed object
+--
+-- There is one nSAP MO for each set of NSAPs supported by the Network Subsystem associated with a 
+-- single Transport layer client.  Each NSAP MO corresponds to a set of one or more NSAPs supported 
+-- by the Network Subsystem.
+--
+-- There is not more than one Transport layer client associated with a single nSAP MO, but there may 
+-- be more than one nSAP MO, and corresponding sets of NSAPs, associated with a single Transport 
+-- layer client.  Its definition permits it to be created and deleted explicitly by management 
+-- operation or to be created and deleted automatically as part of system operation.
+--
 
 
 nSAP MANAGED OBJECT CLASS
@@ -326,18 +331,18 @@ nSAP-networkSubsystem-Management NAME BINDING
 	CREATE;
 	DELETE;
 REGISTERED AS { NLM.nboi nSAP-networkSubsystem-Management(5) };
---5.6 The connectionless-mode network service managed object
--- There is no more than one of these MOs per network entity.
--- Its definition permits it to be created and deleted explicitly by
--- management operation, but in some systems it will exist inherently
--- and neither creation nor deletion by management operation will be
--- possible. Name bindings are defined for both cases.
 --
--- When the protocol machine is operable, the operationalState shall
--- have the value 'enabled'; otherwise it shall have the value 'disabled'.
--- Transitions of operationalState shall be reported using the
--- stateChange notification. A cLNS MO may be created in the
--- 'enabled' operational state.
+-- 5.6 The connectionless-mode network service managed object
+--
+-- There is no more than one of these MOs per network entity.  Its definition permits it to be 
+-- created and deleted explicitly by management operation, but in some systems it will exist 
+-- inherently and neither creation nor deletion by management operation will be possible. Name 
+-- bindings are defined for both cases.
+--
+-- When the protocol machine is operable, the operationalState shall have the value 'enabled'; 
+-- otherwise it shall have the value 'disabled'.  Transitions of operationalState shall be reported 
+-- using the stateChange notification. A cLNS MO may be created in the 'enabled' operational state.
+--
 
 
 cLNS MANAGED OBJECT CLASS
@@ -619,10 +624,9 @@ pDUDiscards ATTRIBUTE
 				| ISO/IEC 8473-1 Table 7 with the exception of `PDU discarded due to 
 				congestion'. This counter is incremented irrespective of the setting of the 
 				Error Report bit in the received PDU.!;;
-	-- NOTE  This counter is therefore a count of the number of
-	-- communicationsAlarm notifications with a specificProblem value of
-	-- pDUDiscard generated (as opposed to CMIP events,
-	-- may be suppressed) as required by GDMO subclause 9.8.5 (SC21 N4852).
+	-- NOTE  This counter is therefore a count of the number of communicationsAlarm 
+	-- notifications with a specificProblem value of pDUDiscard generated (as opposed to CMIP 
+	-- events, may be suppressed) as required by GDMO subclause 9.8.5 (SC21 N4852).
 	REGISTERED AS { NLM.aoi pDUDiscards(10) };
 
 
@@ -686,21 +690,19 @@ notificationPDUHeader PARAMETER
 			DEFINED AS
 				!The header of the data NPDU header which caused this event.!;;
 REGISTERED AS { NLM.proi notificationPDUHeader(1) };
---5.7 The linkage managed object
+--
+-- 5.7 The linkage managed object
+--
 -- Linkage Managed Object
 --
--- There is one of these MOs associated with each separate provision
--- of the underlying service to the superior protocol machine.
--- Its definition permits it to be created and deleted explicitly by
--- management operation, but in some systems it will exist inherently
--- and neither creation nor deletion by management operation will be
--- possible. Name bindings are defined for both cases.
+-- There is one of these MOs associated with each separate provision of the underlying service to 
+-- the superior protocol machine.  Its definition permits it to be created and deleted explicitly by 
+-- management operation, but in some systems it will exist inherently and neither creation nor 
+-- deletion by management operation will be possible. Name bindings are defined for both cases.
 --
--- When the linkage is operable, the operationalState shall
--- have the value 'enabled'; otherwise it shall have the value 'disabled'.
--- Transitions of operationalState shall be reported using the
--- stateChange notification. A linkage MO may be created in the
--- 'enabled' operational state.
+-- When the linkage is operable, the operationalState shall have the value 'enabled'; otherwise it 
+-- shall have the value 'disabled'.  Transitions of operationalState shall be reported using the 
+-- stateChange notification. A linkage MO may be created in the 'enabled' operational state.
 --
 
 
@@ -1188,9 +1190,8 @@ invalid9542PDUs ATTRIBUTE
 				!Counter of invalid 9542 PDUs received. This is the number of ISO 9542 PDUs 
 				received which are discarded as a result of the PDU Header Error Detection or 
 				Protocol Error Processing Functions specified in ISO 9542.!;;
-	-- NOTE  This counter is therefore a count of the number of
-	-- communicationsAlarm notifications with a specificProblem value of
-	-- NLM.iSO9542PDUDiscard generated.
+	-- NOTE  This counter is therefore a count of the number of communicationsAlarm 
+	-- notifications with a specificProblem value of NLM.iSO9542PDUDiscard generated.
 	REGISTERED AS { NLM.aoi invalid9542PDUs(101) };
 
 
@@ -1334,18 +1335,17 @@ reachabilityChange PARAMETER
 	CONTEXT EVENT-INFO;
 	WITH SYNTAX NLM.ReachabilityChangeSyntax;
 REGISTERED AS { NLM.proi reachabilityChange(12) };
---5.8 The connection-mode network service managed object
--- There is no more than one of these MOs per network entity.
--- Its definition permits it to be created and deleted explicitly by
--- management operation, but in some systems it will exist inherently
--- and neither creation nor deletion by management operation will be
--- possible. Name bindings are defined for both cases.
 --
--- When the protocol machine is operable, the operationalState shall
--- have the value 'enabled'; otherwise it shall have the value 'disabled'.
--- Transitions of operationalState shall be reported using the
--- stateChange notification. A cONS MO may be created in the
--- 'enabled' operational state.
+-- 5.8 The connection-mode network service managed object
+--
+-- There is no more than one of these MOs per network entity.  Its definition permits it to be 
+-- created and deleted explicitly by management operation, but in some systems it will exist 
+-- inherently and neither creation nor deletion by management operation will be possible. Name 
+-- bindings are defined for both cases.
+--
+-- When the protocol machine is operable, the operationalState shall have the value 'enabled'; 
+-- otherwise it shall have the value 'disabled'.  Transitions of operationalState shall be reported 
+-- using the stateChange notification. A cONS MO may be created in the 'enabled' operational state.
 --
 
 
@@ -1410,15 +1410,15 @@ cONS-networkEntity-Automatic NAME BINDING
 				!The name binding that applies when the cONS managed object cannot be created or 
 				deleted by management.!;;
 REGISTERED AS { NLM.nboi cONS-networkEntity-Automatic(17) };
---5.9 The network connection managed object
--- There is one instance of this MO corresponding to each network
--- connection. It is created and deleted by the operation of the protocol
--- machine.
 --
--- In some configurations the underlyingConnectionNames attribute may
--- contain more than one distinguished name. In this case, the type of
--- the underlying MO (and hence the particular underlying resource)
--- can only be determined by inspection of the MO pointed to by this
+-- 5.9 The network connection managed object
+--
+-- There is one instance of this MO corresponding to each network connection. It is created and 
+-- deleted by the operation of the protocol machine.
+--
+-- In some configurations the underlyingConnectionNames attribute may contain more than one 
+-- distinguished name. In this case, the type of the underlying MO (and hence the particular 
+-- underlying resource) can only be determined by inspection of the MO pointed to by this 
 -- distinguished name.
 
 
@@ -1481,15 +1481,16 @@ remoteNSAPAddress ATTRIBUTE
 			DEFINED AS
 				!The remote NSAP Address associated with the connection.!;;
 REGISTERED AS { NLM.aoi remoteNSAPAddress(107) };
---5.10 The X.25 PLE and related managed objects
---5.10.1 The X.25 PLE managed object
--- This MO class is never instantiated. It serves as a generic
--- x25PLE MO from which both the x25PLE-DTE and x25PLE-DCE MO
--- classes are derived.
+-- 
+-- 5.10 The X.25 PLE and related managed objects
 --
--- Note that the values of the x25PLEId naming attribute are
--- required to be unique across all instances of MOs derived from
--- this, which have a common superior.
+-- 5.10.1 The X.25 PLE managed object
+--
+-- This MO class is never instantiated. It serves as a generic x25PLE MO from which both the 
+-- x25PLE-DTE and x25PLE-DCE MO classes are derived.
+--
+-- Note that the values of the x25PLEId naming attribute are required to be unique across all 
+-- instances of MOs derived from this, which have a common superior.
 --
 
 
@@ -1538,14 +1539,14 @@ x25PLE MANAGED OBJECT CLASS
 				"DMI":objectCreation,
 				"DMI":objectDeletion;;;
 REGISTERED AS { NLM.moi x25PLE(25) };
---5.10.2 The X.25 PLE initial values managed object
--- This MO class is never instantiated. It serves as a generic
--- x25PLE IVMO from which both the x25PLEIVMO-DTE and x25PLEIVMO-DCE
--- MO classes are derived.
 --
--- Note that the values of the x25PLEIVMOId naming attribute are
--- required to be unique across all instances of MOs derived from
--- this, which have a common superior.
+-- 5.10.2 The X.25 PLE initial values managed object
+--
+-- This MO class is never instantiated. It serves as a generic x25PLE IVMO from which both the 
+-- x25PLEIVMO-DTE and x25PLEIVMO-DCE MO classes are derived.
+--
+-- Note that the values of the x25PLEIVMOId naming attribute are required to be unique across all 
+-- instances of MOs derived from this, which have a common superior.
 
 
 x25PLEIVMO MANAGED OBJECT CLASS
@@ -1576,21 +1577,19 @@ x25PLEIVMO MANAGED OBJECT CLASS
 				"DMI":objectCreation,
 				"DMI":objectDeletion;;;
 REGISTERED AS { NLM.moi x25PLEIVMO(26) };
---5.10.3 The X.25 PLE DTE managed object
--- There may be multiple instances of these MOs within a system,
--- corresponding to Multiple X.25 PLEs.
 --
--- The definition of this MO
--- permits it to be created and deleted explicitly by
--- management operation or to be created and deleted automatically as
--- part of system operation. When an instance of this MO
--- is created automatically, an instance of the
--- x25PLEIVMO-DTE may be used as the source
--- of the initial values for attributes of this MO.
+-- 5.10.3 The X.25 PLE DTE managed object
 --
--- When the x25 PLE is operable, the operationalState shall
--- have the value 'enabled'; otherwise it shall have the value 'disabled'.
--- Transitions of operationalState shall be reported using the
+-- There may be multiple instances of these MOs within a system, corresponding to Multiple X.25 
+-- PLEs.
+--
+-- The definition of this MO permits it to be created and deleted explicitly by management operation 
+-- or to be created and deleted automatically as part of system operation. When an instance of this 
+-- MO is created automatically, an instance of the x25PLEIVMO-DTE may be used as the source of the 
+-- initial values for attributes of this MO.
+--
+-- When the x25 PLE is operable, the operationalState shall have the value 'enabled'; otherwise it 
+-- shall have the value 'disabled'.  Transitions of operationalState shall be reported using the 
 -- stateChange notification.
 
 
@@ -1664,21 +1663,19 @@ x25PLE-DTE MANAGED OBJECT CLASS
 			PRESENT IF
 				!The optional online registration facility is implemented!;
 REGISTERED AS { NLM.moi x25PLE-DTE(17) };
---5.10.4 The X.25 PLE DCE managed object
--- There may be multiple instances of these MOs within a system,
--- corresponding to Multiple X.25 PLEs.
 --
--- The definition of this MO
--- permits it to be created and deleted explicitly by
--- management operation or to be created and deleted automatically as
--- part of system operation. When an instance of this MO
--- is created automatically, an instance of the
--- x25PLEIVMO-DCE may be used as the source
--- of the initial values for attributes of this MO.
+-- 5.10.4 The X.25 PLE DCE managed object
 --
--- When the x25 PLE is operable, the operationalState shall
--- have the value 'enabled'; otherwise it shall have the value 'disabled'.
--- Transitions of operationalState shall be reported using the
+-- There may be multiple instances of these MOs within a system, corresponding to Multiple X.25 
+-- PLEs.
+--
+-- The definition of this MO permits it to be created and deleted explicitly by management operation 
+-- or to be created and deleted automatically as part of system operation. When an instance of this 
+-- MO is created automatically, an instance of the x25PLEIVMO-DCE may be used as the source of the 
+-- initial values for attributes of this MO.
+--
+-- When the x25 PLE is operable, the operationalState shall have the value 'enabled'; otherwise it 
+-- shall have the value 'disabled'.  Transitions of operationalState shall be reported using the 
 -- stateChange notification.
 
 
@@ -1710,14 +1707,14 @@ x25PLE-DCE MANAGED OBJECT CLASS
 			PRESENT IF
 				!the instance supports the dCEX25PLETimers capabilities!;
 REGISTERED AS { NLM.moi x25PLE-DCE(27) };
---5.10.5 The X.25 PLE DTE initial values managed object
--- There may be multiple instances of the x25PLEIVMO-DTE in a system.
--- An x25PLEIVMO-DTE may be used to supply initial
--- values for the attributes of the x25PLE-DTE MO.
--- Different instances of x25PLEIVMO-DTE may contain different initial values.
 --
--- Its definition permits it to be created and deleted explicitly by
--- management operation.
+-- 5.10.5 The X.25 PLE DTE initial values managed object
+--
+-- There may be multiple instances of the x25PLEIVMO-DTE in a system.  An x25PLEIVMO-DTE may be used 
+-- to supply initial values for the attributes of the x25PLE-DTE MO.  Different instances of 
+-- x25PLEIVMO-DTE may contain different initial values.
+--
+-- Its definition permits it to be created and deleted explicitly by management operation.
 --
 
 
@@ -1773,14 +1770,14 @@ x25PLEIVMO-DTE MANAGED OBJECT CLASS
 			PRESENT IF
 				!The optional online registration facility is implemented!;
 REGISTERED AS { NLM.moi x25PLEIVMO-DTE(20) };
---5.10.6 The X.25 PLE DCE initial values managed object
--- There may be multiple instances of the x25PLEIVMO-DCE in a system.
--- An x25PLEIVMO-DCE may be used to supply initial
--- values for the attributes of the x25PLE-DCE MO.
--- Different instances of x25PLEIVMO-DCE may contain different initial values.
 --
--- Its definition permits it to be created and deleted explicitly by
--- management operation.
+-- 5.10.6 The X.25 PLE DCE initial values managed object
+--
+-- There may be multiple instances of the x25PLEIVMO-DCE in a system.  An x25PLEIVMO-DCE may be used 
+-- to supply initial values for the attributes of the x25PLE-DCE MO.  Different instances of 
+-- x25PLEIVMO-DCE may contain different initial values.
+--
+-- Its definition permits it to be created and deleted explicitly by management operation.
 --
 
 
@@ -1900,9 +1897,8 @@ dTEX25PLECounters-P PACKAGE
 		clearTimeouts GET,
 		dataPacketsReceived GET,
 		dataPacketsSent GET,
-		-- Note that the "DMI":PDUsSentCounter
-		-- cannot be used here since it is defined as total number of PDUs sent,
-		-- not just data PDUs.
+		-- Note that the "DMI":PDUsSentCounter cannot be used here since it is defined as 
+		-- total number of PDUs sent, not just data PDUs.
 		dataRetransmissionTimerExpiries GET,
 		providerInitiatedResets GET,
 		providerInitiatedDisconnects GET,
@@ -3205,13 +3201,15 @@ notificationData PARAMETER
 			DEFINED AS
 				!Information relating to the call which resulted in the notification.!;;
 REGISTERED AS { NLM.proi notificationData(7) };
---5.11 The virtual circuit and related managed objects
---5.11.1 The virtual managed object
--- This MO Class is never instantiated. It serves as a generic Virtual Circuit MO from which both the
--- Virtual Circuit DTE and Virtual Circuit DCE MOs are derived.
--- Note that the values of the virtualCircuitId naming attribute are
--- required to be unique across all instances of MOs derived from this
--- which have a common superior.
+--
+-- 5.11 The virtual circuit and related managed objects
+--
+-- 5.11.1 The virtual managed object
+--
+-- This MO Class is never instantiated. It serves as a generic Virtual Circuit MO from which both 
+-- the Virtual Circuit DTE and Virtual Circuit DCE MOs are derived.  Note that the values of the 
+-- virtualCircuitId naming attribute are required to be unique across all instances of MOs derived 
+-- from this which have a common superior.
 --
 
 
@@ -3233,12 +3231,13 @@ virtualCircuit MANAGED OBJECT CLASS
 				"DMI":objectCreation,
 				"DMI":objectDeletion;;;
 REGISTERED AS { NLM.moi virtualCircuit(14) };
---5.11.2 The virtual circuit DTE managed object
--- This MO Class is never instantiated. It serves as a generic Virtual Circuit DTE MO from which both the
--- Virtual Call DTE and the Permanent Virtual Circuit DTE MOs are derived.
--- Note that the values of the virtualCircuitId naming attribute are
--- required to be unique across all instances of MOs derived from this
--- which have a common superior.
+--
+-- 5.11.2 The virtual circuit DTE managed object
+--
+-- This MO Class is never instantiated. It serves as a generic Virtual Circuit DTE MO from which 
+-- both the Virtual Call DTE and the Permanent Virtual Circuit DTE MOs are derived.  Note that the 
+-- values of the virtualCircuitId naming attribute are required to be unique across all instances of 
+-- MOs derived from this which have a common superior.
 --
 
 
@@ -3250,12 +3249,13 @@ virtualCircuit-DTE MANAGED OBJECT CLASS
 			PRESENT IF
 				!the instance supports the dTEVirtualCircuitCounters capabilities!;
 REGISTERED AS { NLM.moi virtualCircuit-DTE(18) };
---5.11.3 The virtual circuit DCE managed object
--- This MO Class is never instantiated. It serves as a generic Virtual Circuit DCE MO from which both the
--- Virtual Call DCE and the Permanent Virtual Circuit DCE MOs are derived.
--- Note that the values of the virtualCircuitId naming attribute are
--- required to be unique across all instances of MOs derived from this
--- which have a common superior.
+--
+-- 5.11.3 The virtual circuit DCE managed object
+--
+-- This MO Class is never instantiated. It serves as a generic Virtual Circuit DCE MO from which 
+-- both the Virtual Call DCE and the Permanent Virtual Circuit DCE MOs are derived.  Note that the 
+-- values of the virtualCircuitId naming attribute are required to be unique across all instances of 
+-- MOs derived from this which have a common superior.
 --
 
 
@@ -3267,9 +3267,11 @@ virtualCircuit-DCE MANAGED OBJECT CLASS
 			PRESENT IF
 				!the instance supports the dCECommonVirtualCircuitCounters capabilities!;
 REGISTERED AS { NLM.moi virtualCircuit-DCE(29) };
---5.11.4 The permanent virtual circuit DTE managed object
--- An instance of this MO exists for each Permanent Virtual Circuit.
--- It may be both created and deleted by management.
+--
+-- 5.11.4 The permanent virtual circuit DTE managed object
+--
+-- An instance of this MO exists for each Permanent Virtual Circuit.  It may be both created and 
+-- deleted by management.
 --
 
 
@@ -3305,8 +3307,10 @@ permanentVirtualCircuit-DTE MANAGED OBJECT CLASS
 						optionalCMIPIV-B
 					;;;
 REGISTERED AS { NLM.moi permanentVirtualCircuit-DTE(19) };
---5.11.5 The permanent virtual circuit DCE managed object
--- An instance of this MO exists for each Permanent Virtual Circuit. It may be both created and
+--
+-- 5.11.5 The permanent virtual circuit DCE managed object
+--
+-- An instance of this MO exists for each Permanent Virtual Circuit. It may be both created and 
 -- deleted by management.
 --
 
@@ -3354,14 +3358,15 @@ permanentVirtualCircuit-DCE MANAGED OBJECT CLASS
 			NOTIFICATIONS
 				"DMI":stateChange;;;
 REGISTERED AS { NLM.moi permanentVirtualCircuit-DCE(30) };
---5.11.6 The virtual call initial values managed object
--- There may be multiple instances of the virtualCallIVMO in a system.
--- A virtualCallIVMO may be used to supply initial
--- values for the attributes of the virtualCall-DTE or virtualCall-DCE MO.
+--
+-- 5.11.6 The virtual call initial values managed object
+--
+-- There may be multiple instances of the virtualCallIVMO in a system.  A virtualCallIVMO may be 
+-- used to supply initial values for the attributes of the virtualCall-DTE or virtualCall-DCE MO.  
 -- Different instances of virtualCallIVMO may contain different initial values.
 --
--- Its definition permits it to be created and deleted explicitly by
--- management operation.
+-- Its definition permits it to be created and deleted explicitly by management operation.
+--
 
 
 virtualCallIVMO MANAGED OBJECT CLASS
@@ -3382,17 +3387,18 @@ virtualCallIVMO MANAGED OBJECT CLASS
 				"DMI":objectCreation,
 				"DMI":objectDeletion;;;
 REGISTERED AS { NLM.moi virtualCallIVMO(15) };
---5.11.7 The virtual call DTE managed object
--- An instance of this MO exists for each Virtual Call. It is not created by
--- management, but by the operation of the protocol state machine.
--- An existing instance may, however, be deactivated by management action,
--- which will cause the associated VC to be cleared.
 --
--- An instance of this MO is created and exists as long as real resources
--- are consumed by the existence of the virtual call. It is an implementation
--- matter to determine the point during call establishment when real
--- resources are consumed, and conversely, when during call clearing,
--- when they are released.
+-- 5.11.7 The virtual call DTE managed object
+--
+-- An instance of this MO exists for each Virtual Call. It is not created by management, but by the 
+-- operation of the protocol state machine.  An existing instance may, however, be deactivated by 
+-- management action, which will cause the associated VC to be cleared.
+--
+-- An instance of this MO is created and exists as long as real resources are consumed by the 
+-- existence of the virtual call. It is an implementation matter to determine the point during call 
+-- establishment when real resources are consumed, and conversely, when during call clearing, when 
+-- they are released.
+--
 
 
 virtualCall-DTE MANAGED OBJECT CLASS
@@ -3417,10 +3423,14 @@ virtualCall-DTE MANAGED OBJECT CLASS
 			NOTIFICATIONS
 				"GMI":communicationsInformation;;;
 REGISTERED AS { NLM.moi virtualCall-DTE(16) };
---5.11.8 The virtual call DCE managed object
--- An instance of this MO is created and exists as long as real resources are consumed by the existence
--- of the Virtual Call. It is an implementation matter to determine the point during a call establishment
--- when real resources are consumed, and conversely, when during call clearing, when they are released.
+--
+-- 5.11.8 The virtual call DCE managed object
+--
+-- An instance of this MO is created and exists as long as real resources are consumed by the 
+-- existence of the Virtual Call. It is an implementation matter to determine the point during a 
+-- call establishment when real resources are consumed, and conversely, when during call clearing, 
+-- when they are released.
+--
 
 
 virtualCall-DCE MANAGED OBJECT CLASS
@@ -3447,12 +3457,14 @@ virtualCall-DCE MANAGED OBJECT CLASS
 			PRESENT IF
 				!the instance supports the dCEVirtualCallFacilities capabilities!;
 REGISTERED AS { NLM.moi virtualCall-DCE(31) };
---5.11.9 The Recommendation D Series counts managed object
--- There is one instance of this MO created by management action or
--- automatically for each instance of a virtual call where the Tariff
--- Principles applying to Data Communications Services over dedicated
--- Public Data Networks are applicable. The provisions of the tariff
--- principles are defined in Recommendations D.10, D.11 and D.12.
+--
+-- 5.11.9 The Recommendation D Series counts managed object
+--
+-- There is one instance of this MO created by management action or automatically for each instance 
+-- of a virtual call where the Tariff Principles applying to Data Communications Services over 
+-- dedicated Public Data Networks are applicable. The provisions of the tariff principles are 
+-- defined in Recommendations D.10, D.11 and D.12.
+--
 
 
 dSeriesCounts MANAGED OBJECT CLASS
@@ -3494,9 +3506,8 @@ dTEVirtualCircuitCounters-P PACKAGE
 		-- Note that the DMI definition is in terms of user data octets.
 		dataPacketsReceived GET,
 		dataPacketsSent GET,
-		-- Note the "DMI":PDUsSentCounter
-		-- cannot be used here since it is defined as total number of PDUs sent,
-		-- not just data PDUs.
+		-- Note the "DMI":PDUsSentCounter cannot be used here since it is defined as total 
+		-- number of PDUs sent, not just data PDUs.
 		dataRetransmissionTimerExpiries GET,
 		interruptPacketsReceived GET,
 		interruptPacketsSent GET,
@@ -3712,8 +3723,8 @@ REGISTERED AS { NLM.aoi bilateralCUGSelection(126) };
 
 calledAddressExtension ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX NLM.NAddress;
-	-- In the OSI context this will always be an NSAP address but in other uses
-	-- it may not. In any case it may be null, for example, when used by ITU-T Rec. X.233 | ISO/IEC 8473-1.
+	-- In the OSI context this will always be an NSAP address but in other uses it may not. In 
+	-- any case it may be null, for example, when used by ITU-T Rec. X.233 | ISO/IEC 8473-1.
 	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		calledAddressExtension-B BEHAVIOUR
@@ -3735,8 +3746,8 @@ REGISTERED AS { NLM.aoi calledLineAddressModifiedNotification(128) };
 
 callingAddressExtension ATTRIBUTE
 	WITH ATTRIBUTE SYNTAX NLM.NAddress;
-	-- In the OSI context this will always be an NSAP address but in other uses
-	-- it may not. In any case it may be null, for example, when used by ITU-T Rec. X.233 | ISO/IEC 8473-1.
+	-- In the OSI context this will always be an NSAP address but in other uses it may not. In 
+	-- any case it may be null, for example, when used by ITU-T Rec. X.233 | ISO/IEC 8473-1.
 	MATCHES FOR EQUALITY, SUBSTRINGS;
 	BEHAVIOUR
 		callingAddressExtension-B BEHAVIOUR
@@ -4025,9 +4036,12 @@ END
 --  =============================================================================
 --  
 --  $Log: X.283.1997.gdmo,v $
+--  Revision 0.9.2.2  2007/09/09 22:58:49  brian
+--  - updates for namespace
+--
 --  Revision 0.9.2.1  2007/09/06 10:59:02  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
 --< GDMO.EndDocument "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" >--
@@ -4142,5 +4156,4 @@ END
 --@@ |  >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":dSeriesCounts
 --@@ >- "ITU-T Rec. X.283 (1997) | ISO/IEC 10733: 1998":virtualCall_DCE +++
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

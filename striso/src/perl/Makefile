@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:58:59 $
+# @(#) $RCSfile: Makefile,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:48 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -45,11 +45,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/09/06 10:58:59 $ by $Author: brian $
+# Last Modified $Date: 2007/09/09 22:58:48 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: Makefile,v $
+# Revision 0.9.2.2  2007/09/09 22:58:48  brian
+# - updates for namespace
+#
 # Revision 0.9.2.1  2007/09/06 10:58:59  brian
 # - added new gdmo files
 #
@@ -88,7 +91,8 @@ GDMOS = \
 	X.748.gdmo \
 	EN300292.gdmo \
 	ES200653.gdmo \
-	ES201097-1.gdmo
+	ES201097-1.gdmo \
+	G.855.1.gdmo
 
 NEW_GDMOS = $(GDMOS:%.gdmo=%.new.gdmo)
 HEADERS = $(GDMOS:%.gdmo=%.hh)
@@ -142,6 +146,12 @@ all: $(NEW_GDMOS)
 
 # $(HEADERS) $(STUBFILES)
 
+gdmos: $(NEW_GDMOS)
+
+headers: $(HEADERS)
+
+stubs: $(STUBFILES)
+
 $(NEW_GDMOS) : %.new.gdmo : %.gdmo
 	./gdmocheck $< > $@
 
@@ -151,11 +161,11 @@ $(HEADERS) : %.hh : %.gdmo
 $(STUBFILES) : %.stub.cpp : %.gdmo
 	./gdmostub $< > $@
 
-$(NEW_GDMOS) : Makefile gdmocheck
+$(NEW_GDMOS) : gdmocheck
 
-$(HEADERS) : Makefile gdmocheck
+$(HEADERS) : gdmocheck
 
-$(STUBFILES) : Makefile gdmocheck
+$(STUBFILES) : gdmocheck
 
 clean:
 	rm -fv $(NEW_GDMOS) $(HEADERS) $(STUBFILES)
