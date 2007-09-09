@@ -1,0 +1,125 @@
+-- 10 Abstract syntax
+-- 10.1 Rules of extensibility
+-- The following types will be indicated as being extensible:
+--  ENUMERATED;
+--  named INTEGER;
+--  named BIT STRING;
+--  tagged SET;
+--  tagged SEQUENCE;
+--  tagged CHOICE.
+-- Under the rules of extensibility, new enumerations (for ENUMERATED types), new bit name
+-- assignments (for named BIT STRING types), new named numbers (for named INTEGER types), and
+-- new tagged elements (for tagged SET, SEQUENCE, and CHOICE types) may be added in future
+-- versions of this Recommendation.
+-- When processing information in a System Management Application Protocol (SMAP) PDU, the
+-- accepting SMAP-machine shall ignore:
+--  enumerations not recognized;
+--  unrecognized named numbers;
+--  unrecognized named bits;
+--  unrecognized tagged elements of sets, sequences, and choices.
+-- 10.2 ASN.1 Module
+G85501-ASN1TypeModule {itu-t recommendation g gntm(85501) informationModel(0) asn1Modules(2)
+asn1TypeModule(0)}
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+AdditionalInformation, AdministrativeState, AvailabilityStatus, OperationalState,
+PerceivedSeverity, ProbableCause
+FROM Attribute-ASN1Module{joint-iso-ccitt ms(9) smi (3) part2 (2) asn1Module(2) 1}
+Directionality, Failed, ObjectList, ProblemCause, UserLabel
+FROM ASN1DefinedTypesModule
+{ccitt recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2)
+asn1DefinedTypesModule(0)}
+Capacity, Capacities, Count, CTPList, LinkConnectionList, LinkEnd, None, UserIdentifier,
+LinkDirectionality, ConnectivityEndPoint, TPList, SignalId FROM M3100ASN1TypeModule2 {itu-t
+recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1Module2(1)}
+ObjectInstance
+FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+DistinguishedName
+FROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)} ;
+-- NOTE  This Recommendation imports DistinguishedName from CCITT Rec. X.501 (1988). The
+-- specification for this syntax can now be found in an informative annex of
+-- Rec. X.711 (1997) | ISO/IEC 9596-1:1998.
+g85501ClassLibrary OBJECT IDENTIFIER ::= {itu-t recommendation g gntm(85501) informationModel(0)}
+g85501MObjectClass OBJECT IDENTIFIER ::= {g85501ClassLibrary managedObjectClass(3)}
+g85501Attribute OBJECT IDENTIFIER ::= {g85501ClassLibrary attribute(7)}
+g85501NameBinding OBJECT IDENTIFIER ::= {g85501ClassLibrary nameBinding(6)}
+g85501Package OBJECT IDENTIFIER ::= {g85501ClassLibrary package(4)}
+g85501Action OBJECT IDENTIFIER ::= {g85501ClassLibrary action(9)}
+g85501Notification OBJECT IDENTIFIER ::= {g85501ClassLibrary notification(10)}
+g85501SpecificError OBJECT IDENTIFIER ::= {g85501ClassLibrary specificError(12)}
+AssociateNetworkTTPWithTopologicalLinkEndInformation ::= SEQUENCE {
+linkEnd ObjectInstance,
+networkTTP ObjectInstance,
+...
+}
+AssociateNetworkTTPWithTopologicalLinkEndResult ::= SEQUENCE {
+potentialCapacity Capacity,
+networkCTPs CTPList,
+...
+}
+AssociateTrailWithTopologicalLinkInformation ::= SEQUENCE {
+link ObjectInstance,
+trail ObjectInstance,
+...
+}
+AssociateTrailWithTopologicalLinkResult ::= SEQUENCE {
+potentialCapacity Capacity,
+resultingLinkConnections LinkConnectionList,
+...
+}
+DisassociateNWTTPFromTopLinkEndInformation::= SEQUENCE {
+linkEnd [1] ObjectInstance,
+networkTTP [2] ObjectInstance OPTIONAL,
+...
+}
+DisassociateTrailFromTopLinkInformation ::= SEQUENCE {
+link [1] ObjectInstance,
+trail [2] ObjectInstance OPTIONAL,
+...
+}
+EstablishLogicalLinkAndEndsResult ::= SEQUENCE {
+link ObjectInstance,
+aEnd ObjectInstance,
+zEnd ObjectInstance,
+...
+}
+EstablishLogicalLinkInformation ::= SEQUENCE {
+layerNetworkDomain ObjectInstance,
+aEnd LinkEnd,
+zEnd LinkEnd,
+suppliedUserIdentifier [1] UserIdentifier OPTIONAL,
+SetupSncInformation ::= SEQUENCE {
+aEnd SET OF ConnectivityEndPoint,
+zEnd SET OF ConnectivityEndPoint,
+directionality Directionality,
+signalid [1] SignalId OPTIONAL,
+qofConnectivityService [2] QofConnectivityService OPTIONAL,
+implicitTPCreation [8] Implicit OPTIONAL,
+...
+}
+SetupSncResult ::= SEQUENCE {
+connection ObjectInstance,
+aEnd ObjectInstance,
+zEnd ObjectInstance,
+userId UserIdentifier OPTIONAL,
+...
+}
+SetupTrailInformation ::= SEQUENCE {
+aEnd SET OF ConnectivityEndPoint,
+zEnd SET OF ConnectivityEndPoint,
+directionality Directionality,
+additionalInformation [2] AdditionalInformation OPTIONAL,
+qofConnectivityService [3] QofConnectivityService OPTIONAL,
+userId [0] UserIdentifier OPTIONAL,
+userLabel [1] UserLabel OPTIONAL,
+...
+}
+SetupTrailResult ::= SEQUENCE {
+trailId ObjectInstance,
+aEnds SET OF ObjectInstance,
+zEnds SET OF ObjectInstance,
+...
+}
+END
