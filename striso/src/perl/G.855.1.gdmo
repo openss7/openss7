@@ -1,0 +1,1506 @@
+--@@ GDMOCHECK $Revision: 0.9.2.1 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sun Sep  9 06:14:45 MDT 2007
+--@@ 
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "ITU-T Rec. Q.855.1 (1999)" >--
+--< GDMO.Namespace g855_1 >--
+MODULE "ITU-T Rec. Q.855.1 (1999)"
+-- 5.1 Basic Layer Network Domain
+
+basicLayerNetworkDomain MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100:1995":layerNetworkDomain;
+	CHARACTERIZED BY
+		basicTrailHandlerPackage,
+		basicLayerNetworkDomainPackage PACKAGE
+			BEHAVIOUR
+				basicLayerNetworkDomainBehaviour BEHAVIOUR
+					DEFINED AS
+						"
+						The basicLayerNetworkDomain object class is a class of managed objects that 
+						manages the immediate set-up and release of trails.
+						It provides the following functionality:
+						1) Immediate trail set-up;
+						<G.854.6,OPERATION:setupPointToPointTrail>
+						2) Trail release.
+						<G.854.6,OPERATION:releaseTrail>";;;;
+	CONDITIONAL PACKAGES
+		topologicalLinkHandlerPackage
+			PRESENT IF
+				"management of topological links is supported",
+		topologicalLinkEndHandlerPackage
+			PRESENT IF
+				"management of topological link ends is supported",
+		logicalLinkEndHandlerPackage
+			PRESENT IF
+				"management of link ends is supported",
+		logicalLinkHandlerPackage
+			PRESENT IF
+				"management of links is supported";
+REGISTERED AS { g85501MObjectClass 1 };
+-- 5.2 Basic SubNetwork
+
+
+basicSubNetwork MANAGED OBJECT CLASS
+	DERIVED FROM
+		"Recommendation M.3100:1995":subNetwork;
+	CHARACTERIZED BY
+		basicConnectionPerformerPackage,
+		basicSubNetworkPackage PACKAGE
+			BEHAVIOUR
+				basicSubNetworkBehaviour BEHAVIOUR
+					DEFINED AS
+						"
+						The basicSubNetwork object class is a class of managed objects that manages the 
+						setup and release of Subnetwork Connections, under the control of a manager.
+						<G.853.1,RELATIONSHIP:subnetworkHasSubnetworkConnections>";;;;
+REGISTERED AS { g85501MObjectClass 2 };
+-- 6 Packages
+-- 6.1 Basic Connection Performer Package
+
+
+basicConnectionPerformerPackage PACKAGE
+	BEHAVIOUR
+		basicConnectionPerformerBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				The Basic Connection Performer object class provides basic connection set-up 
+				functionality.
+				The action SetupSubNetworkConnection sets up a Subnetwork Connection, and 
+				releaseSubNetworkConnection removes the Subnetwork connection.";;
+	ACTIONS
+		setupSnc,
+		releaseSnc;
+REGISTERED AS { g85501Package 1 };
+-- 6.2 Basic Trail Handler Package
+
+
+basicTrailHandlerPackage PACKAGE
+	BEHAVIOUR
+		basicTrailHandlerBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				Immediate trail set-up. When it receives the setupTrail request, the agent has 
+				the responsibility to:
+				1) find a route for the trail;
+				2) set up any required subnetwork connections;
+				3) ensure that the trail object instance has been created with the correct 
+				   initial values.
+				4) inform the service user of the result of its request.
+				Trail release:
+				When it receives the releaseTrail request, the agent has the responsibility to:
+				1) release any used subnetwork connections; Update network resource usage 
+				   (configuration) information;
+				2) inform the service user of the result of its request.";;
+	ACTIONS
+		setupTrail,
+		releaseTrail;
+REGISTERED AS { g85501Package 2 };
+-- 6.3 Logical Link End Handler Package
+
+
+logicalLinkEndHandlerPackage PACKAGE
+	BEHAVIOUR
+		logicalLinkEndHandlerPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This package provides the support for the orderly creation and deletion of a 
+				logical link end.";;
+	ACTIONS
+		establishLogicalLinkAndEnds,
+		removeLogicalLinkAndEnds;
+REGISTERED AS { g85501Package 3 };
+-- 6.4 Logical Link Handler Package
+
+
+logicalLinkHandlerPackage PACKAGE
+	BEHAVIOUR
+		logicalLinkHandlerPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This package provides the support for the orderly creation and deletion of a 
+				logical link.";;
+	ACTIONS
+		establishLogicalLink,
+		removeLogicalLink;
+REGISTERED AS { g85501Package 4 };
+-- 6.5 Topological Link End Handler Package
+
+
+topologicalLinkEndHandlerPackage PACKAGE
+	BEHAVIOUR
+		topologicalLinkEndHandlerPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This package provides the support for the orderly creation and deletion of a 
+				topological link end. It also provides actions to enable an unassigned 
+				topological link end to be assigned to a server network TTP and an assigned 
+				topological link end to be de-assigned.";;
+	ACTIONS
+		associateNetworkTTPWithTopologicalLinkEnd,
+		disassociateNetworkTTPFromTopologicalLinkEnd,
+		establishTopologicalLinkAndEnds,
+		removeTopologicalLinkAndEnds;
+REGISTERED AS { g85501Package 5 };
+-- 6.6 Topological Link Handler Package
+
+
+topologicalLinkHandlerPackage PACKAGE
+	BEHAVIOUR
+		topologicalLinkHandlerPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This package provides the support for the orderly creation and deletion of a 
+				topological link. It also provides actions to enable an unassigned topological 
+				link to be assigned to a server trail and an assigned topological link to be 
+				de-assigned.";;
+	ACTIONS
+		associateTrailWithTopologicalLink,
+		disassociateTrailFromTopologicalLink,
+		establishTopologicalLink,
+		removeTopologicalLink;
+REGISTERED AS { g85501Package 6 };
+-- 7 Actions
+-- NOTE  For all actions below:
+-- The use of local name for object instance may not be appropriate when the names are exchanged between
+-- different Administrations and in the context for which the local root is not defined.
+-- 7.1 Associate a Network TTP with a Topological Link End
+
+
+associateNetworkTTPWithTopologicalLinkEnd ACTION
+	BEHAVIOUR
+		associateNetworkTTPWithTopologicalLinkEndBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action associates a networkTTP in the server layer with a topological link 
+				end in the client layer. There may be one and only one networkTTP associated 
+				with one topological link end.
+				The result of action returns the potential capacity of the link and a list of 
+				the available network CTPs. 
+				<G.854.8,OPERATION:associateNetworkTTPWithTopologicalLinkEnd>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		"Recommendation M.3100:1995":noSuchLinkEnd,
+		noSuchNetworkTTP,
+		linkEndAndNetworkTTPsNotCompatible,
+		initialCapacitiesFailure,
+		networkTTPAlreadyAssociated,
+		finalCapacitiesFailure,
+		consistencyFailure,
+		failureToAssociate;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.AssociateNetworkTTPWithTopologicalLinkEndInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.AssociateNetworkTTPWithTopologicalLinkEndResult;
+REGISTERED AS { g85501Action 1 };
+-- 7.2 Associate Trail with Topological Link
+
+
+associateTrailWithTopologicalLink ACTION
+	BEHAVIOUR
+		associateTrailWithTopologicalLinkBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action associates a trail in the server layer with a topological link in 
+				the client layer.
+				There may be one and only one server trail associated with one topological link.
+				<G.854.8,OPERATION:associateTrailWithTopologicalLink>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		"Recommendation M.3100:1995":noSuchLink,
+		noSuchTrail,
+		linkAndTrailsNotCompatible,
+		initialCapacitiesFailure,
+		trailAlreadyAssociated,
+		finalCapacitiesFailure,
+		consistencyFailure,
+		failureToAssociate;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.AssociateTrailWithTopologicalLinkInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.AssociateTrailWithTopologicalLinkResult;
+REGISTERED AS { g85501Action 2 };
+-- 7.3 Disassociate NetworkTTP from Topological Link End
+
+
+disassociateNetworkTTPFromTopologicalLinkEnd ACTION
+	BEHAVIOUR
+		disassociateNetworkTTPFromTopologicalLinkEndBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action disassociates the server layer network TTP from the topological link 
+				end in the client layer.
+				<G.854.8,OPERATION:disassociateNetworkTTPFromTopologicalLinkEnd>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		"Recommendation M.3100:1995":noSuchLinkEnd,
+		noSuchNetworkTTP,
+		networkTTPNotAssociated,
+		capacityProvisionned,
+		finalCapacitiesFailure;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.DisassociateNWTTPFromTopLinkEndInformation;
+REGISTERED AS { g85501Action 3 };
+-- 7.4 Disassociate Trail from Topological Link
+
+
+disassociateTrailFromTopologicalLink ACTION
+	BEHAVIOUR
+		disassociateTrailFromTopologicalLinkBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action disassociates a server layer trail from the topological link in the 
+				client layer that it supports.
+				<G.854.8,OPERATION:disassociateTrailFromTopologicalLink>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		"Recommendation M.3100:1995":noSuchLink,
+		noSuchTrail,
+		trailNotAssociated,
+		capacityProvisionned,
+		finalCapacitiesFailure,
+		failureToDisassociate;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.DisassociateTrailFromTopLinkInformation;
+REGISTERED AS { g85501Action 4 };
+-- 7.5 Establish Logical Link
+
+
+establishLogicalLink ACTION
+	BEHAVIOUR
+		establishLogicalLinkBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action creates a logical link between either:
+				- two subnetworks; or
+				- two access groups; or
+				- a subnetwork and an access group; or
+				- an access group and a subnetwork.
+				The two end-points are specified in the information in the action request.
+				The linkPointerList attribute of the associated subnetwork managed objects will 
+				be modified to reflect the creation of the logical link.
+				A logical link managed object is created as a result of this action. The name of 
+				the logical link is returned in the action result. 
+				<G.854.3,OPERATION:createLink>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		incorrectLinkEnds,
+		userIdentifierNotUnique,
+		"Recommendation M.3100:1995":failureToSetUserIdentifier,
+		"Recommendation M.3100:1995":failureToCreateLink,
+		"Recommendation M.3100:1995":failureToBindLink,
+		failureToSetDirectionality;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.EstablishLogicalLinkInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.EstablishLogicalLinkResult;
+REGISTERED AS { g85501Action 5 };
+-- 7.6 Establish Logical Link and Logical Link Ends
+
+
+establishLogicalLinkAndEnds ACTION
+	BEHAVIOUR
+		establishLogicalLinkAndEndsBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action creates a logical link between and the logical link ends were the 
+				logical link connects:
+				- two subnetworks; or
+				- two access groups; or
+				- a subnetwork and an access group; or
+				- an access group and a subnetwork.
+				A logical link and two logical link end managed objects are created as result of 
+				this action. The name of the logical link and the names of the logical link ends 
+				are returned in the action result.
+				<G.854.3,OPERATION:createLink>
+				<G.854.3,OPERATION:createLinkEnd>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		userIdentifierNotUnique,
+		incorrectSubnetwork,
+		"Recommendation M.3100:1995":failureToCreateLinkEnd,
+		"Recommendation M.3100:1995":failureToBindLinkEnd,
+		"Recommendation M.3100:1995":failureToSetUserIdentifier,
+		failureToSetDirectionality;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.EstablishLogicalLinkInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.EstablishLogicalLinkAndEndsResult;
+REGISTERED AS { g85501Action 6 };
+-- 7.7 Establish Topological Link
+
+
+establishTopologicalLink ACTION
+	BEHAVIOUR
+		establishTopologicalLinkBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action creates a topological link between which connects:
+				- two subnetworks; or
+				- two access groups; or
+				- a subnetwork and an access group; or
+				- an access group and a subnetwork.
+				A topological link managed object is created as result of this action. The name 
+				of the topological link is returned in the action result.
+				<G.854.3,OPERATION:createTopologicalLink>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		incorrectLinkEnds,
+		userIdentifierNotUnique,
+		"Recommendation M.3100:1995":failureToSetUserIdentifier,
+		failureToCreateTopologicalLink,
+		"Recommendation M.3100:1995":failureToBindTopologicalLink,
+		failureToSetDirectionality;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.EstablishTopologicalLinkInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.EstablishTopologicalLinkResult;
+REGISTERED AS { g85501Action 7 };
+-- 7.8 Establish Topological Link and Link Ends
+
+
+establishTopologicalLinkAndEnds ACTION
+	BEHAVIOUR
+		establishTopologicalLinkAndEndsBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action creates a topological link between and the topological link ends 
+				were the topological link connects:
+				- two subnetworks; or
+				- two access groups; or
+				- a subnetwork and an access group; or
+				- an access group and a subnetwork.
+				A topological link and two topological link end managed objects are created as 
+				result of this action. The name of the topological link and the names of the 
+				topological link ends are returned in the action result.
+				<G.854.3,OPERATION:createTopologicalLink>
+				<G.854.3,OPERATION:createTopologicalLinkEnd>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		incorrectLinkEnds,
+		userIdentifierNotUnique,
+		incorrectSubnetwork,
+		"Recommendation M.3100:1995":failureToCreateLinkEnd,
+		"Recommendation M.3100:1995":failureToBindLinkEnd,
+		"Recommendation M.3100:1995":failureToSetUserIdentifier,
+		failureToSetDirectionality;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.EstablishTopologicalLinkInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.EstablishTopologicalLinkAndEndsResult;
+REGISTERED AS { g85501Action 8 };
+-- 7.9 Release Subnetwork Connection
+
+
+releaseSnc ACTION
+	BEHAVIOUR
+		releaseSncBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action is used to release Subnetwork Connection(s). The Subnetwork 
+				Connection pointed to by the compositePointer attribute will also be cleared 
+				down by this action. If a Link End is involved in the Subnetwork Connection, its 
+				attributes idleNWCTPCount, and connectedNWCTPCount will be updated as a result 
+				of this action. If implicit TP creation is used, the associated TPs will be 
+				deleted when the subnetwork connection is released.
+				<G.852.1,sscc2:Release Point to Point SNC>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		noSuchSnc,
+		sncConnected,
+		failureToRelease;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.ReleaseSncInformation;
+REGISTERED AS { g85501Action 9 };
+-- 7.10 Release Trail
+
+
+releaseTrail ACTION
+	BEHAVIOUR
+		releaseTrailBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action is used to release a Trail. The link connections pointed to by the 
+				clientConnectionList and the subnetwork connections pointed to by the layer 
+				connection list package will also be released by this action.
+				If successful, the connectivityPointer in the disconnected network trail 
+				termination points will be set to NULL as a result of this action.
+				<G.854.6,OPERATION:releaseTrail>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		unknownTrail,
+		trailConnected;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.ReleaseTrailInformation;
+REGISTERED AS { g85501Action 10 };
+-- 7.11 Remove Logical Link
+
+
+removeLogicalLink ACTION
+	BEHAVIOUR
+		removeLinkBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action deletes a logical link.
+				The linkPointerList attribute of the associated subnetworks will be modified to 
+				reflect the deletion of the logical link.
+				<G.854.3,OPERATION:deleteLink>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		incorrectLink,
+		linkConnectionsExisting,
+		failureToDeleteLink;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.RemoveLogicalLinkInformation;
+REGISTERED AS { g85501Action 11 };
+-- 7.12 Remove Logical Link and Logical Link Ends
+
+
+removeLogicalLinkAndEnds ACTION
+	BEHAVIOUR
+		removeLogicalLinkAndEndsBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action removes the logical link and logical link end managed objects that 
+				represent a link.
+				The linkPointerList attribute of the associated subnetworks will be modified to 
+				reflect the deletion of the link.
+				<G.854.3,OPERATION:deleteLink>
+				<G.854.3,OPERATION:deleteLinkEnd>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		incorrectLink,
+		incorrectLinkEnds,
+		networkCTPsExisting,
+		linkConnectionsExisting,
+		failureToDeleteLink;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.RemoveLogicalLinkInformation;
+REGISTERED AS { g85501Action 12 };
+-- 7.13 Remove Topological Link
+
+
+removeTopologicalLink ACTION
+	BEHAVIOUR
+		removeTopologicalLinkBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action deletes a topological link.
+				The linkPointerList attribute of the associated subnetworks will be modified to 
+				reflect the deletion of the topological link.
+				<G.854.3,OPERATION:deleteTopologicalLink>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		"Recommendation M.3100:1995":noSuchLink,
+		linkConnectionsExisting,
+		failureToDeleteLink;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.RemoveTopologicalLinkInformation;
+REGISTERED AS { g85501Action 13 };
+-- 7.14 Remove Topological Link and Link Ends
+
+
+removeTopologicalLinkAndEnds ACTION
+	BEHAVIOUR
+		removeTopologicalLinkAndEndsBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action deletes a topological link and the topological link end managed 
+				objects that represent a topological link.
+				<G.854.3,OPERATION:deleteTopologicalLinkAndEnds>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		"Recommendation M.3100:1995":noSuchLinkEnd,
+		networkCTPsExisting,
+		failureToDeleteTopologicalLinkEnd;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.RemoveTopLinkAndEndsInformation;
+REGISTERED AS { g85501Action 14 };
+-- 7.15 Set up Subnetwork Connection
+
+
+setupSnc ACTION
+	BEHAVIOUR
+		setupSncBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action is used to set up a Subnetwork Connection between network 
+				termination points.
+				If a Link End is involved in the Subnetwork Connection, its attributes 
+				idleNWCTPCount, and connectedNWCTPCount will be updated as a result of this 
+				action.
+				<G.854.01,sscc1:TSetup Point to Point SNCs>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		invalidTransportServiceCharacteristics,
+		incorrectSubnetworkTerminationPoints,
+		aEndNetworkTPConnected,
+		zEndNetworkTPConnected,
+		wrongAEndDirectionality,
+		wrongZEndDirectionality,
+		failureToConnect,
+		"Recommendation M.3100:1995":failureToSetUserIdentifier;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.SetupSncInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.SetupSncResult;
+REGISTERED AS { g85501Action 15 };
+-- 7.16 Set up Trail
+
+
+setupTrail ACTION
+	BEHAVIOUR
+		setupTrailBehaviour BEHAVIOUR
+			DEFINED AS
+				"
+				This action is used to set up a Trail between network trail termination points. 
+				The trail termination points to be connected can be specified in one of two 
+				ways: by explicitly identifying the network trail termination points, or by 
+				specifying one or more Access Groups from which any idle network trail 
+				termination point may be used. The result, if successful, always returns an 
+				explicit list of network TTPs.
+				This action will fail if any of the network termination points specified is 
+				already involved in a Trail. The Trail will have a directionality 
+				(unidirectional or bidirectional) as specified in the action parameter 
+				directionality. The identifier of the client will be passed to the server and 
+				will be logged by the server against the identifier of the created Trail.
+				<G.854.6,OPERATION:setup point-to-point Trail>";;
+	MODE CONFIRMED;
+	PARAMETERS
+		networkTTPsNotPartOfLayerND,
+		aEndNetworkTPConnected,
+		networkTTPsInAEndAccessGroupConnected,
+		zEndNetworkTPConnected,
+		networkTTPsInZEndAccessGroupConnected,
+		userIdentifierNotUnique,
+		"Recommendation M.3100:1995":failureToSetUserIdentifier,
+		"Recommendation M.3100:1995":invalidTPType,
+		invalidTrail,
+		wrongAEndDirectionality,
+		wrongZEndDirectionality,
+		invalidTransportServiceCharacteristics,
+		invalidTrafficDescriptor;
+	WITH INFORMATION SYNTAX G85501-ASN1TypeModule.SetupTrailInformation;
+	WITH REPLY SYNTAX G85501-ASN1TypeModule.SetupTrailResult;
+REGISTERED AS { g85501Action 16 };
+-- 8 Notifications
+-- None.
+-- 9 Parameters
+
+
+aEndNetworkTPConnected PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.TPList;
+REGISTERED AS { g85501SpecificError 1 };
+
+
+capacityProvisionned PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Capacities;
+REGISTERED AS { g85501SpecificError 2 };
+
+
+consistencyFailure PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 3 };
+
+
+failureToAssociate PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 4 };
+
+
+failureToConnect PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Failed;
+REGISTERED AS { g85501SpecificError 5 };
+
+
+failureToCreateTopologicalLink PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 6 };
+
+
+failureToDeleteLink PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 7 };
+
+
+failureToDeleteTopologicalLinkEnd PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 8 };
+
+
+failureToDisassociate PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 9 };
+
+
+failureToRelease PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Failed;
+REGISTERED AS { g85501SpecificError 10 };
+
+
+failureToSetDirectionality PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 11 };
+
+
+finalCapacitiesFailure PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Capacities;
+REGISTERED AS { g85501SpecificError 13 };
+
+
+incorrectLink PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 14 };
+
+
+incorrectLinkEnds PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 15 };
+
+
+incorrectSubnetwork PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 16 };
+
+
+incorrectSubnetworkTerminationPoints PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.TPList;
+REGISTERED AS { g85501SpecificError 17 };
+
+
+initialCapacitiesFailure PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Capacities;
+REGISTERED AS { g85501SpecificError 18 };
+
+
+invalidTrafficDescriptor PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 19 };
+
+
+invalidTrail PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 20 };
+
+
+invalidTransportServiceCharacteristics PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 21 };
+
+
+linkAndTrailsNotCompatible PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 23 };
+
+
+linkEndAndNetworkTTPsNotCompatible PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 24 };
+
+
+linkConnectionsExisting PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectList;
+REGISTERED AS { g85501SpecificError 25 };
+
+
+networkCTPsExisting PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.TPList;
+REGISTERED AS { g85501SpecificError 26 };
+
+
+networkTTPAlreadyAssociated PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 27 };
+
+
+networkTTPNotAssociated PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 28 };
+
+
+networkTTPsInAEndAccessGroupConnected PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 29 };
+
+
+networkTTPsInZEndAccessGroupConnected PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 30 };
+
+
+networkTTPsNotPartOfLayerND PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.TPList;
+REGISTERED AS { g85501SpecificError 31 };
+
+
+noSuchNetworkTTP PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 32 };
+
+
+noSuchSnc PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 33 };
+
+
+noSuchTrail PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 34 };
+
+
+trailAlreadyAssociated PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 35 };
+
+
+sncConnected PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.TPList;
+REGISTERED AS { g85501SpecificError 36 };
+
+
+trailConnected PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.ObjectInstance;
+REGISTERED AS { g85501SpecificError 37 };
+
+
+trailNotAssociated PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 38 };
+
+
+unknownSnc PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Count;
+REGISTERED AS { g85501SpecificError 39 };
+
+
+unknownTrail PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.None;
+REGISTERED AS { g85501SpecificError 40 };
+
+
+userIdentifierNotUnique PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.UserIdentifier;
+REGISTERED AS { g85501SpecificError 41 };
+
+
+wrongAEndDirectionality PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Directionality;
+REGISTERED AS { g85501SpecificError 42 };
+
+
+wrongZEndDirectionality PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.Directionality;
+REGISTERED AS { g85501SpecificError 43 };
+
+
+zEndNetworkTPConnected PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX G85501-ASN1TypeModule.TPList;
+REGISTERED AS { g85501SpecificError 44 };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.855.1 (1999)" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
+--@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
+--@@ |  |  +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsInformationRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":scanReportRecord
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":statisticalReportRecord
+--@@ |  |  +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
+--@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":operationResultRecord
+--@@ |  |  +- "Recommendation G.774.3":apsReportRecord
+--@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ +- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":monitorMetric
+--@@ |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":movingAverageMeanMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndMinMaxMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndPercentileMonitor
+--@@ |  |  |  |  +- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":meanAndVarianceMonitor
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":bufferedScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":heterogeneousScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":homogeneousScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":ensembleStatisticScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanScanner
+--@@ |  |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":meanVarianceScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":minMaxScanner
+--@@ |  |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":percentileScanner
+--@@ |  |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  +- "ITU-T Rec. Q.822 (1994)":currentData
+--@@ |  |  +- "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ |  |  |  +- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicScanner
+--@@ |  +- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ +- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringDataObject
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":dailyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":weeklyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":monthlyOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicScheduler
+--@@ |  |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":periodicOperationScheduler
+--@@ |  +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":multiScheduler
+--@@ +- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ +- "CCITT X.521":organization
+--@@ +- "CCITT X.521":organizationalUnit
+--@@ +- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ +- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ +- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ |  +- "ITU-T G.774.1 (02/2001)":pathTerminationHistoryData
+--@@ +- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSink
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "ITU-T Rec. G.774 : 2001":indirectAdaptorSource
+--@@ |  +- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":indirectAdaptorBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  +- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ +- "Recommendation G.774.3":protectionGroupR1
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionGroupR1
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  +- "Recommendation M.3100:1992":protectionGroupR2
+--@@ +- "Recommendation G.774.3":protectionUnit
+--@@ |  +- "Recommendation G.774.3":sdhMSProtectionUnit
+--@@ |  +- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  +- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ +- "Recommendation M.3100:1992":abstractLink
+--@@ |  +- "Recommendation M.3100:1992":logicalLink
+--@@ |  +- "Recommendation M.3100:1992":topologicalLink
+--@@ +- "Recommendation M.3100:1992":abstractLinkEnd
+--@@ |  +- "Recommendation M.3100:1992":abstractLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":logicalLinkEndR1
+--@@ |  +- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  |  +- "Recommendation M.3100:1992":topologicalLinkEndR1
+--@@ +- "Recommendation M.3100:1992":accessGroup
+--@@ +- "Recommendation M.3100:1992":alarmReportingControlManager
+--@@ +- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ +- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ +- "Recommendation M.3100:1992":attributeRanges
+--@@ +- "Recommendation M.3100:1992":circuitEndPointSubgroup
+--@@ +- "Recommendation M.3100:1992":crossConnection
+--@@ |  +- "Recommendation M.3100:1992":crossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedCrossConnection
+--@@ +- "Recommendation M.3100:1992":equipment
+--@@ |  +- "Recommendation M.3100:1992":equipmentR1
+--@@ |  |  +- "Recommendation M.3100:1992":circuitPack
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":circuitPackR1
+--@@ |  |  +- "Recommendation M.3100:1992":equipmentHolder
+--@@ +- "Recommendation M.3100:1992":externalPoint
+--@@ |  +- "Recommendation M.3100:1992":controlPoint
+--@@ |  +- "Recommendation M.3100:1992":scanPoint
+--@@ +- "Recommendation M.3100:1992":fabric
+--@@ |  +- "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ |  +- "Recommendation M.3100:1992":fabricR1
+--@@ |  |  +- "Recommendation M.3100:1992":fabricR2
+--@@ |  |  |  +- "Recommendation M.3100:1992":fabricR3
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":fabricR4
+--@@ +- "Recommendation M.3100:1992":gtp
+--@@ |  +- "Recommendation M.3100:1992":gtpR1
+--@@ +- "Recommendation M.3100:1992":managedElement
+--@@ |  +- "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ |  +- "Recommendation M.3100:1992":managedElementR1
+--@@ |  |  +- "Recommendation M.3100:1992":managedElementR2
+--@@ +- "Recommendation M.3100:1992":managedElementComplex
+--@@ +- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  +- "Recommendation M.3100:1992":mpCrossConnectionR1
+--@@ |  +- "Recommendation M.3100:1992":namedMpCrossConnection
+--@@ +- "Recommendation M.3100:1992":network
+--@@ |  +- "Recommendation M.3100:1992":networkR1
+--@@ |  |  +- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  |  |  +- "Recommendation M.3100:1992":layerNetworkDomainR1
+--@@ |  |  |  +- "ITU-T Rec. Q.855.1 (1999)":basicLayerNetworkDomain
+--@@ +- "Recommendation M.3100:1992":physicalPort
+--@@ +- "Recommendation M.3100:1992":pipe
+--@@ |  +- "Recommendation M.3100:1992":connectionR1
+--@@ |  +- "Recommendation M.3100:1992":trailR1
+--@@ +- "Recommendation M.3100:1992":pipeR2
+--@@ |  +- "Recommendation M.3100:1992":linkConnection
+--@@ |  +- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  +- "Recommendation M.3100:1992":trailR2
+--@@ +- "Recommendation M.3100:1992":protectionUnitR1
+--@@ +- "Recommendation M.3100:1992":software
+--@@ |  +- "Recommendation M.3100:1992":softwareR1
+--@@ +- "Recommendation M.3100:1992":subNetwork
+--@@ |  +- "ITU-T Rec. Q.855.1 (1999)":basicSubNetwork
+--@@ +- "Recommendation M.3100:1992":terminationPoint
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  +- "Recommendation G.774.3":unprotectedCTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":connectionTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- "ITU-T Rec. G.774.5":tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":networkTerminationPoint
+--@@ |  |  +- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  |  |  +- "Recommendation M.3100:1992":genericTransportTTPR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkCTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPSinkR1
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  |  +- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectional
+--@@ |  |  |  |  +- "Recommendation M.3100:1992":networkTTPBidirectionalR1
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSink
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSink
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  +- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceSource
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  +- "Recommendation G.774.3":protectedTTPSource
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  |  +- "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  |  |  |  +- "ITU-T Rec. G.774 : 2001":rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  |  |  +- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  |  |  +- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ +- "Recommendation M.3100:1992":tpPool
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
+--@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":communicationsEntity
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":clProtocolMachine
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":coProtocolMachine
+--@@ |  |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":singlePeerConnection
+--@@ |  |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap1
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":sap2
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":dynamicSimpleScanner
+--@@ >- "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994":scanner
+--@@ >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ "ITU-T Rec. Q.822 (1994)":currentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "ITU-T G.774.1 (02/2001)":sdhCurrentData
+--@@ >- "ITU-T Rec. Q.822 (1994)":historyData
+--@@ "CCITT X.521":organization
+--@@ >- "Recommendation M.3100:1992":managedElement
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":typeOfDayController
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":currentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":managementOperationsSchedule
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "ITU-T Rec. Q.822 (1994)":thresholdData
+--@@ |  >- "Recommendation G.774.3":protectionGroupR1
+--@@ |  |  >- "Recommendation G.774.3":protectionUnit
+--@@ |  >- "Recommendation M.3100:1992":alarmSeverityAssignmentProfile
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":applicationProcess
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":attributeRanges
+--@@ |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":equipment
+--@@ |  |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  |  >- "Recommendation M.3100:1992":software
+--@@ |  |  |  >- "Recommendation M.3100:1992":software
+--@@ |  >- "Recommendation M.3100:1992":equipment +++
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":fabric
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":gtp
+--@@ |  |  >- "Recommendation M.3100:1992":mpCrossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ |  |  >- "Recommendation M.3100:1992":tpPool
+--@@ |  >- "Recommendation M.3100:1992":fabric +++
+--@@ |  >- "Recommendation M.3100:1992":genericTransportTTP
+--@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log +++
+--@@ |  >- "Recommendation M.3100:1992":physicalPort
+--@@ |  >- "ITU-T Rec. X.746 (2000) | ISO/IEC 10164-15 : 2002":scheduler
+--@@ |  >- "ITU-T Rec. X.738 (1993) | ISO/IEC 10164-13 : 1995":simpleScanner
+--@@ |  >- "Recommendation M.3100:1992":software +++
+--@@ |  >- "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993":subsystem +++
+--@@ |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
+--@@ |  |  >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSink
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ |  >- "Recommendation M.3100:1992":trailTerminationPointSource
+--@@ |  |  >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ |  >- "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":usageMeteringControlObject
+--@@ >- "Recommendation M.3100:1992":managedElementComplex
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":externalPoint
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":network
+--@@ |  >- "ITU-T Rec. Q.821 (2000)":enhancedCurrentAlarmSummaryControl
+--@@ |  >- "Recommendation M.3100:1992":arcIntervalProfile
+--@@ |  >- "Recommendation M.3100:1992":connectionR1
+--@@ |  >- "Recommendation M.3100:1992":managedElement +++
+--@@ |  >- "Recommendation M.3100:1992":network
+--@@ |  >- "Recommendation M.3100:1992":trailR1
+--@@ "CCITT X.521":organizationalUnit
+--@@ >- "Recommendation M.3100:1992":managedElement +++
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ >- "Recommendation M.3100:1992":network +++
+--@@ "ITU-T G.774.4 (02/2001)":sncpFabric
+--@@ >- "ITU-T G.774.4 (02/2001)":connectionProtectionGroupR1
+--@@ |  >- "ITU-T G.774.4 (02/2001)":connectionProtection
+--@@ |  >- "ITU-T G.774.4 (02/2001)":mpConnectionProtection
+--@@ |  |  >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":crossConnection
+--@@ >- "Recommendation M.3100:1992":mpCrossConnection +++
+--@@ "ITU-T Rec. G.774 : 2001":sdhNE
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":electricalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPBidirectional
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSink
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":msTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":au4CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msOrderwireCTPSource
+--@@ |  >- "Recommendation G.774.3":unprotectedCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":opticalSPITTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":rsTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":msCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsDatacomCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsOrderwireCTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":rsUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc11TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc12TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPBidirectionalR1
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ >- "ITU-T Rec. G.774 : 2001":vc2TTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSinkR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc3TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug2Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu11CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu12CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu2CTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPBidirectionalR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Bidirectional
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPBidirectionalR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Bidirectional +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSinkR1
+--@@ |  >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Sink
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSinkR1
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Sink +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSink
+--@@ >- "ITU-T Rec. G.774 : 2001":vc4TTPSourceR1
+--@@ |  >- "ITU-T Rec. G.774 : 2001":tug3Source
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tu3CTPSource
+--@@ |  |  >- "ITU-T Rec. G.774 : 2001":tug2Source +++
+--@@ |  >- "ITU-T Rec. G.774 : 2001":vcnUserChannelCTPSource
+--@@ >- "Recommendation G.774.3":protectedTTPBidirectional
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augBidirectional +++
+--@@ >- "Recommendation G.774.3":protectedTTPSink
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSink +++
+--@@ >- "Recommendation G.774.3":protectedTTPSource
+--@@ |  >- "ITU-T Rec. G.774 : 2001":augSource +++
+--@@ "Recommendation M.3100:1992":networkR1
+--@@ >- "Recommendation M.3100:1992":layerNetworkDomain
+--@@ |  >- "Recommendation M.3100:1992":accessGroup
+--@@ |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":logicalLink
+--@@ |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  >- "Recommendation M.3100:1992":subNetwork
+--@@ |  |  >- "Recommendation M.3100:1992":logicalLinkEnd
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkCTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSink
+--@@ |  |  >- "Recommendation M.3100:1992":networkTTPSource
+--@@ |  |  >- "Recommendation M.3100:1992":subNetworkConnection
+--@@ |  |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":topologicalLink
+--@@ |  |  >- "Recommendation M.3100:1992":linkConnection
+--@@ |  >- "Recommendation M.3100:1992":topologicalLinkEnd
+--@@ |  >- "Recommendation M.3100:1992":trailR2
+--@@ >- "Recommendation M.3100:1992":managedElementComplex +++
+--@@ "ITU-T Rec. G.774.5":au3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":au4SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu11SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu12SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu2SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "ITU-T Rec. G.774.5":tu3SupervisedCTPSinkR1
+--@@ >- "ITU-T G.774.1 (02/2001)":pathTerminationCurrentData
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSink
+--@@ >- "Recommendation M.3100:1992":connectionTerminationPointSource
+--@@ "Recommendation M.3100:1992":trailTerminationPointBidirectional +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi
