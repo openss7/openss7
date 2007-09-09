@@ -574,7 +574,7 @@ void
 handle_message(void)
 {
 	/* turn around SLTM into SLTA only */
-	unsigned char *q = dbuf;
+	unsigned char *q = (unsigned char *)dbuf;
 	uint sio, dpc, opc, sls, h0, h1, b;
 	int i;
 
@@ -606,7 +606,7 @@ handle_message(void)
 			p->pdu_req.sl_mp = 0x3;
 			if (putmsg(fd, &ctrl, &data, 0) < 0)
 				perror(__FUNCTION__);
-			q = dbuf;
+			q = (unsigned char *)dbuf;
 			h1 = 2;
 			q++;
 			*q++ = opc;
@@ -636,7 +636,7 @@ void
 handle_message_ansi(void)
 {
 	/* turn around SLTM into SLTA only */
-	unsigned char *q = dbuf;
+	unsigned char *q = (unsigned char *)dbuf;
 	uint sio, dpc, opc, sls, h0, h1, b, tag;
 	int i;
 
@@ -675,7 +675,7 @@ handle_message_ansi(void)
 			p->pdu_req.sl_mp = 0x3;
 			if (putmsg(fd, &ctrl, &data, 0) < 0)
 				perror(__FUNCTION__);
-			q = dbuf;
+			q = (unsigned char *)dbuf;
 			h0 = 2;
 			h1 = 2;
 			q++;
@@ -714,7 +714,7 @@ handle_message_ansi(void)
 			p->pdu_req.sl_mp = 0x3;
 			if (putmsg(fd, &ctrl, &data, 0) < 0)
 				perror(__FUNCTION__);
-			q = dbuf;
+			q = (unsigned char *)dbuf;
 			h1 = 6;
 			q++;
 			*q++ = opc;
@@ -751,7 +751,7 @@ handle_message_ansi(void)
 			p->pdu_req.sl_mp = 0x3;
 			if (putmsg(fd, &ctrl, &data, 0) < 0)
 				perror(__FUNCTION__);
-			q = dbuf;
+			q = (unsigned char *)dbuf;
 			h0 = 2;
 			h1 = 2;
 			q++;
@@ -807,7 +807,7 @@ handle_message_ansi(void)
 			p->pdu_req.sl_mp = 0x3;
 			if (putmsg(fd, &ctrl, &data, 0) < 0)
 				perror(__FUNCTION__);
-			q = dbuf;
+			q = (unsigned char *)dbuf;
 			q++;
 			*q++ = opc;
 			*q++ = opc >> 8;
@@ -877,7 +877,7 @@ handle_message_ansi(void)
 		p->pdu_req.sl_mp = 0x3;
 		if (putmsg(fd, &ctrl, &data, 0) < 0)
 			perror(__FUNCTION__);
-		q = dbuf;
+		q = (unsigned char *)dbuf;
 		h1 = 2;
 		q++;
 		*q++ = opc;
