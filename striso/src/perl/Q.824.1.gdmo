@@ -1,0 +1,3516 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Wed Sep 12 07:07:40 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "Q.824.0.gdmo" >--
+--< GDMO.Include "X.283.gdmo" >--
+--< GDMO.Include "X.284.gdmo" >--
+--< GDMO.Document "ITU-T Rec. Q.824.1 (1995)" >--
+--< GDMO.Namespace itut_q824_1 >--
+MODULE "ITU-T Rec. Q.824.1 (1995)"
+-- 3 Access Object Classes
+-- 3.1 Access Channels
+-- 3.1.1 Access Channel B-Channel
+
+bChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :accessChannel;
+	CHARACTERIZED BY
+		"CCITT Rec. M.3100" :channelNumberPackage,
+		bChannelPkg PACKAGE
+			BEHAVIOUR
+				bChannelBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the attributes related to a particular B-channel on 
+						an ISDN access port.";;;;
+REGISTERED AS { cAISDNObjectClass 1 };
+-- 3.1.2 Access Channel D-Channel
+
+
+dChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :accessChannel;
+	CHARACTERIZED BY
+		dChannelPkg PACKAGE
+			BEHAVIOUR
+				dChannelBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the attributes and characteristics related to a 
+						particular D-channel on an ISDN access port.";;;;
+REGISTERED AS { cAISDNObjectClass 2 };
+-- 3.2 Access Ports
+-- 3.2.1 Access Port ISDN Basic Rate
+
+
+accessPortISDNBasicRate MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :accessPort;
+	CHARACTERIZED BY
+		accessPortISDNBasicRatePkg PACKAGE
+			BEHAVIOUR
+				accessPortISDNBasicRateBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the access port termination supporting the ISDN 
+						Basic Rate service.";;;;
+REGISTERED AS { cAISDNObjectClass 3 };
+-- 3.2.2 Access Port ISDN Primary Rate
+
+
+accessPortISDNPrimaryRate MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :accessPort;
+	CHARACTERIZED BY
+		accessPortISDNPrimaryRatePkg PACKAGE
+			BEHAVIOUR
+				accessPortISDNPrimaryRateBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the access port termination supporting the DSS 1 
+						interface identifier in the Primary Rate ISDN service.";;;;
+REGISTERED AS { cAISDNObjectClass 4 };
+-- 3.3 Access Port Profiles
+-- 3.3.1 Access Port Profile ISDN
+
+
+accessPortProfileISDN MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :accessPortProfile;
+	CHARACTERIZED BY
+		accessPortProfileISDNPkg PACKAGE
+			BEHAVIOUR
+				accessPortProfileISDNBhv BEHAVIOUR
+					DEFINED AS
+						"This subclass of the access port profile adds ISDN specifics to the general 
+						access port profile class and is further subclassed into particular interface 
+						types (i.e. Basic and Primary). Only characteristics common to basic and primary 
+						are placed in this class.
+
+						This class provides the association between the B- and D-channels needed to 
+						support non-associated signalling. This type of association can be applied to 
+						any subclass of this class including Basic and Primary Rate access ports. The 
+						supportedByAccessPortPtrList attribute inherited from the accessPortProfile 
+						managed object class may point to multiple accessPorts managed objects in this 
+						object and its subclasses.
+
+						The numberOfBChannels attribute controls the number of B-channel resources that 
+						the Access Port Profile ISDN has simultaneous access to. The value of this 
+						attribute must be equal to or less than the number of B-channel Access Channel 
+						object instances associated with the Access Port Profile. The default value of 1 
+						for this indicates that all of the B-channel Access Channel object instances 
+						associated with the Access Port Profile are available.";;
+			ATTRIBUTES
+				accessChannelPtrList REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNAttributeModule.emptySet
+					GET-REPLACE ADD-REMOVE,
+				numberOfBChannels REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNAttributeModule.minusONE
+					GET-REPLACE ADD-REMOVE,
+				layer2LAPDEntityPtr GET,
+				dChannelPacketDirectoryNumberList GET,
+				dChannelPacketDefaultDirectoryNumber GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		bearerServiceListPkg
+			PRESENT IF
+				"an instance supports it.",
+		callReferencePkg
+			PRESENT IF
+				"if restricting the max numbers of call reference is enforced.",
+		selectionProceduresPkg
+			PRESENT IF
+				"if supported by Administration.",
+		nT2ISDNaccessPortProfilePkg
+			PRESENT IF
+				"NT2 type service is supported on the access port and the service is supported by 
+				the Administration.";
+REGISTERED AS { cAISDNObjectClass 5 };
+-- 3.3.2 Access Port Profile ISDN Basic Rate
+
+
+accessPortProfileISDNBasicRate MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessPortProfileISDN;
+	CHARACTERIZED BY
+		accessPortProfileISDNBasicRatePkg PACKAGE
+			BEHAVIOUR
+				accessPortProfileISDNBasicRateBhv BEHAVIOUR
+					DEFINED AS
+						"This object associates the Access Port resources with service for ISDN Basic 
+						Rate. The Basic Rate access supporting this access port Profile may provide up 
+						to two 64 kbit/s B-channel and one 16 kbit/s D-channel service.";;;;
+	CONDITIONAL PACKAGES
+		deactivationCapabilitiesPkg
+			PRESENT IF
+				"deactivationCapabilities procedure is supported by Administration.",
+		activeTerminalListPkg
+			PRESENT IF
+				"an Administration supports it.",
+		numberOfDChannelLinksPkg
+			PRESENT IF
+				"if controlling the number of D-channel links on a per dChannel basis is 
+				supported by the Administration.";
+REGISTERED AS { cAISDNObjectClass 6 };
+-- 3.3.3 Access Port Profile ISDN Primary Rate
+
+
+accessPortProfileISDNPrimaryRate MANAGED OBJECT CLASS
+	DERIVED FROM
+		accessPortProfileISDN;
+	CHARACTERIZED BY
+		accessPortProfileISDNPrimaryRatePkg PACKAGE
+			BEHAVIOUR
+				accessPortProfileISDNPrimaryRateBhv BEHAVIOUR
+					DEFINED AS
+						"This object associates the Access Port resources with services for the ISDN 
+						primary rate. The primary rate access supporting this access port profile can 
+						range from that of a single primary rate section up to that including many 
+						primary rate sections. In addition to the information channels and the 
+						D-channel, a secondary D-channel may also be supported in a backup arrangement 
+						(see Annex F/Q.931).";;
+			ATTRIBUTES
+				dChannelPrimaryPtr GET-REPLACE,
+				dChannelSecondaryPtr GET-REPLACE;;;
+	--CONDITIONAL PACKAGES
+	REGISTERED AS { cAISDNObjectClass 7 };
+-- 3.3.4 Calling Number Screening
+
+
+callingNumberScreening MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)" :top;
+	CHARACTERIZED BY
+		callingNumberScreeningPkg PACKAGE
+			BEHAVIOUR
+				callingNumberScreeningPackageBhv BEHAVIOUR
+					DEFINED AS
+						"This object identifies characteristics of the Access Port Profile ISDN object 
+						class to be instantiated for screening as defined in Calling Line Supplementary 
+						Service I.251.3.
+
+						The attributes included in this object provide an interface with the capability 
+						of defining the set of Calling Party Valid Directory Numbers and a Calling Party 
+						Default Directory Number for the interface. It also provides a boolean attribute 
+						whose value determines whether or not calling party number screening is to be 
+						used by call originations.
+
+						The following table shows the possible combinations of the attributes for 
+						Calling Party Number Provision Necessary (CPNPN), Screening of Calling Party 
+						Number (SCPN), Calling Party Number Discard Control (CPNDC), and Calling Party 
+						Default Directory Number (CPDDN).
+
+						CPNPN indicates whether the calling party number must be provided by the calling 
+						user for call originations. If CPNPN is Y, then all call originations from the 
+						interface must provide a valid calling party number. SCPN indicates whether 
+						calling party numbers received from the interface for call originations will be 
+						screened against the list of valid DNs for the interface.
+
+						CPNDC indicates whether failed-screening and not-screened calling party numbers 
+						are discarded from the calling information. If CPNDC is Y, then calling party 
+						numbers that are either not screened or fail screening are discarded. CPDDN is 
+						the default DN (or DNs/bearer) that are used for call originations from this 
+						interface where the user does not provide a valid calling party number.
+
+						The scenario represented by the first row requires that the user provide valid 
+						calling party numbers (CPNPN = Y) for all call set-ups from the interface. 
+						User-provided calling party numbers will be screened for validity (SCPN = Y). If 
+						the calling party number fails screening, then it is discarded (in fact, the 
+						whole call is discarded so CPNDC really has a different meaning in this case). 
+						If the calling party number is not provided by the user then the call is 
+						cleared. CPDDN is not applicable in this scenario since the DN for the call must 
+						come from the user.
+
+						CPNPN SCPN CPNDC CPDDN
+
+						Y Y Y N/A
+
+						N N N Required
+
+						N N Y Required
+
+						N Y N Required
+
+						N Y Y Required
+
+						The second row represents a scenario where the user does not have to include the 
+						calling party number (CPNPN = N) for call set-ups from the interface. If the 
+						calling party number is provided by the user, it is not screened (SCPN = N) and 
+						it is not discarded (CPNDC = N). Any user-provided calling party number is 
+						passed as part of the call and may be delivered to the called party if the 
+						called party supports two-number delivery. CPDDN is required, and in fact, the 
+						default DN is used for every call origination from the interface.
+
+						The third row represents a scenario where the user does not have to include the 
+						calling party number (CPNPN = N) for call set-ups from the interface. If the 
+						calling party number is provided, it is not screened (SCPN = N) and discarded 
+						(CPNDC = Y). CPDDN is required, and in fact, the default DN is used for every 
+						call origination from the interface. Any user-provided calling party numbers are 
+						ignored (not screened and discarded).
+
+						The fourth row represents a scenario where the user does not have to include the 
+						calling party number (CPNPN = N) for call set-ups from the interface. If the 
+						calling party number is provided it will be screened for validity (SCPN = Y). If 
+						the user-provided calling party number passes screening then that DN is used for 
+						the call.
+
+						CPDDN is required, and the default DN is used for call originations from the 
+						interface when the user-provided calling party number fails screening, or if the 
+						user does not provide a calling party number. Any user-provided calling party 
+						numbers that fail screening are also passed as part of the call (CPNDC = N) and 
+						may be delivered to the called party if the called party supports two-number 
+						delivery.
+
+						The fifth row represents a scenario where the user does not have to include the 
+						calling party number (CPNPN = N) for call set-ups from the interface. If the 
+						calling party number is provided it will be screened for validity (SCPN = Y). If 
+						the user-provided calling party number passes screening then that DN is used for 
+						the call. CPDDN is required, and the default DN is used for call originations 
+						from the interface when the user-provided calling party number fails screening, 
+						or if the user does not provide a calling party number. Any user-provided 
+						calling party numbers that fail screening are discarded (CPNDC = Y).";;
+			ATTRIBUTES
+				callingNumberScreeningId GET SET-BY-CREATE,
+				callingPartyValidDirectoryNumberList GET,
+				callingPartyNumberProvisionNecessary REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNAttributeModule.false
+					GET-REPLACE,
+				screenCallingPartyNumber REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNAttributeModule.true
+					GET-REPLACE,
+				callingPartyNumberDiscardCtrl REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNAttributeModule.true
+					GET-REPLACE,
+				callingPartyDefaultDirectoryNNumber GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectDeletion;;;
+REGISTERED AS { cAISDNObjectClass 8 };
+-- 3.3.5 Network User Identification
+
+
+x25NetworkUserIdentification MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :optionalUserFacilities;
+	CHARACTERIZED BY
+		x25NetworkUserIdentificationPkg PACKAGE
+			BEHAVIOUR
+				x25NetworkUserIdentificationBhv BEHAVIOUR
+					DEFINED AS
+						"This managed object contains attributes to provide information to the network 
+						for purposes of billing, security, network management, or to invoke subscribed 
+						facilities.";;
+			ATTRIBUTES
+				networkUserIdentificationREPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAOptionalUserFacilitiesModule.false
+					GET-REPLACE,
+				networkUserIdentificationOverride REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAOptionalUserFacilitiesModule.false
+					GET-REPLACE,
+				networkUserIdentificationSelection REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAOptionalUserFacilitiesModule.false
+					GET-REPLACE,
+				networkUserIdentificationSupplement REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAOptionalUserFacilitiesModule.false
+					GET-REPLACE,
+				networkUserIdentificationUserValidate REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAOptionalUserFacilitiesModule.false
+					GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992" :attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992" :objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2:1992" :objectDeletion;;;
+REGISTERED AS { cAISDNObjectClass 9 };
+-- 3.4 Layer Entities
+-- 3.4.1 Layer Entity LAPB
+-- This class describes the customizable characteristics of LAPB protocol. That is, the characteristics whose values can be
+-- selected by the customer for his individual packet bearer service subscriptions. This class is subclassed from Layer
+-- Entity.
+
+
+layerEntityLAPB MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :layerEntity;
+	CHARACTERIZED BY
+		layerEntityLAPBPkg PACKAGE
+			BEHAVIOUR
+				layerEntityLAPBBhv BEHAVIOUR
+					DEFINED AS
+						"This object class includes attributes applicable to X.25 layer 2 (LAPB), whose 
+						values are assignable on a Directory Number/Packet Data Bearer Service basis. 
+						Each instance of this object class represents a particular profile of attribute 
+						values and is associated with instances of the 
+						bearerServiceForPacketSwitchedDataobject class by pointers to instances of this 
+						object class.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.282" :sequenceModulus GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		x25DCETimersPkg
+			PRESENT IF
+				"Timers are specified by subscribers.";
+REGISTERED AS { cAISDNObjectClass 10 };
+-- 3.4.2 Layer Entity LAPD
+
+
+layerEntityLAPD MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :layerEntity;
+	CHARACTERIZED BY
+		layerEntityLAPDPkg PACKAGE
+			BEHAVIOUR
+				layerEntityLAPDBhv BEHAVIOUR
+					DEFINED AS
+						"This class describes the customizable characteristics of the LAPD protocol that 
+						are used for user information purpose. These customizable characteristics are 
+						the values that can be selected by the customer for his individual bearer 
+						service subscriptions. This class is subclassed from Layer Entity. These 
+						attributes are not customizable when the LAPD instance is a signalling one.";;;;
+	CONDITIONAL PACKAGES
+		automaticNegotiationPkg
+			PRESENT IF
+				"parameter negotiation is supported.",
+		linkSettingPkg
+			PRESENT IF
+				"if a per link setting is supported.",
+		optionalDeactivationPkg
+			PRESENT IF
+				"the Administration supports deactivation on a LAPD basis.";
+REGISTERED AS { cAISDNObjectClass 11 };
+-- 3.4.3 Layer Entity X.25 PLP
+
+
+layerEntityX25PLP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :layerEntity;
+	CHARACTERIZED BY
+		layerEntityX25PLPPkg PACKAGE
+			BEHAVIOUR
+				layerEntityX25PLPBhv BEHAVIOUR
+					DEFINED AS
+						"This class describes the customizable characteristics of X.25 Layer 3 protocol 
+						that are used for signalling purpose and for user information purpose. These 
+						customizable characteristics are the values that can be selected by the customer 
+						for his individual packet bearer service subscriptions. This object class 
+						includes attributes applicable to X.25 layer 3 whose values are assignable on a 
+						Directory Number/Packet Data Bearer Service basis. Each instance of this object 
+						class represents a particular profile of attribute values.";;
+			ATTRIBUTES
+				dtEcompatibility REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.dte84
+					GET-REPLACE,
+				incomingMaxPacketSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.size128
+					GET-REPLACE,
+				incomingWindowSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.two
+					GET-REPLACE,
+				incomingDefaultThruputClass REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.baud9600
+					GET-REPLACE,
+				outgoingMaxPacketSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.size128
+					GET-REPLACE,
+				outgoingWindowSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.two
+					GET-REPLACE,
+				outgoingDefaultThruputClass REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.baud9600
+					GET-REPLACE,
+				"ITU-T Rec. X.283" :onlineFacilityRegistration GET-REPLACE,
+				"ITU-T Rec. X.283" :extendedPacketSequencing GET-REPLACE,
+				"ITU-T Rec. X.283" :dBitModification GET-REPLACE,
+				"ITU-T Rec. X.283" :packetRetransmission GET-REPLACE,
+				"ITU-T Rec. X.283" :nonStandardDefaultPacketSizes GET-REPLACE,
+				"ITU-T Rec. X.283" :nonStandardDefaultWindowSizes GET-REPLACE,
+				"ITU-T Rec. X.283" :flowControlParameterNegotiation REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.false
+					GET-REPLACE,
+				"ITU-T Rec. X.283" :throughputClassNegotiation REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.false
+					GET-REPLACE,
+				"ITU-T Rec. X.283" :fastSelectAcceptance REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.false
+					GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		maxCombinedThruputBChanPkg
+			PRESENT IF
+				"the maxCombinedThruputDChanPkg is not present.",
+		maxCombinedThruputDChanPkg
+			PRESENT IF
+				"the maxCombinedThruputBChanPkg is not present.";
+REGISTERED AS { cAISDNObjectClass 12 };
+-- 3.4.4 Layer Entity X.25 PLP Shared
+
+
+layerEntityX25PLPShared MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :layerEntity;
+	CHARACTERIZED BY
+		layerEntityX25PLPSharedPkg PACKAGE
+			BEHAVIOUR
+				layerEntityX25PLPSharedBhv BEHAVIOUR
+					DEFINED AS
+						" This class describes the customizable characteristics of X.25 Layer 3 protocol 
+						 that are used for signalling purpose and for user information purpose. 
+						 Instances of this object class are used to define commonly used parameter 
+						 groupings that may be shared by multiple customers. This object class includes 
+						 attributes applicable to X.25 layer 3 whose values are assignable on a 
+						 Directory Number/Packet Data Bearer Service basis. Each instance of this object 
+						 class represents a particular profile of attribute values .";;
+			ATTRIBUTES
+				dTECompatibilty REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.dte84
+					GET-REPLACE,
+				incomingMaxPacketSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.size128
+					GET-REPLACE,
+				incomingWindowSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.two
+					GET-REPLACE,
+				incomingDefaultThruputClass REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.baud9600
+					GET-REPLACE,
+				outgoingMaxPacketSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.size128
+					GET-REPLACE,
+				outgoingWindowSize REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.two
+					GET-REPLACE,
+				outgoingDefaultThruputClass REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.baud9600
+					GET-REPLACE,
+				"ITU-T Rec. X.283" :onlineFacilityRegistration GET-REPLACE,
+				"ITU-T Rec. X.283" :extendedPacketSequencing GET-REPLACE,
+				"ITU-T Rec. X.283" :dBitModification GET-REPLACE,
+				"ITU-T Rec. X.283" :packetRetransmission GET-REPLACE,
+				"ITU-T Rec. X.283" :nonStandardDefaultPacketSizes GET-REPLACE,
+				"ITU-T Rec. X.283" :nonStandardDefaultWindowSizes GET-REPLACE,
+				"ITU-T Rec. X.283" :flowControlParameterNegotiation REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.false
+					GET-REPLACE,
+				"ITU-T Rec. X.283" :throughputClassNegotiation REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.false
+					GET-REPLACE,
+				"ITU-T Rec. X.283" :fastSelectAcceptance REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.false
+					GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		maxCombinedThruputBChanPkg
+			PRESENT IF
+				"the maxCombinedThruputDChanPkg is not present.",
+		maxCombinedThruputDChanPkg
+			PRESENT IF
+				"the maxCombinedThruputBChanPkg is not present.";
+REGISTERED AS { cAISDNObjectClass 13 };
+-- 4 Catalogued Access Object Classes
+-- 4.1 Catalogued Access Port ISDN Primary Rate
+
+
+cataloguedAccessPortISDNPrimaryRate MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)" :top;
+	CHARACTERIZED BY
+		cataloguedAccessPortISDNPrimaryRatePkg PACKAGE
+			BEHAVIOUR
+				cataloguedAccessPortISDNPrimaryRateBhv BEHAVIOUR
+					DEFINED AS
+						"This object class contains the non-customizable attributes of the access port 
+						supporting the DSS 1 interface of the Primary Rate ISDN service.";;
+			ATTRIBUTES
+				cataloguedAccessPortISDNPrimaryRateId GET SET-BY-CREATE,
+				bitRateOfPrimaryRateInterface GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721" :objectCreation,
+				"CCITT Rec. X.721" :objectDeletion,
+				"CCITT Rec. X.721" :attributeValueChange;;;
+REGISTERED AS { cAISDNObjectClass 14 };
+-- 4.2 Catalogued Access Port Profile ISDN
+
+
+cataloguedAccessPortProfileISDN MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)" :top;
+	CHARACTERIZED BY
+		cataloguedAccessPortProfileISDNPkg PACKAGE
+			BEHAVIOUR
+				cataloguedAccessPortProfileISDNBhv BEHAVIOUR
+					DEFINED AS
+						"This object class defines the access port profile attributes that are common to 
+						the ISDN basic and primary rate interfaces that the Administration may manage on 
+						a per exchange basis.";;
+			ATTRIBUTES
+				cataloguedAccessPortProfileISDNId GET SET-BY-CREATE,
+				channelSelection GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721" :objectCreation,
+				"CCITT Rec. X.721" :objectDeletion,
+				"CCITT Rec. X.721" :attributeValueChange;;;
+REGISTERED AS { cAISDNObjectClass 15 };
+-- 4.3 Catalogued Access Port Profile ISDN Basic Rate
+
+
+cataloguedAccessPortProfileISDNBasicRate MANAGED OBJECT CLASS
+	DERIVED FROM
+		cataloguedAccessPortProfileISDN;
+	CHARACTERIZED BY
+		cataloguedAccessPortProfileISDNBasicRatePkg PACKAGE
+			BEHAVIOUR
+				cataloguedAccessPortProfileISDNBasicRateBhv BEHAVIOUR
+					DEFINED AS
+						"This object class defines the access port profile ISDN basic rate interface 
+						characteristics that the Administration may manage on a per exchange basis.";;
+			ATTRIBUTES
+				numberOfDChannelLinks GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721" :objectCreation,
+				"CCITT Rec. X.721" :objectDeletion,
+				"CCITT Rec. X.721" :attributeValueChange;;;
+REGISTERED AS { cAISDNObjectClass 16 };
+-- 4.4 Catalogued Layer Entity DSS 1
+
+
+cataloguedLayerEntityDSS1 MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721" :top;
+	CHARACTERIZED BY
+		cataloguedLayerEntityDSS1Pkg PACKAGE
+			BEHAVIOUR
+				cataloguedLayerEntityDSS1Bhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the Layer 3 signalling parameters that are provided 
+						for customer service on a switch-wide basis.";;
+			ATTRIBUTES
+				cataloguedLayerEntityDSS1Id GET SET-BY-CREATE,
+				dChannelT301 GET-REPLACE,
+				dChannelT303 GET-REPLACE,
+				dChannelT304 GET-REPLACE,
+				dChannelT305 GET-REPLACE,
+				dChannelT306 GET-REPLACE,
+				dChannelT307 GET-REPLACE,
+				dChannelT308 GET-REPLACE,
+				dChannelT309 GET-REPLACE,
+				dChannelT310 GET-REPLACE,
+				dChannelT312 GET-REPLACE,
+				dChannelT314 GET-REPLACE,
+				dChannelT316 GET-REPLACE,
+				dChannelT317 GET-REPLACE,
+				dChannelT320 GET-REPLACE,
+				dChannelT321 GET-REPLACE,
+				dChannelT322 GET-REPLACE,
+				dChannelT330 GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721" :objectCreation,
+				"CCITT Rec. X.721" :objectDeletion,
+				"CCITT Rec. X.721" :attributeValueChange;;;
+REGISTERED AS { cAISDNObjectClass 17 };
+-- 4.5 Catalogued Layer Entity LAPD
+
+
+cataloguedLayerEntityLAPD MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)" :top;
+	CHARACTERIZED BY
+		cataloguedLayerEntityLAPDPkg PACKAGE
+			BEHAVIOUR
+				cataloguedLayerEntityLAPDBhv BEHAVIOUR
+					DEFINED AS
+						"The catalogued LAPD layer entity object class is a class of managed objects that 
+						represents characteristics of the LAPD protocol that are applicable to all 
+						customers on the switch that have ISDN access. This class also provides the 
+						ability for an Administration to set LAPD characteristics for all ISDN customer 
+						accesses without the need for individual LAPD entity settings.";;
+			ATTRIBUTES
+				cataloguedLayerEntityLAPDId GET,
+				interfaceType GET,
+				linkLevelWindowSize GET-REPLACE,
+				maxBitsPerInformationFrame GET-REPLACE,
+				maxTransmissionAttempts GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721" :objectCreation,
+				"CCITT Rec. X.721" :objectDeletion,
+				"CCITT Rec. X.721" :attributeValueChange;;;
+REGISTERED AS { cAISDNObjectClass 18 };
+-- 5 ISDN Terminal Object Classes
+-- 5.1 Terminal Configuration
+
+
+terminalConfiguration MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721" :top;
+	CHARACTERIZED BY
+		terminalConfigurationPkg PACKAGE
+			BEHAVIOUR
+				terminalConfiguratonBhv BEHAVIOUR
+					DEFINED AS
+						"The Terminal Configuration managed object class is a class of managed objects 
+						that represents instances of ISDN terminal push button and indicator lamp 
+						configurations. This managed object class includes the attributes by which the 
+						physical Feature Activator (e.g. buttons) and Feature Indicator (e.g. lamps) at 
+						the user terminal are functionally assigned. This object class may effectively 
+						represent a shared library or unique nonshared object depending on this service.";;
+			ATTRIBUTES
+				terminalConfigurationId GET SET-BY-CREATE,
+				featureActivatorAllDirectoryNumber GET-REPLACE,
+				featureActivatorsPerDirectoryNumber GET-REPLACE,
+				featureActivatorsPerStopHunt GET-REPLACE,
+				featureActivatorsPerHuntMakeBus GET-REPLACE,
+				featureIndicatorsAllDirectoryNumber GET-REPLACE,
+				featureIndicatorsPerDirectoryNumber GET-REPLACE,
+				featureIndicatorsPerStopHunt GET-REPLACE,
+				featureIndicatorsPerHuntMakeBusy GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2 " :attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectDeletion;;;
+REGISTERED AS { cAISDNObjectClass 19 };
+-- 5.2 Terminal Service Profile
+
+
+terminalServiceProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721(1992)" :top;
+	CHARACTERIZED BY
+		terminalServiceProfilePkg PACKAGE
+			BEHAVIOUR
+				terminalServiceProfileBhv BEHAVIOUR
+					DEFINED AS
+						"The Terminal Service Profile (TSP) object class is a class of managed objects 
+						that represents instances of Terminal Service Profiles for self-initializing 
+						ISDN terminals on a Basic Rate Interface (BRI). The TSP is a grouping of service 
+						profile parameters for one or more terminals on a BRI. Each terminal on a BRI 
+						must be initialized with a unique identifier called a Service Profile Identifier 
+						(SPID). The SPID uniquely identifies the ISDN terminal to the switch and to the 
+						supporting Operations System (OS). See Annex A/Q.932 for details.
+
+						The numberOfBChannels attribute limits the B-channel resources that the 
+						terminalServiceProfile can use at any point in time. The value of the attribute 
+						in this object must be equal to or less than the value of the numberOfBChannels 
+						attribute in the associated accessPortProfileIsdn object instance. The default 
+						value of 1 for this attribute indicates that all of the accessChannel object 
+						instances associated with the accessPortProfileIsdn object are available for 
+						use.";;
+			ATTRIBUTES
+				terminalServiceProfileId GET SET-BY-CREATE,
+				"Q.824.0" :accessPortProfilePtr GET-REPLACE,
+				directoryNumberAppearanceIdentifierList GET-REPLACE ADD-REMOVE,
+				directoryNumberReference GET-REPLACE,
+				numberOfBChannels REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.minusOne
+					GET-REPLACE,
+				terminalConfigurationPtr GET-REPLACE,
+				terminalLimit REPLACE-WITH-DEFAULT
+					DEFAULT VALUE CAISDNModule.one
+					GET-REPLACE,
+				tspid GET-REPLACE;
+			NOTIFICATIONS
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :attributeValueChange,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectCreation,
+				"CCITT Rec. X.721 | ISO/IEC 10165-2" :objectDeletion;;;
+REGISTERED AS { cAISDNObjectClass 20 };
+-- 6 Bearer Service Object Classes
+-- 6.1 Bearer Services
+-- 6.1.1 Bearer Service For 384 kbit/s Data
+
+
+bearerServiceFor384kbpsData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. 824.0" :bearerService;
+	CHARACTERIZED BY
+		bearerServiceFor384kbpsDataPkg PACKAGE
+			BEHAVIOUR
+				bearerServiceFor384kbpsDataBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Circuit-Mode, 384 kbit/s 
+						Unrestricted Digital Transmission, 8000 Hz Structured, Demand, Point-To-Point, 
+						and Bidirectional Symmetric bearer service. This bearer service and the 
+						associated values for the I.210 Information Transfer and Access attributes, are 
+						identified in I.231.6. A call using this bearer service must use channels from 
+						single primary rate interfaces as modeled by Access Port.
+
+						The numberOfBChannels attribute inherited from the bearerService superclass must 
+						indicate either all B-channels are available (1) or must be a mutiple of 6 to 
+						indicate that only some of the underlying B-channels may be used for this bearer 
+						service. If all B-channels are indicated by the numberOfBChannels attribute, 
+						then on each related Access Port largest mutiple of 6 less than or equal to the 
+						total number of B-channels on that AccessPort may be used for this service. For 
+						example, if this service is associated with two AccessPort objects, one with 23 
+						B-channels and the other with 24 B-channels, then a 1 in the numberOfBChannels 
+						attribute indicates that 18 B-channels may be used from the first AccessPort and 
+						that 24 may be used from the second AccessPort.";;
+			ATTRIBUTES
+				assignmentOfTimeslots GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		bearerServiceFor384kbpsDataPrimaryICPkg
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { cAISDNObjectClass 21 };
+-- 6.1.2 Bearer Service For 1536 kbit/s Data
+
+
+bearerServiceFor1536kbpsData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. 824.0" :bearerService;
+	CHARACTERIZED BY
+		bearerServiceFor1536kbpsDataPkg PACKAGE
+			BEHAVIOUR
+				bearerServiceFor1536kbpsDataBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Circuit-Mode, 1536 
+						kbit/s Unrestricted Digital Transmission, 8000 Hz Structured, Demand, 
+						Point-To-Point, and Bidirectional Symmetric bearer service. This bearer service 
+						and the associated values for the I.210 Information Transfer and Access 
+						attributes, are identified in I.231.7. A call using this bearer service must use 
+						channels from a single Access Port.
+
+						The numberOfBChannels attribute inherited from the bearerService superclass must 
+						indicate either all B-channels are available (1) or must be a mutiple of 24 to 
+						indicate that only some of the underlying B-channels may be used for this bearer 
+						service. If all B-channels are indicated by the numberOfBChannels attribute, 
+						then on each related Access Port the largest mutiple of 24 less than or equal to 
+						the total number of B-channels on each AccessPort may be used for this service. 
+						For example, if this service is associated with two AccessPort objects, one with 
+						23 B-channels and the other with 24 B-channels, then a 1 in the 
+						numberOfBChannels attribute indicates that 24 B-channels from the second Access 
+						Port may be used (and no B-channels may be used from the Access Port with only 
+						23 B-channels).";;;;
+	CONDITIONAL PACKAGES
+		bearerServiceFor1536kbpsDataPrimaryICPkg
+			PRESENT IF
+				"an instance supports it.",
+		assignmentOfTimeslotsPkg
+			PRESENT IF
+				"2Mb/sec interfaces are supported and an instance supports it.";
+REGISTERED AS { cAISDNObjectClass 22 };
+-- 6.1.3 Bearer Service For 1920 kbit/s Data
+
+
+bearerServiceFor1920kbpsData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. 824.0" :bearerService;
+	CHARACTERIZED BY
+		bearerServiceFor1920kbpsDataPkg PACKAGE
+			BEHAVIOUR
+				bearerServiceFor1920kbpsDataBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Circuit-Mode, 1920 
+						kbit/s Unrestricted Digital Transmission, 8000 Hz Structured, Demand, 
+						Point-To-Point, and Bidirectional Symmetric bearer service. This bearer service 
+						and the associated values for the I.210 Information Transfer and Access 
+						attributes, are identified in I.231.8. A call using this bearer service must use 
+						channels from a single Access Port.";;;;
+	CONDITIONAL PACKAGES
+		bearerServiceFor1920kbpsDataPrimaryICPkg
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { cAISDNObjectClass 23 };
+-- 6.1.4 Bearer Service For Multiple-Rate Data
+
+
+bearerServiceForMuliple-RateData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. 824.0" :bearerService;
+	CHARACTERIZED BY
+		bearerServiceForMultipleRateDataPkg PACKAGE
+			BEHAVIOUR
+				bearerServiceForMultipleRateDataBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Circuit-Mode, 
+						Multiple-Rate Unrestricted Digital Transmission, 8000 Hz Structured, Demand, 
+						Point-To-Point, and Bidirectional Symmetric bearer service. This bearer service 
+						and the associated values for the I.210 Information Transfer and Access 
+						attributes, are identified in I.231.10. A call using this bearer service must 
+						use channels from single physical interfaces as modeled by Access Port.
+
+						The numberOfBChannels attribute inherited from the bearerService superclass must 
+						indicate either all B-channels are available (1) or must indicate the maximum 
+						number of B-channels that may be used for this service.";;
+			ATTRIBUTES
+				assignmentOfTimeslots GET-REPLACE;;;
+	CONDITIONAL PACKAGES
+		bearerServiceForMultipleRateDataPrimaryICPkg
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { cAISDNObjectClass 24 };
+-- 6.1.5 Circuit 3.1 kHz
+-- The 3.1 kHz audio bearer service object class specifies the characteristics of ISDN audio services.
+
+
+circuit3D1kHz MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :bearerService;
+	CHARACTERIZED BY
+		circuit3D1kHzPkg PACKAGE
+			BEHAVIOUR
+				circuit3D1KHzBhv BEHAVIOUR
+					DEFINED AS
+						"This object class and its superclass, bearerService, represent the 
+						characteristics of the Circuit- Mode, 64 kbit/s, 8 kHz Structured, Usable for 
+						Circuit 3.1 kHz Information Transfer bearer service. This bearer service and the 
+						associated values for the I.210 Information Transfer and Access attributes, are 
+						identified in I.231.3.";;;;
+	CONDITIONAL PACKAGES
+		bearerServiceForAudioICPkg
+			PRESENT IF
+				"inter-exchange carrier subscription is supported.",
+		networkProvidedTonePkg
+			PRESENT IF
+				"Network Provided Tone subscription is supported.";
+REGISTERED AS { cAISDNObjectClass 25 };
+-- 6.1.6 Circuit Combined Switched Digital Data
+-- This object class is a subclass derived from the Bearer Service Circuit Unrestricted Digital Data Rate Adapted From
+-- 56 kbit/s and Bearer Service Circuit Unrestricted Digital Data. The object class thereby represents the combined
+-- characteristics of both of its superclasses. An instance of this object class cannot coexist with an instance of either its
+-- superclasses for the same directory number assignment.
+
+
+circuitCombinedSwitchedDigitalData MANAGED OBJECT CLASS
+	DERIVED FROM
+		circuitUnrestrictedDigitalData,
+		circuitUnrestrictedDigitalData;
+	CHARACTERIZED BY
+		circuitCombinedSwitchedDigitalDataPkg PACKAGE
+			BEHAVIOUR
+				circuitCombinedSwitchedDigitalDataBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents a grouping of the following bearer services:
+
+						- Circuit-Mode, 64 kbit/s Unrestricted Digital Data Transmission, 8 kHz 
+						  Structured bearer service,
+
+						- Circuit-Mode, 64 kbit/s Unrestricted Digital Data Transmission adapted from 56 
+						  kbit/s, 8 kHz Structured, Demand, Point-to-Point, and Bidirectional Symmetric 
+						  bearer service.
+
+						The grouping of these circuit-mode bearer services is required when the services 
+						choice or resources allocation are the same whether the capability is 64 kbit/s 
+						or adapted 56 kbit/s. This object class is a subclass of the bearer Service 
+						Restricted Data and bearer Service unrestricted Data object classes and inherits 
+						the characteristics and behaviours from both superclasses.";;;;
+REGISTERED AS { cAISDNObjectClass 26 };
+-- 6.1.7 Circuit Combined Voice Band
+-- This object class is a subclass derived from the Bearer Service Circuit 3.1 kHz and Bearer Service Speech object classes
+-- by multiple inheritance. The object class thereby represents the combined characteristics of both of its superclasses. An
+-- instance of this object class cannot coexist with an instance of either its superclasses for the same directory number
+-- assignment.
+
+
+circuitCombinedVoiceBand MANAGED OBJECT CLASS
+	DERIVED FROM
+		circuit3D1kHz,
+		circuitSpeech;
+	CHARACTERIZED BY
+		circuitCombinedVoiceBandPkg PACKAGE
+			BEHAVIOUR
+				circuitCombinedVoiceBandBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents a grouping of the characteristics of the following 
+						bearer services:
+
+						- Circuit-Mode, 64 kbit/s, 8 kHz Structured, Usable for 3.1 kHz Audio 
+						  Information Transfer bearer services.
+
+						- Circuit-Mode, 64 kbit/s, 8 kHz Structured, Usable for Speech Demand, 
+						  Point-to-Point, and Bidirectional Symmetric bearer service.
+
+						These bearer services are identified in I.231 and I.232. The grouping of these 
+						circuit-mode bearer services is required when the services choice or resources 
+						allocation are the same whether the capability is 3.1 KHz or speech. This object 
+						class is a subclass of thecircuitSpeech and bearer Service3kHzAudio superclasses 
+						and inherits the characteristics and behaviours from both superclasses.";;;;
+REGISTERED AS { cAISDNObjectClass 27 };
+-- 6.1.8 Circuit Multi-Use
+-- The multi-use bearer Service object class specifies the characteristics of ISDN audio services.
+
+
+circuitMultiUse MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :bearerService;
+	CHARACTERIZED BY
+		circuitMultiUsePkg PACKAGE
+			BEHAVIOUR
+				circuitMultiUseBhv BEHAVIOUR
+					DEFINED AS
+						"This object class and its superclass, bearerService, represent the 
+						characteristics of the Circuit-Mode, 64 kbit/s, 8 kHz Structured, Usable for 
+						MultiUse Information Transfer bearer service. This bearer service and associated 
+						values for the I.210 Information Transfer and Access attributes, are identified 
+						in I.231.9.";;;;
+	CONDITIONAL PACKAGES
+		networkProvidedTonePkg
+			PRESENT IF
+				"Network Provided Tone Subscription is supported.",
+		circuitMultiUsePrimaryICPkg
+			PRESENT IF
+				"inter-exchange carrier subscription is supported.";
+REGISTERED AS { cAISDNObjectClass 28 };
+-- 6.1.9 Bearer Service For 64 kbit/s Data (Unrestricted) Rate Adapted From 56 kbit/s
+
+
+circuitUnrestrictedDigitalDataRateAdaptedFrom56kbit/s MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. 824.0" :bearerService;
+	CHARACTERIZED BY
+		circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPkg PACKAGE
+			BEHAVIOUR
+				circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsBhv BEHAVIOUR
+					DEFINED AS
+						"This object represents the characteristics of the Circuit-Mode, 64 kbit/s 
+						Unrestricted bearer service as defined in I.231 and I.232 rate adapted to 56 
+						kbit/s according to V.110.";;;;
+	CONDITIONAL PACKAGES
+		circuitUnrestrictedDigitalDataPrimaryICPkg
+			PRESENT IF
+				"inter-exchange carrier subscription is supported.";
+REGISTERED AS { cAISDNObjectClass 29 };
+-- 6.1.10 Circuit Speech
+-- The Circuit speech bearer service object class specifies the characteristics of ISDN speech services.
+
+
+circuitSpeech MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :bearerService;
+	CHARACTERIZED BY
+		circuitSpeechPkg PACKAGE
+			BEHAVIOUR
+				circuitSpeechBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Circuit-Mode, 64 kbit/s, 
+						8 kHz Structured, Usable for Speech bearer service. This bearer service, and the 
+						associated values for the I.210 Information Transfer and Access attributes, are 
+						identified in I.231.2. This bearer service is intended to support network 
+						characteristics appropriate for speech, such as 4-wire analog transmission, low 
+						bit rate voice encoding, and Time Assignment Speech Interpolation (TASI) 
+						techniques.";;;;
+	CONDITIONAL PACKAGES
+		networkProvidedTonePkg
+			PRESENT IF
+				"Network Provided Tone Subscription is supported.",
+		circuitSpeechPrimaryICPkg
+			PRESENT IF
+				"inter-exchange carrier subscription is supported.";
+REGISTERED AS { cAISDNObjectClass 30 };
+-- 6.1.11 Circuit Unrestricted Digital Data
+-- The unrestricted digital data bearer service object class specifies the characteristics of ISDN circuit mode data calls using
+-- unrestricted digital facilities.
+
+
+circuitUnrestrictedDigitalData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :bearerService;
+	CHARACTERIZED BY
+		circuitUnrestrictedDigitalDataPkg PACKAGE
+			BEHAVIOUR
+				circuitUnrestrictedDigitalDataBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Circuit-Mode, 64 kbit/s 
+						Unrestricted Digital Transmission, 8 kHz Structured bearer service. This bearer 
+						service and the associated values for the I.210 Transfer and Access attributes, 
+						are identified in I.231.1.";;;;
+	CONDITIONAL PACKAGES
+		circuitUnrestrictedDigitalDataPrimaryICPkg
+			PRESENT IF
+				"inter-exchange carrier subscription is supported.";
+REGISTERED AS { cAISDNObjectClass 31 };
+-- 6.1.12 Packet
+-- The Packet bearer service object class specifies the characteristics of ISDN Packet services.
+
+
+packet MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :bearerService;
+	CHARACTERIZED BY
+		packetPkg PACKAGE
+			BEHAVIOUR
+				packetBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Packet bearer service. 
+						The transmission rate of the packet mode service is defined by the associated B- 
+						and D-channel characteristics. This bearer service and the associated values for 
+						the I.210 Transfer and Access attributes, are identified in I.232. This class is 
+						not instantiated, only its subclasses are instatiated.";;
+			ATTRIBUTES
+				notificationClass GET-REPLACE,
+				layer2InfoEntityPtr GET-REPLACE,
+				layer3InfoEntityPtr GET-REPLACE;;;
+REGISTERED AS { cAISDNObjectClass 32 };
+-- 6.1.13 Packet B-channel
+
+
+packetBChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		packet;
+	CHARACTERIZED BY
+		packetBChannelPkg PACKAGE
+			BEHAVIOUR
+				packetPacketBChannelBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Packet bearer service 
+						running over a B-channel. This bearer service and the associated values for the 
+						I.210 Information Transfer and Access attributes, are identified in I.232.";;
+			ATTRIBUTES
+				semiPermAccessPacketHandlerDefaultDN GET-REPLACE;;;
+REGISTERED AS { cAISDNObjectClass 33 };
+-- 6.1.14 Packet D-Channel
+
+
+packetDChannel MANAGED OBJECT CLASS
+	DERIVED FROM
+		packet;
+	CHARACTERIZED BY
+		packetDChannelPkg PACKAGE
+			BEHAVIOUR
+				packetDChannelBhv BEHAVIOUR
+					DEFINED AS
+						"This object class represents the characteristics of the Packet bearer service 
+						running over a D-channel. This bearer service and the associated values for the 
+						I.210 Information Transfer and Access attributes, are identified in I.232.";;;;
+REGISTERED AS { cAISDNObjectClass 34 };
+-- 7 Operations Support Managed Object Classes
+-- 7.1 Service Manager ISDN
+
+
+serviceManagerISDN MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :serviceManager;
+	CHARACTERIZED BY
+		serviceManagerISDNPkg PACKAGE
+			BEHAVIOUR
+				serviceManagerISDNBhv BEHAVIOUR
+					DEFINED AS
+						"The serviceManagerISDN will perform the actions that establish and remove ISDN 
+						accesses, services and terminals. In addition, the serviceManagerISDN will 
+						perform actions that will change a directory number.";;
+			ACTIONS
+				establishISDNAccess
+					invalidReferenceError,
+				removeISDNAccess
+					invalidReferenceError,
+				establishISDNService
+					invalidReferenceError,
+				removeISDNService
+					invalidReferenceError,
+				changeDirectoryNumber
+					invalidReferenceError;;;
+	CONDITIONAL PACKAGES
+		manageISDNTerminalPackage
+			PRESENT IF
+				"supported by Administration.";
+REGISTERED AS { cAISDNObjectClass 35 };
+-- 7.2 Service Manager Retrieve Service
+
+
+serviceManagerRetrieveService MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.824.0" :serviceManager;
+	CHARACTERIZED BY
+		serviceManagerRetrieveServicePkg PACKAGE
+			BEHAVIOUR
+				serviceManagerRetrieveServiceBhv BEHAVIOUR
+					DEFINED AS
+						"The serviceManagerCustService is service independent managed object whose action 
+						will retrieve all service information related to a given customer service.";;
+			ACTIONS
+				retrieveService
+					invalidReferenceError;;;
+REGISTERED AS { cAISDNObjectClass 36 };
+-- 8 Package Templates
+-- 8.1 Active Terminal List
+
+
+activeTerminalListPkg PACKAGE
+	BEHAVIOUR
+		activeTerminalListPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package provides information on the terminal currently active on the access 
+				port profile. The activeTerminalList attribute is a get only attribute that is 
+				set when a terminal initializes on the access port profile. For terminals with 
+				fixed TEI, the TEI is recorded when the terminal is in the Mutliframe 
+				Established state. For automatic terminals, the TEI is set when the terminals 
+				enter the TEI assigned state. For fully initializing terminals (those using the 
+				optional procedures of Q.932), the SPID and USID may also be recorded in this 
+				attribute when the terminal initializes.";;
+	ATTRIBUTES
+		activeTerminalList GET;
+REGISTERED AS { cAISDNPackage 1 };
+-- 8.2 Assignment Of Timeslots
+
+
+assignmentOfTimeslotsPkg PACKAGE
+	BEHAVIOUR
+		assignmentOfTimeslotsBhv BEHAVIOUR
+			DEFINED AS
+				"This package provides an attribute whose value is used to determine how wideband 
+				channel selection is done.";;
+	ATTRIBUTES
+		assignmentOfTimeslots GET-REPLACE;
+REGISTERED AS { cAISDNPackage 2 };
+-- 8.3 Automatic Negotiation
+
+
+automaticNegotiationPkg PACKAGE
+	ATTRIBUTES
+		automaticXIDnotification GET-REPLACE,
+		signallingParameterNegotiation GET-REPLACE;
+REGISTERED AS { cAISDNPackage 3 };
+-- 8.4 Bearer Service For Audio IC
+
+
+bearerServiceForAudioICPkg PACKAGE
+	ATTRIBUTES
+		circuitAudioPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 4 };
+-- 8.5 Bearer Service For 384 kbit/s Data Primary IC
+
+
+bearerServiceFor384kbpsDataPrimaryICPkg PACKAGE
+	BEHAVIOUR
+		bearerServiceFor384kbpsDataPrimaryICPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package provides an attribute whose value identifies the Inter-Exchange 
+				Carrier assigned to the subscriber service this object represents.";;
+	ATTRIBUTES
+		bearerServiceFor384kbpsDataPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 5 };
+-- 8.6 Bearer Service For 1536 kbit/s Data Primary IC
+
+
+bearerServiceFor1536kbpsDataPrimaryICPkg PACKAGE
+	BEHAVIOUR
+		bearerServiceFor1536kbpsDataPrimaryICPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package provides an attribute whose value identifies the Inter-Exchange 
+				Carrier assigned to the subscriber service this object represents.";;
+	ATTRIBUTES
+		bearerServiceFor1536kbpsDataPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 6 };
+-- 8.7 Bearer Service For 1920 kbit/s Data Primary IC
+
+
+bearerServiceFor1920kbpsDataPrimaryICPkg PACKAGE
+	BEHAVIOUR
+		bearerServiceFor1920kbpsDataPrimaryICPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package provides an attribute whose value identifies the Inter-Exchange 
+				Carrier assigned to the subscriber service this object represents.";;
+	ATTRIBUTES
+		bearerServiceFor1920kbpsDataPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 7 };
+-- 8.8 Bearer Service For Multiple-Rate Data Primary IC
+
+
+bearerServiceForMultipleRateDataPrimaryICPkg PACKAGE
+	BEHAVIOUR
+		bearerServiceForMultipleRateDataPrimaryICPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package provides an attribute whose value identifies the Inter-Exchange 
+				Carrier assigned to the subscriber service this object represents.";;
+	ATTRIBUTES
+		bearerServiceForMultipleRateDataPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 8 };
+-- 8.9 Bearer Service List
+
+
+bearerServiceListPkg PACKAGE
+	ATTRIBUTES
+		bearerServiceList GET-REPLACE ADD-REMOVE;
+REGISTERED AS { cAISDNPackage 9 };
+-- 8.10 Call Reference
+
+
+callReferencePkg PACKAGE
+	BEHAVIOUR
+		callReferencePkgBhv BEHAVIOUR
+			DEFINED AS
+				"The maxNumberOfCallReference attribute indicates the maximum number of the 
+				simultaneous layer 3 connections for signalling (SAPI = 0 for all TEIs on this 
+				Access Port Profile). It must be at least as large as the largest 
+				callReferenceBusyLimit attribute (in ISDN Circuit Service Set managed object 
+				contained in the Bearer Services).";;
+	ATTRIBUTES
+		maxNumberOfCallReference GET-REPLACE;
+REGISTERED AS { cAISDNPackage 10 };
+-- 8.11 Circuit Speech Primary IC
+
+
+circuitSpeechPrimaryICPkg PACKAGE
+	ATTRIBUTES
+		circuitSpeechPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 11 };
+-- 8.12 Circuit Multi-Use Primary IC
+
+
+circuitMultiUsePrimaryICPkg PACKAGE
+	ATTRIBUTES
+		circuitMultiUsePrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 12 };
+-- 8.13 Circuit Unrestricted Digital Data Primary IC
+
+
+circuitUnrestrictedDigitalDataPrimaryICPkg PACKAGE
+	ATTRIBUTES
+		circuitUnrestrictedDigitalDataPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 13 };
+-- 8.14 Circuit Unrestricted Digital Data Rate Adapted From 56 kbit/s Primary IC
+
+
+circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryICPkg PACKAGE
+	ATTRIBUTES
+		circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryIC GET-REPLACE;
+REGISTERED AS { cAISDNPackage 14 };
+-- 8.15 Deactivation Capabilities
+
+
+deactivationCapabilitiesPkg PACKAGE
+	ATTRIBUTES
+		deactivationCapabilities GET-REPLACE;
+REGISTERED AS { cAISDNPackage 15 };
+-- 8.16 Link Setting
+
+
+linkSettingPkg PACKAGE
+	ATTRIBUTES
+		linkLevelWindowSize GET-REPLACE,
+		maxBitsPerInformationFrame GET-REPLACE,
+		maxTransmissionAttempts GET-REPLACE;
+REGISTERED AS { cAISDNPackage 16 };
+-- 8.17 Manage ISDN Terminal
+
+
+manageISDNTerminalPackage PACKAGE
+	ACTIONS
+		establishISDNTerminal
+			invalidReferenceError,
+		removeISDNTerminal
+			invalidReferenceError;
+REGISTERED AS { cAISDNPackage 17 };
+-- 8.18 Max Combined Thruput B-Channel
+
+
+maxCombinedThruputBChanPkg PACKAGE
+	BEHAVIOUR
+		maxCombinedThruputBChanPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package identifies the maximum combined throughput permitted on the 
+				B-Channel.";;
+	ATTRIBUTES
+		maxCombinedThruputClass REPLACE-WITH-DEFAULT
+			DEFAULT VALUE CAISDNModule.null
+			GET-REPLACE;
+REGISTERED AS { cAISDNPackage 18 };
+-- 8.19 Max Combined Thruput D-Channel
+
+
+maxCombinedThruputDChanPkg PACKAGE
+	BEHAVIOUR
+		maxCombinedThruputDChanPkgBhv BEHAVIOUR
+			DEFINED AS
+				"This package identifies the maximum combined throughput permitted on the 
+				D-Channel.";;
+	ATTRIBUTES
+		maxCombinedThruputClass REPLACE-WITH-DEFAULT
+			DEFAULT VALUE CAISDNModule.null
+			GET-REPLACE;
+REGISTERED AS { cAISDNPackage 19 };
+-- 8.20 Network Provided Tone
+
+
+networkProvidedTonePkg PACKAGE
+	ATTRIBUTES
+		networkProvidedTones REPLACE-WITH-DEFAULT
+			DEFAULT VALUE CAISDNModule.true
+			GET-REPLACE;
+REGISTERED AS { cAISDNPackage 20 };
+-- 8.21 nT2ISDN Access Port Profile
+
+
+nT2ISDNaccessPortProfilePkg PACKAGE
+	BEHAVIOUR
+		nT2ISDNAccessPortProfilePkgBhv BEHAVIOUR
+			DEFINED AS
+				"This object package represents the characteristics of the ISDN Access Port 
+				Profile object class to be instantied for support of a nT2 (class 2) ISDN 
+				interface configuration.";;
+	ATTRIBUTES
+		earlyCutThruUserProvidedAudibleRing GET-REPLACE,
+		earlyCutThruRemoteNetworkInterwork GET-REPLACE;
+REGISTERED AS { cAISDNPackage 21 };
+-- 8.22 Number Of D-Channel Links
+
+
+numberOfDChannelLinksPkg PACKAGE
+	BEHAVIOUR
+		numberOfDChannelLinksPkgBhv BEHAVIOUR
+			DEFINED AS
+				"The linkOption attribute is a choice of fixed or an identification of the values 
+				for the 4 attributes callControlTEItotal, callControlTEIsw, packTEItotal and 
+				packTEIsw. The selection of fixed links (which can be represented by null) would 
+				indicate that there is exactly one signalling data link connection at sapi 0, 
+				TEI 0; and one packet link at sapi 16, TEI 0. The number of signalling links for 
+				the fixed option is 3. This includes one link for the signalling access 
+				controller at sapi 63, TEI 127.
+
+				The dynamic choice is the default with callControlTEItotal and packTEItotal set 
+				to 127 and callControlTEIsw and packTEIsw set to 63. Where:
+
+				callControlTEItotal is the total number of TEIs that can be assigned for Call 
+				Control, callControlTEIsw is either null or is the number of TEIs that can be 
+				assigned by the switch for Call Control. The null value indicates that the way 
+				TEIs are assigned is not controlled.
+
+				packTEItotal is the total number of TEIs that can be assigned for packet, 
+				packTEIsw is either null or is the number of TEIs that can be assigned by the 
+				switch for packet. The null value indicates that the way TEIs are assigned is 
+				not controlled.
+
+				The number of signalling links must be less than or equal to the sum of 
+				callControlTEItotal and packetTEItotal.";;
+	ATTRIBUTES
+		linkOption REPLACE-WITH-DEFAULT
+			DEFAULT VALUE CAISDNModule.linkOptionDefault
+			GET-REPLACE,
+		numberOfDChannelLinks GET-REPLACE;
+REGISTERED AS { cAISDNPackage 22 };
+-- 8.23 Optional Deactivation
+
+
+optionalDeactivationPkg PACKAGE
+	ATTRIBUTES
+		deactivationCapabilities GET-REPLACE;
+REGISTERED AS { cAISDNPackage 23 };
+-- 8.24 Selection Procedures
+
+
+selectionProceduresPkg PACKAGE
+	ATTRIBUTES
+		channelSelection GET-REPLACE;
+REGISTERED AS { cAISDNPackage 24 };
+-- 8.25 DCE Timers
+
+
+x25DCETimersPkg PACKAGE
+	ATTRIBUTES
+		"ITU-T Rec. X.282" :t1Timer GET-REPLACE,
+		"ITU-T Rec. X.282" :t2Timer GET-REPLACE,
+		"ITU-T Rec. X.282" :t3Timer GET-REPLACE,
+		"ITU-T Rec. X.282" :t4Timer GET-REPLACE,
+		"ITU-T Rec. X.282" :n1 GET-REPLACE,
+		"ITU-T Rec. X.282" :n2 GET-REPLACE,
+		"ITU-T Rec. X.282" :k GET-REPLACE;
+REGISTERED AS { cAISDNPackage 25 };
+-- 9 Attribute templates
+-- This clause contains the ASN.1 definitions for all attributes in the described object classes. These definitions identify the
+-- function of the attributes and their valid characteristics, such as their valid values, interdependencies, read/write
+-- constraints, etc. The attributes are identified by their ASN.1 descriptors.
+-- 9.1 Access Channel Pointer List
+
+
+accessChannelPtrList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.AccessChannelPtrList;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		accessChannelPtrListBhv BEHAVIOUR
+			DEFINED AS
+				"This is a set-valued attribute whose value(s) points to one or more instances of 
+				the Access Channel object class.";;
+REGISTERED AS { cAISDNAttribute 1 };
+-- 9.2 Active Terminal List
+
+
+activeTerminalList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.ActiveTerminalList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		activeTerminalListBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the active terminals on the interface by the spid, 
+				tei., and usid. It is used to support maintenance. Spid and usid are allowed to 
+				be NULL if spid initialization procedures are not used.";;
+REGISTERED AS { cAISDNAttribute 2 };
+-- 9.3 Assignment Of Timeslots
+
+
+assignmentOfTimeslots ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.AssignmentOfTimeslots;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		assignmentOfTimeslotsBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies how timeslots are assigned for wideband (e.g. 
+				384k/sec) bearer services. The channels must always be with a single physical 
+				interface (as modeled by access port). However, within the interface the 
+				channels may be assigned to:
+
+				- fixed positions of contiguous channels (such as specified by Annex A/I.431 and 
+				  Annex B/I.431);
+
+				- loating positions of contiguous channels (the channels must be contiguous but 
+				  may start at any position within the physical interface that can support that 
+				  number of contiguous channels;
+
+				- flexibly to any channels available within the physical interface without 
+				  regard to whether the channels are contiguous or not.
+
+				Note that this attribute controls how calls are offered to subscribers. It is a 
+				network provider option what channel assignments are accepted from subscribers.";;
+REGISTERED AS { cAISDNAttribute 3 };
+-- 9.4 Automatic XID Notification
+
+
+automaticXIDnotification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		automaticXIDnotificationBhv BEHAVIOUR
+			DEFINED AS
+				"The XID frames may be exchanged only after the link has been made active. 
+				Exchange of XID frames before the link is made active is controlled by 
+				'automaticXIDnotification'. This Boolean value attribute controls the exchange 
+				of XID frames between the switch and the user equipment. A 'True' value of the 
+				attribute indicates that XID frames can be exchanged between the link controller 
+				in the switch and user equipment. A 'False' value of the attribute indicates 
+				that XID frames cannot be exchanged.";;
+REGISTERED AS { cAISDNAttribute 4 };
+-- 9.5 Bearer Service For 384 kbit/s Data Primary IC
+
+
+bearerServiceFor384kbpsDataPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bearerServiceFor384kbpsDataPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Primary Inter-Exchange Carrier (PIC) selected by 
+				the ISDN 384 kbit/s Data Service Subscriber.";;
+REGISTERED AS { cAISDNAttribute 5 };
+-- 9.6 Bearer Service For 1536 kbit/s Data Primary IC
+
+
+bearerServiceFor1536kbpsDataPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bearerServiceFor1536kbpsDataPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Primary Inter-Exchange Carrier (PIC) selected by 
+				the ISDN 1536 kbit/s Data Service Subscriber.";;
+REGISTERED AS { cAISDNAttribute 6 };
+-- 9.7 Bearer Service For 1920 kbit/s Data Primary IC
+
+
+bearerServiceFor1920DataPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bearerServiceFor1920kbpsDataPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Primary Inter-Exchange Carrier (PIC) selected by 
+				the ISDN 1920 kbit/s Data Service Subscriber.";;
+REGISTERED AS { cAISDNAttribute 7 };
+-- 9.8 Bearer Service For Multiple-Rate Data Primary IC
+
+
+bearerServiceForMultipleRateDataPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		bearerServiceForMultipleRateDataPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Primary Inter-Exchange Carrier (PIC) selected by 
+				the ISDN Multiple- Rate kbit/s Data Service Subscriber.";;
+REGISTERED AS { cAISDNAttribute 8 };
+-- 9.9 Bearer Service List
+
+
+bearerServiceList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.BearerServiceList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		bearerServiceListBhv BEHAVIOUR
+			DEFINED AS
+				"The bearerServiceList attribute is a list of one or more bearerService types.";;
+REGISTERED AS { cAISDNAttribute 9 };
+-- 9.10 Bit Rate Of Primary Rate Interface
+
+
+bitRateOfPrimaryRateInterface ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.BitRateOfPrimaryRateInterface;
+	MATCHES FOR SET-INTERSECTION, SET-COMPARISON;
+	BEHAVIOUR
+		bitRateOfPrimaryRateInterfaceBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates bit rate of Primary rate interface. When the value of 
+				this attribute is 'rate1544', the bit rate of interface is 1544 kbit/s.When the 
+				value of this attribute is 'rate2048', the bit rate of interface is 2048 kbit/s.";;
+REGISTERED AS { cAISDNAttribute 10 };
+-- 9.11 Calling Number Screening Id
+
+
+callingNumberScreeningId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		callingNumberScreeningIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is the naming attribute of the calling number screening managed object. If 
+				the string choice for the syntax is used, matching on the substings is 
+				permitted. If the number choice for the syntax is used, then matching on the 
+				ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 11 };
+-- 9.12 Catalogued Layer Entity LAPD Id
+
+
+cataloguedLayerEntityLAPDId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CACommonModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedLayerEntityLAPDIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute of the Access Channel managed object. If the string 
+				choice for the syntax is used, matching on the substrings is permitted. If the 
+				number choice for the syntax is used, then matching on ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 12 };
+-- 9.13 Circuit Audio Primary IC
+
+
+circuitAudioPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitAudioPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the Primary Inter-Exchange Carrier (PIC) selected by 
+				the bearerServiceAudio service subscriber.";;
+REGISTERED AS { cAISDNAttribute 13 };
+-- 9.14 Circuit Multi-Use Primary IC
+
+
+circuitMultiUsePrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitMultiUsePrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the Primary Inter-Exchange Carrier (PIC) selected by 
+				the circuitMultiUse service subscriber.";;
+REGISTERED AS { cAISDNAttribute 14 };
+-- 9.15 Circuit Unrestricted Digital Data Rate Adapted From 56 kbit/s Primary IC
+
+
+circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the Primary Inter-Exchange Carrier (PIC) selected by 
+				the circuitUnrestrictedDigitalDataRateAdaptedFrom56kbps service subscriber.";;
+REGISTERED AS { cAISDNAttribute 15 };
+-- 9.16 Circuit Speech Primary IC
+
+
+circuitSpeechPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitSpeechPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the Primary Inter-Exchange Carrier (PIC) selected by 
+				the CircuitSpeech service subscriber.";;
+REGISTERED AS { cAISDNAttribute 16 };
+-- 9.17 Circuit Unrestricted Digital Data Primary IC
+
+
+circuitUnrestrictedDigitalDataPrimaryIC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.PrimaryIC;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		circuitUnrestrictedDigitalDataPrimaryICBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute represents the Primary Inter-Exchange Carrier (PIC) selected by 
+				the circuitUnrestrictedDigitalData service subscriber.";;
+REGISTERED AS { cAISDNAttribute 17 };
+-- 9.18 Calling Party Default Directory Number
+
+
+callingPartyDefaultDN ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.CallingPartyDefaultDirectoryNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyDefaultDNBhv BEHAVIOUR
+			DEFINED AS
+				"The attribute is applicable only if the Calling Party Number Provision Necessary 
+				attribute is set to the boolean value FALSE. The value(s) of this attribute is 
+				the calling party number default Directory Number(s) to be used for billing 
+				purposes when the calling party numbers are not provided by the CPE. The 
+				attribute value choices may be either one Default Directory Number with the 
+				choice ALL specified (indicating that the Default DN applies to all bearer 
+				services assigned to the Directory Number), or a list of Directory Numbers per 
+				bearer service. The attribute value set may be 1 to 3 sequences. The form of 
+				each sequence within the value set is: <Directory Number>,<bearer service>|ALL
+
+				The bearer service(s) type must be part of the set of values of the bearer 
+				service attribute.";;
+REGISTERED AS { cAISDNAttribute 18 };
+-- 9.19 Calling Party Number Discard Control
+
+
+callingPartyNumberDiscardCtrl ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyNumberDiscardCtrlBhv BEHAVIOUR
+			DEFINED AS
+				"When the value of this attribute is 'TRUE' (default), the switch discards user 
+				supplied Directory Numbers, Directory Numbers not screened or that failed 
+				screening, and calling party numbers when they occur and uses a single default 
+				Directory Number as the calling party number. If the attribute value is 'FALSE', 
+				the discard feature does not apply. If the Calling Party Number Provision 
+				Necessary attribute = 'TRUE', then the value of this attribute should be 
+				'FALSE'. This attribute is only applicable to ISDN services.";;
+REGISTERED AS { cAISDNAttribute 19 };
+-- 9.20 Calling Party Number Provision Necessary
+
+
+callingPartyNumberProvisionNecessary ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingPartyNumberProvisionNecessaryBhv BEHAVIOUR
+			DEFINED AS
+				"When the value of this attribute is FALSE, the call processing will accept any 
+				call originations from this access line without the calling party number 
+				information being given. When the value of this attribute is FALSE, the value of 
+				the callingPartyDefaultDN attribute is assumed as the originating directory 
+				number for billing purposes. The default value of this attribute is FALSE.
+
+				The attribute value TRUE means that calling party information is required by 
+				call processing and if the information is not provided by the CPE on a call 
+				origination, the call processing should reject the call.";;
+REGISTERED AS { cAISDNAttribute 20 };
+-- 9.21 Calling Party Valid Directory Number List
+
+
+callingPartyValidDirectoryNumberList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.CallingPartyValidDirectoryNumberList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		callingPartyValidDirectoryNumberListBhv BEHAVIOUR
+			DEFINED AS
+				"This set-value attribute identifies the individual directory numbers that 
+				originate calls from an instance of the ISDN Access Port object class.";;
+REGISTERED AS { cAISDNAttribute 21 };
+-- 9.22 Catalogued Access Port ISDN Primary Rate Id
+
+
+cataloguedAccessPortISDNPrimaryRateId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedAccessPortISDNPrimaryRateIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 22 };
+-- 9.23 Catalogued Access Port Profile ISDN Id
+
+
+cataloguedAccessPortProfileISDNId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedAccessPortProfileISDNIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 23 };
+-- 9.24 Catalogued Layer Entity DSS 1 ID
+
+
+cataloguedLayerEntityDSS1Id ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		cataloguedLayerEntityDSS1IdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 24 };
+-- 9.25 Channel Selection
+
+
+channelSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ChannelSelection;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		channelSelectionBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used to set the B-channel selection procedure from the network 
+				to the user. The selection procedure is shown in 5.2.3.1/Q.931. The value 
+				byNetwork(0) means that the channel is indicated by the network which 
+				corresponds to items 1) and 2) in 5.2.3.1/Q.931 and by user (1) means that any 
+				channel is acceptable which corresponds to item 3) in 5.2.3.1/Q.931.";;
+REGISTERED AS { cAISDNAttribute 25 };
+-- 9.26 D-channel Packet Default Directory Number
+
+
+dChannelPacketDefaultDirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.DirectoryNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelPacketDefaultDirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute is a Numeric string representing a particular 
+				default Directory Number (Directory Number) from the set of Directory Numbers 
+				listed in the DChannelDirectoryNumberList attribute. This Directory Number is 
+				used when no X.25 Calling Address is provided due to the caller using in-band 
+				procedures.";;
+REGISTERED AS { cAISDNAttribute 26 };
+-- 9.27 D-Channel Packet Directory Number List
+
+
+dChannelPacketDirectoryNumberList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.DirectoryNumberList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelPacketDirectoryNumberListBhv BEHAVIOUR
+			DEFINED AS
+				"The value(s) of this attribute are 1 or more Numeric strings representing the 
+				Directory Numbers (Directory Number) that provide a Directory Number screening 
+				set for use over a D-Channel packet connection (LAPD SAPI address field set to 
+				Packet Control).";;
+REGISTERED AS { cAISDNAttribute 27 };
+-- 9.28 D-Channel Primary Pointer
+
+
+dChannelPrimaryPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		dChannelPrimaryPtrBhv BEHAVIOUR
+			DEFINED AS
+				"The dChannelPrimaryPtr attribute of the ISDN Access Port Profile Primary Rate 
+				object class and identifies the primary D-Channel object.";;
+REGISTERED AS { cAISDNAttribute 28 };
+-- 9.29 D-Channel Secondary Pointer
+
+
+dChannelSecondaryPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		dChannelSecondaryPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This is pointer to the optional backup D-Channel primary rate resource object 
+				instance for a Primary Rate Access.";;
+REGISTERED AS { cAISDNAttribute 29 };
+-- 9.30 D-Channel T301
+
+
+dChannelT301 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT301Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T301 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 30 };
+-- 9.31 D-Channel T303
+
+
+dChannelT303 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT303Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T303 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 31 };
+-- 9.32 D-Channel T304
+
+
+dChannelT304 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT304Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T304 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 32 };
+-- 9.33 D-Channel T305
+
+
+dChannelT305 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT305Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T305 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 33 };
+-- 9.34 D-Channel T306
+
+
+dChannelT306 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT306Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T306 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 34 };
+-- 9.35 D-Channel T307
+
+
+dChannelT307 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT307Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T307 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 35 };
+-- 9.36 D-Channel T308
+
+
+dChannelT308 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT308Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T308 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 36 };
+-- 9.37 D-Channel T309
+
+
+dChannelT309 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT309Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T309 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 37 };
+-- 9.38 D-Channel T310
+
+
+dChannelT310 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT310Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T310 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 38 };
+-- 9.39 D-Channel T312
+
+
+dChannelT312 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT312Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T312 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 39 };
+-- 9.40 D-Channel T314
+
+
+dChannelT314 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT314Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T314 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 40 };
+-- 9.41 D-Channel T316
+
+
+dChannelT316 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT316Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T316 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 41 };
+-- 9.42 D-Channel T317
+
+
+dChannelT317 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT317Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T317 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 42 };
+-- 9.43 D-Channel T320
+
+
+dChannelT320 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT320Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T320 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 43 };
+-- 9.44 D-Channel T321
+
+
+dChannelT321 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT321Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T321 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 44 };
+-- 9.45 D-Channel T322
+
+
+dChannelT322 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT322Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T322 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 45 };
+-- 9.46 D-Channel T330
+
+
+dChannelT330 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DChannelT3xx;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dChannelT330Bhv BEHAVIOUR
+			DEFINED AS
+				"This attribute provides the value of call control timer T330 defined in Q.931.";;
+REGISTERED AS { cAISDNAttribute 46 };
+-- 9.47 Deactivation Capabilities
+
+
+deactivationCapabilities ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		deactivationCapabilitiesBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the exchange supports deactivation or not. In 
+				the APP, this attribute is a boolean with the true value stating that the APP 
+				supports deactivation by the user; the false value indicates that the APP 
+				supports only permanent deactivation. In the layer 2 entity, this attribute 
+				indicates whether signalling or information entity support deactivation by the 
+				user or not. The attribute is a boolean; the false value is only possible if the 
+				same attribute in the ISDN APP is also false.";;
+REGISTERED AS { cAISDNAttribute 47 };
+-- 9.48 Directory Number Appearance Identifier List
+
+
+directoryNumberAppearanceIdentifierList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DirectoryNumberAppearanceIdentifierList;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		directoryNumberAppearanceIdentifierBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the terminal controlled call appearance identifier 
+				information for each DN associated with the Terminal Service Profile. These call 
+				appearance identifiers are not used for call set-up or for compatibility checks 
+				for incoming calls. This information is simply used for associating a DN with a 
+				particular key on a terminal. This attribute also identifies the default bearer 
+				service associated with each terminal controlled call appearance. This BS 
+				information can be used in originating calls, if not overridden by the user.";;
+REGISTERED AS { cAISDNAttribute 48 };
+-- 9.49 Directory Number Reference
+
+
+directoryNumberReference ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.DirectoryNumberReference;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		directoryNumberReferenceBhv BEHAVIOUR
+			DEFINED AS
+				"The function of this set-valued attribute is to assign a logical number 
+				(integer) to each Directory Number/Bearer service pair associated with this TSP. 
+				This attribute is used in the attribute value structure of the Feature 
+				Activators per Directory Number/BS (FADN) and Feature Indicators per Directory 
+				Number/BS (FIDN) attributes of the Terminal Configuration object class instance 
+				associated with this TSP. The set of value(s) of this attribute are each of the 
+				following sequence:
+
+				<DirectoryNumberR>,<DirectoryNumber>,<BS>
+
+				where:
+
+				DirectoryNumberR is an integer in the range from 1 to 128, which is the 
+				Directory Number/BS reference number used by attributes of the associated TCGN 
+				object associated with this TSP object,
+
+				Directory Number is the Directory Number to which the DirectoryNumberR is 
+				assigned.
+
+				BS is the ISDN bearer service contained in the Directory Number Profile managed 
+				object.";;
+REGISTERED AS { cAISDNAttribute 49 };
+-- 9.50 DTE Compatibility
+
+
+dTECompatibilty ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.DTECompatibility;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dTECompatibiltyBhv BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute provides compatibility with DTE built to 1980, 1984, 
+				1988 or 1993 X.25 specifications.";;
+REGISTERED AS { cAISDNAttribute 50 };
+-- 9.51 Early Cut Thru Remote Network Interwork
+
+
+earlyCutThruRemoteNetworkInterwork ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		earlyCutThruRemoteNetworkInterworkBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the procedures described in Annex K/Q.931are 
+				activated or not. It is a boolean value that is associated with the attribute 
+				earlyCutThruUserProvidedAudibleRing. If earlyCutThruUserProvidedAudibleRing is 
+				true, earlyCutThruRemoteNetworkInterwork must be true to allow the PBX to return 
+				the tone back towards the network.";;
+REGISTERED AS { cAISDNAttribute 51 };
+-- 9.52 Early Cut Thru User Provided Audible Ring
+
+
+earlyCutThruUserProvidedAudibleRing ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		earlyCutThruUserProvidedAudibleRingBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether the exchange provides users with tone or not. 
+				It is a boolean, with the true value indicating that the exchange is not 
+				providing the tones while early cut through is provided.";;
+REGISTERED AS { cAISDNAttribute 52 };
+-- 9.53 Feature Activators All Directory Number
+
+
+featureActivatorsAllDirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureActivator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureActivatorsAllDirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute, (FA), is a set-valued attribute of the Terminal Configuration 
+				object class. This attribute identifies Feature Activators for features which 
+				have the same value for all Directory Number/BSs on an ISDN terminal. This 
+				attribute identifies Feature Activators for TSP features to be applied to all 
+				Directory Number/BS pairs identified on an ISDN terminal. At least 64 feature 
+				activators should be assignable for the combination of the FA and 
+				FADirectoryNumber TCGN features. Each value in the set is a sequence of data 
+				items in the following format:
+
+				n, <ObjectID>
+
+				where: an integer in the range of 0 to 16383, identifying a Feature Activator 
+				value to be sent by an ISDN terminal when the user activates a key, The 
+				identifier of a Service Feature Object, in ASN.1 format.";;
+REGISTERED AS { cAISDNAttribute 53 };
+-- 9.54 Feature Activators Per Directory Number
+
+
+featureActivatorsPerDirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureActivator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureActivatorsPerDirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is a set-valued attribute of the Terminal Configuration object 
+				class. This attribute identifies Feature Activators for TSP features requiring 
+				different values for each Directory Number/BS pair on an ISDN terminal. This 
+				feature is operable only for specific Directory Number/CT pairs identified by 
+				the Directory Number Reference attribute in the TSP object associated with this 
+				TCGN object. At least 64 feature activators should be assignable for the 
+				combination of the FA and FADirectoryNumber TCGN features. Each value in the set 
+				is a sequence of data items in the following format:
+
+				n, m, <ObjectID>
+
+				where: an integer in the range of 0 to 16383, identifying a Feature Activator 
+				value to be sent by an ISDN terminal when the user activates a key, an integer 
+				in the range of 1 to 128, representing the Directory Number Reference that 
+				specifically identifies a Directory Number/BS pair to which the Feature 
+				Activator is assigned, The identifier of a Service Feature Object in ASN.1 
+				format.";;
+REGISTERED AS { cAISDNAttribute 54 };
+-- 9.55 Feature Activators Per Hunt Make Busy
+
+
+featureActivatorsPerHuntMakeBusy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureActivator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureActivatorsPerHuntMakeBusyBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies Feature Activators used to activate and deactivate the 
+				Hunt Make Busy application on an ISDN Terminal.";;
+REGISTERED AS { cAISDNAttribute 55 };
+-- 9.56 Feature Activators Per Stop Hunt
+
+
+featureActivatorsPerStopHunt ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureActivator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureActivatorsPerStopHuntBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies Feature Activators used to activate and deactivate the 
+				Stop Hunt application on an ISDN terminal.";;
+REGISTERED AS { cAISDNAttribute 56 };
+-- 9.57 Feature Indicators All Directory Number
+
+
+featureIndicatorsAllDirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureIndicator;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureIndicatorsAllDirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This set-valued attribute identifies Feature Indicators at an ISDN terminal for 
+				features which have the same value for all Directory Number/BS. At least 64 
+				feature indicators may be assignable to a given terminal. Each attribute value 
+				in the set is a sequence of data items in the following format:
+
+				n,<Object ID>
+
+				where:
+
+				n = an integer in the range of 0 to 16383, identifying a Feature Indicator value 
+				to be received by an ISDN terminal to light a particular lamp at the terminal,
+
+				Object ID = The identifier a supplementary feature to be which this indicator is 
+				assigned.";;
+REGISTERED AS { cAISDNAttribute 57 };
+-- 9.58 Feature Indicators Per Directory Number
+
+
+featureIndicatorsPerDirectoryNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureIndicatorsPerDirectoryNumber;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureIndicatorsPerDirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is a set-valued attribute of the Terminal Configuration (TCGN) 
+				object class. This attribute identifies Feature Indicators for TSP features 
+				requiring different values for each Directory Number/BS pair on an ISDN 
+				terminal. This feature indication applies only for specific Directory Number/CT 
+				pairs identified by the Directory Number Reference attribute in the TSP object 
+				associated with this TCGN object. At least 64 feature activators should be 
+				assignable for the combination of the FI and FIDirectoryNumber TCGN features. 
+				Each value in the set is a sequence of data items in the following format:
+
+				n, m, <Object ID>
+
+				where: An integer in the range of 0 to 16383, identifying a Feature Indicator or 
+				value to be returned to an ISDN terminal indicating the status of the assigned 
+				feature, an integer in the range of 1 to 128, representing the Directory Number 
+				Reference, (DirectoryNumberR), that specifically identifies a DirectoryNumber/BS 
+				pair to which the Feature Indicator is assigned, The identifier of a Service 
+				Feature Object in ASN.1 format.";;
+REGISTERED AS { cAISDNAttribute 58 };
+-- 9.59 Feature Indicators Per Hunt Make Busy
+
+
+featureIndicatorsPerHuntMakeBusy ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureActivatorValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureIndicatorsPerHuntMakeBusyBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Feature Indicator that displays the status of the 
+				Make Busy application on an ISDN terminal.";;
+REGISTERED AS { cAISDNAttribute 59 };
+-- 9.60 Feature Indicators Per Stop Hunt
+
+
+featureIndicatorsPerStopHunt ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.FeatureActivatorValue;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		featureIndicatorsPerStopHuntBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies the Feature Indicator that displays the status of the 
+				Stop Hunt application on an ISDN terminal.";;
+REGISTERED AS { cAISDNAttribute 60 };
+-- 9.61 Incoming Default Thruput Class
+
+
+incomingDefaultThruputClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ThruputClass;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		incomingDefaultThruputClassBhv BEHAVIOUR
+			DEFINED AS
+				"The values of this attribute identify selections of the default throughput class 
+				for the incoming direction on the B- or D-Channels.";;
+REGISTERED AS { cAISDNAttribute 61 };
+-- 9.62 Incoming Max Packet Size
+
+
+incomingMaxPacketSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.PacketSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		incomingMaxPacketSizeBhv BEHAVIOUR
+			DEFINED AS
+				"The function of this attribute is to allow the subscriber to choose a maximum 
+				packet size (different from the default of 128 provided by the network) for the 
+				incoming direction on the B- or D-Channels.
+
+				The enumerated choice value of this attribute is one of the following, 
+				representing the maximum allowable packet size for a logical channel which does 
+				not include Private Virtual Circuits (PVC).
+
+				� 16 (octets)
+
+				� 32 (octets)
+
+				� 64 (octets)
+
+				� 128 (octets)
+
+				� 256 (octets)
+
+				� 512 (octets)
+
+				� 1024 (octets)
+
+				� 2048 (octets)
+
+				� 4096 (octets)";;
+REGISTERED AS { cAISDNAttribute 62 };
+-- 9.63 Incoming Window Size
+
+
+incomingWindowSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.WindowSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		incomingWindowSizeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is an attribute of the Packet Switched Subscriber Services object 
+				class. The value of this attribute allows for the subscription to non-standard 
+				default window sizes for the incoming direction. The attribute value is an 
+				integer whose range of permissible values depends upon the value of the Packet 
+				Level Sequencing (PLSQ) attribute. If modulo 8 sequencing is specified by PLSQ, 
+				the permissible range of the IWS integer is 1 to 7. If modulo 128 is specified 
+				by PLSQ, the range of permissible values for IWS is 1 to 60 (61 to 127 is 
+				desirable).";;
+REGISTERED AS { cAISDNAttribute 63 };
+-- 9.64 Interface Type
+
+
+interfaceType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.InterfaceType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		interfaceTypeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates whether channel access is provided via a basic or a 
+				primary rate interface.";;
+REGISTERED AS { cAISDNAttribute 64 };
+-- 9.65 Layer 2 Info Entity Pointer
+
+
+layer2InfoEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		layer2InfoEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer2InfoEntity 
+				managed object class.";;
+REGISTERED AS { cAISDNAttribute 65 };
+-- 9.66 Layer Entity LAPD Pointer
+
+
+layerEntityLAPDPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		layerEntityLAPDPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer2LAPDEntity 
+				managed object class.";;
+REGISTERED AS { cAISDNAttribute 66 };
+-- 9.67 Layer 3 Info Entity Pointer
+
+
+layer3InfoEntityPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		layer3InfoEntityPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the Layer3InfoEntity 
+				managed object class.";;
+REGISTERED AS { cAISDNAttribute 67 };
+-- 9.68 Link Level Window Size
+
+
+linkLevelWindowSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.WindowSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		linkLevelWindowSizeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the link layer window size as defined in Q.921. The 
+				linkLevelWindowSize attribute value determines the number of packets allowed in 
+				a packet window. The permissible values of this attribute are a range of integer 
+				values between 1 and 60, with the following conditions:
+
+				� if the linkLevelFrameSequence attribute is 0, (Modulo 8 frame sequence), the 
+				  value range of the linkLevelWindowSize attribute is 1 to 7,
+
+				� if the linkLevelFrameSequence attribute is 1, (Modulo 128 frame sequence), the 
+				  value range of the linkLevelWindowSize attribute is 1 to 127.";;
+REGISTERED AS { cAISDNAttribute 68 };
+-- 9.69 Link Option
+
+
+linkOption ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.LinkOption;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		linkOptionBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute defines whether the user has subscribed to dynamic or static tei 
+				assignment.";;
+REGISTERED AS { cAISDNAttribute 69 };
+-- 9.70 Max Bits Per Information Frame
+
+
+maxBitsPerInformationFrame ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.MaxBitsPerInformationFrame;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxBitsPerInformationFrameBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the maximum number of bits allowed in the Information 
+				frame on LAPB over the B-Channel. The values permissible for this attribute is a 
+				single choice from the following enumerated list: 2120, 4168, 8264, 16456, 
+				32840.";;
+REGISTERED AS { cAISDNAttribute 70 };
+-- 9.71 Max Combined Thruput Class
+
+
+maxCombinedThruputClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.MaxCombinedThruputClass;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxCombinedThruputClassBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute determines the maximum value for the sum of the throughput 
+				classes allowed on the B-channel before the switch classifies that the channel 
+				is busy. The attribute value is either an alphanumeric string 'NULL' (default) 
+				or a discrete numeric rate value.";;
+REGISTERED AS { cAISDNAttribute 71 };
+-- 9.72 Max Number of Call Reference
+
+
+maxNumberOfCallReference ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.MaxNumberOfCallReference;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxNumberOfCallReferenceBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the maximum number of the simultaneous layer 3 
+				connections for signalling (SAPI = 0 for all TEIs on this Access Port Profile).";;
+REGISTERED AS { cAISDNAttribute 72 };
+-- 9.73 Max Transmission Attempts
+
+
+maxTransmissionAttempts ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.MaxTransmissionAttempts;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		maxTransmissionRequestsBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the maximum number of attempts allowed on the B-Channel 
+				to complete a successful transmission. The value of this attribute is an integer 
+				in the range from 2 through 15, directly representing the maximum permissable 
+				attempts. The default value of this attribute is 3.";;
+REGISTERED AS { cAISDNAttribute 73 };
+-- 9.74 Network Provided Tones
+
+
+networkProvidedTones ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkProvidedTonesBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates that a tone and/or announcement is to be provided by 
+				the network to indicate the progress or otherwise the status of a call. It is a 
+				Boolean attribute with a deafult value of true, as defined in I.231, which means 
+				that tones are provided by the network.";;
+REGISTERED AS { cAISDNAttribute 74 };
+-- 9.75 Network User Identification
+
+
+networkUserIdentification ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkUserIdentificationBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute that determines Network User Identification (NUI) 
+				capability for a Packet Mode user. When the value of this attribute is TRUE, the 
+				interface is configured to allow NUI selection facility to be provided to the 
+				network for billing, security or network management purposes on a per call 
+				basis. When FALSE, the NUI capability is not assigned to this access interface.";;
+REGISTERED AS { cAISDNAttribute 75 };
+-- 9.76 Network User Id Override
+
+
+networkUserIdentificationOverride ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkUserIdentificationOverrideBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute that determines Network User Identification (NUI) 
+				override capabilty. This attribute value is applicable only if the networkUserId 
+				attribute value is TRUE, indicating that the interface is configured to allow 
+				NUI selection facility to be provided to the network for billing, security or 
+				network management purposes on a per call basis. When this attribute value is 
+				TRUE, the interface is configured so that the NUI information may be associated 
+				with a user profile that will be used for the duration of the call. When FALSE, 
+				the NUI Override capability is not assigned to this access interface.";;
+REGISTERED AS { cAISDNAttribute 76 };
+-- 9.77 Network User Id Selection
+
+
+networkUserIdentificationSelection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAOptionalUserFacilitiesModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkUserIdentificationSelectionBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute that determines Network User Identification (NUI) 
+				Selection and Acceptance capability. This attribute value is applicable only if 
+				the networkUserIdentification attribute value is TRUE, indicating that the 
+				interface is configured to allow NUI selection facility to be provided to the 
+				network for billing, security or network management purposes on a per call 
+				basis. When the value of this attribute is TRUE, the NUI selection may be 
+				signalled in Call Accepted packets. When FALSE, the NUI Selection is not 
+				permitted in Call Accepted packets.";;
+REGISTERED AS { cAISDNAttribute 77 };
+-- 9.78 Network UserId Supplement
+
+
+networkUserIdentificationSupplement ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAOptionalUserFacilitiesModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkUserIdentificationSupplementBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute that determines Network User Identification (NUI) 
+				Supplemental User Identification (SUI) capabilty. This attribute value is 
+				applicable only if the networkUserIdentification attribute value is TRUE, 
+				indicating that the interface is configured to allow NUI selection facility to 
+				be provided to the network for billing, security or network management purposes 
+				on a per call basis. When the value of this attribute is TRUE, the Packet 
+				Handler Function (PHF) is configured to signal SUI information. When FALSE, the 
+				PHF is not configured for SUI.";;
+REGISTERED AS { cAISDNAttribute 78 };
+-- 9.79 Network UserId User Validate
+
+
+networkUserIdentificationUserValidate ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAOptionalUserFacilitiesModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkUserIdentificationUserValidateBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute that determines Network User Identification (NUI) 
+				user validation capabilty. This attribute value is applicable only if the 
+				networkUserIdentification attribute value is TRUE, indicating that the interface 
+				is configured to allow NUI selection facility to be provided to the network for 
+				billing, security or network management purposes on a per call basis. When the 
+				attribute value is TRUE, validated NUI values may be passed over the interface 
+				from the user to the network and unvalidated NUI values may be passed over the 
+				interface from the network to the user. The default value is FALSE, indicating 
+				that user validation is not allowed.";;
+REGISTERED AS { cAISDNAttribute 79 };
+-- 9.80 Notification Class
+
+
+notificationClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.NotificationClass;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		notificationClassBhv BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute indicates whether the packet bearer service is 
+				'without notification', 'with conditional notification' or 'with systematic 
+				notification' as described in X.31 and Q.931.";;
+REGISTERED AS { cAISDNAttribute 80 };
+-- 9.81 Number Of D-Channel Links
+
+
+numberOfDChannelLinks ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.NumberOfDChannelLinks;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		numberOfDChannelLinksBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute indicates the max number of D-Channel links on the basic rate 
+				access. This includes signalling links and links used for other services (e.g. 
+				packets).";;
+REGISTERED AS { cAISDNAttribute 81 };
+-- 9.82 Outgoing Default Thruput Class
+
+
+outgoingDefaultThruputClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ThruputClass;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		outgoingDefaultThruputClassBhv BEHAVIOUR
+			DEFINED AS
+				"The values of this attribute identify selections of the default throughput class 
+				for the outgoing direction on the B- or D-Channels.";;
+REGISTERED AS { cAISDNAttribute 82 };
+-- 9.83 Outgoing Max Packet Size
+
+
+outgoingMaxPacketSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.PacketSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		outgoingMaxPacketSizeBhv BEHAVIOUR
+			DEFINED AS
+				"The function of this attribute is to allow the subscriber to choose a maximum 
+				packet size (different than the default of 128 provided by the network) for the 
+				outcoming direction on the B- or D-Channels.
+
+				The enumerated choice value of this attribute is one of the following, 
+				representing the maximum allowable packet size for a logical channel which does 
+				not include Private Virtual Circuits (PVC).: 16, 32, 64, 128, 256, 512, 1024, 
+				2048, or 4096 octets.";;
+REGISTERED AS { cAISDNAttribute 83 };
+-- 9.84 Outgoing Window Size
+
+
+outgoingWindowSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.WindowSize;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		outgoingWindowSizeBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies the packet window size for outgoing packet 
+				transmissions in LAPB. The value of this attribute allows for the subscription 
+				to non-standard default window sizes for the outgoing direction. The attribute 
+				value is an integer whose range of permissible values depends upon the value of 
+				the packetLevelSequence attribute. If modulo 8 sequencing is specified by the 
+				packetLevelSequence attribute, the permissible range is an integer between 1 and 
+				7. If modulo 128 is specified by the packetLevelSequence attribute, the range of 
+				permissible values is 1 to 60 (61 to 127 is desirable).";;
+REGISTERED AS { cAISDNAttribute 84 };
+-- 9.85 Screen Calling Party Number
+
+
+screenCallingPartyNumber ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		screenCallingPartyNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute. When the value of this attribute is TRUE, the 
+				switch will screen calling party number information for validity when provided 
+				on a call by the user equipment. The attribute value FALSE is the default and 
+				will prohibit the switch from screening calling party numbers. If the attribute 
+				value is FALSE, then the Calling Party Number Default DN attribute is required. 
+				If the Calling Party Number Provision Necessary attribute value is TRUE, then 
+				this attribute must also be TRUE.";;
+REGISTERED AS { cAISDNAttribute 85 };
+-- 9.86 Semi-Permanent Access Packet Handler Default Directory Number
+
+
+semiPermAccessPacketHandlerDefaultDN ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.SemiPermAccessPacketHandlerDefaultDN;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		semiPermAccessPacketHandlerDefaultDNBhv BEHAVIOUR
+			DEFINED AS
+				" The values of this attribute value identifies the Directory Number assigned to 
+				 each access channels to be used as the default DN if a DN is not included in 
+				 the outgoing set-up message to a nailed-up B-channel.";;
+REGISTERED AS { cAISDNAttribute 86 };
+-- 9.87 Signalling Parameter Negotiation
+
+
+signallingParameterNegotiation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		signallingParameterNegotiationBhv BEHAVIOUR
+			DEFINED AS
+				"This is a boolean attribute. The attribute value TRUE allows the use of 
+				signalling parameter negotiation, providing that the switch supports XID frames.";;
+REGISTERED AS { cAISDNAttribute 87 };
+-- 9.88 Terminal Configuration Id
+
+
+terminalConfigurationId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		terminalConfigurationIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 88 };
+-- 9.89 Terminal configuration Pointer
+
+
+terminalConfigurationPtr ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.ObjectInstance;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		terminalConfigurationPtrBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is used as a pointer to an instance of the terminal Configuration 
+				managed object class.";;
+REGISTERED AS { cAISDNAttribute 89 };
+-- 9.90 TSP ID
+
+
+tspid ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.TSPID;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		tspidBhv BEHAVIOUR
+			DEFINED AS
+				"The value of this attribute is a numeric string of up to 18 numeric characters 
+				that identify the subscriber ISDN Basic Rate CPE profiles from a human user 
+				perspective. Prior to CPE initialization, a terminalServiceProfile (TSP) object 
+				instance is created including an assignment of a tspid attribute by the service 
+				providerSs Service Order Process. Prior to using the terminal, a 
+				serviceProfileIdentifier (SPID) is entered by the subscriber at the CPE. The 
+				SPID, provided to the subscriber at Service Order time by the Administration, 
+				includes the TSPID as a component. The other componenet of the SPID is the 
+				terminalIdentifier (TID) that identifies at protocol layer 3 the particular CPE 
+				terminal being initialized.";;
+REGISTERED AS { cAISDNAttribute 90 };
+-- 9.91 Terminal Limit
+
+
+terminalLimit ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNAttributeModule.TerminalLimit;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		terminalLimitBhv BEHAVIOUR
+			DEFINED AS
+				"This attribute is an integer in the range from 0 to 62 which identifies the 
+				maximum number of Basic Rate ISDN terminals that can share an instance of the 
+				TSP object class. A value of 0 stops service for the terminalServiceProfile.";;
+REGISTERED AS { cAISDNAttribute 91 };
+-- 9.92 Terminal Service Profile
+
+
+terminalServiceProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CAISDNModule.NameType;
+	MATCHES FOR EQUALITY, ORDERING, SUBSTRINGS;
+	BEHAVIOUR
+		terminalServiceProfileIdBhv BEHAVIOUR
+			DEFINED AS
+				"This is a naming attribute. If the string choice for the syntax is used, 
+				matching on the substrings is permitted. If the number choice for the syntax is 
+				used, then matching on ordering is permitted.";;
+REGISTERED AS { cAISDNAttribute 92 };
+-- 10 Parameter Templates
+
+
+invalidReferenceError PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX CAISDNModule.ObjectInstance;
+	BEHAVIOUR
+		invalidReferenceErrorBehaviour BEHAVIOUR
+			DEFINED AS
+				"This error is sent to the Managing System when a CMIP request would cause an 
+				object to point to an object instance which is either non-existent, not of an 
+				appropriate type or not in an appropriate state. The invalid reference pointer 
+				value (an object instance name) of the request is returned to the managing 
+				system along with the error message.";;
+REGISTERED AS { cAISDNParameter 1 };
+-- 11 Name Bindings
+-- 11.1 Catalogued Access Port ISDN
+
+
+cataloguedAccessPortISDN-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedAccessPortISDN AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100" :managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedAccessPortISDNId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cAISDNNameBinding 3 };
+-- 11.2 Calling Number Screening
+
+
+callingNumberScreening-accessPortProfileISDN NAME BINDING
+	SUBORDINATE OBJECT CLASS callingNumberScreening AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS accessPortProfileISDN AND SUBCLASSES;
+	WITH ATTRIBUTE
+		callingNumberScreeningId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { cAISDNNameBinding 4 };
+-- 11.3 Catalogued Access Port Profile ISDN Primary Rate
+
+
+cataloguedAccessPortProfileISDN-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedAccessPortProfileISDN AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedAccessPortProfileISDNId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cAISDNNameBinding 5 };
+-- 11.4 Catalogued Layer Entity LAPD
+
+
+cataloguedLayerEntityLAPD-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedLayerEntityLAPD AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedLayerEntityLAPDId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cAISDNNameBinding 6 };
+-- 11.5 Catalogued Layer Entity DSS 1
+
+
+cataloguedLayerEntityDSS1-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS cataloguedLayerEntityDSS1 AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100" :managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		cataloguedLayerEntityDSS1Id;
+	CREATE;
+	DELETE;
+REGISTERED AS { cAISDNNameBinding 7 };
+-- 11.6 Terminal Configuration
+
+
+terminalConfiguration-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS terminalConfiguration AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		terminalConfigurationId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cAISDNNameBinding 11 };
+-- 11.7 Terminal Service Profile
+
+
+terminalServiceProfile-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS terminalServiceProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "CCITT Rec. M.3100(1992)" :managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		terminalServiceProfileId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cAISDNNameBinding 12 };
+-- 11.8 X.25 Network User Identification
+
+
+x25NetworkUserIdentification-accessPortProfileISDN NAME BINDING
+	SUBORDINATE OBJECT CLASS x25NetworkUserIdentification AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS accessPortProfileISDN AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. Q.824.0" :optionalUserFacilitiesId;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING, WITH-REFERENCE-OBJECT;
+	DELETE DELETES-CONTAINED-OBJECTS;
+REGISTERED AS { cAISDNNameBinding 13 };
+-- 11.9 Layer Entity X25PLP Shared
+
+
+layerEntityX25PLPShared-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS layerEntityX25PLPShared AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		layerEntityId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cACommonNameBinding 14 };
+-- 12 Service Provisioning Actions
+-- 12.1 Change Directory Number
+
+
+changeDirectoryNumber ACTION
+	BEHAVIOUR
+		changeDirectoryNumberBhv BEHAVIOUR
+			DEFINED AS
+				"This action is used to change the Directory Number for a given customer service. 
+				The action request identifies the customer service with the old Directory Number 
+				Name. The request also indicates the new Directory Number Name to use and the 
+				intercept Treatment Termination to apply to the old Directory Number Name.
+
+				The action verifies that the old directoryNumberName is in service, and that the 
+				new Directory NumberName and interceptTreatment are valid. The new 
+				directoryNumberName is considered valid if it exists and does not have a 
+				relationship with a customerProfile or its subclasses (it is not in service). If 
+				not, the agent returns an invalid reference error.
+
+				The action sets the interceptTreatmentOrigin and interceptTreatmentTerm of the 
+				new Directory NumberName based on the values of those attributes of the old 
+				DirectoryNumberName and then sets the value of interceptTreatmentTerm of the old 
+				DirectoryNumberName to the value provided by the action request information. 
+				Moreover, the relationship of the customerProfile or its subclasses associated 
+				with the old DirectoryNumberName is deleted and replaced by a relationship with 
+				the old DirectoryNumberName.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX SpmAttributeModule.ChangeDirectoryNumberRequest;
+REGISTERED AS { cAISDNAction 1 };
+-- 12.2 Establish ISDN Access
+
+
+establishISDNAccess ACTION
+	BEHAVIOUR
+		establishISDNAccessBhv BEHAVIOUR
+			DEFINED AS
+				"The action first verifies that the access port trail termination point name 
+				identified in the service is valid. If it is not valid the agent returns an 
+				invalid reference error. The access port trail termination point name is 
+				considered valid if all of the following conditions are met:
+
+				� an instance of accessPortTrailTerminationPoint exists for the name provided in 
+				  the action;
+
+				� the accessPortTrailTerminationPoint can support ISDN services.
+
+				Depending on the actual syntax selected, a different behaviour will apply for 
+				the remaining of the action execution:
+
+				� if a servicePackage is provided, the service is instantiated based on the 
+				  definition provided by a service package and the 
+				  instantiateISDNAccesslServicePackageBehaviour applies;
+
+				� if a copyCommand is selected, the service is instantiated based on the 
+				  definition provided by an already existing service and the 
+				  copyISDNAccessCommandBehaviour applies.
+
+				In all cases, if the action is successful, the reply will indicate so and will 
+				also contain the list of names of the object instances just created. Otherwise 
+				the action leaves the MIB unaffected (unchanged) and returns the specified error 
+				message .";,
+		copyISDNAccessCommandBehaviour BEHAVIOUR
+			DEFINED AS
+				"The action verifies that the source Access Port Profile Name in the service is 
+				valid. If it is not valid the agent returns an invalid reference error. The 
+				existing Access Port Profile Name is considered valid if it exists and supports 
+				ISDN service.
+
+				The action creates a duplicate of the accessPortProfile subtree of the service 
+				identified by the existing Acces Port Profile Name.";,
+		instantiateISDNAccessServicePackageBhv BEHAVIOUR
+			DEFINED AS
+				"The action determines the existence of the service package name provided in the 
+				action request parameters. If it does not exist, the agent returns an invalid 
+				reference error. The action creates a duplicate of the accessPortProfile 
+				containment subtree of the service package for use by the new service.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNAttributeModule.EstablishISDNAccessRequest;
+	WITH REPLY SYNTAX CAISDNAttributeModule.CreatedInstancesName;
+REGISTERED AS { cAISDNAction 2 };
+-- 12.3 Remove ISDN Access
+
+
+removeISDNAccess ACTION
+	BEHAVIOUR
+		removeISDNAccessBhv BEHAVIOUR
+			DEFINED AS
+				"This action removes an ISDN Access that is not associated with any 
+				CustomerProfile. In addition, all contained object classes, and all associated 
+				supplementary service object classes based on the Access Port Profile Name 
+				parameter in the action request.
+
+				The action verifies that the access port service profile name exists, and that 
+				there are no associated customer profiles. If not the agent returns an invalid 
+				reference error.
+
+				The name of all the deleted object instances is sent back as a reply to the 
+				managing system.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNAttributeModule.RemoveISDNAccessRequest;
+	WITH REPLY SYNTAX CAISDNAttributeModule.DeletedInstancesName;
+REGISTERED AS { cAISDNAction 3 };
+-- 12.4 Establish ISDN Service
+
+
+establishISDNService ACTION
+	BEHAVIOUR
+		establishISDNServiceBhv BEHAVIOUR
+			DEFINED AS
+				"The action first verifies that the directory number name(s) and termination 
+				point name identified in the service are valid. If either is not valid the agent 
+				returns an invalid reference error. The directory number name is considered 
+				valid if it exists and does not have a relationship with a customerProfile or 
+				its subclasses and its administrative state is unlocked. The termination point 
+				name is considered valid if all of the following conditions are met:
+
+				� an instance of accessPortTrailTerminationPoint exists for the termination 
+				  point name provided in the action;
+
+				� the accessPortTrailTerminationPoint can support ISDN services, either with or 
+				  without a physical line card change.
+
+				Depending on the actual syntax selected, a different behaviour will apply for 
+				the remaining of the action execution :
+
+				� if a servicePackage is provided, the service is instantiated based on the 
+				  definition provided by a service package and the 
+				  instantiateServicePackageBehaviour applies;
+
+				� if a copyCommand is selected, the service is instantiated based on the 
+				  definition provided by an already existing service and the 
+				  copyCommandBehaviour applies.
+
+				In all cases, if the action is successful, the reply will indicate so and will 
+				also contain the list of names of the object instances just created. Otherwise 
+				the action leaves the MIB unaffected (unchanged) and returns the specified error 
+				message.";,
+		copyISDNServiceCommandBehaviour BEHAVIOUR
+			DEFINED AS
+				"The action verifies that the existing Customer Profile, Directory Number Name(s) 
+				and existing Termination Point Name identified in the service are valid. If any 
+				are not valid the agent returns an invalid reference error. The existing 
+				Directory Number Name(s) is considered valid if it exists and it is in service 
+				(has a relationship with the specified customerProfile and an accessPortProfile) 
+				on the specified existing Termination Point Name.
+
+				If the existing Termination Point Name is not provided, the existing Directory 
+				Number Name(s) must be in service on only one office equipment. Otherwise, the 
+				agent returns an invalid reference error with a NULL value for the Existing 
+				Service Office Equipment Number Name.
+
+				The action creates a duplicate of the customerProfile or its subclasses and 
+				accessPortProfile containment subtrees of the service identified by the existing 
+				Directory Number Name and existing Termination Point Name (if provided) for use 
+				by the new service, and create the following relationships:
+
+				� directoryNumber - customerProfile or its subclasses
+
+				� customerProfile or its subclasses - accessPortProfile
+
+				� accessPortProfile - accessPortTrailTerminationPoint.
+
+				If an accessPortProfile already exists in association with the 
+				accessPortProfileTrailTerminationPoint, then a new one does not need to be 
+				instantiated.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNAttributeModule.EstablishISDNServiceRequest;
+	WITH REPLY SYNTAX CAISDNAttributeModule.CreatedInstancesName;
+REGISTERED AS { cAISDNAction 4 };
+-- 12.5 Remove ISDN Service
+
+
+removeISDNService ACTION
+	BEHAVIOUR
+		removeISDNServiceBhv BEHAVIOUR
+			DEFINED AS
+				"This action removes an ISDN Service based on the Directory Number Name and 
+				Bearer Service parameters in the action request. Removing an ISDN Service 
+				consists of removing the Bearer Service, all contained objects, and all 
+				associated supplementary service objects. If the last bearer service is removed, 
+				the Customer profile or its subclasses object that contained the removed bearer 
+				service is also removed.
+
+				The action verifies that the directory number name exists. If not the agent 
+				returns an invalid reference error. The name of all the deleted object instances 
+				is sent back as a reply to the managing system.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNAttributeModule.RemoveISDNServiceRequest;
+	WITH REPLY SYNTAX CAISDNAttributeModule.DeletedInstancesName;
+REGISTERED AS { cAISDNAction 5 };
+-- 12.6 Establish ISDN Terminal
+
+
+establishISDNTerminal ACTION
+	BEHAVIOUR
+		establishISDNTerminalBhv BEHAVIOUR
+			DEFINED AS
+				"The action first verifies that the TSPID and access port profile name identified 
+				in the service are valid. If either is not valid the agent returns an invalid 
+				reference error. TSPID is considered valid if it is not assigned in to any 
+				existing TSP object instance. The access port profile name is considered valid 
+				if all of the following conditions are met:
+
+				� an instance of accessPortProfile exists for the name provided in the action;
+
+				� the accessPortProfile can support ISDN services.
+
+				Depending on the actual syntax selected, a different behaviour will apply for 
+				the remaining of the action execution:
+
+				� if a 'servicePackage' is provided, the service is instantiated based on the 
+				  definition provided by a service package and the 
+				  instantiateISDNTerminalServicePackageBehaviour applies;
+
+				� if a 'copyCommand' is selected, the service is instantiated based on the 
+				  definition provided by an already existing service and the 
+				  copyISDNTerminalCommandBehaviour applies.
+
+				In all cases, if the action is successful, the reply will indicate so and will 
+				also contain the list of names of the object instances just created. Otherwise 
+				the action leaves the MIB unaffected (unchanged) and returns the specified error 
+				message .";,
+		copyISDNTerminalCommandBhv BEHAVIOUR
+			DEFINED AS
+				"The action verifies that the source Terminal Service Profile Name in the service 
+				is valid. If it is not valid the agent returns an invalid reference error. The 
+				existing Terminal Service Profile Name is considered valid if it exists.
+
+				The action creates a duplicate of the terminalServiceProfile subtree of the 
+				service identified by the existing Terminal Service Profile Name.";,
+		instantiateISDNTerminalServicePackageBhv BEHAVIOUR
+			DEFINED AS
+				"The action determines the existence of the service package and (optional) 
+				terminal configuration names provided in the action request parameters. If 
+				either does not exist, the agent returns an invalid reference error.
+
+				The action creates a duplicate of the terminalServiceProfile containment subtree 
+				of the service package for use by the new service.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNAttributeModule.EstablishISDNTerminalRequest;
+	WITH REPLY SYNTAX CAISDNAttributeModule.CreatedInstancesName;
+REGISTERED AS { cAISDNAction 6 };
+-- 12.7 Remove ISDN Terminal
+
+
+removeISDNTerminal ACTION
+	BEHAVIOUR
+		removeISDNTerminalBhv BEHAVIOUR
+			DEFINED AS
+				"This action removes a Terminal Service Profile, all contained objects, and all 
+				associated supplementary service objects based on the Terminal Service Profile 
+				Name parameter in the action request. The action verifies that the terminal 
+				service profile name exists. If not the agent returns an invalid reference 
+				error. The name of all the deleted object instances is sent back as a reply to 
+				the managing system.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNAttributeModule.RemoveISDNTerminalRequest;
+	WITH REPLY SYNTAX CAISDNAttributeModule.DeletedInstancesName;
+REGISTERED AS { cAISDNAction 7 };
+-- 12.8 Retrieve Service
+
+
+retrieveService ACTION
+	BEHAVIOUR
+		retrieveCustomerServiceBhv BEHAVIOUR
+			DEFINED AS
+				"This action is used to retrieve a customer service identified by either the 
+				Directory Number Name or the Termination Point Name. When both are present, only 
+				the part of the service common to both will be retrieved.
+
+				If either the Directory Number Name or the Termination Point Name do not exist, 
+				no service exists and the agent returns an invalid reference error. If the 
+				Directory Number Name is not in service on the specified Termination Point Name 
+				then an invalid Reference error is returned to the managing system.
+
+				Otherwise, the action is successful and linked replies contain the objects in 
+				the customer service profile according to the following rules:
+
+				If the action request contains only the directory number name, then the object 
+				instances returned are all of the following:
+
+				� the directoryNumber,
+
+				� the customerProfile or its subclasses related to the directoryNumber, and its 
+				  contained object instances,
+
+				� all the accessPortProfiles related to the customerProfile or its subclasses, 
+				  and their contained object instances,
+
+				� the terminationPoints related to all the accessPortProfiles.
+
+				If the action request contains only the termination point name, then the object 
+				instances returned are all of the following:
+
+				� the terminationPoint with the attribute officeEquipment equal to that of the 
+				  action request parameter,
+
+				� the accessPortProfile related to the terminationPoint, and its contained 
+				  object instances,
+
+				� all the customerProfile or its subclassess related to the accessPortProfile, 
+				  and their contained object instances,
+
+				� the directoryNumbers related to all the customerProfile or its subclassess.
+
+				If the action request contains both the directory number name and the 
+				termination point name, then the object instances returned are all of the 
+				following:
+
+				� the directoryNumber,
+
+				� the customerProfile or its subclasses related to the directoryNumber, and its 
+				  contained object instances,
+
+				� the terminationPoint with the attribute officeEquipment equal to that of the 
+				  action request parameter,
+
+				� the accessPortProfile related to the terminationPoint, and its contained 
+				  object instances.";;
+	MODE CONFIRMED;
+	WITH INFORMATION SYNTAX CAISDNModule.RetrieveCustomerServiceRequest;
+	WITH REPLY SYNTAX CAISDNModule.RetrieveCustomerServiceReply;
+REGISTERED AS { cAISDNAction 8 };
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.824.1 (1995)" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@
+--@@ These modules reference "CCITT Rec. M.3100" 3 times.
+--@@ These modules reference "CCITT Rec. M.3100(1992)" 4 times.
+--@@ These modules reference "CCITT Rec. X.721" 17 times.
+--@@ These modules reference "CCITT Rec. X.721 | ISO/IEC 10165-2" 8 times.
+--@@ These modules reference "CCITT Rec. X.721 | ISO/IEC 10165-2 " 1 times.
+--@@ These modules reference "CCITT Rec. X.721 | ISO/IEC 10165-2:1992" 3 times.
+--@@ These modules reference "CCITT Rec. X.721(1992)" 5 times.
+--@@ These modules reference "ITU-T Rec. 824.0" 5 times.
+--@@ These modules reference "ITU-T Rec. Q.824.0" 18 times.
+--@@ These modules reference "ITU-T Rec. X.282" 8 times.
+--@@ These modules reference "ITU-T Rec. X.283" 18 times.
+--@@ These modules reference "Q.824.0" 1 times.
+--@@
+--@@
+--@@ These modules reference MANAGED OBJECT CLASS accessChannel in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS accessPort in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS accessPortProfile in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS bearerService in module "ITU-T Rec. 824.0".
+--@@ These modules reference MANAGED OBJECT CLASS bearerService in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS layerEntity in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS managedElement in module "CCITT Rec. M.3100".
+--@@ These modules reference MANAGED OBJECT CLASS managedElement in module "CCITT Rec. M.3100(1992)".
+--@@ These modules reference MANAGED OBJECT CLASS optionalUserFacilities in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS serviceManager in module "ITU-T Rec. Q.824.0".
+--@@ These modules reference MANAGED OBJECT CLASS top in module "CCITT Rec. X.721".
+--@@ These modules reference MANAGED OBJECT CLASS top in module "CCITT Rec. X.721(1992)".
+--@@
+--@@ These modules define MANAGED OBJECT CLASS accessPortISDNBasicRate.
+--@@ These modules define MANAGED OBJECT CLASS accessPortISDNPrimaryRate.
+--@@ These modules define MANAGED OBJECT CLASS accessPortProfileISDN.
+--@@ These modules define MANAGED OBJECT CLASS accessPortProfileISDNBasicRate.
+--@@ These modules define MANAGED OBJECT CLASS accessPortProfileISDNPrimaryRate.
+--@@ These modules define MANAGED OBJECT CLASS bChannel.
+--@@ These modules define MANAGED OBJECT CLASS bearerServiceFor1536kbpsData.
+--@@ These modules define MANAGED OBJECT CLASS bearerServiceFor1920kbpsData.
+--@@ These modules define MANAGED OBJECT CLASS bearerServiceFor384kbpsData.
+--@@ These modules define MANAGED OBJECT CLASS bearerServiceForMuliple-RateData.
+--@@ These modules define MANAGED OBJECT CLASS callingNumberScreening.
+--@@ These modules define MANAGED OBJECT CLASS cataloguedAccessPortISDNPrimaryRate.
+--@@ These modules define MANAGED OBJECT CLASS cataloguedAccessPortProfileISDN.
+--@@ These modules define MANAGED OBJECT CLASS cataloguedAccessPortProfileISDNBasicRate.
+--@@ These modules define MANAGED OBJECT CLASS cataloguedLayerEntityDSS1.
+--@@ These modules define MANAGED OBJECT CLASS cataloguedLayerEntityLAPD.
+--@@ These modules define MANAGED OBJECT CLASS circuit3D1kHz.
+--@@ These modules define MANAGED OBJECT CLASS circuitCombinedSwitchedDigitalData.
+--@@ These modules define MANAGED OBJECT CLASS circuitCombinedVoiceBand.
+--@@ These modules define MANAGED OBJECT CLASS circuitMultiUse.
+--@@ These modules define MANAGED OBJECT CLASS circuitSpeech.
+--@@ These modules define MANAGED OBJECT CLASS circuitUnrestrictedDigitalData.
+--@@ These modules define MANAGED OBJECT CLASS circuitUnrestrictedDigitalDataRateAdaptedFrom56kbit/s.
+--@@ These modules define MANAGED OBJECT CLASS dChannel.
+--@@ These modules define MANAGED OBJECT CLASS layerEntityLAPB.
+--@@ These modules define MANAGED OBJECT CLASS layerEntityLAPD.
+--@@ These modules define MANAGED OBJECT CLASS layerEntityX25PLP.
+--@@ These modules define MANAGED OBJECT CLASS layerEntityX25PLPShared.
+--@@ These modules define MANAGED OBJECT CLASS packet.
+--@@ These modules define MANAGED OBJECT CLASS packetBChannel.
+--@@ These modules define MANAGED OBJECT CLASS packetDChannel.
+--@@ These modules define MANAGED OBJECT CLASS serviceManagerISDN.
+--@@ These modules define MANAGED OBJECT CLASS serviceManagerRetrieveService.
+--@@ These modules define MANAGED OBJECT CLASS terminalConfiguration.
+--@@ These modules define MANAGED OBJECT CLASS terminalServiceProfile.
+--@@ These modules define MANAGED OBJECT CLASS x25NetworkUserIdentification.
+--@@
+--@@ These modules reference PACKAGE channelNumberPackage in module "CCITT Rec. M.3100".
+--@@
+--@@ These modules define PACKAGE accessPortISDNBasicRatePkg.
+--@@ These modules define PACKAGE accessPortISDNPrimaryRatePkg.
+--@@ These modules define PACKAGE accessPortProfileISDNBasicRatePkg.
+--@@ These modules define PACKAGE accessPortProfileISDNPkg.
+--@@ These modules define PACKAGE accessPortProfileISDNPrimaryRatePkg.
+--@@ These modules define PACKAGE activeTerminalListPkg.
+--@@ These modules define PACKAGE assignmentOfTimeslotsPkg.
+--@@ These modules define PACKAGE automaticNegotiationPkg.
+--@@ These modules define PACKAGE bChannelPkg.
+--@@ These modules define PACKAGE bearerServiceFor1536kbpsDataPkg.
+--@@ These modules define PACKAGE bearerServiceFor1536kbpsDataPrimaryICPkg.
+--@@ These modules define PACKAGE bearerServiceFor1920kbpsDataPkg.
+--@@ These modules define PACKAGE bearerServiceFor1920kbpsDataPrimaryICPkg.
+--@@ These modules define PACKAGE bearerServiceFor384kbpsDataPkg.
+--@@ These modules define PACKAGE bearerServiceFor384kbpsDataPrimaryICPkg.
+--@@ These modules define PACKAGE bearerServiceForAudioICPkg.
+--@@ These modules define PACKAGE bearerServiceForMultipleRateDataPkg.
+--@@ These modules define PACKAGE bearerServiceForMultipleRateDataPrimaryICPkg.
+--@@ These modules define PACKAGE bearerServiceListPkg.
+--@@ These modules define PACKAGE callReferencePkg.
+--@@ These modules define PACKAGE callingNumberScreeningPkg.
+--@@ These modules define PACKAGE cataloguedAccessPortISDNPrimaryRatePkg.
+--@@ These modules define PACKAGE cataloguedAccessPortProfileISDNBasicRatePkg.
+--@@ These modules define PACKAGE cataloguedAccessPortProfileISDNPkg.
+--@@ These modules define PACKAGE cataloguedLayerEntityDSS1Pkg.
+--@@ These modules define PACKAGE cataloguedLayerEntityLAPDPkg.
+--@@ These modules define PACKAGE circuit3D1kHzPkg.
+--@@ These modules define PACKAGE circuitCombinedSwitchedDigitalDataPkg.
+--@@ These modules define PACKAGE circuitCombinedVoiceBandPkg.
+--@@ These modules define PACKAGE circuitMultiUsePkg.
+--@@ These modules define PACKAGE circuitMultiUsePrimaryICPkg.
+--@@ These modules define PACKAGE circuitSpeechPkg.
+--@@ These modules define PACKAGE circuitSpeechPrimaryICPkg.
+--@@ These modules define PACKAGE circuitUnrestrictedDigitalDataPkg.
+--@@ These modules define PACKAGE circuitUnrestrictedDigitalDataPrimaryICPkg.
+--@@ These modules define PACKAGE circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPkg.
+--@@ These modules define PACKAGE circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryICPkg.
+--@@ These modules define PACKAGE dChannelPkg.
+--@@ These modules define PACKAGE deactivationCapabilitiesPkg.
+--@@ These modules define PACKAGE layerEntityLAPBPkg.
+--@@ These modules define PACKAGE layerEntityLAPDPkg.
+--@@ These modules define PACKAGE layerEntityX25PLPPkg.
+--@@ These modules define PACKAGE layerEntityX25PLPSharedPkg.
+--@@ These modules define PACKAGE linkSettingPkg.
+--@@ These modules define PACKAGE manageISDNTerminalPackage.
+--@@ These modules define PACKAGE maxCombinedThruputBChanPkg.
+--@@ These modules define PACKAGE maxCombinedThruputDChanPkg.
+--@@ These modules define PACKAGE nT2ISDNaccessPortProfilePkg.
+--@@ These modules define PACKAGE networkProvidedTonePkg.
+--@@ These modules define PACKAGE numberOfDChannelLinksPkg.
+--@@ These modules define PACKAGE optionalDeactivationPkg.
+--@@ These modules define PACKAGE packetBChannelPkg.
+--@@ These modules define PACKAGE packetDChannelPkg.
+--@@ These modules define PACKAGE packetPkg.
+--@@ These modules define PACKAGE selectionProceduresPkg.
+--@@ These modules define PACKAGE serviceManagerISDNPkg.
+--@@ These modules define PACKAGE serviceManagerRetrieveServicePkg.
+--@@ These modules define PACKAGE terminalConfigurationPkg.
+--@@ These modules define PACKAGE terminalServiceProfilePkg.
+--@@ These modules define PACKAGE x25DCETimersPkg.
+--@@ These modules define PACKAGE x25NetworkUserIdentificationPkg.
+--@@
+--@@ These modules reference ATTRIBUTE optionalUserFacilitiesId in module "ITU-T Rec. Q.824.0".
+--@@
+--@@ These modules define ATTRIBUTE accessChannelPtrList.
+--@@ These modules define ATTRIBUTE activeTerminalList.
+--@@ These modules define ATTRIBUTE assignmentOfTimeslots.
+--@@ These modules define ATTRIBUTE automaticXIDnotification.
+--@@ These modules define ATTRIBUTE bearerServiceFor1536kbpsDataPrimaryIC.
+--@@ These modules define ATTRIBUTE bearerServiceFor1920DataPrimaryIC.
+--@@ These modules define ATTRIBUTE bearerServiceFor384kbpsDataPrimaryIC.
+--@@ These modules define ATTRIBUTE bearerServiceForMultipleRateDataPrimaryIC.
+--@@ These modules define ATTRIBUTE bearerServiceList.
+--@@ These modules define ATTRIBUTE bitRateOfPrimaryRateInterface.
+--@@ These modules define ATTRIBUTE callingNumberScreeningId.
+--@@ These modules define ATTRIBUTE callingPartyDefaultDN.
+--@@ These modules define ATTRIBUTE callingPartyNumberDiscardCtrl.
+--@@ These modules define ATTRIBUTE callingPartyNumberProvisionNecessary.
+--@@ These modules define ATTRIBUTE callingPartyValidDirectoryNumberList.
+--@@ These modules define ATTRIBUTE cataloguedAccessPortISDNPrimaryRateId.
+--@@ These modules define ATTRIBUTE cataloguedAccessPortProfileISDNId.
+--@@ These modules define ATTRIBUTE cataloguedLayerEntityDSS1Id.
+--@@ These modules define ATTRIBUTE cataloguedLayerEntityLAPDId.
+--@@ These modules define ATTRIBUTE channelSelection.
+--@@ These modules define ATTRIBUTE circuitAudioPrimaryIC.
+--@@ These modules define ATTRIBUTE circuitMultiUsePrimaryIC.
+--@@ These modules define ATTRIBUTE circuitSpeechPrimaryIC.
+--@@ These modules define ATTRIBUTE circuitUnrestrictedDigitalDataPrimaryIC.
+--@@ These modules define ATTRIBUTE circuitUnrestrictedDigitalDataRateAdaptedFrom56kbpsPrimaryIC.
+--@@ These modules define ATTRIBUTE dChannelPacketDefaultDirectoryNumber.
+--@@ These modules define ATTRIBUTE dChannelPacketDirectoryNumberList.
+--@@ These modules define ATTRIBUTE dChannelPrimaryPtr.
+--@@ These modules define ATTRIBUTE dChannelSecondaryPtr.
+--@@ These modules define ATTRIBUTE dChannelT301.
+--@@ These modules define ATTRIBUTE dChannelT303.
+--@@ These modules define ATTRIBUTE dChannelT304.
+--@@ These modules define ATTRIBUTE dChannelT305.
+--@@ These modules define ATTRIBUTE dChannelT306.
+--@@ These modules define ATTRIBUTE dChannelT307.
+--@@ These modules define ATTRIBUTE dChannelT308.
+--@@ These modules define ATTRIBUTE dChannelT309.
+--@@ These modules define ATTRIBUTE dChannelT310.
+--@@ These modules define ATTRIBUTE dChannelT312.
+--@@ These modules define ATTRIBUTE dChannelT314.
+--@@ These modules define ATTRIBUTE dChannelT316.
+--@@ These modules define ATTRIBUTE dChannelT317.
+--@@ These modules define ATTRIBUTE dChannelT320.
+--@@ These modules define ATTRIBUTE dChannelT321.
+--@@ These modules define ATTRIBUTE dChannelT322.
+--@@ These modules define ATTRIBUTE dChannelT330.
+--@@ These modules define ATTRIBUTE dTECompatibilty.
+--@@ These modules define ATTRIBUTE deactivationCapabilities.
+--@@ These modules define ATTRIBUTE directoryNumberAppearanceIdentifierList.
+--@@ These modules define ATTRIBUTE directoryNumberReference.
+--@@ These modules define ATTRIBUTE earlyCutThruRemoteNetworkInterwork.
+--@@ These modules define ATTRIBUTE earlyCutThruUserProvidedAudibleRing.
+--@@ These modules define ATTRIBUTE featureActivatorsAllDirectoryNumber.
+--@@ These modules define ATTRIBUTE featureActivatorsPerDirectoryNumber.
+--@@ These modules define ATTRIBUTE featureActivatorsPerHuntMakeBusy.
+--@@ These modules define ATTRIBUTE featureActivatorsPerStopHunt.
+--@@ These modules define ATTRIBUTE featureIndicatorsAllDirectoryNumber.
+--@@ These modules define ATTRIBUTE featureIndicatorsPerDirectoryNumber.
+--@@ These modules define ATTRIBUTE featureIndicatorsPerHuntMakeBusy.
+--@@ These modules define ATTRIBUTE featureIndicatorsPerStopHunt.
+--@@ These modules define ATTRIBUTE incomingDefaultThruputClass.
+--@@ These modules define ATTRIBUTE incomingMaxPacketSize.
+--@@ These modules define ATTRIBUTE incomingWindowSize.
+--@@ These modules define ATTRIBUTE interfaceType.
+--@@ These modules define ATTRIBUTE layer2InfoEntityPtr.
+--@@ These modules define ATTRIBUTE layer3InfoEntityPtr.
+--@@ These modules define ATTRIBUTE layerEntityLAPDPtr.
+--@@ These modules define ATTRIBUTE linkLevelWindowSize.
+--@@ These modules define ATTRIBUTE linkOption.
+--@@ These modules define ATTRIBUTE maxBitsPerInformationFrame.
+--@@ These modules define ATTRIBUTE maxCombinedThruputClass.
+--@@ These modules define ATTRIBUTE maxNumberOfCallReference.
+--@@ These modules define ATTRIBUTE maxTransmissionAttempts.
+--@@ These modules define ATTRIBUTE networkProvidedTones.
+--@@ These modules define ATTRIBUTE networkUserIdentification.
+--@@ These modules define ATTRIBUTE networkUserIdentificationOverride.
+--@@ These modules define ATTRIBUTE networkUserIdentificationSelection.
+--@@ These modules define ATTRIBUTE networkUserIdentificationSupplement.
+--@@ These modules define ATTRIBUTE networkUserIdentificationUserValidate.
+--@@ These modules define ATTRIBUTE notificationClass.
+--@@ These modules define ATTRIBUTE numberOfDChannelLinks.
+--@@ These modules define ATTRIBUTE outgoingDefaultThruputClass.
+--@@ These modules define ATTRIBUTE outgoingMaxPacketSize.
+--@@ These modules define ATTRIBUTE outgoingWindowSize.
+--@@ These modules define ATTRIBUTE screenCallingPartyNumber.
+--@@ These modules define ATTRIBUTE semiPermAccessPacketHandlerDefaultDN.
+--@@ These modules define ATTRIBUTE signallingParameterNegotiation.
+--@@ These modules define ATTRIBUTE terminalConfigurationId.
+--@@ These modules define ATTRIBUTE terminalConfigurationPtr.
+--@@ These modules define ATTRIBUTE terminalLimit.
+--@@ These modules define ATTRIBUTE terminalServiceProfileId.
+--@@ These modules define ATTRIBUTE tspid.
+--@@
+--@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721".
+--@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
+--@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721 | ISO/IEC 10165-2 ".
+--@@ These modules reference NOTIFICATION attributeValueChange in module "CCITT Rec. X.721 | ISO/IEC 10165-2:1992".
+--@@ These modules reference NOTIFICATION objectCreation in module "CCITT Rec. X.721".
+--@@ These modules reference NOTIFICATION objectCreation in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
+--@@ These modules reference NOTIFICATION objectCreation in module "CCITT Rec. X.721 | ISO/IEC 10165-2:1992".
+--@@ These modules reference NOTIFICATION objectDeletion in module "CCITT Rec. X.721".
+--@@ These modules reference NOTIFICATION objectDeletion in module "CCITT Rec. X.721 | ISO/IEC 10165-2".
+--@@ These modules reference NOTIFICATION objectDeletion in module "CCITT Rec. X.721 | ISO/IEC 10165-2:1992".
+--@@
+--@@ These modules define no NOTIFICATION.
+--@@ 
+--@@ objects accessChannel referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessChannel
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessChannel
+--@@ objects accessPort referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessPort
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessPort
+--@@ objects accessPortProfile referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":accessPortProfile
+--@@ objects bearerService referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. 824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":bearerService
+--@@ objects cataloguedAccessPortISDN referenced but never defined!
+--@@ ClassReference references undefined "":cataloguedAccessPortISDN
+--@@ objects layerEntity referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":layerEntity
+--@@ objects managedElement referenced but never defined!
+--@@ ClassReference references undefined "CCITT Rec. M.3100":managedElement
+--@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
+--@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
+--@@ ClassReference references undefined "CCITT Rec. M.3100":managedElement
+--@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
+--@@ ClassReference references undefined "CCITT Rec. M.3100(1992)":managedElement
+--@@ ClassReference references undefined "":managedElement
+--@@ objects optionalUserFacilities referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":optionalUserFacilities
+--@@ objects serviceManager referenced but never defined!
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":serviceManager
+--@@ ClassReference references undefined "ITU-T Rec. Q.824.0":serviceManager
+--@@ objects top referenced but never defined!
+--@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
+--@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
+--@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
+--@@ ClassReference references undefined "CCITT Rec. X.721":top
+--@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
+--@@ ClassReference references undefined "CCITT Rec. X.721":top
+--@@ ClassReference references undefined "CCITT Rec. X.721(1992)":top
+--@@ packages channelNumberPackage referenced but never defined!
+--@@ PackageReference references undefined "CCITT Rec. M.3100":channelNumberPackage
+--@@ attributes cataloguedAccessPortISDNId referenced but never defined!
+--@@ AttributeReference references undefined "":cataloguedAccessPortISDNId
+--@@ attributes layerEntityId referenced but never defined!
+--@@ AttributeReference references undefined "":layerEntityId
+--@@ attributes optionalUserFacilitiesId referenced but never defined!
+--@@ AttributeReference references undefined "ITU-T Rec. Q.824.0":optionalUserFacilitiesId
+--@@ notifications attributeValueChange referenced but never defined!
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2 ":attributeValueChange
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":attributeValueChange
+--@@ notifications objectCreation referenced but never defined!
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectCreation
+--@@ notifications objectDeletion referenced but never defined!
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion
+--@@ NotificationReference references undefined "CCITT Rec. X.721 | ISO/IEC 10165-2":objectDeletion
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

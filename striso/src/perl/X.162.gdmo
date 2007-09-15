@@ -1,0 +1,3322 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 09:45:12 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "Q.822.gdmo" >--
+--< GDMO.Include "X.281.gdmo" >--
+--< GDMO.Include "X.282.gdmo" >--
+--< GDMO.Include "X.283.gdmo" >--
+--< GDMO.Include "X.737.gdmo" >--
+--< GDMO.Include "X.739.gdmo" >--
+--< GDMO.Include "X.742.gdmo" >--
+--< GDMO.Include "X.745.gdmo" >--
+--< GDMO.Include "X.790.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Document "Recommendation X.162 (1997)"
+--  { itu-t(0) recommendation(0) x(24) x162(162) informationModel(0) } >--
+--< GDMO.Namespace itut_x162 >--
+MODULE "Recommendation X.162 (1997)" { itu-t(0) recommendation(0) x(24) x162(162) informationModel(0) }
+-- 7 Definition of managed object classes
+-- 7.1 Managed objects for fault management
+-- 7.1.1 Managed objects for alarm notification service
+-- 7.1.1.1 Referenced managed objects
+-- 1) This Recommendation references the following support MO classes for which the abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+-- a) top;
+-- b) event forwarding discriminator.
+-- 2) This Recommendation references the following support MO classes for which the abstract syntax is specified in
+-- Recommendation M.3100:
+-- a) network;
+-- NOTE 1  This object is the superior object for all the CNM objects.
+-- b) termination point;
+-- c) managed element;
+-- NOTE 2  This object is used for containing the objects that provides general functions irrespective of the types of network
+-- service. The Event Forwarding Discriminator or the Log object is contained by this object.
+-- d) equipment.
+-- 7.1.1.2 Defined managed objects
+-- 7.1.1.2.1 CNM X.25 entity
+
+cnmX25Entity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		cnmX25Entity-P PACKAGE
+			BEHAVIOUR
+				cnmX25Entity-B BEHAVIOUR
+					DEFINED AS
+						This object represents the entity that is related to a DTE address and for which 
+						traffic data are measured as a monitored object. It is used to contain one or 
+						more X.25 Termination Points. It is also used to suspend or resume the X.25 
+						packet level communication This object is created at the time of subscription.;;
+			ATTRIBUTES
+				cnmX25EntityId GET,
+				"DMI":administrativeState GET-REPLACE;;;
+REGISTERED AS { cnmObjectClass cnmX25Entity(1) };
+-- 7.1.1.2.2 X.25 termination point
+
+
+x25TerminationPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GNM":terminationPoint;
+	CHARACTERIZED BY
+		x25TerminationPoint-P PACKAGE
+			BEHAVIOUR
+				x25TerminationPoint-B BEHAVIOUR
+					DEFINED AS
+						This MO represents the termination point of the access line, on which one data 
+						link is overridden. It emits alarms related to the access line and the data 
+						link. It also represents the monitored resource for which data-link-trafficdata 
+						are measured.;;
+			ATTRIBUTES
+				x25TerminationPointId GET,
+				"DMI":administrativeState GET-REPLACE;
+			NOTIFICATIONS
+				"DMI":qualityofServiceAlarm,
+				"DMI":processingErrorAlarm,
+				"DMI":equipmentAlarm,
+				"DMI":environmentalAlarm;;;
+REGISTERED AS { cnmObjectClass x25TerminationPoint(2) };
+-- 7.1.2 Managed objects for fault history service
+-- 7.1.2.1 Referenced managed objects
+-- This Recommendation references the following support MO classes for which the 
+-- abstract syntax is specified in CCITT
+-- Rec. X.721 | ISO/IEC 10165-2:
+-- a) top;
+-- b) log;
+-- c) eventLogRecord.
+-- 7.1.2.2 Defined managed objects
+-- This Recommendation defines the following MO classes by inheriting the 
+-- logRecord MO classes:
+-- 7.1.2.2.1 PDN fault log record
+
+
+pdnFaultLogRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":eventLogRecord;
+	CHARACTERIZED BY
+		faultLogRecord-P PACKAGE
+			BEHAVIOUR
+				faultLogRecord-B BEHAVIOUR
+					DEFINED AS
+						"This MO class is used to represent logged information that resulted from alarm 
+						notification related to CNM. The attributes represent causes of all types of 
+						fault alarms.";;
+			ATTRIBUTES
+				"DMI":probableCause GET,
+				"DMI":perceivedSeverity GET;;;
+	CONDITIONAL PACKAGES
+		specificProblems-P PACKAGE
+			ATTRIBUTES
+				"DMI":specificProblems GET;
+		REGISTERED AS { cnmPackage specificProblems-P(14) };
+			PRESENT IF
+				"the 'specific problems' parameter is present in the alarm notification to be 
+				logged.",
+		backedUpStatus-P PACKAGE
+			ATTRIBUTES
+				"DMI":backedUpStatus GET;
+		REGISTERED AS { cnmPackage backedUpStatus-P(15) };
+			PRESENT IF
+				"the 'backedupStatus' attribute has a value TRUE and the back-up status parameter 
+				is present in the alarm notification to be logged.",
+		backUpObject-P PACKAGE
+			ATTRIBUTES
+				"DMI":backUpObject GET;
+		REGISTERED AS { cnmPackage backUpObject-P(16) };
+			PRESENT IF
+				"the 'backup object' parameter is present in the alarm notification to be logged.",
+		trendIndication-P PACKAGE
+			ATTRIBUTES
+				"DMI":trendIndication GET;
+		REGISTERED AS { cnmPackage trendIndication-P(17) };
+			PRESENT IF
+				"the 'trend indication' parameter is present in the alarm notification to be 
+				logged.",
+		thresholdInfo-P PACKAGE
+			ATTRIBUTES
+				"DMI":thresholdInfo GET;
+		REGISTERED AS { cnmPackage thresholdInfo-P(18) };
+			PRESENT IF
+				"the value for the 'probableCause' attribute is 'thresholdCrossed'.",
+		stateChangeDefinition-P PACKAGE
+			ATTRIBUTES
+				"DMI":stateChangeDefinition GET;
+		REGISTERED AS { cnmPackage stateChangeDefinition-P(19) };
+			PRESENT IF
+				"there is a state transition in the alarm notification to be logged.",
+		monitoredAttributes-P PACKAGE
+			ATTRIBUTES
+				"DMI":monitoredAttributes GET;
+		REGISTERED AS { cnmPackage monitoredAttributes-P(20) };
+			PRESENT IF
+				"the 'monitoredAttributes' parameter is present in the alarm notification to be 
+				logged.",
+		proposedRepairActions-P PACKAGE
+			ATTRIBUTES
+				"DMI":proposedRepairActions GET;
+		REGISTERED AS { cnmPackage proposedRepairActions-P(21) };
+			PRESENT IF
+				"the 'proposedRepairActions' parameter is present in the alarm notification to be 
+				logged.",
+		attributeList-P PACKAGE
+			ATTRIBUTES
+				"DMI":attributeList GET;
+		REGISTERED AS { cnmPackage attributeList-P(22) };
+			PRESENT IF
+				"the 'attributeList' parameter is present in the object creation (or deletion) 
+				notification or event report corresponding to the instance of object creation 
+				(or deletion) record.",
+		sourceIndicator-P PACKAGE
+			ATTRIBUTES
+				"DMI":sourceIndicator GET;
+		REGISTERED AS { cnmPackage sourceIndicator-P(23) };
+			PRESENT IF
+				"the 'sourceIndicator' parameter is present in the object creation (or deletion) 
+				notification or event report corresponding to the instance of object creation 
+				(or deletion) record.";
+REGISTERED AS { cnmObjectClass pdnFaultLogRecord(22) };
+-- 7.1.3 Managed objects for trouble report service
+-- 7.1.3.1 Referenced managed objects
+-- 1) This Recommendation references the following support MO classes for which 
+-- the abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+-- a) top;
+-- b) log.
+-- 2) This Recommendation references the following support MO class for which 
+-- the abstract syntax is specified in
+-- Recommendation M.3100:
+--  network.
+-- NOTE  This object is the superior object for all the CNM objects.
+-- 3) This Recommendation references the following support MO classes for which 
+-- the abstract syntax is specified in
+-- Recommendation X.790:
+-- a) telecommunicationsTroubleReport;
+-- b) providerTroubleReport;
+-- c) contact;
+-- d) repairActivity;
+-- e) troubleHistoryRecord;
+-- f) troubleReportFormatDefinition.
+-- 7.1.3.2 Defined managed objects
+-- This Recommendation defines the following MO classes by inheriting the 
+-- telecommunicationsTroubleReport and
+-- troubleHistory MO classes.
+-- 7.1.3.2.1 PDN telecommunications trouble report
+
+
+pdnTelecommunicationsTroubleReport MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.790":telecommunicationsTroubleReport;
+	CHARACTERIZED BY
+		pdnTTR-P PACKAGE
+			BEHAVIOUR
+				pdnTTR-B BEHAVIOUR
+					DEFINED AS
+						"This object has trouble types specific to packet communication. The trouble type 
+						attribute defined in the super class is not used for the trouble management of 
+						PDN.";;
+			ATTRIBUTES
+				troubleTypePspdn GET;;;
+REGISTERED AS { cnmObjectClass pdnTelecommunicationsTroubleReport(3) };
+-- 7.1.3.2.2 PDN trouble history record
+
+
+pdnTroubleHistoryRecord MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.790":troubleHistoryRecord;
+	CHARACTERIZED BY
+		troubleTypePspdnPkg PACKAGE
+			ATTRIBUTES
+				troubleTypePspdn GET;;;
+REGISTERED AS { cnmObjectClass pdnTroubleHistoryRecord(4) };
+-- 7.1.4 Managed objects for loop setup service
+-- 7.1.4.1 Defined managed objects
+-- This Recommendation defines the following MO class.
+-- 7.1.4.1.1 CNM loopback point
+
+
+cnmLoopbackPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		x25TerminationPoint;
+	CHARACTERIZED BY
+		cnmLoopbackPointPackage PACKAGE
+			BEHAVIOUR
+				cnmLoopbackPoint-B BEHAVIOUR
+					DEFINED AS
+						"This object sets or resets the loopback point by the loopbackStatus attribute. 
+						The location at which the loopback point is set is represented by the 
+						locationPointer attribute.";;
+			ATTRIBUTES
+				locationPointer GET,
+				loopbackStatus GET-REPLACE;;;
+REGISTERED AS { cnmObjectClass cnmLoopbackPoint(23) };
+-- 7.1.5 Managed objects for test host service
+-- 7.1.5.1 Referenced managed objects
+-- 1) This Recommendation references the following support MO class for which 
+-- the abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+--  top.
+-- 2) This Recommendation references the following support MO classes for which 
+-- the abstract syntax is specified in
+-- ITU-T Rec. X.737 | ISO/IEC 10164-14:
+-- a) loopbackTest;
+-- b) protocolIntegrityTest.
+-- 7.1.5.2 Defined managed objects
+-- 7.1.5.2.1 X.25 physical connection
+
+
+x25PhysicalConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		x25PhysicalConnection-P PACKAGE
+			BEHAVIOUR
+				x25PhysicalConnection-B BEHAVIOUR
+					DEFINED AS
+						"This object includes the TARR package for performing a loopback test.";;
+			ATTRIBUTES
+				x25PhysicalConnectionId GET;;,
+		cnmLoopbackTestTARRPackage PACKAGE
+			BEHAVIOUR
+				cnmLoopbackTestTARR-B BEHAVIOUR
+					DEFINED AS
+						"A managed object containing this package supports receiving a loopback test 
+						request in the form of the testRequestControlledAction action with the 
+						appropriate parameters defined for loopback testing. Test results are returned 
+						in a testResultNotification with the loopbackControlledResultsParam parameter by 
+						the loopback Test Object.";;
+			ACTIONS
+				"ITU-T Rec. X.745 | ISO/IEC 10164-12":testRequestControlledAction
+					"ITU-T Rec. X.737 | ISO/IEC 10164-14":loopbackTestInfoParam
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":associatedObjectNotAvailable
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":independentTestInvocationError
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":mistypedTestCategoryInformation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":mORTNotAvailable
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchAssociatedObject
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchMORT
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":relatedTOError,
+				"ITU-T Rec. X.745 | ISO/IEC 10164-12":testSuspendResumeAction
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestInvocationId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestSessionId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":invalidTestOperation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":testSuspendResumeError,
+				"ITU-T Rec. X.745 | ISO/IEC 10164-12":testTerminateAction
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestInvocationId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestSessionId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":invalidTestOperation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":testTerminateError;;;
+REGISTERED AS { cnmObjectClass x25PhysicalConnection(24) };
+-- NOTE 1  The difference between this service and the definition of ITU-T Rec.  
+-- X.737 | ISO/IEC 10164-14 is that no PDU sequence is
+-- handed from the customer to the test action request receiver in the CNM 
+-- provider but several test patterns are prepared and emitted to
+-- the tested customer by the CNM provider.
+-- NOTE 2  In the LoopbackTestInfo data type associated to the 
+-- testRequestControlledAction action, loopbackData, testStartTime
+-- GeneralizedTime, testIntervalTime, reportingIntervalTime, 
+-- loopbackErrorThreshold may be specified.
+-- NOTE 3  In the LoopbackTestResults data type associated the loopback test 
+-- object, loopbackDataReceived and
+-- loopbackErrorReceived for a successful test and reasons for failure. The 
+-- testInvocationId, testSessionId, testOutcome, mORTs,
+-- associatedObjects, monitoredAttributes, proposedRepairActions, 
+-- additionalText, additionalInformation, notificationIdentifier, and
+-- correlatedNotifications attributes are returned.
+-- 7.1.5.2.2 CNM X.25 entity tested
+
+
+cnmX25EntityTested MANAGED OBJECT CLASS
+	DERIVED FROM
+		cnmX25Entity;
+	CHARACTERIZED BY
+		cnmX25EntityTested-P PACKAGE
+			BEHAVIOUR
+				cnmX25EntityTested-B BEHAVIOUR
+					DEFINED AS
+						"This object includes the TARR package for performing a protocol integrity test.";;;,
+		cnmProtocolIntegrityTestTARRPackage PACKAGE
+			BEHAVIOUR
+				cnmProtocolIntegrityTestTARR-B BEHAVIOUR
+					DEFINED AS
+						"A managed object containing this package supports receiving a protocol integrity 
+						test request in the form of the testRequestControlledAction action with the 
+						appropriate parameters defined for protocol integrity testing. Test results are 
+						returned in a testResultNotification with the 
+						protocolIntegrityControlledResultsParam parameter by the protocolIntegrity Test 
+						Object.";;
+			ACTIONS
+				"ITU-T Rec. X.745 | ISO/IEC 10164-12":testRequestControlledAction
+					"ITU-T Rec. X.737 | ISO/IEC 10164-14":protocolIntegrityTestInfoParam
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":associatedObjectNotAvailable
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":independentTestInvocationError
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":invalidTestOperation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":mistypedTestCategoryInformation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":mORTNotAvailable
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchAssociatedObject
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchMORT
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":relatedTOError,
+				"ITU-T Rec. X.745 | ISO/IEC 10164-12":testSuspendResumeAction
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestInvocationId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestSessionId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":invalidTestOperation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":testSuspendResumeError,
+				"ITU-T Rec. X.745 | ISO/IEC 10164-12":testTerminateAction
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestInvocationId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":noSuchTestSessionId
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":invalidTestOperation
+					"ITU-T Rec. X.745 | ISO/IEC 10164-12":testTerminateError;;;
+REGISTERED AS { cnmObjectClass cnmX25EntityTested(25) };
+-- 7.1.6 Managed objects for protocol monitoring service
+-- This service is for further study.
+-- 7.2 Managed objects for configuration management
+-- 7.2.1 Managed objects for configuration inquiry service
+-- 7.2.1.1 Referenced managed objects
+-- 1) This Recommendation references the following support MO class for which 
+-- the abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+--  top.
+-- 2) This Recommendation references the following support MO classes for which 
+-- the abstract syntax is specified in
+-- Recommendation M.3100:
+-- a) network;
+-- b) termination point;
+-- c) managed element;
+-- d) equipment.
+-- 3) This Recommendation references the following support MO class for which 
+-- the abstract syntax is specified in
+-- Recommendation X.790:
+--  contact.
+-- 7.2.1.2 Defined managed objects
+-- 7.2.1.2.1 CNM X.25 entity
+-- This object class is defined in 7.1.1.2.1.
+-- 7.2.1.2.2 X.25 termination point
+-- This object class is defined in 7.1.1.2.2.
+-- 7.2.1.2.3 X.25 service profile
+
+
+x25ServiceProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		x25ServiceProfile-P,
+		pleProfile-P;
+	CONDITIONAL PACKAGES
+		slpTimersProfile-P
+			PRESENT IF
+				"the timers may be specified by customers";
+REGISTERED AS { cnmObjectClass x25BasicServiceProfile(5) };
+-- 7.2.1.2.4 MLP profile
+
+
+mlpProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		mlpProfile-P PACKAGE
+			BEHAVIOUR
+				mlpProfile-B BEHAVIOUR
+					DEFINED AS
+						"This object is used to represent the service profile necessary for providing the 
+						MLP. Creation, modification and deletion of this object are controlled by the 
+						Service Request object.";;
+			ATTRIBUTES
+				mlpProfileId GET,
+				"DLMO":mW GET,
+				"DLMO":mX GET;;;
+	CONDITIONAL PACKAGES
+		mlpTimer-P PACKAGE
+			ATTRIBUTES
+				"NLMO":localDTEAddress GET,
+				"DLMO":mT1Timer GET,
+				"DLMO":mT3Timer GET,
+				"DLMO":mT2Timer GET;
+		REGISTERED AS { cnmPackage mlpTimer-P(26) };
+			PRESENT IF
+				"The provider allows customers to set and modify these attributes.";
+REGISTERED AS { cnmObjectClass mlpProfile(6) };
+-- 7.2.1.2.5 SLP profile
+
+
+slpProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		slpProfile-P;
+	CONDITIONAL PACKAGES
+		slpTimersProfile-P
+			PRESENT IF
+				"the timers may be specified by customers";
+REGISTERED AS { cnmObjectClass slpProfile(7) };
+-- 7.2.1.2.6 X.25 PVC profile
+
+
+x25PvcProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		x25PvcProfile-P PACKAGE
+			BEHAVIOUR
+				x25PvcProfile-B BEHAVIOUR
+					DEFINED AS
+						"This MO class represents subscription data, i.e. the service profile of each 
+						PVC. Necessary PVC parameters are included in this MO. Creation, modification 
+						and deletion of this object are controlled by the Service Request object.";;
+			ATTRIBUTES
+				x25PvcProfileId GET,
+				"NLMO":chargingDirection GET,
+				"NLMO":localDTEAddress GET,
+				"NLMO":logicalChannel GET,
+				"DMI":operationalState GET,
+				"NLMO":packetSizes GET,
+				"NLMO":remoteDTEAddress GET,
+				"NLMO":remoteLogicalChannel GET,
+				"NLMO":throughputClasses GET,
+				"NLMO":virtualCircuitId GET,
+				"NLMO":windowSizes GET;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { cnmObjectClass x25PvcProfile(8) };
+-- 7.2.1.2.7 Closed user group profile
+
+
+cugProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		cugProfile-P PACKAGE
+			BEHAVIOUR
+				cugProfile-B BEHAVIOUR
+					DEFINED AS
+						"This MO class is used for managing the subscription of each CUG. The attributes 
+						represent the list of DTE addresses that belong to the same CUG. Creation, 
+						modification and deletion of this object are controlled by the Service Request 
+						object.";;
+			ATTRIBUTES
+				cugProfileId GET,
+				"NLMO":cUGWithIncomingAccess GET,
+				"NLMO":cUGWithOutgoingAccess GET,
+				"NLMO":bilateralCUG GET,
+				"NLMO":bilateralCUGWithOutgoingAccess GET,
+				dTEAddressList GET;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+	CONDITIONAL PACKAGES
+		interlockCodePkg PACKAGE
+			ATTRIBUTES
+				interlockCode GET;
+		REGISTERED AS { cnmPackage interlockCodePkg(24) };
+			PRESENT IF
+				"The service provider allows customers to use the international CUG service and 
+				to handle the interlock code value.",
+		cugIndexPkg PACKAGE
+			ATTRIBUTES
+				cugIndex GET;
+		REGISTERED AS { cnmPackage cugIndexPkg(25) };
+			PRESENT IF
+				"The service provider offers multiple CUGs and a customer subscribes to more than 
+				one CUG.";
+REGISTERED AS { cnmObjectClass cugProfile(9) };
+-- 7.2.1.2.8 Hunt group profile
+
+
+hgProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		hgProfile-P PACKAGE
+			BEHAVIOUR
+				hgProfile-B BEHAVIOUR
+					DEFINED AS
+						"This MO class is used for managing the subscription of each HG. The attributes 
+						represent the list of DTE addresses that belong to the same HG. Creation, 
+						modification and deletion of this object are controlled by the Service Request 
+						object.";;
+			ATTRIBUTES
+				hgProfileId GET,
+				hgAddress GET,
+				dTEAddressList GET;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { cnmObjectClass hgProfile(10) };
+-- 7.2.1.2.9 CNM user
+
+
+cnmUser MANAGED OBJECT CLASS
+	DERIVED FROM
+		customer;
+	CHARACTERIZED BY
+		cnmUser-P PACKAGE
+			BEHAVIOUR
+				cnmUser-B BEHAVIOUR
+					DEFINED AS
+						"This MO represents a customer's suborganization and/or access line group. The 
+						suborganizationObjectList points all the relevant objects that belong to that 
+						suborganization.";;
+			ATTRIBUTES
+				cnmUserId GET,
+				suborganizationObjectList GET-REPLACE;;;
+REGISTERED AS { cnmObjectClass cnmUser(11) };
+-- 7.2.1.2.10 Customer
+
+
+customer MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		customerPkg,
+		"GNM":attributeValueChangeNotificationPackage,
+		contactList-P,
+		"GNM":createDeleteNotificationsPackage;
+	CONDITIONAL PACKAGES
+		customerTypesPkg
+			PRESENT IF
+				"an instance supports it.",
+		opNetworkListPkg
+			PRESENT IF
+				"an instance supports it.",
+		serviceListPkg
+			PRESENT IF
+				"an instance supports it.",
+		typeTextPkg
+			PRESENT IF
+				"an instance supports it.",
+		"GNM":userLabelPackage
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { cnmObjectClass customer(12) };
+-- 7.2.1.2.11 Location
+
+
+location MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		locationPkg,
+		"GNM":attributeValueChangeNotificationPackage,
+		"GNM":createDeleteNotificationsPackage;
+	CONDITIONAL PACKAGES
+		contactList-P
+			PRESENT IF
+				"an instance supports it.",
+		typeTextPkg
+			PRESENT IF
+				"an instance supports it.",
+		"GNM":userLabelPackage
+			PRESENT IF
+				"an instance supports it.";
+REGISTERED AS { cnmObjectClass location(13) };
+-- 7.2.2 Managed objects for CNM reconfiguration service
+-- 7.2.2.1 Referenced managed objects
+--  This Recommendation references the following support MO class for which the 
+--  abstract syntax is specified by
+-- Recommendation M.3100:
+-- - equipment.
+-- 7.2.2.2 Defined managed objects
+-- 7.2.2.2.1 CNM X.25 entity
+-- This object class is defined in 7.1.1.2.1.
+-- 7.2.2.2.2 X.25 termination point
+-- This object class is defined in 7.1.1.2.2.
+-- 7.2.2.2.3 CNM user
+-- This object class is defined in 7.2.1.2.9.
+-- 7.2.2.2.4 Customer
+-- This object class is defined in 7.2.1.2.10.
+-- 7.2.2.2.5 Location
+-- This object class is defined in 7.2.1.2.11.
+-- 7.2.3 Managed objects for ordering service
+-- 7.2.3.1 Referenced managed objects
+--  This Recommendation references the following support managed object for 
+--  which the abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+-- - top.
+-- 7.2.3.2 Defined managed objects
+-- 7.2.3.2.1 X.25 service profile
+-- This object class is defined in 7.2.1.2.3.
+-- 7.2.3.2.2 MLP profile
+-- This object class is defined in 7.2.1.2.4.
+-- 7.2.3.2.3 SLP profile
+-- This object class is defined in 7.2.1.2.5.
+-- 7.2.3.2.4 X.25 PVC profile
+-- This object class is defined in 7.2.1.2.6.
+-- 7.2.3.2.5 Closed user group profile
+-- This object class is defined in 7.2.1.2.7.
+-- 7.2.3.2.6 Hunt group profile
+-- This object class is defined in 7.2.1.2.8.
+-- 7.2.4 Managed objects for systematic call redirection service
+-- 7.2.4.1 Referenced managed objects
+--  This Recommendation references the following support MO class for which the 
+--  abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+-- - top.
+-- 7.2.4.2 Defined managed objects
+-- 7.2.4.2.1 Redirection list
+
+
+redirectionList MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		redirectionListPackage PACKAGE
+			BEHAVIOUR
+				redirectionListPackage-B BEHAVIOUR
+					DEFINED AS
+						"This object controls call redirection. Calls are redirected to addresses 
+						contained in the redirection list attribute.";;
+			ATTRIBUTES
+				redirectionListId GET,
+				dTEAddressList GET-REPLACE,
+				"DMI":administrativeState GET-REPLACE,
+				callRedirectionList GET-REPLACE;;;
+REGISTERED AS { cnmObjectClass redirectionList(26) };
+-- 7.3 Managed objects for accounting management
+-- 7.3.1 Managed objects for periodic billing service
+-- 7.3.1.1 Referenced managed objects
+--  This Recommendation references the following support MO class for which the 
+--  abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+-- - top.
+-- 7.3.1.2 Defined managed objects
+-- This Recommendation defines the following MO:
+
+
+cnmBillingController MANAGED OBJECT CLASS
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":top;
+	CHARACTERIZED BY
+		cnmBillingController-P PACKAGE
+			BEHAVIOUR
+				cnmBillingController-B BEHAVIOUR
+					DEFINED AS
+						"This MO controls the emission of invoice notifications. If this MO is in the 
+						unlocked state, invoices are sent periodically. If it is locked, no invoice is 
+						emitted.";;
+			ATTRIBUTES
+				"ITU-T Rec. X.742 | ISO/IEC 10164-10":controlObjectId GET,
+				"DMI":administrativeState GET-REPLACE;
+			NOTIFICATIONS
+				invoiceReport;;;
+REGISTERED AS { cnmObjectClass cnmBillingController(27) };
+-- 7.3.2 Managed objects for detailed accounting service
+-- 7.3.2.1 Referenced managed objects
+--  This Recommendation references the following support MO class for which the 
+--  abstract syntax is specified in
+-- ITU-T Rec. X.742 | ISO/IEC 10164-10:
+-- - usageMeteringRecord.
+-- 7.3.2.2 Defined managed objects
+-- This Recommendation does not define any specific MO classes for this service.  
+-- However, the following data types are
+-- defined to complete the definition of the ITU-T Rec. X.742 | ISO/IEC 
+-- 10164-10: usageMeteringRecord class for the
+-- accounting specific to the accounting service. Related data type is defined 
+-- in clause 14.
+-- NOTE 1  ITU-T Rec. X.742 | ISO/IEC 10164-10 defines the UsageInfo data type 
+-- as follows:
+-- UMF-USAGE ::= DMI-TYPE-IDENTIFIER
+-- UsageInfo ::= SEQUENCE {
+-- serviceType UMF-USAGE&.id ({UsageInfoSet}),
+-- usageData UMF-USAGE&.value({UsageInfoSet }{@.serviceType})}
+-- UsageInfoSet UMF-USAGE ::= { ... }
+-- This Recommendation adds the following definitions:
+-- - UsageInfo-PacketService;
+-- - PacketUsageData;
+-- - PacketRegistrationType;
+-- - PacketCompleteType;
+-- - UsageMeasurement;
+-- - UsageCounter;
+-- - PacketInterruptType.
+-- NOTE 2  If a provider needs other usage metering items, another attribute 
+-- (e.g. usageInfo2) may be defined in a subclass. In this
+-- attribute, supplementary service charging items, interworking charging items 
+-- or any other ones specific to the provider are represented.
+-- 7.4 Managed objects for performance management
+-- 7.4.1 Managed objects for traffic information service
+-- 7.4.1.1 Referenced managed objects
+--  This Recommendation references the following support MO classes for which 
+--  the abstract syntax is specified in
+-- Recommendation Q.822:
+-- a) currentData;
+-- b) historyData.
+-- 7.4.1.2 Defined managed objects
+-- 7.4.1.2.1 CNM X.25 entity
+-- The cnmX25Entity object defined in 7.1.1.2.1 is used as the monitored MO for 
+-- the measurement of packet layer counters
+-- of the currentPacketTrafficData object.
+-- 7.4.1.2.2 Current packet traffic data
+
+
+currentPacketTrafficData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.822":currentData;
+	CHARACTERIZED BY
+		currentPacketTrafficData-P PACKAGE
+			BEHAVIOUR
+				currentPacketTrafficData-B BEHAVIOUR
+					DEFINED AS
+						"This MO is a subclass of the currentData object that has a scanning function to 
+						monitor a specified Monitored Object. The traffic measurement parameters shall 
+						be explicitly defined as attributes of this MO, not as measurementListPkg.";;
+			ATTRIBUTES
+				"NLMO":callAttempts GET,
+				"NLMO":callsConnected GET,
+				"NLMO":callTimeouts GET,
+				"NLMO":clearTimeouts GET,
+				"NLMO":dataPacketsReceived GET,
+				"NLMO":dataPacketsSent GET,
+				"DMI":octetsReceivedCounter GET,
+				"DMI":octetsSentCounter GET,
+				"NLMO":protocolErrorsAccusedOf GET,
+				"NLMO":protocolErrorsDetectedLocally GET,
+				"NLMO":providerInitiatedDisconnects GET,
+				"NLMO":providerInitiatedResets GET,
+				"NLMO":resetTimeouts GET,
+				"NLMO":remotelyInitiatedResets GET,
+				"NLMO":remotelyInitiatedRestarts GET,
+				"NLMO":segmentsReceived GET,
+				"NLMO":segmentsSent GET;;;
+REGISTERED AS { cnmObjectClass currentPacketTrafficData(14) };
+-- NOTE 1  This MO intends to be used by many CNM service providers. However, 
+-- based on the agreement between the provider and
+-- its customers, traffic items may be added by subclassing. If a provider does 
+-- not collect some of the counters above, another object may
+-- be defined by directly inheriting the Recommendation Q.822: currentData 
+-- object.
+-- NOTE 2  This MO shall be created on demand before the traffic data 
+-- collection. The maximum number of observation is determined
+-- by the service provider in consideration of the processing load and the 
+-- capacity.
+-- 7.4.1.2.3 History packet traffic data
+
+
+historyPacketTrafficData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.822":historyData;
+	CHARACTERIZED BY
+		historyPacketTrafficData-P PACKAGE
+			BEHAVIOUR
+				historyPacketTrafficData-B BEHAVIOUR
+					DEFINED AS
+						"This MO is a subclass of the historyData object that has a function for storing 
+						monitored measurements of the currentPacketTrafficData object for a specified 
+						time interval. The measurement attributes in this object shall be an exact copy 
+						of the attributes in the currentPacketTrafficData object at the end of the 
+						interval. The traffic parameters shall be explicitly defined as attributes of 
+						this object, not as historyDataMeasurementListPkg of the super class.";;
+			ATTRIBUTES
+				"NLMO":callAttempts GET,
+				"NLMO":callsConnected GET,
+				"NLMO":callTimeouts GET,
+				"NLMO":clearTimeouts GET,
+				"NLMO":dataPacketsReceived GET,
+				"NLMO":dataPacketsSent GET,
+				"DMI":octetsReceivedCounter GET,
+				"DMI":octetsSentCounter GET,
+				"NLMO":protocolErrorsAccusedOf GET,
+				"NLMO":protocolErrorsDetectedLocally GET,
+				"NLMO":providerInitiatedDisconnects GET,
+				"NLMO":providerInitiatedResets GET,
+				"NLMO":resetTimeouts GET,
+				"NLMO":remotelyInitiatedResets GET,
+				"NLMO":remotelyInitiatedRestarts GET,
+				"NLMO":segmentsReceived GET,
+				"NLMO":segmentsSent GET;;;
+REGISTERED AS { cnmObjectClass historyPacketTrafficData(15) };
+-- 7.4.1.2.4 MLP monitored point
+
+
+mlpMonitoredPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		mlpMonitoredPoint-P PACKAGE
+			BEHAVIOUR
+				mlpMonitoredPoint-B BEHAVIOUR
+					DEFINED AS
+						"This object represents the monitored resource for which MLP-traffic-data are 
+						measured.";;
+			ATTRIBUTES
+				mlpMonitoredPointId GET;;;
+REGISTERED AS { cnmObjectClass mlpMonitoredPoint(16) };
+-- 7.4.1.2.5 Current MLP traffic data
+
+
+currentMlpTrafficData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.822":currentData;
+	CHARACTERIZED BY
+		currentMlpTrafficData-P PACKAGE
+			BEHAVIOUR
+				currentMlpTrafficData-B BEHAVIOUR
+					DEFINED AS
+						"This MO is a subclass of the currentData object that has a scanning function to 
+						monitor MLP communication. The traffic measurement parameters shall be 
+						explicitly defined as attributes of this MO, not as measurementListPkg.";;
+			ATTRIBUTES
+				"DLMO":receivedMlpFramesInGuardRegion GET,
+				"DLMO":receivedMlpResets GET,
+				mlpFramesReceived GET,
+				mlpFramesSent GET,
+				mlpFramesOutsideWindowGuard GET;;;
+REGISTERED AS { cnmObjectClass currentMlpTrafficData(17) };
+-- 7.4.1.2.6 History MLP traffic data
+
+
+historyMlpTrafficData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.822":historyData;
+	CHARACTERIZED BY
+		historyMlpTrafficData-P PACKAGE
+			BEHAVIOUR
+				historyMlpTrafficData-B BEHAVIOUR
+					DEFINED AS
+						"This MO is a subclass of the historyData object that has a function for storing 
+						monitored measurements of the currentMlpTrafficData object for a specified time 
+						interval. The measurement attributes in this object shall be an exact copy of 
+						the attributes in the currentMlpTrafficData object at the end of the interval. 
+						The traffic parameters shall be explicitly defined as attributes of this object, 
+						not as historyDataMeasurementListPkg of the super class.";;
+			ATTRIBUTES
+				"DLMO":receivedMlpFramesInGuardRegion GET,
+				"DLMO":receivedMlpResets GET,
+				mlpFramesReceived GET,
+				mlpFramesSent GET,
+				mlpFramesOutsideWindowGuard GET;;;
+REGISTERED AS { cnmObjectClass historyMlpTrafficData(18) };
+-- 7.4.1.2.7 X.25 termination point
+-- This object is also used for the monitored resource for the measurement of an 
+-- SLP. This object class is defined
+-- in 7.1.1.2.2.
+-- 7.4.1.2.8 Current SLP traffic data
+
+
+currentSlpTrafficData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.822":currentData;
+	CHARACTERIZED BY
+		currentSlpTrafficData-P PACKAGE
+			BEHAVIOUR
+				currentSlpTrafficData-B BEHAVIOUR
+					DEFINED AS
+						"This MO is a subclass of the currentData object that has a scanning function to 
+						monitor a specified Monitored Object. The traffic measurement parameters shall 
+						be explicitly defined as attributes of this MO, not as measurementListPkg.";;
+			ATTRIBUTES
+				"DLMO":fCSErrorsReceived GET,
+				"DLMO":fRMRsReceived GET,
+				"DLMO":fRMRsSent GET,
+				"DLMO":iFrameDataOctetsReceived GET,
+				"DLMO":iFrameDataOctetsSent GET,
+				"DLMO":iFramesReceived GET,
+				"DLMO":iFramesSent GET,
+				"DLMO":pollsReceived GET,
+				"DLMO":rEJsReceived GET,
+				"DLMO":rEJsSent GET,
+				"DLMO":rNRsReceived GET,
+				"DLMO":rNRsSent GET,
+				"DLMO":sABMsReceived GET,
+				"DLMO":sABMsSent GET,
+				"DLMO":timesT1Expired GET;;;
+REGISTERED AS { cnmObjectClass currentSlpTrafficData(19) };
+-- 7.4.1.2.9 History SLP traffic data
+
+
+historySlpTrafficData MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.822":historyData;
+	CHARACTERIZED BY
+		historySlpTrafficData-P PACKAGE
+			BEHAVIOUR
+				historySlpTrafficData-B BEHAVIOUR
+					DEFINED AS
+						"This MO is a subclass of the historyData object that has a function for storing 
+						monitored measurements of the currentSlpTrafficData object for a specified time 
+						interval. The measurement attributes in this object shall be an exact copy of 
+						the attributes in the currentSlpTrafficData object at the end of the interval. 
+						The traffic parameters shall be explicitly defined as attributes of this object, 
+						not as historyDataMeasurementListPkg of the super class.";;
+			ATTRIBUTES
+				"DLMO":fCSErrorsReceived GET,
+				"DLMO":fRMRsReceived GET,
+				"DLMO":fRMRsSent GET,
+				"DLMO":iFrameDataOctetsReceived GET,
+				"DLMO":iFrameDataOctetsSent GET,
+				"DLMO":iFramesReceived GET,
+				"DLMO":iFramesSent GET,
+				"DLMO":pollsReceived GET,
+				"DLMO":rEJsReceived GET,
+				"DLMO":rEJsSent GET,
+				"DLMO":rNRsReceived GET,
+				"DLMO":rNRsSent GET,
+				"DLMO":sABMsReceived GET,
+				"DLMO":sABMsSent GET,
+				"DLMO":timesT1Expired GET;;;
+REGISTERED AS { cnmObjectClass historySlpTrafficData(20) };
+-- 7.4.2 Managed objects for quality of service information service
+-- This service is for further study.
+-- 7.5 Managed objects for security management
+-- 7.5.1 Managed objects for password change service
+-- This service is for further study.
+-- 7.5.2 Managed objects for access rights definition service
+-- This service is for further study.
+-- 7.6 Managed objects for CNM supporting services
+-- 7.6.1 Managed objects for generic CNM service request service
+-- 7.6.1.1 Referenced managed objects
+--  This Recommendation references the following support managed object for 
+--  which the abstract syntax is specified in
+-- CCITT Rec. X.721 | ISO/IEC 10165-2:
+-- - top.
+-- 7.6.1.2 Defined managed objects
+-- 7.6.1.2.1 Service request
+
+
+serviceRequest MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		serviceRequestPkg;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. X.790":trAgentContactPersonAttributePkg
+			PRESENT IF
+				"an instance supports it and the trAgentContactPersonObjectPkg is not present",
+		"ITU-T Rec. X.790":trAgentContactPersonObjectPkg
+			PRESENT IF
+				"an instance supports it and the trAgentContactPersonAttributePkg is not present",
+		"ITU-T Rec. X.790":trAlternateManagerContactPersonAttributePkg
+			PRESENT IF
+				"an instance supports it and the trAlternateManagerContactPersonObjectPkg is not 
+				present",
+		"ITU-T Rec. X.790":trAlternateManagerContactPersonObjectPkg
+			PRESENT IF
+				"an instance supports it and the trAlternateManagerContactPersonAttributePkg is 
+				not present",
+		"ITU-T Rec. X.790":trDialogPkg
+			PRESENT IF
+				"an instance supports it",
+		"ITU-T Rec. X.790":trManagerContactPersonAttributePkg
+			PRESENT IF
+				"an instance supports it and the trManagerContactPersonObjectPkg is not present",
+		"ITU-T Rec. X.790":trManagerContactPersonObjectPkg
+			PRESENT IF
+				"an instance supports it and the trManagerContactPersonAttributePkg is not 
+				present",
+		negotiationPkg
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { cnmObjectClass serviceRequest(21) };
+-- 8 Name binding for object classes
+-- 8.1 Name binding for fault management
+-- 8.1.1 Name binding for alarm reporting service
+-- 8.1.1.1 Network
+-- This object may recursively be contained by the Network object. The name 
+-- binding definition between the network and
+-- network objects is imported from Recommendation M.3100.
+-- 8.1.1.2 CNM X.25 entity
+-- This object shall be contained by the Network (customer network) object.
+
+
+cnmX25Entity-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS cnmX25Entity;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		cnmX25EntityId;
+REGISTERED AS { cnmNameBinding cnmX25Entity-network-NB(2) };
+-- 8.1.1.3 X.25 termination point
+-- This object shall be contained by the Network (customer network) object.
+
+
+x25TerminationPoint-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS x25TerminationPoint;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cnmX25Entity;
+	WITH ATTRIBUTE
+		x25TerminationPointId;
+REGISTERED AS { cnmNameBinding x25TerminationPoint-network-NB(3) };
+-- 8.1.1.4 Equipment
+-- This object shall be contained by the X.25 Termination Point object.
+
+
+equipment-x25TerminationPoint-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "Recommendation M.3100":equipment;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25TerminationPoint;
+	WITH ATTRIBUTE
+		"Recommendation M.3100":equipmentId;
+REGISTERED AS { cnmNameBinding equipment-x25TerminationPoint-NB(4) };
+-- 8.1.1.5 Managed element
+-- This object shall be contained by the Network (customer network) object. The 
+-- name binding definition between the
+-- managed element and network objects is imported from Recommendation M.3100.
+-- 8.1.1.6 Event forwarding discriminator
+-- The Event Forwarding Discriminator object shall be contained by the Managed 
+-- Element object.
+
+
+eventForwardingDiscriminator-managedElement-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement;
+	WITH ATTRIBUTE
+		"CCITT Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminatorId;
+REGISTERED AS { cnmNameBinding eventForwardingDiscriminator-managedElement-NB(6) };
+-- 8.1.2 Name binding for fault history service
+-- 8.1.2.1 PDN fault log record
+-- The PDN Fault Log Record object shall be contained by the Log object.
+
+
+pdnFaultLogRecord-managedElement-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS pdnFaultLogRecord;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI":log;
+	WITH ATTRIBUTE
+		"DMI":logRecordId;
+REGISTERED AS { cnmNameBinding pdnFaultLogRecord-log-NB(29) };
+-- 8.1.3 Name binding for trouble report service
+-- 8.1.3.1 PDN telecommunications trouble report
+-- This object shall be contained by the Network (customer network) object.
+
+
+pdnTelecommunicationsTroubleReport-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS pdnTelecommunicationsTroubleReport;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		"ITU-T Recommendation X.790":troubleReportID;
+REGISTERED AS { cnmNameBinding pdnTelecommunicationsTroubleReport-network-NB(7) };
+-- 8.1.3.2 Provider trouble report
+-- This object shall be contained by the Network (customer network) object. The 
+-- name binding definition between the
+-- provider Trouble Report and network objects is imported from Recommendation 
+-- X.790.
+-- 8.1.3.3 Trouble report format definition
+-- This object shall be contained by the Network (customer network) object. The 
+-- name binding definition between the
+-- Trouble Report Format Definition and network objects is imported from 
+-- Recommendation X.790.
+-- 8.1.3.4 Repair activity
+-- This object shall be contained by the pdnTelecommunicationsTroubleReport 
+-- object.
+
+
+repairActivity-pdnTelecommunicationsTroubleReport-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "ITU-T Recommendation X.790":repairActivity;
+	NAMED BY
+	SUPERIOR OBJECT CLASS pdnTelecommunicationsTroubleReport;
+	WITH ATTRIBUTE
+		"ITU-T Recommendation X.790":repairActivityID;
+REGISTERED AS { cnmNameBinding repairActivity-pdnTelecommunicationsTroubleReport-NB(8) };
+-- 8.1.3.5 PDN trouble history record
+-- This object shall be contained by the log object.
+
+
+pdnTroubleHistoryRecord-log-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS pdnTroubleHistoryRecord;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI":log;
+	WITH ATTRIBUTE
+		"DMI":logRecordId;
+REGISTERED AS { cnmNameBinding pdnTroubleHistoryRecord-log-NB(9) };
+-- 8.1.3.6 Contact
+-- This object shall be contained by the Network (customer network) object. The 
+-- name binding definition between the
+-- contact and network objects is imported from Recommendation X.790.
+-- 8.1.3.7 Log
+-- This object shall be contained by the managedElement object.
+
+
+log-managedElement-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "DMI":log;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement;
+	WITH ATTRIBUTE
+		"DMI":logId;
+REGISTERED AS { cnmNameBinding log-managedElement-NB(11) };
+-- 8.1.4 Name binding for loop setup service
+-- 8.1.4.1 loopbackPoint
+-- This object shall be contained by the Network object.
+
+
+cnmLoopbackPoint-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS cnmLoopbackPoint;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		x25TerminationPointId;
+REGISTERED AS { cnmNameBinding cnmLoopbackPoint-network-NB(30) };
+-- 8.1.5 Name binding for test host service
+-- 8.1.5.1 cnmX25EntityTested
+-- This object shall be contained by the Network object.
+
+
+cnmX25EntityTested-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS cnmX25EntityTested;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		cnmX25EntityId;
+REGISTERED AS { cnmNameBinding cnmX25EntityTested-network-NB(31) };
+-- 8.1.5.2 loopbackTest
+-- This object shall be contained by the managedElement object.
+
+
+loopbackTest-managedElement-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "ITU-T Rec. X.737 (1995) | ISO/IEC 10164-14 : 1996":loopbackTestObject;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.745 | ISO/IEC 10164-12":testObjectId;
+REGISTERED AS { cnmNameBinding loopbackTest-managedElement-NB(32) };
+-- 8.1.5.3 protocolIntegrityTest
+-- This object shall be contained by the managedElement object.
+
+
+protocolIntegrityTest-managedElement-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS "ITU-T Rec. X.737 | ISO/IEC 10164-14":protocolIntegrityTestObject;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.745 | ISO/IEC 10164-12":testObjectId;
+REGISTERED AS { cnmNameBinding protocolIntegrityTest-managedElement-NB(33) };
+-- 8.1.5.4 X.25 physical connection
+-- This object shall be contained by the x25TerminationPoint object.
+
+
+x25PhysicalConnection-x25TerminationPoint-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS x25PhysicalConnection;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		x25PhysicalConnectionId;
+REGISTERED AS { cnmNameBinding x25PhysicalConnection-x25TerminationPoint-NB(34) };
+-- 8.1.6 Name binding for protocol monitoring service
+-- This service is for further study.
+-- 8.2 Name binding for configuration management
+-- 8.2.1 Name binding for configuration inquiry service
+-- 8.2.1.1 Network
+-- The name binding for this service is the same as defined in 8.1.1.1.
+-- 8.2.1.2 CNM X.25 entity
+-- The name binding for this service is the same as defined in 8.1.1.2.
+-- 8.2.1.3 X.25 termination point
+-- The name binding for this service is the same as defined in 8.1.1.3.
+-- 8.2.1.4 Equipment
+-- The name binding for this service is the same as defined in 8.1.1.4.
+-- 8.2.1.5 X.25 service profile
+-- This object shall be contained by the Network (customer network) object.
+
+
+x25ServiceProfile-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS x25ServiceProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		x25ServiceProfileId;
+REGISTERED AS { cnmNameBinding x25ServiceProfile-network-NB(12) };
+-- 8.2.1.6 MLP profile
+-- This object shall be contained by the X.25 Service Profile object.
+
+
+mlpProfile-x25ServiceProfile-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS mlpProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25ServiceProfile;
+	WITH ATTRIBUTE
+		mlpProfileId;
+REGISTERED AS { cnmNameBinding mlpProfile-x25ServiceProfile-NB(13) };
+-- 8.2.1.7 SLP profile
+-- This object shall be contained by the X.25 Service Profile object.
+
+
+slpProfile-x25ServiceProfile-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS slpProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25ServiceProfile;
+	WITH ATTRIBUTE
+		slpProfileId;
+REGISTERED AS { cnmNameBinding slpProfile-x25ServiceProfile-NB(14) };
+-- 8.2.1.8 X.25 PVC profile
+-- This object shall be contained by the X.25 Service Profile object.
+
+
+x25PvcProfile-x25ServiceProfile-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS x25PvcProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25ServiceProfile;
+	WITH ATTRIBUTE
+		x25PvcProfileId;
+REGISTERED AS { cnmNameBinding x25PvcProfile-x25ServiceProfile-NB(15) };
+-- 8.2.1.9 CUG profile
+-- This object shall be contained by the Network (customer network) object.
+
+
+cugProfile-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS cugProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		cugProfileId;
+REGISTERED AS { cnmNameBinding cugProfile-network-NB(16) };
+-- 8.2.1.10 Hunt group profile
+-- This object shall be contained by the Network (customer network) object.
+
+
+hgProfile-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS hgProfile;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		hgProfileId;
+REGISTERED AS { cnmNameBinding hgProfile-network-NB(17) };
+-- 8.2.1.11 Customer
+-- This object shall be contained by the Network (customer network) object.
+
+
+customer-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS customer;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		customerID;
+REGISTERED AS { cnmNameBinding customer-network-NB(18) };
+-- 8.2.1.12 CNM user
+-- This object shall be contained by the Customer object.
+
+
+cnmUser-customer-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS cnmUser;
+	NAMED BY
+	SUPERIOR OBJECT CLASS customer;
+	WITH ATTRIBUTE
+		cnmUserId;
+REGISTERED AS { cnmNameBinding cnmUser-customer-NB(19) };
+-- 8.2.1.13 Contact
+-- The name binding is defined in 8.1.3.6.
+-- 8.2.1.14 Location
+-- This object shall be contained by the Network (customer network) object.
+
+
+location-network-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS location;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":network;
+	WITH ATTRIBUTE
+		locationID;
+REGISTERED AS { cnmNameBinding location-network-NB(20) };
+-- 8.2.2 Name binding for CNM reconfiguration service
+-- All the name binding for this service is the same as defined 8.2.1.
+-- 8.2.3 Name binding for ordering service
+-- 8.2.3.1 X.25 service profile
+-- The name binding for this object is the same as defined in 8.2.1.5.
+-- 8.2.3.2 MLP profile
+-- The name binding for this object is the same as defined in 8.2.1.6.
+-- 8.2.3.3 SLP profile
+-- The name binding for this object is the same as defined in 8.2.1.7.
+-- 8.2.3.4 X.25 PVC profile
+-- The name binding for this object is the same as defined in 8.2.1.8.
+-- 8.2.3.5 CUG profile
+-- The name binding for this object is the same as defined in 8.2.1.9.
+-- 8.2.3.6 Hunt group profile
+-- The name binding for this object is the same as defined in 8.2.1.10.
+-- 8.2.4 Name binding for systematic call redirection service
+-- 8.2.4.1 Redirection list
+-- This object shall be contained by the CNM X.25 Entity object.
+
+
+redirectionList-cnmX25Entity-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS redirectionList;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cnmX25Entity;
+	WITH ATTRIBUTE
+		redirectionListId;
+REGISTERED AS { cnmNameBinding redirectionList-cnmX25Entity-NB(35) };
+-- 8.3 Name binding for accounting management
+-- 8.3.1 Name binding for periodic billing service
+-- 8.3.1.1 CNM billing controller
+-- This object shall be contained by the managedElement.
+
+
+cnmBillingController-managedElement-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS cnmBillingController;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995":controlObjectId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding cnmBillingController-managedElement-NB(36) };
+-- 8.3.2 Name binding for detailed accounting
+-- 8.3.2.1 Usage metering record
+-- This object shall be contained by the Network (customer network) object. The 
+-- name binding definition between the
+-- usageMeteringRecord and log objects is imported from ITU-T Rec. X.742 | 
+-- ISO/IEC 10164-10.
+-- 8.4 Name binding for performance management
+-- 8.4.1 Name binding for traffic information service
+-- 8.4.1.1 CNM X.25 entity
+-- The relationship between the CNM X.25 Entity object and the Network (customer 
+-- network) object is defined in 8.1.1.2.
+-- 8.4.1.2 Current packet traffic data
+-- This object shall be contained by the CNM X.25 Entity object.
+
+
+currentPacketTrafficData-cnmX25Entity-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS currentPacketTrafficData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cnmX25Entity;
+	WITH ATTRIBUTE
+		"X.739":scannerId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding currentPacketTrafficData-cnmX25Entity-NB(21) };
+-- 8.4.1.3 History packet traffic data
+-- This object shall be contained by the Current Packet Traffic Data object.
+
+
+historyPacketTrafficData-currentPacketTrafficData-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS historyPacketTrafficData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS currentPacketTrafficData;
+	WITH ATTRIBUTE
+		"ITU-T Rec. Q.822":historyDataId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding historyPacketTrafficData-currentPacketTrafficData-NB(22) };
+-- 8.4.1.4 MLP monitored point
+-- This object shall be contained by the CNM X.25 Entity object.
+
+
+mlpMonitoredPoint-cnmX25Entity-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS mlpMonitoredPoint;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cnmX25Entity;
+	WITH ATTRIBUTE
+		mlpMonitoredPointId;
+REGISTERED AS { cnmNameBinding mlpMonitoredPoint-cnmX25Entity-NB(23) };
+-- 8.4.1.5 Current MLP traffic data
+-- This object shall be contained by the MLP Monitored Point object.
+
+
+currentMlpTrafficData-mlpMonitoredPoint-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS currentMlpTrafficData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS mlpMonitoredPoint;
+	WITH ATTRIBUTE
+		"X.739":scannerId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding currentMlpTrafficData-mlpMonitoredPoint-NB(24) };
+-- 8.4.1.6 History MLP traffic data
+-- This object shall be contained by the Current MLP Traffic Data object.
+
+
+historyMlpTrafficData-currentMlpTrafficData-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS historyMlpTrafficData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS currentMlpTrafficData;
+	WITH ATTRIBUTE
+		"ITU-T Rec. Q.822":historyDataId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding historyMlpTrafficData-currentMlpTrafficData-NB(25) };
+-- 8.4.1.7 X.25 termination point
+-- The name binding for this object is defined in 8.1.1.3.
+-- 8.4.1.8 Current SLP traffic data
+-- This object shall be contained by the X.25 Termination Point object.
+
+
+currentSlpTrafficData-cnmX25Entity-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS currentSlpTrafficData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25TerminationPoint;
+	WITH ATTRIBUTE
+		"X.739":scannerId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding currentSlpTrafficData-cnmX25Entity-NB(26) };
+-- 8.4.1.9 History SLP traffic data
+-- This object shall be contained by the Current SLP Traffic Data object.
+
+
+historySlpTrafficData-currentSlpTrafficData-NB NAME BINDING
+	SUBORDINATE OBJECT CLASS historySlpTrafficData;
+	NAMED BY
+	SUPERIOR OBJECT CLASS currentSlpTrafficData;
+	WITH ATTRIBUTE
+		"ITU-T Rec. Q.822":historyDataId;
+	CREATE;
+	DELETE;
+REGISTERED AS { cnmNameBinding historySlpTrafficData-currentSlpTrafficData-NB(27) };
+-- 8.4.2 Name binding for quality of service information service
+-- This service is for further study.
+-- 8.5 Name binding for security management
+-- 8.5.1 Name binding for password change service
+-- This service is for further study.
+-- 8.5.2 Name binding for access rights definition service
+-- This service is for further study.
+-- 8.6 Name binding for CNM supporting services
+-- 8.6.1 Service request
+-- The Service Request object shall be contained by the Managed Element object.
+
+
+serviceRequest-managedElement NAME BINDING
+	SUBORDINATE OBJECT CLASS serviceRequest AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Recommendation M.3100":managedElement;
+	WITH ATTRIBUTE
+		serviceRequestId;
+	CREATE WITH-REFERENCE-OBJECT, WITH-AUTOMATIC-INSTANCE-NAMING;
+	DELETE
+	sRChangeDenied;
+REGISTERED AS { cnmNameBinding serviceRequest-managedElement-NB(28) };
+-- 9 Definition of packages
+-- 9.1 Packages for fault management
+-- 9.1.1 Packages for alarm notification service
+-- There is no package definition specific for this service.
+-- 9.1.2 Packages for fault history service
+-- There is no package definition specific for this service.
+-- 9.1.3 Packages for trouble report service
+-- There is no package definition specific for this service.
+-- 9.1.4 Packages for loop setup service
+-- This service is for further study.
+-- 9.1.5 Packages for test host service
+-- This service is for further study.
+-- 9.1.6 Packages for protocol monitoring service
+-- This service is for further study.
+-- 9.2 Packages for configuration management
+-- 9.2.1 Packages for configuration inquiry service
+-- 9.2.1.1 X.25 service profile
+
+
+x25ServiceProfile-P PACKAGE
+	BEHAVIOUR
+		x25ServiceProfile-B BEHAVIOUR
+			DEFINED AS
+				"The service profile object represents the X.25 packet layer parameters (i.e. 
+				service profile) for each interface (DTE address). This object is created 
+				through the Service Request MO, by which subscription data are set to this 
+				object. Also replacement, addition and removal of service parameters or deletion 
+				are done through the Service Request MO.";;
+	ATTRIBUTES
+		x25ServiceProfileId GET;
+REGISTERED AS { cnmPackage x25ServiceProfile-P(1) };
+-- 9.2.1.2 PLE profile
+
+
+pleProfile-P PACKAGE
+	BEHAVIOUR
+		pleProfile-B BEHAVIOUR
+			DEFINED AS
+				"This package represents the service profile of the X.25 packet layer protocol. 
+				Only GET operation is allowed.";,
+		"NLMO":logicalChannelAssignmentsX25PLE-P-B;
+	ATTRIBUTES
+		"NLMO":localDTEAddress GET,
+		"NLMO":protocolVersionSupported GET,
+		mlpSubscription GET,
+		"NLMO":cUG GET,
+		"NLMO":incomingCallBarredWithinCUG GET,
+		"NLMO":outgoingCallBarredWithinCUG GET,
+		"NLMO":bilateralCUG GET,
+		"NLMO":bilateralCUGWithOutgoingAccess GET,
+		"NLMO":fastSelectAcceptance GET,
+		"NLMO":flowControlParameterNegotiation GET,
+		"NLMO":incomingCallsBarred GET,
+		"DLMO":interfaceType GET,
+		"NLMO":logicalChannelAssignments GET,
+		"NLMO":outgoingCallsBarred GET,
+		"NLMO":oneWayLogicalChannelIncoming GET,
+		"NLMO":oneWayLogicalChannelOutgoing GET,
+		"NLMO":throughputClassNegotiation GET,
+		"NLMO":callDeflectionSubscription GET,
+		"NLMO":chargingInformation GET,
+		"NLMO":nonStandardDefaultPacketSizes GET,
+		"NLMO":defaultThroughputClassesAssignment GET,
+		"NLMO":defaultThroughputClasses GET,
+		"NLMO":defaultWindowSizes GET,
+		"NLMO":defaultPacketSizes GET,
+		"NLMO":nonStandardDefaultWindowSizes GET,
+		"NLMO":nUISubscription GET,
+		"NLMO":onlineFacilityRegistration GET,
+		"NLMO":packetRetransmission GET,
+		"NLMO":extendedPacketSequenceNumbering GET,
+		"NLMO":rOASubscription GET,
+		"NLMO":callRedirection GET,
+		"NLMO":dBitModification GET,
+		"NLMO":huntGroup GET,
+		"NLMO":localChargingPrevention GET,
+		"NLMO":nUIOverride GET,
+		"NLMO":reverseChargingAcceptance GET;
+	NOTIFICATIONS
+		"DMI":objectCreation,
+		"DMI":objectDeletion,
+		"DMI":attributeValueChange;
+REGISTERED AS { cnmPackage pleProfile-P(2) };
+-- 9.2.1.3 SLP profile
+
+
+slpProfile-P PACKAGE
+	BEHAVIOUR
+		slpProfile-B BEHAVIOUR
+			DEFINED AS
+				"This package represents subscription data, i.e. the service profile of the SLP 
+				that supports the packet layer entity. The linkage between the slp and 
+				x25ServiceProfile objects is done by the dTEAddress attribute. This package 
+				includes also the profile of physical properties related to the access line.";;
+	ATTRIBUTES
+		slpProfileId GET,
+		"NLMO":localDTEAddress GET,
+		"ITU-T Rec. X.281 | ISO/IEC 13642":transmissionRate GET,
+		"DLMO":sequenceModulus GET;
+REGISTERED AS { cnmPackage slpProfile-P(3) };
+-- 9.2.1.4 SLP timers
+
+
+slpTimersProfile-P PACKAGE
+	BEHAVIOUR
+		slpTimersProfile-B BEHAVIOUR
+			DEFINED AS
+				"provides the set of optional timers used for slp communication";;
+	ATTRIBUTES
+		"DLMO":k GET,
+		"DLMO":n1 GET,
+		"DLMO":n2 GET,
+		"DLMO":t1Timer GET,
+		"DLMO":t2Timer GET,
+		"DLMO":t4Timer GET;
+REGISTERED AS { cnmPackage slpTimersProfile-P(4) };
+-- 9.2.1.5 Customer
+
+
+customerPkg PACKAGE
+	BEHAVIOUR
+		customerPkgDefinition BEHAVIOUR
+			DEFINED AS
+				"The Customer managed object class refers to a corporation, organization or 
+				individual with telecommunication needs to be satisfied via a private network, 
+				provider services, or a combination of a private network and provider services.";,
+		customerPkg-B BEHAVIOUR
+			DEFINED AS
+				" Attributes whose values are names of other managed object instances (e.g. 
+				 opNetworkList) must have names of managed objects which already exist or a 
+				 value of null, if permitted for that attribute.
+
+				Conditions under which an attributeValueChange notification is emitted are 
+				stated in the behaviour of the appropriate package or attribute. In absence of 
+				such a statement in the behaviour, the attribute does not cause an 
+				attributeValueChange notification to be emitted. All attributeValueChange 
+				notifications shall include the Attribute Identifier List parameter.
+
+				A value for the customerID attribute can only be provided when the object is 
+				created. Furthermore, once the object is created, the value of customerID may 
+				not be modified (i.e. the instance cannot be renamed). When customerTitle is 
+				used for naming, the customerID attribute has a NULL value.";,
+		commonCreation-B BEHAVIOUR
+			DEFINED AS
+				" Unless otherwise specified, all attributes can be set by an M-CREATE";;
+	ATTRIBUTES
+		customerID
+			PERMITTED VALUES CnmAsn1Module.SystemIdRange
+			GET,
+		customerTitle GET;
+REGISTERED AS { cnmPackage customerPkg(5) };
+-- 9.2.1.6 Contact list
+
+
+contactList-P PACKAGE
+	BEHAVIOUR
+		contactListPkgDefinition BEHAVIOUR
+			DEFINED AS
+				" The Contact List Attribute identifies who (person or organization) should be 
+				 contacted about the resource.";,
+		contactListPkgBehaviour BEHAVIOUR
+			DEFINED AS
+				" If the atributeValueChange notification is defined for the managed object class 
+				 using this package, this notification is emitted when the contactList attribute 
+				 changes value.";;
+	ATTRIBUTES
+		contactList
+			PERMITTED VALUES CnmAsn1Module.AnyNamesRange
+			GET-REPLACE ADD-REMOVE;
+REGISTERED AS { cnmPackage customer-P(6) };
+-- 9.2.1.7 Location
+
+
+locationPkg PACKAGE
+	BEHAVIOUR
+		locationPkgDefinition,
+		locationPkgBehaviour,
+		commonCreation-B;
+	ATTRIBUTES
+		locationID
+			PERMITTED VALUES CnmAsn1Module.SystemIdRange
+			GET,
+		geographicCoordinates GET-REPLACE,
+		locationDetails GET-REPLACE,
+		locationTitle GET,
+		locationType GET-REPLACE,
+		postalAddress GET-REPLACE;
+REGISTERED AS { cnmPackage locationPkg(7) };
+
+
+locationPkgDefinition BEHAVIOUR
+	DEFINED AS
+		" The location managed object class refers to a place occupied by one or more 
+		 managed objects or persons associated with object management.";
+
+
+locationPkgBehaviour BEHAVIOUR
+	DEFINED AS
+		" When an instance of the location managed object class is created, attributes 
+		 whose values are names of other managed object instances (such as contactList) 
+		 shall be names of managed objects which already exist, or a value of null if 
+		 permitted for that attribute.
+
+		The attributeValueChange notification is emitted when any of the following 
+		attributes change in value: geographicCoordinates, locationDetails, locationType 
+		and postalAddress. All attributeValueChange notifications shall include the 
+		Attribute Identifier List parameter. Also, conditions under which an 
+		attributeValueChange notification is emitted are stated in the behaviour of the 
+		appropriate package or attribute. In the absence of such a statement in the 
+		behaviour, the attribute does not cause an attributeValueChange notification to 
+		be emitted.
+
+		A value for the locationID attribute can only be provided when the object is 
+		created. Furthermore, once the object is created, the value of locationID may 
+		not be modified (i.e., the instance can not be renamed). When locationTitle is 
+		used for naming, the locationID attribute has a NULL value.";
+-- 9.2.1.8 Type text
+
+
+typeTextPkg PACKAGE
+	BEHAVIOUR
+		typeTextPkgDefiniton BEHAVIOUR
+			DEFINED AS
+				"This package serves to supplement and refine individual managed object class 
+				attribute.";,
+		typeTextPkgBehaviour BEHAVIOUR
+			DEFINED AS
+				" If the attributeValueChange notification is defined for the managed object 
+				 class using this package, this notification is emitted when the typeText 
+				 attribute changes value.";;
+	ATTRIBUTES
+		typeText
+			PERMITTED VALUES CnmAsn1Module.GraphicString64
+			GET-REPLACE;
+REGISTERED AS { cnmPackage typeTextPkg(8) };
+-- 9.2.1.9 Customer types
+
+
+customerTypesPkg PACKAGE
+	BEHAVIOUR
+		customerTypesPkgDefinition BEHAVIOUR
+			DEFINED AS
+				"This package contains one attribute that provides information about the types of 
+				customer.";,
+		customerTypesPkg-B BEHAVIOUR
+			DEFINED AS
+				"If the attributeValueChange notification is defined for the managed object class 
+				using this package, this notification is emitted when the customerTypes 
+				attribute changes value.";;
+	ATTRIBUTES
+		customerTypes GET-REPLACE ADD-REMOVE;
+REGISTERED AS { cnmPackage customerTypesPkg(9) };
+-- 9.2.1.10 OP network list
+
+
+opNetworkListPkg PACKAGE
+	BEHAVIOUR
+		opNetworkListPkgDefinition BEHAVIOUR
+			DEFINED AS
+				"The opNetworkList attribute indicates what networks use or are dependent on the 
+				resource.";,
+		opNetworkListPkg-B BEHAVIOUR
+			DEFINED AS
+				"If the attributeValueChange notification is defined for the managed object class 
+				using this package, this notification is emitted when the opNetworkList 
+				attribute changes value.";;
+	ATTRIBUTES
+		opNetworkList
+			PERMITTED VALUES CnmAsn1Module.AnyNamesRange
+			GET-REPLACE ADD-REMOVE;
+REGISTERED AS { cnmPackage opNetworkListPkg(10) };
+-- 9.2.1.11 Service list
+
+
+serviceListPkg PACKAGE
+	BEHAVIOUR
+		serviceListPkgDefinition BEHAVIOUR
+			DEFINED AS
+				"ServiceList attribute identifies any services that are supported by the 
+				resource.";,
+		serviceListPkg-B BEHAVIOUR
+			DEFINED AS
+				"If the attributeValueChange notification is defined for the managed object class 
+				using this package, this notification is emitted when the serviceList attribute 
+				changes value.";;
+	ATTRIBUTES
+		serviceList
+			PERMITTED VALUES CnmAsn1Module.AnyNamesRange
+			GET-REPLACE ADD-REMOVE;
+REGISTERED AS { cnmPackage serviceListPkg(11) };
+-- 9.2.2 Packages for CNM reconfiguration service
+-- The same packages as defined in 9.2.1 for service profiles are also used for 
+-- the CNM reconfiguration service.
+-- 9.2.3 Packages for systematic call redirection service
+-- This service is for further study.
+-- 9.3 Packages for accounting management
+-- 9.3.1 Packages for periodic billing service
+-- There is no package definition specific for this service.
+-- 9.3.2 Packages for detailed accounting
+-- There is no package definition specific for this service.
+-- 9.4 Packages for performance management
+-- 9.4.1 Packages for traffic information service
+-- There is no package definition specific for this service.
+-- 9.4.2 Packages for quality of service information service
+-- This service is for further study.
+-- 9.5 Packages for security management
+-- 9.5.1 Packages for password change service
+-- This service is for further study.
+-- 9.5.2 Packages for access rights definition service
+-- This service is for further study.
+-- 9.6 Packages for CNM supporting services management
+-- 9.6.1 Packages for negotiation service
+-- 9.6.1.1 Negotiation
+
+
+negotiationPkg PACKAGE
+	BEHAVIOUR
+		negotiationBehaviour BEHAVIOUR
+			DEFINED AS
+				"The negotiationPkg provides the means for the manager and the agent to negotiate 
+				the parameters of the request.";;
+	ATTRIBUTES
+		limitValidityDate GET-REPLACE;
+REGISTERED AS { cnmPackage negotiationPkg(12) };
+-- 9.6.2 Packages for service request service
+-- 9.6.2.1 Service request
+
+
+serviceRequestPkg PACKAGE
+	BEHAVIOUR
+		serviceRequestBehaviour BEHAVIOUR
+			DEFINED AS
+				"When an instance of the serviceRequest MO class is created, all mandatory 
+				attributes must be supplied. The attributeValueChange notification is emitted 
+				when any of the attributes is changed either by the manager or the agent. The 
+				object creation notification is generated when an instance of the serviceRequest 
+				is deleted.";,
+		serviceRequestDefinition BEHAVIOUR
+			DEFINED AS
+				"The serviceRequest provides the means for a manager to ask for operations on 
+				objects of the interoperable interface that are not directly accessible. It 
+				contains the basic attributes that allow a manager to ask for an operation at a 
+				given date. It allows an agent to negotiate with the manager the appropriate 
+				conditions or the date using the negotiationPkg and the status attribute. When 
+				needed, the dialogue attribute is needed in the same way as in the 
+				Recommendation X.790: telecommunicationsTroubleReport. The dateRequest attribute 
+				is used by the manager to indicate when he wants the service to be provided 
+				(dontCare, now, at a precise date). The operationList attribute allows the 
+				manager to specify in details the CMISE operations he wants to ... performed.";,
+		serviceRequestDefinition;
+	ATTRIBUTES
+		serviceRequestId GET,
+		status
+			INITIAL VALUE CnmAsn1Module.initialStatus
+			GET-REPLACE,
+		dateRequest
+			DEFAULT VALUE CnmAsn1Module.defaultDateRequest
+			GET-REPLACE,
+		operationList
+			DEFAULT VALUE CnmAsn1Module.defaultOperationList
+			GET-REPLACE,
+		resultList
+			INITIAL VALUE CnmAsn1Module.initialResultList
+			GET,
+		processingMode
+			DEFAULT VALUE CnmAsn1Module.defaultProcessingMode
+			GET-REPLACE;
+	NOTIFICATIONS
+		"DMI":attributeValueChange,
+		"DMI":objectCreation,
+		"DMI":objectDeletion;
+REGISTERED AS { cnmPackage serviceRequestPkg(13) };
+-- 10 Definition of attributes
+-- 10.1 Attributes for name binding
+-- Currently, there are no attributes for this subclause.
+-- 10.2 Attributes for objects identifier
+-- 10.2.1 CNM user identifier
+
+
+cnmUserId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		cnmUserId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of cnmUser object or subclass";;
+REGISTERED AS { cnmAttribute cnmUserId(24) };
+-- 10.2.2 CNM X.25 entity identifier
+
+
+cnmX25EntityId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		cnmX25EntityId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of cnmX25Entity object or subclass";;
+REGISTERED AS { cnmAttribute cnmX25EntityId(25) };
+-- 10.2.3 CUG profile identifier
+
+
+cugProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		cugServiceProfileId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of cugProfile MO or subclass";;
+REGISTERED AS { cnmAttribute cugServiceProfileId(26) };
+-- 10.2.4 Customer identifier
+
+
+customerID ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2:1992":systemId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		customerID-B BEHAVIOUR
+			DEFINED AS
+				"The customer attribute is one of the distinguishing attributes in the customer 
+				managed object class.";;
+REGISTERED AS { cnmAttribute customerId(27) };
+-- 10.2.5 Hunt group profile identifier
+
+
+hgProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		hgProfileId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of hgProfile MO or subclass";;
+REGISTERED AS { cnmAttribute hgServiceProfileId(28) };
+-- 10.2.6 MLP monitored point identifier
+
+
+mlpMonitoredPointId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		mlpMonitoredPointId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of mlpMonitoredPoint object or subclass";;
+REGISTERED AS { cnmAttribute mlpMonitoredPointId(29) };
+-- 10.2.7 MLP profile identifier
+
+
+mlpProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		mlpProfileId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of mlpProfile object or subclass";;
+REGISTERED AS { cnmAttribute mlpProfileId(30) };
+-- 10.2.8 Service request Id
+
+
+serviceRequestId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		serviceRequestIdBehaviour BEHAVIOUR
+			DEFINED AS
+				" The serviceRequestId is an attribute type whose distinguished value can be used 
+				 as a RDN when naming an instance of the serviceRequest object class";;
+REGISTERED AS { cnmAttribute serviceRequest(31) };
+-- 10.2.9 SLP profile identifier
+
+
+slpProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		slpProfileId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of slpProfile object or subclass";;
+REGISTERED AS { cnmAttribute slpProfileId(32) };
+-- 10.2.10 X.25 PVC profile identifier
+
+
+x25PvcProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		x25PvcProfileId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of x25PvcProfile object or subclass";;
+REGISTERED AS { cnmAttribute x25PvcProfileId(33) };
+-- 10.2.11 X.25 termination point identifier
+
+
+x25TerminationPointId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		x25TerminationPointId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of TerminationPoint object or subclass";;
+REGISTERED AS { cnmAttribute x25TerminationPointId(34) };
+-- 10.2.12 X.25 service profile identifier
+
+
+x25ServiceProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		x25ServiceProfileId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of x25ServiceProfile object or subclass";;
+REGISTERED AS { cnmAttribute x25ServiceProfileId(35) };
+-- 10.2.13 Redirection list identifier
+
+
+redirectionListId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		redirectionListId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of redirectionList object or subclass";;
+REGISTERED AS { cnmAttribute redirectionListId(65) };
+-- 10.2.14 X.25 physical connection identifier
+
+
+x25PhysicalConnectionId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		x25PhysicalConnectionId-B BEHAVIOUR
+			DEFINED AS
+				"The naming instance of x25PhysicalConnection object or subclass";;
+REGISTERED AS { cnmAttribute x25PhysicalConnectionId(53) };
+-- 10.3 Other attributes
+-- 10.3.1 Contact list
+
+
+contactList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.AnyNamesBase;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		contactList-B BEHAVIOUR
+			DEFINED AS
+				! The contactList attribute provides managed object instance information for one 
+				 or more contacts. The following object classes (or any of their subclasses or 
+				 allomorphic classes) are valid as contacts: "Rec. X.790": Contact.
+				The SET-COMPARISON and/or SET-INTERSECTION matching rules may not be supported 
+				by some managed object instances which include this attribute.!;;
+REGISTERED AS { cnmAttribute contactList(36) };
+-- 10.3.2 Interlock code
+
+
+interlockCode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.InterlockCode;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		interlockCode-B BEHAVIOUR
+			DEFINED AS
+				" This attribute represents the interlock code of a CUG.";;
+REGISTERED AS { cnmAttribute interlockCode(54) };
+-- 10.3.3 CUG index
+
+
+cugIndex ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.Integer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		cugIndex-B BEHAVIOUR
+			DEFINED AS
+				" The cugIndex attribute indentifies each closed user group when a customer 
+				 subscribes to multiple CUGs.";;
+REGISTERED AS { cnmAttribute cugIndex(66) };
+-- 10.3.4 Customer title
+
+
+customerTitle ATTRIBUTE
+	DERIVED FROM
+		"DMI":systemTitle;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		customerTitle-B BEHAVIOUR
+			DEFINED AS
+				" The customerTitle attribute is one of the distinguishing attributes in the 
+				 Customer Managed object class for use as described in 6.3 of CCITT Rec. X.720 | 
+				 ISO/IEC 10165-1.";;
+REGISTERED AS { cnmAttribute customerTitle(37) };
+-- 10.3.5 Customer types
+
+
+customerTypes ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.CustomerTypes;
+	MATCHES FOR EQUALITY, SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		customerTypes-B BEHAVIOUR
+			DEFINED AS
+				"The customerType attribute identifies the types of customer.";;
+REGISTERED AS { cnmAttribute customerTypes(38) };
+-- 10.3.6 Date request
+
+
+dateRequest ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.DateRequest;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dateRequestBehaviour BEHAVIOUR
+			DEFINED AS
+				" The dateRequest attribute provides the means for the manager to ask for a 
+				 special date, when he wants the service to be provided, and for the agent to 
+				 inform the manager that this date is not acceptable, giving another date.";;
+REGISTERED AS { cnmAttribute dateRequest(39) };
+-- 10.3.7 DTE address list
+
+
+dTEAddressList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.DTEAddressList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		dTEAddressList-B BEHAVIOUR
+			DEFINED AS
+				"A set of DTE addresses that belong to the same HG.";;
+REGISTERED AS { cnmAttribute dTEAddressList(40) };
+-- 10.3.8 Geographic coordinates
+
+
+geographicCoordinates ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GeographicCoordinates;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		geographicCoordinates-B BEHAVIOUR
+			DEFINED AS
+				"The geographicCoordinates attribute identifies the type of geographic 
+				coordinates and the geographic coordinates. Four types of geographic coordinates 
+				are defined:
+
+				The latitude-longitude coordinates type refers to position on the earth's 
+				surface as measured in angular distance from the equator and the meridian which 
+				runs between the north and south pole through Greenwich, England.
+
+				The npa-nxx coordinates type refers to a telephone number npa identifies the 
+				North America numbering plan area (i.e. area code), and nxx identifies the 
+				exchange or central office site.
+
+				The v-h coordinates type refers to a vertical and horizontal coordinate system 
+				used and originated by the bell System in North America to identify the location 
+				of central offices and equipment.
+
+				The country-city type refers to the international country and city dialing 
+				codes.";;
+REGISTERED AS { cnmAttribute geographicCoordinates(41) };
+-- 10.3.9 Hunt group address
+
+
+hgAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.DTEAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		hgAddress-B BEHAVIOUR
+			DEFINED AS
+				"The DTE address of the main member of a hunt group expressed as CCITT 
+				Recommendations X.121, E.164, etc. address.";;
+REGISTERED AS { cnmAttribute hgAddress(42) };
+-- 10.3.10 Limit validity date
+
+
+limitValidityDate ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.Date;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		limitValidityDateBehaviour BEHAVIOUR
+			DEFINED AS
+				" This date indicates the date when the proposed attributes won't be valid 
+				 anymore.";;
+REGISTERED AS { cnmAttribute limitValidityDate(43) };
+-- 10.3.11 Location detail
+
+
+locationDetails ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.LocationDetails;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		locationDetails-B BEHAVIOUR
+			DEFINED AS
+				"The locationDetails attribute provides additional information regarding the 
+				location.";;
+REGISTERED AS { cnmAttribute locationDetails(44) };
+-- 10.3.12 Location ID
+
+
+locationID ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":systemId;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		locationID-B BEHAVIOUR
+			DEFINED AS
+				"The locationID attribute is one of the distinguishing attributes of the Location 
+				managed object class.";;
+REGISTERED AS { cnmAttribute locationID(45) };
+-- 10.3.13 Location title
+
+
+locationTitle ATTRIBUTE
+	DERIVED FROM
+		"CCITT Rec. X.721 | ISO/IEC 10165-2":systemTitle;
+	BEHAVIOUR
+		locationTitle-B BEHAVIOUR
+			DEFINED AS
+				"The locationTitle attribute is one of the distinguishing attributes in the 
+				Location managed object class for use as described in 6.3 of CCITT Rec.X.720 | 
+				ISO/IEC 10165-1.";;
+REGISTERED AS { cnmAttribute locationTitle(46) };
+-- 10.3.14 Location type
+
+
+locationType ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.LocationType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		locationType-B BEHAVIOUR
+			DEFINED AS
+				"The locationType attribute shall indicate the type of location.";;
+REGISTERED AS { cnmAttribute locationType(47) };
+-- 10.3.15 MLP frames outside window guard
+
+
+mlpFramesOutsideWindowGuard ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		mlpFramesOutsideWindowGuard-B BEHAVIOUR
+			DEFINED AS
+				" Counter: Total number of MLP frames outside the window guard that have been 
+				 received.";;
+REGISTERED AS { cnmAttribute mlpFramesOutsideWindowGuard(48) };
+-- 10.3.16 MLP frames received
+
+
+mlpFramesReceived ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		mlpFramesReceived-B BEHAVIOUR
+			DEFINED AS
+				" Counter: Total number of MLP frames received.";;
+REGISTERED AS { cnmAttribute mlpFramesReceived(49) };
+-- 10.3.17 MLP frames sent
+
+
+mlpFramesSent ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		mlpFramesSent-B BEHAVIOUR
+			DEFINED AS
+				" Counter: Total number of MLP frames sent.";;
+REGISTERED AS { cnmAttribute mlpFramesSent(50) };
+-- 10.3.18 MLP subscription
+
+
+mlpSubscription ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		mlpSubscription-B BEHAVIOUR
+			DEFINED AS
+				"This attribute identifies whether or not the MLP service is subscribed to. 
+				Expressed as a boolean where value of 'True' indicates subscription";;
+REGISTERED AS { cnmAttribute mlpSubscription(51) };
+-- 10.3.19 Operation list
+
+
+operationList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.OperationList;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { cnmAttribute operationList(55) };
+-- 10.3.20 Postal address
+
+
+postalAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.PostalAddress;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		postalAddress-B BEHAVIOUR
+			DEFINED AS
+				"The postalAddress attribute specifies the address information required for the 
+				physical delivery of postal messages by the postal authority to the named 
+				object. The postal address is limited to six(6) lines of thirty(30) characters 
+				each, including a Postal Country Name. Normally the information contained in 
+				such an address could include an addressee's name, street address, city, state 
+				or province, postal code and possibly a post office box number depending on the 
+				specific requirements of the named object. Only the GraphicString string choice 
+				defined in the selectedAttributesType module defined in Recommendation X.520 
+				must be supported.";;
+REGISTERED AS { cnmAttribute postalAddress(56) };
+-- 10.3.21 OP network list
+
+
+opNetworkList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.AnyNamesBase;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		opNetworkList-B BEHAVIOUR
+			DEFINED AS
+				"The opNetworkList attribute shall provide managed object instance information 
+				about a set of networks. The following object class (or any of their subclasses 
+				or allomorphic classes) are valid as networks. The SET-COMPARISON and/or 
+				SET-INTERSECTION matching rules may not be supported by some managed object 
+				instances which include this attribute.";;
+REGISTERED AS { cnmAttribute opNetworkList(57) };
+-- 10.3.22 Processing mode
+
+
+processingMode ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.ProcessingMode;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { cnmAttribute processingMode(58) };
+-- 10.3.23 Result list
+
+
+resultList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.ResultList;
+	MATCHES FOR EQUALITY;
+REGISTERED AS { cnmAttribute resultList(59) };
+-- 10.3.24 Service list
+
+
+serviceList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.AnyNamesBase;
+	MATCHES FOR SET-COMPARISON;
+	BEHAVIOUR
+		service-B BEHAVIOUR
+			DEFINED AS
+				"The serviceList attribute provides managed object instance information about one 
+				or more services. The following object classes (or any of their subclasses or 
+				allomorphic classes ) are valid as services. The SET-COMPARISON and/or 
+				SET-INTERSECTION matching rules may not be supported by some managed object 
+				instances which include this attribute.";;
+REGISTERED AS { cnmAttribute serviceList(60) };
+-- 10.3.25 Suborganization object list
+
+
+suborganizationObjectList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.SuborganizationObjectList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		suborganizationObjectList-B BEHAVIOUR
+			DEFINED AS
+				" This attribute indicates objects that belong to a customer's suborganization.";;
+REGISTERED AS { cnmAttribute suborganizationObjectList(61) };
+-- 10.3.26 Status
+
+
+status ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.Status;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		statusBehaviour BEHAVIOUR
+			DEFINED AS
+				" This attribute indicates the status or phase of the request.";;
+REGISTERED AS { cnmAttribute status(62) };
+-- 10.3.27 Trouble type PSPDN
+
+
+troubleTypePspdn ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.TroubleTypePspdn;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		troubleTypePspdn-B BEHAVIOUR
+			DEFINED AS
+				" This attribute represents types of trouble for PDNs. It may or may not 
+				 supersede the trouble type attribute of ITU-T Recommendation X.790.";;
+REGISTERED AS { cnmAttribute troubleTypePspdn(63) };
+-- 10.3.28 Type text
+
+
+typeText ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.GraphicStringBase;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		typeTextBehaviour BEHAVIOUR
+			DEFINED AS
+				"The typeText attribute serves to supplement and refine individual managed object 
+				class attributes. If none of the named items defined for the 'type' attribute 
+				are appropriate, or the 'type' attribute requires refinement, the typeText 
+				attribute contains supplemental information.";;
+REGISTERED AS { cnmAttribute typeText(64) };
+-- 10.3.29 Call redirection list
+
+
+callRedirectionList ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.DTEAddressList;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callRedirectionList-B BEHAVIOUR
+			DEFINED AS
+				" A set of DTE addresses to be redirected.";;
+REGISTERED AS { cnmAttribute callRedirectionList(67) };
+-- 10.3.30 Location pointer
+
+
+locationPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.ObjectInstance;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		locationPointer-B BEHAVIOUR
+			DEFINED AS
+				" represents the point where a loopback point is set.";;
+REGISTERED AS { cnmAttribute locationPointer(68) };
+-- 10.3.31 Loopback status
+
+
+loopbackStatus ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX CnmAsn1Module.LoopbackStatus;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		loopbackStatus-B BEHAVIOUR
+			DEFINED AS
+				" represents whether or not the loopback point is set. By setting value 'true', 
+				 the loopback point is set. By setting value 'false', the loopback point is 
+				 released.";;
+REGISTERED AS { cnmAttribute loopbackStatus(69) };
+-- 10.4 Attributes for further studying services
+-- The following services are for further study. The attributes for them have 
+-- not yet been defined:
+--  access rights definition service;
+--  cancellation service;
+--  inventory inquiry service;
+--  network statistic service;
+--  password change service;
+--  protocol monitoring service;
+--  quality of service information service;
+--  quota control service;
+--  real time charging information service.
+-- 10.5 Services that define no attribute on this Recommendation
+-- No attributes are defined for the following services. Several attributes 
+-- defined in other clauses are referenced for these
+-- services:
+--  CNM Reconfiguration service;
+--  service ordering service.
+-- 11 Definition of notifications
+-- 11.1 Derived notification definitions
+-- Notifications defined in CCITT Rec. X.721 | ISO/IEC 10165-2 are derived and 
+-- incorporated into managed object classes
+-- that emit alarms. They are:
+--  attribute value change;
+--  communication alarm;
+--  equipment alarm;
+--  environmental alarm;
+--  object creation;
+--  object deletion;
+--  quality of service alarm; and
+--  processing error alarm.
+-- 11.2 Defined notifications
+-- 11.2.1 Invoice report
+
+
+invoiceReport NOTIFICATION
+	BEHAVIOUR
+		invoiceReport-B BEHAVIOUR
+			DEFINED AS
+				"represents invoice items.";;
+	WITH INFORMATION SYNTAX CnmAsn1Module.InvoiceInfo;
+REGISTERED AS { cnmNotification invoiceReport(1) };
+-- 12 Definition of parameters
+-- 12.1 Service request change denied
+
+
+sRChangeDenied PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX CnmAsn1Module.SRChangeDenied;
+	BEHAVIOUR
+		sRChangeDenied-B BEHAVIOUR
+			DEFINED AS
+				"This error message is sent to the manager when the manager attempts to change a 
+				service request which is not in an appropriate state to accept the change.";;
+REGISTERED AS { cnmParameter sRChangeDenied(1) };
+-- 13 Definitions of action types
+-- Currently, no Action Types are imported or defined for the use of this Recommendation.
+
+END
+--< GDMO.EndDocument "Recommendation X.162 (1997)"
+--  { itu-t(0) recommendation(0) x(24) x162(162) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x790::troubleHistoryRecord
+--@@ |  |  |  +- itut_x162::pdnTroubleHistoryRecord
+--@@ |  |  +- itut_x162::pdnFaultLogRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x281::physicalEntity
+--@@ |  +- itut_x282::datalinkEntity
+--@@ |  |  +- itut_x282::lAPBDLE
+--@@ |  +- itut_x283::networkEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x283::cLNS
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x281::dataCircuit
+--@@ |  +- itut_x282::sLPPM
+--@@ |  +- itut_x283::cONS
+--@@ +- itut_x723::sap1
+--@@ |  +- itut_x281::physicalSAP
+--@@ |  +- itut_x282::dLSAP
+--@@ +- itut_x723::sap2
+--@@ |  +- itut_x283::nSAP
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x281::physicalConnection
+--@@ |  +- itut_x282::sLPConnection
+--@@ |  +- itut_x283::networkConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x281::physicalSubsystem
+--@@ |  +- itut_x282::datalinkSubsystem
+--@@ |  +- itut_x283::networkSubsystem
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ |  +- itut_x737::connectionTestObject
+--@@ |  +- itut_x737::connectivityTestObject
+--@@ |  +- itut_x737::dataIntegrityTestObject
+--@@ |  +- itut_x737::loopbackTestObject
+--@@ |  +- itut_x737::protocolIntegrityTestObject
+--@@ |  +- itut_x737::resourceBoundaryTestObject
+--@@ |  +- itut_x737::resourceSelfTestObject
+--@@ |  +- itut_x737::testInfrastructureTestObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_x162::x25TerminationPoint
+--@@ |  |  +- itut_x162::cnmLoopbackPoint
+--@@ +- itut_m3100::tpPool
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ |  |  +- itut_x162::currentPacketTrafficData
+--@@ |  |  +- itut_x162::currentMlpTrafficData
+--@@ |  |  +- itut_x162::currentSlpTrafficData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ |  +- itut_x162::historyPacketTrafficData
+--@@ |  +- itut_x162::historyMlpTrafficData
+--@@ |  +- itut_x162::historySlpTrafficData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_x282::sLPConnectionIVMO
+--@@ +- iso_10589_2::adjacency
+--@@ +- iso_10589_2::virtualAdjacency
+--@@ +- iso_10589_2::destination
+--@@ |  +- iso_10589_2::destinationSystem
+--@@ |  +- iso_10589_2::destinationArea
+--@@ +- iso_10589_2::reachableAddress
+--@@ +- itut_x283::linkage
+--@@ +- itut_x283::x25PLE
+--@@ |  +- itut_x283::x25PLE_DTE
+--@@ |  +- itut_x283::x25PLE_DCE
+--@@ +- itut_x283::x25PLEIVMO
+--@@ |  +- itut_x283::x25PLEIVMO_DTE
+--@@ |  +- itut_x283::x25PLEIVMO_DCE
+--@@ +- itut_x283::virtualCircuit
+--@@ |  +- itut_x283::virtualCircuit_DTE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DTE
+--@@ |  |  +- itut_x283::virtualCall_DTE
+--@@ |  +- itut_x283::virtualCircuit_DCE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DCE
+--@@ |  |  +- itut_x283::virtualCall_DCE
+--@@ +- itut_x283::virtualCallIVMO
+--@@ +- itut_x283::dSeriesCounts
+--@@ +- itut_x790::account
+--@@ +- itut_x790::contact
+--@@ +- itut_x790::repairActivity
+--@@ +- itut_x790::service
+--@@ |  +- itut_x790::cnmService
+--@@ +- itut_x790::troubleReport
+--@@ |  +- itut_x790::providerTroubleReport
+--@@ |  +- itut_x790::telecommunicationsTroubleReport
+--@@ |  |  +- itut_x162::pdnTelecommunicationsTroubleReport
+--@@ +- itut_x790::troubleReportFormatDefn
+--@@ +- itut_x162::cnmX25Entity
+--@@ |  +- itut_x162::cnmX25EntityTested
+--@@ +- itut_x162::x25PhysicalConnection
+--@@ +- itut_x162::x25ServiceProfile
+--@@ +- itut_x162::mlpProfile
+--@@ +- itut_x162::slpProfile
+--@@ +- itut_x162::x25PvcProfile
+--@@ +- itut_x162::cugProfile
+--@@ +- itut_x162::hgProfile
+--@@ +- itut_x162::customer
+--@@ |  +- itut_x162::cnmUser
+--@@ +- itut_x162::location
+--@@ +- itut_x162::redirectionList
+--@@ +- itut_x162::cnmBillingController
+--@@ +- itut_x162::mlpMonitoredPoint
+--@@ +- itut_x162::serviceRequest
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ |  >- itut_x790::troubleHistoryRecord
+--@@ |  >- itut_x162::pdnFaultLogRecord
+--@@ |  >- itut_x162::pdnTroubleHistoryRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x281::physicalSubsystem
+--@@ |  >- itut_x281::physicalEntity
+--@@ |  |  >- itut_x281::dataCircuit
+--@@ |  |  |  >- itut_x281::physicalConnection
+--@@ |  >- itut_x281::physicalSAP
+--@@ >- itut_x283::networkSubsystem
+--@@ |  >- itut_x283::networkEntity
+--@@ |  |  >- itut_x283::cLNS
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
+--@@ |  |  |  >- itut_x283::linkage
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  >- itut_x283::cLNS +++
+--@@ |  |  >- itut_x283::cONS
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::networkConnection
+--@@ |  |  >- itut_x283::cONS +++
+--@@ |  >- itut_x283::networkEntity +++
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::x25PLEIVMO
+--@@ |  >- itut_x283::x25PLE
+--@@ |  |  >- itut_x283::virtualCallIVMO
+--@@ |  >- itut_x283::x25PLE +++
+--@@ >- itut_x745::testObject
+--@@ >- itut_x790::contact
+--@@ >- itut_x790::telecommunicationsTroubleReport
+--@@ |  >- itut_x790::repairActivity
+--@@ >- itut_x790::troubleReportFormatDefn
+--@@ itut_x282::lAPBDLE
+--@@ >- itut_x282::sLPPM
+--@@ |  >- itut_x282::sLPConnection
+--@@ |  >- itut_x282::sLPConnection
+--@@ |  >- itut_x282::sLPConnectionIVMO
+--@@ itut_x282::datalinkSubsystem
+--@@ >- itut_x282::datalinkEntity
+--@@ |  >- itut_x282::dLSAP
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_x737::loopbackTestObject
+--@@ |  >- itut_x737::protocolIntegrityTestObject
+--@@ |  >- itut_x162::cnmBillingController
+--@@ |  >- itut_x162::serviceRequest
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ |  >- itut_x790::account
+--@@ |  |  >- itut_x790::account
+--@@ |  |  >- itut_x790::contact
+--@@ |  |  >- itut_x790::cnmService
+--@@ |  |  |  >- itut_x790::telecommunicationsTroubleReport +++
+--@@ |  |  |  >- itut_x721::log +++
+--@@ |  |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  |  >- itut_x790::telecommunicationsTroubleReport +++
+--@@ |  |  >- itut_x721::log +++
+--@@ |  |  >- itut_x790::providerTroubleReport
+--@@ |  >- itut_x790::contact
+--@@ |  >- itut_x790::telecommunicationsTroubleReport +++
+--@@ |  >- itut_x790::troubleReportFormatDefn
+--@@ |  >- itut_x790::providerTroubleReport
+--@@ |  >- itut_x162::cnmX25Entity
+--@@ |  |  >- itut_x162::x25TerminationPoint
+--@@ |  |  |  >- itut_m3100::equipment +++
+--@@ |  |  |  >- itut_x162::currentSlpTrafficData
+--@@ |  |  |  |  >- itut_x162::historySlpTrafficData
+--@@ |  |  >- itut_x162::redirectionList
+--@@ |  |  >- itut_x162::currentPacketTrafficData
+--@@ |  |  |  >- itut_x162::historyPacketTrafficData
+--@@ |  |  >- itut_x162::mlpMonitoredPoint
+--@@ |  |  |  >- itut_x162::currentMlpTrafficData
+--@@ |  |  |  |  >- itut_x162::historyMlpTrafficData
+--@@ |  >- itut_x162::pdnTelecommunicationsTroubleReport
+--@@ |  |  >- itut_x790::repairActivity
+--@@ |  >- itut_x162::cnmLoopbackPoint
+--@@ |  >- itut_x162::cnmX25EntityTested
+--@@ |  >- itut_x162::x25PhysicalConnection
+--@@ |  >- itut_x162::x25ServiceProfile
+--@@ |  |  >- itut_x162::mlpProfile
+--@@ |  |  >- itut_x162::slpProfile
+--@@ |  |  >- itut_x162::x25PvcProfile
+--@@ |  >- itut_x162::cugProfile
+--@@ |  >- itut_x162::hgProfile
+--@@ |  >- itut_x162::customer
+--@@ |  |  >- itut_x162::cnmUser
+--@@ |  >- itut_x162::location
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x283::x25PLE_DTE
+--@@ >- itut_x283::permanentVirtualCircuit_DTE
+--@@ >- itut_x283::virtualCall_DTE
+--@@ itut_x283::x25PLE_DCE
+--@@ >- itut_x283::permanentVirtualCircuit_DCE
+--@@ >- itut_x283::virtualCall_DCE
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ >- itut_x283::virtualCall_DCE +++
+--@@ itut_x790::service
+--@@ >- itut_x790::contact
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

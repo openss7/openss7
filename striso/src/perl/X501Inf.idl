@@ -1,0 +1,38 @@
+// File: X501Inf.idl
+#ifndef _X501INF_IDL_
+#define _X501INF_IDL_
+//
+// ASN.1 Module name: InformationFramework
+// ASN.1 Module OID: 2.5.1.1
+// ASN.1 Module nickname: X501Inf
+//
+#include <ASN1Types.idl>
+module X501Inf {
+// Assignments mapping
+typedef ASN1_ObjectIdentifier AttributeTypeType;
+typedef ASN1_Any AttributeValueType;
+typedef sequence <AttributeValueType>
+AttributeValuesType;
+struct AttributeType {
+AttributeTypeType type;
+AttributeValuesType values;
+};
+struct AttributeValueAssertionType {
+AttributeTypeType attributeType;
+ASN1_DefinedAny attributeValue; // defined by:attributeType
+};
+typedef sequence <AttributeValueAssertionType>
+RelativeDistinguishedNameType;
+typedef sequence <RelativeDistinguishedNameType>
+RDNSequenceType;
+enum NameTypeChoice { rDNSequenceChoice };
+union NameType
+switch(NameTypeChoice) {
+case rDNSequenceChoice:
+RDNSequenceType rDNSequence;
+};
+typedef RDNSequenceType DistinguishedNameType;
+//NO complex constant declarations
+//interface ConstValues empty
+};
+#endif /* _X501INF_IDL_ */

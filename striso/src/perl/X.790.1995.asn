@@ -1,0 +1,811 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 08:31:23 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.790 (1995)"
+--  { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) } >--
+MODULE "ITU-T Rec. X.790 (1995)" { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) }
+--< ASN1.Version 1994 X790ASN1Module
+--  { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) asn1module(2) } >--
+-- A.6 Abstract syntax
+-- Recommendation X.790 (11/95)
+-- A.6.1
+X790ASN1Module { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) asn1module(2) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+AttributeId, ObjectClass, ObjectInstance, GraphicString64
+	FROM CMIP-1 { joint-iso-itu-t(2) ms(9) cmip(1) modules(0) protocol(3) }
+-- Only the Distinguished Name and Local Distinguished Name forms are supported
+-- From Recommendation X.721
+Time24, AdministrativeState, EventTime, OperationalState, UsageState, SimpleNameType
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 }
+-- From Recommendation M.3100
+ObjectList, AlarmStatus, CurrentProblemList, SupportedByObjectList
+	FROM ASN1DefinedTypesModule { itu-t recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) };
+x790ObjectClass OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) managedObjectClass(3) }
+x790Package OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) package(4) }
+x790Parameter OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) parameter(5) }
+x790NameBinding OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) nameBinding(6) }
+x790Attribute OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) attribute(7) }
+x790Notification OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) notification(10) }
+activityInfoActivityInfoDefault GraphicString ::= ""
+afterHrsRepairAuthAfterHrsRepairAuthDefault BOOLEAN ::= FALSE
+authorizationAuthorizationDefault AuthorizationList ::= { { provided, '000000000'B } }
+closeOutNarrCloseOutNarrInitial GraphicString ::= ""
+closeOutVerificationCloseOutVerificationDefault CloseOutVerification ::= noAction
+handOffCenterHandOffCenterInitial GraphicString ::= ""
+handOffLocationHandOffLocationInitial GraphicString ::= ""
+handOffPersonNameHandOffPersonNameInitial PersonReach ::= { number "", name "" }
+handOffTimeHandOffTimeInitial NULL ::= NULL
+maintenanceOrgContactNameMaintenanceOrgContactNameInitial PersonReach ::= { number "", name "" }
+maintenanceOrgContactTimeMaintenanceOrgContactTimeInitial NULL ::= NULL
+maintServiceChargeMaintServiceChargeInitial BOOLEAN ::= FALSE
+outageDurationOutageDurationInitial NULL ::= NULL
+repairActivityListRepairActivityListInitial RepairActivityList ::= { { "000000000000.0", "" } }
+restoredTimeRestoredTimeInitial NULL ::= NULL
+troubleClearancePersonTroubleClearancePersonDefault PersonReach ::= { number "", name "" }
+troubleDetectionTimeTroubleDetectionTimeDefault NULL ::= NULL
+troubleFoundTroubleFoundInitial TroubleFound ::= number : 0
+troubleReportCancelRequestedByManagerDefault BOOLEAN ::= FALSE
+AccountContactList ::= SET OF PersonReach
+AccountName ::= GraphicString(SIZE(0..64))
+ActivityCode ::= CHOICE {
+	number INTEGER {
+		approved(0),
+		assign(1),
+		cancel(2),
+		clear(3),
+		close(4),
+		defer(5),
+		dispatch(6),
+		refer(7),
+		release(8),
+		re-open(9),
+		repair(10),
+		test(11),
+		transfer(12),
+		... },
+	identifier OBJECT IDENTIFIER,
+	... }
+ActivityDuration ::= SET OF SEQUENCE {
+	duration [0] TimeInterval,
+	billable [1] BOOLEAN DEFAULT TRUE,-- OPTIONAL,
+	type [2] ActivityType OPTIONAL,
+	... }
+ActivityInfo ::= GraphicString(SIZE(0..256))
+ActivityPerson ::= PersonReach
+ActivityType ::= BIT STRING {
+	after-hours-repair(0),
+	standby(1),
+	after-hours-standby(2),
+	test(3),
+	manager-initiated-test(4),
+	dispatch(5),
+	no-access(6),
+	delayed-maintenance(7),
+	release(8),
+	... }
+AdditionalText ::= GraphicString(SIZE(0..256))
+AdditionalTroubleInfoList ::= SET OF GraphicString
+-- A minimum of 256 octets should be supported
+-- if a Japanese operator set of Chinese characters is used for this attribute
+-- 256 characters cannot be accommodated.
+AdditionalTroubleStatusInfo ::= SET OF GraphicString(SIZE(0..256))
+AfterHrsRepairAuth ::= BOOLEAN
+AgentContactObjectPtr ::= CHOICE {
+	null NULL,
+	objectInstance ObjectInstance,
+	... }
+AlarmRecordPtrList ::= SET OF ObjectInstance
+AlternateManagerContactObjectPtr ::= CHOICE {
+	null NULL,
+	objectInstance ObjectInstance,
+	... }
+ApplicableManagedObjectClassList ::= SET OF ObjectClass
+ApplicableManagedObjectInstanceList ::= SET OF ObjectInstance
+AttributeIDList ::= SET OF AttributeId
+AuthorizationList ::= SET OF SEQUENCE {
+	state RequestState,
+	type ActivityType,
+	authTime AuthorizationTime OPTIONAL,
+	authPerson PersonReach OPTIONAL,
+	... }
+AuthorizationTime ::= GeneralizedTime
+BeginTime ::= GeneralizedTime
+CallBackInfoList ::= SET OF CHOICE {
+	escalation [0] PersonReach,
+	beforeAutoTest [1] PersonReach,
+	afterCleared [2] PersonReach,
+	... }
+CalledNumber ::= GraphicString(SIZE(0..64))
+CancelRequestedByManager ::= BOOLEAN
+CanNotClose ::= INTEGER {
+	alreadyCleared(0),
+	... }
+CannotVerifyOrDenyAtThisTime ::= NULL
+ChangeDeniedReason ::= ENUMERATED {
+	waitingVerificationOfClosure(1),
+	troubleReportAlreadyClosed(2),
+	activityAuthorizationPending(3),
+	... }
+CloseOutNarr ::= GraphicString(SIZE(0..256))
+CloseOutVerification ::= ENUMERATED {
+	noAction(0),
+	verified(1),
+	denied(2),
+	deniedActivityDurationDisputed(3),
+	deniedCloseOutNarrDisputed(4),
+	... }
+CommitmentTime ::= CHOICE {
+	onsiteTime [0] GeneralizedTime,
+	clearedTime [1] GeneralizedTime,
+	... }
+ContactCompany ::= GraphicStringBase
+ContactDetails ::= GraphicStringBase
+ContactFunction ::= ENUMERATED {
+	other(0),
+	customerMaintenanceManager(1),
+	providerMaintenanceManager(2),
+	customerAccountManager(3),
+	providerAccountManager(4),
+	fieldServiceManager(5),
+	repairman(6),
+	tester(7),
+	screener(8),
+	... }
+ContactObjectPtrList ::= SET OF ObjectInstance
+ContactType ::= BIT STRING {
+	other(0),
+	contacts-for-equipment-related-activities(1),
+	contacts-for-location-related-activities(2),
+	contacts-for-circuit-related-activities(3),
+	contacts-for-provider-related-activities(4),
+	contacts-for-service-related-activities(5),
+	contacts-for-facility-related-activities(6),
+	contacts-for-customer-related-activities(7),
+	contacts-for-vendor-related-activities(8),
+	contacts-for-manufacturer-related-activities(9),
+	contacts-for-software-related-activities(10),
+	contacts-for-function-related-activities(11),
+	... }
+CustomerWorkCenter ::= GraphicString(SIZE(0..64))
+CustTroubleTickNum ::= GraphicString(SIZE(0..64))
+Dialog ::= GraphicString(SIZE(0..64))
+ElectronicMailAddress ::= SET OF IA5String(SIZE(0..64))
+ElectronicMailAddressRange ::= SET OF GraphicString
+EndTime ::= GeneralizedTime
+EntryTime ::= GeneralizedTime
+EscalationList ::= SET OF SEQUENCE {
+	state RequestState,
+	escTime EscalationTime,
+	-- supplied by agent
+	requestPerson [0] PersonReach,
+	level [1] OrgLevel OPTIONAL,
+	escPerson [2] PersonReach OPTIONAL,
+	... }
+EscalationTime ::= GeneralizedTime
+FallBackReporting ::= CHOICE {
+	null NULL,
+	graphicString GraphicString,
+	... }
+GraphicString128 ::= GraphicStringBase(SIZE(0..128))
+GraphicStringBase ::= GraphicString
+HandOffCenter ::= GraphicString(SIZE(0..64))
+HandOffLocation ::= GraphicString(SIZE(0..64))
+HandOffPersonPtr ::= CHOICE {
+	null NULL,
+	objectInstance ObjectInstance,
+	... }
+HandOffTime ::= CHOICE {
+	null NULL,
+	generalizedTime GeneralizedTime,
+	... }
+InitiatingMode ::= INTEGER {
+	-- Integer values are to be registered in the standard.
+	managerDirect(0),
+	managerIndirect(1),
+	agentOriginated(2),
+	managerIndirectEMail(4),
+	managerIndirectFax(5),
+	managerIndirectPersonal(6),
+	managerIndirectPhone(7),
+	... }
+LastUpdateTime ::= GeneralizedTime
+LocationAddress ::= SEQUENCE {
+	premisesName PremisesName,
+	premisesAddress PremisesAddress,
+	... }
+LocationAccessHours ::= SET OF WeekMask-- cannot repeat the same day
+MaintenanceOrgContactPtr ::= CHOICE {
+	null NULL,
+	objectInstance ObjectInstance,
+	... }
+MaintenanceOrgContactTime ::= CHOICE {
+	null NULL,
+	generalizedTime GeneralizedTime,
+	... }
+MaintServiceCharge ::= BOOLEAN
+ManagedObjectAccessFromTime ::= GeneralizedTime
+ManagedObjectAccessHours ::= SET OF WeekMask-- cannot repeat the same day
+ManagedObjectAccessToTime ::= StopTime
+ManagedObjectInstance ::= ObjectInstance
+ManagedObjectInstanceAliasList ::= SET OF GraphicString(SIZE(0..256))
+ManagerContactObjectPtr ::= CHOICE {
+	null NULL,
+	objectInstance ObjectInstance,
+	... }
+ManagerSearchKey ::= CHOICE {
+	managerSearchString ManagerSearchString,
+	objectInstance ObjectInstance,
+	... }
+ManagerSearchKeyList ::= SET OF CHOICE {
+	managerSearchString ManagerSearchString,
+	objectInstance ObjectInstance,
+	... }
+ManagerSearchString ::= GraphicString(SIZE(0..64))
+NameType ::= CHOICE {
+	number INTEGER,
+	pString PrintableString,
+	... }
+NamingString ::= GraphicString(SIZE(0..32))
+Name ::= CHOICE {
+	null NULL,
+	classAndInstance SEQUENCE {
+		managedObjectClass ObjectClass,
+		managedObjectInstance ObjectInstance,
+		... },
+	... }
+Names ::= SET OF Name
+OrgLevel ::= INTEGER {
+	no-escalation(0),
+	first-level(1),
+	second-level(2),
+	third-level(3),
+	fourth-level(4),
+	fifth-level(5),
+	sixth-level(6),
+	... }
+OutageDuration ::= CHOICE {
+	null NULL,
+	timeInterval TimeInterval,
+	... }
+PerceivedTroubleSeverity ::= CHOICE {
+	number INTEGER {
+		-- Administrations may provide additional
+		-- values and/or restrict the values supported
+		outOfService(0),
+		backInService(1),
+		serviceImpairment(2),
+		nonServiceAffectingTrouble(3),
+		... },
+	identifier OBJECT IDENTIFIER,
+	... }
+PersonEmail ::= GraphicString(SIZE(0..64))
+PersonFax ::= GraphicString(SIZE(0..64))
+PersonLocation ::= PremisesAddress
+PersonName ::= GraphicString(SIZE(0..64))
+PersonNumber ::= GraphicString(SIZE(0..64))
+PersonPhone ::= GraphicString(SIZE(0..64))
+PersonRespon ::= GraphicString(SIZE(0..64))
+PersonReach ::= SEQUENCE {
+	number [0] PersonNumber DEFAULT "",
+	name [1] PersonName DEFAULT "",
+	phone [2] PersonPhone OPTIONAL,
+	loc [3] PersonLocation OPTIONAL,
+	email [4] PersonEmail OPTIONAL,
+	fax [5] PersonFax OPTIONAL,
+	respon [6] PersonRespon OPTIONAL,
+	... }
+PreferredPriority ::= ENUMERATED {
+	undefined(0),
+	minor(1),
+	major(2),
+	serious(3),
+	... }
+PremisesName ::= GraphicString(SIZE(0..64))
+PremisesAddress ::= SEQUENCE {
+	civicAddress GraphicString(SIZE(0..64)),
+	city GraphicString(SIZE(0..64)),
+	state GraphicString(SIZE(0..64)),
+	zip GraphicString(SIZE(0..64)),
+	... }
+ReceivedTime ::= GeneralizedTime
+RelatedTroubleReportList ::= SET OF ObjectInstance
+RelatedObject ::= CHOICE {
+	noObject NULL,
+	object ObjectInstance,
+	... }
+RepairActivityID ::= INTEGER
+RepairActivityList ::= SET OF SEQUENCE {
+	entryTime GeneralizedTime,
+	activityInfo GraphicString,
+	activityPerson PersonReach OPTIONAL,
+	activityCode ActivityCode OPTIONAL,
+	... }
+RepeatReport ::= ENUMERATED {
+	unspecified(0),
+	recentInstallation(1),
+	repeat(2),
+	bothInstallationAndRepeat(3),
+	chronic(4),
+	bothInstallationAndChronic(5),
+	... }
+RequestState ::= ENUMERATED {
+	requested(1),
+	provided(2),
+	... }
+ResponsiblePersonPtr ::= CHOICE {
+	null NULL,
+	objectInstance ObjectInstance,
+	... }
+RestoredTime ::= CHOICE {
+	null NULL,
+	generalizedTime GeneralizedTime,
+	... }
+ServiceAliasList ::= SET OF GraphicString(SIZE(0..64))
+ServiceDescription ::= GraphicString(SIZE(0..256))
+ServiceLocationList ::= SET OF SEQUENCE {
+	premiseName PremisesName,
+	premiseAddress PremisesAddress,
+	... }
+ServiceId ::= NameType
+ServiceType ::= CHOICE {
+	number INTEGER,
+	string PrintableString,
+	objectIdentifier OBJECT IDENTIFIER,
+	... }
+SimpleNameRange ::= CHOICE {
+	number INTEGER,
+	string GraphicString64,
+	... }
+StopTime ::= CHOICE {
+	specific GeneralizedTime,
+	continual NULL,
+	... }
+SuspectObjectList ::= SET OF SuspectObject
+TelephoneNumberListRange ::= SET SIZE(0..64) OF TelephoneNumber
+TRFormatID ::= INTEGER
+TelephoneNumber ::= GraphicString(SIZE(0..32))
+TRMustBePresentAttributeMissing ::= AttributeIDList
+TroubleDetectionTime ::= CHOICE {
+	null NULL,
+	generalizedTime GeneralizedTime,
+	... }
+TroubleFound ::= CHOICE {
+	number INTEGER {
+		-- Integer values are to be registered in the
+		-- standard. Administrations may restrict
+		-- the values to be used.
+		pending(0),
+		cameClear(1),
+		centralOffice(2),
+		switchTrouble(3),
+		customerProvidedEquipment(4),
+		facility(5),
+		centralOfficeFacility(6),
+		iCfacility(7),
+		interexchangeCarrier(8),
+		information(9),
+		nonplanClassified(10),
+		nonplanClassifiedIC(11),
+		nonplanClassifiedEA(12),
+		noTroubleFound(13),
+		station(14),
+		stationProductData(15),
+		stationProductTerminal(16),
+		stationProductVideo(17),
+		stationProductVoice(18),
+		stationWiring(19),
+		otherStationEquipment(20),
+		foundOKStation(21),
+		servingBureau(22),
+		testOK(23),
+		publicServicesCoinSet(24),
+		customerOperatingInstructions(25),
+		testedOKVerifiedOK(26),
+		coFacilityTestedFoundOK(27),
+		outsideFacilityTestedFoundOK(28),
+		referredOutToOtherDept(29),
+		protectiveConnectingArrang(30),
+		cpeCustomerResponsibility(31),
+		preService(32),
+		preServiceIC(33),
+		preServiceEA(34),
+		serviceNode(35),
+		data(36),
+		customerReferredToVendor(37),
+		exchangeAccess(38),
+		international(39),
+		otherProvidedAccess(40),
+		existingReport(41),
+		cancelExclude(42),
+		paBX(43),
+		outsideWire(44),
+		outsideTerminals(45),
+		outsidePlantEquipment(46),
+		outsidePlantFiberOptic(47),
+		ousidePlantOther(48),
+		coEquipmentOther(49),
+		coEquipmentFrames(50),
+		coConcentrator(51),
+		receiverOffHook(52),
+		cpeAuthorized(53),
+		cpeTelcoMaintained(54),
+		independentCompany(55),
+		cpeCalledNumber(56),
+		assigningProvisioning(57),
+		interServiceCenter(58),
+		referredOut(59),
+		network(60),
+		... },
+	identifier OBJECT IDENTIFIER,
+	... }
+TroubleHistoryInfo ::= SEQUENCE {
+	managedObjectInstance [0] ObjectInstance,
+	receivedTime [1] GeneralizedTime,
+	troubleFound [2] TroubleFound,
+	activityDuration [3] ActivityDuration OPTIONAL,
+	additionalTroubleInfoList [4] AdditionalTroubleInfoList OPTIONAL,
+	authorizationList [5] AuthorizationList OPTIONAL,
+	cancelRequestedByManager [6] CancelRequestedByManager OPTIONAL,
+	closeOutNarr [7] GraphicString OPTIONAL,
+	closeOutVerification [8] CloseOutVerification OPTIONAL,
+	commitmentTime [9] CommitmentTime OPTIONAL,
+	custTroubleTickNum [10] GraphicString OPTIONAL,
+	perceivedTroubleSeverity [11] PerceivedTroubleSeverity OPTIONAL,
+	restoredTime [12] GeneralizedTime OPTIONAL,
+	troubleClearancePerson [13] PersonReach OPTIONAL,
+	troubleReportNumberList [14] TroubleReportNumberList OPTIONAL,
+	troubleType [15] TroubleType OPTIONAL,
+	... }
+TroubleLocation ::= CHOICE {
+	locationAddress [0] LocationAddress,
+	locationPtr [1] ObjectInstance,
+	... }
+TroubleProgressInfo ::= SEQUENCE {
+	troubleReportStatus [0] TroubleReportStatus,
+	additionalTroubleStatusInfo [1] AdditionalTroubleStatusInfo OPTIONAL,
+	... }
+TroubleReportAlreadyExists ::= SEQUENCE {
+	managedObjectClass ObjectClass OPTIONAL,
+	managedObjectInstance ObjectInstance,
+	troubleReportInstance ObjectInstance,
+	... }
+TroubleReportChangeDenied ::= SEQUENCE {
+	changeDeniedReason ChangeDeniedReason,
+	managedObjectClass ObjectClass OPTIONAL,
+	managedObjectInstance ObjectInstance,
+	troubleReportInstance ObjectInstance,
+	... }
+TroubleReportFormatObjectPtr ::= ObjectInstance
+TroubleReportNumberList ::= SET OF GraphicString(SIZE(0..64))
+-- TroubleReportState ::= INTEGER(0..255){
+TroubleReportState ::= INTEGER {
+	queued(0),
+	openActive(1),
+	deferred(2),
+	cleared(3),
+	closed(4),
+	disabled(5),
+	... }(0..255)
+TroubleReportStatus ::= CHOICE {
+	number INTEGER {
+		-- Integer values are to be registered in the
+		-- standard. Administrations may restrict
+		-- the values to be used.
+		screening(1),
+		testing(2),
+		dispatchedIn(3),
+		dispatchedOut(4),
+		preassignedOut(5),
+		bulkDispatchedOut(6),
+		startRepair(7),
+		pendingTest(8),
+		pendingDispatch(9),
+		requestRepair(10),
+		referMtceCenter(11),
+		referVendor(12),
+		noAccessOther(13),
+		startNoAccess(14),
+		stopNoAccess(15),
+		startDelayedMtce(16),
+		stopDelayedMtce(17),
+		troubleEscalated(18),
+		craftDispatched(19),
+		temporaryOK(20),
+		cableFailure(21),
+		originatingEquipFailure(22),
+		backOrder(23),
+		clearedCustNotAdvised(24),
+		clearedCustAdvised(25),
+		clearedAwaitingCustVerification(26),
+		closedOut(27),
+		closedOutByCustReq(28),
+		closedOutCustVerified(29),
+		closedOutCustDenied(30),
+		canceledPendingWorkInProgress(31),
+		canceledPendingTestCompletion(32),
+		canceledPendingDispatchCompl(33),
+		techOnSite(34),
+		techLeftSite(35),
+		... },
+	identifier OBJECT IDENTIFIER,
+	... }
+TroubleReportStatusTime ::= GeneralizedTime
+TroubleReportStatusWindow ::= TimeInterval
+TroubleType ::= CHOICE {
+	number INTEGER {
+		-- Integer values are to be registered in the
+		-- standard. Administrations may restrict
+		-- the values to be used.
+		noDialToneGroup(100),
+		noDialTone(101),
+		slowDialTone(102),
+		circuitDead(103),
+		-- No audible tone when the telephone receiver is off-hook
+		canNotCallOutGroup(200),
+		canNotCallOut(201),
+		canNotBreakDialTone(203),
+		dialToneAfterDialing(204),
+		highAndDry(205),
+		canNotRaise(206),
+		allAccessBusy(207),
+		canNotCallOut2(208),
+		canNotCallLongDistance(209),
+		canNotCallOverseas(210),
+		speedCall(211),
+		canNotBeCalledGroup(300),
+		canNotBeCalled(301),
+		canNotBeCalledBusy(302),
+		doNotGetCalled(303),
+		canNotTripRing(304),
+		falseRings(305),
+		doNotAnswer(306),
+		reachRecording(307),
+		canNotRaiseAStation(308),
+		canNotRaiseADrop(309),
+		canNotRaiseACircuitLocation(310),
+		ringNoAnswer(311),
+		reorder(312),
+		alwaysBusy(313),
+		bellDoesNotRing(314),
+		bellDoesNotRing2(315),
+		bellRingsCanNotAnswer(316),
+		bellRingsAfterAnswer(317),
+		noRingNoAnswer(318),
+		otherRingTrouble(319),
+		receivesCallsForWrongNumber(320),
+		recordingOnLine(321),
+		canNotBeHeardGroup(400),
+		canNotBeHeard(401),
+		canNotHear(402),
+		fading(403),
+		distant(404),
+		reachedWrongNumberGroup(500),
+		wrongNumber(501),
+		circuitOperationGroup(600),
+		open(601),
+		falseDisconnect(602),
+		grounded(603),
+		canNotBeSignalled(604),
+		canNotSignal(605),
+		permanentSignal(606),
+		improperSupervision(607),
+		supervision(608),
+		canNotMeet(609),
+		canNotReleaseCircuit(610),
+		hungUp(611),
+		noWinkStart(612),
+		noSF(613),
+		lowSF(614),
+		noContinuity(615),
+		cutCable(616),
+		openToDEMARC(617),
+		noRingGenerator(618),
+		badERL(619),
+		echo(620),
+		hollow(621),
+		circuitDead(622),
+		-- No activity on circuit at all. Circuit shows no sign of continuity with service provider
+		circuitDown(623),
+		failingCircuit(624),
+		noSignal(625),
+		seizureOnCircuit(626),
+		lossEPSCSorSwitchedServices(627),
+		monitorCircuit(628),
+		newServiceNotWorking(629),
+		openEPSCSorSwitchedServices(630),
+		otherVoiceDescribeAdditInfo(631),
+		cutOffsGroup(700),
+		cutsOff(701),
+		noiseProblemGroup(800),
+		intermittentNoise(801),
+		noisy(802),
+		foreignTone(803),
+		clipping(804),
+		crossTalk(805),
+		staticOnLine(806),
+		groundHum(807),
+		hearsOtherOnLine(808),
+		humOnLine(809),
+		clicking(810),
+		noiseEPSCSorSwitchedServices(811),
+		levelTroublesGroup(900),
+		lowLevels(901),
+		highLevels(902),
+		longLevels(903),
+		hotLevels(904),
+		highEndRollOff(905),
+		lowEndRollOff(906),
+		needsEqualized(907),
+		lineLoss(908),
+		doesNotPassFreqResponse(909),
+		miscellaneousTroubleGroup(1000),
+		hiCapDown(1001),
+		carrierDown(1002),
+		biPolarViolations(1003),
+		frameErrorsHiCap(1004),
+		outOfFrame(1005),
+		lossOfSync(1006),
+		frameSlips(1007),
+		noLoopback(1008),
+		canNotLoopbackDEMARC(1009),
+		recordingOnCircuit(1010),
+		linesNeedTagging(1011),
+		outwatsRingingin(1012),
+		remoteAccess(1013),
+		other(1014),
+		alarm(1015),
+		memoryServiceProblemGroup(1100),
+		dataTroubleGroup(1200),
+		canNotReceiveData(1201),
+		canNotSendData(1202),
+		canNotTransmitCanNotReceive(1203),
+		noReceive(1204),
+		noResponse(1205),
+		delay(1206),
+		impulseNoise(1207),
+		phaseJitter(1208),
+		harmonicDistortion(1209),
+		highDistortion(1210),
+		noDataLoopback(1211),
+		noCarrier(1212),
+		notPolling(1213),
+		dataFramingErrors(1214),
+		dropOuts(1215),
+		hits(1216),
+		noAnswerBack(1217),
+		streamer(1218),
+		outOfSpecification(1219),
+		canNotRunToCSU(1220),
+		canNotRunToOSU(1221),
+		deadDataCircuit(1222),
+		circuitInLoopback(1223),
+		errors(1224),
+		garbledData(1225),
+		invalidData(1226),
+		crossModulation(1227),
+		slowResponse(1228),
+		otherDataDescribeAdditInfo(1229),
+		gettingAllOnes(1230),
+		slip(1231),
+		stationTroubleGroup(1300),
+		voiceEquipment(1301),
+		dataEquipment(1302),
+		videoEquipment(1303),
+		otherEquipment(1304),
+		stationWiring(1305),
+		physicalTroubleGroup(1400),
+		lightBurnedOut(1401),
+		dataset(1402),
+		ttySet(1403),
+		highSpeedPrinter(1404),
+		aNI(1405),
+		aLI(1406),
+		canNotActivatePC(1407),
+		modem(1408),
+		cathodeRayTube(1409),
+		looseJack(1410),
+		offHook(1411),
+		physicalProblem(1412),
+		processorDead(1413),
+		wiringProblem(1414),
+		wireBrokeSetBrokePoleDown(1415),
+		noRegister(1416),
+		stuckSender(1417),
+		otherStationTrouble(1418),
+		otherCaseGroup(1500),
+		callTransferProblem(1501),
+		callWaitingProblem(1502),
+		customCallFeatureDoNotWork(1503),
+		information(1504),
+		threeWayCallingProblem(1505),
+		orderWork(1506),
+		releaseCktRequestedByIC(1507),
+		releaseCktRequestedByEC(1508),
+		releaseFacilityRequestedByIC(1509),
+		releaseFacilityRequestedByEC(1510),
+		requestForRoutine(1511),
+		--release (1512)
+		release(1512),
+		requestDispatch(1513),
+		requestMonitorOfCircuit(1514),
+		routineTestFailure(1515),
+		lostTimerReport(1516),
+		historicalReports(1517),
+		switchOrTrunkRelated(1518),
+		testAssist(1519),
+		... },
+	identifier OBJECT IDENTIFIER,
+	... }
+Text128 ::= PrintableString(SIZE(0..128))
+TspPriority ::= GraphicString(SIZE(2))
+SuspectObject ::= SEQUENCE {
+	suspectObjectClass OBJECT IDENTIFIER,
+	suspectObjectInstance ObjectInstance,
+	failureProbability INTEGER OPTIONAL,
+	-- in the range 1-100
+	... }
+TimeInterval ::= SEQUENCE {
+	day [0] INTEGER(0..31) DEFAULT 0,
+	hour [1] INTEGER(0..23) DEFAULT 0,
+	minute [2] INTEGER(0..59) DEFAULT 0,
+	second [3] INTEGER(0..59) DEFAULT 0,
+	msec [4] INTEGER(0..999) DEFAULT 0,
+	... }
+-- TimeInterval shall be non-zero
+TypeText ::= IA5String(SIZE(0..32))
+UnavailableServicePtr ::= RelatedObject
+WeekMask ::= SEQUENCE {
+	daysOfWeek BIT STRING {
+		sunday(0),
+		monday(1),
+		tuesday(2),
+		wednesday(3),
+		thursday(4),
+		friday(5),
+		saturday(6),
+		... } DEFAULT '1111111'B,
+	intervalsOfDay SET OF SEQUENCE {
+		intervalStart Time24,
+		intervalEnd Time24,
+		... }
+	-- DEFAULT {(0,0),(23,59)}
+	DEFAULT { { { 0, 0 }, { 23, 59 } } },
+	... }
+END
+-- A.7 Rules of extensibility
+-- Extensibility rules
+-- As per Recommendation X.680 on extensibility rules, the productions that are of extensible types
+-- are to be indicated by including three (3) ellipses (...) in their type descriptions.
+-- The productions of the following types will be indicated as having extensible types-
+--- ENUMERATED
+--- named INTEGER
+--- named BIT STRING
+--- SEQUENCE
+--- SET
+--- CHOICE
+-- Under the rules of extensibility, new enumerations (for ENUMERATED type), new bit name
+-- assignments (for named BIT STRING type), new named numbers (for named INTEGER type),
+-- new members (for SET type and SEQUENCE type) and new choices (for CHOICE type) may
+-- be added in the future versions of this Recommendation.
+-- In any interface implementation if any of the above (enumerations, bit name assignments, named
+-- numbers etc.) are not recognized in a response to a request, a RORJ-U/ReturnResultProblem
+-- "mistypedResult" will be issued. If an error response is not recognized in a returned error, then
+-- RORJ-U/ReturnError Problem "mistypedParameter" will be issued.
+
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.790 (1995)"
+--  { itu-t(0) recommendation(0) x(24) x790(790) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

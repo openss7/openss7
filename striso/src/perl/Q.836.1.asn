@@ -1,0 +1,307 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:57 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.836.1 (02/2000)"
+--  { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) } >--
+MODULE "ITU-T Rec. Q.836.1 (02/2000)" { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) }
+--< ASN1.Version 1994 ASN1DefinedTypesModule
+--  { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) } >--
+-- 11 ASN.1 Module
+ASN1DefinedTypesModule { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+ObjectClass, ObjectInstance, Attribute
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+--- see X.711
+AdministrativeState, OperationalState, ManagementExtension
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(1) 1 }
+--- see X.721
+BillingCharacteristics, CallTreatment, DefaultCharging, FilteredCallTreatment, FilteringCharacteristics, FilteringCriteria, FilteringTimeOut, GapTreatment, GapInterval, GapDuration, GapCriteria, InbandInfo, InformationToSend, Integer4, MessageID
+	FROM IN-CS-1-Operations { ccitt recommendations q 1218 modules(0) cs-1-operations(0) version1(0) };
+--- see Q.1218
+-- OBJECT IDENTIFIERS
+managedObjectClass OBJECT IDENTIFIER ::= { informationModel managedObjectClass(3) }
+package OBJECT IDENTIFIER ::= { informationModel package(4) }
+nameBinding OBJECT IDENTIFIER ::= { informationModel nameBinding(6) }
+attribute OBJECT IDENTIFIER ::= { informationModel attribute(7) }
+action OBJECT IDENTIFIER ::= { informationModel action(9) }
+notification OBJECT IDENTIFIER ::= { informationModel notification(10) }
+behaviour OBJECT IDENTIFIER ::= { informationModel behaviour(11) }
+notification OBJECT IDENTIFIER ::= { informationModel notification(10) }
+-- ASN.1 Types
+AuthenticationCode ::= OCTET STRING
+BearerCapability ::= CHOICE {
+	bearerCap [0] OCTET STRING,
+	tmr [1] OCTET STRING }
+-- bearerCap is encoded according to Q.763 or Q.931 and
+-- tmr (transmission medium requirement parameter) is encoded according to ITU-T Q.763
+CalledPartyNumber ::= OCTET STRING-- Encoded according to ITU-T Q.763
+CalledPartyNumberList ::= SET OF CalledPartyNumber
+CallingPartyNumber ::= OCTET STRING-- Encoded according to ITU-T Q.763
+CallingPartyNumberList ::= SET OF CallingPartyNumber
+Cause ::= OCTET STRING
+-- Cause values encoded according to ITU-T Q.763.
+-- Cause and Location values encoded according to ITU-T Q.850.
+ChargeProfile ::= OCTET STRING-- Operator Specific
+CongestionAction ::= ENUMERATED {
+	terminateCall(0),
+	playAnnouncement(1),
+	playAnnouncementAndTerminate(2) }
+ControlType ::= ENUMERATED {
+	sCPInitiated(0),
+	oSInitiated(1) }
+Count ::= INTEGER
+DialledDigitLength ::= INTEGER-- Specifies the length of a dialled digit string
+DigitString ::= OCTET STRING-- Encoded in accordance with ITU-T Q.763
+DefaultChargingAction ::= CHOICE {
+	specificAction [1] ENUMERATED {
+		continueWithNormalCharging(0),
+		freeCall(1),
+		releaseCall(2) },
+	tariffReference [2] NameType }
+DisplayInformation ::= IA5String(SIZE(minDisplayInformationLength..maxDisplayInformationLength))
+ExceptionHandling ::= NULL
+INAPException ::= ENUMERATED {
+	continueCall(0),
+	playAnnouncement(1),
+	playAnnouncementAndContinueCall(2),
+	releaseCall(3),
+	playAnnouncementAndReleaseCall(4) }
+INEscape ::= SEQUENCE OF DigitString
+FeatureActivation ::= OCTET STRING-- Encoded in accordance with ITU-T Q.763
+ForwardCallIndicators ::= OCTET STRING(SIZE(2))
+-- Indicates the Forward Call Indicators. Refer to ITU-T Q.771 for encoding.
+GapOnService ::= SEQUENCE OF ServiceKey
+GapIndicators ::= SEQUENCE {
+	duration [0] Duration,
+	gapInterval [1] Interval }
+IPCapabilityList ::= SET OF IPCapabilities
+IPCapabilities ::= OCTET STRING(SIZE(minIPSSPCapabilitiesLength..maxIPSSPCapabilitiesLength))
+-- defined by network operator. Indicates the SRF resources available at the SSP.
+ObservedEventId ::= ENUMERATED {
+	dialogueInitiationAttempt(1),
+	dialogueInitiatedWithInitialDP(2),
+	dialogueInitiatedWithAssistRequestInstructions(3),
+	dialogueInitiatedWithServiceFilteringResponse(4),
+	dialogueInitiatedWithInitiateCallAttempt(5),
+	dialogueInitiatedWithCallGap(6),
+	dialogueInitiatedWithServiceFiltering(7),
+	dialogueCongestion(8),
+	tC-MessageNotAccepted(9),
+	sSFInitiatedDialoguesProcessed(10),
+	sCFInitiatedDialoguesProcessed(11),
+	errorOrRejectMessagesSentBySSP(12),
+	errorOrRejectMessagesFromSCP(13),
+	timeoutOnSCFResponse(14),
+	dialoguesAbortedBySCPOrRemoteTC(15),
+	dialoguesAbortedBySSP(16),
+	dialoguesInProgress(17) }
+ObservedSCFAccessList ::= SET OF ObjectInstance
+ServiceKey ::= Integer4
+TdpCriteria ::= CHOICE {
+	bearerCapability [0] BearerCapability,
+	callingPartyNumber [1] CallingPartyNumber,
+	calledPartyNumber [2] CalledPartyNumber,
+	classOfService [3] ClassOfService,
+	cause [4] Cause,
+	digitString [5] DigitString,
+	facilityInformation [6] FacilityInformation,
+	featureActivation [7] FeatureActivation,
+	natureOfAddress [8] NatureOfAddress,
+	stringLength [9] StringLength }
+Tdp1Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	calledPartyNumber [2] CalledPartyNumber,
+	classOfService [3] ClassOfService }
+Tdp2Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	calledPartyNumber [2] CalledPartyNumber,
+	digitString [5] DigitString,
+	stringLength [9] StringLength }
+Tdp3Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	calledPartyNumber [2] CalledPartyNumber,
+	digitString [5] DigitString,
+	facilityInformation [6] FacilityInformation,
+	featureActivation [7] FeatureActivation,
+	natureOfAddress [8] NatureOfAddress,
+	stringLength [9] StringLength }
+Tdp4Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp5Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp6Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp7Criteria ::= CHOICE {
+	facilityInformation [6] FacilityInformation,
+	featureActivation [7] FeatureActivation }
+Tdp8Criteria ::= CHOICE {
+	facilityInformation [6] FacilityInformation,
+	featureActivation [7] FeatureActivation }
+Tdp9Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp10Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp11Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp12Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	classOfService [3] ClassOfService }
+Tdp13Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp14Criteria ::= CHOICE {
+	callingPartyNumber [1] CallingPartyNumber,
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp15Criteria ::= CHOICE {
+	facilityInformation [6] FacilityInformation,
+	featureActivation [7] FeatureActivation }
+Tdp16Criteria ::= CHOICE {
+	facilityInformation [6] FacilityInformation,
+	featureActivation [7] FeatureActivation }
+Tdp17Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+Tdp18Criteria ::= CHOICE {
+	cause [4] Cause,
+	featureActivation [7] FeatureActivation }
+TDP1Filter ::= CMISFilter-- restricted to using TDP1Criteria
+TDP2Filter ::= CMISFilter-- restricted to using TDP2Criteria
+TDP3Filter ::= CMISFilter-- restricted to using TDP3Criteria
+TDP4Filter ::= CMISFilter-- restricted to using TDP4Criteria
+TDP5Filter ::= CMISFilter-- restricted to using TDP5Criteria
+TDP6Filter ::= CMISFilter-- restricted to using TDP6Criteria
+TDP7Filter ::= CMISFilter-- restricted to using TDP7Criteria
+TDP8Filter ::= CMISFilter-- restricted to using TDP8Criteria
+TDP9Filter ::= CMISFilter-- restricted to using TDP9Criteria
+TDP10Filter ::= CMISFilter-- restricted to using TDP10Criteria
+TDP11Filter ::= CMISFilter-- restricted to using TDP11Criteria
+TDP12Filter ::= CMISFilter-- restricted to using TDP12Criteria
+TDP13Filter ::= CMISFilter-- restricted to using TDP13Criteria
+TDP14Filter ::= CMISFilter-- restricted to using TDP14Criteria
+TDP15Filter ::= CMISFilter-- restricted to using TDP15Criteria
+TDP16Filter ::= CMISFilter-- restricted to using TDP16Criteria
+TDP17Filter ::= CMISFilter-- restricted to using TDP17Criteria
+TDP18Filter ::= CMISFilter-- restricted to using TDP18Criteria
+TdpMode ::= ENUMERATED {
+	notification(1),
+	request(2) }
+TimerValue ::= INTEGER-- time specified in milliseconds
+Tone ::= SEQUENCE {
+	toneID [0] Integer4,
+	duration [1] Integer4 OPTIONAL }
+-- The duration specifies the length of the tone in seconds; value 0 indicates infinite duration.
+TerminatingDialledDigitList ::= SEQUENCE OF DigitString
+TriggerAssociation ::= SET OF ObjectInstance
+Version ::= GraphicString
+-- END end of ASN1 DefinedTypesModule
+-- APPENDIX I
+-- Productions Imported From Q.1218
+BillingChargingCharacteristics ::= OCTET STRING
+CallTreatment ::= CHOICE {
+	informationToSend [0] InformationToSend,
+	releaseCause [1] Cause,
+	both [2] SEQUENCE {
+		informationToSend [0] InformationToSend,
+		releaseCause [1] Cause } }
+-- The default value for Cause is the same as in ISUP.
+DefaultCharging ::= CHOICE {
+	pSTNChargingLevel [0] BOOLEAN,
+	freeOfCharge [1] BOOLEAN,
+	callReject [2] BOOLEAN,
+	inChargeLevels [3] SET OF OCTET STRING-- Operator Specific
+	}
+FilteredCallTreatment ::= SEQUENCE {
+	sFBillingChargingCharacteristics [0] SFBillingChargingCharacteristics,
+	informationToSend [1] InformationToSend OPTIONAL,
+	maximumNumberOfCounters [2] MaximumNumberOfCounters OPTIONAL,
+	releaseCause [3] Cause OPTIONAL }
+-- If releaseCause is not present, the default value is the same as the ISUP cause value decimal 31.
+-- If informationToSend is present, the call will be released after the end of the announcement with the
+-- indicated or default releaseCause. If maximumNumberOfCounters is not present, ServiceFilteringResponse
+-- will be sent with CountersValue ::= SEQUENCE SIZE (0) OF CounterAndValue
+FilteringCharacteristics ::= CHOICE {
+	interval [0] INTEGER(-1..32000),
+	numberOfCalls [1] Integer4 }
+-- Indicates the severity of the filtering and the point in time when the ServiceFilteringResponse is to be
+-- sent. If = interval, every interval of time the next call leads to an InitialDP and a
+-- ServiceFilteringResponse is sent to the SCF. The interval is specified in seconds. If = NumberOfCalls,
+-- every N calls the Nth call leads to an InitialDP and a ServiceFilteringResponse is sent to the SCF. If
+-- ActivateServiceFiltering implies several counters (filtering on several dialled numbers), the
+-- numberOfCalls would include calls to all the dialled numbers.
+FilteringCriteria ::= CHOICE {
+	serviceKey [2] ServiceKey,
+	addressAndService [30] SEQUENCE {
+		calledAddressValue [0] Digits,
+		serviceKey [1] ServiceKey,
+		callingAddressValue [2] Digits OPTIONAL,
+		locationNumber [3] LocationNumber OPTIONAL } }
+-- In case calledAddressValue is specified, the numbers to be filtered are from calledAddressValue up to
+-- and including calledAddressValue +maximumNumberOfCounters-1. The last two digits of calledAddressValue
+-- cannot exceed 100-maximumNumberOfCounters.
+FilteringTimeOut ::= CHOICE {
+	duration [0] Duration,
+	stopTime [1] DateAndTime }
+-- Indicates the maximum duration of the filtering. When the timer expires, a ServiceFilteringResponse is
+-- sent to the SCF.
+GapCriteria ::= CHOICE {
+	calledAddressValue [0] Digits,
+	gapOnService [2] GapOnService,
+	calledAddressAndService [29] SEQUENCE {
+		calledAddressValue [0] Digits,
+		serviceKey [1] ServiceKey },
+	callingAddressAndService [30] SEQUENCE {
+		callingAddressValue [0] Digits,
+		serviceKey [1] ServiceKey,
+		locationNumber [2] LocationNumber OPTIONAL } }
+-- Both calledAddressValue and callingAddressValue can be incomplete numbers, in the sense that a limited
+-- amount of digits can be given. For the handling of numbers starting with the same digit string refer to
+-- the detailed procedure of the CallGap operation in Clause 9.}
+InbandInfo ::= SEQUENCE {
+	messageID [0] MessageID,
+	numberOfRepetitions [1] INTEGER(1..127) OPTIONAL,
+	duration [2] INTEGER(0..32767) OPTIONAL,
+	interval [3] INTEGER(0..32767) OPTIONAL }
+-- interval is the time in seconds between each repeated announcement. Duration is the total amount of time
+-- in seconds, including repetitions and intervals. The end of announcement is either the end of duration
+-- or numberOfRepetitions, whatever comes first. Duration with value 0 indicates infinite duration.
+InformationToSend ::= CHOICE {
+	inbandinfo [0] InbandInfo,
+	tone [1] Tone,
+	displayInformation [2] DisplayInformation }
+Integer4 ::= INTEGER(0..2147483647)
+MessageID ::= CHOICE {
+	elementaryMessageID [0] Integer4,
+	text [1] SEQUENCE {
+		messageContent [0] IA5String(SIZE(minMessageContentLength..maxMessageContentLength)),
+		attributes [1] OCTET STRING(SIZE(minAttributesLength..maxAttributesLength)) OPTIONAL },
+	elementaryMessageIDs [29] SEQUENCE SIZE(1..numOfMessageIDs) OF Integer4,
+	variableMessage [30] SEQUENCE {
+		elementaryMessageID [0] Integer4,
+		variableParts [1] SEQUENCE SIZE(1..5) OF VariablePart } }
+END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.836.1 (02/2000)"
+--  { itu-t(0) recommendation(0) q(17) inmod(1831) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

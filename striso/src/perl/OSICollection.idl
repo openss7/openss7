@@ -1,0 +1,111 @@
+// File: OSICollection.idl
+#ifndef _OSICOLLECTION_IDL_
+#define _OSICOLLECTION_IDL_
+#include <OSIMgmt.idl>
+#pragma prefix jidm.org
+module OSICollection {
+typedef OSIMgmt::ManagedObject ManagedObject;
+typedef sequence < ManagedObject > ManagedObjectSeq;
+exception IteratorInvalid { };
+exception IteratorInBetween { };
+exception CollectionInvalid { };
+exception NotFound { };
+exception InvalidName { };
+interface Iterator {
+// retrieving elements
+boolean get_element (
+out ManagedObject mo
+) raises ( IteratorInvalid, IteratorInBetween );
+boolean get_n_elements (
+in unsigned long how_many,
+out ManagedObjectSeq mo_list
+) raises ( IteratorInvalid );
+// moving iterator
+void restart () raises ( IteratorInvalid );
+void set_to_next_element () raises ( IteratorInvalid );
+void set_to_next_nth_element (
+in unsigned long how_many
+) raises ( IteratorInvalid );
+// iterator state
+void invalidate ();
+boolean is_valid ();
+boolean is_in_between ();
+boolean is_equal ( in Iterator other ) raises ( IteratorInvalid );
+// cloning, assigning and destroying
+Iterator clone ();
+void assign ( in Iterator from_where ) raises ( IteratorInvalid );
+void destroy ();
+};
+typedef OSIMgmt::LinkedReplyHandler LinkedReplyHandler;
+typedef OSIMgmt::EndOfRepliesHandler EndOfRepliesHandler;
+// abstract base interface
+interface BaseCollection {
+// operations to perform on all elements in the collection
+void perform_get (
+in OSIMgmt::ASN1_ObjectIdentifierSeq attr_id_list,
+in LinkedReplyHandler lrh,
+in EndOfRepliesHandler eorh
+);
+void perform_set (
+in OSIMgmt::SetOperationArgument modif_list,
+in LinkedReplyHandler lrh,
+in EndOfRepliesHandler eorh
+);
+void perform_action (
+in ASN1_ObjectIdentifier action_id,
+in ASN1_DefinedAny action_info,
+in LinkedReplyHandler lrh,
+in EndOfRepliesHandler eorh
+);
+void perform_delete (
+in LinkedReplyHandler lrh,
+in EndOfRepliesHandler eorh
+);
+// statistics
+boolean is_empty ();
+// creating iterators
+Iterator create_iterator (
+in boolean read_only
+) raises ( CollectionInvalid );
+// destruction
+void destroy ();
+};
+interface EnumCollection : BaseCollection {
+// adding elements
+void add_element ( in ManagedObject element );
+void add_elements ( in ManagedObjectSeq elem_list );
+void add_all_from ( in BaseCollection collection );
+// removing elements
+void remove_element_at (
+in Iterator where
+) raises ( IteratorInvalid, IteratorInBetween );
+void remove_all ();
+};
+interface RuleCollection : BaseCollection {
+ManagedObject get_base_object () raises ( CollectionInvalid );
+X711CMI::ScopeType get_scope () raises ( CollectionInvalid );
+X711CMI::CMISFilterType get_filter () raises ( CollectionInvalid );
+X711CMI::CMISSyncType get_synchronization () raises ( CollectionInvalid );
+};
+interface CollectionFactory {
+EnumCollection create_enum_collection ();
+EnumCollection create_enum_collection_from_collection (
+in BaseCollection collection
+);
+RuleCollection create_rule_collection (
+in OSIMgmt::ManagedObject base_managed_object,
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType sync
+);
+RuleCollection create_rule_collection_by_name (
+in OSIMgmt::ProxyAgent proxy_agent,
+in CORBA::ScopedName base_mo_interface,
+in CosNaming::Name base_mo_name,
+in X711CMI::ScopeType scope,
+in X711CMI::CMISFilterType filter,
+in X711CMI::CMISSyncType sync
+);
+};
+};
+#endif /* _OSICOLLECTION_IDL_ */

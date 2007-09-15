@@ -1,0 +1,276 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 10:17:28 MDT 2007
+--@@ 
+--< GDMO.Document "Recommendation X.162 (1997)"
+--  { itu-t(0) recommendation(0) x(24) x162(162) informationModel(0) } >--
+MODULE "Recommendation X.162 (1997)" { itu-t(0) recommendation(0) x(24) x162(162) informationModel(0) }
+--< ASN1.Version 1994 CnmAsn1Module
+--  { itu-t(0) recommendation(0) x(24) 162 cnmAsn1Module(2) version2(2) } >--
+-- 14 ASN.1 production definitions
+CnmAsn1Module { itu-t(0) recommendation(0) x(24) 162 cnmAsn1Module(2) version2(2) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+GroupObjects, ObservedValue, DMI-TYPE-IDENTIFIER, PerceivedSeverity
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+SetInfoStatus, CMIP-ATTRIBUTE, AttributeSet, AttributeId, ObjectClass, ObjectInstance, ActionArgument, CreateArgument, DeleteArgument, GetArgument, SetArgument
+	FROM CMIP-1 { joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3) }
+NameType
+	FROM ASN1DefinedTypesModule { itu-t(0) recommendation(0) m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+DTEAddress, LogicalChannelId
+	FROM NLM { joint-iso-itu-t network-layer(13) management(0) nLM(2) asn1Module(2) 0 }
+UsageInfo
+	FROM UsageMeteringFunction { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1 };
+cnmObjectClass OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmObjectClass(3) }
+cnmPackage OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmPackage(4) }
+cnmParameter OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmParameter(5) }
+cnmNameBinding OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmNameBinding(6) }
+cnmAttribute OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmAttribute(7) }
+cnmAttributeGroup OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmAttributeGroup(8) }
+cnmAction OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmAction(9) }
+cnmNotification OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmNotification(10) }
+cnmFunctionalUnit OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 cnmFunctionalUnit(11) version1(1) }
+miscellaneous OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 miscellaneous(12) }
+-- default value definition
+defaultDateRequest DateRequest ::= dontCare : NULL
+defaultInitialResultList ResultList ::= { }
+defaultOperationList OperationList ::= { }
+defaultProcessingMode ProcessingMode ::= independent : NULL
+-- initial value definition
+initialResultList ResultList ::= { }
+-- supporting production
+AnyNamesBase ::= SET OF ObjectInstance
+AnyNamesRange ::= SET SIZE(0..64) OF ObjectInstance
+Boolean ::= BOOLEAN
+ConnectionType ::= INTEGER {
+	unknown(-1),
+	other(0) }
+CustomerTypes ::= SET OF INTEGER(0..255)
+Date ::= GeneralizedTime
+DateRequest ::= CHOICE {
+	dontCare NULL,
+	request RequestedTime }
+DTEAddressList ::= SET OF DTEAddress
+GeographicCoordinates ::= INTEGER {
+	v-h-Coordinates(0),
+	latitude-longitude(1),
+	npa-nxx(2),
+	country-city(3) }
+GraphicString64 ::= GraphicString(SIZE(0..64))
+GraphicStringBase ::= GraphicString
+initialStatus Status ::= customerAgreement
+Integer ::= INTEGER
+InterlockCode ::= GraphicString
+CNM-SERVICE-PROVIDER ::= DMI-TYPE-IDENTIFIER
+InvoiceInfo ::= SET OF SEQUENCE {
+	serviceProviderName CNM-SERVICE-PROVIDER.&id( {InvoiceInfoSet }),
+	invoiceData CNM-SERVICE-PROVIDERNAME.&Value( { InvoiceInfoSet } { @.serviceProviderName }) }
+InvoiceInfoSet CNM-SERVICE-PROVIDER ::= {
+	... }
+LocationDetails ::= CHOICE {
+	unknown NULL,
+	details GraphicString }
+LocationType ::= INTEGER {
+	other(0),
+	customer(1),
+	provider(2) }(0..255)
+LoopbackStatus ::= BOOLEAN
+OperationArgument ::= CHOICE {
+	actionArgument [0] ActionArgument,
+	createArgument [1] CreateArgument,
+	deleteArgument [2] DeleteArgument,
+	getArgument [3] GetArgument,
+	setArgument [4] SetArgument }
+OperationList ::= SEQUENCE OF OperationArgument
+PacketCompleteType ::= SEQUENCE {
+	providerName [0] IMPLICIT GraphicString,
+	originatingAddress [1] IMPLICIT DTEAddress,
+	destinationAddress [2] IMPLICIT DTEAddress,
+	logicalChannel [3] IMPLICIT LogicalChannelId,-- X.283
+	usageMeasurement [4] IMPLICIT SET OF UsageMeasurement,
+	connectionType [5] IMPLICIT ConnectionType,
+	reverseChargingIndication [6] IMPLICIT Boolean }
+-- Other items such as supplementaryCharge, supplementaryServiceList, interworking charge
+-- should be defined by using another attribute (e.g. usageInfo2).
+-- We can use this type for the recording of PVC charging data.
+-- In case of PVC, basically, the same information as the SVC should be provided periodically
+-- (e.g. the interval = 1 hour or 12 hours) or when one of the charging conditions is changed,
+-- e.g. at the time when the discount rate is changed.
+-- reverseChargingIndication: the 'TRUE' value of this attribute means that the
+-- packetUsageData has been created by an incoming SVC that requests reverse charging.
+PacketInterruptType ::= SEQUENCE {
+	interruptionTime [0] IMPLICIT GeneralizedTime,
+	durationTime [1] IMPLICIT INTEGER(0..MAX),
+	cause [2] IMPLICIT ENUMERATED {
+		unknown(0),
+		hostBusy(1),
+		systemFailure(2),
+		planedMaintenance(3) } }
+CNM-PACKET-INVOICE ::= DMI-TYPE-IDENTIFIER
+PacketInvoiceData ::= SEQUENCE {
+	packetInvoiceType CNM-PACKET-INVOICE.&id( {PacketInvoiceDataSet }),
+	packetInvoiceInfo CNM-PACKET-INVOICE.&Value( { PacketInvoiceDataSet } { @.packetInvoiceType }) }
+PacketInvoiceDataSet CNM-PACKET-INVOICE ::= {
+	... }
+PacketRegistrationType ::= SET OF CHOICE {-- Identification of a user, several types of identifier
+	userId [0] IMPLICIT DTEAddress,
+	-- Directory number
+	userName [1] IMPLICIT GraphicString,
+	-- user title
+	accountId [2] IMPLICIT NumericString
+	-- invoice number -- }
+packetService OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) x(24) 162 miscellaneous(12) 1 }
+PostalAddress ::= SET OF GraphicString
+ProcessingMode ::= CHOICE {
+	sequential Sequential,
+	independent NULL }
+RequestedTime ::= CHOICE {
+	now [0] NULL,
+	scheduled [1] Date }
+Result ::= INTEGER {
+	fullySuccessed(0),
+	failed(1),
+	cancelled(2) }
+ResultList ::= SEQUENCE OF Result
+Sequential ::= CHOICE {
+	stopAfterFailure [0] NULL,
+	bestEffort [1] NULL }
+SRChangeDenied ::= INTEGER {
+	negotiationAlreadyEnded(0) }
+Status ::= INTEGER {
+	customerAgreement(0),
+	providerAgreement(1),
+	serviceBeingProcessed(2),
+	endOfProcessing(3) }
+SuborganizationObjectList ::= SEQUENCE OF SEQUENCE {
+	managedObjectClass ObjectClass,
+	managedObjectInstance ObjectInstance }
+SystemIdRange ::= CHOICE {
+	name GraphicString64,
+	number Integer,
+	nothing NULL }
+TroubleTypePspdn ::= CHOICE {
+	integerForm INTEGER {
+		unknown(0),
+		physicalLayerGroup(1),
+		disconnect(2),
+		tooManyBitErrors(3),
+		lossOfSyncFpattern(4),
+		datalinkLayerGroup(30),
+		canNotSetUpDataLink(31),
+		noResponse(32),
+		dataLinkProtocolError(33),
+		frameReject(34),
+		undefinedFrame(35),
+		overSizeIFrame(36),
+		unpermittedFrameWithInformation(37),
+		abnormalNumber(38),
+		n2TimerExpiration(39),
+		packetLayerGroup(60),
+		errorSequence(61),
+		-- Items from 70 to 192 correspond to the X.25 diagnostics.
+		-- Trouble type value = X.25 diagonistic code + 70
+		invalidPS(71),
+		invalidPR(72),
+		packetTypeInvalid(86),
+		pTypeInvalidForStateR1(87),
+		pTypeInvalidForStateR2(88),
+		pTypeInvalidForStateR3(89),
+		pTypeInvalidForStateP1(90),
+		pTypeInvalidForStateP2(91),
+		pTypeInvalidForStateP3(92),
+		pTypeInvalidForStateP4(93),
+		pTypeInvalidForStateP5(94),
+		pTypeInvalidForStateP6(95),
+		pTypeInvalidForStateP7(96),
+		pTypeInvalidForStateD1(97),
+		pTypeInvalidForStateD2(98),
+		pTypeInvalidForStateD3(99),
+		packetNotAllowed(102),
+		unidentifiablePacket(103),
+		callOnOnewayLC(104),
+		invalidPTypeOnPVC(105),
+		packetOnUnassignedLC(106),
+		rejectNotSubscribedTo(107),
+		packetTooShort(108),
+		packetTooLong(109),
+		invalidGFI(110),
+		restartRegistrationPacketWithNonzero(111),
+		pTypeNotCompatibleWithFacility(112),
+		unauthorizedInterruptConf(113),
+		unauthorizedInterrupt(114),
+		unauthorizedReject(115),
+		timeExpired(118),
+		tOForIncomingCall(119),
+		tOForClearIndication(120),
+		tOForResetIndication(121),
+		tOForRestartIndication(122),
+		tOForCallDeflection(123),
+		callSetupClearingRegistrationProblem(134),
+		facilityRegistrationCodeNotAllowed(135),
+		invalidCalledDTEAddress(136),
+		invalidCallingDTEAddress(137),
+		invalidSendAddress(138),
+		invalidFacilityRegistrationLength(139),
+		incomingCallsBarred(140),
+		noLogicalChanelAvailable(141),
+		callCollision(142),
+		duplicateFacilityRequested(143),
+		nonZeroAddressLength(144),
+		nonZeroFacilityLength(145),
+		facilityNotProvidedWhenExpected(146),
+		invalidDTEFacility(147),
+		maxNumberRedirectionDeflectionExceed(148),
+		miscellaneous(150),
+		improperCauseCodeFromDTE(151),
+		notAlignedOctet(152),
+		inconsistentQbitSetting(153),
+		nUIProblem(154),
+		iCRDProblem(155),
+		internationalProblem(182),
+		remoteNetworkProblem(183),
+		internationalProtocolProblem(184),
+		internationalLinkOutOfOrder(185),
+		internationalLinkBusy(186),
+		transitNetworkFacilityProblem(187),
+		remoteNetworkFacilityProblem(188),
+		internationalRoutingProblem(189),
+		temporaryRoutingProblem(190),
+		unknownCalledDNIC(191),
+		maintenanceAction(192),
+		-- unexpected call disconnection during ordinary communication
+		clearIndicationCause(200),
+		remoteProcedureError(201),
+		localProcedureError(202),
+		restartIndicationCause(205) },
+	oidForm OBJECT IDENTIFIER }
+UsageMeasurement ::= SEQUENCE {
+	serviceClass [0] ServiceClass OPTIONAL,
+	usageCounterSent [1] IMPLICIT SET OF UsageCounter,
+	usageCounterReceived [2] IMPLICIT SET OF UsageCounter,
+	usageStartTime [3] IMPLICIT GeneralizedTime,
+	usageStopTime [4] IMPLICIT GeneralizedTime,
+	durationTime [5] IMPLICIT INTEGER-- time in seconds -- }
+UsageCounter ::= INTEGER
+CNM-SERVICE-CLASS ::= DMI-TYPE-IDENTIFIER
+ServiceClass ::= SEQUENCE {
+	serviceClassType CNM-SERVICE-CLASS.&id( {ServiceClassSet }),
+	serviceClassData CNM-SERVICE-CLASS.&Value( { ServiceClassSet } { @serviceClassType }) }
+ServiceClassSet CNM-SERVICE-CLASS ::= {
+	... }
+END
+
+END
+--< GDMO.EndDocument "Recommendation X.162 (1997)"
+--  { itu-t(0) recommendation(0) x(24) x162(162) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi
