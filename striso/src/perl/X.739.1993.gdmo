@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994" >--
+--< GDMO.Namespace itut_x739 >--
 MODULE "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994"
 -- Annex A
 -- Metric objects

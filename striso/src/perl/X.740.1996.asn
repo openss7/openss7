@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 SecurityAuditTrailDefinitions {joint-iso-ccitt ms(9) function(2) part8(8) asn1Module(2) 1} >--
 -- A.1 Allocation of object identifiers
 -- This Recommendation | International Standard allocates the following object identifiers
 SecurityAuditTrailDefinitions {joint-iso-ccitt ms(9) function(2) part8(8) asn1Module(2) 1}
@@ -15,6 +16,7 @@ serviceFailure ServiceReportCause ::= {serviceReportCause 4}
 serviceRecovery ServiceReportCause ::= {serviceReportCause 5}
 otherReason ServiceReportCause ::= {serviceReportCause 6}
 END
+--< ASN1.Version 1994 SecurityAuditTrail-ASN1Module {joint-iso-ccitt ms(9) function(2) part8(8) asn1Module(2) 2} >--
 -- A.5 Abstract syntax definitions
 SecurityAuditTrail-ASN1Module {joint-iso-ccitt ms(9) function(2) part8(8) asn1Module(2) 2}
 DEFINITIONS ::= BEGIN

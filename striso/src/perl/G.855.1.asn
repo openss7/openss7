@@ -1,3 +1,16 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:05:21 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.855.1 (1999)"
+--  { itu-t recommendation g gntm(85501) informationModel(0) } >--
+MODULE "ITU-T Rec. Q.855.1 (1999)" { itu-t recommendation g gntm(85501) informationModel(0) }
+--< ASN1.Version 1994 G85501-ASN1TypeModule
+--  { itu-t recommendation g gntm(85501) informationModel(0) asn1Modules(2) asn1TypeModule(0) } >--
 -- 10 Abstract syntax
 -- 10.1 Rules of extensibility
 -- The following types will be indicated as being extensible:
@@ -18,108 +31,142 @@
 --  unrecognized named bits;
 --  unrecognized tagged elements of sets, sequences, and choices.
 -- 10.2 ASN.1 Module
-G85501-ASN1TypeModule {itu-t recommendation g gntm(85501) informationModel(0) asn1Modules(2)
-asn1TypeModule(0)}
+G85501-ASN1TypeModule { itu-t recommendation g gntm(85501) informationModel(0) asn1Modules(2) asn1TypeModule(0) }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything
 IMPORTS
-AdditionalInformation, AdministrativeState, AvailabilityStatus, OperationalState,
-PerceivedSeverity, ProbableCause
-FROM Attribute-ASN1Module{joint-iso-ccitt ms(9) smi (3) part2 (2) asn1Module(2) 1}
+AdditionalInformation, AdministrativeState, AvailabilityStatus, OperationalState, PerceivedSeverity, ProbableCause
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 Directionality, Failed, ObjectList, ProblemCause, UserLabel
-FROM ASN1DefinedTypesModule
-{ccitt recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2)
-asn1DefinedTypesModule(0)}
-Capacity, Capacities, Count, CTPList, LinkConnectionList, LinkEnd, None, UserIdentifier,
-LinkDirectionality, ConnectivityEndPoint, TPList, SignalId FROM M3100ASN1TypeModule2 {itu-t
-recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1Module2(1)}
+	FROM ASN1DefinedTypesModule { ccitt recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+Capacity, Capacities, Count, CTPList, LinkConnectionList, LinkEnd, None, UserIdentifier, LinkDirectionality, ConnectivityEndPoint, TPList, SignalId
+	FROM M3100ASN1TypeModule2 { itu-t recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1Module2(1) }
 ObjectInstance
-FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
 DistinguishedName
-FROM InformationFramework {joint-iso-ccitt ds(5) modules(1) informationFramework(1)} ;
+	FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) };
 -- NOTE  This Recommendation imports DistinguishedName from CCITT Rec. X.501 (1988). The
 -- specification for this syntax can now be found in an informative annex of
 -- Rec. X.711 (1997) | ISO/IEC 9596-1:1998.
-g85501ClassLibrary OBJECT IDENTIFIER ::= {itu-t recommendation g gntm(85501) informationModel(0)}
-g85501MObjectClass OBJECT IDENTIFIER ::= {g85501ClassLibrary managedObjectClass(3)}
-g85501Attribute OBJECT IDENTIFIER ::= {g85501ClassLibrary attribute(7)}
-g85501NameBinding OBJECT IDENTIFIER ::= {g85501ClassLibrary nameBinding(6)}
-g85501Package OBJECT IDENTIFIER ::= {g85501ClassLibrary package(4)}
-g85501Action OBJECT IDENTIFIER ::= {g85501ClassLibrary action(9)}
-g85501Notification OBJECT IDENTIFIER ::= {g85501ClassLibrary notification(10)}
-g85501SpecificError OBJECT IDENTIFIER ::= {g85501ClassLibrary specificError(12)}
+g85501ClassLibrary OBJECT IDENTIFIER ::= { itu-t recommendation g gntm(85501) informationModel(0) }
+g85501MObjectClass OBJECT IDENTIFIER ::= { g85501ClassLibrary managedObjectClass(3) }
+g85501Attribute OBJECT IDENTIFIER ::= { g85501ClassLibrary attribute(7) }
+g85501NameBinding OBJECT IDENTIFIER ::= { g85501ClassLibrary nameBinding(6) }
+g85501Package OBJECT IDENTIFIER ::= { g85501ClassLibrary package(4) }
+g85501Action OBJECT IDENTIFIER ::= { g85501ClassLibrary action(9) }
+g85501Notification OBJECT IDENTIFIER ::= { g85501ClassLibrary notification(10) }
+g85501SpecificError OBJECT IDENTIFIER ::= { g85501ClassLibrary specificError(12) }
 AssociateNetworkTTPWithTopologicalLinkEndInformation ::= SEQUENCE {
-linkEnd ObjectInstance,
-networkTTP ObjectInstance,
-...
-}
+	linkEnd ObjectInstance,
+	networkTTP ObjectInstance,
+	... }
 AssociateNetworkTTPWithTopologicalLinkEndResult ::= SEQUENCE {
-potentialCapacity Capacity,
-networkCTPs CTPList,
-...
-}
+	potentialCapacity Capacity,
+	networkCTPs CTPList,
+	... }
 AssociateTrailWithTopologicalLinkInformation ::= SEQUENCE {
-link ObjectInstance,
-trail ObjectInstance,
-...
-}
+	link ObjectInstance,
+	trail ObjectInstance,
+	... }
 AssociateTrailWithTopologicalLinkResult ::= SEQUENCE {
-potentialCapacity Capacity,
-resultingLinkConnections LinkConnectionList,
-...
-}
-DisassociateNWTTPFromTopLinkEndInformation::= SEQUENCE {
-linkEnd [1] ObjectInstance,
-networkTTP [2] ObjectInstance OPTIONAL,
-...
-}
+	potentialCapacity Capacity,
+	resultingLinkConnections LinkConnectionList,
+	... }
+DisassociateNWTTPFromTopLinkEndInformation ::= SEQUENCE {
+	linkEnd [1] ObjectInstance,
+	networkTTP [2] ObjectInstance OPTIONAL,
+	... }
 DisassociateTrailFromTopLinkInformation ::= SEQUENCE {
-link [1] ObjectInstance,
-trail [2] ObjectInstance OPTIONAL,
-...
-}
+	link [1] ObjectInstance,
+	trail [2] ObjectInstance OPTIONAL,
+	... }
 EstablishLogicalLinkAndEndsResult ::= SEQUENCE {
-link ObjectInstance,
-aEnd ObjectInstance,
-zEnd ObjectInstance,
-...
-}
+	link ObjectInstance,
+	aEnd ObjectInstance,
+	zEnd ObjectInstance,
+	... }
 EstablishLogicalLinkInformation ::= SEQUENCE {
-layerNetworkDomain ObjectInstance,
-aEnd LinkEnd,
-zEnd LinkEnd,
-suppliedUserIdentifier [1] UserIdentifier OPTIONAL,
+	layerNetworkDomain ObjectInstance,
+	aEnd LinkEnd,
+	zEnd LinkEnd,
+	suppliedUserIdentifier [1] UserIdentifier OPTIONAL,
+	suppliedUserLabel [2] GraphicString OPTIONAL,
+	suppliedDirection [3] LinkDirectionality OPTIONAL,
+	... }
+EstablishLogicalLinkResult ::= SEQUENCE {
+	link ObjectInstance,
+	... }
+EstablishTopologicalLinkAndEndsResult ::= SEQUENCE {
+	link ObjectInstance,
+	aEnd ObjectInstance,
+	zEnd ObjectInstance,
+	... }
+EstablishTopologicalLinkInformation ::= SEQUENCE {
+	layerNetworkDomain ObjectInstance,
+	aEnd LinkEnd,
+	zEnd LinkEnd,
+	suppliedUserIdentifier [1] UserIdentifier OPTIONAL,
+	suppliedUserLabel [2] GraphicString OPTIONAL,
+	suppliedDirection [3] Directionality OPTIONAL,
+	... }
+EstablishTopologicalLinkResult ::= SEQUENCE {
+	link ObjectInstance,
+	... }
+Implicit ::= BOOLEAN(TRUE)
+QofConnectivityService ::= ObjectInstance
+ReleaseSncInformation ::= SEQUENCE {
+	snc ObjectInstance,
+	userId UserIdentifier OPTIONAL,
+	... }
+ReleaseTrailInformation ::= SEQUENCE {
+	trailId ObjectInstance,
+	userId UserIdentifier OPTIONAL,
+	... }
+RemoveLogicalLinkInformation ::= SEQUENCE {
+	link ObjectInstance,
+	... }
+RemoveTopologicalLinkInformation ::= SEQUENCE {
+	link ObjectInstance,
+	... }
+RemoveTopLinkAndEndsInformation ::= SEQUENCE {
+	link ObjectInstance,
+	... }
 SetupSncInformation ::= SEQUENCE {
-aEnd SET OF ConnectivityEndPoint,
-zEnd SET OF ConnectivityEndPoint,
-directionality Directionality,
-signalid [1] SignalId OPTIONAL,
-qofConnectivityService [2] QofConnectivityService OPTIONAL,
-implicitTPCreation [8] Implicit OPTIONAL,
-...
-}
+	aEnd SET OF ConnectivityEndPoint,
+	zEnd SET OF ConnectivityEndPoint,
+	directionality Directionality,
+	signalid [1] SignalId OPTIONAL,
+	qofConnectivityService [2] QofConnectivityService OPTIONAL,
+	implicitTPCreation [8] Implicit OPTIONAL,
+	... }
 SetupSncResult ::= SEQUENCE {
-connection ObjectInstance,
-aEnd ObjectInstance,
-zEnd ObjectInstance,
-userId UserIdentifier OPTIONAL,
-...
-}
+	connection ObjectInstance,
+	aEnd ObjectInstance,
+	zEnd ObjectInstance,
+	userId UserIdentifier OPTIONAL,
+	... }
 SetupTrailInformation ::= SEQUENCE {
-aEnd SET OF ConnectivityEndPoint,
-zEnd SET OF ConnectivityEndPoint,
-directionality Directionality,
-additionalInformation [2] AdditionalInformation OPTIONAL,
-qofConnectivityService [3] QofConnectivityService OPTIONAL,
-userId [0] UserIdentifier OPTIONAL,
-userLabel [1] UserLabel OPTIONAL,
-...
-}
+	aEnd SET OF ConnectivityEndPoint,
+	zEnd SET OF ConnectivityEndPoint,
+	directionality Directionality,
+	additionalInformation [2] AdditionalInformation OPTIONAL,
+	qofConnectivityService [3] QofConnectivityService OPTIONAL,
+	userId [0] UserIdentifier OPTIONAL,
+	userLabel [1] UserLabel OPTIONAL,
+	... }
 SetupTrailResult ::= SEQUENCE {
-trailId ObjectInstance,
-aEnds SET OF ObjectInstance,
-zEnds SET OF ObjectInstance,
-...
-}
+	trailId ObjectInstance,
+	aEnds SET OF ObjectInstance,
+	zEnds SET OF ObjectInstance,
+	... }
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.855.1 (1999)"
+--  { itu-t recommendation g gntm(85501) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

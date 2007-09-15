@@ -1,4 +1,4 @@
-
+--< ASN1.Version 1994 TestCategories-ASN1Module { joint-iso-ccitt ms(9) function(2) part14(14) asn1Module(2) 1} >--
 -- A.7 Supporting productions
 -- This subclause specifies the required ASN.1 value notation for the value reference used in the MANAGED OBJECT
 -- CLASS template.

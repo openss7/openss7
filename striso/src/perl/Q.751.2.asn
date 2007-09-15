@@ -1,125 +1,130 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:53 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.751.2 (1992)"
+--  { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) } >--
+MODULE "ITU-T Rec. Q.751.2 (1992)" { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) }
+--< ASN1.Version 1994 SCCPDefinedTypesModule
+--  { itu-t(0) recommendation q(17) omap(751) sccp(2) informationModel(0) asn1Modules(2) sccpDefinedTypesModule(0) } >--
 -- 7.8 Abstract syntax productions
-SCCPDefinedTypesModule
-{itu-t(0) recommendation q(17) omap(751) sccp(2) informationModel(0) asn1Modules(2)
-sccpDefinedTypesModule(0)}
-DEFINITIONS IMPLICIT TAGS ::= BEGIN
+SCCPDefinedTypesModule { itu-t(0) recommendation q(17) omap(751) sccp(2) informationModel(0) asn1Modules(2) sccpDefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
 IMPORTS
-ProbableCause,SimpleNameType FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2)
-asn1Module(2) 1}
-Pointer, PointerOrNull FROM ASN1DefinedTypesModule { itu-t recommendation m gnm(3100)
-informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0)}
-AdditionalName FROM MTPDefinedTypesModule {itu-t (0) recommendation q(17) omap(751) mtp(1)
-informationModel(0) asn1Modules(2) mtpDefinedTypesModule(0)}
-ConfirmedAction, EventReport FROM MP {itu-t (0) recommendation q(17) (753) mp (0) version1 (1) };
+ProbableCause, SimpleNameType
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 }
+Pointer, PointerOrNull
+	FROM ASN1DefinedTypesModule { itu-t recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+AdditionalName
+	FROM MTPDefinedTypesModule { itu-t(0) recommendation q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule(0) }
+ConfirmedAction, EventReport
+	FROM MP { itu-t(0) recommendation q(17) 753 mp(0) version1(1) };
 --EXPORTS EVERYTHING
-sccpInformationModel OBJECT IDENTIFIER ::= {itu-t recommendation q(17) omap(751) sccp(2)
-informationModel(0)}
-sccpObjectClass OBJECT IDENTIFIER ::= {sccpInformationModel managedObjectClass(3)}
-sccpPackage OBJECT IDENTIFIER ::= {sccpInformationModel package(4)}
-sccpParameter OBJECT IDENTIFIER ::= {sccpInformationModel parameter(5)}
-sccpAttribute OBJECT IDENTIFIER ::= {sccpInformationModel attribute(7)}
-sccpNameBinding OBJECT IDENTIFIER ::= {sccpInformationModel nameBinding(6)}
-sccpAction OBJECT IDENTIFIER ::= {sccpInformationModel action(9)}
-sccpNotification OBJECT IDENTIFIER ::= {sccpInformationModel notification(10)}
+sccpInformationModel OBJECT IDENTIFIER ::= { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) }
+sccpObjectClass OBJECT IDENTIFIER ::= { sccpInformationModel managedObjectClass(3) }
+sccpPackage OBJECT IDENTIFIER ::= { sccpInformationModel package(4) }
+sccpParameter OBJECT IDENTIFIER ::= { sccpInformationModel parameter(5) }
+sccpAttribute OBJECT IDENTIFIER ::= { sccpInformationModel attribute(7) }
+sccpNameBinding OBJECT IDENTIFIER ::= { sccpInformationModel nameBinding(6) }
+sccpAction OBJECT IDENTIFIER ::= { sccpInformationModel action(9) }
+sccpNotification OBJECT IDENTIFIER ::= { sccpInformationModel notification(10) }
 sccpSpecificExtensions OBJECT IDENTIFIER ::= { sccpInformationModel specificExtensions(0) }
-AttackTimerValue ::= INTEGER --milliseconds
+AttackTimerValue ::= INTEGER--milliseconds
 CLS ::= INTEGER
 cLSDefault CLS ::= 8
-CongestionTimerValue ::= INTEGER --milliseconds
+CongestionTimerValue ::= INTEGER--milliseconds
 --
 -- Probable Causes used in combination with communicationsAlarm
 -- for on occurrence measurements.
-	
-hopCounterViolation ProbableCause::= globalValue: { sccpSpecificExtensions 1 }
-localSubsystemProhibited ProbableCause::= globalValue: { sccpSpecificExtensions 2 }
-localSccpUnAvailable ProbableCause::= globalValue: { sccpSpecificExtensions 3 }
-noReassemblySpace ProbableCause::= globalValue: { sccpSpecificExtensions 4 }
-noRuleForAddress ProbableCause::= globalValue: { sccpSpecificExtensions 5 }
-noSegmentationSupport ProbableCause::= globalValue: { sccpSpecificExtensions 6 }
-noTranslatorForAddress ProbableCause::= globalValue: { sccpSpecificExtensions 7 }
-pointCodeCongested ProbableCause::= globalValue: { sccpSpecificExtensions 8 }
-pointCodeNotAvailable ProbableCause::= globalValue: { sccpSpecificExtensions 9 }
-reassemblyFailure ProbableCause::= globalValue: { sccpSpecificExtensions 10 }
-reassemblyTimeOut ProbableCause::= globalValue: { sccpSpecificExtensions 11 }
-routingFailureNoReasonOrUnqualified ProbableCause::= globalValue: { sccpSpecificExtensions 12 }
-sccpCongested ProbableCause::= globalValue: { sccpSpecificExtensions 13 }
-segmentationFailure ProbableCause::= globalValue: { sccpSpecificExtensions 14 }
-segmentOutOfOrder ProbableCause::= globalValue: { sccpSpecificExtensions 15 }
-subsystemCongested ProbableCause::= globalValue: { sccpSpecificExtensions 16 }
-subsystemOoSdenied ProbableCause::= globalValue: { sccpSpecificExtensions 17 }
-subsystemOoSgranted ProbableCause::= globalValue: { sccpSpecificExtensions 18 }
-subsystemProhibited ProbableCause::= globalValue: { sccpSpecificExtensions 19 }
-subsystemUnavailable ProbableCause::= globalValue: { sccpSpecificExtensions 20 }
-syntaxErrorDetected ProbableCause::= globalValue: { sccpSpecificExtensions 21 }
-tooLargeForSegmentation ProbableCause::= globalValue: { sccpSpecificExtensions 22 }
-unequippedSubsystem ProbableCause::= globalValue: { sccpSpecificExtensions 23 }
-sccpProtocolClass0 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 24} -- basic connectionless
-sccpProtocolClass1 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 25} -- sequenced connectionless
-sccpProtocolClass2 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 26} -- basic connection-oriented
-sccpProtocolClass3 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 27} -- flow control connection oriented
+hopCounterViolation ProbableCause ::= globalValue : { sccpSpecificExtensions 1 }
+localSubsystemProhibited ProbableCause ::= globalValue : { sccpSpecificExtensions 2 }
+localSccpUnAvailable ProbableCause ::= globalValue : { sccpSpecificExtensions 3 }
+noReassemblySpace ProbableCause ::= globalValue : { sccpSpecificExtensions 4 }
+noRuleForAddress ProbableCause ::= globalValue : { sccpSpecificExtensions 5 }
+noSegmentationSupport ProbableCause ::= globalValue : { sccpSpecificExtensions 6 }
+noTranslatorForAddress ProbableCause ::= globalValue : { sccpSpecificExtensions 7 }
+pointCodeCongested ProbableCause ::= globalValue : { sccpSpecificExtensions 8 }
+pointCodeNotAvailable ProbableCause ::= globalValue : { sccpSpecificExtensions 9 }
+reassemblyFailure ProbableCause ::= globalValue : { sccpSpecificExtensions 10 }
+reassemblyTimeOut ProbableCause ::= globalValue : { sccpSpecificExtensions 11 }
+routingFailureNoReasonOrUnqualified ProbableCause ::= globalValue : { sccpSpecificExtensions 12 }
+sccpCongested ProbableCause ::= globalValue : { sccpSpecificExtensions 13 }
+segmentationFailure ProbableCause ::= globalValue : { sccpSpecificExtensions 14 }
+segmentOutOfOrder ProbableCause ::= globalValue : { sccpSpecificExtensions 15 }
+subsystemCongested ProbableCause ::= globalValue : { sccpSpecificExtensions 16 }
+subsystemOoSdenied ProbableCause ::= globalValue : { sccpSpecificExtensions 17 }
+subsystemOoSgranted ProbableCause ::= globalValue : { sccpSpecificExtensions 18 }
+subsystemProhibited ProbableCause ::= globalValue : { sccpSpecificExtensions 19 }
+subsystemUnavailable ProbableCause ::= globalValue : { sccpSpecificExtensions 20 }
+syntaxErrorDetected ProbableCause ::= globalValue : { sccpSpecificExtensions 21 }
+tooLargeForSegmentation ProbableCause ::= globalValue : { sccpSpecificExtensions 22 }
+unequippedSubsystem ProbableCause ::= globalValue : { sccpSpecificExtensions 23 }
+sccpProtocolClass0 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 24 }-- basic connectionless
+sccpProtocolClass1 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 25 }-- sequenced connectionless
+sccpProtocolClass2 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 26 }-- basic connection-oriented
+sccpProtocolClass3 OBJECT IDENTIFIER ::= { sccpSpecificExtensions 27 }-- flow control connection oriented
 CongestionLevel ::= INTEGER
-DecayTimerValue ::= INTEGER --milliseconds
+DecayTimerValue ::= INTEGER--milliseconds
 AddressInfoConversionRule ::= SEQUENCE OF Operation
-AddressElement ::= INTEGER (0 ..15)
+AddressElement ::= INTEGER(0..15)
 -- The choice for INTEGER type arbitrary. Recommendation Q.715 does not restrict the type,
 -- all types are allowed in network implementations.
-DSRVT ::= INTEGER -- milliseconds
-EntitySetSapPointer ::= SET SIZE (2) OF SAPPointer
+DSRVT ::= INTEGER-- milliseconds
+EntitySetSapPointer ::= SET SIZE(2) OF SAPPointer
 -- see behaviour description for sccpEntitySet managed object class.
 GtAddressInformation ::= SEQUENCE OF BIT STRING
-GtEncodingScheme ::= CHOICE{
-notUsedOrNoOverwrite NULL,
-gtES ENUMERATED
-{ unknown (0),
-bCDODD (1),
-bCDEVEN (2),
-nationalSpecific (3)
-}}
-GtIndicator ::= ENUMERATED
-{ noGlobalTitle (0),
-nOAonly (1),
-tTonly (2),
-tT-NP-ES (3),
-tT-NP-ES-NOA (4)
-}
-GtNatureOfAddress ::= CHOICE{
-notUsedOrNoOverwrite NULL,
-gtNoA ENUMERATED
-{ unknown (0),
-subscriber (1),
-national (3),
-international (4)
-}}
-GtNumberingPlan ::= CHOICE{
-notUsedOrNoOverwrite NULL,
-gtNP ENUMERATED
-{ unknown (0),
-iSDNTNP (1),
-genericNumberingPlan (2),
-dNP (3),
-tNP (4),
-mMNP (5),
-lMNP (6),
-iSDNMNP (7),
-privateNumberingPlan (14)
-}}
-GtTranslationType ::= CHOICE{
-notUsedOrNoOverwrite NULL,
-gtTT ENUMERATED
-{ unknown (0),
-iTCC (1),
-genericNumberingPlan (14),
-iEESS (17)
-}}
+GtEncodingScheme ::= CHOICE {
+	notUsedOrNoOverwrite NULL,
+	gtES ENUMERATED {
+		unknown(0),
+		bCDODD(1),
+		bCDEVEN(2),
+		nationalSpecific(3) } }
+GtIndicator ::= ENUMERATED {
+	noGlobalTitle(0),
+	nOAonly(1),
+	tTonly(2),
+	tT-NP-ES(3),
+	tT-NP-ES-NOA(4) }
+GtNatureOfAddress ::= CHOICE {
+	notUsedOrNoOverwrite NULL,
+	gtNoA ENUMERATED {
+		unknown(0),
+		subscriber(1),
+		national(3),
+		international(4) } }
+GtNumberingPlan ::= CHOICE {
+	notUsedOrNoOverwrite NULL,
+	gtNP ENUMERATED {
+		unknown(0),
+		iSDNTNP(1),
+		genericNumberingPlan(2),
+		dNP(3),
+		tNP(4),
+		mMNP(5),
+		lMNP(6),
+		iSDNMNP(7),
+		privateNumberingPlan(14) } }
+GtTranslationType ::= CHOICE {
+	notUsedOrNoOverwrite NULL,
+	gtTT ENUMERATED {
+		unknown(0),
+		iTCC(1),
+		genericNumberingPlan(14),
+		iEESS(17) } }
 ImportanceLevel ::= SEQUENCE {
-defaultImportance INTEGER,
-maxImportance INTEGER }
+	defaultImportance INTEGER,
+	maxImportance INTEGER }
 -- For recommended values, see 2.6.2/Q.714.
-InitialValueReassTimer ::= INTEGER -- milliseconds
+InitialValueReassTimer ::= INTEGER-- milliseconds
 LowerLimitForSegmentation ::= INTEGER
 LUDTandLUDTSSupported ::= BOOLEAN
-MaxStatInfoTimer::= INTEGER -- seconds, recommended value 600 .. 1200, see 5.3.4.2/Q.714.
+MaxStatInfoTimer ::= INTEGER-- seconds, recommended value 600 .. 1200, see 5.3.4.2/Q.714.
 NrOfAddressElements ::= INTEGER
 NrOfRestrictionLevels ::= INTEGER
 nrOfRestrictionLevelsDefault NrOfRestrictionLevels ::= 8
@@ -127,50 +132,58 @@ NrOfSubLevels ::= INTEGER
 nrOfSubLevelsDefault NrOfSubLevels ::= 4
 NSRVT ::= INTEGER
 Operation ::= CHOICE {
-insert [0] AddressElement,
-replace [1] AddressElement,
-passTransparently [2] NrOfAddressElements,
-delete [3] NrOfAddressElements,
-stop [4] NULL,
-copyRemain [5] NULL }
-P ::= INTEGER -- See congestion handling 5.2.7/Q.714.
+	insert [0] AddressElement,
+	replace [1] AddressElement,
+	passTransparently [2] NrOfAddressElements,
+	delete [3] NrOfAddressElements,
+	stop [4] NULL,
+	copyRemain [5] NULL }
+P ::= INTEGER-- See congestion handling 5.2.7/Q.714.
 pDefault P ::= 8
 PrimaryOrBackup ::= ENUMERATED {
-equal (0),
-primary (1),
-backup (2) }
+	equal(0),
+	primary(1),
+	backup(2) }
 -- see behaviour description for sccpEntitySet managed object class.
-RemoteSCCPList ::= SET OF Pointer -- The maximum size is implementation-dependent.
+RemoteSCCPList ::= SET OF Pointer-- The maximum size is implementation-dependent.
 RLM ::= INTEGER
 RSLM ::= INTEGER
 SAPPointer ::= SEQUENCE {
-primaryOrBackup PrimaryOrBackup,
-sap Pointer }
+	primaryOrBackup PrimaryOrBackup,
+	sap Pointer }
 -- see behaviour description for sccpEntitySet managed object class.
 SccpSyntaxErrorList ::= INTEGER {
-unknownMessageType (0),
-invalidValueOfProtocolClass (1),
-invalidValueOfGTI (2),
-invalidValueForEncodingScheme (3),
-invalidParameterLength (4),
-invalidPointerToOptionalParameter (5),
-optionalParameterToLong (6),
-pointerInconsistentWithLengths (7),
-incompatibleAddressLength (8),
-expectedSSNnotFound (9) }
+	unknownMessageType(0),
+	invalidValueOfProtocolClass(1),
+	invalidValueOfGTI(2),
+	invalidValueForEncodingScheme(3),
+	invalidParameterLength(4),
+	invalidPointerToOptionalParameter(5),
+	optionalParameterToLong(6),
+	pointerInconsistentWithLengths(7),
+	incompatibleAddressLength(8),
+	expectedSSNnotFound(9) }
 SccpVersion ::= PrintableString
 -- localSCCPUnavailabilityDuration ATTRIBUTE.
 Seconds ::= INTEGER
-SharingMode ::= ENUMERATED
-{ solitary (0),
-dupliDominant (1),
-dupliReplacement (2),
-dupliLoadShared (3)
-}
+SharingMode ::= ENUMERATED {
+	solitary(0),
+	dupliDominant(1),
+	dupliReplacement(2),
+	dupliLoadShared(3) }
 SsAvailableAfterSpRestart ::= BOOLEAN
 ssAvailableAfterSpRestartDefault SsAvailableAfterSpRestart ::= TRUE
 SSN ::= INTEGER(0..255)
-TcoordChg::= INTEGER -- seconds, recommended value 60 .. 120, see 5.3.5.2/Q.714.
-TignoreSST::= INTEGER -- seconds, see 5.3.5.2/Q.714.
+TcoordChg ::= INTEGER-- seconds, recommended value 60 .. 120, see 5.3.5.2/Q.714.
+TignoreSST ::= INTEGER-- seconds, see 5.3.5.2/Q.714.
 UpperLimitForSegmentation ::= INTEGER
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.751.2 (1992)"
+--  { itu-t recommendation q(17) omap(751) sccp(2) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

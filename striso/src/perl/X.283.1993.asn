@@ -1,3 +1,5 @@
+--< ASN1.Version 1990 NLM
+--  { joint-iso-ccitt network-layer(13) management(0) nLM(2) asn1Module(2) 0 } >--
 NLM { joint-iso-ccitt network-layer(13) management(0) nLM(2) asn1Module(2) 0 } DEFINITIONS IMPLICIT TAGS ::= BEGIN
 -- EXPORTS everything --
 IMPORTS communicationsProtocolError

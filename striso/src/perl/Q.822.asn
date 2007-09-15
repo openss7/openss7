@@ -1,53 +1,49 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:54 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.822 (1994)"
+--  { ccitt(0) recommendation(0) q(17) q822(822) informationModel(0) } >--
+MODULE "ITU-T Rec. Q.822 (1994)" { ccitt(0) recommendation(0) q(17) q822(822) informationModel(0) }
+--< ASN1.Version 1994 Q822-PM-ASN1Module
+--  { ccitt(0) recommendation(0) q(17) q822(822) asn1Module(2) q822ASN1Module(0) } >--
 --4.3.5 Abstract syntax productions
-Q822-PM-ASN1Module {ccitt(0) recommendation(0) q(17) q822(822) asn1Module(2)
-q822ASN1Module(0)}
+Q822-PM-ASN1Module { ccitt(0) recommendation(0) q(17) q822(822) asn1Module(2) q822ASN1Module(0) }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything
 IMPORTS
-AttributeId, ObjectInstance, ObjectClass,
-FROM
-CMIP-1 {joint-iso-ccitt ms(9) cmip(1) version1(1) protocol(3)}
+AttributeId, ObjectInstance, ObjectClass
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) version1(1) protocol(3) }
 AttributeList
-FROM Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1}
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 SeverityIndicatingThreshold, SeverityIndicatingGaugeThreshold
-FROM
-MetricModule {joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0}
+	FROM MetricModule { joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0 }
 TimeInterval
-FROM
-Q821-ASN1Module {ccitt(0) recommendation(0) q(17) q821(821) ans1Module(2)
-q821ASN1Module(0)};
-q822InformationModel OBJECT IDENTIFIER ::=
-{ccitt(0) recommendation(0) q(17) q822(822) informationModel(0)}
-q822ObjectClass OBJECT IDENTIFIER ::=
-{q822InformationModel managedObjectClass(3)}
-q822Package OBJECT IDENTIFIER ::=
-{q822InformationModel package(4)}
-q822Attribute OBJECT IDENTIFIER ::=
-{q822InformationModel managedObjectClass(7)}
-q822NameBinding OBJECT IDENTIFIER ::=
-{q822InformationModel nameBinding(6)}
-defaultCurrentDataSuspectIntervalFlag
-SuspectIntervalFlag ::= FALSE
-defaultReportAllAttributes
-ReportAllAttributes ::= FALSE
-defaultSuppressAdditionalThresholds
-SuppressAdditionalThresholds ::= FALSE
+	FROM Q821-ASN1Module { ccitt(0) recommendation(0) q(17) q821(821) ans1Module(2) q821ASN1Module(0) };
+q822InformationModel OBJECT IDENTIFIER ::= { ccitt(0) recommendation(0) q(17) q822(822) informationModel(0) }
+q822ObjectClass OBJECT IDENTIFIER ::= { q822InformationModel managedObjectClass(3) }
+q822Package OBJECT IDENTIFIER ::= { q822InformationModel package(4) }
+q822Attribute OBJECT IDENTIFIER ::= { q822InformationModel managedObjectClass(7) }
+q822NameBinding OBJECT IDENTIFIER ::= { q822InformationModel nameBinding(6) }
+defaultCurrentDataSuspectIntervalFlag SuspectIntervalFlag ::= FALSE
+defaultReportAllAttributes ReportAllAttributes ::= FALSE
+defaultSuppressAdditionalThresholds SuppressAdditionalThresholds ::= FALSE
 CounterThresholdAttributeList ::= SET OF CounterThresholdSetting
 CounterThresholdSetting ::= SEQUENCE {
-attributeId AttributeId,
-severityIndicatingThreshold SeverityIndicatingThreshold
-}
+	attributeId AttributeId,
+	severityIndicatingThreshold SeverityIndicatingThreshold }
 ElapsedTime ::= CHOICE {
-elapsedTime TimeInterval,
-notAvailable NULL
-}
+	elapsedTime TimeInterval,
+	notAvailable NULL }
 GaugeThresholdAttributeList ::= SET OF GaugeThresholdSetting
 GaugeThresholdSetting ::= SEQUENCE {
-attributeId AttributeId,
-severityIndicatingGaugeThreshold SeverityIndicatingGaugeThreshold
-}
+	attributeId AttributeId,
+	severityIndicatingGaugeThreshold SeverityIndicatingGaugeThreshold }
 HistoryRetention ::= INTEGER
 MaxSuppressedIntervals ::= INTEGER
 MonitoredEntityTypes ::= SET OF ObjectClass
@@ -58,3 +54,12 @@ SuppressAdditionalThresholds ::= BOOLEAN
 SuspectIntervalFlag ::= BOOLEAN
 ThresholdDataInstance ::= SET OF ObjectInstance
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.822 (1994)"
+--  { ccitt(0) recommendation(0) q(17) q822(822) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

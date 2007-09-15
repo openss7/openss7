@@ -1,8 +1,17 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 13:23:56 MDT 2007
+--@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.723.gdmo" >--
 --< GDMO.Include "ISO10589.2.gdmo" >--
---< GDMO.Document "ISO/IEC 10733" >--
---< GDMO.Namespace "iso10733" >--
+--< GDMO.Document "ISO/IEC 10733"
+--  { joint-iso-ccitt network-layer(13) } >--
+--< GDMO.Namespace iso_10733 >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
 --  =============================================================================
@@ -56,57 +65,64 @@
 --  
 --  =============================================================================
 --  >--
-MODULE "ISO/IEC 10733"
+MODULE "ISO/IEC 10733" { joint-iso-ccitt network-layer(13) }
 -- 6.2 Common Network Layer GDMO Definitions
 -- The following templates are referred to from multiple objects.
 -- Behaviours
 
 commonCreationDeletion-B BEHAVIOUR
 	DEFINED AS
-		!Managed object class imports the 10165-2 objectCreation and objectDeletion notifications. Used as
-		follows:
+		!Managed object class imports the 10165-2 objectCreation and objectDeletion 
+		notifications. Used as follows:
 
-		objectCreation - Generated whenever an instance of the managed object class is created.
-		Implementations may optionally include the sourceIndicator parameter in the notification.
+		objectCreation - Generated whenever an instance of the managed object class is 
+		created. Implementations may optionally include the sourceIndicator parameter in 
+		the notification.
 
-		If creation occured as a result of internal operation of the resource, the value
-		'resourceOperation' is used. If creation occured in response to a management operation, the value
-		'managementOperation' is used. A value of 'unknown' may be returned if it is not possible to
-		determine the source of the operation. None of the other optional parameters are used.
+		If creation occured as a result of internal operation of the resource, the value 
+		'resourceOperation' is used. If creation occured in response to a management 
+		operation, the value 'managementOperation' is used. A value of 'unknown' may be 
+		returned if it is not possible to determine the source of the operation. None of 
+		the other optional parameters are used.
 
-		objectDeletion - Generated whenever an instance of the managed object class is deleted.
-		Implementations may optionally include the sourceIndicator parameter in the notification.
+		objectDeletion - Generated whenever an instance of the managed object class is 
+		deleted. Implementations may optionally include the sourceIndicator parameter in 
+		the notification.
 
-		If deletion occured as a result of internal operation of the resource, the value
-		'resourceOperation' is used. If deletion occured in response to a management operation, the value
-		'managementOperation' is used. A value of 'unknown' may be returned if it is not possible to
-		determine the source of the operation. None of the other optional parameters are used.!;
+		If deletion occured as a result of internal operation of the resource, the value 
+		'resourceOperation' is used. If deletion occured in response to a management 
+		operation, the value 'managementOperation' is used. A value of 'unknown' may be 
+		returned if it is not possible to determine the source of the operation. None of 
+		the other optional parameters are used.!;
 
 
 commonStateChange-B BEHAVIOUR
 	DEFINED AS
-		!Managed object class imports the 10165-2 stateChange notification. Used to report the changes to
-		the operationalState attribute, and where present, the administrativeState attribute. A single
-		parameter set is included in the State change definition field. Only the (mandatory) attributeId
-		and (optional) newAttributeValue parameters are used.!;
+		!Managed object class imports the 10165-2 stateChange notification. Used to 
+		report the changes to the operationalState attribute, and where present, the 
+		administrativeState attribute. A single parameter set is included in the State 
+		change definition field. Only the (mandatory) attributeId and (optional) 
+		newAttributeValue parameters are used.!;
 
 
 octetsSentReceivedCounter-B BEHAVIOUR
 	DEFINED AS
-		The octetsSentCounter and octetsReceivedCounter shall count only user data octets in valid data
-		packets. They shall not count user data octets in data packets which are rejected for any reason,
-		nor user data octets in non data packets;
+		The octetsSentCounter and octetsReceivedCounter shall count only user data 
+		octets in valid data packets. They shall not count user data octets in data 
+		packets which are rejected for any reason, nor user data octets in non data 
+		packets;
 
 
 successfulConnectionEstablishment-B BEHAVIOUR
 	DEFINED AS
-		This Package imports the communicationsInformation notification from "Rec. X.723 | ISO/IEC
-		10165-5". It is used to report the following events.
+		This Package imports the communicationsInformation notification from "Rec. X.723 
+		| ISO/IEC 10165-5". It is used to report the following events.
 
-		successfulConnectionEstablishment: Generated when a connection is successfully established.
-		However, the precise synchronization between the notification and the corresponding protocol and
-		service interface interactions is not defined by this standard. The value
-		NLM.successfulConnectionEstablishment shall be reported in the informationType field.;
+		successfulConnectionEstablishment: Generated when a connection is successfully 
+		established. However, the precise synchronization between the notification and 
+		the corresponding protocol and service interface interactions is not defined by 
+		this standard. The value NLM.successfulConnectionEstablishment shall be reported 
+		in the informationType field.;
 -- 6.3 The Network Subsystem Managed Object
 --	Managed Object for Network Layer Subsystem
 --	There is exactly one of these MOs within a system.  It exists to provide a container for the
@@ -132,12 +148,9 @@ REGISTERED AS { NLM.moi networkSubsystem(1) };
 
 
 networkSubsystem-system NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		"Rec. X.721 | ISO/IEC 10165-2 : 1992":system
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS networkSubsystem AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "Rec. X.721 | ISO/IEC 10165-2 : 1992":system AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":subsystemId;
 REGISTERED AS { NLM.nboi networkSubsystem-system(1) };
@@ -154,22 +167,16 @@ networkEntity MANAGED OBJECT CLASS
 	CHARACTERIZED BY
 		networkEntity-P PACKAGE
 			ATTRIBUTES
-				networkEntityTitles
-					GET-REPLACE
-					ADD-REMOVE,
-				cLNSSystemTypes
-					GET;;;
+				networkEntityTitles GET-REPLACE ADD-REMOVE,
+				cLNSSystemTypes GET;;;
 REGISTERED AS { NLM.moi networkEntity(2) };
 ---Name Bindings
 
 
 networkEntity-networkSubsystem NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		networkEntity
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS networkEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":communicationsEntityId;
 REGISTERED AS { NLM.nboi networkEntity-networkSubsystem(2) };
@@ -182,9 +189,10 @@ cLNSSystemTypes ATTRIBUTE
 	BEHAVIOUR
 		cLNSSystemTypes-B BEHAVIOUR
 			DEFINED AS
-				The set of CLNS system roles supported by this Network Entity. This may be End System, Intermediate
-				System or both. The actual role in which a particular instance of the cLNS protocol machine is
-				operating is determined by the operationalSystemType attribute of the cLNS MO.;;
+				The set of CLNS system roles supported by this Network Entity. This may be End 
+				System, Intermediate System or both. The actual role in which a particular 
+				instance of the cLNS protocol machine is operating is determined by the 
+				operationalSystemType attribute of the cLNS MO.;;
 REGISTERED AS { NLM.aoi cLNSSystemTypes(108) };
 
 
@@ -194,17 +202,20 @@ networkEntityTitles ATTRIBUTE
 	BEHAVIOUR
 		networkEntityTitles-B BEHAVIOUR
 			DEFINED AS
-				The set of Network Entity Titles (having the same abstract syntax as an NSAP address), which
-				unambiguously identify the Network Entity in an End or Intermediate System. The value may be
-				entered by a system management operation or it may be derived by some local means, for example by
-				autoconfiguration.;;
+				The set of Network Entity Titles (having the same abstract syntax as an NSAP 
+				address), which unambiguously identify the Network Entity in an End or 
+				Intermediate System. The value may be entered by a system management operation 
+				or it may be derived by some local means, for example by autoconfiguration.;;
 REGISTERED AS { NLM.aoi networkEntityTitles(3) };
+--
 -- 6.5 The nSAP Managed Object
---	There is one nSAP MO for each set of NSAPs supported by the Network Subsystem
---	associated with a single Transport layer client.
---	Its definition permits it to be created and deleted explicitly by
---	management operation or to be created and deleted automatically as
---	part of system operation.
+--
+-- There is one nSAP MO for each set of NSAPs supported by the Network Subsystem associated with a 
+-- single Transport layer client.
+--
+-- Its definition permits it to be created and deleted explicitly by management operation or to be 
+-- created and deleted automatically as part of system operation.
+--
 
 
 nSAP MANAGED OBJECT CLASS
@@ -228,60 +239,58 @@ REGISTERED AS { NLM.moi nSAP(4) };
 
 nAddressesIV-B BEHAVIOUR
 	DEFINED AS
-		If the package is created using the nSAP-networkSubsystem-Automatic name binding the initial value
-		of this attribute is not constrained by this International Standard. However, if the package is
-		created using the nSAP-networkSubsystem-Management name binding the initial value shall be
+		If the package is created using the nSAP-networkSubsystem-Automatic name binding 
+		the initial value of this attribute is not constrained by this International 
+		Standard. However, if the package is created using the 
+		nSAP-networkSubsystem-Management name binding the initial value shall be 
 		specified in the CMIP create;
 ---Name Bindings
 
 
 nSAP-networkSubsystem-Automatic NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		nSAP
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS nSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":sapId;
 	BEHAVIOUR
 		nSAP-networkSubsystem-Automatic-B BEHAVIOUR
 			DEFINED AS
-				This name binding shall be used when the nSAP MO is created automatically by the operation of the
-				network entity. For example, by the use of autoconfiguration or dynamic NSAP Address assignment
-				techniques. The details of the operation of these techniques are outside the scope of this
-				international standard.;;
+				This name binding shall be used when the nSAP MO is created automatically by the 
+				operation of the network entity. For example, by the use of autoconfiguration or 
+				dynamic NSAP Address assignment techniques. The details of the operation of 
+				these techniques are outside the scope of this international standard.;;
 REGISTERED AS { NLM.nboi nSAP-networkSubsystem-Automatic(4) };
 
 
 nSAP-networkSubsystem-Management NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		nSAP
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS nSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":sapId;
 	BEHAVIOUR
 		nSAP-networkSubsystem-Management-B BEHAVIOUR
 			DEFINED AS
-				This name binding shall be used when the nSAP MO is created by system management. The value of the
-				sap2Addresses attribute shall be specified in the CMIP create;;
+				This name binding shall be used when the nSAP MO is created by system 
+				management. The value of the sap2Addresses attribute shall be specified in the 
+				CMIP create;;
 	CREATE;
 	DELETE;
 REGISTERED AS { NLM.nboi nSAP-networkSubsystem-Management(5) };
+--
 -- 6.6 The Connectionless-mode Network Service Managed Object
---	There is no more than one of these MOs per network entity.
---	Its definition permits it to be created and deleted explicitly by
---	management operation, but in some systems it will exist inherently
---	and neither creation nor deletion by management operation will be
---	possible. Name bindings are defined for both cases.
---	When the protocol machine is operable, the operationalState shall
---	have the value 'enabled'; otherwise it shall have the value 'disabled'.
---	Transitions of operationalState shall be reported using the
---	stateChange notification. An cLNS MO may be created in the
---	'enabled' operational state.
+--
+-- There is no more than one of these MOs per network entity.
+--
+-- Its definition permits it to be created and deleted explicitly by management operation, but in 
+-- some systems it will exist inherently and neither creation nor deletion by management operation 
+-- will be possible. Name bindings are defined for both cases.
+--
+-- When the protocol machine is operable, the operationalState shall have the value 'enabled'; 
+-- otherwise it shall have the value 'disabled'.  Transitions of operationalState shall be reported 
+-- using the stateChange notification. An cLNS MO may be created in the 'enabled' operational state.
+--
 
 
 cLNS MANAGED OBJECT CLASS
@@ -293,8 +302,7 @@ cLNS MANAGED OBJECT CLASS
 				commonStateChange-B,
 				commonCreationDeletion-B;
 			ATTRIBUTES
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState
-					GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState GET,
 				"Rec. X.723 | ISO/IEC 10165-5":clProtocolMachineId
 					INITIAL VALUE NLM.cLNSId-Value
 					GET;
@@ -325,13 +333,15 @@ cLNS MANAGED OBJECT CLASS
 				The system is an ISO 10589 IS and the authentication procedures are implemented,
 		"ISO/IEC 10589":cLNSISISPartitionRepair-P
 			PRESENT IF
-				The system is an ISO 10589 Level 2 IS and the partition repair procedures are implemented,
+				The system is an ISO 10589 Level 2 IS and the partition repair procedures are 
+				implemented,
 		"ISO/IEC 10589":cLNSISISLevel2-P
 			PRESENT IF
 				The system is an ISO 10589 Level 2 IS,
 		"ISO/IEC 10589":cLNSISISLevel2Authentication-P
 			PRESENT IF
-				The system is an ISO 10589 Level 2 IS and the authentication procedures are implemented;
+				The system is an ISO 10589 Level 2 IS and the authentication procedures are 
+				implemented;
 REGISTERED AS { NLM.moi cLNS(3) };
 ---Packages
 
@@ -344,30 +354,20 @@ cLNS8473-P PACKAGE
 		cLNS8473PImportedNotifications-B,
 		cLNS8473PImportedCounters-B;
 	ATTRIBUTES
-		"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter
-			GET,
-		"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsReceivedCounter
-			GET,
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter GET,
+		"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsReceivedCounter GET,
 		operationalSystemType
 			INITIAL VALUE DERIVATION RULE
 				operationalSystemTypeIV-B
 			GET,
-		supportedProtocols
-			GET,
-		segmentsReceived
-			GET,
-		segmentsDiscarded
-			GET,
-		assemblingSegmentsDiscarded
-			GET,
-		errorReportsReceived
-			GET,
-		pDUDiscards
-			GET,
-		congestionDiscards
-			GET,
-		maximumLifetime
-			GET-REPLACE;
+		supportedProtocols GET,
+		segmentsReceived GET,
+		segmentsDiscarded GET,
+		assemblingSegmentsDiscarded GET,
+		errorReportsReceived GET,
+		pDUDiscards GET,
+		congestionDiscards GET,
+		maximumLifetime GET-REPLACE;
 	ATTRIBUTE GROUPS
 		"Rec. X.723 | ISO/IEC 10165-5":counters
 			"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter
@@ -388,10 +388,10 @@ cLNSChecksum-P PACKAGE
 	BEHAVIOUR
 		cLNSChecksum-P-B BEHAVIOUR
 			DEFINED AS
-				When present checksum generation is controlled by the 8473 enableChecksum attribute;;
+				When present checksum generation is controlled by the 8473 enableChecksum 
+				attribute;;
 	ATTRIBUTES
-		enableChecksum
-			REPLACE-WITH-DEFAULT
+		enableChecksum REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.false
 			GET-REPLACE;
 REGISTERED AS { NLM.poi cLNSChecksum-P(1) };
@@ -400,88 +400,87 @@ REGISTERED AS { NLM.poi cLNSChecksum-P(1) };
 
 cLNS8473PImportedCounters-B BEHAVIOUR
 	DEFINED AS
-		The cLNS8473-P package imports octetsSentCounter and octetsReceivedCounter from DIS
-		10165-2. They are used to count the number of octets of data transmitted or received
-		by the local network entity in ISO 8473 Data PDUs. (i.e. those which which have a
-		source or destination N-Address, respectively, which corresponds to that of the
-		local netwerk entity.);
+		The cLNS8473-P package imports octetsSentCounter and octetsReceivedCounter from 
+		DIS 10165-2. They are used to count the number of octets of data transmitted or 
+		received by the local network entity in ISO 8473 Data PDUs. (i.e. those which 
+		which have a source or destination N-Address, respectively, which corresponds to 
+		that of the local netwerk entity.);
 
 
 cLNS8473PImportedNotifications-B BEHAVIOUR
 	DEFINED AS
-		The cLNS8473-P package imports the communicationsAlarm notification from Rec. 721 |
-		ISO/IEC 10165-2. It is used to report the following cLNS managed object events.
+		The cLNS8473-P package imports the communicationsAlarm notification from Rec. 
+		721 | ISO/IEC 10165-2. It is used to report the following cLNS managed object 
+		events.
 
-		pDUDiscard: Generated when a data NPDU is discarded due to any of the reasons
-		specified in ISO 8473 Table 7, with the exception of `PDU Discarded due to
-		Congestion' The header of the PDU in error shall be reported as a parameter in the
-		additionalInformation field of the communicationsAlarm, using the
+		pDUDiscard: Generated when a data NPDU is discarded due to any of the reasons 
+		specified in ISO 8473 Table 7, with the exception of `PDU Discarded due to 
+		Congestion' The header of the PDU in error shall be reported as a parameter in 
+		the additionalInformation field of the communicationsAlarm, using the 
 		notificationPDUHeader PARAMETER.
 
-		The significance sub-parameter of each item of additionalInformation shall be set to
-		the value `False' (i.e. not significant) so that a managing system receiving the
-		event report will be less likely to reject it. The value NLM.pDUDiscard and that
-		corresponding to the Reason For Discard shall both be reported in the
-		specificProblems parameter.
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.pDUDiscard and that corresponding to the Reason For Discard shall both be 
+		reported in the specificProblems parameter.
 
 		The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with
-		a perceivedSeverity value of `Cleared' shall not be generated. No other fields or
-		parameters shall be used, with the exception of further parameters in the
-		AdditionalInformation field. A PDU which does not contain one of the protocol
-		identifiers defined in ISO 8473 shall not cause this event.
-		A PDU with a protocol ID 1000 0001 shall not cause this event if it does not also
-		contain the Version/Protocol Identifier extension in clause 7.2.4 of ISO 8473. If an
-		error report PDU is generated, the PDU header and Discard Reason in the error report
-		shall be the same as those in the corresponding notification.;
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field. A PDU which does not contain one of the 
+		protocol identifiers defined in ISO 8473 shall not cause this event.
+
+		A PDU with a protocol ID 1000 0001 shall not cause this event if it does not 
+		also contain the Version/Protocol Identifier extension in clause 7.2.4 of ISO 
+		8473. If an error report PDU is generated, the PDU header and Discard Reason in 
+		the error report shall be the same as those in the corresponding notification.;
 
 
 operationalSystemTypeIV-B BEHAVIOUR
 	DEFINED AS
-		If the cLNS MO is created by management operation (using the cLNS-networkEntity-Management name
-		binding), the initial value of the operationalSystemType attribute shall be specified in the CMIP
-		create. Otherwise, the value shall be determined in an implementation specific manner. The value
-		shall be one of those present in the cLNSSystemTypes attribute of the superior Network Entity MO. A
-		value of ES indicates that the system shall perform no 8473 forwarding operations upon non-local
-		CLN-P PDUs. A value of IS indicates that the system is permitted to perform forwarding operations,
-		but the decision to forward individual PDUs, or not to forward them, shall be taken on the basis of
-		the available routing information.;
+		If the cLNS MO is created by management operation (using the 
+		cLNS-networkEntity-Management name binding), the initial value of the 
+		operationalSystemType attribute shall be specified in the CMIP create. 
+		Otherwise, the value shall be determined in an implementation specific manner. 
+		The value shall be one of those present in the cLNSSystemTypes attribute of the 
+		superior Network Entity MO. A value of ES indicates that the system shall 
+		perform no 8473 forwarding operations upon non-local CLN-P PDUs. A value of IS 
+		indicates that the system is permitted to perform forwarding operations, but the 
+		decision to forward individual PDUs, or not to forward them, shall be taken on 
+		the basis of the available routing information.;
 ---Name Bindings
 
 
 cLNS-networkEntity-Management NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cLNS
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkEntity
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cLNS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":clProtocolMachineId;
 	BEHAVIOUR
 		cLNS-networkEntity-Management-B BEHAVIOUR
 			DEFINED AS
-				The name binding that applies when the cLNS managed object can be created and deleted by management;;
+				The name binding that applies when the cLNS managed object can be created and 
+				deleted by management;;
 	CREATE;
 	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { NLM.nboi cLNS-networkEntity-Management(3) };
 
 
 cLNS-networkEntity-Automatic NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cLNS
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkEntity
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cLNS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":clProtocolMachineId;
 	BEHAVIOUR
 		cLNS-networkEntity-Automatic-B BEHAVIOUR
 			DEFINED AS
-				The name binding that applies when the cLNS managed object cannot be created or deleted by
-				management;;
+				The name binding that applies when the cLNS managed object cannot be created or 
+				deleted by management;;
 REGISTERED AS { NLM.nboi cLNS-networkEntity-Automatic(16) };
 ---Attributes
 
@@ -492,8 +491,8 @@ assemblingSegmentsDiscarded ATTRIBUTE
 	BEHAVIOUR
 		assemblingSegmentsDiscarded-B BEHAVIOUR
 			DEFINED AS
-				Counter of segments discarded due to reassembly time expiry. This is the number of data and error
-				report NPDUs discarded due to reassembly time expiry;;
+				Counter of segments discarded due to reassembly time expiry. This is the number 
+				of data and error report NPDUs discarded due to reassembly time expiry;;
 REGISTERED AS { NLM.aoi assemblingSegmentsDiscarded(8) };
 
 
@@ -503,9 +502,9 @@ congestionDiscards ATTRIBUTE
 	BEHAVIOUR
 		congestionDiscards-B BEHAVIOUR
 			DEFINED AS
-				Counter of PDUs discarded due to congestion. This is the number of data or error report PDUs
-				discarded due to congestion. This counter is incremented irrespective of the setting of the Error
-				Report bit in the received PDU;;
+				Counter of PDUs discarded due to congestion. This is the number of data or error 
+				report PDUs discarded due to congestion. This counter is incremented 
+				irrespective of the setting of the Error Report bit in the received PDU;;
 REGISTERED AS { NLM.aoi congestionDiscards(11) };
 
 
@@ -525,8 +524,8 @@ errorReportsReceived ATTRIBUTE
 	BEHAVIOUR
 		errorReportsReceived-B BEHAVIOUR
 			DEFINED AS
-				Counter of received error reports. This is the number of error report NPDUs received which were
-				addressed to the local network entity;;
+				Counter of received error reports. This is the number of error report NPDUs 
+				received which were addressed to the local network entity;;
 REGISTERED AS { NLM.aoi errorReportsReceived(9) };
 
 
@@ -536,14 +535,16 @@ maximumLifetime ATTRIBUTE
 	BEHAVIOUR
 		maximumLifetime-B BEHAVIOUR
 			DEFINED AS
-				Maximum PDU lifetime (in half seconds). This attribute controls the maximum value (in half seconds)
-				which may be placed in the lifetime field of any 8473 data or error report PDU generated by the
-				local network entity. It does not affect the lifetime field of any PDUs not generated by this
-				network entity, for example those relayed by this system acting as an Intermediate System. PDUs
-				generated by the local network entity are permitted to have a lower value of lifetime field than
-				this attribute, but shall not have a larger value. The means by which the value of the lifetime
-				field is determined for an individual PDU is outside the scope of this international standard,
-				provided that it meets the above constraints.;;
+				Maximum PDU lifetime (in half seconds). This attribute controls the maximum 
+				value (in half seconds) which may be placed in the lifetime field of any 8473 
+				data or error report PDU generated by the local network entity. It does not 
+				affect the lifetime field of any PDUs not generated by this network entity, for 
+				example those relayed by this system acting as an Intermediate System. PDUs 
+				generated by the local network entity are permitted to have a lower value of 
+				lifetime field than this attribute, but shall not have a larger value. The means 
+				by which the value of the lifetime field is determined for an individual PDU is 
+				outside the scope of this international standard, provided that it meets the 
+				above constraints.;;
 REGISTERED AS { NLM.aoi maximumLifetime(102) };
 
 
@@ -563,10 +564,11 @@ pDUDiscards ATTRIBUTE
 	BEHAVIOUR
 		pDUDiscards-B BEHAVIOUR
 			DEFINED AS
-				Counter of PDUs discarded (except for congestion). This is the number of data or error report PDUs
-				discarded for any of the reasons specified in ISO 8473 Table 7 with the exception of `PDU discarded
-				due to congestion'. This counter is incremented irrespective of the setting of the Error Report bit
-				in the received PDU;;
+				Counter of PDUs discarded (except for congestion). This is the number of data or 
+				error report PDUs discarded for any of the reasons specified in ISO 8473 Table 7 
+				with the exception of `PDU discarded due to congestion'. This counter is 
+				incremented irrespective of the setting of the Error Report bit in the received 
+				PDU;;
 	-- Note: this counter is therefore a count of the number of
 	-- communicationsAlarm notifications with a specificProblem value of
 	-- pDUDiscard generated (as opposed to CMI-P events,
@@ -580,9 +582,9 @@ segmentsDiscarded ATTRIBUTE
 	BEHAVIOUR
 		segmentsDiscarded-B BEHAVIOUR
 			DEFINED AS
-				Counter of segments discarded. This is the number of data and error report NPDUs discarded without
-				being delivered to a Network Service user or forwarded. This includes segments discarded for any
-				reason except reassembly time expiry;;
+				Counter of segments discarded. This is the number of data and error report NPDUs 
+				discarded without being delivered to a Network Service user or forwarded. This 
+				includes segments discarded for any reason except reassembly time expiry;;
 REGISTERED AS { NLM.aoi segmentsDiscarded(7) };
 
 
@@ -592,8 +594,9 @@ segmentsReceived ATTRIBUTE
 	BEHAVIOUR
 		segmentsReceived-B BEHAVIOUR
 			DEFINED AS
-				Counter of segments received. This is the number of data and error report NPDUs received prior to
-				reassembly, including those which may subsequently be discarded;;
+				Counter of segments received. This is the number of data and error report NPDUs 
+				received prior to reassembly, including those which may subsequently be 
+				discarded;;
 REGISTERED AS { NLM.aoi segmentsReceived(6) };
 
 
@@ -603,10 +606,10 @@ supportedProtocols ATTRIBUTE
 	BEHAVIOUR
 		supportedProtocols-B BEHAVIOUR
 			DEFINED AS
-				The set of Connectionless Network protocols supported by this instance of the cLNS protocol
-				machine. The operation of a particular protocol over a particular linkage is determined by the
-				linkage operationalProtocols Attribute. The value of the supportedProtocols attribute is determined
-				by the implementation.;;
+				The set of Connectionless Network protocols supported by this instance of the 
+				cLNS protocol machine. The operation of a particular protocol over a particular 
+				linkage is determined by the linkage operationalProtocols Attribute. The value 
+				of the supportedProtocols attribute is determined by the implementation.;;
 REGISTERED AS { NLM.aoi supportedProtocols(110) };
 ---Parameters
 
@@ -639,18 +642,14 @@ linkage MANAGED OBJECT CLASS
 				commonCreationDeletion-B,
 				commonStateChange-B;
 			ATTRIBUTES
-				linkageId
-					GET,
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState
-					GET,
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState
-					GET,
+				linkageId GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState GET,
 				sN-ServiceProvider
 					INITIAL VALUE DERIVATION RULE
 						sN-ServiceProviderIV-B
 					GET,
-				sN-SA-P
-					GET,
+				sN-SA-P GET,
 				operationalProtocols
 					INITIAL VALUE DERIVATION RULE
 						operationalProtocolIV-B
@@ -675,14 +674,16 @@ linkage MANAGED OBJECT CLASS
 				support for ISO 9542 operating as an ES,
 		linkageInitialMinimumTimer-P
 			PRESENT IF
-				support for the initial minimum timer attribute of an ISO 8208 or CO Datalink Service SNDCF for ISO
-				8473,
+				support for the initial minimum timer attribute of an ISO 8208 or CO Datalink 
+				Service SNDCF for ISO 8473,
 		linkageReserveTimer-P
 			PRESENT IF
-				support for the reserve timer attribute of an ISO 8208 or CO Datalink Service SNDCF for ISO 8473,
+				support for the reserve timer attribute of an ISO 8208 or CO Datalink Service 
+				SNDCF for ISO 8473,
 		linkageIdleTimer-P
 			PRESENT IF
-				support for the idle timer attribute of an ISO 8208 or CO Datalink Service SNDCF for ISO 8473,
+				support for the idle timer attribute of an ISO 8208 or CO Datalink Service SNDCF 
+				for ISO 8473,
 		linkage-ISO8473-ISO8208SNDCF-P
 			PRESENT IF
 				support for an ISO 8208 SNDCF for ISO 8473,
@@ -701,8 +702,8 @@ linkage MANAGED OBJECT CLASS
 				the linkage is a broadcast circuit on an ISO 10589 IS,
 		"ISO/IEC 10589":linkageISISDACallEstablishmentMetricIncrement-P
 			PRESENT IF
-				the linkage is a DA Circuit and support is implemented for call establishment metric increment
-				values greater than zero on an ISO 10589 IS,
+				the linkage is a DA Circuit and support is implemented for call establishment 
+				metric increment values greater than zero on an ISO 10589 IS,
 		"ISO/IEC 10589":linkageISISPtToPt-P
 			PRESENT IF
 				the linkage is a point to point circuit on an ISO 10589 IS,
@@ -712,7 +713,7 @@ linkage MANAGED OBJECT CLASS
 		"ISO/IEC 10589":linkageISISLevel2-P
 			PRESENT IF
 				the system is an ISO 10589 level 2 IS,
-		"ISO/IEC 10589":linkageISISlevel2Broadcast-P
+		"ISO/IEC 10589":linkageISISLevel2Broadcast-P
 			PRESENT IF
 				the linkage is a broadcast circuit on an ISO 10589 level 2 IS;
 REGISTERED AS { NLM.moi linkage(5) };
@@ -725,10 +726,8 @@ linkageCODLService-P PACKAGE
 			DEFINED AS
 				Controls the operation of CO Datalink as an SNDCF for ISO 8473;;
 	ATTRIBUTES
-		callsPlaced
-			GET,
-		callsFailed
-			GET;
+		callsPlaced GET,
+		callsFailed GET;
 	ATTRIBUTE GROUPS
 		"Rec. X.723 | ISO/IEC 10165-5":counters
 			callsPlaced
@@ -740,12 +739,10 @@ linkageIdleTimer-P PACKAGE
 	BEHAVIOUR
 		linkageIdleTimer-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the ability, when implemented, of an ISO 8208 or CO Datalink SNDCF for ISO 8473 to close
-				an established SVC when it is idle.;;
+				Controls the ability, when implemented, of an ISO 8208 or CO Datalink SNDCF for 
+				ISO 8473 to close an established SVC when it is idle.;;
 	ATTRIBUTES
-		idleTimer
-			REPLACE-WITH-DEFAULT
-			GET-REPLACE;
+		idleTimer REPLACE-WITH-DEFAULT GET-REPLACE;
 REGISTERED AS { NLM.poi linkageIdleTimer-P(5) };
 
 
@@ -753,12 +750,11 @@ linkageInitialMinimumTimer-P PACKAGE
 	BEHAVIOUR
 		linkageInitialMinimumTimer-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the ability, when implemented, of an ISO 8208 or CO Datalink SNDCF for ISO 8473 to close
-				an established SVC when it is idle, but only after a minimum time after its establishment;;
+				Controls the ability, when implemented, of an ISO 8208 or CO Datalink SNDCF for 
+				ISO 8473 to close an established SVC when it is idle, but only after a minimum 
+				time after its establishment;;
 	ATTRIBUTES
-		initialMinimumTimer
-			REPLACE-WITH-DEFAULT
-			GET-REPLACE;
+		initialMinimumTimer REPLACE-WITH-DEFAULT GET-REPLACE;
 REGISTERED AS { NLM.poi linkageInitialMinimumTimer-P(7) };
 
 
@@ -768,10 +764,8 @@ linkage-ISO8473-ISO8208SNDCF-P PACKAGE
 			DEFINED AS
 				Controls the operation of ISO 8208 as an SNDCF for ISO 8473;;
 	ATTRIBUTES
-		callsPlaced
-			GET,
-		callsFailed
-			GET;
+		callsPlaced GET,
+		callsFailed GET;
 	ATTRIBUTE GROUPS
 		"Rec. X.723 | ISO/IEC 10165-5":counters
 			callsPlaced
@@ -787,8 +781,7 @@ linkage-ISO9542ES-P PACKAGE
 		linkage-ISO9542ImportedAlarmNotifications-B,
 		linkage-ISO9542ImportedInformationNotifications-B;
 	ATTRIBUTES
-		iSO9542OperationalSubsets
-			GET-REPLACE,
+		iSO9542OperationalSubsets GET-REPLACE,
 		holdingTimerMultiplier
 			DEFAULT VALUE NLM.holdingTimerMultiplierDefault
 			-- 3
@@ -800,19 +793,11 @@ linkage-ISO9542ES-P PACKAGE
 		-- Editor's note: The actual values quoted here for the default, required and permitted values
 		-- are subject to N-B agreement.  They are presented here as a place-holder for the
 		-- finally agreed values.
-		manualISSNPAAddress
-			REPLACE-WITH-DEFAULT
-			GET
-			ADD-REMOVE,
-		defaultESConfigTimer
-			REPLACE-WITH-DEFAULT
-			GET-REPLACE,
-		activeESConfigTimer
-			GET,
-		iSReachabilityChanges
-			GET,
-		invalid9542PDUs
-			GET;
+		manualISSNPAAddress REPLACE-WITH-DEFAULT GET ADD-REMOVE,
+		defaultESConfigTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+		activeESConfigTimer GET,
+		iSReachabilityChanges GET,
+		invalid9542PDUs GET;
 	ATTRIBUTE GROUPS
 		"Rec. X.723 | ISO/IEC 10165-5":counters
 			iSReachabilityChanges
@@ -833,34 +818,23 @@ linkage-ISO9542IS-P PACKAGE
 		linkage-ISO9542ImportedInformationNotifications-B,
 		linkage-ISO9542IsImportedInformationNotifications-B;
 	ATTRIBUTES
-		iSO9542OperationalSubsets
-			GET-REPLACE,
+		iSO9542OperationalSubsets GET-REPLACE,
 		holdingTimerMultiplier
-			DEFAULT VALUE NLM.holdingTimerMultiplierDefault
-			-- 3
-			PERMITTED VALUES NLM.HoldingTimerMultiplierPermitted
-			-- 2-63
-			REQUIRED VALUES NLM.HoldingTimerMultiplierRequired
-			-- 2
+			DEFAULT VALUE NLM.holdingTimerMultiplierDefault-- 3
+			PERMITTED VALUES NLM.HoldingTimerMultiplierPermitted-- 2-63
+			REQUIRED VALUES NLM.HoldingTimerMultiplierRequired-- 2
 			GET-REPLACE,
 		-- Editor's Note: The actual values quoted here for the default, required and permitted values
 		-- are subject to N-B agreement.  They are presented here as a place-holder for the
 		-- finally agreed values.
-		iSConfigurationTimer
-			REPLACE-WITH-DEFAULT
-			GET-REPLACE,
-		suggestedESConfigurationTimer
-			REPLACE-WITH-DEFAULT
-			GET-REPLACE,
-		redirectHoldingTime
-			REPLACE-WITH-DEFAULT
+		iSConfigurationTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+		suggestedESConfigurationTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+		redirectHoldingTime REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.redirectHoldingTime-Default
 			PERMITTED VALUES NLM.RedirectHoldingTime-Permitted
 			GET-REPLACE,
-		eSReachabilityChanges
-			GET,
-		invalid9542PDUs
-			GET;
+		eSReachabilityChanges GET,
+		invalid9542PDUs GET;
 	ATTRIBUTE GROUPS
 		"Rec. X.723 | ISO/IEC 10165-5":counters
 			eSReachabilityChanges
@@ -876,101 +850,101 @@ linkageReserveTimer-P PACKAGE
 	BEHAVIOUR
 		linkageReserveTimer-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the ability, when implemented, of an ISO 8208 or CO Datalink SNDCF for ISO 8473 to close
-				an established SVC when it is idle, but retain resources for its re-establishment;;
+				Controls the ability, when implemented, of an ISO 8208 or CO Datalink SNDCF for 
+				ISO 8473 to close an established SVC when it is idle, but retain resources for 
+				its re-establishment;;
 	ATTRIBUTES
-		reserveTimer
-			REPLACE-WITH-DEFAULT
-			GET-REPLACE;
+		reserveTimer REPLACE-WITH-DEFAULT GET-REPLACE;
 REGISTERED AS { NLM.poi linkageReserveTimer-P(6) };
 ---Behaviours
 
 
 linkage-ISO9542ImportedInformationNotifications-B BEHAVIOUR
 	DEFINED AS
-		This package imports the communicationsInformation notification from Rec. X.723 | ISO/IEC 10165-5.
-		It is used to report the following events.
+		This package imports the communicationsInformation notification from Rec. X.723 
+		| ISO/IEC 10165-5. It is used to report the following events.
 
-		iSReachabilityChange: Generated when an ES or IS detects a change in the reachability of a
-		neighboring IS. The value NLM.iSReachabilityChange shall be reported in the informationType field.
-		The new State, NET of the IS concerned, snpaAddress (where available) and the reason for the change
-		shall be reported in the informationData field using the reachabilityChange PARAMETER.;
+		iSReachabilityChange: Generated when an ES or IS detects a change in the 
+		reachability of a neighboring IS. The value NLM.iSReachabilityChange shall be 
+		reported in the informationType field.
+
+		The new State, NET of the IS concerned, snpaAddress (where available) and the 
+		reason for the change shall be reported in the informationData field using the 
+		reachabilityChange PARAMETER.;
 
 
 linkage-ISO9542IsImportedInformationNotifications-B BEHAVIOUR
 	DEFINED AS
-		This package imports the communicationsInformation notification from Rec. X.723 | ISO/IEC 10165-5.
-		It is used to report the following events.
+		This package imports the communicationsInformation notification from Rec. X.723 
+		| ISO/IEC 10165-5. It is used to report the following events.
 
-		eSReachabilityChange: Generated when an IS detects a change in the reachability of a neighboring
-		ES. The value NLM.eSReachabilityChange shall be reported in the informationType field. The new
-		State, set of NSAPAddresses of the IS concerned, the snpaAddress (where available) and the reason
-		for the change shall be reported in the informationData field using the reachabilityChange
-		PARAMETER.;
+		eSReachabilityChange: Generated when an IS detects a change in the reachability 
+		of a neighboring ES. The value NLM.eSReachabilityChange shall be reported in the 
+		informationType field.
+
+		The new State, set of NSAPAddresses of the IS concerned, the snpaAddress (where 
+		available) and the reason for the change shall be reported in the 
+		informationData field using the reachabilityChange PARAMETER.;
 
 
 linkage-ISO9542ImportedAlarmNotifications-B BEHAVIOUR
 	DEFINED AS
-		This package imports the communicationsAlarm notification from Rec. X.721 | ISO/IEC 10165-2. It is
-		used to report the following events.
+		This package imports the communicationsAlarm notification from Rec. X.721 | 
+		ISO/IEC 10165-2. It is used to report the following events.
 
-		invalid9542PDU: Generated when an ISO 9542 PDU is received which is discarded as result of the PDU
-		Header Error Detection or Protocol Error Processing Functions specified in ISO 9542.
+		invalid9542PDU: Generated when an ISO 9542 PDU is received which is discarded as 
+		result of the PDU Header Error Detection or Protocol Error Processing Functions 
+		specified in ISO 9542.
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it.
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
 
-		The value NLM.iSO9542PDUDiscard shall be reported in the specificProblems parameter. The
-		probableCause shall be set to NLM.communicationsProtocolError.
+		The value NLM.iSO9542PDUDiscard shall be reported in the specificProblems 
+		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.;
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.;
 
 
 operationalProtocolIV-B BEHAVIOUR
 	DEFINED AS
-		The Initial value of the operationalProtocols attribute shall be specified in the CMIP create;
+		The Initial value of the operationalProtocols attribute shall be specified in 
+		the CMIP create;
 
 
 sN-ServiceProviderIV-B BEHAVIOUR
 	DEFINED AS
-		The Initial value of the sN-ServiceProvider attribute shall be specified in the CMIP create;
+		The Initial value of the sN-ServiceProvider attribute shall be specified in the 
+		CMIP create;
 ---Name Bindings
 
 
 linkage-cLNS NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		linkage
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		cLNS
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS linkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cLNS AND SUBCLASSES;
 	WITH ATTRIBUTE
 		linkageId;
 	BEHAVIOUR
 		sN-ServiceProviderIV-B,
 		operationalProtocolIV-B;
-	CREATE
-		WITH-REFERENCE-OBJECT;
+	CREATE WITH-REFERENCE-OBJECT;
 	DELETE;
 REGISTERED AS { NLM.nboi linkage-cLNS(6) };
 
 
 linkage-cONS NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		linkage
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		cONS
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS linkage AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cONS AND SUBCLASSES;
 	WITH ATTRIBUTE
 		linkageId;
 	BEHAVIOUR
 		sN-ServiceProviderIV-B;
-	CREATE
-		WITH-REFERENCE-OBJECT;
+	CREATE WITH-REFERENCE-OBJECT;
 	DELETE;
 REGISTERED AS { NLM.nboi linkage-cONS(7) };
 ---Attributes
@@ -992,7 +966,8 @@ callsFailed ATTRIBUTE
 	BEHAVIOUR
 		callsFailed-B BEHAVIOUR
 			DEFINED AS
-				Counter of the number of X.25 call failures while attempting establishment by the SNDCF;;
+				Counter of the number of X.25 call failures while attempting establishment by 
+				the SNDCF;;
 REGISTERED AS { NLM.aoi callsFailed(30) };
 
 
@@ -1012,9 +987,9 @@ defaultESConfigTimer ATTRIBUTE
 	BEHAVIOUR
 		defaultESConfigTimer-B BEHAVIOUR
 			DEFINED AS
-				Default value for the ISO 9542 ES configuration timer. This value is used when the ES has not
-				received, or has not chosen to accept, a suggested configuration timer value from an Intermediate
-				System;;
+				Default value for the ISO 9542 ES configuration timer. This value is used when 
+				the ES has not received, or has not chosen to accept, a suggested configuration 
+				timer value from an Intermediate System;;
 REGISTERED AS { NLM.aoi defaultESConfigTimer(21) };
 
 
@@ -1033,12 +1008,13 @@ holdingTimerMultiplier ATTRIBUTE
 	BEHAVIOUR
 		holdingTimerMultiplier-B BEHAVIOUR
 			DEFINED AS
-				The factor to derive holding timer from configuration timer. This value, when multiplied by a
-				configuration timer yields the value of the holding timer parameter issued with configuration
-				information. The semantics of this parameter are such that it is permissible to also add a delta
-				value to the result to compensate for possible delays and imprecision of timers. The result of the
-				calculation is truncated, upon overflow, to the maximum value for the parameter permitted by the
-				protocol (65535);;
+				The factor to derive holding timer from configuration timer. This value, when 
+				multiplied by a configuration timer yields the value of the holding timer 
+				parameter issued with configuration information. The semantics of this parameter 
+				are such that it is permissible to also add a delta value to the result to 
+				compensate for possible delays and imprecision of timers. The result of the 
+				calculation is truncated, upon overflow, to the maximum value for the parameter 
+				permitted by the protocol (65535);;
 REGISTERED AS { NLM.aoi holdingTimerMultiplier(20) };
 
 
@@ -1058,9 +1034,9 @@ idleTimer ATTRIBUTE
 	BEHAVIOUR
 		idleTimer-B BEHAVIOUR
 			DEFINED AS
-				Time in seconds before release of an idle call. This timer determines the interval (in seconds) for
-				which a call is permitted to remain idle (i.e. no data traffic in either direction) before being
-				released by the SNDCF;;
+				Time in seconds before release of an idle call. This timer determines the 
+				interval (in seconds) for which a call is permitted to remain idle (i.e. no data 
+				traffic in either direction) before being released by the SNDCF;;
 REGISTERED AS { NLM.aoi idleTimer(31) };
 
 
@@ -1070,10 +1046,11 @@ initialMinimumTimer ATTRIBUTE
 	BEHAVIOUR
 		initialMinimumTimer-B BEHAVIOUR
 			DEFINED AS
-				Minimum time in seconds to retain call after establishment. This timer determines the interval (in
-				seconds) that a call shall remain connected after being established, irrespective of traffic.
-				(Note. This should be set small enough so that the call is cleared before the start of the next
-				charging interval.);;
+				Minimum time in seconds to retain call after establishment. This timer 
+				determines the interval (in seconds) that a call shall remain connected after 
+				being established, irrespective of traffic. (Note. This should be set small 
+				enough so that the call is cleared before the start of the next charging 
+				interval.);;
 REGISTERED AS { NLM.aoi initialMinimumTimer(33) };
 
 
@@ -1083,9 +1060,9 @@ invalid9542PDUs ATTRIBUTE
 	BEHAVIOUR
 		invalid9542PDUs-B BEHAVIOUR
 			DEFINED AS
-				Counter of invalid 9542 PDUs received. This is the number of ISO 9542 PDUs received which are
-				discarded as a result of the PDU Header Error Detection or Protocol Error Processing Functions
-				specified in ISO 9542;;
+				Counter of invalid 9542 PDUs received. This is the number of ISO 9542 PDUs 
+				received which are discarded as a result of the PDU Header Error Detection or 
+				Protocol Error Processing Functions specified in ISO 9542;;
 	-- Note: this counter is therefore a count of the number of
 	-- communicationsAlarm notifications with a specificProblem value of
 	-- NLM.iSO9542PDUDiscard generated.
@@ -1098,8 +1075,8 @@ iSConfigurationTimer ATTRIBUTE
 	BEHAVIOUR
 		iSConfigurationTimer-B BEHAVIOUR
 			DEFINED AS
-				Value for the ISO 9542 IS configuration timer. It is used to determine how often an IS reports
-				configuration information to ESs;;
+				Value for the ISO 9542 IS configuration timer. It is used to determine how often 
+				an IS reports configuration information to ESs;;
 REGISTERED AS { NLM.aoi iSConfigurationTimer(24) };
 
 
@@ -1119,7 +1096,8 @@ iSReachabilityChanges ATTRIBUTE
 	BEHAVIOUR
 		iSReachabilityChanges-B BEHAVIOUR
 			DEFINED AS
-				Counter of the number of changes in reachability of Intermediate Systems from this system;;
+				Counter of the number of changes in reachability of Intermediate Systems from 
+				this system;;
 REGISTERED AS { NLM.aoi iSReachabilityChanges(23) };
 
 
@@ -1129,10 +1107,11 @@ manualISSNPAAddress ATTRIBUTE
 	BEHAVIOUR
 		manualISSNPAAddress-B BEHAVIOUR
 			DEFINED AS
-				The set of SNPA Addresses to which calls associated with the SNDCF are to be established in the
-				absence of any other information. The maximum set cardinality shall be implementation specific. An
-				attempt to set the value of an element of this set to a type of SNPAAddress which is not supported
-				by this linkage shall result in a failure of the SET operation.;;
+				The set of SNPA Addresses to which calls associated with the SNDCF are to be 
+				established in the absence of any other information. The maximum set cardinality 
+				shall be implementation specific. An attempt to set the value of an element of 
+				this set to a type of SNPAAddress which is not supported by this linkage shall 
+				result in a failure of the SET operation.;;
 REGISTERED AS { NLM.aoi manualISSNPAAddress(28) };
 
 
@@ -1152,7 +1131,8 @@ redirectHoldingTime ATTRIBUTE
 	BEHAVIOUR
 		redirectHoldingTime-B BEHAVIOUR
 			DEFINED AS
-				The holding time (in seconds) to be specified in Redirect PDUs generated by this system;;
+				The holding time (in seconds) to be specified in Redirect PDUs generated by this 
+				system;;
 REGISTERED AS { NLM.aoi redirectHoldingTime(26) };
 
 
@@ -1162,10 +1142,10 @@ reserveTimer ATTRIBUTE
 	BEHAVIOUR
 		reserveTimer-B BEHAVIOUR
 			DEFINED AS
-				Time in seconds to reserve resources for call re-establishment. This timer determines the interval
-				(in seconds) for which an attempt shall be made to retain those resources, as determined by the
-				implementation, whose retention will increase the probability of successful re-establishment of an
-				idled VC;;
+				Time in seconds to reserve resources for call re-establishment. This timer 
+				determines the interval (in seconds) for which an attempt shall be made to 
+				retain those resources, as determined by the implementation, whose retention 
+				will increase the probability of successful re-establishment of an idled VC;;
 REGISTERED AS { NLM.aoi reserveTimer(32) };
 
 
@@ -1175,11 +1155,13 @@ sN-SA-P ATTRIBUTE
 	BEHAVIOUR
 		sN-SA-P-B BEHAVIOUR
 			DEFINED AS
-				Distinguished name of the service provider SA-P MO (if present). This is obtained via an internal
-				interface when the linkage is enabled. The sN-SA-P may be a relationship to a SA-P MO in the
-				Datalink Layer, or it may be a relationship to another Managed Object within the Network Layer
-				which is not a SA-P MO. For example, when operating ISO 8473 over the ISO 8208 SNDCF, it is a
-				relationship to the same x25PLE MO which is pointed to by the sN-ServiceProvider Attribute.;;
+				Distinguished name of the service provider SA-P MO (if present). This is 
+				obtained via an internal interface when the linkage is enabled. The sN-SA-P may 
+				be a relationship to a SA-P MO in the Datalink Layer, or it may be a 
+				relationship to another Managed Object within the Network Layer which is not a 
+				SA-P MO. For example, when operating ISO 8473 over the ISO 8208 SNDCF, it is a 
+				relationship to the same x25PLE MO which is pointed to by the sN-ServiceProvider 
+				Attribute.;;
 REGISTERED AS { NLM.aoi sN-SA-P(18) };
 
 
@@ -1189,10 +1171,10 @@ sN-ServiceProvider ATTRIBUTE
 	BEHAVIOUR
 		sN-ServiceProvider-B BEHAVIOUR
 			DEFINED AS
-				Distinguished name of the SN service provider MO. This attribute identifies the subnetwork entity
-				to be used to support the linkage, when enabled. The subnetwork service provider may be in the
-				Datalink Layer, or it may be in the Network Layer (for example when operating ISO 8473 over the ISO
-				8208 SNDCF).;;
+				Distinguished name of the SN service provider MO. This attribute identifies the 
+				subnetwork entity to be used to support the linkage, when enabled. The 
+				subnetwork service provider may be in the Datalink Layer, or it may be in the 
+				Network Layer (for example when operating ISO 8473 over the ISO 8208 SNDCF).;;
 REGISTERED AS { NLM.aoi sN-ServiceProvider(19) };
 
 
@@ -1202,8 +1184,8 @@ suggestedESConfigurationTimer ATTRIBUTE
 	BEHAVIOUR
 		suggestedESConfigurationTimer-B BEHAVIOUR
 			DEFINED AS
-				Value to be used for the ISO 9542 suggested ES configuration timer value, advertised in IS hellos
-				generated by this network entity;;
+				Value to be used for the ISO 9542 suggested ES configuration timer value, 
+				advertised in IS hellos generated by this network entity;;
 	-- Editor's note: It is far from clear that this attribute would be able to be set to a specific
 	-- value in all implementations. For example, the DIS 10589 ES poll protocol relies
 	-- on the IS being able to set this to different values in different circumstances.
@@ -1239,8 +1221,7 @@ cONS MANAGED OBJECT CLASS
 				commonStateChange-B,
 				commonCreationDeletion-B;
 			ATTRIBUTES
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState
-					GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState GET,
 				"Rec. X.723 | ISO/IEC 10165-5":coProtocolMachineId
 					INITIAL VALUE NLM.cONSId-Value
 					GET;
@@ -1266,37 +1247,32 @@ REGISTERED AS { NLM.moi cONS(6) };
 
 
 cONS-networkEntity-Management NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cONS
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkEntity
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cONS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":coProtocolMachineId;
 	BEHAVIOUR
 		cONS-networkEntity-Management-B BEHAVIOUR
 			DEFINED AS
-				The name binding that applies when the cONS managed object can be created and deleted by management;;
+				The name binding that applies when the cONS managed object can be created and 
+				deleted by management;;
 	CREATE;
 	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { NLM.nboi cONS-networkEntity-Management(8) };
 
 
 cONS-networkEntity-Automatic NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		cONS
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkEntity
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS cONS AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkEntity AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":coProtocolMachineId;
 	BEHAVIOUR
 		cONS-ncetworkEntity-Automatic-B BEHAVIOUR
 			DEFINED AS
-				The name binding that applies when the cONS managed object cannot be created or deleted by
-				management;;
+				The name binding that applies when the cONS managed object cannot be created or 
+				deleted by management;;
 REGISTERED AS { NLM.nboi cONS-networkEntity-Automatic(17) };
 -- 6.9 The Network Connection Managed Object
 --	Network Connection Managed Object
@@ -1320,15 +1296,14 @@ networkConnection MANAGED OBJECT CLASS
 				successfulConnectionEstablishment-B,
 				networkConnection-P-B BEHAVIOUR
 					DEFINED AS
-						The "Rec. X.723 | ISO/IEC 10165-5":underlyingConnectionNames attribute shall contain the
-						distinguished name(s) of the other MO(s) which represent the resources used to support this
-						connection. In the case of the CONS operating directly over X.25, this shall be the single
-						distinguished name of the underlying switched virtual call or permanent virtual circuit MO;;
+						The "Rec. X.723 | ISO/IEC 10165-5":underlyingConnectionNames attribute shall 
+						contain the distinguished name(s) of the other MO(s) which represent the 
+						resources used to support this connection. In the case of the CONS operating 
+						directly over X.25, this shall be the single distinguished name of the 
+						underlying switched virtual call or permanent virtual circuit MO;;
 			ATTRIBUTES
-				localNSAPMO
-					GET,
-				remoteNSAPAddress
-					GET;
+				localNSAPMO GET,
+				remoteNSAPAddress GET;
 			NOTIFICATIONS
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectCreation,
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectDeletion,
@@ -1347,12 +1322,9 @@ REGISTERED AS { NLM.moi networkConnection(13) };
 
 
 networkConnection-cONS NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		networkConnection
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		cONS
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS networkConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS cONS AND SUBCLASSES;
 	WITH ATTRIBUTE
 		"Rec. X.723 | ISO/IEC 10165-5":connectionId;
 REGISTERED AS { NLM.nboi networkConnection-cONS(19) };
@@ -1365,8 +1337,8 @@ localNSAPMO ATTRIBUTE
 	BEHAVIOUR
 		localNSAPMO-B BEHAVIOUR
 			DEFINED AS
-				Pointer to local nSAP MO. This is a relationship attribute which points to the local nSAP MO which
-				is associated with the connection;;
+				Pointer to local nSAP MO. This is a relationship attribute which points to the 
+				local nSAP MO which is associated with the connection;;
 REGISTERED AS { NLM.aoi localNSAPMO(106) };
 
 
@@ -1378,19 +1350,23 @@ remoteNSAPAddress ATTRIBUTE
 			DEFINED AS
 				The remote NSAP Address associated with the connection;;
 REGISTERED AS { NLM.aoi remoteNSAPAddress(107) };
+--
 -- 6.10 The X.25 PLE Managed Object and IVMO
+--
 -- 6.10.1 The X25 PLE Managed Object
---	There may be multiple instances of these MOs within a system,
---	corresponding to Multiple X.25 PLEs.
---	Its definition permits it to be created and deleted explicitly by
---	management operation or to be created and deleted automatically as
---	part of system operation. For an automatically created X25 PLE
---	managed object, an x25PLEIVMO may be used as the source of
---	initial values of attributes of the x25PLE managed object.
---  When the PLE is operable, the operationalState shall
---	have the value 'enabled'; otherwise it shall have the value 'disabled'.
---	Transitions of operationalState shall be reported using the
---	stateChange notification.
+--
+-- There may be multiple instances of these MOs within a system, corresponding to Multiple X.25 
+-- PLEs.
+--
+-- Its definition permits it to be created and deleted explicitly by management operation or to be 
+-- created and deleted automatically as part of system operation.  For an automatically created X25 
+-- PLE managed object, an x25PLEIVMO may be used as the source of initial values of attributes of 
+-- the x25PLE managed object.
+--
+-- When the PLE is operable, the operationalState shall have the value 'enabled'; otherwise it shall 
+-- have the value 'disabled'.  Transitions of operationalState shall be reported using the 
+-- stateChange notification.
+--
 
 
 x25PLE MANAGED OBJECT CLASS
@@ -1405,109 +1381,64 @@ x25PLE MANAGED OBJECT CLASS
 				x25PLEPImportedNotifications-B,
 				logicalChannelAssignmentsX25PLE-P-B BEHAVIOUR
 					DEFINED AS
-						The logicalChannelAssignments attribute shall not be replaceable when the value of the
-						operationalState attribute is `enabled';;
+						The logicalChannelAssignments attribute shall not be replaceable when the value 
+						of the operationalState attribute is `enabled';;
 			ATTRIBUTES
-				x25PLEId
-					GET,
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState
-					GET,
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState
-					GET,
-				protocolVersionSupported
-					GET,
-				localDTEAddress
-					GET-REPLACE,
-				interfaceMode
-					GET-REPLACE,
-				defaultThroughputClass
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				flowControlNegotiationPermitted
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				callDeflectionSubscription
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				maxActiveCircuits
-					REPLACE-WITH-DEFAULT
+				x25PLEId GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":operationalState GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":administrativeState GET,
+				protocolVersionSupported GET,
+				localDTEAddress GET-REPLACE,
+				interfaceMode GET-REPLACE,
+				defaultThroughputClass REPLACE-WITH-DEFAULT GET-REPLACE,
+				flowControlNegotiationPermitted REPLACE-WITH-DEFAULT GET-REPLACE,
+				callDeflectionSubscription REPLACE-WITH-DEFAULT GET-REPLACE,
+				maxActiveCircuits REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.nullChoiceInteger
 					GET-REPLACE,
-				restartTime
-					REPLACE-WITH-DEFAULT
+				restartTime REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.restartTimeDefault
 					GET-REPLACE,
-				defaultPacketSize
-					REPLACE-WITH-DEFAULT
+				defaultPacketSize REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.nullChoiceInteger
 					GET-REPLACE,
-				defaultWindowSize
-					REPLACE-WITH-DEFAULT
+				defaultWindowSize REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.nullChoiceInteger
 					GET-REPLACE,
-				minimumRecallTimer
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				restartCount
-					REPLACE-WITH-DEFAULT
+				minimumRecallTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+				restartCount REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.restartCountDefault
 					GET-REPLACE,
-				sN-ServiceProvider
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				sN-SA-P
-					GET,
-				logicalChannelAssignments
-					GET-REPLACE,
-				packetSequencing
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter
-					GET,
+				sN-ServiceProvider REPLACE-WITH-DEFAULT GET-REPLACE,
+				sN-SA-P GET,
+				logicalChannelAssignments GET-REPLACE,
+				packetSequencing REPLACE-WITH-DEFAULT GET-REPLACE,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter GET,
 				-- This corresponds to the ISO8208OctetsSent attribute. Note that the DMI
 				-- definition is in terms of user data octets.
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsReceivedCounter
-					GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsReceivedCounter GET,
 				-- This corresponds to the ISO8208OctetsReceived attribute. Note that the
 				-- DMI definition is in terms of user data octets.
-				dataPacketsSent
-					GET,
+				dataPacketsSent GET,
 				-- Note the "Rec. X.721 | ISO/IEC 10165-2 : 1992":PDUsSentCounter cannot be used here
 				-- since it is defined as total number of PDUs sent, not just data PDUs.
-				dataPacketsReceived
-					GET,
-				callAttempts
-					GET,
-				callsConnected
-					GET,
-				providerInitiatedDisconnects
-					GET,
-				callTimeouts
-					GET,
-				clearTimeouts
-					GET,
-				remotelyInitiatedResets
-					GET,
-				dataRetransmissionTimerExpiries
-					GET,
-				providerInitiatedResets
-					GET,
-				resetTimeouts
-					GET,
-				remotelyInitiatedRestarts
-					GET,
-				restartCountsExceeded
-					GET,
-				protocolErrorsDetectedLocally
-					GET,
-				protocolErrorsAccusedOf
-					GET,
-				callEstablishmentRetryCountsExceeded
-					GET,
-				clearCountsExceeded
-					GET,
-				pLEClientMOName
-					GET;
+				dataPacketsReceived GET,
+				callAttempts GET,
+				callsConnected GET,
+				providerInitiatedDisconnects GET,
+				callTimeouts GET,
+				clearTimeouts GET,
+				remotelyInitiatedResets GET,
+				dataRetransmissionTimerExpiries GET,
+				providerInitiatedResets GET,
+				resetTimeouts GET,
+				remotelyInitiatedRestarts GET,
+				restartCountsExceeded GET,
+				protocolErrorsDetectedLocally GET,
+				protocolErrorsAccusedOf GET,
+				callEstablishmentRetryCountsExceeded GET,
+				clearCountsExceeded GET,
+				pLEClientMOName GET;
 			ATTRIBUTE GROUPS
 				"Rec. X.723 | ISO/IEC 10165-5":counters
 					"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter
@@ -1565,51 +1496,31 @@ x25PLEIVMO MANAGED OBJECT CLASS
 				commonCreationDeletion-B,
 				x25PLEIVMO-P-B;
 			ATTRIBUTES
-				x25PLEIVMOId
-					GET,
-				localDTEAddress
-					GET-REPLACE,
-				interfaceMode
-					GET-REPLACE,
-				defaultThroughputClass
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				flowControlNegotiationPermitted
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				callDeflectionSubscription
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				maxActiveCircuits
-					REPLACE-WITH-DEFAULT
+				x25PLEIVMOId GET,
+				localDTEAddress GET-REPLACE,
+				interfaceMode GET-REPLACE,
+				defaultThroughputClass REPLACE-WITH-DEFAULT GET-REPLACE,
+				flowControlNegotiationPermitted REPLACE-WITH-DEFAULT GET-REPLACE,
+				callDeflectionSubscription REPLACE-WITH-DEFAULT GET-REPLACE,
+				maxActiveCircuits REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.nullChoiceInteger
 					GET-REPLACE,
-				restartTime
-					REPLACE-WITH-DEFAULT
+				restartTime REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.restartTimeDefault
 					GET-REPLACE,
-				defaultPacketSize
-					REPLACE-WITH-DEFAULT
+				defaultPacketSize REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.nullChoiceInteger
 					GET-REPLACE,
-				defaultWindowSize
-					REPLACE-WITH-DEFAULT
+				defaultWindowSize REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.nullChoiceInteger
 					GET-REPLACE,
-				minimumRecallTimer
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				restartCount
-					REPLACE-WITH-DEFAULT
+				minimumRecallTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+				restartCount REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.restartCountDefault
 					GET-REPLACE,
-				sN-ServiceProvider
-					GET-REPLACE,
-				logicalChannelAssignments
-					GET-REPLACE,
-				packetSequencing
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE;
+				sN-ServiceProvider GET-REPLACE,
+				logicalChannelAssignments GET-REPLACE,
+				packetSequencing REPLACE-WITH-DEFAULT GET-REPLACE;
 			NOTIFICATIONS
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectCreation,
 				"Rec. X.721 | ISO/IEC 10165-2 : 1992":objectDeletion;;;
@@ -1625,19 +1536,16 @@ onlineRegistration-P PACKAGE
 	BEHAVIOUR
 		onlineRegistration-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the operation of the optional online registration facility as described in Clause 13.1 of
-				ISO 8208 (2nd Edition);;
+				Controls the operation of the optional online registration facility as described 
+				in Clause 13.1 of ISO 8208 (2nd Edition);;
 	ATTRIBUTES
-		registrationRequestTime
-			REPLACE-WITH-DEFAULT
+		registrationRequestTime REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.registrationRequestTimeDefault
 			GET-REPLACE,
-		registrationRequestCount
-			REPLACE-WITH-DEFAULT
+		registrationRequestCount REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.registrationRequestCountDefault
 			GET-REPLACE,
-		registrationPermitted
-			REPLACE-WITH-DEFAULT
+		registrationPermitted REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.registrationPermittedDefault
 			GET-REPLACE;
 REGISTERED AS { NLM.poi onlineRegistration-P(11) };
@@ -1646,208 +1554,227 @@ REGISTERED AS { NLM.poi onlineRegistration-P(11) };
 
 x25PLEPImportedNotifications-B BEHAVIOUR
 	DEFINED AS
-		The x25PLE-P package imports the communicationsAlarm notification from Rec. X.721 | ISO/IEC
-		10165-2. It is used to report the following x25PLE managed object events.
+		The x25PLE-P package imports the communicationsAlarm notification from Rec. 
+		X.721 | ISO/IEC 10165-2. It is used to report the following x25PLE managed 
+		object events.
 
-		providerInitiatedDisconnect: Issued upon receipt of a clear packet with a cause code other than
-		`DTE initiated'.
+		providerInitiatedDisconnect: Issued upon receipt of a clear packet with a cause 
+		code other than `DTE initiated'.
 
-		The information relating to the packet shall be reported as a parameter in the
-		additionalInformation field of the communicationsAlarm, using the notificationData PARAMETER.
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER.
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.providerInitiatedDisconnect shall be reported in the
-		specificProblems parameter. The probableCause shall be set to NLM.communicationsProtocolError.
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.providerInitiatedDisconnect shall be reported in the specificProblems 
+		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
 
-		remotelyInitiatedReset: Issued upon occurance of a remotely initiated reset. This event is issued
-		in lieu of a 'providerInitiatedReset' when operating in a DTE-DXE environment. The information
-		relating to the packet shall be reported as a parameter in the additionalInformation field of the
-		communicationsAlarm, using the notificationData PARAMETER
+		remotelyInitiatedReset: Issued upon occurance of a remotely initiated reset. 
+		This event is issued in lieu of a 'providerInitiatedReset' when operating in a 
+		DTE-DXE environment. The information relating to the packet shall be reported as 
+		a parameter in the additionalInformation field of the communicationsAlarm, using 
+		the notificationData PARAMETER
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.remotelyInitiatedDisconnect shall be reported in the
-		specificProblems parameter. The probableCause shall be set to NLM.communicationsProtocolError.
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.remotelyInitiatedDisconnect shall be reported in the specificProblems 
+		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
 
-		providerInitiatedReset: Issued upon occurance of a provider initiated reset. This event is issued
-		when operating in a DTE-DCE environment. The information relating to the packet shall be reported
-		as a parameter in the additionalInformation field of the communicationsAlarm, using the
+		providerInitiatedReset: Issued upon occurance of a provider initiated reset. 
+		This event is issued when operating in a DTE-DCE environment. The information 
+		relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
 		notificationData PARAMETER
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.providerInitiatedReset shall be reported in the specificProblems
-		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
-
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
-
-		remotelyInitiatedRestart: Issued upon receipt of a remotely (including provider) initiated restart.
-
-		The information relating to the packet shall be reported as a parameter in the
-		additionalInformation field of the communicationsAlarm, using the notificationData PARAMETER
-
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.remotelyInitiatedRestart shall be reported in the
-		specificProblems parameter. The probableCause shall be set to NLM.communicationsProtocolError.
-
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
-
-		restartCountExceeded: Issued on restart failure due to restart count (R20) exceeded. The
-		information relating to the packet shall be reported as a parameter in the additionalInformation
-		field of the communicationsAlarm, using the notificationData PARAMETER
-
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it.
-
-		The value NLM.restartCountExceeded shall be reported in the specificProblems parameter. The
-		probableCause shall be set to NLM.communicationsProtocolError.
-
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
-
-		protocolErrorDetectedLocally: Issued upon receipt of a packet which causes the "A=Error" action in
-		the ISO 8208 state tables to be taken.
-
-		The information relating to the packet shall be reported as a parameter in the
-		additionalInformation field of the communicationsAlarm, using the notificationData PARAMETER.
-
-		The values of cause diagnosand diagnostic codes shall be those which would have been placed in a
-		diagnostic packet had one been generated by the DTE (i.e. as if it were a DTE). The actual
-		generation of such a packet is not required.
-
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.communicationsProtocolErrorDetectedLocally shall be reported in
-		the specificProblems parameter.
-
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.providerInitiatedReset shall be reported in the specificProblems parameter. 
 		The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
 
-		accusedOfProtocolError: Issued upon receipt of a diagnostic packet or a clear, reset or restart
-		packet with a cause code equal to `protocol error'. No other x25PLE communication alarm shall be
-		generated as a result of this particular instance of packet.
+		remotelyInitiatedRestart: Issued upon receipt of a remotely (including provider) 
+		initiated restart.
 
-		The information relating to the packet shall be reported as a parameter in the
-		additionalInformation field of the communicationsAlarm, using the notificationData PARAMETER
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.accusedOfProtocolError shall be reported in the specificProblems
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.remotelyInitiatedRestart shall be reported in the specificProblems 
 		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
 
-		callEstablishmentRetryCountExceeded: Issued on retry failure during call establishment due to retry
-		limit exceeded.
+		restartCountExceeded: Issued on restart failure due to restart count (R20) 
+		exceeded. The information relating to the packet shall be reported as a 
+		parameter in the additionalInformation field of the communicationsAlarm, using 
+		the notificationData PARAMETER
 
-		The information relating to the call shall be reported as a parameter in the additionalInformation
-		field of the communicationsAlarm, using the notificationData PARAMETER
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it. The value NLM.callEstablishmentRetryCountExceeded shall be reported in the
+		The value NLM.restartCountExceeded shall be reported in the specificProblems 
+		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
+
+		protocolErrorDetectedLocally: Issued upon receipt of a packet which causes the 
+		"A=Error" action in the ISO 8208 state tables to be taken.
+
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER.
+
+		The values of cause diagnosand diagnostic codes shall be those which would have 
+		been placed in a diagnostic packet had one been generated by the DTE (i.e. as if 
+		it were a DTE). The actual generation of such a packet is not required.
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.communicationsProtocolErrorDetectedLocally shall be reported in the 
 		specificProblems parameter.
 
 		The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
 
-		clearCountExceeded: Issued on retry failure due to clear limit (R23) exceeded. The information
-		relating to the call shall be reported as a parameter in the additionalInformation field of the
-		communicationsAlarm, using the notificationData PARAMETER
+		accusedOfProtocolError: Issued upon receipt of a diagnostic packet or a clear, 
+		reset or restart packet with a cause code equal to `protocol error'. No other 
+		x25PLE communication alarm shall be generated as a result of this particular 
+		instance of packet.
 
-		The significance sub-parameter of each item of additionalInformation shall be set to the value
-		`False' (i.e. not significant) so that a managing system receiving the event report will be less
-		likely to reject it.
+		The information relating to the packet shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
 
-		The value NLM.clearCountExceeded shall be reported in the specificProblems parameter. The
-		probableCause shall be set to NLM.communicationsProtocolError.
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.accusedOfProtocolError shall be reported in the specificProblems parameter. 
+		The probableCause shall be set to NLM.communicationsProtocolError.
 
-		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm with a
-		perceivedSeverity value of `Cleared' shall not be generated. No other fields or parameters shall be
-		used, with the exception of further parameters in the AdditionalInformation field.;
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
+
+		callEstablishmentRetryCountExceeded: Issued on retry failure during call 
+		establishment due to retry limit exceeded.
+
+		The information relating to the call shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it. The value 
+		NLM.callEstablishmentRetryCountExceeded shall be reported in the 
+		specificProblems parameter.
+
+		The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.
+
+		clearCountExceeded: Issued on retry failure due to clear limit (R23) exceeded. 
+		The information relating to the call shall be reported as a parameter in the 
+		additionalInformation field of the communicationsAlarm, using the 
+		notificationData PARAMETER
+
+		The significance sub-parameter of each item of additionalInformation shall be 
+		set to the value `False' (i.e. not significant) so that a managing system 
+		receiving the event report will be less likely to reject it.
+
+		The value NLM.clearCountExceeded shall be reported in the specificProblems 
+		parameter. The probableCause shall be set to NLM.communicationsProtocolError.
+
+		The perceivedSeverity shall be set to `Minor'. A subsequent communicationsAlarm 
+		with a perceivedSeverity value of `Cleared' shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the AdditionalInformation field.;
 
 
 x25PLEIVMO-P-B BEHAVIOUR
 	DEFINED AS
-		!Used as the source of initial values for some of the attributes of automatically created x25PLE
-		managed objects. Initial values of attributes of the x25PLE not included in the x25PLEIVMO are
-		derived in other ways. In particular, all counter attributes have a mandatory initial value of
-		zero. The naming attribute is assigned an initial value according to local mechanisms.!;
+		!Used as the source of initial values for some of the attributes of automatically 
+		created x25PLE managed objects. Initial values of attributes of the x25PLE not 
+		included in the x25PLEIVMO are derived in other ways. In particular, all counter 
+		attributes have a mandatory initial value of zero. The naming attribute is 
+		assigned an initial value according to local mechanisms.!;
 ---Name Bindings
 
 
 x25PLEIVMO-networkSubsystem NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		x25PLEIVMO
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS x25PLEIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
 	WITH ATTRIBUTE
 		x25PLEIVMOId;
-	CREATE
-		WITH-REFERENCE-OBJECT;
+	CREATE WITH-REFERENCE-OBJECT;
 	DELETE;
 REGISTERED AS { NLM.nboi x25PLEIVMO-networkSubsystem(10) };
 
 
 x25PLE-networkSubsystem-Management NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		x25PLE
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS x25PLE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
 	WITH ATTRIBUTE
 		x25PLEId;
 	BEHAVIOUR
 		x25PLE-networkSubsystem-Management-B BEHAVIOUR
 			DEFINED AS
-				The name binding that applies when the x25PLE Managed Object is created by management operation.;;
-	CREATE
-		WITH-REFERENCE-OBJECT;
+				The name binding that applies when the x25PLE Managed Object is created by 
+				management operation.;;
+	CREATE WITH-REFERENCE-OBJECT;
 	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
 REGISTERED AS { NLM.nboi x25PLE-networkSubsystem-Management(9) };
 
 
 x25PLE-networkSubsystem-Automatic NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		x25PLE
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		networkSubsystem
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS x25PLE AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS networkSubsystem AND SUBCLASSES;
 	WITH ATTRIBUTE
 		x25PLEId;
 	BEHAVIOUR
 		x25PLE-netowrkSusbsystem-Automatic-B BEHAVIOUR
 			DEFINED AS
-				The name binding that applies when the x25PLE Managed Object is created by automatic operation of
-				the sytem.;;
+				The name binding that applies when the x25PLE Managed Object is created by 
+				automatic operation of the sytem.;;
 	DELETE;
 REGISTERED AS { NLM.nboi x25PLE-networkSubsystem-Automatic(18) };
 ---Attributes
@@ -1869,8 +1796,8 @@ callDeflectionSubscription ATTRIBUTE
 	BEHAVIOUR
 		callDeflectionSubscription-B BEHAVIOUR
 			DEFINED AS
-				Indicates whether call deflection has been subscribed to. When this has the value `true', call
-				deflection has been subscribed to.;;
+				Indicates whether call deflection has been subscribed to. When this has the 
+				value `true', call deflection has been subscribed to.;;
 REGISTERED AS { NLM.aoi callDeflectionSubscription(114) };
 
 
@@ -1890,8 +1817,8 @@ callEstablishmentRetryCountsExceeded ATTRIBUTE
 	BEHAVIOUR
 		callEstablishmentRetryCountsExceeded-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the callEstablishmentRetryCountExceeded event which generates a
-				communications alarm notification.;;
+				Counter associated with the callEstablishmentRetryCountExceeded event which 
+				generates a communications alarm notification.;;
 REGISTERED AS { NLM.aoi callEstablishmentRetryCountsExceeded(65) };
 
 
@@ -1911,8 +1838,8 @@ clearCountsExceeded ATTRIBUTE
 	BEHAVIOUR
 		clearCountsExceeded-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the clearCountExceeded event which generates a communications alarm
-				notification.;;
+				Counter associated with the clearCountExceeded event which generates a 
+				communications alarm notification.;;
 REGISTERED AS { NLM.aoi clearCountsExceeded(66) };
 
 
@@ -1952,7 +1879,8 @@ dataRetransmissionTimerExpiries ATTRIBUTE
 	BEHAVIOUR
 		dataRetransmissionTimerExpiries-B BEHAVIOUR
 			DEFINED AS
-				Counter of the number of expiries of timer T25. Returns zero if the option is not implemented;;
+				Counter of the number of expiries of timer T25. Returns zero if the option is 
+				not implemented;;
 REGISTERED AS { NLM.aoi dataRetransmissionTimerExpiries(58) };
 
 
@@ -1962,9 +1890,9 @@ defaultPacketSize ATTRIBUTE
 	BEHAVIOUR
 		defaultPacketSize-B BEHAVIOUR
 			DEFINED AS
-				The default value of the packet size parameter for this DTE. A value of NULL indicates the ISO 8208
-				default value of 128. Any other value indicates the value agreed by the nonstandard default packet
-				sizes facility.;;
+				The default value of the packet size parameter for this DTE. A value of NULL 
+				indicates the ISO 8208 default value of 128. Any other value indicates the value 
+				agreed by the nonstandard default packet sizes facility.;;
 REGISTERED AS { NLM.aoi defaultPacketSize(103) };
 
 
@@ -1974,8 +1902,9 @@ defaultThroughputClass ATTRIBUTE
 	BEHAVIOUR
 		defaultThroughputClass-B BEHAVIOUR
 			DEFINED AS
-				The default throughput class value currently agreed with the DCE. This may be the normal default,
-				or may have been changed as a result of the use of the defaultThroughputClassAssignment facility.;;
+				The default throughput class value currently agreed with the DCE. This may be 
+				the normal default, or may have been changed as a result of the use of the 
+				defaultThroughputClassAssignment facility.;;
 REGISTERED AS { NLM.aoi defaultThroughputClass(112) };
 
 
@@ -1985,9 +1914,9 @@ defaultWindowSize ATTRIBUTE
 	BEHAVIOUR
 		defaultWindowSize-B BEHAVIOUR
 			DEFINED AS
-				The default value of the window size parameter for this DTE. A value of NULL indicates the ISO 8208
-				default value of 2. Any other value indicates the value agreed by the nonstandard default window
-				sizes facility.;;
+				The default value of the window size parameter for this DTE. A value of NULL 
+				indicates the ISO 8208 default value of 2. Any other value indicates the value 
+				agreed by the nonstandard default window sizes facility.;;
 REGISTERED AS { NLM.aoi defaultWindowSize(104) };
 
 
@@ -1997,11 +1926,12 @@ flowControlNegotiationPermitted ATTRIBUTE
 	BEHAVIOUR
 		flowcontrolNegotiationPermitted-B BEHAVIOUR
 			DEFINED AS
-				Indicates whether flow control parameter negotiation is permitted. When this has the value `true',
-				the use of flow control parameter negotiation (by specifying values for the window and packet size
-				in call request and accept packets) is permitted. When it has the value `false', no such values
-				shall be specified in call request and accept packets, and any values specified in an IVMO or via
-				an internal interface shall be ignored.;;
+				Indicates whether flow control parameter negotiation is permitted. When this has 
+				the value `true', the use of flow control parameter negotiation (by specifying 
+				values for the window and packet size in call request and accept packets) is 
+				permitted. When it has the value `false', no such values shall be specified in 
+				call request and accept packets, and any values specified in an IVMO or via an 
+				internal interface shall be ignored.;;
 REGISTERED AS { NLM.aoi flowControlNegotiationPermitted(113) };
 
 
@@ -2021,7 +1951,8 @@ interruptPacketsReceived ATTRIBUTE
 	BEHAVIOUR
 		interruptPacketsReceived-B BEHAVIOUR
 			DEFINED AS
-				Counter of the number of interrupt packets received by the PLE or over the PVC/VC;;
+				Counter of the number of interrupt packets received by the PLE or over the 
+				PVC/VC;;
 REGISTERED AS { NLM.aoi interruptPacketsReceived(68) };
 
 
@@ -2041,7 +1972,8 @@ interruptTimerExpiries ATTRIBUTE
 	BEHAVIOUR
 		interruptTimerExpiries-B BEHAVIOUR
 			DEFINED AS
-				Counter of the number of expiries of timer T26 experienced by the PLE or over the PVC/VC;;
+				Counter of the number of expiries of timer T26 experienced by the PLE or over 
+				the PVC/VC;;
 REGISTERED AS { NLM.aoi interruptTimerExpiries(69) };
 
 
@@ -2061,19 +1993,22 @@ logicalChannelAssignments ATTRIBUTE
 	BEHAVIOUR
 		logicalChannelAssignments-B BEHAVIOUR
 			DEFINED AS
-				Represents the logical channel assignments of this PLE, expressed as a four-tuple where the values
-				represent the set (with maximum permitted cardinality (LIC - 1), minimum required cardinality of
-				zero) of PVC channels (with maximum value (LIC -1), and minimum value 1) assigned, the incoming
-				channel range, the two-way channel range, the outgoing channel range, respectively.
+				Represents the logical channel assignments of this PLE, expressed as a 
+				four-tuple where the values represent the set (with maximum permitted 
+				cardinality (LIC - 1), minimum required cardinality of zero) of PVC channels 
+				(with maximum value (LIC -1), and minimum value 1) assigned, the incoming 
+				channel range, the two-way channel range, the outgoing channel range, 
+				respectively.
 
-				The presence of each of the ranges shall be optional. Absence of a particular range shall signify
-				that there are no channels of that type assigned. Within each range, the low value shall be less
-				than or equal to the high value, and there shall be no value in any set or range which is greater
-				than or equal to a value in a subsequent range when ordered as above.
+				The presence of each of the ranges shall be optional. Absence of a particular 
+				range shall signify that there are no channels of that type assigned. Within 
+				each range, the low value shall be less than or equal to the high value, and 
+				there shall be no value in any set or range which is greater than or equal to a 
+				value in a subsequent range when ordered as above.
 
-				This attribute is subject to the rules for logical assignments described in ISO 8208 clause 3.7. It
-				is understood that the Highest Permanent Channel (HPC) is defined by the Lowest Incoming Channel
-				(LIC) value minus one.;;
+				This attribute is subject to the rules for logical assignments described in ISO 
+				8208 clause 3.7. It is understood that the Highest Permanent Channel (HPC) is 
+				defined by the Lowest Incoming Channel (LIC) value minus one.;;
 REGISTERED AS { NLM.aoi logicalChannelAssignments(48) };
 
 
@@ -2083,8 +2018,9 @@ maxActiveCircuits ATTRIBUTE
 	BEHAVIOUR
 		maxActiveCircuits-B BEHAVIOUR
 			DEFINED AS
-				The maximum number of active circuits permitted on this PLE. When the NULL value is specifed, the
-				maximum number of active circuits shall be limited only by the resources available to the entity;;
+				The maximum number of active circuits permitted on this PLE. When the NULL value 
+				is specifed, the maximum number of active circuits shall be limited only by the 
+				resources available to the entity;;
 REGISTERED AS { NLM.aoi maxActiveCircuits(41) };
 
 
@@ -2094,9 +2030,9 @@ minimumRecallTimer ATTRIBUTE
 	BEHAVIOUR
 		minimumRecallTimer-B BEHAVIOUR
 			DEFINED AS
-				Mimimum time in seconds before recall permitted. This timer determines the minimum interval (in
-				seconds) which shall elapse following an unsuccessful first call attempt before a subsequent call
-				attempt is permitted;;
+				Mimimum time in seconds before recall permitted. This timer determines the 
+				minimum interval (in seconds) which shall elapse following an unsuccessful first 
+				call attempt before a subsequent call attempt is permitted;;
 REGISTERED AS { NLM.aoi minimumRecallTimer(43) };
 
 
@@ -2106,10 +2042,11 @@ packetSequencing ATTRIBUTE
 	BEHAVIOUR
 		packetSequencing-B BEHAVIOUR
 			DEFINED AS
-				The modulo of the packet sequence number space. Expressed as an integer. ISO 8208 only requires
-				support for at least one of the two values 8 and 128, but it is possible that some future revision
-				may extend the range. A system is only required to support the setting of values which are also
-				required by the protocol standard. A system shall return an error when an attempt is made to set
+				The modulo of the packet sequence number space. Expressed as an integer. ISO 
+				8208 only requires support for at least one of the two values 8 and 128, but it 
+				is possible that some future revision may extend the range. A system is only 
+				required to support the setting of values which are also required by the 
+				protocol standard. A system shall return an error when an attempt is made to set 
 				the value to a value which is not supported by that system.;;
 REGISTERED AS { NLM.aoi packetSequencing(49) };
 
@@ -2131,8 +2068,8 @@ protocolErrorsAccusedOf ATTRIBUTE
 	BEHAVIOUR
 		protocolErrorsAccusedOf-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the accusedOfProtocolError event which generates a communications alarm
-				notifiaction.;;
+				Counter associated with the accusedOfProtocolError event which generates a 
+				communications alarm notifiaction.;;
 REGISTERED AS { NLM.aoi protocolErrorsAccusedOf(64) };
 
 
@@ -2142,8 +2079,8 @@ protocolErrorsDetectedLocally ATTRIBUTE
 	BEHAVIOUR
 		protocolErrorsDetectedLocally-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the protocolErrorDetectedLocally event which generates a communications
-				alarm notification;;
+				Counter associated with the protocolErrorDetectedLocally event which generates a 
+				communications alarm notification;;
 REGISTERED AS { NLM.aoi protocolErrorsDetectedLocally(63) };
 
 
@@ -2163,8 +2100,8 @@ providerInitiatedDisconnects ATTRIBUTE
 	BEHAVIOUR
 		providerInitiatedDisconnects-B BEHAVIOUR
 			DEFINED AS
-				Counter for the providerInitiatedDisconnect events which generate communication alarm
-				notifications.;;
+				Counter for the providerInitiatedDisconnect events which generate communication 
+				alarm notifications.;;
 REGISTERED AS { NLM.aoi providerInitiatedDisconnects(54) };
 
 
@@ -2174,8 +2111,8 @@ providerInitiatedResets ATTRIBUTE
 	BEHAVIOUR
 		providerInitiatedResets-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the providerInitiatedReset event which generates a communication alarm
-				notification.;;
+				Counter associated with the providerInitiatedReset event which generates a 
+				communication alarm notification.;;
 REGISTERED AS { NLM.aoi providerInitiatedResets(59) };
 
 
@@ -2215,8 +2152,8 @@ remotelyInitiatedResets ATTRIBUTE
 	BEHAVIOUR
 		remotelyInitiatedResets-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the remotelyInitiatedReset event which genrates a communication alarm
-				notification.;;
+				Counter associated with the remotelyInitiatedReset event which genrates a 
+				communication alarm notification.;;
 REGISTERED AS { NLM.aoi remotelyInitiatedResets(57) };
 
 
@@ -2226,9 +2163,9 @@ remotelyInitiatedRestarts ATTRIBUTE
 	BEHAVIOUR
 		remotelyInitiatedestarts-B BEHAVIOUR
 			DEFINED AS
-				Counter of the number of remotely initiated restarts. This is the total number of remotely
-				initiated (including provider initiated) restarts experienced by the PLE, excluding the restart
-				associated with bringing up the PLE interface;;
+				Counter of the number of remotely initiated restarts. This is the total number 
+				of remotely initiated (including provider initiated) restarts experienced by the 
+				PLE, excluding the restart associated with bringing up the PLE interface;;
 REGISTERED AS { NLM.aoi remotelyInitiatedRestarts(61) };
 
 
@@ -2258,8 +2195,8 @@ restartCountsExceeded ATTRIBUTE
 	BEHAVIOUR
 		restartCountsExceeded-B BEHAVIOUR
 			DEFINED AS
-				Counter associated with the restartCountExceeded event which generates a communication alarm
-				notification.;;
+				Counter associated with the restartCountExceeded event which generates a 
+				communication alarm notification.;;
 REGISTERED AS { NLM.aoi restartCountsExceeded(62) };
 
 
@@ -2321,42 +2258,27 @@ virtualCall MANAGED OBJECT CLASS
 				octetsSentReceivedCounter-B,
 				virtualCallNaming-B;
 			ATTRIBUTES
-				virtualCallId
-					GET,
-				channel
-					GET,
-				packetSize
-					GET,
-				windowSize
-					GET,
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter
-					GET,
+				virtualCallId GET,
+				channel GET,
+				packetSize GET,
+				windowSize GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter GET,
 				-- This corresponds to the ISO8208OctetsSent attribute. Note that the DMI
 				-- definition is in terms of user data octets.
-				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsReceivedCounter
-					GET,
+				"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsReceivedCounter GET,
 				-- This corresponds to the ISO8208OctetsReceived attribute. Note that the
 				--DMI definition is in terms of user data octets.
-				dataPacketsSent
-					GET,
+				dataPacketsSent GET,
 				-- Note the "Rec. X.721 | ISO/IEC 10165-2 : 1992":PDUsSentCounter cannot be used here
 				-- since it is defined as total number of PDUs sent, not just data PDUs.
-				dataPacketsReceived
-					GET,
-				remotelyInitiatedResets
-					GET,
-				dataRetransmissionTimerExpiries
-					GET,
-				providerInitiatedResets
-					GET,
-				resetTimeouts
-					GET,
-				interruptPacketsSent
-					GET,
-				interruptPacketsReceived
-					GET,
-				interruptTimerExpiries
-					GET;
+				dataPacketsReceived GET,
+				remotelyInitiatedResets GET,
+				dataRetransmissionTimerExpiries GET,
+				providerInitiatedResets GET,
+				resetTimeouts GET,
+				interruptPacketsSent GET,
+				interruptPacketsReceived GET,
+				interruptTimerExpiries GET;
 			ATTRIBUTE GROUPS
 				"Rec. X.723 | ISO/IEC 10165-5":counters
 					"Rec. X.721 | ISO/IEC 10165-2 : 1992":octetsSentCounter
@@ -2387,12 +2309,13 @@ permanentVirtualCircuit MANAGED OBJECT CLASS
 			BEHAVIOUR
 				pVCMOPBehaviour BEHAVIOUR
 					DEFINED AS
-						When the MO is created, the protocol machine shall be reinitialized and a reset PDU shall be
-						transmitted.;;
+						When the MO is created, the protocol machine shall be reinitialized and a reset 
+						PDU shall be transmitted.;;
 			ATTRIBUTES
 				channel
 					INITIAL VALUE DERIVATION RULE
-						channelIV-B;;;
+						channelIV-B
+					;;;
 REGISTERED AS { NLM.moi permanentVirtualCircuit(12) };
 -- 6.11.3  The Virtual Call Initial Values Managed Object
 -- This managed object exists in order to permit the values of various parameters of a virtual call to
@@ -2413,45 +2336,28 @@ virtualCallIVMO MANAGED OBJECT CLASS
 				commonCreationDeletion-B,
 				virtualCallIVMO-P-B;
 			ATTRIBUTES
-				virtualCallIVMOId
-					GET,
-				proposedPacketSize
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				proposedWindowSize
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				acceptReverseCharging
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				proposeReverseCharging
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				fastSelect
-					REPLACE-WITH-DEFAULT
-					GET-REPLACE,
-				callTime
-					REPLACE-WITH-DEFAULT
+				virtualCallIVMOId GET,
+				proposedPacketSize REPLACE-WITH-DEFAULT GET-REPLACE,
+				proposedWindowSize REPLACE-WITH-DEFAULT GET-REPLACE,
+				acceptReverseCharging REPLACE-WITH-DEFAULT GET-REPLACE,
+				proposeReverseCharging REPLACE-WITH-DEFAULT GET-REPLACE,
+				fastSelect REPLACE-WITH-DEFAULT GET-REPLACE,
+				callTime REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.callTimeDefault
 					GET-REPLACE,
-				resetTime
-					REPLACE-WITH-DEFAULT
+				resetTime REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.resetTimeDefault
 					GET-REPLACE,
-				clearTime
-					REPLACE-WITH-DEFAULT
+				clearTime REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.clearTimeDefault
 					GET-REPLACE,
-				interruptTime
-					REPLACE-WITH-DEFAULT
+				interruptTime REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.interruptTimeDefault
 					GET-REPLACE,
-				resetCount
-					REPLACE-WITH-DEFAULT
+				resetCount REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.resetCountDefault
 					GET-REPLACE,
-				clearCount
-					REPLACE-WITH-DEFAULT
+				clearCount REPLACE-WITH-DEFAULT
 					DEFAULT VALUE NLM.clearCountDefault
 					GET-REPLACE;
 			NOTIFICATIONS
@@ -2460,10 +2366,12 @@ virtualCallIVMO MANAGED OBJECT CLASS
 	CONDITIONAL PACKAGES
 		receivingWindowRotationRecoveryProcedures-P
 			PRESENT IF
-				The optional window rotation recovery procedures are implemented at a recieving DTE,
+				The optional window rotation recovery procedures are implemented at a recieving 
+				DTE,
 		transmittingWindowRotationRecoveryProcedures-P
 			PRESENT IF
-				The optional window rotation recovery procedures are implemented at a transmitting DTE,
+				The optional window rotation recovery procedures are implemented at a 
+				transmitting DTE,
 		packetRetransmissionProcedures-P
 			PRESENT IF
 				The optional packet retransmission procedures are implemented;
@@ -2485,20 +2393,13 @@ switchedVirtualCall MANAGED OBJECT CLASS
 			BEHAVIOUR
 				successfulConnectionEstablishment-B;
 			ATTRIBUTES
-				direction
-					GET,
-				remoteDTEAddress
-					GET,
-				throughputClass
-					GET,
-				redirectReason
-					GET,
-				originallyCalledAddress
-					GET,
-				callingAddressExtension
-					GET,
-				calledAddressExtension
-					GET;
+				direction GET,
+				remoteDTEAddress GET,
+				throughputClass GET,
+				redirectReason GET,
+				originallyCalledAddress GET,
+				callingAddressExtension GET,
+				calledAddressExtension GET;
 			NOTIFICATIONS
 				"Rec. X.723 | ISO/IEC 10165-5":communicationsInformation;;;
 REGISTERED AS { NLM.moi switchedVirtualCall(11) };
@@ -2509,15 +2410,13 @@ packetRetransmissionProcedures-P PACKAGE
 	BEHAVIOUR
 		packetRetransmissionProcedures-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the operation of the optional packet retransmission procedures as described in Clause 13.4
-				of ISO 8208 (2nd Edition);;
+				Controls the operation of the optional packet retransmission procedures as 
+				described in Clause 13.4 of ISO 8208 (2nd Edition);;
 	ATTRIBUTES
-		rejectTime
-			REPLACE-WITH-DEFAULT
+		rejectTime REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.rejectTimeDefault
 			GET-REPLACE,
-		rejectCount
-			REPLACE-WITH-DEFAULT
+		rejectCount REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.rejectCountDefault
 			GET-REPLACE;
 REGISTERED AS { NLM.poi packetRetransmissionProcedures-P(14) };
@@ -2527,11 +2426,10 @@ receivingWindowRotationRecoveryProcedures-P PACKAGE
 	BEHAVIOUR
 		receivingWindowRotationRecoveryProcedures-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the operation of the optional window rotation recovery procedures at a receiving DTE as
-				described in Clause 11.2.2 of ISO 8208 (2nd Edition);;
+				Controls the operation of the optional window rotation recovery procedures at a 
+				receiving DTE as described in Clause 11.2.2 of ISO 8208 (2nd Edition);;
 	ATTRIBUTES
-		windowTime
-			REPLACE-WITH-DEFAULT
+		windowTime REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.windowTimeDefault
 			GET-REPLACE;
 REGISTERED AS { NLM.poi receivingWindowRotationRecoveryProcedures-P(12) };
@@ -2541,15 +2439,13 @@ transmittingWindowRotationRecoveryProcedures-P PACKAGE
 	BEHAVIOUR
 		transmittingWindowRotationRecoveryProcedures-P-B BEHAVIOUR
 			DEFINED AS
-				Controls the operation of the optional window rotation recovery procedures at a transmitting DTE as
-				described in Clause 11.2.1 of ISO 8208 (2nd Edition);;
+				Controls the operation of the optional window rotation recovery procedures at a 
+				transmitting DTE as described in Clause 11.2.1 of ISO 8208 (2nd Edition);;
 	ATTRIBUTES
-		dataRetransmissionTime
-			REPLACE-WITH-DEFAULT
+		dataRetransmissionTime REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.dataRetransmissionTimeDefault
 			GET-REPLACE,
-		dataRetransmissionCount
-			REPLACE-WITH-DEFAULT
+		dataRetransmissionCount REPLACE-WITH-DEFAULT
 			DEFAULT VALUE NLM.dataRetransmissionCountDefault
 			GET-REPLACE;
 REGISTERED AS { NLM.poi transmittingWindowRotationRecoveryProcedures-P(13) };
@@ -2563,65 +2459,58 @@ channelIV-B BEHAVIOUR
 
 virtualCallIVMO-P-B BEHAVIOUR
 	DEFINED AS
-		!Used as the source of initial values for some of the attributes of automatically created
-		switchedVirtualCall managed objects. Initial values of attributes of the switchedVirtualCall MO not
-		included in the virtualCallIVMO are derived in other ways. In particular, all counter attributes
-		have a mandatory initial value of zero. The naming attribute is assigned an initial value according
-		to local mechanisms. Initial values of attributes included in the virtualCallIVMO, are permitted to
-		be derived in other ways, for example by being supplied via a local user interface. In this case,
-		the IVMO only supplies values for attributes whose values are not provided by other means.!;
+		!Used as the source of initial values for some of the attributes of automatically 
+		created switchedVirtualCall managed objects. Initial values of attributes of the 
+		switchedVirtualCall MO not included in the virtualCallIVMO are derived in other 
+		ways. In particular, all counter attributes have a mandatory initial value of 
+		zero. The naming attribute is assigned an initial value according to local 
+		mechanisms. Initial values of attributes included in the virtualCallIVMO, are 
+		permitted to be derived in other ways, for example by being supplied via a local 
+		user interface. In this case, the IVMO only supplies values for attributes whose 
+		values are not provided by other means.!;
 
 
 virtualCallNaming-B BEHAVIOUR
 	DEFINED AS
-		A system shall ensure that all instances of MOs derived from the virtualCall MO which have a common
-		x25PLE as their superior MO, shall have unique values for the virtualCallId attribute. This applies
-		to both automatically generated names and those supplied by means of a CMIP create.;
+		A system shall ensure that all instances of MOs derived from the virtualCall MO 
+		which have a common x25PLE as their superior MO, shall have unique values for 
+		the virtualCallId attribute. This applies to both automatically generated names 
+		and those supplied by means of a CMIP create.;
 ---Name Bindings
 
 
 pVCMO-x25PLE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		permanentVirtualCircuit
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		x25PLE
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS permanentVirtualCircuit AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		virtualCallId;
 	BEHAVIOUR
 		channelIV-B;
-	CREATE
-		WITH-AUTOMATIC-INSTANCE-NAMING;
+	CREATE WITH-AUTOMATIC-INSTANCE-NAMING;
 	DELETE;
 REGISTERED AS { NLM.nboi pVCMO-x25PLE(13) };
 
 
 sVCMO-x25PLE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		switchedVirtualCall
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		x25PLE
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS switchedVirtualCall AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		virtualCallId;
 	BEHAVIOUR
 		sVCMO-x25PLE-B BEHAVIOUR
 			DEFINED AS
-				Created only by the operation of the protocol or local interface. The instance name is derived
-				automatically (as for CREATE WITH-AUTOMATIC-INSTANCE-NAMING);;
+				Created only by the operation of the protocol or local interface. The instance 
+				name is derived automatically (as for CREATE WITH-AUTOMATIC-INSTANCE-NAMING);;
 	DELETE;
 REGISTERED AS { NLM.nboi sVCMO-x25PLE(12) };
 
 
 virtualCallIVMO-x25PLE NAME BINDING
-	SUBORDINATE OBJECT CLASS
-		virtualCallIVMO
-		AND SUBCLASSES;
-	NAMED BY SUPERIOR OBJECT CLASS
-		x25PLE
-		AND SUBCLASSES;
+	SUBORDINATE OBJECT CLASS virtualCallIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS x25PLE AND SUBCLASSES;
 	WITH ATTRIBUTE
 		virtualCallIVMOId;
 	CREATE;
@@ -2743,9 +2632,10 @@ fastSelect ATTRIBUTE
 	BEHAVIOUR
 		fastSelect-B BEHAVIOUR
 			DEFINED AS
-				Type of fast select to used for call. This specifies that one of `fast select', `fast select with
-				retricted response', or no fast select facility is to be used for the call. Includes a value `not
-				specified' which indicates that no preference is expressed;;
+				Type of fast select to used for call. This specifies that one of `fast select', 
+				`fast select with retricted response', or no fast select facility is to be used 
+				for the call. Includes a value `not specified' which indicates that no 
+				preference is expressed;;
 REGISTERED AS { NLM.aoi fastSelect(76) };
 
 
@@ -2785,9 +2675,10 @@ proposedPacketSize ATTRIBUTE
 	BEHAVIOUR
 		proposedPacketSize-B BEHAVIOUR
 			DEFINED AS
-				The proposed value of the packet size parameter to be used when establishing the virtual call,
-				expressed in octets. The value of NULL indicates that the default packet size (as indicated by the
-				defaultPacketSize attribute of the containing X.25 PLE MO), is to be used.;;
+				The proposed value of the packet size parameter to be used when establishing the 
+				virtual call, expressed in octets. The value of NULL indicates that the default 
+				packet size (as indicated by the defaultPacketSize attribute of the containing 
+				X.25 PLE MO), is to be used.;;
 REGISTERED AS { NLM.aoi proposedPacketSize(72) };
 
 
@@ -2797,9 +2688,10 @@ proposedWindowSize ATTRIBUTE
 	BEHAVIOUR
 		proposedWindowSize-B BEHAVIOUR
 			DEFINED AS
-				The proposed value of the window size parameter to be used when establishing the virtual call.The
-				value of NULL indicates that the default window size (as indicated by the defaultWindowSize
-				attribute of the containing X.25 PLE MO), is to be used.;;
+				The proposed value of the window size parameter to be used when establishing the 
+				virtual call.The value of NULL indicates that the default window size (as 
+				indicated by the defaultWindowSize attribute of the containing X.25 PLE MO), is 
+				to be used.;;
 REGISTERED AS { NLM.aoi proposedWindowSize(73) };
 
 
@@ -2820,7 +2712,8 @@ redirectReason ATTRIBUTE
 	BEHAVIOUR
 		redirectReason-B BEHAVIOUR
 			DEFINED AS
-				The reason for call redirect. The zero value indicates that the call was not redirected;;
+				The reason for call redirect. The zero value indicates that the call was not 
+				redirected;;
 REGISTERED AS { NLM.aoi redirectReason(97) };
 
 
@@ -2850,9 +2743,10 @@ remoteDTEAddress ATTRIBUTE
 	BEHAVIOUR
 		remoteDTEAddress-B BEHAVIOUR
 			DEFINED AS
-				The DTE Address of the remote DTE. In the case of an outgoing call, this is the remote DTE address
-				from the called address of the transmitted call request packet. In the case of an incoming call, it
-				is the calling address from the received call request packet.;;
+				The DTE Address of the remote DTE. In the case of an outgoing call, this is the 
+				remote DTE address from the called address of the transmitted call request 
+				packet. In the case of an incoming call, it is the calling address from the 
+				received call request packet.;;
 REGISTERED AS { NLM.aoi remoteDTEAddress(93) };
 
 
@@ -2882,7 +2776,8 @@ throughputClass ATTRIBUTE
 	BEHAVIOUR
 		throughputClass-B BEHAVIOUR
 			DEFINED AS
-				The actual throughput class in use for the call. For SVCs this is the result of negotiation;;
+				The actual throughput class in use for the call. For SVCs this is the result of 
+				negotiation;;
 REGISTERED AS { NLM.aoi throughputClass(96) };
 
 
@@ -2932,10 +2827,135 @@ END
 --  $Log: ISO10733.gdmo,v $
 --  Revision 0.9.2.2  2007/09/09 22:58:47  brian
 --  - updates for namespace
---
+--  
 --  Revision 0.9.2.1  2007/09/06 10:58:57  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
---< GDMO.EndDocument "ISO/IEC 10733" >--
+--< GDMO.EndDocument "ISO/IEC 10733"
+--  { joint-iso-ccitt network-layer(13) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x283::networkEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x283::cLNS
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x283::cONS
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ |  +- itut_x283::nSAP
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x283::networkConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x283::networkSubsystem
+--@@ +- iso_10589_2::adjacency
+--@@ +- iso_10589_2::virtualAdjacency
+--@@ +- iso_10589_2::destination
+--@@ +- iso_10589_2::reachableAddress
+--@@ +- itut_x283::linkage
+--@@ +- itut_x283::x25PLE
+--@@ +- itut_x283::x25PLEIVMO
+--@@ +- itut_x283::virtualCircuit
+--@@ |  +- itut_x283::virtualCircuit_DTE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DTE
+--@@ |  |  +- itut_x283::virtualCall_DTE
+--@@ |  +- itut_x283::virtualCircuit_DCE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DCE
+--@@ |  |  +- itut_x283::virtualCall_DCE
+--@@ +- itut_x283::virtualCallIVMO
+--@@ +- itut_x283::dSeriesCounts
+--@@ +- iso_10733::virtualCall
+--@@ |  +- iso_10733::permanentVirtualCircuit
+--@@ |  +- iso_10733::switchedVirtualCall
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- iso_10733::networkSubsystem
+--@@ |  >- iso_10733::networkEntity
+--@@ |  |  >- iso_10733::cLNS
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
+--@@ |  |  |  >- iso_10733::linkage
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  >- iso_10733::linkage +++
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
+--@@ |  |  |  >- iso_10733::linkage +++
+--@@ |  |  >- iso_10733::cLNS +++
+--@@ |  |  >- iso_10733::cONS
+--@@ |  |  |  >- iso_10733::linkage +++
+--@@ |  |  |  >- iso_10733::linkage +++
+--@@ |  |  |  >- iso_10733::networkConnection
+--@@ |  |  |  >- iso_10733::linkage +++
+--@@ |  |  |  >- iso_10733::networkConnection
+--@@ |  |  >- iso_10733::cONS +++
+--@@ |  |  >- iso_10733::cLNS +++
+--@@ |  |  >- iso_10733::cLNS +++
+--@@ |  |  >- iso_10733::cONS +++
+--@@ |  |  >- iso_10733::cONS +++
+--@@ |  >- iso_10733::networkEntity +++
+--@@ |  >- iso_10733::nSAP
+--@@ |  >- iso_10733::nSAP
+--@@ |  >- iso_10733::x25PLEIVMO
+--@@ |  >- iso_10733::x25PLE
+--@@ |  |  >- iso_10733::virtualCallIVMO
+--@@ |  |  >- iso_10733::permanentVirtualCircuit
+--@@ |  |  >- iso_10733::switchedVirtualCall
+--@@ |  |  >- iso_10733::virtualCallIVMO
+--@@ |  >- iso_10733::x25PLE +++
+--@@ |  >- iso_10733::networkEntity +++
+--@@ |  >- iso_10733::nSAP
+--@@ |  >- iso_10733::nSAP
+--@@ |  >- iso_10733::x25PLEIVMO
+--@@ |  >- iso_10733::x25PLE +++
+--@@ |  >- iso_10733::x25PLE +++
+--@@ >- iso_10733::networkSubsystem +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

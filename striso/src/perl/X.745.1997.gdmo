@@ -1,3 +1,5 @@
+--< GDMO.Document "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" >--
+--< GDMO.Namespace itut_x745 >--
 --< GDMO.Alias "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" "X.745",
 --  "ITU-T Rec. X.745 (1993)/Cor.1 (1997) | ISO/IEC 10164-12 : 1993/Cor.1 : 1998" >--
 MODULE "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993"
@@ -198,3 +200,4 @@ testTerminateError PARAMETERCONTEXT SPECIFIC-ERROR ;
 WITH SYNTAX Test-ASN1Module.TestTerminateError;BEHAVIOUR testTerminateErrorBehaviour BEHAVIOUR
 DEFINED AS "as defined in 8.4.4.13";;REGISTERED AS { part12Parameter 12 };
 END
+--< GDMO.EndDocument "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993" >--

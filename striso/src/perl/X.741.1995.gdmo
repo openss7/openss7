@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
+--< GDMO.Namespace itut_x741 >--
 MODULE "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995"
 -- Annex A
 -- Definition of management information

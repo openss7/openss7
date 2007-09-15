@@ -8,6 +8,7 @@
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997" >--
+--< GDMO.Namespace itut_x750 >--
 MODULE "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997"
 -- Annex A
 -- Management knowledge managed objects

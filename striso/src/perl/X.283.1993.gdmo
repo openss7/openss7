@@ -2,6 +2,7 @@
 --< GDMO.Include "X.723.gdmo" >--
 --< GDMO.Include "ISO10589.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992" >--
+--< GDMO.Namespace itut_x283 >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Alias "ITU-T Rec. X.283 (1993) | ISO/IEC 10733 : 1992" "CCITT Rec. X.283 (1993) | ISO/IEC 10733 : 1992",
 --  "ISO/IEC 10733" >--

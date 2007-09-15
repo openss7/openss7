@@ -13,6 +13,7 @@
 --  GDMO.Include "G.774.04.gdmo" >--
 --  GDMO.Include "G.774.03.gdmo" >--
 --< GDMO.Document "ITU-T Recommendation M.3100" >--
+--< GDMO.Namespace itut_m3100 >--
 --< GDMO.Alias "ITU-T Recommendation M.3100" "Rec. M.3100 : 1995",
 --  "Recommendation M.3100 : 1992",
 --  "Recommendation M.3100: 1992",

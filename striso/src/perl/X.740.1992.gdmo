@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993" >--
+--< GDMO.Namespace itut_x740 >--
 MODULE "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993"
 -- Annex A
 -- Definition of management information

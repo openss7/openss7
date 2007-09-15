@@ -1,5 +1,6 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "Rec. X.745 (1993)" >--
+--< GDMO.Namespace itut_x745 >--
 --< GDMO.Alias "Rec. X.745 (1993)" "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12:1994",
 --  "Rec. X.745 (1993) | ISO/IEC 10164-12:1994",
 --  "Rec. X.745 (1993) | ISO/IEC 10164-12:1994 " >--

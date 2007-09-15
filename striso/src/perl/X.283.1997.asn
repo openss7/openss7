@@ -1,183 +1,178 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:47:00 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998"
+--  { joint-iso-ccitt network-layer(13) } >--
+MODULE "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998" { joint-iso-ccitt network-layer(13) }
+--< ASN1.Version 1994 NLM
+--  { joint-iso-ccitt network-layer(13) management(0) nLM(2) asn1Module(2) 0 } >--
 --6 ASN.1 modules
-NLM { joint-iso-ccitt network-layer(13) management(0) nLM(2) asn1Module(2) 0 } DEFINITIONS IMPLICIT TAGS ::= BEGIN
+NLM { joint-iso-ccitt network-layer(13) management(0) nLM(2) asn1Module(2) 0 }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
 -- EXPORTS everything --
-IMPORTS communicationsProtocolError
-FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+IMPORTS
+communicationsProtocolError
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 ObjectInstance
-FROM CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
 Timer
-FROM GMI-AttributeModule {joint-iso-ccitt ms(9) smi(3) part5(5) asn1Module(2) gmiAttributeModule(0)};
+	FROM GMI-AttributeModule { joint-iso-ccitt ms(9) smi(3) part5(5) asn1Module(2) gmiAttributeModule(0) };
 --6.1 Object identifier definitions
 --6.1.1 Abbreviations
-network-layer OBJECT IDENTIFIER ::= { joint-iso-ccitt network-layer (13) }
-nl OBJECT IDENTIFIER ::= { network-layer management (0) }
+network-layer OBJECT IDENTIFIER ::= { joint-iso-ccitt network-layer(13) }
+nl OBJECT IDENTIFIER ::= { network-layer management(0) }
 nloi OBJECT IDENTIFIER ::= { nl nLM(2) }
-sseoi OBJECT IDENTIFIER ::= { nloi standardSpecificExtensions (0) }
-moi OBJECT IDENTIFIER ::= { nloi managedObjectClass (3) }
-poi OBJECT IDENTIFIER ::= { nloi package (4) }
-proi OBJECT IDENTIFIER ::= { nloi parameter (5) }
-nboi OBJECT IDENTIFIER ::= { nloi nameBinding (6) }
-aoi OBJECT IDENTIFIER ::= { nloi attribute (7) }
-agoi OBJECT IDENTIFIER ::= { nloi attributeGroup (8) }
-acoi OBJECT IDENTIFIER ::= { nloi action (9) }
-noi OBJECT IDENTIFIER ::= { nloi notification (10) }
+sseoi OBJECT IDENTIFIER ::= { nloi standardSpecificExtensions(0) }
+moi OBJECT IDENTIFIER ::= { nloi managedObjectClass(3) }
+poi OBJECT IDENTIFIER ::= { nloi package(4) }
+proi OBJECT IDENTIFIER ::= { nloi parameter(5) }
+nboi OBJECT IDENTIFIER ::= { nloi nameBinding(6) }
+aoi OBJECT IDENTIFIER ::= { nloi attribute(7) }
+agoi OBJECT IDENTIFIER ::= { nloi attributeGroup(8) }
+acoi OBJECT IDENTIFIER ::= { nloi action(9) }
+noi OBJECT IDENTIFIER ::= { nloi notification(10) }
 --6.1.2 Other Object Identifier definitions
 -- value assignments for specificProblems
 pDUDiscard OBJECT IDENTIFIER ::= { sseoi specificProblems(3) pDUDiscard(1) }
-pDUDiscardReasonNotSpecified OBJECT IDENTIFIER ::= { pDUDiscard
-reasonNotSpecified(0) }
-pDUDiscardProtocolProcedureError OBJECT IDENTIFIER ::= { pDUDiscard
-protocolProcedureError(1) }
-pDUDiscardIncorrectChecksum OBJECT IDENTIFIER ::= { pDUDiscard
-incorrectChecksum(2) }
-pDUDiscardHeaderSyntaxError OBJECT IDENTIFIER ::= { pDUDiscard
-headerSyntaxError(4) }
-pDUDiscardSegmentationNeededButNotPermitted OBJECT IDENTIFIER ::= { pDUDiscard
-segmentationNeededButNotPermitted(5) }
-pDUDiscardIncompletePDUReceived OBJECT IDENTIFIER ::= { pDUDiscard
-incompletePDUReceived(6) }
-pDUDiscardDuplicateOption OBJECT IDENTIFIER ::= { pDUDiscard
-duplicateOption(7) }
-pDUDiscardDestinationAddressUnreachable OBJECT IDENTIFIER ::= { pDUDiscard
-destinationAddressUnreachable(128) }
-pDUDiscardDestinationAddressUnknown OBJECT IDENTIFIER ::= { pDUDiscard
-destinationAddressUnknown(129) }
-pDUDiscardUnspecifiedSourceRouteingError OBJECT IDENTIFIER ::= { pDUDiscard
-unspecifiedSourceRouteingError(144) }
-pDUDiscardSyntaxErrorInSourceRouteingField OBJECT IDENTIFIER ::= { pDUDiscard
-syntaxErrorInSourceRouteingField(145) }
-pDUDiscardUnknownAddressInSourceRouteingField OBJECT IDENTIFIER ::= { pDUDiscard
-unknownAddressInSourceRouteingField(146) }
-pDUDiscardPathNotAcceptable OBJECT IDENTIFIER ::= { pDUDiscard
-pathNotAcceptable(147) }
-pDUDiscardLifetimeExpiredWhileDataUnitInTransit OBJECT IDENTIFIER ::= { pDUDiscard
-lifetimeExpiredWhileDataUnitInTransit(160) }
-pDUDiscardLifetimeExpiredDuringReassembly OBJECT IDENTIFIER ::= { pDUDiscard
-lifetimeExpiredDuringReassembly(161) }
-pDUDiscardUnsupportedOptionNotSpecified OBJECT IDENTIFIER ::= { pDUDiscard
-unsupportedOptionNotSpecified(176) }
-pDUDiscardUnsupportedProtocolVersion OBJECT IDENTIFIER ::= { pDUDiscard
-unsupportedProtocolVersion(177) }
-pDUDiscardUnsupportedSecurityOption OBJECT IDENTIFIER ::= { pDUDiscard
-unsupportedSecurityOption(178) }
-pDUDiscardUnsupportedSourceRouteingOption OBJECT IDENTIFIER ::= { pDUDiscard
-unsupportedSourceRouteingOption(179) }
-pDUDiscardUnsupportedRecordingOfRouteOption OBJECT IDENTIFIER ::= { pDUDiscard
-unsupportedRecordingOfRouteOption(180) }
-pDUDiscardReassemblyInterference OBJECT IDENTIFIER ::= { pDUDiscard
-reassemblyInterference(181) }
+pDUDiscardReasonNotSpecified OBJECT IDENTIFIER ::= { pDUDiscard reasonNotSpecified(0) }
+pDUDiscardProtocolProcedureError OBJECT IDENTIFIER ::= { pDUDiscard protocolProcedureError(1) }
+pDUDiscardIncorrectChecksum OBJECT IDENTIFIER ::= { pDUDiscard incorrectChecksum(2) }
+pDUDiscardHeaderSyntaxError OBJECT IDENTIFIER ::= { pDUDiscard headerSyntaxError(4) }
+pDUDiscardSegmentationNeededButNotPermitted OBJECT IDENTIFIER ::= { pDUDiscard segmentationNeededButNotPermitted(5) }
+pDUDiscardIncompletePDUReceived OBJECT IDENTIFIER ::= { pDUDiscard incompletePDUReceived(6) }
+pDUDiscardDuplicateOption OBJECT IDENTIFIER ::= { pDUDiscard duplicateOption(7) }
+pDUDiscardDestinationAddressUnreachable OBJECT IDENTIFIER ::= { pDUDiscard destinationAddressUnreachable(128) }
+pDUDiscardDestinationAddressUnknown OBJECT IDENTIFIER ::= { pDUDiscard destinationAddressUnknown(129) }
+pDUDiscardUnspecifiedSourceRouteingError OBJECT IDENTIFIER ::= { pDUDiscard unspecifiedSourceRouteingError(144) }
+pDUDiscardSyntaxErrorInSourceRouteingField OBJECT IDENTIFIER ::= { pDUDiscard syntaxErrorInSourceRouteingField(145) }
+pDUDiscardUnknownAddressInSourceRouteingField OBJECT IDENTIFIER ::= { pDUDiscard unknownAddressInSourceRouteingField(146) }
+pDUDiscardPathNotAcceptable OBJECT IDENTIFIER ::= { pDUDiscard pathNotAcceptable(147) }
+pDUDiscardLifetimeExpiredWhileDataUnitInTransit OBJECT IDENTIFIER ::= { pDUDiscard lifetimeExpiredWhileDataUnitInTransit(160) }
+pDUDiscardLifetimeExpiredDuringReassembly OBJECT IDENTIFIER ::= { pDUDiscard lifetimeExpiredDuringReassembly(161) }
+pDUDiscardUnsupportedOptionNotSpecified OBJECT IDENTIFIER ::= { pDUDiscard unsupportedOptionNotSpecified(176) }
+pDUDiscardUnsupportedProtocolVersion OBJECT IDENTIFIER ::= { pDUDiscard unsupportedProtocolVersion(177) }
+pDUDiscardUnsupportedSecurityOption OBJECT IDENTIFIER ::= { pDUDiscard unsupportedSecurityOption(178) }
+pDUDiscardUnsupportedSourceRouteingOption OBJECT IDENTIFIER ::= { pDUDiscard unsupportedSourceRouteingOption(179) }
+pDUDiscardUnsupportedRecordingOfRouteOption OBJECT IDENTIFIER ::= { pDUDiscard unsupportedRecordingOfRouteOption(180) }
+pDUDiscardReassemblyInterference OBJECT IDENTIFIER ::= { pDUDiscard reassemblyInterference(181) }
 iSO9542PDUDiscard OBJECT IDENTIFIER ::= { sseoi specificProblems(3) iSO9542PDUDiscard(2) }
 -- for communication information notification
-iSReachabilityChange OBJECT IDENTIFIER ::= {
-sseoi informationtype(4) iSReachabilityChange(1) }
-eSReachabilityChange OBJECT IDENTIFIER ::= {
-sseoi informationtype(4) eSReachabilityChange(2) }
-successfulConnectionEstablishment OBJECT IDENTIFIER ::= {
-sseoi informationtype(4) successfulConnectionEstablishment (3) }
+iSReachabilityChange OBJECT IDENTIFIER ::= { sseoi informationtype(4) iSReachabilityChange(1) }
+eSReachabilityChange OBJECT IDENTIFIER ::= { sseoi informationtype(4) eSReachabilityChange(2) }
+successfulConnectionEstablishment OBJECT IDENTIFIER ::= { sseoi informationtype(4) successfulConnectionEstablishment(3) }
 -- for SNPAAddress type
-sNPADTEAddress OBJECT IDENTIFIER ::= {
-sseoi sNPAAddressType(5) dTEAddress(1) }
-sNPAMACAddress OBJECT IDENTIFIER ::= {
-sseoi sNPAAddressType(5) mACAddress(2) }
+sNPADTEAddress OBJECT IDENTIFIER ::= { sseoi sNPAAddressType(5) dTEAddress(1) }
+sNPAMACAddress OBJECT IDENTIFIER ::= { sseoi sNPAAddressType(5) mACAddress(2) }
 --6.2 Other definitions
 BidirectionalValues ::= SEQUENCE {
-incoming [0] ChoiceInteger,
-outgoing[1] ChoiceInteger }
+	incoming [0] ChoiceInteger,
+	outgoing [1] ChoiceInteger }
 Boolean ::= BOOLEAN
 callRequestResponseTimerDefault INTEGER ::= 200
 ChoiceInteger ::= CHOICE {
-dontCare [0] IMPLICIT NULL, -- The I dont care value --
-integer [1] IMPLICIT INTEGER }
+	dontCare [0] IMPLICIT NULL,-- The I dont care value --
+	integer [1] IMPLICIT INTEGER }
 clearRequestRetransmissionCountDefault INTEGER ::= 1
 clearRequestResponseTimerDefault INTEGER ::= 180
 cLNSId-Value GraphicString ::= "CLNS"
 cONSId-Value GraphicString ::= "CONS"
 DefaultTCA ::= SEQUENCE {
-subscription [0] BOOLEAN,
-supportedThroughClasses [1] SET OF INTEGER OPTIONAL,
-selectedThroughputClasses [2] BidirectionalValues OPTIONAL }
+	subscription [0] BOOLEAN,
+	supportedThroughClasses [1] SET OF INTEGER OPTIONAL,
+	selectedThroughputClasses [2] BidirectionalValues OPTIONAL }
 dataPacketRetransmissionCountDefault INTEGER ::= 0
 windowRotationTimerDefault INTEGER ::= 200
 DTEAddress ::= SEQUENCE {
-numberingPlanId [0] ENUMERATED { unknown (0), x121(1), e164(2) },
-addressDigits [1] OCTET STRING }
+	numberingPlanId [0] ENUMERATED {
+		unknown(0),
+		x121(1),
+		e164(2) },
+	addressDigits [1] OCTET STRING }
 Direction ::= ENUMERATED {
-incoming(0),
-outgoing(1) }
+	incoming(0),
+	outgoing(1) }
 DiscardReason ::= INTEGER(0..255)
 EndToEndDelay ::= INTEGER(0..65535)
 -- Note that according to ISO/IEC 8208 or ITU-T Rec. X.25 a value of 65535 indicates that the delay is
 -- unknown or exceeds 65534 milliseconds.
 false BOOLEAN ::= FALSE
-False ::= BOOLEAN (FALSE)
+False ::= BOOLEAN(FALSE)
 FastSelect ::= ENUMERATED {
-notSpecified(0),
-fastSelect(1),
-fastSelectWithRestrictedResponse(2),
-noFastSelect(3) }
+	notSpecified(0),
+	fastSelect(1),
+	fastSelectWithRestrictedResponse(2),
+	noFastSelect(3) }
 GraphicStringBase ::= GraphicString
 holdingTimerMultiplierDefault INTEGER ::= 3
 HoldingTimerMultiplierPermitted ::= INTEGER(2..63)
 HoldingTimerMultiplierRequired ::= INTEGER(3)
 Integer ::= INTEGER
 interruptResponseTimerDefault INTEGER ::= 180
-iSConfigurationTimerDefault Timer ::= {exponent 0, mantissa 10}
-ISO9542Subsets ::= BIT STRING { configuration(0), redirection(1) }
+iSConfigurationTimerDefault Timer ::= { exponent 0, mantissa 10 }
+ISO9542Subsets ::= BIT STRING {
+	configuration(0),
+	redirection(1) }
 Lifetime ::= INTEGER(1..255)
 LocalDistinguishedName ::= localDistinguishedName < ObjectInstance
 LocalDistinguishedNames ::= SET OF LocalDistinguishedName
 LogicalChannelAssignments ::= SEQUENCE {
-pVC [0] SET OF LogicalChannelId,
-incoming [1] LogicalChannelRange OPTIONAL,
-twoWay [2] LogicalChannelRange OPTIONAL,
-outgoing [3] LogicalChannelRange OPTIONAL }
-LogicalChannelId ::= INTEGER (1..4095)
+	pVC [0] SET OF LogicalChannelId,
+	incoming [1] LogicalChannelRange OPTIONAL,
+	twoWay [2] LogicalChannelRange OPTIONAL,
+	outgoing [3] LogicalChannelRange OPTIONAL }
+LogicalChannelId ::= INTEGER(1..4095)
 LogicalChannelRange ::= SEQUENCE {
-low [1] LogicalChannelId,
-high [2] LogicalChannelId }
+	low [1] LogicalChannelId,
+	high [2] LogicalChannelId }
 ManualISSNPAAddress ::= SET OF SNPAAddress
 MaxActiveCircuits ::= ChoiceInteger
 NotificationDataSyntax ::= SEQUENCE {
-channel [1] LogicalChannelId OPTIONAL,
-packetHeader [2] OCTET STRING,
-diagnosticCode [3] OCTET STRING,
-causeCode [4] OCTET STRING}
+	channel [1] LogicalChannelId OPTIONAL,
+	packetHeader [2] OCTET STRING,
+	diagnosticCode [3] OCTET STRING,
+	causeCode [4] OCTET STRING }
 NAddress ::= OCTET STRING(SIZE(0..20))
 -- up to 20 octets
 NAddresses ::= SET OF NAddress
 networkSubsystemId-Value GraphicString ::= "NetworkSubsystem"
 NonStandardDPS ::= SEQUENCE {
-subscription [0] BOOLEAN,
-supportedPacketSizes [1] SET OF INTEGER OPTIONAL,
-selectedPacketSizes [2] BidirectionalValues OPTIONAL }
+	subscription [0] BOOLEAN,
+	supportedPacketSizes [1] SET OF INTEGER OPTIONAL,
+	selectedPacketSizes [2] BidirectionalValues OPTIONAL }
 NonStandardDWS ::= SEQUENCE {
-subscription [0] BOOLEAN,
-supportedWindowSizes [1] SET OF INTEGER OPTIONAL,
-selectedWindowSizes [2] BidirectionalValues OPTIONAL }
+	subscription [0] BOOLEAN,
+	supportedWindowSizes [1] SET OF INTEGER OPTIONAL,
+	selectedWindowSizes [2] BidirectionalValues OPTIONAL }
 NUI ::= OctetString(SIZE(0..255))
-nullBidirectionalValues BidirectionalValues ::= {
-incoming dontCare: NULL,
-outgoing dontCare: NULL }
-nullChoiceInteger ChoiceInteger ::= dontCare: NULL
+nullBidirectionalValues BidirectionalValues ::= { incoming dontCare : NULL, outgoing dontCare : NULL }
+nullChoiceInteger ChoiceInteger ::= dontCare : NULL
 OctetString ::= OCTET STRING
 PacketSequencing ::= INTEGER
 PDUFormatErrorSyntax ::= PDUHeader
-PDUHeader ::= OCTET STRING (SIZE(1..255))
+PDUHeader ::= OCTET STRING(SIZE(1..255))
 PDUOtherErrorSyntax ::= SEQUENCE {
-errorCode [1] INTEGER(0..255),
-header [2] PDUHeader }
+	errorCode [1] INTEGER(0..255),
+	header [2] PDUHeader }
 ProtocolVersion ::= ENUMERATED {
-iSO8208V1 (0),
-iSO8208V2 (1),
-x2584 (2),
-x2588 (3) }
+	iSO8208V1(0),
+	iSO8208V2(1),
+	x2584(2),
+	x2588(3) }
 ReachabilityChangeSyntax ::= SEQUENCE {
-newState [1] ENUMERATED { down(0), up(1) },
-nAddresses [2] SET OF NAddress,
-sNPAAddress [3] SNPAAddress OPTIONAL,
-reason [4] ENUMERATED
-{ holdingTimerExpired(0),
-circuitDisabled(1) } OPTIONAL } -- Down only
+	newState [1] ENUMERATED {
+		down(0),
+		up(1) },
+	nAddresses [2] SET OF NAddress,
+	sNPAAddress [3] SNPAAddress OPTIONAL,
+	reason [4] ENUMERATED {
+		holdingTimerExpired(0),
+		circuitDisabled(1) } OPTIONAL }-- Down only
 RedirectHoldingTime ::= INTEGER(1..65535)
 redirectHoldingTime-Default INTEGER ::= 600
 RedirectHoldingTime-Permitted ::= INTEGER(1..65535)
@@ -191,24 +186,35 @@ resetRequestRetransmissionCountDefault INTEGER ::= 1
 resetRequestResponseTimerDefault INTEGER ::= 180
 restartRequestRetransmissionCountDefault INTEGER ::= 1
 restartRequestResponseTimerDefault INTEGER ::= 180
-ROASequence ::= SEQUENCE OF NumericString (SIZE(0..4))
+ROASequence ::= SEQUENCE OF NumericString(SIZE(0..4))
 -- each numeric string limited to 4 decimal digits
 -- an empty sequence is permitted
-SDUSize ::= INTEGER (0..65535)
+SDUSize ::= INTEGER(0..65535)
 SNPAAddress ::= SEQUENCE {
-type [1] OBJECT IDENTIFIER,
-address [2] OCTET STRING }
-suggestedESConfigurationTimerDefault Timer ::= {exponent 0, mantissa 600}
+	type [1] OBJECT IDENTIFIER,
+	address [2] OCTET STRING }
+suggestedESConfigurationTimerDefault Timer ::= { exponent 0, mantissa 600 }
 SupportedProtocol ::= SEQUENCE {
-protocol [1] OBJECT IDENTIFIER,
-versions [2] SET OF ProtocolVersion,
-defectsRepaired [3] SET OF OBJECT IDENTIFIER OPTIONAL }
+	protocol [1] OBJECT IDENTIFIER,
+	versions [2] SET OF ProtocolVersion,
+	defectsRepaired [3] SET OF OBJECT IDENTIFIER OPTIONAL }
 SupportedProtocols ::= SET OF SupportedProtocol
-SystemType ::= ENUMERATED { eS(1), iS(2) }
+SystemType ::= ENUMERATED {
+	eS(1),
+	iS(2) }
 SystemTypes ::= SET OF SystemType
 windowStatusTransmissionTimerDefault INTEGER ::= 60
 X25PLEMode ::= ENUMERATED {
-dTE(0),
-dCE(1),
-dTEasDCE(2) }
+	dTE(0),
+	dCE(1),
+	dTEasDCE(2) }
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.283 (1997) | ISO/IEC 10733 : 1998"
+--  { joint-iso-ccitt network-layer(13) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

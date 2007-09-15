@@ -1,6 +1,7 @@
+--< ASN1.Version 1990,1994 MKMD
+--  {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5} >--
 -- A.1 Allocation of object identifiers
 -- This Recommendation | International Standard allocates the following object identifiers.
---< ASN1.Version 1990,1994 MKMD >--
 MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -28,8 +29,8 @@ mkmAttribute OBJECT IDENTIFIER ::=
 mkmAction OBJECT IDENTIFIER ::=
 {joint-iso-ccitt(2) ms(9) function(2) part16(16) action(9)}
 END
+--< ASN1.Version 1990,1994 RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0} >--
 -- A.2.4 Abstract syntax
---< ASN1.Version 1990,1994 RepertoireASN1Module >--
 RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -59,8 +60,8 @@ SupportedManagedObjectClassList ::= SET OF GdmoObjectClass
 SupportedNameBindingList ::= SET OF NameBinding
 SupportedRelationshipClassList ::= SET OF OBJECT IDENTIFIER
 END
+--< ASN1.Version 1990,1994 DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1} >--
 -- A.3.5 Abstract syntax
---< ASN1.Version 1990,1994 DefinitionASN1Module >--
 DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -186,7 +187,7 @@ derivationRule [1] TemplateLabel}
 WithAttribute ::= TemplateLabel
 WithSyntax ::= CHOICE { present DefinedType, absent NULL}
 END
---< ASN1.Version 1990, 1994 GrmAttributeDefinitionModule >--
+--< ASN1.Version 1990, 1994 GrmAttributeDefinitionModule {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 6} >--
 GrmAttributeDefinitionModule {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 6}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -270,9 +271,9 @@ delete [5] TemplateList,
 action [6] LabelAndParameters,
 notification [7] LabelAndParameters}
 END
+--< ASN1.Version 1990, 1994 DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2} >--
 -- A.4.5 Abstract syntax
 --%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= {v1990, v1994}
---< ASN1.Version 1990, 1994 DiscoveryASN1Module >--
 DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -311,11 +312,11 @@ rootObject ObjectInstance,
 classOfRoot GdmoObjectClass OPTIONAL,
 subordinates SET OF NameTree OPTIONAL}
 END
+--< ASN1.Version 1994 RepertoireDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 3} >--
 -- Annex B
 -- Management knowledge Directory objects
 -- (This annex forms an integral part of this Recommendation | International Standard)
 -- B.1 Repertoire Directory object definitions
---< ASN1.Version 1994 RepertoireDirectoryASN1Module >--
 RepertoireDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 3}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -395,8 +396,8 @@ EQUALITY MATCHING RULE booleanMatch
 SINGLE VALUETRUE
 ID { mkmDirectoryAttributeType 44}}
 END
+--< ASN1.Version 1994 DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4} >--
 -- B.2 Definition Directory object definitions
---< ASN1.Version 1994 DefinitionDirectoryASN1Module >--
 DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -715,8 +716,8 @@ WITH SYNTAX WithSyntax
 SINGLE VALUETRUE
 ID { mkmDirectoryAttributeType 42}}
 END
+--< ASN1.Version 1994 GrmDefinitionDirectoryASN1Module {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 7} >--
 -- Ammendment 1
---< ASN1.Version 1994 GrmDefinitionDirectoryASN1Module >--
 GrmDefinitionDirectoryASN1Module {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 7}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN

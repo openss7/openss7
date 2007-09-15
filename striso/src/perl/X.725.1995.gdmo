@@ -4,17 +4,18 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Tue Sep  4 13:40:10 MDT 2007
+--@@ Date: Sat Sep 15 06:31:10 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
---< GDMO.Document "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" >--
---< GDMO.Namespace "x725" >--
+--< GDMO.Document "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996"
+--  { joint-iso-itu-t ms(9) smi(3) part7(7) } >--
+--< GDMO.Namespace itut_x725 >--
 --< GDMO.Alias "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" "X.725",
 --  "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7: 1996",
 --  "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7:1996",
 --  "ITU-T Rec. X.725 | ISO/IEC 10165-7",
 --  "ITU-T Rec. X.725 (1996) | ISO/IEC 10165-7: 1996" >--
-MODULE "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996"
+MODULE "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" { joint-iso-itu-t ms(9) smi(3) part7(7) }
 -- Annex B
 -- Definition of management information4)
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -100,7 +101,8 @@ relationshipCardinalityViolation PARAMETER
 REGISTERED AS { GRMD.grm-Parameter 4 };
 
 END
---< GDMO.EndDocument "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996" >--
+--< GDMO.EndDocument "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996"
+--  { joint-iso-itu-t ms(9) smi(3) part7(7) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 
@@ -109,31 +111,30 @@ END
 --@@
 --@@ Derivation Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ +- "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996":genericRelationshipObject
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x725::genericRelationshipObject
 --@@
 
 --@@
 --@@ Containment Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ >- "ITU-T Rec. X.725 (1995) | ISO/IEC 10165-7 : 1996":genericRelationshipObject
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x725::genericRelationshipObject
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

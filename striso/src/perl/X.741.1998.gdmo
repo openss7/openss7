@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
+--< GDMO.Namespace itut_x741 >--
 --< GDMO.Alias "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" "X.741",
 --  "ITU-T Rec. X.741 (1995)/Cor.2 (1998) | ISO/IEC 10164-9 : 1995/Cor.2 : 1999" >--
 MODULE "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995"

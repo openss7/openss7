@@ -1,6 +1,6 @@
+--< ASN1.Version 1990,1994 MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5} >--
 -- A.1 Allocation of object identifiers
 -- This Recommendation | International Standard allocates the following object identifiers.
---< ASN1.Version 1990,1994 MKMD >--
 MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -28,8 +28,8 @@ mkmAttribute OBJECT IDENTIFIER ::=
 mkmAction OBJECT IDENTIFIER ::=
 {joint-iso-ccitt(2) ms(9) function(2) part16(16) action(9)}
 END
+--< ASN1.Version 1990,1994 RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0} >--
 -- A.2.4 Abstract syntax
---< ASN1.Version 1990,1994 RepertoireASN1Module >--
 RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -42,7 +42,7 @@ FROM Attribute-ASN1Module {joint-iso-ccitt(2) ms(9) smi(3) part2(2) asn1Module(2
 GdmoObjectClass ::= OBJECT IDENTIFIER
 MKMF-VALUES ::= DMI-TYPE-IDENTIFIER
 ImplementedValues ::= SET OF SEQUENCE {
-attributeId MKMF-VALUES&.id ({ImplementedValuesSet}),
+attributeId MKMF-VALUES.&id ({ImplementedValuesSet}),
 defaultValue [1] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL,
 initialValue [2] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL,
 minValue [3] EXPLICIT MKMF-VALUES.&Value ({ImplementedValuesSet} {@.attributeId}) OPTIONAL,
@@ -60,8 +60,8 @@ SupportedManagedObjectClassList ::= SET OF GdmoObjectClass
 SupportedNameBindingList ::= SET OF NameBinding
 SupportedRelationshipClassList ::= SET OF OBJECT IDENTIFIER
 END
+--< ASN1.Version 1990,1994 DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1} >--
 -- A.3.5 Abstract syntax
---< ASN1.Version 1990,1994 DefinitionASN1Module >--
 DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -173,7 +173,6 @@ documentId CHOICE {
 documentName DocumentName,
 documentObjectIdentifier DocumentObjectIdentifier
 } OPTIONAL -- align with GDMO document
-identifier
 }
 TemplateName::= PrintableString(FROM("0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" |
 "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
@@ -187,7 +186,7 @@ derivationRule [1] TemplateLabel}
 WithAttribute ::= TemplateLabel
 WithSyntax ::= CHOICE { present DefinedType, absent NULL}
 END
---< ASN1.Version 1990, 1994 GrmAttributeDefinitionModule >--
+--< ASN1.Version 1990, 1994 GrmAttributeDefinitionModule {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 6} >--
 GrmAttributeDefinitionModule {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 6}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -271,9 +270,9 @@ delete [5] TemplateList,
 action [6] LabelAndParameters,
 notification [7] LabelAndParameters}
 END
+--< ASN1.Version 1990, 1994 DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2} >--
 -- A.4.5 Abstract syntax
 --%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= {v1990, v1994}
---< ASN1.Version 1990, 1994 DiscoveryASN1Module >--
 DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -291,8 +290,7 @@ MITSearch ::= SEQUENCE {
 base ObjectInstance,
 discoveryScope Scope,
 classRequest BOOLEAN DEFAULT FALSE
--- if true, include class with
-MITSearchResponse
+-- if true, include class with MITSearchResponse
 }
 MITSearchResponse ::= SET OF RootedNameTree
 NameTree ::= SEQUENCE {
@@ -306,17 +304,17 @@ rootObject ObjectInstance,
 classOfRoot GdmoObjectClass OPTIONAL,
 subordinates SET OF NameTree OPTIONAL}
 END
+--< ASN1.Version 1994 RepertoireDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 3} >--
 -- Annex B
 -- Management knowledge Directory objects
 -- (This annex forms an integral part of this Recommendation | International Standard)
 -- B.1 Repertoire Directory object definitions
---< ASN1.Version 1994 RepertoireDirectoryASN1Module >--
 RepertoireDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 3}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything;
 IMPORTS
-ATTRIBUTE, OBJECT-CLASS CONTENT-RULE
+ATTRIBUTE, OBJECT-CLASS, CONTENT-RULE
 FROM InformationFramework {joint-iso-ccitt(2) ds(5) modules(1) informationFramework(1) 2}
 -- ITU-T Rec. X.501 | ISO/IEC 9594-2
 applicationEntity
@@ -330,7 +328,7 @@ FROM CMIP-1 {joint-iso-ccitt(2) ms(9) cmip(1) modules(0) protocols(3)}
 -- CCITT Rec. X.711 and ISO/IEC 9596-1
 FunctionalUnits, ProtocolVersion
 FROM CMIP-A-ASSOCIATE-Information {joint-iso-ccitt(2) ms(9) cmip(1) modules (0)
-AssociateUserInfo(1)} -- CCITT Rec. X.711 and ISO/IEC 9596-1
+associateUserInfo(1)} -- CCITT Rec. X.711 and ISO/IEC 9596-1
 FunctionalUnitPackage
 FROM SMASE-A-ASSOCIATE-Information {joint-iso-ccitt(2) ms(9) smo(0) negotiationAbstractSyntax(1)
 version1(1)} -- CCITT Rec. X.701 | ISO/IEC 10040
@@ -390,8 +388,8 @@ EQUALITY MATCHING RULE booleanMatch
 SINGLE VALUETRUE
 ID { mkmDirectoryAttributeType 44}}
 END
+--< ASN1.Version 1994 DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4} >--
 -- B.2 Definition Directory object definitions
---< ASN1.Version 1994 DefinitionDirectoryASN1Module >--
 DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -710,8 +708,8 @@ WITH SYNTAX WithSyntax
 SINGLE VALUETRUE
 ID { mkmDirectoryAttributeType 42}}
 END
+--< ASN1.Version 1994 GrmDefinitionDirectoryASN1Module {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 7} >--
 -- Ammendment 1
---< ASN1.Version 1994 GrmDefinitionDirectoryASN1Module >--
 GrmDefinitionDirectoryASN1Module {joint-iso-itu-t(2) ms(9) function(2) part16(16) asn1Modules(2) 7}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
