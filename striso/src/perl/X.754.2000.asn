@@ -1,34 +1,56 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 06:02:59 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.754 (2000)"
+--  { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) } >--
+MODULE "ITU-T Rec. X.754 (2000)" { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) }
+--< ASN1.Version 1994 ASN1DefinedTypesModule
+--  { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) } >--
 -- 9 ASN.1 module
-ASN1DefinedTypesModule { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) asn1Modules(2)
-asn1DefinedTypesModule(0)}
-DEFINITION IMPLICIT TAGS ::=
+ASN1DefinedTypesModule { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything
 IMPORTS
-ObjectClass, ObjectInstance, Attribute FROM CMIP-1 { joint-iso-ccitt ms (9) cmip (1) modules (0) protocol (3) }
+ObjectClass, ObjectInstance, Attribute
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
 -- see ITU-T X.711
-AdministrativeState, OperationalState, Management Extension, RecordId, Destination FROM Attribute-
-ASN1Module { joint-iso-ccitt ms(9) smi (3) part2 (2) asn1Module(1) 1}
+AdministrativeState, OperationalState, ManagementExtension, RecordId, Destination
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(1) 1 };
 -- see ITU-T X.721
 -- OBJECT IDENTIFIERS
-informationModel Objectidentifier::= { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0}
-eecManagedObjectClass OBJECT IDENTIFIER ::= {informationModel managedObjectClass(3)}
-eecPackage OBJECT IDENTIFIER ::= {informationModel package(4)}
-eecNameBinding OBJECT IDENTIFIER ::= {informationModel nameBinding(6)}
-eecAttribute OBJECT IDENTIFIER ::= {informationModel attribute(7)}
-eecAction OBJECT IDENTIFIER ::= {informationModel action(9)}
-eecBehaviour OBJECT IDENTIFIER ::= {informationModel behaviour(11)}
-eecNotification OBJECT IDENTIFIER ::= {informationModel notification(10)}
+informationModel Objectidentifier ::= { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) }
+eecManagedObjectClass OBJECT IDENTIFIER ::= { informationModel managedObjectClass(3) }
+eecPackage OBJECT IDENTIFIER ::= { informationModel package(4) }
+eecNameBinding OBJECT IDENTIFIER ::= { informationModel nameBinding(6) }
+eecAttribute OBJECT IDENTIFIER ::= { informationModel attribute(7) }
+eecAction OBJECT IDENTIFIER ::= { informationModel action(9) }
+eecBehaviour OBJECT IDENTIFIER ::= { informationModel behaviour(11) }
+eecNotification OBJECT IDENTIFIER ::= { informationModel notification(10) }
 AgingPeriod ::= TimePeriod
-SendToList::= SEQUENCE
-{recordId RecordId,
-DestinationList SET OF Destination}
-GetDestinationArgument::= SEQUENCE OF RecordId
-GetDestinationResult::= SEQUENCE OF SendToList
-NonNegativeInteger ::= INTEGER (0..MAX)
-QueuingDiscipline ::= ENUMERATED
-{ fifoTransmission (0),
-lifoTransmission (1)}
-QueueSize ::= NonNegativeInteger -- contains a count of the number of records
+SendToList ::= SEQUENCE {
+	recordId RecordId,
+	destinationList SET OF Destination }
+GetDestinationArgument ::= SEQUENCE OF RecordId
+GetDestinationResult ::= SEQUENCE OF SendToList
+NonNegativeInteger ::= INTEGER(0..MAX)
+QueuingDiscipline ::= ENUMERATED {
+	fifoTransmission(0),
+	lifoTransmission(1) }
+QueueSize ::= NonNegativeInteger-- contains a count of the number of records
 RecordIdList ::= SEQUENCE OF NonNegativeInteger
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.754 (2000)"
+--  { itu-t(0) recommendation(0) x(24) eecmod(754) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

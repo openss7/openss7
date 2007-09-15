@@ -1,7 +1,9 @@
 
 
+--< ASN1.Version 1994 Test-ASN1Module { joint-iso-ccitt ms(9) function(2) part12(12) asn1Module(2) 0 } >--
 -- A.7 Abstract Syntax definitions
-Test-ASN1Module { joint-iso-ccitt ms(9) function(2) part12(12) asn1Module(2) 0 }DEFINITIONS IMPLICIT TAGS ::= BEGIN-- EXPORTS everything
+Test-ASN1Module { joint-iso-ccitt ms(9) function(2) part12(12) asn1Module(2) 0 }
+DEFINITIONS IMPLICIT TAGS ::= BEGIN-- EXPORTS everything
 
 IMPORTSDistinguishedName FROM InformationFramework{ joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
 

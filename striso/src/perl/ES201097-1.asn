@@ -1,4 +1,16 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:04:52 MDT 2007
+--@@ 
+--< GDMO.Document "ES 201 097-1 V1.1.1 (1998-01)"
+--  { ccitt(0) identified-organization(4) etsi(0) ets(x) informationModel(0) } >--
+MODULE "ES 201 097-1 V1.1.1 (1998-01)" { ccitt(0) identified-organization(4) etsi(0) ets(x) informationModel(0) }
+--< ASN1.Version 1994 PhysicalResourceManagementModule
+--  { ccitt(0) identified-organization(4) etsi(0) ets(653) informationModel(0) asn1Module(2) physicalResourceManagementModule(0) } >--
 --5.5.5 ASN.1 Definitions
 --Rules of extensibility (ITU-T Recommendation M.3100 (13]) - The following
 --types will be indicated as being
@@ -25,22 +37,16 @@
 --both the ASN.1 88-90 ITU-T
 --Recommendation X.208 [15] version and the ASN.1 1994 ITU-T Recommendation
 --X.680 [16-19] version.
-PhysicalResourceManagementModule {ccitt(0) identified-organization(4) etsi(0)
-ets(x)
-informationModel(0) asn1Module(2) physicalResourceManagementModule(???)}
+PhysicalResourceManagementModule { ccitt(0) identified-organization(4) etsi(0) ets(653) informationModel(0) asn1Module(2) physicalResourceManagementModule(0) }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything
 IMPORTS
-NameType FROM ASN1DefinedTypesModule {ccitt(0) recommendation(0) m(13)
-m3100(3100)
-informationModel(0) asn1Module(2) asn1DefinedTypesModule(0)};
+NameType
+	FROM ASN1DefinedTypesModule { ccitt(0) recommendation(0) m(13) m3100(3100) informationModel(0) asn1Module(2) asn1DefinedTypesModule(0) };
 -- OBJECT IDENTIFIER DEFINITIONS
-informationModel OBJECT IDENTIFIER ::= {ccitt(0) identified-organization(4)
-etsi(0) ets(x)
-informationModel(0) }
-managedObjectClass OBJECT IDENTIFIER ::= { informationModel
-managedObjectClass(3) }
+informationModel OBJECT IDENTIFIER ::= { ccitt(0) identified-organization(4) etsi(0) ets(x) informationModel(0) }
+managedObjectClass OBJECT IDENTIFIER ::= { informationModel managedObjectClass(3) }
 package OBJECT IDENTIFIER ::= { informationModel package(4) }
 parameter OBJECT IDENTIFIER ::= { informationModel parameter(5) }
 nameBinding OBJECT IDENTIFIER ::= { informationModel nameBinding(6) }
@@ -50,34 +56,35 @@ action OBJECT IDENTIFIER ::= { informationModel action(9) }
 notification OBJECT IDENTIFIER ::= { informationModel notification(10) }
 -- TYPE DEFINITIONS
 Connected ::= SEQUENCE {
-cableType [0] PrintableString,
-farEndConnectorList [1] FarEndConnectorList
-}
+	cableType [0] PrintableString,
+	farEndConnectorList [1] FarEndConnectorList }
 Connection ::= CHOICE {
-notConnected NULL,
-connected Connected
-}
+	notConnected NULL,
+	connected Connected }
 Connector ::= SEQUENCE {
-connectorType [0] PrintableString,
-connectorIdentifier [1] NameType
-}
+	connectorType [0] PrintableString,
+	connectorIdentifier [1] NameType }
 FarEndConnectorList ::= SEQUENCE {
-farEndResource [0] OBJECT IDENTIFIER,
-connectorList [1] PhysicalConnectorList
-}
+	farEndResource [0] OBJECT IDENTIFIER,
+	connectorList [1] PhysicalConnectorList }
 ModuleType ::= CHOICE {
-globalValue OBJECT IDENTIFIER,
-localValue INTEGER
-}
+	globalValue OBJECT IDENTIFIER,
+	localValue INTEGER }
 OnOff ::= ENUMERATED {
-off (0),
-on (1)
-}
+	off(0),
+	on(1) }
 PhysicalConnectionList ::= SEQUENCE OF Connection
 PhysicalConnectorList ::= SEQUENCE OF Connector
 Polarity ::= ENUMERATED {
-activeLow (0),
-activeHigh (1)
-}
+	activeLow(0),
+	activeHigh(1) }
 END
 
+END
+--< GDMO.EndDocument "ES 201 097-1 V1.1.1 (1998-01)"
+--  { ccitt(0) identified-organization(4) etsi(0) ets(x) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

@@ -1,29 +1,49 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:04:54 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T G.774.1 (02/2001)"
+--  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(1) informationModel(0) } >--
+MODULE "ITU-T G.774.1 (02/2001)" { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(1) informationModel(0) }
+--< ASN1.Version 1994 SDHPMASN1
+--  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(1) informationModel(0) asn1Module(2) sdhpm(0) } >--
 -- 15  Supporting ASN.1 productions 
-SDHPMASN1 { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(01)
-informationModel(0)
-asn1Module(2) sdhpm (0) }
+SDHPMASN1 { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(1) informationModel(0) asn1Module(2) sdhpm(0) }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything
 IMPORTS
-ProbableCause FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2)
-asn1Module(2) 1}
-TimePeriod FROM MetricModule {joint-iso-itu-t ms(9) function(2) part11(11)
-asn1Module(2) 0};
-sdhPM OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) g(7) g774(774)
-hyphen(127) pm(01) informationModel(0) }
-g774-01MObjectClass OBJECT IDENTIFIER ::= {sdhPM managedObjectClass(3)}
-g774-01Attribute OBJECT IDENTIFIER ::= {sdhPM attribute(7)}
-g774-01NameBinding OBJECT IDENTIFIER ::= {sdhPM nameBinding(6)}
-g774-01Package OBJECT IDENTIFIER ::= {sdhPM package(4)}
+ProbableCause
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 }
+TimePeriod
+	FROM MetricModule { joint-iso-itu-t ms(9) function(2) part11(11) asn1Module(2) 0 };
+sdhPM OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(1) informationModel(0) }
+g774-01MObjectClass OBJECT IDENTIFIER ::= { sdhPM managedObjectClass(3) }
+g774-01Attribute OBJECT IDENTIFIER ::= { sdhPM attribute(7) }
+g774-01NameBinding OBJECT IDENTIFIER ::= { sdhPM nameBinding(6) }
+g774-01Package OBJECT IDENTIFIER ::= { sdhPM package(4) }
 Integer ::= INTEGER
 CSES ::= SET OF SEQUENCE {
-eventTime GeneralizedTime,
-nCSES NCSESRange
-}
-NCSESRange ::= Integer(2 .. 9)
-SDHGranularityPeriod ::= TimePeriod (WITH COMPONENTS {minutes (15), days(1)})
-SDHPVGranularityPeriod ::= TimePeriod (WITH COMPONENTS {minutes (15)})
-END -- end of SDHPMASN1
+	eventTime GeneralizedTime,
+	nCSES NCSESRange }
+NCSESRange ::= Integer(2..9)
+SDHGranularityPeriod ::= TimePeriod(WITH COMPONENTS {
+	minutes(15),
+	days(1) })
+SDHPVGranularityPeriod ::= TimePeriod(WITH COMPONENTS {
+	minutes(15) })
+END-- end of SDHPMASN1
 
+
+END
+--< GDMO.EndDocument "ITU-T G.774.1 (02/2001)"
+--  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) pm(1) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

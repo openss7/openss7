@@ -1,3 +1,6 @@
+--< GDMO.Document "ITU-T Rec. X.738 (1993)" >--
+--< GDMO.Namespace itut_x738 >--
+MODULE "ITU-T Rec. X.738 (1993)"
 -- Annex A
 -- Summarization management support objects
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -588,3 +591,5 @@ the following reasons: administrative state is locked, administrative state is s
 terminated because administrative state was set to locked when performing the scan action or an
 unspecified error occurred.";;
 REGISTERED AS { summarizationParameter 1 };
+END
+--< GDMO.EndDocument "ITU-T Rec. X.738 (1993)" >--

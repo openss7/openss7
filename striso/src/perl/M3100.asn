@@ -1,69 +1,80 @@
---< GDMO.Document "ITU-T Rec. M.3100 (1992)" >--
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:49 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. M.3100 (1992)"
+--  { ccitt recommendation m gnm(3100) informationModel(0) } >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright
--- =============================================================================
--- 
--- @(#) $RCSfile: M3100.asn,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:58:58 $
---
--- -----------------------------------------------------------------------------
---
--- Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
--- Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
---
--- All Rights Reserved.
---
--- This program is free software; you can redistribute it and/or modify it under
--- the terms of the GNU General Public License as published by the Free Software
--- Foundation; version 3 of the License.
---
--- This program is distributed in the hope that it will be useful, but WITHOUT
--- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
--- FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
--- details.
---
--- You should have received a copy of the GNU General Public License along with
--- this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
--- Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
---
--- -----------------------------------------------------------------------------
---
--- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
--- behalf of the U.S. Government ("Government"), the following provisions apply
--- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
--- is classified as "Commercial Computer Software" under paragraph 252.227-7014
--- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
--- successor regulations) and the Government is acquiring only the license rights
--- granted herein (the license rights customarily provided to non-Government
--- users).  If the Software is supplied to any unit or agency of the Government
--- other than DoD, it is classified as "Restricted Computer Software" and the
--- Government's rights in the Software are defined in paragraph 52.227-19 of the
--- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
--- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
--- (or any successor regulations).
---
--- -----------------------------------------------------------------------------
---
--- Commercial licensing and support of this software is available from OpenSS7
--- Corporation at a fee.  See http://www.openss7.com/
---
--- -----------------------------------------------------------------------------
---
--- Last Modified $Date: 2007/09/06 10:58:58 $ by $Author: brian $
---
--- =============================================================================
--- >--
-
---< ASN1.Version 1.2 >--
-ASN1DefinedTypesModule { ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2)asn1DefinedTypesModule(0) }
-DEFINITIONS IMPLICIT TAGS ::= BEGIN -- EXPORTS everything
+--  =============================================================================
+--  
+--  @(#) $RCSfile: M3100.asn,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:58:58 $
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+--  Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+--  
+--  All Rights Reserved.
+--  
+--  This program is free software; you can redistribute it and/or modify it under
+--  the terms of the GNU General Public License as published by the Free Software
+--  Foundation; version 3 of the License.
+--  
+--  This program is distributed in the hope that it will be useful, but WITHOUT
+--  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+--  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+--  details.
+--  
+--  You should have received a copy of the GNU General Public License along with
+--  this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+--  Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+--  behalf of the U.S. Government ("Government"), the following provisions apply
+--  to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+--  is classified as "Commercial Computer Software" under paragraph 252.227-7014
+--  of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+--  successor regulations) and the Government is acquiring only the license rights
+--  granted herein (the license rights customarily provided to non-Government
+--  users).  If the Software is supplied to any unit or agency of the Government
+--  other than DoD, it is classified as "Restricted Computer Software" and the
+--  Government's rights in the Software are defined in paragraph 52.227-19 of the
+--  Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+--  the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+--  (or any successor regulations).
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Commercial licensing and support of this software is available from OpenSS7
+--  Corporation at a fee.  See http://www.openss7.com/
+--  
+--  -----------------------------------------------------------------------------
+--  
+--  Last Modified $Date: 2007/09/06 10:58:58 $ by $Author: brian $
+--  
+--  =============================================================================
+--  >--
+MODULE "ITU-T Rec. M.3100 (1992)" { ccitt recommendation m gnm(3100) informationModel(0) }
+--< ASN1.Version 1994 ASN1DefinedTypesModule
+--  { ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) } >--
+ASN1DefinedTypesModule { ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN-- EXPORTS everything
 IMPORTS
-	RDNSequence
-		FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
-	ObjectInstance, ObjectClass
-		FROM CMIP-1 { joint-iso-ccitt ms(9)  cmip(1) modules(0) protocol(3) }
-	ProbableCause, AdministrativeState, AvailabilityStatus
-		FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2)asn1Module (2) 1 } ;
-
+RDNSequence
+	FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
+ObjectInstance, ObjectClass
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+ProbableCause, AdministrativeState, AvailabilityStatus
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 };
+--
 m3100InformationModel OBJECT IDENTIFIER ::= { ccitt recommendation m gnm(3100) informationModel(0) }
 m3100standardSpecificExtension OBJECT IDENTIFIER ::= { m3100InformationModel standardSpecificExtension(0) }
 m3100ObjectClass OBJECT IDENTIFIER ::= { m3100InformationModel managedObjectClass(3) }
@@ -72,32 +83,32 @@ m3100Parameter OBJECT IDENTIFIER ::= { m3100InformationModel package(5) }
 m3100Attribute OBJECT IDENTIFIER ::= { m3100InformationModel attribute(7) }
 m3100NameBinding OBJECT IDENTIFIER ::= { m3100InformationModel nameBinding(6) }
 m3100Action OBJECT IDENTIFIER ::= { m3100InformationModel action(9) }
-m3100Notification OBJECT IDENTIFIER ::= { m3100InformationModel notification(10) 
+m3100Notification OBJECT IDENTIFIER ::= { m3100InformationModel notification(10) }
 -- Reserved arcs below m3100InformationModel are (8) for attribute groups
-
+--
 characteristicInfo OBJECT IDENTIFIER ::= { m3100standardSpecificExtension 0 }
-opticalSTM1SPICI  CharacteristicInformation ::= { characteristicInfo 1 }-- opticalSPITTP* object instances with stmLevel attribute = 1
-opticalSTM4SPICI  CharacteristicInformation ::= {characteristicInfo 2}-- opticalSPITTP* object instances with stmLevel attribute = 4
-opticalSTM16SPICI CharacteristicInformation ::= {characteristicInfo 3}-- opticalSPITTP* object instances with stmLevel attribute = 16
-electricalSTM1SPICI  CharacteristicInformation ::= {characteristicInfo 4}-- electricalSPITTP* object instances with stmLevel attribute = 1
-rsSTM1SPICI  CharacteristicInformation ::= {characteristicInfo 5}-- rsCTP* object instances with stmLevel attribute = 1
-rsSTM4SPICI  CharacteristicInformation ::= {characteristicInfo 6}-- rsCTP* object instances with stmLevel attribute = 4
-rsSTM16SPICI CharacteristicInformation ::= {characteristicInfo 7}-- rsCTP* object instances with stmLevel attribute = 16
-msSTM1SPICI  CharacteristicInformation ::= {characteristicInfo 8}-- msCTP* object instances with stmLevel attribute = 1
-msSTM4SPICI  CharacteristicInformation ::= {characteristicInfo 9}-- msCTP* object instances with stmLevel attribute = 4
-msSTM16SPICI CharacteristicInformation ::= {characteristicInfo 10}-- msCTP* object instances with stmLevel attribute = 16
-au3TU3VC3CI CharacteristicInformation ::= {characteristicInfo 11}
-au4VC4CI CharacteristicInformation ::= {characteristicInfo 12}
-tu11VC11CI CharacteristicInformation ::= {characteristicInfo 13}
-tu12VC12CI CharacteristicInformation ::= {characteristicInfo 14}
-tu2VC2CI CharacteristicInformation ::= {characteristicInfo 15}
-tu12VC11CI CharacteristicInformation ::= {characteristicInfo 16}
-
+opticalSTM1SPICI CharacteristicInformation ::= { characteristicInfo 1 }-- opticalSPITTP* object instances with stmLevel attribute = 1
+opticalSTM4SPICI CharacteristicInformation ::= { characteristicInfo 2 }-- opticalSPITTP* object instances with stmLevel attribute = 4
+opticalSTM16SPICI CharacteristicInformation ::= { characteristicInfo 3 }-- opticalSPITTP* object instances with stmLevel attribute = 16
+electricalSTM1SPICI CharacteristicInformation ::= { characteristicInfo 4 }-- electricalSPITTP* object instances with stmLevel attribute = 1
+rsSTM1SPICI CharacteristicInformation ::= { characteristicInfo 5 }-- rsCTP* object instances with stmLevel attribute = 1
+rsSTM4SPICI CharacteristicInformation ::= { characteristicInfo 6 }-- rsCTP* object instances with stmLevel attribute = 4
+rsSTM16SPICI CharacteristicInformation ::= { characteristicInfo 7 }-- rsCTP* object instances with stmLevel attribute = 16
+msSTM1SPICI CharacteristicInformation ::= { characteristicInfo 8 }-- msCTP* object instances with stmLevel attribute = 1
+msSTM4SPICI CharacteristicInformation ::= { characteristicInfo 9 }-- msCTP* object instances with stmLevel attribute = 4
+msSTM16SPICI CharacteristicInformation ::= { characteristicInfo 10 }-- msCTP* object instances with stmLevel attribute = 16
+au3TU3VC3CI CharacteristicInformation ::= { characteristicInfo 11 }
+au4VC4CI CharacteristicInformation ::= { characteristicInfo 12 }
+tu11VC11CI CharacteristicInformation ::= { characteristicInfo 13 }
+tu12VC12CI CharacteristicInformation ::= { characteristicInfo 14 }
+tu2VC2CI CharacteristicInformation ::= { characteristicInfo 15 }
+tu12VC11CI CharacteristicInformation ::= { characteristicInfo 16 }
+--
 -- The following value assignments are for the Probable Cause when Integer Choice is used within the
--- TMN application context.  These values shall always be assigned by this Recommendation in the context
+-- TMN application context. These values shall always be assigned by this Recommendation in the context
 -- of TMN.
 indeterminate ProbableCause ::= localValue : 0
-
+--
 -- The following are used with communications alarm.
 aIS ProbableCause ::= localValue : 1
 callSetUpFailure ProbableCause ::= localValue : 2
@@ -116,7 +127,7 @@ unavailable ProbableCause ::= localValue : 14
 signalLabelMismatch ProbableCause ::= localValue : 15
 lossOfMultiFrame ProbableCause ::= localValue : 16
 -- Values 17-50 are reserved for communications alarm related probable causes
-
+--
 -- The following are used with equipment alarm.
 backplaneFailure ProbableCause ::= localValue : 51
 dataSetProblem ProbableCause ::= localValue : 52
@@ -138,7 +149,7 @@ transmitterFailure ProbableCause ::= localValue : 67
 trunkCardProblem ProbableCause ::= localValue : 68
 replaceableUnitProblem ProbableCause ::= localValue : 69
 -- Values 70-100 are reserved for equipment alarm related probable causes
-
+--
 -- The following are used with environmental alarm.
 airCompressorFailure ProbableCause ::= localValue : 101
 airConditioningFailure ProbableCause ::= localValue : 102
@@ -151,7 +162,7 @@ engineFailure ProbableCause ::= localValue : 108
 fireDetectorFailure ProbableCause ::= localValue : 109
 fuseFailure ProbableCause ::= localValue : 110
 generatorFailure ProbableCause ::= localValue : 111
-lowBatteryThreshold ProbableCause ::= localValue :112
+lowBatteryThreshold ProbableCause ::= localValue : 112
 pumpFailure ProbableCause ::= localValue : 113
 rectifierFailure ProbableCause ::= localValue : 114
 rectifierHighVoltage ProbableCause ::= localValue : 115
@@ -174,7 +185,7 @@ lowWater ProbableCause ::= localValue : 131
 smoke ProbableCause ::= localValue : 132
 toxicGas ProbableCause ::= localValue : 133
 -- Values 134-150 are reserved for environmental alarm related probable causes
-
+--
 -- The following are used with Processing error alarm.
 storageCapacityProblem ProbableCause ::= localValue : 151
 memoryMismatch ProbableCause ::= localValue : 152
@@ -182,92 +193,207 @@ corruptData ProbableCause ::= localValue : 153
 outOfCPUCycles ProbableCause ::= localValue : 154
 sfwrEnvironmentProblem ProbableCause ::= localValue : 155
 sfwrDownloadFailure ProbableCause ::= localValue : 156
-
+--
 -- Service ProblemType is for further study
 AcceptableCircuitPackTypeList ::= SET OF PrintableString
-
-AddedTps  ::= SEQUENCE { gtp ObjectInstance, tpsAdded SEQUENCE OF ObjectInstance } 
-AddLeg ::= SEQUENCE { mpCrossConnection ObjectInstance, legs SET OF ToTermSpecifier } 
-AddTpsToGtpInformation ::= SEQUENCE OF SEQUENCE { tpsAdded   SEQUENCE OF TerminationPointInformation, gtp ObjectInstance   OPTIONAL } 
-AddTpsToGtpResult  ::= SEQUENCE OF CHOICE { failed	    [0] Failed, addedTps    [1] AddedTps }
--- the n-th  element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
+--
+AddedTps ::= SEQUENCE {
+	gtp ObjectInstance,
+	tpsAdded SEQUENCE OF ObjectInstance }
+AddLeg ::= SEQUENCE {
+	mpCrossConnection ObjectInstance,
+	legs SET OF ToTermSpecifier }
+AddTpsToGtpInformation ::= SEQUENCE OF SEQUENCE {
+	tpsAdded SEQUENCE OF TerminationPointInformation,
+	gtp ObjectInstance OPTIONAL }
+AddTpsToGtpResult ::= SEQUENCE OF CHOICE {
+	failed [0] Failed,
+	addedTps [1] AddedTps }
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
 -- "AddTpsToGtpInformation" type.
-
-AddTpsToTpPoolInformation  ::= SEQUENCE OF SEQUENCE { tps SET OF TerminationPointInformation, toTpPool ObjectInstance    OPTIONAL }
-
-AddTpsToTpPoolResult  ::= SEQUENCE OF CHOICE {failed              [0] Failed, tpsAddedToTpPool  [1] TpsAddedToTpPool}
--- the n-th  element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
+--
+AddTpsToTpPoolInformation ::= SEQUENCE OF SEQUENCE {
+	tps SET OF TerminationPointInformation,
+	toTpPool ObjectInstance OPTIONAL }
+--
+AddTpsToTpPoolResult ::= SEQUENCE OF CHOICE {
+	failed [0] Failed,
+	tpsAddedToTpPool [1] TpsAddedToTpPool }
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
 -- "AddTPsToTpPoolInformation" type.
-
+--
 AlarmEffectOnServiceParameter ::= BOOLEAN
 -- TRUE implies service is affected
-AlarmSeverityAssignment ::= SEQUENCE  {problem ProbableCause, severityAssignedServiceAffecting [0]AlarmSeverityCode  OPTIONAL,severityAssignedNonServiceAffecting [1]AlarmSeverityCode  OPTIONAL, severityAssignedServiceIndependent [2]AlarmSeverityCode  OPTIONAL}
-AlarmSeverityAssignmentList ::=  SET OF AlarmSeverityAssignment AlarmSeverityCode ::= ENUMERATED  {non-alarmed (0), minor (1),major  (2), critical  (3),warning (4) }
-AlarmStatus ::= ENUMERATED {cleared (0), activeReportable-Indeterminate (1),activeReportable-Warning (2), activeReportable-Minor (3),activeReportable-Major (4), activeReportable-Critical (5),activePending (6) }
+AlarmSeverityAssignment ::= SEQUENCE {
+	problem ProbableCause,
+	severityAssignedServiceAffecting [0] AlarmSeverityCode OPTIONAL,
+	severityAssignedNonServiceAffecting [1] AlarmSeverityCode OPTIONAL,
+	severityAssignedServiceIndependent [2] AlarmSeverityCode OPTIONAL }
+AlarmSeverityAssignmentList ::= SET OF AlarmSeverityAssignment
+AlarmSeverityCode ::= ENUMERATED {
+	non-alarmed(0),
+	minor(1),
+	major(2),
+	critical(3),
+	warning(4) }
+AlarmStatus ::= ENUMERATED {
+	cleared(0),
+	activeReportable-Indeterminate(1),
+	activeReportable-Warning(2),
+	activeReportable-Minor(3),
+	activeReportable-Major(4),
+	activeReportable-Critical(5),
+	activePending(6) }
 Boolean ::= BOOLEAN
-Bundle ::= SEQUENCE {characteristicInfoType CharacteristicInformation, bundlingFactor INTEGER}
+Bundle ::= SEQUENCE {
+	characteristicInfoType CharacteristicInformation,
+	bundlingFactor INTEGER }
 ChannelNumber ::= INTEGER
-CharacteristicInformation  ::= OBJECT IDENTIFIER
-CircuitDirectionality ::= ENUMERATED {onewayOut(0), onewayIn(1), twoway(2)} 
-CircuitPackAvailabilityStatus ::= AvailabilityStatus (WITH COMPONENT(notInstalled))
-CircuitPackType ::= PrintableString Connected ::= CHOICE {pointToPoint [0]   PointToPoint, pointToMultipoint [1]   PointToMultipoint}
-ConnectInformation ::= SEQUENCE OF SEQUENCE {CHOICE { unidirectional [0]  ConnectionType,bidirectional [1]  ConnectionTypeBi, addleg [2]  AddLeg}, administrativeState   AdministrativeState   OPTIONAL,namedCrossConnection  [3] NamedCrossConnection   OPTIONAL }
-ConnectivityPointer ::= CHOICE { none NULL,single ObjectInstance, concatenated SEQUENCE OF ObjectInstance}
-ConnectResult ::= SEQUENCE OF CHOICE {failed      Failed, connected   Connected}
--- the n-th  element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
+CharacteristicInformation ::= OBJECT IDENTIFIER
+CircuitDirectionality ::= ENUMERATED {
+	onewayOut(0),
+	onewayIn(1),
+	twoway(2) }
+CircuitPackAvailabilityStatus ::= AvailabilityStatus(WITH COMPONENT(notInstalled))
+CircuitPackType ::= PrintableString
+Connected ::= CHOICE {
+	pointToPoint [0] PointToPoint,
+	pointToMultipoint [1] PointToMultipoint }
+ConnectInformation ::= SEQUENCE OF SEQUENCE {
+	xxx CHOICE {
+		unidirectional [0] ConnectionType,
+		bidirectional [1] ConnectionTypeBi,
+		addleg [2] AddLeg },
+	administrativeState AdministrativeState OPTIONAL,
+	namedCrossConnection [3] NamedCrossConnection OPTIONAL }
+ConnectivityPointer ::= CHOICE {
+	none NULL,
+	single ObjectInstance,
+	concatenated SEQUENCE OF ObjectInstance }
+ConnectResult ::= SEQUENCE OF CHOICE {
+	failed Failed,
+	connected Connected }
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
 -- "ConnectInformation" type.
-ConnectionType ::= CHOICE {explicitPToP [0]   ExplicitPtoP, ptoTpPool [1]   PtoTPPool,explicitPtoMP [2]   ExplicitPtoMP, ptoMPools [3]   PtoMPools}
-ConnectionTypeBi ::= CHOICE {explicitPToP [0]   ExplicitPtoP, ptoTpPool [1]   PtoTPPool}
+ConnectionType ::= CHOICE {
+	explicitPToP [0] ExplicitPtoP,
+	ptoTpPool [1] PtoTPPool,
+	explicitPtoMP [2] ExplicitPtoMP,
+	ptoMPools [3] PtoMPools }
+ConnectionTypeBi ::= CHOICE {
+	explicitPToP [0] ExplicitPtoP,
+	ptoTpPool [1] PtoTPPool }
 Count ::= INTEGER
 CreateError ::= INTEGER
 CrossConnectionName ::= GraphicString
-CrossConnectionObjectPointer ::= CHOICE { notConnected [0] ObjectInstance, -- Fabric object --
-	connected [1] ObjectInstance, -- Cross-connection object --
+CrossConnectionObjectPointer ::= CHOICE {
+	notConnected [0] ObjectInstance,-- Fabric object --
+	connected [1] ObjectInstance,-- Cross-connection object --
 	multipleConnections MultipleConnections }
-CTPUpstreamPointer ::= ConnectivityPointer(WITH COMPONENTS { ...,-- the other two choices are present
-concatenated ABSENT})
-CTPDownstreamPointer ::= DownstreamConnectivityPointer (WITH COMPONENTS {..., concatenated ABSENT, broadcastConcatenated ABSENT-- other choices are present
-})
-CurrentProblem  ::=  SEQUENCE {problem [0] ProbableCause, alarmStatus [1] AlarmStatus}
-CurrentProblemList  ::=  SET OF CurrentProblem Directionality ::= ENUMERATED { unidirectional(0),bidirectional(1) }
-DisconnectInformation ::= SEQUENCE OF ObjectInstance   -- tps
-DisconnectResult  ::= SEQUENCE OF CHOICE {failed             Failed, disconnected       ObjectInstance -- tp}
--- the n-th  element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
+CTPUpstreamPointer ::= ConnectivityPointer(WITH COMPONENTS {
+	...,-- the other two choices are present
+	concatenated ABSENT })
+CTPDownstreamPointer ::= DownstreamConnectivityPointer(WITH COMPONENTS {
+	...,
+	concatenated ABSENT,
+	broadcastConcatenated ABSENT-- other choices are present
+	})
+CurrentProblem ::= SEQUENCE {
+	problem [0] ProbableCause,
+	alarmStatus [1] AlarmStatus }
+CurrentProblemList ::= SET OF CurrentProblem
+Directionality ::= ENUMERATED {
+	unidirectional(0),
+	bidirectional(1) }
+DisconnectInformation ::= SEQUENCE OF ObjectInstance-- tps
+DisconnectResult ::= SEQUENCE OF CHOICE {
+	failed Failed,
+	disconnected ObjectInstance-- tp
+	}
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
 -- "DisconnectInformation" type.
-
-DownstreamConnectivityPointer ::= CHOICE {none NULL, single ObjectInstance,concatenated SEQUENCE OF ObjectInstance, broadcast SET OF ObjectInstance,broadcastConcatenated [1] SET OF SEQUENCE OF ObjectInstance}
-ExplicitPtoMP  ::= SEQUENCE {fromTp ExplicitTP, toTPs SET OF ExplicitTP}
-ExplicitPtoP ::= SEQUENCE {fromTp ExplicitTP, toTp ExplicitTP}
-ExplicitTP ::= CHOICE {oneTPorGTP  ObjectInstance, listofTPs   SEQUENCE OF ObjectInstance}
+--
+DownstreamConnectivityPointer ::= CHOICE {
+	none NULL,
+	single ObjectInstance,
+	concatenated SEQUENCE OF ObjectInstance,
+	broadcast SET OF ObjectInstance,
+	broadcastConcatenated [1] SET OF SEQUENCE OF ObjectInstance }
+ExplicitPtoMP ::= SEQUENCE {
+	fromTp ExplicitTP,
+	toTPs SET OF ExplicitTP }
+ExplicitPtoP ::= SEQUENCE {
+	fromTp ExplicitTP,
+	toTp ExplicitTP }
+ExplicitTP ::= CHOICE {
+	oneTPorGTP ObjectInstance,
+	listofTPs SEQUENCE OF ObjectInstance }
 ExternalTime ::= GeneralizedTime
 EquipmentHolderAddress ::= SEQUENCE OF PrintableString
 EquipmentHolderType ::= GraphicString
-Failed ::= CHOICE {logicalProblem LogicalProblem, resourceProblem ResourceProblem}
-HolderStatus ::= CHOICE {holderEmpty [0] NULL, inTheAcceptableList [1] CircuitPackType,notInTheAcceptableList [2] CircuitPackType, unknownType [3] NULL}
-IndividualSwitchOver ::= SEQUENCE {connection ObjectInstance, -- crossConnection of connectionProtection (defined in Recommendation G.774.04)
-unchangedTP ObjectInstance,newTP ObjectInstance -- designates the newTP to which the unchanged TP has to be connected with
-}
-IndividualResult ::= CHOICE {failed [0] Failed, pass [1] Connected}
-InformationTransferCapabilities ::= ENUMERATED {speech(0),audio3pt1(1),audio7(2),audioComb(3),digitalRestricted56(4), digitalUnrestricted64(5)
--- "..." these ellipses defined in ASN.1 amendment are used here to indicate that this is --
--- an  extensible type and additional enumerations may be added in future --
-}
+Failed ::= CHOICE {
+	logicalProblem LogicalProblem,
+	resourceProblem ResourceProblem }
+HolderStatus ::= CHOICE {
+	holderEmpty [0] NULL,
+	inTheAcceptableList [1] CircuitPackType,
+	notInTheAcceptableList [2] CircuitPackType,
+	unknownType [3] NULL }
+IndividualSwitchOver ::= SEQUENCE {
+	connection ObjectInstance,-- crossConnection of connectionProtection (defined in Recommendation G.774.04)
+	unchangedTP ObjectInstance,
+	newTP ObjectInstance-- designates the newTP to which the unchanged TP has to be connected with
+	}
+IndividualResult ::= CHOICE {
+	failed [0] Failed,
+	pass [1] Connected }
+InformationTransferCapabilities ::= ENUMERATED {
+	speech(0),
+	audio3pt1(1),
+	audio7(2),
+	audioComb(3),
+	digitalRestricted56(4),
+	digitalUnrestricted64(5)
+	-- "..." these ellipses defined in ASN.1 amendment are used here to indicate that this is --
+	-- an extensible type and additional enumerations may be added in future -- }
 ListOfCharacteristicInformation ::= SET OF CharacteristicInformation
 ListOfTPs ::= SET OF ObjectInstance
 LocationName ::= GraphicString
-LogicalProblem ::= SEQUENCE {problemCause ProblemCause, incorrectInstances SET OF ObjectInstance  OPTIONAL}
-MultipleConnections ::= SET OF CHOICE {downstreamNotConnected [0]  ObjectInstance, downstreamConnected [1]  ObjectInstance,upstreamNotConnected [2]  ObjectInstance, upstreamConnected [3]  ObjectInstance }
-NamedCrossConnection ::= SEQUENCE { redline BOOLEAN,name CrossConnectionName}
-NameType ::= CHOICE { numericName INTEGER, pString GraphicString}
+LogicalProblem ::= SEQUENCE {
+	problemCause ProblemCause,
+	incorrectInstances SET OF ObjectInstance OPTIONAL }
+MultipleConnections ::= SET OF CHOICE {
+	downstreamNotConnected [0] ObjectInstance,
+	downstreamConnected [1] ObjectInstance,
+	upstreamNotConnected [2] ObjectInstance,
+	upstreamConnected [3] ObjectInstance }
+NamedCrossConnection ::= SEQUENCE {
+	redline BOOLEAN,
+	name CrossConnectionName }
+NameType ::= CHOICE {
+	numericName INTEGER,
+	pString GraphicString }
 NumberOfCircuits ::= INTEGER
-ObjectList ::= SET OF  ObjectInstance
+ObjectList ::= SET OF ObjectInstance
 Pointer ::= ObjectInstance
-PointerOrNull ::= CHOICE{pointer ObjectInstance, null NULL}
-PointToPoint ::= SEQUENCE {fromTp ObjectInstance, toTp ObjectInstance,xCon ObjectInstance }
-PointToMultipoint ::= SEQUENCE {fromTp ObjectInstance, toTps SET OF SEQUENCE {tp ObjectInstance, xConnection ObjectInstance}, mpXCon ObjectInstance}
-ProblemCause ::= CHOICE {unknown NULL, integerValue INTEGER}-- The values of integer value for ProblemCause and integerValue for ResourceProblem shall always be
--- assigned by this Recommendation.  No values of integerValue for ResourceProblem have been assigned.
-
+PointerOrNull ::= CHOICE {
+	pointer ObjectInstance,
+	null NULL }
+PointToPoint ::= SEQUENCE {
+	fromTp ObjectInstance,
+	toTp ObjectInstance,
+	xCon ObjectInstance }
+PointToMultipoint ::= SEQUENCE {
+	fromTp ObjectInstance,
+	toTps SET OF SEQUENCE {
+		tp ObjectInstance,
+		xConnection ObjectInstance },
+	mpXCon ObjectInstance }
+ProblemCause ::= CHOICE {
+	unknown NULL,
+	integerValue INTEGER }-- The values of integer value for ProblemCause and integerValue for ResourceProblem shall always be
+-- assigned by this Recommendation. No values of integerValue for ResourceProblem have been assigned.
+--
 -- The following values are used for integerValue of ProblemCause.
 noSuchTpInstance ProblemCause ::= integerValue : 0
 noSuchGtpInstance ProblemCause ::= integerValue : 1
@@ -285,52 +411,114 @@ alreadyConnected ProblemCause ::= integerValue : 12
 -- alreadyConnected is used to indicate the two termination points requested to be cross-connected are already
 -- cross-connected versus involvedInCrossConnection is used to indicate one or more termination points are
 -- cross-connected but not to each other.
-
-PtoMPools ::= SEQUENCE {fromTp ExplicitTP, toTPPools ToTPPools}
-PtoTPPool  ::= SEQUENCE {fromTp ExplicitTP, toTpPool ObjectInstance}
-RelatedObjectInstance ::= CHOICE {notAvailable NULL, relatedObject ObjectInstance}
-RemoveTpsFromGtpInformation ::= SEQUENCE OF SEQUENCE {fromGtp    ObjectInstance, tps        SET OF ObjectInstance}
-RemoveTpsFromGtpResult ::= SEQUENCE OF CHOICE {failed [0] Failed, removed [1]RemoveTpsResultInformation}
--- the n-th  element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
+--
+PtoMPools ::= SEQUENCE {
+	fromTp ExplicitTP,
+	toTPPools ToTPPools }
+PtoTPPool ::= SEQUENCE {
+	fromTp ExplicitTP,
+	toTpPool ObjectInstance }
+RelatedObjectInstance ::= CHOICE {
+	notAvailable NULL,
+	relatedObject ObjectInstance }
+RemoveTpsFromGtpInformation ::= SEQUENCE OF SEQUENCE {
+	fromGtp ObjectInstance,
+	tps SET OF ObjectInstance }
+RemoveTpsFromGtpResult ::= SEQUENCE OF CHOICE {
+	failed [0] Failed,
+	removed [1] RemoveTpsResultInformation }
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
 -- "RemoveTPsFromGtpInformation" type.
-RemoveTpsFromTpPoolInformation  ::= SEQUENCE OF SEQUENCE {fromTpPool ObjectInstance, tps SET OF ObjectInstance}
-RemoveTpsFromTpPoolResult ::= SEQUENCE OF CHOICE {failed [0] Failed, removed [1] RemoveTpsResultInformation}
--- the n-th  element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
+RemoveTpsFromTpPoolInformation ::= SEQUENCE OF SEQUENCE {
+	fromTpPool ObjectInstance,
+	tps SET OF ObjectInstance }
+RemoveTpsFromTpPoolResult ::= SEQUENCE OF CHOICE {
+	failed [0] Failed,
+	removed [1] RemoveTpsResultInformation }
+-- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF" of the
 -- "RemoveTPsFromTpPoolInformation" type.
-RemoveTpsResultInformation ::= SEQUENCE {deletedTpPoolOrGTP ObjectInstance OPTIONAL, tps SET OF ObjectInstance }
+RemoveTpsResultInformation ::= SEQUENCE {
+	deletedTpPoolOrGTP ObjectInstance OPTIONAL,
+	tps SET OF ObjectInstance }
 -- If the TP Pool or GTP is deleted, the deleted TP Pool or GTP should be provided in the --
-RemoveTpsResultInformation Replaceable ::= ENUMERATED {yes (0), no (1),notapplicable (2) }
-ResourceProblem::= CHOICE {unknown NULL, integerValue INTEGER}
+-- RemoveTpsResultInformation
+Replaceable ::= ENUMERATED {
+	yes(0),
+	no(1),
+	notapplicable(2) }
+ResourceProblem ::= CHOICE {
+	unknown NULL,
+	integerValue INTEGER }
 SequenceOfObjectInstance ::= SEQUENCE OF ObjectInstance
 SerialNumber ::= GraphicString
-SignallingCapabilities ::= ENUMERATED {isup(0), isup92(1),ccittNo5(2),r2(3),ccittNo6(4), tup(5)
+SignallingCapabilities ::= ENUMERATED {
+	isup(0),
+	isup92(1),
+	ccittNo5(2),
+	r2(3),
+	ccittNo6(4),
+	tup(5)
 	-- "..." these ellipses defined in ASN.1 amendment are used here to indicate that this is --
-		-- an  extensible type and additional enumerations may be added in future -- }
-SignalType ::= CHOICE {simple CharacteristicInformation, bundle Bundle,complex [0] SEQUENCE OF Bundle }
-SubordinateCircuitPackSoftwareLoad ::= CHOICE {notApplicable NULL, softwareInstances  [0] SEQUENCE OF ObjectInstance,softwareIdentifiers [1] SEQUENCE OF PrintableString}
+	-- an extensible type and additional enumerations may be added in future -- }
+SignalType ::= CHOICE {
+	simple CharacteristicInformation,
+	bundle Bundle,
+	complex [0] SEQUENCE OF Bundle }
+SubordinateCircuitPackSoftwareLoad ::= CHOICE {
+	notApplicable NULL,
+	softwareInstances [0] SEQUENCE OF ObjectInstance,
+	softwareIdentifiers [1] SEQUENCE OF PrintableString }
 SupportableClientList ::= SET OF ObjectClass
-SystemTiming ::= SEQUENCE { sourceType ENUMERATED { internalTimingSource(0),remoteTimingSource(1), slavedTimingTerminationSignal(2)}, sourceID ObjectInstance   OPTIONAL  -- not needed for internal source
-}
-SystemTimingSource ::= SEQUENCE {primaryTimingSource SystemTiming, secondaryTimingSource SystemTiming OPTIONAL}
+SystemTiming ::= SEQUENCE {
+	sourceType ENUMERATED {
+		internalTimingSource(0),
+		remoteTimingSource(1),
+		slavedTimingTerminationSignal(2) },
+	sourceID ObjectInstance OPTIONAL-- not needed for internal source
+	}
+SystemTimingSource ::= SEQUENCE {
+	primaryTimingSource SystemTiming,
+	secondaryTimingSource SystemTiming OPTIONAL }
 SwitchOverInformation ::= SEQUENCE OF IndividualSwitchOver
 SwitchOverResult ::= SEQUENCE OF IndividualResult
-TerminationPointInformation ::= CHOICE {tPOrGTP [0] ObjectInstance, sourceTP [1] ObjectInstance,sinkTP [2] ObjectInstance}
-ToTermSpecifier ::= CHOICE {toTpOrGTP [0]   ExplicitTP, toPool [1]   ObjectInstance}
-ToTPPools ::= SET OF SEQUENCE {tpPoolId    ObjectInstance, numberOfTPs INTEGER}
-TpsAddedToTpPool  ::= SEQUENCE {tpPool                ObjectInstance, tps                   SET OF ObjectInstance}
+TerminationPointInformation ::= CHOICE {
+	tPOrGTP [0] ObjectInstance,
+	sourceTP [1] ObjectInstance,
+	sinkTP [2] ObjectInstance }
+ToTermSpecifier ::= CHOICE {
+	toTpOrGTP [0] ExplicitTP,
+	toPool [1] ObjectInstance }
+ToTPPools ::= SET OF SEQUENCE {
+	tpPoolId ObjectInstance,
+	numberOfTPs INTEGER }
+TpsAddedToTpPool ::= SEQUENCE {
+	tpPool ObjectInstance,
+	tps SET OF ObjectInstance }
 TpsInGtpList ::= SEQUENCE OF ObjectInstance
-TransmissionCharacteristics ::= BIT STRING {satellite(0), dCME(1), echoControl(2)}
+TransmissionCharacteristics ::= BIT STRING {
+	satellite(0),
+	dCME(1),
+	echoControl(2) }
 UserLabel ::= GraphicString
 VendorName ::= GraphicString
 Version ::= GraphicString
-END -- end of ASN1 DefinedTypesModule
+END-- end of ASN1 DefinedTypesModule
 
+
+END
 --< GDMO.ChangeLog
 --  =============================================================================
--- 
+--  
 --  $Log: M3100.asn,v $
 --  Revision 0.9.2.1  2007/09/06 10:58:58  brian
 --  - added new gdmo files
---
+--  
 --  =============================================================================
 --  >--
+--< GDMO.EndDocument "ITU-T Rec. M.3100 (1992)"
+--  { ccitt recommendation m gnm(3100) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

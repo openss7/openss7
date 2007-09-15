@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 AccessControlDefinitions{ joint-iso-ccitt(2) ms(9) function(2) part9(9) asn1Module(2) 1 } >--
 -- A.1 Allocation of object identifiers
 -- This Recommendation | International Standard allocates the following object identifiers
 AccessControlDefinitions{ joint-iso-ccitt(2) ms(9) function(2) part9(9) asn1Module(2) 1 }
@@ -13,6 +14,7 @@ accessControl-NameBinding OBJECT IDENTIFIER ::=
 accessControl-Attribute OBJECT IDENTIFIER ::=
 { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) }
 END
+--< ASN1.Version 1994 AcessControl-ASN1Module { joint-iso-ccitt ms(9) function(2) part9(9) asn1Module(2) 2 } >--
 -- A.6 Abstract syntax definitions
 AcessControl-ASN1Module { joint-iso-ccitt ms(9) function(2) part9(9) asn1Module(2) 2 }
 DEFINITIONS IMPLICIT TAGS ::= BEGIN

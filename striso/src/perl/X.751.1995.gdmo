@@ -1,3 +1,6 @@
+--< GDMO.Document "ITU-T Rec. X.751 (1995)" >--
+--< GDMO.Namespace itut_x751 >--
+MODULE "ITU-T Rec. X.751 (1995)"
 -- Annex A
 -- Management information definitions
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -196,3 +199,5 @@ secondaryInstanceUnavailable PARAMETER
 CONTEXT SPECIFIC-ERROR;
 WITH SYNTAX ChangeOverASN1Productions.ObjectInstance;
 REGISTERED AS {part17Parameter 10};
+END
+--< GDMO.EndDocument "ITU-T Rec. X.751 (1995)" >--

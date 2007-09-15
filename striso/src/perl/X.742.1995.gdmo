@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" >--
+--< GDMO.Namespace itut_x742 >--
 --< GDMO.Alias "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" "X.742" >--
 MODULE "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
 -- Annex A

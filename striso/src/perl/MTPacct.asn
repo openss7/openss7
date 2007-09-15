@@ -1,134 +1,121 @@
-AccountingDefinedTypesModule
-{itu-t(0) recommendation(0) q(17)
-omap(751) accounting(3) informationModel(0) asn1Modules(2)
-accountingDefinedTypesModule(0)}
-DEFINITIONS IMPLICIT TAGS ::= BEGIN
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 05:43:50 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.751.3 (1992)"
+--  { itu-t recommendation(0) q(17) omap(751) accounting(3) } >--
+MODULE "ITU-T Rec. Q.751.3 (1992)" { itu-t recommendation(0) q(17) omap(751) accounting(3) }
+--< ASN1.Version 1994 AccountingDefinedTypesModule
+--  { itu-t(0) recommendation(0) q(17) omap(751) accounting(3) informationModel(0) asn1Modules(2) accountingDefinedTypesModule(0) } >--
+AccountingDefinedTypesModule { itu-t(0) recommendation(0) q(17) omap(751) accounting(3) informationModel(0) asn1Modules(2) accountingDefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+EXPORTS ALL;
 IMPORTS
 ObjectInstance, ControlStatus
-FROM Attribute-ASN1Module {joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1}
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 }
 PointerOrNull
-FROM ASN1DefinedTypesModule { itu-t recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+	FROM ASN1DefinedTypesModule { itu-t recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
 MTPDefinedTypesModule
-FROM MTPDefinedTypesModule {itu-t(0) recommendation(0) q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule}
-EXPORTS ALL
+	FROM MTPDefinedTypesModule { itu-t(0) recommendation(0) q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule };
 -- ASN.1 type definitions
 DataProblem ::= ENUMERATED {
-	noProblem
-	(0),
-	intervalNotComplete (1),
-	configurationChanged (2),
-	notReliable
-	(3)
-	}
-	EndOfMeasurementTime ::= GeneralizedTime
-	MeasurementControlStatus ControlStatus::= SET OF INTEGER {suspended(3)}
-	maxNumberReferencesInSelectionGroupSet INTEGER::= h -- this number is only for compilability
-	SelectionGroup ::= SEQUENCE {
-		selectionItem
-		[0] ObjectInstance,
-		optionalSelectionItem
-		[1] ObjectInstance OPTIONAL
-		}
-		SelectionGroupSet ::= SET SIZE (0..maxNumberReferencesInSelectionGroupSet) OF SelectionGroup
-		-- ASN.1 OBJECT IDENTIFIER definitions
-		ss7AccountingInformationModel OBJECT IDENTIFIER ::= {itu-t recommendation(0) q(17)
-		omap(751)
-		accounting(3)}
-		accountingAction OBJECT IDENTIFIER ::= {ss7AccountingInformationModel action(9)}
-		accountingAttribute OBJECT IDENTIFIER ::= {ss7AccountingInformationModel attribute(7)}
-		accountingAttributeGroup OBJECT IDENTIFIER ::= {ss7AccountingInformationModel attributeGroup(8)} 
-accountingNameBinding OBJECT IDENTIFIER ::= {ss7AccountingInformationModel nameBinding(6)}
-accountingNotification OBJECT IDENTIFIER ::= {ss7AccountingInformationModel notification(10)}
-accountingObjectClass OBJECT IDENTIFIER ::= {ss7AccountingInformationModel managedObjectClass(3)}
-accountingPackage OBJECT IDENTIFIER ::= {ss7AccountingInformationModel package(4)}
-accountingParameter OBJECT IDENTIFIER ::= {ss7AccountingInformationModel parameter(5)}
-accountingOrVerification-AOi OBJECT IDENTIFIER ::= {accountingAttribute accountingOrVerification(0)}
-endOfMeasurementTime-AOi OBJECT IDENTIFIER ::= {accountingAttribute endOfMeasurementTime(7)}
-controlPointer-AOi OBJECT IDENTIFIER ::= {accountingAttribute controlPointer(1)}
-controlPointerPackage-POi OBJECT IDENTIFIER ::= ::= {accountingPackage controlPointerPackage(1)}
-measurementControlStatus-AOi OBJECT IDENTIFIER ::= {accountingAttribute measurementControlStatus(6)}
-measurementControlStatusPackage-POi OBJECT IDENTIFIER ::= ::= {accountingPackage
-measurementControlStatusPackage(2)}
-operatorName-AOi OBJECT IDENTIFIER ::= {accountingAttribute operatorName(3)}
-selectionGroupSetForAccounting-AOi OBJECT IDENTIFIER ::= {accountingAttribute selectionGroupSetForAccounting(4)}
-selectionGroupSetForVerification-AOi OBJECT IDENTIFIER ::= {accountingAttribute
-selectionGroupSetForVerification(5)}
-ss7AccountingAndVerificationControlPackage-POi OBJECT IDENTIFIER ::= ::= {accountingPackage ss7AccountingAndVerificationControlPackage(3)}
-ss7AccountingAndVerificationControl-OOi OBJECT IDENTIFIER ::= {accountingObjectClass
-ss7AccountingAndVerificationControl(0)}
-ss7AccountingAndVerificationControl-managedElement-NBOI OBJECT IDENTIFIER ::= {accountingNameBinding ss7AccountingAndVerificationControl-managedElement(0)}
-ss7AccountingAndVerificationControl-managedSwitchingElement-NBOI OBJECT IDENTIFIER ::=
-{accountingNameBinding ss7AccountingAndVerificationControl-managedSwitchingElement(1)}
-ss7AccountingAndVerificationControlPackage-POi OBJECT IDENTIFIER ::= {accountingPackage ss7AccountingAndVerificationControlPackage(0)}
-ss7AccountingLogRecord-OOi OBJECT IDENTIFIER ::= {accountingObjectClass ss7AccountingLogRecord(1)}
-ss7AccountingLogRecordPackage-POi OBJECT IDENTIFIER ::= {accountingPackage
-ss7AccountingLogRecordPackage(1)}
-ss7Accounting-NOI OBJECT IDENTIFIER ::= {accountingNotification ss7Accounting(0)}
+	noProblem(0),
+	intervalNotComplete(1),
+	configurationChanged(2),
+	notReliable(3) }
+EndOfMeasurementTime ::= GeneralizedTime
+-- MeasurementControlStatus ControlStatus ::= SET OF INTEGER { suspended(3) }
+maxNumberReferencesInSelectionGroupSet INTEGER ::= 0--h---- this number is only for compilability
+SelectionGroup ::= SEQUENCE {
+	selectionItem [0] ObjectInstance,
+	optionalSelectionItem [1] ObjectInstance OPTIONAL }
+SelectionGroupSet ::= SET SIZE(0..maxNumberReferencesInSelectionGroupSet) OF SelectionGroup
+-- ASN.1 OBJECT IDENTIFIER definitions
+ss7AccountingInformationModel OBJECT IDENTIFIER ::= { itu-t recommendation(0) q(17) omap(751) accounting(3) }
+accountingAction OBJECT IDENTIFIER ::= { ss7AccountingInformationModel action(9) }
+accountingAttribute OBJECT IDENTIFIER ::= { ss7AccountingInformationModel attribute(7) }
+accountingAttributeGroup OBJECT IDENTIFIER ::= { ss7AccountingInformationModel attributeGroup(8) }
+accountingNameBinding OBJECT IDENTIFIER ::= { ss7AccountingInformationModel nameBinding(6) }
+accountingNotification OBJECT IDENTIFIER ::= { ss7AccountingInformationModel notification(10) }
+accountingObjectClass OBJECT IDENTIFIER ::= { ss7AccountingInformationModel managedObjectClass(3) }
+accountingPackage OBJECT IDENTIFIER ::= { ss7AccountingInformationModel package(4) }
+accountingParameter OBJECT IDENTIFIER ::= { ss7AccountingInformationModel parameter(5) }
+accountingOrVerification-AOi OBJECT IDENTIFIER ::= { accountingAttribute accountingOrVerification(0) }
+endOfMeasurementTime-AOi OBJECT IDENTIFIER ::= { accountingAttribute endOfMeasurementTime(7) }
+controlPointer-AOi OBJECT IDENTIFIER ::= { accountingAttribute controlPointer(1) }
+controlPointerPackage-POi OBJECT IDENTIFIER ::= { accountingPackage controlPointerPackage(1) }
+measurementControlStatus-AOi OBJECT IDENTIFIER ::= { accountingAttribute measurementControlStatus(6) }
+measurementControlStatusPackage-POi OBJECT IDENTIFIER ::= { accountingPackage measurementControlStatusPackage(2) }
+operatorName-AOi OBJECT IDENTIFIER ::= { accountingAttribute operatorName(3) }
+selectionGroupSetForAccounting-AOi OBJECT IDENTIFIER ::= { accountingAttribute selectionGroupSetForAccounting(4) }
+selectionGroupSetForVerification-AOi OBJECT IDENTIFIER ::= { accountingAttribute selectionGroupSetForVerification(5) }
+ss7AccountingAndVerificationControlPackage-POi OBJECT IDENTIFIER ::= { accountingPackage ss7AccountingAndVerificationControlPackage(3) }
+ss7AccountingAndVerificationControl-OOi OBJECT IDENTIFIER ::= { accountingObjectClass ss7AccountingAndVerificationControl(0) }
+ss7AccountingAndVerificationControl-managedElement-NBOI OBJECT IDENTIFIER ::= { accountingNameBinding ss7AccountingAndVerificationControl-managedElement(0) }
+ss7AccountingAndVerificationControl-managedSwitchingElement-NBOI OBJECT IDENTIFIER ::= { accountingNameBinding ss7AccountingAndVerificationControl-managedSwitchingElement(1) }
+ss7AccountingAndVerificationControlPackage-POi OBJECT IDENTIFIER ::= { accountingPackage ss7AccountingAndVerificationControlPackage(0) }
+ss7AccountingLogRecord-OOi OBJECT IDENTIFIER ::= { accountingObjectClass ss7AccountingLogRecord(1) }
+ss7AccountingLogRecordPackage-POi OBJECT IDENTIFIER ::= { accountingPackage ss7AccountingLogRecordPackage(1) }
+ss7Accounting-NOI OBJECT IDENTIFIER ::= { accountingNotification ss7Accounting(0) }
 -- ASN.1 OBJECT IDENTIFIER definitions for specific errors
-objectStillReferencedError-OID OBJECT IDENTIFIER ::= {accountingParameter objectStillReferencedError(1)}
+objectStillReferencedError-OID OBJECT IDENTIFIER ::= { accountingParameter objectStillReferencedError(1) }
 END
 
-MtpAccountingDefinedTypesModule
-{itu-t(0) recommendation(0) q(17) omap(751) accounting(3) informationModel(0) asn1Modules(2)
-mtpAccountingDefinedTypesModule(1)}
-DEFINITIONS IMPLICIT TAGS ::= BEGIN
+--< ASN1.Version 1994 MtpAccountingDefinedTypesModule
+--  { itu-t(0) recommendation(0) q(17) omap(751) accounting(3) informationModel(0) asn1Modules(2) mtpAccountingDefinedTypesModule(1) } >--
+MtpAccountingDefinedTypesModule { itu-t(0) recommendation(0) q(17) omap(751) accounting(3) informationModel(0) asn1Modules(2) mtpAccountingDefinedTypesModule(1) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+EXPORTS ALL;
 IMPORTS
-ObjectInstance, SimpleNameType, NameType FROM Attribute-ASN1Module {joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1}
-Counter, DataProblem, accountingInformationModel, accountingAction, accountingAttribute,
-accountingAttributeGroup, accountingNameBinding, accountingNotification, accountingObjectClass, accountingPackage, accountingParameter
-FROM AccountingDefinedTypesModule {itu-t(0) recommendation(0) q(17) omap(751) accounting(3)
-informationModel(0) asn1Modules(2) accountingDefinedTypesModule(0)}
-PointCode, SIOType, NetworkIndicator FROM MTPDefinedTypesModule {itu-t(0) recommendation(0) q(17) omap(751) mtp(1) informationModel(0)
-asn1Modules(2) mtpDefinedTypesModule(0)}
-Ss7SpecificErrorInformation FROM {itu(0) recommendation(0) q(17) omap2(2751) part1(1) informationModel(0) asn1Modules(2) 
-
-q2751DefinedTypesModule(0)}
-EXPORTS EVERYTHING
+ObjectInstance, SimpleNameType, NameType
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 }
+Counter, DataProblem, accountingInformationModel, accountingAction, accountingAttribute, accountingAttributeGroup, accountingNameBinding, accountingNotification, accountingObjectClass, accountingPackage, accountingParameter
+	FROM AccountingDefinedTypesModule { itu-t(0) recommendation(0) q(17) omap(751) accounting(3) informationModel(0) asn1Modules(2) accountingDefinedTypesModule(0) }
+PointCode, SIOType, NetworkIndicator
+	FROM MTPDefinedTypesModule { itu-t(0) recommendation(0) q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule(0) }
+Ss7SpecificErrorInformation
+	FROM XXX { itu(0) recommendation(0) q(17) omap2(2751) part1(1) informationModel(0) asn1Modules(2) q2751DefinedTypesModule(0) };
 -- ASN.1 type definitions
-maxNumberPointCodesInPointCodeSet INTEGER::= n -- this number is only for compilability
-maxNumberReferencesInMtpSelectionGroupSet INTEGER::= p -- this number is only for compilability
-maxNumberReferencesInSignLinkSetTpSet INTEGER::= m -- this number is only for compilability
-MtpAccCounterData ::= SEQUENCE
-{ msus
-[0] INTEGER,
-octetts
-[1] INTEGER,
-dataProblem
-[2] DataProblem,
-pointCodeSet [3] PointCodeSet
-OPTIONAL,
-optionalSiSet [5] SiSet
-OPTIONAL }
-MtpAccCounterDataSequence ::= SEQUENCE SIZE(1..maxNumberReferencesInMtpSelectionGroupSet} OF
-MtpAccCounterData -- maximum size = p
-MtpAccountingNotificationData ::= SEQUENCE{
-	endOfMeasurementTime
-	GeneralizedTime,
-	networkIndicator
-	NetworkIndicator,
-	signLinkSetTpIdSet
-	SignLinkSetTpIdSet,
-	mtpAccCounterDataSequence MtpAccCounterDataSequence}
-	PointCodeSet ::= SET SIZE (1..maxNumberPointCodesInPointCodeSet) OF PointCode
-	SignLinkSetTpIdSet ::= SET SIZE(1..maxNumberReferencesInSignLinkSetTpSet) OF
-	NameType
-	-- maximum size = m
-	-- Only the integer type of the CHOICE within NameType shall be used.
-	SignLinkSetTpSet ::= SET SIZE (1..maxNumberReferencesInSignLinkSetTpSet) OF ObjectInstance
-	SiSet ::= SET SIZE (1..16) OF SIOType
-	-- the following values of Ss7SpecificErrorInformation defined in Rec. Q.2751.1 are used additionally:
-	dpcGroupNotExistingInSameMtpSignPointError Ss7SpecificErrorInformation ::= 3000
-	-- At least one of the dpcGroup instances to be referenced is not
-	-- existing in the same mtpSignPoint as the mtpAccount.
-	linksetAlreadyInOtherMtpAccountError Ss7SpecificErrorInformation ::= 3001,
-	-- At least one of the signLinkSetTp instances to be referenced is
-	-- already referenced by another mtpAccount instance.
-	linksetNotExistingInSameMtpSignPointError Ss7SpecificErrorInformation ::= 3002
-	-- At least one of the signLinkSetTp instances to be referenced is
-	-- not existing in the same mtpSignPoint as the mtpAccount.
-	pointCodeNotExistingInSameMtpSignPointError Ss7SpecificErrorInformation ::= 3003
-	-- At least one of the point codes is not used by any signRouteSetNePart
-	-- instance contained in the same mtpSignPoint as the mtpAccount.
+maxNumberPointCodesInPointCodeSet INTEGER ::= n-- this number is only for compilability
+maxNumberReferencesInMtpSelectionGroupSet INTEGER ::= p-- this number is only for compilability
+maxNumberReferencesInSignLinkSetTpSet INTEGER ::= m-- this number is only for compilability
+MtpAccCounterData ::= SEQUENCE {
+	msus [0] INTEGER,
+	octetts [1] INTEGER,
+	dataProblem [2] DataProblem,
+	pointCodeSet [3] PointCodeSet OPTIONAL,
+	optionalSiSet [5] SiSet OPTIONAL }
+MtpAccCounterDataSequence ::= SEQUENCE SIZE(1..maxNumberReferencesInMtpSelectionGroupSet) OF MtpAccCounterData-- maximum size = p
+MtpAccountingNotificationData ::= SEQUENCE {
+	endOfMeasurementTime GeneralizedTime,
+	networkIndicator NetworkIndicator,
+	signLinkSetTpIdSet SignLinkSetTpIdSet,
+	mtpAccCounterDataSequence MtpAccCounterDataSequence }
+PointCodeSet ::= SET SIZE(1..maxNumberPointCodesInPointCodeSet) OF PointCode
+SignLinkSetTpIdSet ::= SET SIZE(1..maxNumberReferencesInSignLinkSetTpSet) OF NameType
+-- maximum size = m
+-- Only the integer type of the CHOICE within NameType shall be used.
+SignLinkSetTpSet ::= SET SIZE(1..maxNumberReferencesInSignLinkSetTpSet) OF ObjectInstance
+SiSet ::= SET SIZE(1..16) OF SIOType
+-- the following values of Ss7SpecificErrorInformation defined in Rec. Q.2751.1 are used additionally:
+dpcGroupNotExistingInSameMtpSignPointError Ss7SpecificErrorInformation ::= 3000
+-- At least one of the dpcGroup instances to be referenced is not
+-- existing in the same mtpSignPoint as the mtpAccount.
+linksetAlreadyInOtherMtpAccountError Ss7SpecificErrorInformation ::= 3001
+-- At least one of the signLinkSetTp instances to be referenced is
+-- already referenced by another mtpAccount instance.
+linksetNotExistingInSameMtpSignPointError Ss7SpecificErrorInformation ::= 3002
+-- At least one of the signLinkSetTp instances to be referenced is
+-- not existing in the same mtpSignPoint as the mtpAccount.
+pointCodeNotExistingInSameMtpSignPointError Ss7SpecificErrorInformation ::= 3003
+-- At least one of the point codes is not used by any signRouteSetNePart
+-- instance contained in the same mtpSignPoint as the mtpAccount.
 pointCodeUsedByMtpSignPointError Ss7SpecificErrorInformation ::= 3004
 -- At least one of the point codes is used as point code by the mtpSignPoint
 -- containing the mtpAccount.
@@ -140,27 +127,35 @@ selectionGroupOverlapError Ss7SpecificErrorInformation ::= 3007
 -- The selectionGroups within the selectionGroupSequence would
 -- not allow an unambiguous identification of the counter to be incremented.
 -- ASN.1 OBJECT IDENTIFIER definitions
-dpcGroupId-AOi OBJECT IDENTIFIER ::= {accountingAttribute dpcGroupId(6)}
-dpcGroup-mtpSignPoint-NBOI OBJECT IDENTIFIER ::= {accountingNameBinding dpcGroupmtpSignPoint(2)}
-dpcGroupPackage-POi OBJECT IDENTIFIER ::= {accountingPackage dpcGroupPackage (3)}
-dpcGroup-OOi OBJECT IDENTIFIER ::= {accountingObjectClass dpcGroup(2)}
-mtpAccCounterDataSequence-AOi OBJECT IDENTIFIER ::= {accountingAttribute mtpAccCounterDataSequence(13) }
-mtpAccount-mtpSignPoint-NBOI OBJECT IDENTIFIER ::= {accountingNameBinding mtpAccountmtpSignPoint(3)}
-mtpAccountId-AOi OBJECT IDENTIFIER ::= {accountingAttribute mtpAccountId(7)}
-mtpAccounting-NOI OBJECT IDENTIFIER ::= {accountingNotification mtpAccounting(1) }
-mtpAccountingLogRecord-OOi OBJECT IDENTIFIER ::= {accountingObjectClass mtpAccountingLogRecord(5) }
-mtpAccountingLogRecordPackage-POi OBJECT IDENTIFIER ::= {accountingPackage
-mtpAccountingLogRecordPackage(6) }
-mtpAccountingVerification-NOI OBJECT IDENTIFIER ::= {accountingNotification mtpAccountingVerification(2) }
-mtpAccountPackage-POi OBJECT IDENTIFIER ::= {accountingPackage mtpAccountPackage(4)}
-mtpAccount-OOi OBJECT IDENTIFIER ::= {accountingObjectClass mtpAccount(3)}
-pointCodeSet-AOi OBJECT IDENTIFIER ::= {accountingAttribute pointCodeSet(8)}
-signLinkSetTpIdSet-AOi OBJECT IDENTIFIER ::= {accountingAttribute signLinkSetTpIdSet(12) }
-signLinkSetTpSet-AOi OBJECT IDENTIFIER ::= {accountingAttribute signLinkSetTpSet(9)}
-siGroupId-AOi OBJECT IDENTIFIER ::= {accountingAttribute siGroupId(10)}
-siGroupPackage-POi OBJECT IDENTIFIER ::= {accountingPackage siGroupPackage(5)}
-siGroup-OOi OBJECT IDENTIFIER ::= {accountingObjectClass siGroup(4)}
-siGroup-managedElement-NBOI OBJECT IDENTIFIER ::= {accountingNameBinding siGroup-managedElement(4)}
-siGroup-managedSwitchingElement-NBOI OBJECT IDENTIFIER ::= {accountingNameBinding siGroupmanagedSwitchingElement(5)}
-siSet-AOi OBJECT IDENTIFIER ::= {accountingAttribute siSet(11)}
+dpcGroupId-AOi OBJECT IDENTIFIER ::= { accountingAttribute dpcGroupId(6) }
+dpcGroup-mtpSignPoint-NBOI OBJECT IDENTIFIER ::= { accountingNameBinding dpcGroupmtpSignPoint(2) }
+dpcGroupPackage-POi OBJECT IDENTIFIER ::= { accountingPackage dpcGroupPackage(3) }
+dpcGroup-OOi OBJECT IDENTIFIER ::= { accountingObjectClass dpcGroup(2) }
+mtpAccCounterDataSequence-AOi OBJECT IDENTIFIER ::= { accountingAttribute mtpAccCounterDataSequence(13) }
+mtpAccount-mtpSignPoint-NBOI OBJECT IDENTIFIER ::= { accountingNameBinding mtpAccountmtpSignPoint(3) }
+mtpAccountId-AOi OBJECT IDENTIFIER ::= { accountingAttribute mtpAccountId(7) }
+mtpAccounting-NOI OBJECT IDENTIFIER ::= { accountingNotification mtpAccounting(1) }
+mtpAccountingLogRecord-OOi OBJECT IDENTIFIER ::= { accountingObjectClass mtpAccountingLogRecord(5) }
+mtpAccountingLogRecordPackage-POi OBJECT IDENTIFIER ::= { accountingPackage mtpAccountingLogRecordPackage(6) }
+mtpAccountingVerification-NOI OBJECT IDENTIFIER ::= { accountingNotification mtpAccountingVerification(2) }
+mtpAccountPackage-POi OBJECT IDENTIFIER ::= { accountingPackage mtpAccountPackage(4) }
+mtpAccount-OOi OBJECT IDENTIFIER ::= { accountingObjectClass mtpAccount(3) }
+pointCodeSet-AOi OBJECT IDENTIFIER ::= { accountingAttribute pointCodeSet(8) }
+signLinkSetTpIdSet-AOi OBJECT IDENTIFIER ::= { accountingAttribute signLinkSetTpIdSet(12) }
+signLinkSetTpSet-AOi OBJECT IDENTIFIER ::= { accountingAttribute signLinkSetTpSet(9) }
+siGroupId-AOi OBJECT IDENTIFIER ::= { accountingAttribute siGroupId(10) }
+siGroupPackage-POi OBJECT IDENTIFIER ::= { accountingPackage siGroupPackage(5) }
+siGroup-OOi OBJECT IDENTIFIER ::= { accountingObjectClass siGroup(4) }
+siGroup-managedElement-NBOI OBJECT IDENTIFIER ::= { accountingNameBinding siGroup-managedElement(4) }
+siGroup-managedSwitchingElement-NBOI OBJECT IDENTIFIER ::= { accountingNameBinding siGroupmanagedSwitchingElement(5) }
+siSet-AOi OBJECT IDENTIFIER ::= { accountingAttribute siSet(11) }
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.751.3 (1992)"
+--  { itu-t recommendation(0) q(17) omap(751) accounting(3) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

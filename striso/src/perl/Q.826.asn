@@ -1,4 +1,16 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:56 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.826 (2000)"
+--  { itu-t recommendation q routing(826) informationModel(0) } >--
+MODULE "ITU-T Rec. Q.826 (2000)" { itu-t recommendation q routing(826) informationModel(0) }
+--< ASN1.Version 1994 ASN1TypeModule
+--  { itu-t recommendation q routing(826) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) } >--
 --7.5 ASN.1 type definitions
 --7.5.1 Rules of extensibility
 --The following types will be indicated as being extensible:
@@ -19,217 +31,223 @@
 -- unrecognized named bits;
 -- unrecognized tagged elements of sets, sequences, and choices.
 --7.5.2 ASN.1 type definition module
-ASN1TypeModule { itu-t recommendation q routing(826) informationModel(0) asn1Modules(2)
-asn1DefinedTypesModule(0)}
+ASN1TypeModule { itu-t recommendation q routing(826) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
 DEFINITIONS ::=
 BEGIN
 IMPORTS
 ObjectClass, ObjectInstance, Attribute
-FROM CMIP-1 {joint-iso-ccitt ms (9) cmip (1) module(0) protocol (3)}
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) module(0) protocol(3) }
 AdministrativeState, UsageState
-FROM Attribute-ASN1Module {joint-iso-ccitt ms (9) smi(3) part2(2) asn1Module(2) 1}
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 NameType, GeneralErrorCause
-FROM ASN1DefinedTypesModule {ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2)
-asn1DefinedTypesModule (0)};
-informationModel OBJECT IDENTIFIER::={ itu-t recommendation q routing(826)
-informationModel(0)}
-standardSpecificExtension OBJECT IDENTIFIER::={informationModel standardSpecificExtension(0)}
-routingAdminError OBJECT IDENTIFIER::={standardSpecificExtension routingAdminError(0)}
-managedObjectClass OBJECT IDENTIFIER::={informationModel managedObjectClass(3)}
-package OBJECT IDENTIFIER::={informationModel package(4)}
-nameBinding OBJECT IDENTIFIER::={informationModel nameBinding(6)}
-attribute OBJECT IDENTIFIER::={informationModel attribute(7)}
-action OBJECT IDENTIFIER::={informationModel action(9)}
-notification OBJECT IDENTIFIER::={informationModel notification(10)}
+	FROM ASN1DefinedTypesModule { ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) };
+informationModel OBJECT IDENTIFIER ::= { itu-t recommendation q routing(826) informationModel(0) }
+standardSpecificExtension OBJECT IDENTIFIER ::= { informationModel standardSpecificExtension(0) }
+routingAdminError OBJECT IDENTIFIER ::= { standardSpecificExtension routingAdminError(0) }
+managedObjectClass OBJECT IDENTIFIER ::= { informationModel managedObjectClass(3) }
+package OBJECT IDENTIFIER ::= { informationModel package(4) }
+nameBinding OBJECT IDENTIFIER ::= { informationModel nameBinding(6) }
+attribute OBJECT IDENTIFIER ::= { informationModel attribute(7) }
+action OBJECT IDENTIFIER ::= { informationModel action(9) }
+notification OBJECT IDENTIFIER ::= { informationModel notification(10) }
 -- default values
-defaultAnalysisOrigin Origin ::= anyOrigin: NULL
-defaultAssocSignRouteSetNePart ObjectInstanceOrNull ::= null: NULL
+defaultAnalysisOrigin Origin ::= anyOrigin : NULL
+defaultAssocSignRouteSetNePart ObjectInstanceOrNull ::= null : NULL
 defaultBoundaryCrossing BoundaryCrossing ::= national
-defaultCallingPartyCategory CallingPartyCategory ::= anyCategory: NULL
+defaultCallingPartyCategory CallingPartyCategory ::= anyCategory : NULL
 defaultCrankbackAdminState AdministrativeState ::= unlocked
 defaultLanguageDigitProc YesNo ::= FALSE
 defaultPrefixDigits PrefixDigits ::= ""
-defaultPreparationOrigin Origin ::= anyOrigin: NULL
-defaultPreparationTerm Term ::= anyTerm: NULL
-defaultRebuildingOrigin Origin ::= anyOrigin: NULL
-defaultRoutingOrigin Origin ::= anyOrigin: NULL
+defaultPreparationOrigin Origin ::= anyOrigin : NULL
+defaultPreparationTerm Term ::= anyTerm : NULL
+defaultRebuildingOrigin Origin ::= anyOrigin : NULL
+defaultRoutingOrigin Origin ::= anyOrigin : NULL
 defaultTrafficCategory TrafficCategory ::= nationalTraffic
 -- initial values
 initialCarrierCodePresent CarrierCodePresent ::= NULL
 initialValueIdle UsageState ::= idle
-initialValueOrigin Origin ::= anyOrigin: NULL
+initialValueOrigin Origin ::= anyOrigin : NULL
 -- routing administrative errors
-stillBeingRefererenced GeneralErrorCause ::= globalValue : {routingAdminError (1)}
-uniquenessConstraintViolation GeneralErrorCause ::= globalValue : {routingAdminError (2) }
+stillBeingRefererenced GeneralErrorCause ::= globalValue : { routingAdminError(1) }
+uniquenessConstraintViolation GeneralErrorCause ::= globalValue : { routingAdminError(2) }
 -- ASN.1 Types
 ActiveDestination ::= CHOICE {
-destination [0] ObjectInstance,
-destinationGroup [1] DestinationGroup }
+	destination [0] ObjectInstance,
+	destinationGroup [1] DestinationGroup }
 -- Permitted value for cepsg admin state
-AdminLockedUnlocked ::= AdministrativeState ( locked | unlocked )
+AdminLockedUnlocked ::= AdministrativeState(locked|unlocked)
 BoundaryCrossing ::= INTEGER {
-national (0),
-international (1)}
-CalledNumberingPlan ::= BIT STRING (SIZE(4))
+	national(0),
+	international(1) }
+CalledNumberingPlan ::= BIT STRING(SIZE(4))
 -- Value according ITU-T Q.763
 CallingPartyCategory ::= CHOICE {
-anyCategory [0] NULL,
-definedCategory [1] BIT STRING(SIZE(8)),
--- Values of 'definedCategory' according ITU-T Q.763
-extendedCategory [2] OBJECT IDENTIFIER}
+	anyCategory [0] NULL,
+	definedCategory [1] BIT STRING(SIZE(8)),
+	-- Values of 'definedCategory' according ITU-T Q.763
+	extendedCategory [2] OBJECT IDENTIFIER }
 CarrierCode ::= IA5String(FROM("0".."9"|"A".."F"))
 CarrierCodePresent ::= NULL
-CarrierList ::= CHOICE{ noList [0] NULL,
-listOfCarriers [1] ObjectInstance}
-CarrierType::= CHOICE{ objectIdentifier OBJECT IDENTIFIER,
-name NameType }
+CarrierList ::= CHOICE {
+	noList [0] NULL,
+	listOfCarriers [1] ObjectInstance }
+CarrierType ::= CHOICE {
+	objectIdentifier OBJECT IDENTIFIER,
+	name NameType }
 Cic ::= INTEGER
 CircuitNumber ::= INTEGER
 DestinationCode ::= IA5String(FROM("0".."9"|"A".."F"))
-DestinationGroup ::= SEQUENCE{
-objectClass [0] ObjectClass OPTIONAL,
-label [1] NameType}
+DestinationGroup ::= SEQUENCE {
+	objectClass [0] ObjectClass OPTIONAL,
+	label [1] NameType }
 DestinationType ::= INTEGER {
-international (0),
-national (1),
-local (2),
-other (3) }
+	international(0),
+	national(1),
+	local(2),
+	other(3) }
 DigitComb ::= IA5String(FROM("0".."9"|"A".."F"))
 DigitCombInsert ::= SET OF SEQUENCE {
-startPosition [0] INTEGER,
-combination [1] DigitComb }
+	startPosition [0] INTEGER,
+	combination [1] DigitComb }
 DigitCombReplace ::= SET OF SEQUENCE {
-startPosition [0] INTEGER,
-endPosition [1] INTEGER,
-combination [2] DigitComb }
+	startPosition [0] INTEGER,
+	endPosition [1] INTEGER,
+	combination [2] DigitComb }
 DigitSuppress ::= SET OF SEQUENCE {
-startPosition [0] INTEGER,
-endPosition [1] INTEGER }
-ExcludedSubscriberCodes::= SET OF IA5String(FROM("0".."9"|"A".."F"))
+	startPosition [0] INTEGER,
+	endPosition [1] INTEGER }
+ExcludedSubscriberCodes ::= SET OF IA5String(FROM("0".."9"|"A".."F"))
 ExtSchedulingAttribute ::= SET OF SEQUENCE {
-objectOrGroup [0] CHOICE {
-destination [0] ObjectInstance,
-destinationGroup [1] DestinationGroup},
-index [1] INTEGER }
+	objectOrGroup [0] CHOICE {
+		destination [0] ObjectInstance,
+		destinationGroup [1] DestinationGroup },
+	index [1] INTEGER }
 IncCepsg ::= ObjectInstance
 -- instances of OC cepsg for one-way incoming or two-way direction
 InitialSubscriberCodes ::= SEQUENCE OF IA5String(FROM("0".."9"|"A".."F"))
 InputCriteriaDataForAlgorithm ::= CHOICE {
-out [0] SEQUENCE OF SEQUENCE {
-outCepsgs SET OF OutCepsg,
-userLabel GraphicString OPTIONAL},
-perc [1] SEQUENCE OF SEQUENCE {
-percentage INTEGER(0..100),
-userLabel GraphicString OPTIONAL},
-inc [2] SEQUENCE OF SEQUENCE {
-incCarriedCallsQuota SEQUENCE{
-incCepsgs SET OF IncCepsg,
-percentage INTEGER (0..100)},
-userLabel GraphicString OPTIONAL}}
+	out [0] SEQUENCE OF SEQUENCE {
+		outCepsgs SET OF OutCepsg,
+		userLabel GraphicString OPTIONAL },
+	perc [1] SEQUENCE OF SEQUENCE {
+		percentage INTEGER(0..100),
+		userLabel GraphicString OPTIONAL },
+	inc [2] SEQUENCE OF SEQUENCE {
+		incCarriedCallsQuota SEQUENCE {
+			incCepsgs SET OF IncCepsg,
+			percentage INTEGER(0..100) },
+		userLabel GraphicString OPTIONAL } }
 InstanceOrName ::= CHOICE {
-objectInstance [0] ObjectInstance,
-symbolic [1] NameType}
+	objectInstance [0] ObjectInstance,
+	symbolic [1] NameType }
 LanguageDigit ::= INTEGER {
-french (1),
-english (2),
-german (3),
-russian (4),
-spanish (5)} (0..15)
+	french(1),
+	english(2),
+	german(3),
+	russian(4),
+	spanish(5) }(0..15)
 -- the number of the language corresponds to the language numbers in the calling party's
 -- category field in ITU-T Q.763
 ListOfCarriers ::= SET OF CarrierCode
 MatchesIf ::= SET OF CHOICE {
-criteria [0] ObjectClass,
-cause [1] BIT STRING}
+	criteria [0] ObjectClass,
+	cause [1] BIT STRING }
 -- causes as defined in ITU-T Q.850
 ModifyNumberingSchemeInfo ::= SEQUENCE {
-newNationalDestInstance [0] ObjectInstance OPTIONAL,
-newInitialSubscriberCodes [1] InitialSubscriberCodes OPTIONAL }
+	newNationalDestInstance [0] ObjectInstance OPTIONAL,
+	newInitialSubscriberCodes [1] InitialSubscriberCodes OPTIONAL }
 ModifyNumberingSchemeReply ::= SET OF Attribute
 NationalDestinationCode ::= IA5String(FROM("0".."9"))
 -- size is limited as in ITU-T E.164 [2] or any successor document
-NatureOfAddress ::= BIT STRING (SIZE(7))
+NatureOfAddress ::= BIT STRING(SIZE(7))
 -- Value according ITU-T Q.763
 NumberOfDigits ::= INTEGER
 NumberOfSatLinks ::= INTEGER
 ObjectInstanceOrNull ::= CHOICE {
-objectInstance [0] ObjectInstance,
-null [1] NULL}
+	objectInstance [0] ObjectInstance,
+	null [1] NULL }
 -- Definition similar to PointerOrNull from ITU-T M.3100 [4]
 ObjectInstances ::= SET OF ObjectInstance
 OfficeEquipment ::= CHOICE {
-string [0] PrintableString,
-inst [1] ObjectInstance}
+	string [0] PrintableString,
+	inst [1] ObjectInstance }
 Origin ::= CHOICE {
-anyOrigin [0] NULL,
-namedOrigin [1] NameType,
-extendedOrigin [2] OBJECT IDENTIFIER}
+	anyOrigin [0] NULL,
+	namedOrigin [1] NameType,
+	extendedOrigin [2] OBJECT IDENTIFIER }
 OutCepsg ::= ObjectInstance
 -- instance of OC cepsg for out/bothway direction
 OwnCac ::= BOOLEAN
 PrefixCode ::= IA5String(FROM("0".."9"|"A".."F"|"*"|"#"))
-PrefixDigits ::= IA5String (FROM("0".."9"|"A".."F"))
+PrefixDigits ::= IA5String(FROM("0".."9"|"A".."F"))
 PrefTrafficDirect ::= INTEGER {
-incoming (1),
-outgoing (2),
-outgoingFirstChoice (3) }
+	incoming(1),
+	outgoing(2),
+	outgoingFirstChoice(3) }
 ReqBearerCapability ::= INTEGER {
-speech (0),
-r64kbitsUnrestricted (1),
-r56kbitsDigitalRestricted (2),
-r3point1kHzAudio (3),
-r7kHzAudio (4),
-r64kbitPref (5) }
+	speech(0),
+	r64kbitsUnrestricted(1),
+	r56kbitsDigitalRestricted(2),
+	r3point1kHzAudio(3),
+	r7kHzAudio(4),
+	r64kbitPref(5) }
 ReqSignCapability ::= INTEGER {
-isupRequired (0),
-isupPreferred (1),
-anySignalling (2) }
+	isupRequired(0),
+	isupPreferred(1),
+	anySignalling(2) }
 SchedulingAttribute ::= SET OF SEQUENCE {
-object [0] ObjectInstance,
-index [1] INTEGER}
+	object [0] ObjectInstance,
+	index [1] INTEGER }
 SearchMethod ::= INTEGER {
-fifoEvenElseLifoOdd (0), -- priority for idle list with even CIC
-fifoOddElseLifoEven (1), -- priority for idle list with odd CIC
-fifoEvenGrpElseLifoOddGrp (2), -- priority for idle list with even group CIC
-fifoOddGrpElseLifoEvenGrp (3), -- priority for idle list with odd group CIC
-fifo (4), -- FIFO method for idle list
-forwardSequential (5), -- idle circuit with lowest CIC
-backwardSequential (6), -- idle circuit with highest CIC
-forwardOddElseBackwardEven (7), -- lowest odd CIC or highest even CIC
-forwardEvenElseBackwardOdd (8), -- lowest even CIC or highest odd CIC
-forwardCyclic (9), -- cyclic search ascending order of CICs
-backwardCyclic (10), -- cyclic search descending order of CICs
-random (11)} -- random idle circuit
-SelectedCarrierType ::= CHOICE { networkProviderSelectionMechanism [0] NULL,
-selectedCarrierType [1] CarrierType}
-SelectedInstances ::= SEQUENCE OF CHOICE{
-routingPossibilitiesInstance [0] ObjectInstance,
-postAnalysisEvaluationGroup [1] DestinationGroup}
-SelectionForAlgorithm ::=
-CHOICE {
-ordered [0] SEQUENCE OF ObjectInstance,
-proportional [1] SET OF SEQUENCE {
-percentage [0] INTEGER(0..100),
-list [1] SEQUENCE OF ObjectInstance}
-}
+	fifoEvenElseLifoOdd(0),-- priority for idle list with even CIC
+	fifoOddElseLifoEven(1),-- priority for idle list with odd CIC
+	fifoEvenGrpElseLifoOddGrp(2),-- priority for idle list with even group CIC
+	fifoOddGrpElseLifoEvenGrp(3),-- priority for idle list with odd group CIC
+	fifo(4),-- FIFO method for idle list
+	forwardSequential(5),-- idle circuit with lowest CIC
+	backwardSequential(6),-- idle circuit with highest CIC
+	forwardOddElseBackwardEven(7),-- lowest odd CIC or highest even CIC
+	forwardEvenElseBackwardOdd(8),-- lowest even CIC or highest odd CIC
+	forwardCyclic(9),-- cyclic search ascending order of CICs
+	backwardCyclic(10),-- cyclic search descending order of CICs
+	random(11) }-- random idle circuit
+SelectedCarrierType ::= CHOICE {
+	networkProviderSelectionMechanism [0] NULL,
+	selectedCarrierType [1] CarrierType }
+SelectedInstances ::= SEQUENCE OF CHOICE {
+	routingPossibilitiesInstance [0] ObjectInstance,
+	postAnalysisEvaluationGroup [1] DestinationGroup }
+SelectionForAlgorithm ::= CHOICE {
+	ordered [0] SEQUENCE OF ObjectInstance,
+	proportional [1] SET OF SEQUENCE {
+		percentage [0] INTEGER(0..100),
+		list [1] SEQUENCE OF ObjectInstance } }
 SkipGroup ::= ObjectInstances
 -- list of instances of OCs localDestination, routingPossData, cepsgComb, cepsg,
 -- routingPossibilities.
 SuppressCac ::= BOOLEAN
 Term ::= CHOICE {
-anyTerm [0] NULL,
-namedTerm [1] NameType}
-TrafficCategory ::= INTEGER{
-nationalTraffic (0),
-internationalTransitTraffic (1),
-internationalTerminatingTraffic (2) }
+	anyTerm [0] NULL,
+	namedTerm [1] NameType }
+TrafficCategory ::= INTEGER {
+	nationalTraffic(0),
+	internationalTransitTraffic(1),
+	internationalTerminatingTraffic(2) }
 TrafficDistributionData ::= SEQUENCE OF SEQUENCE {
-percentage [0] INTEGER(0..100),
-userLabel [1] GraphicString OPTIONAL}
+	percentage [0] INTEGER(0..100),
+	userLabel [1] GraphicString OPTIONAL }
 UsedAlgorithm ::= INTEGER {
-sequential (0),
-cyclic (1),
-proportionalBidding (2) }
+	sequential(0),
+	cyclic(1),
+	proportionalBidding(2) }
 YesNo ::= BOOLEAN
 END
 
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.826 (2000)"
+--  { itu-t recommendation q routing(826) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

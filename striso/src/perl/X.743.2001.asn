@@ -1,212 +1,220 @@
--- A.5 ASN.1 definition module for management information
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 06:02:56 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
+--  { joint-iso-ccitt ms(9) function(2) part20(20) } >--
+MODULE "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" { joint-iso-ccitt ms(9) function(2) part20(20) }
 --< ASN1.Version 1990,1994 TimeMF
--- { joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeMF(1) } >--
-TimeMF {joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeMF(1)}
-DEFINITIONS IMPLICIT TAGS ::= BEGIN
+--  { joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeMF(1) } >--
+-- A.5 ASN.1 definition module for management information
+TimeMF { joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeMF(1) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
 -- EXPORTS everything --
 IMPORTS
 Attribute, ObjectInstance
-FROM
-CMIP-1 {joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3)}
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
 SimpleNameType
-FROM
-Attribute-ASN1Module {joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1};
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 };
 -- object identifier values --
-timeManagement OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part20(20)}
-clockSourceOID OBJECT IDENTIFIER ::= {timeManagement managedObjectClass(3) clockSource(0)}
-localClockOID OBJECT IDENTIFIER ::= {timeManagement managedObjectClass(3) localClock(1)}
-referenceClockOID OBJECT IDENTIFIER ::= {timeManagement managedObjectClass(3) referenceClock(2)}
-synchronizationProtocolOID OBJECT IDENTIFIER ::= {timeManagement managedObjectClass(3)
-synchronizationProtocol(3)}
-ntpProtocolOID OBJECT IDENTIFIER ::= {timeManagement managedObjectClass(3) ntpProtocol(4)}
-clockSourceDetailPkgOID OBJECT IDENTIFIER ::= {timeManagement package(4) clockSourceDetailPkg(0)}
-leapSecondPkgOID OBJECT IDENTIFIER ::= {timeManagement package(4) leapSecondPkg(1)}
-clockAdjustmentIntervalOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockAdjustmentInterval(0)}
-clockDriftOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockDrift(1)}
-clockEstimatedErrorOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockEstimatedError(2)}
-clockEventCodeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockEventCode(3)}
-clockEventCounterOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockEventCounter(4)}
-clockEventTimeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockEventTime(5)}
-clockIDOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockID(6)}
-clockMaximumErrorOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockMaximumError(7)}
-clockPrecisionOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockPrecision(8)}
-clockStatusOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockStatus(9)}
-clockStratumOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockStratum(10)}
-clockValueOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) clockValue(11)}
-filterSizeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) filterSize(12)}
-filterWeightOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) filterWeight(13)}
-leapSecondCountOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) leapSecondCount(14)}
-leapSecondIndicationOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) leapSecondIndication(15)}
-localClockAddressOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) localClockAddress(16)}
-maximumClockAgeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumClockAge(17)}
-maximumDispersionOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumDispersion(18)}
-maximumDistanceOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumDistance(19)}
-maximumPollIntervalOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumPollInterval(20)}
-maximumSelectClockOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumSelectClock(21)}
-maximumSkewOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumSkew(22)}
-maximumStratumOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) maximumStratum(23)}
-minimumDispersionOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) minimumDispersion(24)}
-minimumPollIntervalOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) minimumPollInterval(25)}
-minimumSelectClockOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) minimumSelectClock(26)}
-peerClockAddressesOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) peerClockAddresses(27)}
-reachabilityRegisterSizeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) reachabilityRegisterSize(28)}
-referenceClockTypeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) referenceClockType(29)}
-selectWeightOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) selectWeight(30)}
-synchronizationProtocolIDOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) synchronizationProtocolID(31)}
-synchronizationProtocolTypeOID OBJECT IDENTIFIER ::= {timeManagement attribute(7)
-synchronizationProtocolType(32)}
-synchronizationSourceAddressOID OBJECT IDENTIFIER ::= {timeManagement attribute(7)
-synchronizationSourceAddress(33)}
-synchronizedClockOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) synchronizedClock(34)}
-synchronizingClocksOID OBJECT IDENTIFIER ::= {timeManagement attribute(7) synchronizingClocks(35)}
-clockResetActionOID OBJECT IDENTIFIER ::= {timeManagement action(9) clockResetAction(1)}
-leapSecondActionOID OBJECT IDENTIFIER ::= {timeManagement action(9) leapSecondAction(2)}
-protocolResetActionOID OBJECT IDENTIFIER ::= {timeManagement action(9) protocolResetAction(3)}
-synchronizationProtocol-systemOID OBJECT IDENTIFIER ::= {timeManagement nameBinding(6) synchronizationProtocolsystem(
-1)}
-clockSource-systemOID OBJECT IDENTIFIER ::= {timeManagement nameBinding(6) clockSource-system(2)}
+timeManagement OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part20(20) }
+clockSourceOID OBJECT IDENTIFIER ::= { timeManagement managedObjectClass(3) clockSource(0) }
+localClockOID OBJECT IDENTIFIER ::= { timeManagement managedObjectClass(3) localClock(1) }
+referenceClockOID OBJECT IDENTIFIER ::= { timeManagement managedObjectClass(3) referenceClock(2) }
+synchronizationProtocolOID OBJECT IDENTIFIER ::= { timeManagement managedObjectClass(3) synchronizationProtocol(3) }
+ntpProtocolOID OBJECT IDENTIFIER ::= { timeManagement managedObjectClass(3) ntpProtocol(4) }
+clockSourceDetailPkgOID OBJECT IDENTIFIER ::= { timeManagement package(4) clockSourceDetailPkg(0) }
+leapSecondPkgOID OBJECT IDENTIFIER ::= { timeManagement package(4) leapSecondPkg(1) }
+clockAdjustmentIntervalOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockAdjustmentInterval(0) }
+clockDriftOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockDrift(1) }
+clockEstimatedErrorOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockEstimatedError(2) }
+clockEventCodeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockEventCode(3) }
+clockEventCounterOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockEventCounter(4) }
+clockEventTimeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockEventTime(5) }
+clockIDOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockID(6) }
+clockMaximumErrorOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockMaximumError(7) }
+clockPrecisionOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockPrecision(8) }
+clockStatusOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockStatus(9) }
+clockStratumOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockStratum(10) }
+clockValueOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) clockValue(11) }
+filterSizeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) filterSize(12) }
+filterWeightOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) filterWeight(13) }
+leapSecondCountOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) leapSecondCount(14) }
+leapSecondIndicationOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) leapSecondIndication(15) }
+localClockAddressOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) localClockAddress(16) }
+maximumClockAgeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumClockAge(17) }
+maximumDispersionOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumDispersion(18) }
+maximumDistanceOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumDistance(19) }
+maximumPollIntervalOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumPollInterval(20) }
+maximumSelectClockOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumSelectClock(21) }
+maximumSkewOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumSkew(22) }
+maximumStratumOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) maximumStratum(23) }
+minimumDispersionOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) minimumDispersion(24) }
+minimumPollIntervalOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) minimumPollInterval(25) }
+minimumSelectClockOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) minimumSelectClock(26) }
+peerClockAddressesOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) peerClockAddresses(27) }
+reachabilityRegisterSizeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) reachabilityRegisterSize(28) }
+referenceClockTypeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) referenceClockType(29) }
+selectWeightOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) selectWeight(30) }
+synchronizationProtocolIDOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) synchronizationProtocolID(31) }
+synchronizationProtocolTypeOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) synchronizationProtocolType(32) }
+synchronizationSourceAddressOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) synchronizationSourceAddress(33) }
+synchronizedClockOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) synchronizedClock(34) }
+synchronizingClocksOID OBJECT IDENTIFIER ::= { timeManagement attribute(7) synchronizingClocks(35) }
+clockResetActionOID OBJECT IDENTIFIER ::= { timeManagement action(9) clockResetAction(1) }
+leapSecondActionOID OBJECT IDENTIFIER ::= { timeManagement action(9) leapSecondAction(2) }
+protocolResetActionOID OBJECT IDENTIFIER ::= { timeManagement action(9) protocolResetAction(3) }
+synchronizationProtocol-systemOID OBJECT IDENTIFIER ::= { timeManagement nameBinding(6) synchronizationProtocolsystem(1) }
+clockSource-systemOID OBJECT IDENTIFIER ::= { timeManagement nameBinding(6) clockSource-system(2) }
 ntp SynchronizationProtocolType ::= { joint-iso-ccitt ms(9) function(2) part20(20) synchProtocolType(20) ntp(1) }
 -- type references --
 AdjustmentInterval ::= TimeInterval
 ClockAddress ::= CHOICE {
-isoNsap [1] OCTET STRING (SIZE (0 | 3..20)),
-ip [2] SEQUENCE {
-host OCTET STRING (SIZE(4)),
-port INTEGER (0..65536)
-}
-}
+	isoNsap [1] OCTET STRING(SIZE(0|3..20)),
+	ip [2] SEQUENCE {
+		host OCTET STRING(SIZE(4)),
+		port INTEGER(0..65536) } }
 ClockDrift ::= REAL
 ClockEstimatedError ::= TimeInterval
 ClockEventCode ::= INTEGER {
-unspecified (0),
-restart (1),
-systemOrHardwareFault (2),
-newStatusWord (3),
-newSynchSourceOrStratum (4),
-systemClockReset (5),
-systemInvalidTimeOrDate (6),
-systemClockException (7),
-reserved8 (8),
-reserved9 (9),
-reserved10 (10),
-reserved11 (11),
-reserved12 (12),
-reserved13 (13),
-reserved14 (14),
-reserved15 (15)
-}
-ClockEventCounter ::= INTEGER (0 .. 255)
+	unspecified(0),
+	restart(1),
+	systemOrHardwareFault(2),
+	newStatusWord(3),
+	newSynchSourceOrStratum(4),
+	systemClockReset(5),
+	systemInvalidTimeOrDate(6),
+	systemClockException(7),
+	reserved8(8),
+	reserved9(9),
+	reserved10(10),
+	reserved11(11),
+	reserved12(12),
+	reserved13(13),
+	reserved14(14),
+	reserved15(15) }
+ClockEventCounter ::= INTEGER(0..255)
 ClockEventTime ::= GlobalTime
 ClockID ::= SimpleNameType
 ClockMaximumError ::= TimeInterval
 ClockValue ::= GlobalTime
-CumLeapSeconds ::= INTEGER (0 .. 255)
+CumLeapSeconds ::= INTEGER(0..255)
 ClockResetInfo ::= ClockValue
 CurrSynchSourceAddress ::= CHOICE {
-refPeerAssoc [0] ClockAddress,
-refClockID [1] ReferenceClockType
-}
+	refPeerAssoc [0] ClockAddress,
+	refClockID [1] ReferenceClockType }
 DateOfLeap ::= GeneralizedTime
 Dispersion ::= TimeInterval
 -- This field represents the dispersion (positive values only). --
-FilterSize ::= INTEGER (0 .. 32)
-FilterWeight ::= REAL (0 .. {mantissa 1, base 10, exponent 0})
-GlobalTime ::= OCTET STRING (SIZE (8)) -- See 8.1.--
+FilterSize ::= INTEGER(0..32)
+FilterWeight ::= REAL(0..{ mantissa 1, base 10, exponent 0 })
+GlobalTime ::= OCTET STRING(SIZE(8))-- See 8.1.--
 LeapIndication ::= ENUMERATED {
-noWarning (0),
-minuteHas61Seconds (1),
-minuteHas59Seconds (2),
-alarmCondition (3) }
+	noWarning(0),
+	minuteHas61Seconds(1),
+	minuteHas59Seconds(2),
+	alarmCondition(3) }
 LeapSecondInfo ::= SEQUENCE {
-leapIndication LeapIndication,
-dateOfLeap DateOfLeap
-}
+	leapIndication LeapIndication,
+	dateOfLeap DateOfLeap }
 MaxAperature ::= TimeInterval
 MaxClockAge ::= TimeInterval
 MaxDistance ::= TimeInterval
 MaxSkew ::= TimeInterval
 PeerClockAddresses ::= SET OF SinglePeerClock
-PollInterval ::= INTEGER (0..MAX)
+PollInterval ::= INTEGER(0..MAX)
 -- This field represents the polling interval in seconds and can only contain positive values. --
 Precision ::= TimeInterval
 -- This field represents precision and can only contain positive values. --
 ProtocolResetInfo ::= SET OF Attribute
-ReachRegSize ::= INTEGER (0 .. 32)
+ReachRegSize ::= INTEGER(0..32)
 ReferenceClockType ::= INTEGER {
-unspecifiedOrUnknown (0),
-calibratedAtomicClock (1),
-radioVLForLF (2),
-radioHF (3),
-radioUHF (4),
-localNet (5),
-synch (6),
-wallclock (7),
-telephoneModem (8),
-gps (9),
-loranC (10),
-other (11)
-}
-SelectClock ::= INTEGER (0 .. 255)
-SelectWeight ::= REAL (0 .. {mantissa 1, base 10, exponent 0})
+	unspecifiedOrUnknown(0),
+	calibratedAtomicClock(1),
+	radioVLForLF(2),
+	radioHF(3),
+	radioUHF(4),
+	localNet(5),
+	synch(6),
+	wallclock(7),
+	telephoneModem(8),
+	gps(9),
+	loranC(10),
+	other(11) }
+SelectClock ::= INTEGER(0..255)
+SelectWeight ::= REAL(0..{ mantissa 1, base 10, exponent 0 })
 SinglePeerClock ::= SEQUENCE {
-assocNum [0] INTEGER,
-assocClock [1] ClockAddress
-}
-Stratum ::= INTEGER (0..255)
+	assocNum [0] INTEGER,
+	assocClock [1] ClockAddress }
+Stratum ::= INTEGER(0..255)
 -- A value of zero means that the stratum is not specified. --
 -- A value of one indicates a primary reference. --
 -- Values from 2 to 255 indicate secondary references of increasing --
 -- distance from the root of the synchronization subnet .--
 Status ::= INTEGER {
-operatingWithinNominals (0),
-replyTimeout (1),
-badReplyFormat (2),
-hardwareSoftwareFault (3),
-propagationFailure (4),
-badDateFormatOrValue (5),
-badTimeFormatOrValue (6)
-}
+	operatingWithinNominals(0),
+	replyTimeout(1),
+	badReplyFormat(2),
+	hardwareSoftwareFault(3),
+	propagationFailure(4),
+	badDateFormatOrValue(5),
+	badTimeFormatOrValue(6) }
 SynchronizationProtocolID ::= SimpleNameType
 SynchronizationProtocolType ::= OBJECT IDENTIFIER
 SynchronizedClock ::= ObjectInstance
 SynchronizingClocks ::= SET OF ObjectInstance
-TimeInterval ::= OCTET STRING (SIZE (8)) -- See 8.1. --
-TSelect ::= OCTET STRING (SIZE (4))
-END -- End of syntax definitions --
--- A.6 ASN.1 definition module for time representation
+TimeInterval ::= OCTET STRING(SIZE(8))-- See 8.1. --
+TSelect ::= OCTET STRING(SIZE(4))
+END-- End of syntax definitions --
+
 --< ASN1.Version 1990,1994 TimeRepresentation
--- { joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeRepresentation(2) } >--
-TimeRepresentation {joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeRepresentation(2)}
-DEFINITIONS::= BEGIN
-Epochs::= INTEGER (-128 .. 127)
-Seconds::= INTEGER (0 .. 4294967295)
-Nanoseconds::= INTEGER (0 .. 999999999)
-MaximumErrorInNanoseconds::= INTEGER {noEstimate (281474976710655)}
-(0 .. 281474976710655)
-CumLeapSeconds::= INTEGER (0 .. 65536)
-TimeZone::= INTEGER {unknown (781)} (-780 .. 781)
+--  { joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeRepresentation(2) } >--
+-- A.6 ASN.1 definition module for time representation
+TimeRepresentation { joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeRepresentation(2) }
+DEFINITIONS ::=
+BEGIN
+Epochs ::= INTEGER(-128..127)
+Seconds ::= INTEGER(0..4294967295)
+Nanoseconds ::= INTEGER(0..999999999)
+MaximumErrorInNanoseconds ::= INTEGER {
+	noEstimate(281474976710655) }(0..281474976710655)
+CumLeapSeconds ::= INTEGER(0..65536)
+TimeZone ::= INTEGER {
+	unknown(781) }(-780..781)
 -- Represents minutes east of GMT.--
-TimeStamp::= SEQUENCE {
-epoch Epochs,
-second Seconds,
-nanosecond Nanoseconds,
-maximumError MaximumErrorInNanoseconds
-}
-ClockTime::= SEQUENCE {
-time TimeStamp,
-leapSeconds CumLeapSeconds,
-localTimeZone TimeZone
-}
-TimeInterval::= SEQUENCE {
-epochs Epochs,
-seconds Seconds,
-nanoseconds Nanoseconds
-}
-TimeDifference::= SEQUENCE {
-sign ENUMERATED {positive (0), negative (1)},
-epochs Epochs,
-seconds Seconds,
-nanoseconds Nanoseconds,
-maximumError MaximumErrorInNanoseconds
-}
+TimeStamp ::= SEQUENCE {
+	epoch Epochs,
+	second Seconds,
+	nanosecond Nanoseconds,
+	maximumError MaximumErrorInNanoseconds }
+ClockTime ::= SEQUENCE {
+	time TimeStamp,
+	leapSeconds CumLeapSeconds,
+	localTimeZone TimeZone }
+TimeInterval ::= SEQUENCE {
+	epochs Epochs,
+	seconds Seconds,
+	nanoseconds Nanoseconds }
+TimeDifference ::= SEQUENCE {
+	sign ENUMERATED {
+		positive(0),
+		negative(1) },
+	epochs Epochs,
+	seconds Seconds,
+	nanoseconds Nanoseconds,
+	maximumError MaximumErrorInNanoseconds }
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
+--  { joint-iso-ccitt ms(9) function(2) part20(20) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

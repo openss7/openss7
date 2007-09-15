@@ -1,96 +1,107 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 10:37:58 MDT 2007
+--@@ 
 -- A.9 Definition of ASN.1 modules
-UMFObjId {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0}
+UMFObjId { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 }
 DEFINITIONS ::=
 BEGIN
-umf-mo OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) managedObjectClass(3)}
-umf-pkg OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) package(4)}
-umf-par OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) parameter(5)}
-umf-nb OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) nameBinding(6)}
-umf-att OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) attribute(7)}
-umf-act OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) action(9)}
-umf-not OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) notification(10)}
+umf-mo OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) managedObjectClass(3) }
+umf-pkg OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) package(4) }
+umf-par OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) parameter(5) }
+umf-nb OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) nameBinding(6) }
+umf-att OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) attribute(7) }
+umf-act OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) action(9) }
+umf-not OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) notification(10) }
 END
-UsageMeteringFunction {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1}
+
+--< ASN1.Version 1994 UsageMeteringFunction
+--  { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1 } >--
+UsageMeteringFunction { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1 }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything
 IMPORTS
 ObjectInstance
-FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) } -- Corrigendum 1
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }-- Corrigendum 1
 DMI-TYPE-IDENTIFIER, ControlStatus, ProceduralStatus, SimpleNameType, ManagementExtension
-FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 TimePeriod
-FROM MetricModule { joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0 }
+	FROM MetricModule { joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0 }
 UsageInfo
-FROM UsageMeteringDataInfo { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 } -- Corrigendum 1
+	FROM UsageMeteringDataInfo { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 }-- Corrigendum 1
 ;
 AccountableObjectReference ::= ObjectInstance
 AccountableObjectsReferenceList ::= SET OF ObjectInstance
 ActionArgument ::= CHOICE {
-selectedObjects SET OF ObjectInstance,
--- set of data objects, controlled by the control
--- object for which the request is appropriate
-allObjects NULL
--- selects all data objects controlled by control
--- object --
-}
+	selectedObjects SET OF ObjectInstance,
+	-- set of data objects, controlled by the control
+	-- object for which the request is appropriate
+	allObjects NULL
+	-- selects all data objects controlled by control
+	-- object -- }
 ActionResponse ::= SEQUENCE {
--- at least one component shall be present
-success [0] SET OF ObjectInstance OPTIONAL,
-failed [1] SET OF ObjectInstance OPTIONAL,
-indeterminate [2] SET OF ObjectInstance OPTIONAL }
+	-- at least one component shall be present
+	success [0] SET OF ObjectInstance OPTIONAL,
+	failed [1] SET OF ObjectInstance OPTIONAL,
+	indeterminate [2] SET OF ObjectInstance OPTIONAL }
 UMF-AUDIT ::= DMI-TYPE-IDENTIFIER
 AuditInfo ::= SEQUENCE {
-service UMF-AUDIT.&id ({AuditInfoSet}),
-auditDetails UMF-AUDIT.&Value ({AuditInfoSet} {@.service}) }
-AuditInfoSet UMF-AUDIT ::= {...}
+	service UMF-AUDIT.&id( {AuditInfoSet }),
+	auditDetails UMF-AUDIT.&Value( { AuditInfoSet } { @.service }) }
+AuditInfoSet UMF-AUDIT ::= {
+	... }
 ControlInfo ::= SEQUENCE {
-actionResponse ActionResponse,
-reportingTriggers [0] ReportingTriggers OPTIONAL,
-accountableObjectsReferenceList [1] AccountableObjectsReferenceList OPTIONAL,
-dataObjectsReferenceList [2] DataObjectsReferenceList OPTIONAL,
-additionalInformation [3] SET OF ManagementExtension }
-ControlStatusValue ::= ControlStatus ( WITH COMPONENT ( suspended ) )
+	actionResponse ActionResponse,
+	reportingTriggers [0] ReportingTriggers OPTIONAL,
+	accountableObjectsReferenceList [1] AccountableObjectsReferenceList OPTIONAL,
+	dataObjectsReferenceList [2] DataObjectsReferenceList OPTIONAL,
+	additionalInformation [3] SET OF ManagementExtension }
+ControlStatusValue ::= ControlStatus(WITH COMPONENT(suspended))
 DataErrors ::= CHOICE {
-possibleErrors SET OF PossibleError,
-noProblem NULL }
+	possibleErrors SET OF PossibleError,
+	noProblem NULL }
 DataObjectsReferenceList ::= SET OF ObjectInstance
 DeniedMeteringAction ::= ENUMERATED {
-canNotStart(0),
-canNotSuspend(1),
-canNotResume(2)}
+	canNotStart(0),
+	canNotSuspend(1),
+	canNotResume(2) }
 Induced ::= ENUMERATED {
-start(0),
-suspend(1),
-resume(2),
-delete(3),
-disabled(4),
-enabled(5) }
+	start(0),
+	suspend(1),
+	resume(2),
+	delete(3),
+	disabled(4),
+	enabled(5) }
 NotificationCause ::= CHOICE {
-periodic [1] TimePeriod,
-induced [2] Induced,
-event [3] ReportingEvent,
-stimulus [4] OBJECT IDENTIFIER }
+	periodic [1] TimePeriod,
+	induced [2] Induced,
+	event [3] ReportingEvent,
+	stimulus [4] OBJECT IDENTIFIER }
 PossibleError ::= OBJECT IDENTIFIER
-ProceduralStatusValue ::= ProceduralStatus ( WITH COMPONENT ( terminating ) )
+ProceduralStatusValue ::= ProceduralStatus(WITH COMPONENT(terminating))
 ProviderId ::= CHOICE {
-objectReference [1] ObjectInstance,
-textualName [2] GraphicString,
-serviceSpecific [3] ServiceSpecificId,
-unknown [4] NULL }
+	objectReference [1] ObjectInstance,
+	textualName [2] GraphicString,
+	serviceSpecific [3] ServiceSpecificId,
+	unknown [4] NULL }
 ReportingTriggers ::= SET OF CHOICE {
-periodic [1] TimePeriod,
-induced [2] Induced,
-event [3] ReportingEvent,
-stimulus [4] OBJECT IDENTIFIER }
+	periodic [1] TimePeriod,
+	induced [2] Induced,
+	event [3] ReportingEvent,
+	stimulus [4] OBJECT IDENTIFIER }
 ReportingEvent ::= ENUMERATED {
-registration (0),
-request (1),
-accept (2),
-complete (3),
-corresponding (4),
-bulk (5),
-interruption (6) }
+	registration(0),
+	request(1),
+	accept(2),
+	complete(3),
+	corresponding(4),
+	bulk(5),
+	interruption(6) }
 -- The applicability of each of these values must be specified by a specialization, together
 -- with the exact semantics of the values used.
 -- NOTE  All of events from 8.2.3 have been included in this enumerated type for the
@@ -99,32 +110,37 @@ interruption (6) }
 -- certain specializations.
 UMF-SERVICE ::= DMI-TYPE-IDENTIFIER
 ServiceSpecificId ::= SEQUENCE {
-service UMF-SERVICE.&id ({ServiceSpecificSet}),
-serviceSpecificId UMF-SERVICE.&Value ({ServiceSpecificSet} {@.service}) }
-ServiceSpecificSet UMF-SERVICE ::= {...}
+	service UMF-SERVICE.&id( {ServiceSpecificSet }),
+	serviceSpecificId UMF-SERVICE.&Value( { ServiceSpecificSet } { @.service }) }
+ServiceSpecificSet UMF-SERVICE ::= {
+	... }
 UsageDataInfo ::= SEQUENCE {
-accountableObjectReference [0] ObjectInstance,
-notificationCause [1] NotificationCause,
-usageInfo [2] UsageInfo,
-auditInfo [3] AuditInfo OPTIONAL,
-dataErrors [4] DataErrors,
-providerId [5] ProviderId OPTIONAL,
-additionalInformation [6] SET OF ManagementExtension OPTIONAL}
+	accountableObjectReference [0] ObjectInstance,
+	notificationCause [1] NotificationCause,
+	usageInfo [2] UsageInfo,
+	auditInfo [3] AuditInfo OPTIONAL,
+	dataErrors [4] DataErrors,
+	providerId [5] ProviderId OPTIONAL,
+	additionalInformation [6] SET OF ManagementExtension OPTIONAL }
 UsageMeteringControlObjectId ::= SimpleNameType
 UsageMeteringDataObjectId ::= SimpleNameType
 END
-UsageMeteringDataInfo {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2}
+
+--< ASN1.Version 1994 UsageMeteringDataInfo
+--  { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 } >--
+UsageMeteringDataInfo { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
+EXPORTS UsageInfo;-- Corrigendum 1
 IMPORTS
-DMI-TYPE-IDENTIFIER FROM Attribute-ASN1Module
-{ joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 };
-EXPORTS UsageInfo; -- Corrigendum 1
+DMI-TYPE-IDENTIFIER
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 };
 UMF-USAGE ::= DMI-TYPE-IDENTIFIER
 UsageInfo ::= SEQUENCE {
-serviceType UMF-USAGE.&id ({UsageInfoSet}),
-usageData UMF-USAGE.&Value ({UsageInfoSet} {@.serviceType}) }
-UsageInfoSet UMF-USAGE ::= {...}
+	serviceType UMF-USAGE.&id( {UsageInfoSet }),
+	usageData UMF-USAGE.&Value( { UsageInfoSet } { @.serviceType }) }
+UsageInfoSet UMF-USAGE ::= {
+	... }
 -- the following ASN.1 provides the means to include the service-specific information in the usage
 -- metering data. The data type XxxUsageData, detailed below, is a prototype of how a
 -- specialization shall specify a data type to replace the ANY in the usageData field of the UsageInfo
@@ -230,4 +246,11 @@ UsageInfoSet UMF-USAGE ::= {...}
 -- registration and corresponding event types will only appear in the sequence once. The
 -- registration block shall always be present. This constraint ensures that a usage metering record
 -- only applies to the one requester and that there is only one set of correlation information.
-END -- Corrigendum 1
+END-- Corrigendum 1
+
+
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

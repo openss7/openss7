@@ -1,4 +1,5 @@
 
+--< ASN1.Version 1994 Schedulerev1-ASN1Module { joint-iso-itu-t ms(9) function(2) part15(15) modules (2)} >--
 -- A.6 ASN.1 definitions
 Schedulerev1-ASN1Module { joint-iso-itu-t ms(9) function(2) part15(15) modules (2)}
 DEFINITIONS IMPLICIT TAGS ::=

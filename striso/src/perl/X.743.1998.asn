@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 TimeMF {joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeMF(1)} >--
 -- A.5 ASN.1 definition module for management information
 -- <ASN1.Version 1990,1994 TimeMF --
 -- {joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeMF(1)}> --
@@ -173,6 +174,7 @@ SynchronizingClocks ::= SET OF ObjectInstance
 TimeInterval ::= OCTET STRING (SIZE (8)) -- See 8.1. --
 TSelect ::= OCTET STRING (SIZE (4))
 END -- End of syntax definitions --
+--< ASN1.Version 1994 TimeRepresentation {joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) timeRepresentation(2)} >--
 -- A.6 ASN.1 definition module for time representation
 -- <ASN1.Version 1990,1994 TimeRepresentation --
 -- {joint-iso-ccitt ms(9) function(2) part20(20) asn1Module(2) --

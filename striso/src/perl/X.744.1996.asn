@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 SWMF {joint-iso-ccitt ms(9) function(2) part18(18) asn1Module(2) 0} >--
 --A.8 Supporting Productions
 SWMF {joint-iso-ccitt ms(9) function(2) part18(18) asn1Module(2) 0}
 DEFINITIONS IMPLICIT TAGS ::= BEGIN
@@ -146,6 +147,7 @@ passValidationWithResult [2] SET OF ManagementExtension,
 failValidation [3] NULL,
 failValidationWithResult [4] SET OF ManagementExtension }
 END -- end of SWMF supporting productions --
+--< ASN1.Version 1994 BackupRestoreASN1Module {joint-iso-ccitt ms(9) function(2) part18(18) asn1Module(2) 1} >--
 --A.9.3 Backup Restore Supporting Productions--
 BackupRestoreASN1Module {joint-iso-ccitt ms(9) function(2) part18(18) asn1Module(2) 1}
 DEFINITIONS IMPLICIT TAGS ::= BEGIN

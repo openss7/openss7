@@ -4,13 +4,15 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Sun Sep  9 06:05:36 MDT 2007
+--@@ Date: Wed Sep 12 10:56:08 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.745.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996" >--
---< GDMO.Namespace x737 >--
+--< GDMO.Namespace itut_x737 >--
 --< GDMO.Alias "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996" "X.737",
+--  "ITU-T Rec. X.737 (1995) | ISO/IEC 10164-14 : 1996",
+--  "ITU-T Rec. X.737 | ISO/IEC 10164-14",
 --  "ITU-T Rec. X.737 (1995)/Cor.1 (1998) | ISO/IEC 10165-14 : 1996/Cor.1 : 1999" >--
 MODULE "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996"
 -- A.2 Generic Object Classes
@@ -1009,41 +1011,41 @@ END
 --@@
 --@@ Derivation Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
---@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":schedulingConflictRecord
---@@ |  |  +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testResultsRecord
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testActionPerformer
---@@ +- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":connectionTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":connectivityTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":dataIntegrityTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":loopbackTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":protocolIntegrityTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":resourceBoundaryTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":resourceSelfTestObject
---@@ |  +- "ITU-T Rec. X.737 (1995) | ISO/IEC 10165-14 : 1996":testInfrastructureTestObject
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ |  +- itut_x737::connectionTestObject
+--@@ |  +- itut_x737::connectivityTestObject
+--@@ |  +- itut_x737::dataIntegrityTestObject
+--@@ |  +- itut_x737::loopbackTestObject
+--@@ |  +- itut_x737::protocolIntegrityTestObject
+--@@ |  +- itut_x737::resourceBoundaryTestObject
+--@@ |  +- itut_x737::resourceSelfTestObject
+--@@ |  +- itut_x737::testInfrastructureTestObject
 --@@
 
 --@@
 --@@ Containment Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ >- "ITU-T Rec. X.745 (1993) | ISO/IEC 10164-12 : 1993":testObject
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x745::testObject
 --@@
 --@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

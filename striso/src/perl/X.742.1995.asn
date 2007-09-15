@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 UMFObjId {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0} >--
 -- A.9 Definition of ASN.1 modules
 UMFObjId {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0}
 DEFINITIONS
@@ -10,6 +11,7 @@ umf-att OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) attr
 umf-act OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) action(9)}
 umf-not OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) notification(10)}
 END
+--< ASN1.Version 1994 UsageMeteringFunction {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1} >--
 UsageMeteringFunction {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -109,6 +111,7 @@ additionalInformation [6] SET OF ManagementExtension OPTIONAL}
 UsageMeteringControlObjectId ::= SimpleNameType
 UsageMeteringDataObjectId ::= SimpleNameType
 END
+--< ASN1.Version 1994 UsageMeteringDataInfo {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2} >--
 UsageMeteringDataInfo {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN

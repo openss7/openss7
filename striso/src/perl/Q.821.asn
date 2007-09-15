@@ -1,49 +1,43 @@
-
-
-ITU-T Q.821 (02/2000) 63
-Q821-ASN1Module
-{ ccitt(0) recommendation(0) q(17) q821(821) asn1Module(2) q821ASN1Module(0) }
-DEFINITIONS ::= BEGIN
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:53 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. Q.821 (2000)"
+--  { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) } >--
+MODULE "ITU-T Rec. Q.821 (2000)" { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) }
+--< ASN1.Version 1994 Q821-ASN1Module
+--  { ccitt(0) recommendation(0) q(17) q821(821) asn1Module(2) q821ASN1Module(0) } >--
+-- ITU-T Q.821 (02/2000) 63
+Q821-ASN1Module { ccitt(0) recommendation(0) q(17) q821(821) asn1Module(2) q821ASN1Module(0) }
+DEFINITIONS ::=
+BEGIN
 -- EXPORTS everything
 IMPORTS
-BackedUpStatus, CorrelatedNotifications, ObservedValue,
-PerceivedSeverity, ProbableCause, StartTime,
-StopTime, TrendIndication, ThresholdInfo
-FROM
-Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+BackedUpStatus, CorrelatedNotifications, ObservedValue, PerceivedSeverity, ProbableCause, StartTime, StopTime, TrendIndication, ThresholdInfo
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 AlarmInfo
-FROM
-Notification-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 2 }
+	FROM Notification-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 2 }
 AlarmStatus, NameType
-FROM
-ASN1DefinedTypeModule
-{ ccitt(0) recommendation(0) m(13) gnm(3100) informationModel(0) asn1Modules(2)
-asn1DefinedTypesModule(0) }
+	FROM ASN1DefinedTypeModule { ccitt(0) recommendation(0) m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
 Attribute, AttributeId, ObjectInstance
-FROM
-CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
 AE-title
-FROM
-ACSE-1 { joint-iso-ccitt association-control(2) apdus(0) version(1) }
+	FROM ACSE-1 { joint-iso-ccitt association-control(2) apdus(0) version(1) }
 -- Note that the syntax of AE-title to be used is from ITU-T Rec. X.227|ISO/IEC 8650-1 and not "ANY"
 DistinguishedName
-FROM
-InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
+	FROM InformationFramework { joint-iso-ccitt ds(5) modules(1) informationFramework(1) }
 EventTime
-FROM Attribute-ASN1Module
-{ joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
 ObjectClass, ObjectInstance, EventTypeId, InvokeIDType, Scope, CMISFilter
-FROM CMIP-1
-{ joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
-;
-q821InformationModel OBJECT IDENTIFIER ::= { ccitt(0) recommendation(0)
-q(17) q821(821) informationMode(0) }
-
-64 ITU-T Q.821 (02/2000)
-q821StandardSpecificExtension OBJECT IDENTIFIER ::= { q821InformationModel
-standardSpecificExtension(0) }
-q821ObjectClass OBJECT IDENTIFIER ::= { q821InformationModel
-managedObjectClass(3) }
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
+q821InformationModel OBJECT IDENTIFIER ::= { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) }
+-- 64 ITU-T Q.821 (02/2000)
+q821StandardSpecificExtension OBJECT IDENTIFIER ::= { q821InformationModel standardSpecificExtension(0) }
+q821ObjectClass OBJECT IDENTIFIER ::= { q821InformationModel managedObjectClass(3) }
 q821Package OBJECT IDENTIFIER ::= { q821InformationModel package(4) }
 q821Parameter OBJECT IDENTIFIER ::= { q821InformationModel parameter(5) }
 q821NameBinding OBJECT IDENTIFIER ::= { q821InformationModel namebinding(6) }
@@ -56,43 +50,48 @@ AffectedObjectClass ::= OBJECT IDENTIFIER
 AlarmStatusList ::= SET OF AlarmStatus
 AlarmSummaryData ::= SEQUENCE OF ObjectAlarmSummary
 AlarmSynchronizationData ::= SEQUENCE {
-alarmManagedObjectClass ObjectClass,
-alarmManagedObjectInstance ObjectInstance,
-eventTime EventTime OPTIONAL,
-eventType EventTypeId,
-alarmInfo COMPONENTS OF AlarmInfo
-}
+	alarmManagedObjectClass ObjectClass,
+	alarmManagedObjectInstance ObjectInstance,
+	eventTime EventTime OPTIONAL,
+	eventType EventTypeId,
+	--alarmInfo
+	COMPONENTS OF AlarmInfo }
 AlarmSynchronizationInfo ::= CHOICE {
-allObjectsRelativeToSuperior [0] NULL,
-scopedCriteria [1] ScopedCriteria,
-simpleObjectList 2] ObjectList
-}
-AlarmSummaryInfo ::= SEQUENCE { perceivedSeverity [0] PerceivedSeverity OPTIONAL,
-alarmStatus [1] AlarmStatus OPTIONAL,
-probableCause [2] ProbableCause OPTIONAL }
+	allObjectsRelativeToSuperior [0] NULL,
+	scopedCriteria [1] ScopedCriteria,
+	simpleObjectList [2] ObjectList }
+AlarmSummaryInfo ::= SEQUENCE {
+	perceivedSeverity [0] PerceivedSeverity OPTIONAL,
+	alarmStatus [1] AlarmStatus OPTIONAL,
+	probableCause [2] ProbableCause OPTIONAL }
 CancelAlarmSynchronization ::= CancelledAlarmSynchronization
 CancelledAlarmSynchronization ::= InvokeIDType
 -- error response to action for Alarm Synchronization if cancelled prior to completion
 CorrelatedRecordName ::= ObjectInstance
 CountInterval ::= SEQUENCE {
-count INTEGER,
-startTime GeneralizedTime,
-window TimeInterval }
+	count INTEGER,
+	startTime GeneralizedTime,
+	window TimeInterval }
 CountWindow ::= SEQUENCE {
-count INTEGER,
-window TimeInterval }
-
-ITU-T Q.821 (02/2000) 65
-DestinationAddress ::= CHOICE { singleAddress AE-title,
-groupAddress GraphicString }
+	count INTEGER,
+	window TimeInterval }
+-- ITU-T Q.821 (02/2000) 65
+DestinationAddress ::= CHOICE {
+	singleAddress AE-title,
+	groupAddress GraphicString }
 GaugeParameters ::= CHOICE {
-up [1] SEQUENCE { high ObservedValue, low ObservedValue },
-down [2] SEQUENCE { high ObservedValue, low ObservedValue }}
+	up [1] SEQUENCE {
+		high ObservedValue,
+		low ObservedValue },
+	down [2] SEQUENCE {
+		high ObservedValue,
+		low ObservedValue } }
 LogRecordId ::= NumericName
-Interval ::= CHOICE { days [0] INTEGER,
-hours [1] INTEGER,
-minutes [2] INTEGER,
-seconds [3] INTEGER }
+Interval ::= CHOICE {
+	days [0] INTEGER,
+	hours [1] INTEGER,
+	minutes [2] INTEGER,
+	seconds [3] INTEGER }
 InvalidBaseManagedObjectError ::= ObjectInstance
 -- error response for an invalid Base Managed Object parameter
 InvalidObjectInstanceError ::= ObjectInstance
@@ -101,11 +100,13 @@ NoSuchInvokeIdError ::= InvokeIDType
 -- error response to Cancel Alarm Synchronization request
 NotificationId ::= INTEGER
 NumericName ::= INTEGER
-ObjectAlarmSummary ::= SEQUENCE{ objectOfReference ObjectOfReference,
-summaryInfo SEQUENCE OF AlarmSummaryInfo }
+ObjectAlarmSummary ::= SEQUENCE {
+	objectOfReference ObjectOfReference,
+	summaryInfo SEQUENCE OF AlarmSummaryInfo }
 ObjectList ::= SET OF ObjectListChoice
-ObjectListChoice ::= CHOICE { singleObject [1] ObjectInstance,
-rangeOfObjects [2] RangeOfObjects }
+ObjectListChoice ::= CHOICE {
+	singleObject [1] ObjectInstance,
+	rangeOfObjects [2] RangeOfObjects }
 -- The rangeOfObjects may be used to specify a group
 -- of objects which are named in a contiguous manner
 -- without having to specify each instance explicitly.
@@ -117,69 +118,79 @@ rangeOfObjects [2] RangeOfObjects }
 ObjectOfReference ::= ObjectInstance
 PerceivedSeverityList ::= SET OF PerceivedSeverity
 ProbableCauseList ::= SET OF ProbableCause
-ProblemData ::= SEQUENCE { identifier [0] OBJECT IDENTIFIER,
-significance [1] BOOLEAN DEFAULT FALSE,
-information [2] ANY DEFINED BY identifier }
+ProblemData ::= SEQUENCE {
+	identifier [0] OBJECT IDENTIFIER,
+	significance [1] BOOLEAN DEFAULT FALSE,
+	information [2] ANY DEFINED BY identifier }
 RangeOfObjects ::= SEQUENCE {
-superiorObjectName ObjectInstance,
-terminalRDNRange TerminalRDNRange }
+	superiorObjectName ObjectInstance,
+	terminalRDNRange TerminalRDNRange }
 ScopedCriteria ::= SEQUENCE {
-baseManagedObject ObjectInstance,
-scope Scope,
-criteria CMISFilter DEFAULT and : {}
-}
-
-66 ITU-T Q.821 (02/2000)
-simpleObjectList ::= SET OF ObjectInstance
-StatusChange ::= SET OF SEQUENCE { statusAttributeID OBJECT IDENTIFIER,
-oldStatusValue [1] ANY DEFINED BY statusAttributeID OPTIONAL,
-newStatusValue [2] ANY DEFINED BY statusAttributeID }
-SummaryContents ::= BIT STRING { includePerceivedSeverity(0),
-includeAlarmStatus(1),
-includeProbableCause(2) }
-SuspectObject ::= SEQUENCE { suspectObjectClass OBJECT IDENTIFIER,
-suspectObjectInstance ObjectInstance,
-failureProbability INTEGER (0..100) OPTIONAL --in the range 1 ..100-- }
+	baseManagedObject ObjectInstance,
+	scope Scope,
+	criteria CMISFilter DEFAULT and : { } }
+-- 66 ITU-T Q.821 (02/2000)
+SimpleObjectList ::= SET OF ObjectInstance
+StatusChange ::= SET OF SEQUENCE {
+	statusAttributeID OBJECT IDENTIFIER,
+	oldStatusValue [1] ANY DEFINED BY statusAttributeID OPTIONAL,
+	newStatusValue [2] ANY DEFINED BY statusAttributeID }
+SummaryContents ::= BIT STRING {
+	includePerceivedSeverity(0),
+	includeAlarmStatus(1),
+	includeProbableCause(2) }
+SuspectObject ::= SEQUENCE {
+	suspectObjectClass OBJECT IDENTIFIER,
+	suspectObjectInstance ObjectInstance,
+	failureProbability INTEGER(0..100) OPTIONAL--in the range 1 ..100-- }
 SuspectObjectList ::= SET OF SuspectObject
 TerminalRDNRange ::= SEQUENCE {
-attributeId OBJECT IDENTIFIER,
-firstObjectInRange INTEGER,
-lastObjectInRange INTEGER }
+	attributeId OBJECT IDENTIFIER,
+	firstObjectInRange INTEGER,
+	lastObjectInRange INTEGER }
 Threshold ::= CHOICE {
-absoluteCount [0] INTEGER,
-countOverFixedTimeInterval [1] CountInterval,
-countOverSlidingWindow [2] CountWindow,
-valueAndDuration [3] ValueDuration,
-absoluteValue [4] REAL,
-gauge [5] GaugeParameters }
+	absoluteCount [0] INTEGER,
+	countOverFixedTimeInterval [1] CountInterval,
+	countOverSlidingWindow [2] CountWindow,
+	valueAndDuration [3] ValueDuration,
+	absoluteValue [4] REAL,
+	gauge [5] GaugeParameters }
 TimeInterval ::= SEQUENCE {
-day [0] INTEGER (0..31) DEFAULT 0,
-hour [1] INTEGER (0..23) DEFAULT 0,
-minute [2] INTEGER (0..59) DEFAULT 0,
-second [3] INTEGER (0..59) DEFAULT 0,
-msec [4] INTEGER (0..999) DEFAULT 0 }
+	day [0] INTEGER(0..31) DEFAULT 0,
+	hour [1] INTEGER(0..23) DEFAULT 0,
+	minute [2] INTEGER(0..59) DEFAULT 0,
+	second [3] INTEGER(0..59) DEFAULT 0,
+	msec [4] INTEGER(0..999) DEFAULT 0 }
 -- TimeInterval shall be non-zero
 ValueDuration ::= SEQUENCE {
-value REAL,
-duration TimeInterval }
+	value REAL,
+	duration TimeInterval }
 -- the following is the bit string to be used when specifying
 -- the functional units for alarm surveillance
-AlarmSurveillanceFunctionalUnits ::= BIT STRING { as-kernel(0),
-as-alarm-retrieval(1),
-as-basic-arc(2),
-as-enhanced-arc(3),
-as-cur-alm-sum-reporting(4),
-as-basic-mos(5),
-as-enhanced-mos(6),
-as-cur-alm-sum-control(7),
-as-cur-alm-sum-retrieval(8),
-as-basic-log-control(9),
-as-enhanced-log-control(10),
-as-alarm-deletion(11),
-as-alarm-event-criteria(12),
-as-alarm-indication(13),
-as-alarm-synch(14),
-as-alarm-synch-cancel(15)}
+AlarmSurveillanceFunctionalUnits ::= BIT STRING {
+	as-kernel(0),
+	as-alarm-retrieval(1),
+	as-basic-arc(2),
+	as-enhanced-arc(3),
+	as-cur-alm-sum-reporting(4),
+	as-basic-mos(5),
+	as-enhanced-mos(6),
+	as-cur-alm-sum-control(7),
+	as-cur-alm-sum-retrieval(8),
+	as-basic-log-control(9),
+	as-enhanced-log-control(10),
+	as-alarm-deletion(11),
+	as-alarm-event-criteria(12),
+	as-alarm-indication(13),
+	as-alarm-synch(14),
+	as-alarm-synch-cancel(15) }
 END
 
-
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.821 (2000)"
+--  { ccitt(0) recommendation(0) q(17) q821(821) informationMode(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

@@ -4,16 +4,16 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Sun Sep  9 06:07:38 MDT 2007
+--@@ Date: Wed Sep 12 10:57:58 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.740.gdmo" >--
---< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
---< GDMO.Namespace x741 >--
+--< GDMO.Document "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" { joint-iso-ccitt(2) ms(9) function(2) part9(9) } >--
+--< GDMO.Namespace itut_x741 >--
 --< GDMO.Alias "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" "X.741",
 --  "ITU-T Rec. X.741 (1995)/Cor.2 (1998) | ISO/IEC 10164-9 : 1995/Cor.2 : 1999",
 --  "ITU-T Rec. X.741 (1995)/Cor.3 (2000) | ISO/IEC 10164-9 : 1995/Cor.3 : 2001" >--
-MODULE "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995"
+MODULE "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" { joint-iso-ccitt(2) ms(9) function(2) part9(9) }
 -- Annex A
 -- Definition of management information
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -1231,7 +1231,7 @@ validAccessAttempts ATTRIBUTE
 REGISTERED AS { joint-iso-ccitt(2) ms(9) function(2) part9(9) attribute(7) validAccessAttempts(29) };
 
 END
---< GDMO.EndDocument "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" >--
+--< GDMO.EndDocument "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995" { joint-iso-ccitt(2) ms(9) function(2) part9(9) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 
@@ -1240,52 +1240,52 @@ END
 --@@
 --@@ Derivation Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
---@@ |  |  +- "ITU-T Rec. X.740 (1992) | ISO/IEC 10164-8 : 1993":securityAuditTrailRecord
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":accessControl
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":accessControlRules
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":rule
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":notificationEmitter
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":targets
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":initiators
---@@ |  |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":aclInitiators
---@@ |  |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":capabilityInitiators
---@@ |  |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":labelInitiators
---@@ +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":operations
---@@ +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":assignedLabels
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":attributeLabel
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":instanceLabel
---@@ |  +- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":classLabel
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x740::securityAuditTrailRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x741::accessControl
+--@@ |  +- itut_x741::accessControlRules
+--@@ |  +- itut_x741::rule
+--@@ |  +- itut_x741::notificationEmitter
+--@@ |  +- itut_x741::targets
+--@@ |  +- itut_x741::initiators
+--@@ |  |  +- itut_x741::aclInitiators
+--@@ |  |  +- itut_x741::capabilityInitiators
+--@@ |  |  +- itut_x741::labelInitiators
+--@@ +- itut_x741::operations
+--@@ +- itut_x741::assignedLabels
+--@@ |  +- itut_x741::attributeLabel
+--@@ |  +- itut_x741::instanceLabel
+--@@ |  +- itut_x741::classLabel
 --@@
 
 --@@
 --@@ Containment Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":accessControlRules
---@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":rule
---@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":notificationEmitter
---@@ "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":targets
---@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":operations
---@@ "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":assignedLabels
---@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":attributeLabel
---@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":instanceLabel
---@@ >- "ITU-T Rec. X.741 (1995) | ISO/IEC 10164-9 : 1995":classLabel
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ itut_x741::accessControlRules
+--@@ >- itut_x741::rule
+--@@ >- itut_x741::notificationEmitter
+--@@ itut_x741::targets
+--@@ >- itut_x741::operations
+--@@ itut_x741::assignedLabels
+--@@ >- itut_x741::attributeLabel
+--@@ >- itut_x741::instanceLabel
+--@@ >- itut_x741::classLabel
 --@@
 --@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

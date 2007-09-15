@@ -1,5 +1,6 @@
 
 
+--< ASN1.Version 1994 UMFObjId {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0} >--
 UMFObjId {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0}
 DEFINITIONS
 BEGIN
@@ -12,6 +13,7 @@ umf-act OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) acti
 umf-not OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) function(2) part10(10) notification(10)}
 END
 
+--< ASN1.Version 1994 UsageMeteringFunction {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1} >--
 UsageMeteringFunction {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -112,6 +114,7 @@ additionalInformation [6] SET OF ManagementExtension OPTIONAL}
 UsageMeteringControlObjectId ::= SimpleNameType
 UsageMeteringDataObjectId ::= SimpleNameType
 END
+--< ASN1.Version 1994 UsageMeteringDataInfo {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2} >--
 UsageMeteringDataInfo {joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
@@ -248,6 +251,7 @@ pstnService OBJECT IDENTIFIER ::= {joint-iso-ccitt ms(9) part10(10) example(99) 
 
 END
 
+--< ASN1.Version 1994 UsageMeteringFunctionsNew {joint-iso-ccitt ms(9) function(2) part(10) example(99) asn1Modules(2) 1} >--
 UsageMeteringFunctionsNew {joint-iso-ccitt ms(9) function(2) part(10) example(99) asn1Modules(2) 1}
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN

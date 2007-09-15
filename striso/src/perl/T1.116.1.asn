@@ -1,525 +1,395 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:59 MDT 2007
+--@@ 
+--< GDMO.Document "ANSI T1.116.1/2000"
+--  { itu-t recommendation q(17) omap(751) mtp(1) informationModel(0) } >--
+MODULE "ANSI T1.116.1/2000" { itu-t recommendation q(17) omap(751) mtp(1) informationModel(0) }
+--< ASN1.Version 1994 MTPDefinedTypesModule
+--  { itu-t recommendation q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule(0) } >--
 -- 49	Abstract syntax productions
-
 -- The syntax of this ASN.1 is based on Recommendation X.208. However, from Recommendation X.680,
 --  the 'elipsis notation' is used.
-
-MTPDefinedTypesModule
-{ITU-T recommendation q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) 
-mtpDefinedTypesModule(0)}
-DEFINITIONS IMPLICIT TAGS ::= BEGIN
-
+MTPDefinedTypesModule { itu-t recommendation q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
 IMPORTS
-AdministrativeState, SimpleNameType, ProbableCause, SpecificProblems, PerceivedSeverity, NotificationIdentifier, CorrelatedNotifications, AdditionalText, AdditionalInformation FROM Attribute-ASN1Module 
-	{joint-iso-ITU-T ms(9) smi(3) part2(2) asn1Module(2) 1}
-NameType, Pointer,ObjectList, PointerOrNull FROM ASN1DefinedTypesModule 
-	{ITU-T recommendation m gnm(3100) informationModel(0) asn1Modules(2) 
-asn1DefinedTypesModule(0)}
-ObjectInstance FROM CMIP-1 
-	{joint-iso-ITU-T ms(9) cmip(1) modules(0) protocol(3)};
-
-
-mtpInformationModel OBJECT IDENTIFIER ::= {ITU-T recommendation q(17) omap(751) mtp(1) 
-informationModel(0)}
-mtpObjectClass OBJECT IDENTIFIER ::= {mtpInformationModel managedObjectClass(3)}
-mtpPackage OBJECT IDENTIFIER ::= {mtpInformationModel package(4)}
-mtpParameter OBJECT IDENTIFIER ::= {mtpInformationModel parameter(5)}
-mtpAttribute OBJECT IDENTIFIER ::= {mtpInformationModel attribute(7)}
-mtpNameBinding OBJECT IDENTIFIER ::= {mtpInformationModel nameBinding(6)}
-mtpAction OBJECT IDENTIFIER ::= {mtpInformationModel action(9)}
-mtpNotification OBJECT IDENTIFIER ::= {mtpInformationModel notification(10)}
+AdministrativeState, SimpleNameType, ProbableCause, SpecificProblems, PerceivedSeverity, NotificationIdentifier, CorrelatedNotifications, AdditionalText, AdditionalInformation
+	FROM Attribute-ASN1Module { joint-iso-ITU-T ms(9) smi(3) part2(2) asn1Module(2) 1 }
+NameType, Pointer, ObjectList, PointerOrNull
+	FROM ASN1DefinedTypesModule { itu-t recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+ObjectInstance
+	FROM CMIP-1 { joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3) };
+mtpInformationModel OBJECT IDENTIFIER ::= { itu-t recommendation q(17) omap(751) mtp(1) informationModel(0) }
+mtpObjectClass OBJECT IDENTIFIER ::= { mtpInformationModel managedObjectClass(3) }
+mtpPackage OBJECT IDENTIFIER ::= { mtpInformationModel package(4) }
+mtpParameter OBJECT IDENTIFIER ::= { mtpInformationModel parameter(5) }
+mtpAttribute OBJECT IDENTIFIER ::= { mtpInformationModel attribute(7) }
+mtpNameBinding OBJECT IDENTIFIER ::= { mtpInformationModel nameBinding(6) }
+mtpAction OBJECT IDENTIFIER ::= { mtpInformationModel action(9) }
+mtpNotification OBJECT IDENTIFIER ::= { mtpInformationModel notification(10) }
 mtpSpecificExtensions OBJECT IDENTIFIER ::= { mtpInformationModel specificExtensions(0) }
-
-AdditionalName ::= IA5String  -- the size of this string is implementation dependent
-
-administrativeStateLocked	AdministrativeState ::= locked
-
-AlternativeSlCodeList::= SEQUENCE SIZE (0..15) OF SlCode
-
-CapacityLink ::= INTEGER (0..maxOctetsPerSecondLink)
-
-CapacityLS ::= INTEGER (0..maxOctetsPerSecondLS)
-
-ChangeInLsToAdjSpInfo::= SEQUENCE { 
-		oldSignLinkSetTp	NameType,
-		newSignLinkSetTp	NameType }
-
-Cic::= INTEGER (0..4095)
-
-CongestedState ::=ENUMERATED {
-	notCongested		(0),
-	congested 		(1)}
-
-CongestionControlMethod::=ENUMERATED {
-	unknown			(0),
-	ccmT1.111.4International		(1),
-	ccmT1.111.4NationalWithPrio	(2),
-	ccmT1.111.4NationalNoPrioBufferMechanism 	(3),
-	ccmT1.111.4NationalNoPrioTimerMechanism 	(4)}
-
-CongestionCounting::=ENUMERATED {
-	octet		(0),
-	message		(1)}
-
+AdditionalName ::= IA5String-- the size of this string is implementation dependent
+administrativeStateLocked AdministrativeState ::= locked
+AlternativeSlCodeList ::= SEQUENCE SIZE(0..15) OF SlCode
+CapacityLink ::= INTEGER(0..maxOctetsPerSecondLink)
+CapacityLS ::= INTEGER(0..maxOctetsPerSecondLS)
+ChangeInLsToAdjSpInfo ::= SEQUENCE {
+	oldSignLinkSetTp NameType,
+	newSignLinkSetTp NameType }
+Cic ::= INTEGER(0..4095)
+CongestedState ::= ENUMERATED {
+	notCongested(0),
+	congested(1) }
+CongestionControlMethod ::= ENUMERATED {
+	unknown(0),
+	ccmT1.111.4International(1),
+	ccmT1.111.4NationalWithPrio(2),
+	ccmT1.111.4NationalNoPrioBufferMechanism(3),
+	ccmT1.111.4NationalNoPrioTimerMechanism(4) }
+CongestionCounting ::= ENUMERATED {
+	octet(0),
+	message(1) }
 CongestionLevel ::= ENUMERATED {
-	none			(0),
-	congestionLevel1	(1),
-	congestionLevel2	(2),
-	congestionLevel3	(3)}
-
-CongestionReportingBaseObject::= ENUMERATED {
-	routeSet				(0),
-	linkSetOfCongestedRouteSet	(1),
-	linkOfCongestedRouteSet	(2),
-	congestedLinkOfCongestedRoute	(3)}
-
-DpcComponent ::= CHOICE	{ 
-	dpc			[0]	PointCode,
-	dpcRange	[1]	SEQUENCE {
-						firstDPC	PointCode,
-						lastDPC	PointCode }}
-
-ErrorCorrectionMethod ::= ENUMERATED
-	{basicRetr	(0),
-	 prevCyclRetr	(1) }
-
+	none(0),
+	congestionLevel1(1),
+	congestionLevel2(2),
+	congestionLevel3(3) }
+CongestionReportingBaseObject ::= ENUMERATED {
+	routeSet(0),
+	linkSetOfCongestedRouteSet(1),
+	linkOfCongestedRouteSet(2),
+	congestedLinkOfCongestedRoute(3) }
+DpcComponent ::= CHOICE {
+	dpc [0] PointCode,
+	dpcRange [1] SEQUENCE {
+		firstDPC PointCode,
+		lastDPC PointCode } }
+ErrorCorrectionMethod ::= ENUMERATED {
+	basicRetr(0),
+	prevCyclRetr(1) }
 EventsCongestionLevel ::= SEQUENCE {
-	events		INTEGER,
-	conglevel		CongestionLevel }
-
-EventsUP  ::= SEQUENCE {
-	events		INTEGER,
-	userpart		UserPart}
-
+	events INTEGER,
+	conglevel CongestionLevel }
+EventsUP ::= SEQUENCE {
+	events INTEGER,
+	userpart UserPart }
 FixedPriority ::= Priority
-
 FlexiblePriority ::= Priority
-
-InaccessibleSpInfo::= SEQUENCE {
-		networkIndicator	NetworkIndicator,
-		pointCode		PointCode }
-
+InaccessibleSpInfo ::= SEQUENCE {
+	networkIndicator NetworkIndicator,
+	pointCode PointCode }
 InClsLoadsharingAlgorithm ::= SET OF SlsLinkPriorityList
-
 InfoRequest ::= BIT STRING {
-	pointCode 		(0),
-	pointCodeList 		(1),
-	routePriorityList 	(2),
-	...}
-
-InitialLevelOfCongestion::= INTEGER (1..3) -- This equals the value s from B.1.2.9.2 in Annex B
-
+	pointCode(0),
+	pointCodeList(1),
+	routePriorityList(2),
+	... }
+InitialLevelOfCongestion ::= INTEGER(1..3)-- This equals the value s from B.1.2.9.2 in Annex B
 InLsLoadShareAlgorithm ::= OBJECT IDENTIFIER
-
-L2TimerT1 ::= INTEGER (13000..600000)
+L2TimerT1 ::= INTEGER(13000..600000)
 -- time, in milliseconds
-
-L2TimerT2 ::= INTEGER (5000..150000)
+L2TimerT2 ::= INTEGER(5000..150000)
 -- time, in milliseconds
-
-L2TimerT3 ::= INTEGER (1000..14000)
+L2TimerT3 ::= INTEGER(1000..14000)
 -- time, in milliseconds
-
-L2TimerT4E ::= INTEGER (400..8000)
+L2TimerT4E ::= INTEGER(400..8000)
 -- time, in milliseconds
-
-L2TimerT4N ::= INTEGER (7500..120000)
+L2TimerT4N ::= INTEGER(7500..120000)
 -- time, in milliseconds
-
-L2TimerT5 ::= INTEGER (80..120)
+L2TimerT5 ::= INTEGER(80..120)
 -- time, in milliseconds
-
-L2TimerT6 ::= INTEGER (3000..12000)
+L2TimerT6 ::= INTEGER(3000..12000)
 -- time, in milliseconds
-
-L2TimerT7 ::= INTEGER (500..6000)
+L2TimerT7 ::= INTEGER(500..6000)
 -- time, in milliseconds
-
-LinkSetPriorityListSntx ::= SEQUENCE OF NameType 
-
+LinkSetPriorityListSntx ::= SEQUENCE OF NameType
 LinkTpStatus ::= BIT STRING {
-	localBlocked 		(0),
-	remoteBlocked 	(1),
-	localInhibited 		(2),
-	remoteInhibited 	(3),
-	failed 			(4),
-	deactivated 		(5)}
-
+	localBlocked(0),
+	remoteBlocked(1),
+	localInhibited(2),
+	remoteInhibited(3),
+	failed(4),
+	deactivated(5) }
 LoadsharingInformationRouteNePart ::= IA5String
 -- the size of this string is implementation dependend
-
-LoadsharingInformationRouteSetNePart ::=IA5String
+LoadsharingInformationRouteSetNePart ::= IA5String
 -- the size of this string is implementation dependend
-
 LocalUpUnavailable ::= UserPart
-
 LoopDelay ::= INTEGER
 -- time, in milliseconds
-
-ManagementExtension::= SEQUENCE {
-	identifier			OBJECT IDENTIFIER,
-	significance	[1] 	BOOLEAN DEFAULT FALSE,
-	information	[2] 	ANY DEFINED BY identifier }
-
-maxLinksInLs INTEGER::= 16
-
-MaxMSUsRetransN1::= INTEGER (0..127)
+ManagementExtension ::= SEQUENCE {
+	identifier OBJECT IDENTIFIER,
+	significance [1] BOOLEAN DEFAULT FALSE,
+	information [2] ANY DEFINED BY identifier }
+maxLinksInLs INTEGER ::= 16
+MaxMSUsRetransN1 ::= INTEGER(0..127)
 -- lower range is implementation dependent
-
 MaxMSUsRetransN2 ::= INTEGER
-
-maxNoOfScreenedDpcs INTEGER::=128
+maxNoOfScreenedDpcs INTEGER ::= 128
 -- This value is suggested by 8/T1.111.5. It is likely that this value is too low for international networks
-
-maxNoOfScreenedOpcs INTEGER::=128
+maxNoOfScreenedOpcs INTEGER ::= 128
 -- This value is suggested by 8/T1.111.5. It is likely that this value is too low for international networks
-
 MaxNumOfTests ::= INTEGER
-
-maxOctetsPerSecondLink  INTEGER::= 8000
-
-maxOctetsPerSecondLS  INTEGER::= 128000
-
+maxOctetsPerSecondLink INTEGER ::= 8000
+maxOctetsPerSecondLS INTEGER ::= 128000
 MaxOctRetransN2 ::= INTEGER
-
-maxSpc INTEGER::= 16383
-
+maxSpc INTEGER ::= 16383
 MRVTActionResult ::= CHOICE {
-	resultOfMRVT	[0] 	ResultOfMRVT,
-	reasonForRejection	[1] 	ReasonForRejection}
-
+	resultOfMRVT [0] ResultOfMRVT,
+	reasonForRejection [1] ReasonForRejection }
 MRVTFailureString ::= BIT STRING {
-	detectedLoop 			(0),
-	excessiveLengthRoute 		(1),
-	unknownDestination 		(2),
-	routeInaccessible 		(3),
-	processingFailure 		(4),
-	unknownInitiatingSP 		(5),
-	timerExpired 			(6),
-	spNotAnSTP 			(7),
-	indirectRoute 			(8),
-	maxNrMRVTestsAlready 	(9), -- Info from adjacent SP
+	detectedLoop(0),
+	excessiveLengthRoute(1),
+	unknownDestination(2),
+	routeInaccessible(3),
+	processingFailure(4),
+	unknownInitiatingSP(5),
+	timerExpired(6),
+	spNotAnSTP(7),
+	indirectRoute(8),
+	maxNrMRVTestsAlready(9),-- Info from adjacent SP
 	... }
-
 MtpRestarting ::= PointCode
-
 MtpRouteVerifTestResultSntx ::= SEQUENCE {
-	testedDestination	PointCode,		-- 2.2.2.3/T1.116.3 (b)
-	routeTestResult	ResultOfMRVT,		-- 2.2.2.3/T1.116.3 (c)
-	failureType	[1] 	MRVTFailureString OPTIONAL,	-- 2.1.1.3.1/T1.116.4 
-	routeTrace	[2] 	RouteTrace OPTIONAL,	-- 2.2.2.3/T1.116.3 (d)
-	copyData		[6] 	OCTET STRING OPTIONAL	-- 2.2.2.3/T1.116.3 (e)
+	testedDestination PointCode,-- 2.2.2.3/T1.116.3 (b)
+	routeTestResult ResultOfMRVT,-- 2.2.2.3/T1.116.3 (c)
+	failureType [1] MRVTFailureString OPTIONAL,-- 2.1.1.3.1/T1.116.4 
+	routeTrace [2] RouteTrace OPTIONAL,-- 2.2.2.3/T1.116.3 (d)
+	copyData [6] OCTET STRING OPTIONAL-- 2.2.2.3/T1.116.3 (e)
 	}
-
-NetworkIndicator::= ENUMERATED{
-	internationalNetwork1	(0),
-	internationalNetwork2	(1),
-	nationalNetwork1	(2),
-	nationalNetwork2	(3)}
-
-NumCongStates ::= INTEGER (0..3)
-
-NumberOfNormallyActiveSignLinksTps::= INTEGER (0..16)
-
-NumberOfThresholdLevels::= INTEGER (2 | 3)
-
+NetworkIndicator ::= ENUMERATED {
+	internationalNetwork1(0),
+	internationalNetwork2(1),
+	nationalNetwork1(2),
+	nationalNetwork2(3) }
+NumCongStates ::= INTEGER(0..3)
+NumberOfNormallyActiveSignLinksTps ::= INTEGER(0..16)
+NumberOfThresholdLevels ::= INTEGER(2|3)
 PeriodicLinkTestFlag ::= ENUMERATED {
-	on	(0),
-	off	(1)}
-
+	on(0),
+	off(1) }
 periodicTestFlagDefault PeriodicLinkTestFlag ::= off
-
-PointCode ::= INTEGER (0..maxSpc)
-
+PointCode ::= INTEGER(0..maxSpc)
 PointCodeList ::= SEQUENCE OF PointCode
-
-PointerList::= SEQUENCE OF Pointer
-
+PointerList ::= SEQUENCE OF Pointer
 Priority ::= INTEGER
 -- maximum value is implementation dependent
-
-PriorityInfo::= INTEGER {
-	unknown			(0),
-	firstChoice 		(1),
-	secondChoice 	(2),
-	thirdChoice		(3),
-	...} (0..255)
-
+PriorityInfo ::= INTEGER {
+	unknown(0),
+	firstChoice(1),
+	secondChoice(2),
+	thirdChoice(3),
+	... }(0..255)
 PriorityMode ::= ENUMERATED {
-	insert 			(0),
-	equal 			(1),
-	exchangeSingle 	(2),
-	exchangeGroup 	(3)}
-
-priorityModeDefault PriorityMode::= insert
-
-localUserPartUnavailable ProbableCause::= globalValue: {mtpSpecificExtensions 001}
-
-q752Item1p02 ProbableCause::= globalValue: {mtpSpecificExtensions 102}
-
-q752Item1p10 ProbableCause::= globalValue: {mtpSpecificExtensions 110}
-
-q752Item2p10 ProbableCause::= globalValue: {mtpSpecificExtensions 210}
-
-q752Item2p16 ProbableCause::= globalValue: {mtpSpecificExtensions 216}
-
-q752Item2p18 ProbableCause::= globalValue: {mtpSpecificExtensions 218}
-
-q752Item3p06 ProbableCause::= globalValue: {mtpSpecificExtensions 306}
-
-q752Item3p11 ProbableCause::= globalValue: {mtpSpecificExtensions 311}
-
-q752Item4p03 ProbableCause::= globalValue: {mtpSpecificExtensions 403}
-
-q752Item4p05 ProbableCause::= globalValue: {mtpSpecificExtensions 405}
-
-q752Item4p11 ProbableCause::= globalValue: {mtpSpecificExtensions 411}
-
-q752Item4p13 ProbableCause::= globalValue: {mtpSpecificExtensions 413}
-
-q752Item5p01 ProbableCause::= globalValue: {mtpSpecificExtensions 501}
-
-q752Item5p05 ProbableCause::= globalValue: {mtpSpecificExtensions 505}
-
-q752Item5p06 ProbableCause::= globalValue: {mtpSpecificExtensions 506}
-
-q752Item5p07 ProbableCause::= globalValue: {mtpSpecificExtensions 507}
-
-q752Item5p08 ProbableCause::= globalValue: {mtpSpecificExtensions 508}
-
-remoteUserPartUnavailable ProbableCause::= globalValue: {mtpSpecificExtensions 002}
-
-abnormalFIBRorBSNR SpecificProblems ::= {{mtpSpecificExtensions 003}}
-
-excessiveAckDelay SpecificProblems ::= {{mtpSpecificExtensions 004}}
-
-excessiveCongDuration SpecificProblems ::=  {{mtpSpecificExtensions 006}}
-
-excessiveErrorRate SpecificProblems ::=  {{mtpSpecificExtensions 005}}
-
-remoteUPInaccessible SpecificProblems ::=  {{mtpSpecificExtensions 009}}
-
-remoteUPUnequipped SpecificProblems ::=  {{mtpSpecificExtensions 008}}
-
-remoteUPUnknown SpecificProblems ::=  {{mtpSpecificExtensions 007}}
-
+	insert(0),
+	equal(1),
+	exchangeSingle(2),
+	exchangeGroup(3) }
+priorityModeDefault PriorityMode ::= insert
+localUserPartUnavailable ProbableCause ::= globalValue : { mtpSpecificExtensions 0 0 1 }
+q752Item1p02 ProbableCause ::= globalValue : { mtpSpecificExtensions 102 }
+q752Item1p10 ProbableCause ::= globalValue : { mtpSpecificExtensions 110 }
+q752Item2p10 ProbableCause ::= globalValue : { mtpSpecificExtensions 210 }
+q752Item2p16 ProbableCause ::= globalValue : { mtpSpecificExtensions 216 }
+q752Item2p18 ProbableCause ::= globalValue : { mtpSpecificExtensions 218 }
+q752Item3p06 ProbableCause ::= globalValue : { mtpSpecificExtensions 306 }
+q752Item3p11 ProbableCause ::= globalValue : { mtpSpecificExtensions 311 }
+q752Item4p03 ProbableCause ::= globalValue : { mtpSpecificExtensions 403 }
+q752Item4p05 ProbableCause ::= globalValue : { mtpSpecificExtensions 405 }
+q752Item4p11 ProbableCause ::= globalValue : { mtpSpecificExtensions 411 }
+q752Item4p13 ProbableCause ::= globalValue : { mtpSpecificExtensions 413 }
+q752Item5p01 ProbableCause ::= globalValue : { mtpSpecificExtensions 501 }
+q752Item5p05 ProbableCause ::= globalValue : { mtpSpecificExtensions 505 }
+q752Item5p06 ProbableCause ::= globalValue : { mtpSpecificExtensions 506 }
+q752Item5p07 ProbableCause ::= globalValue : { mtpSpecificExtensions 507 }
+q752Item5p08 ProbableCause ::= globalValue : { mtpSpecificExtensions 508 }
+remoteUserPartUnavailable ProbableCause ::= globalValue : { mtpSpecificExtensions 0 0 2 }
+abnormalFIBRorBSNR SpecificProblems ::= { { mtpSpecificExtensions 0 0 3 } }
+excessiveAckDelay SpecificProblems ::= { { mtpSpecificExtensions 0 0 4 } }
+excessiveCongDuration SpecificProblems ::= { { mtpSpecificExtensions 0 0 6 } }
+excessiveErrorRate SpecificProblems ::= { { mtpSpecificExtensions 0 0 5 } }
+remoteUPInaccessible SpecificProblems ::= { { mtpSpecificExtensions 0 0 9 } }
+remoteUPUnequipped SpecificProblems ::= { { mtpSpecificExtensions 0 0 8 } }
+remoteUPUnknown SpecificProblems ::= { { mtpSpecificExtensions 0 0 7 } }
 ReasonForRejection ::= ENUMERATED {
-	routeTestInstanceLocked 	(10),
-	routeTestInstanceDisabled 	(11),
-	routeTestInstanceBusy 		(12),
-	routeTestAlreadyInProgress 	(13)}
-
-ReceiveCongestionThresholdAbatement::= INTEGER 
-
-ReceiveCongestionThresholdOnset ::= INTEGER 
-
-RelatedLinkGroupNumber::= INTEGER (0..15)
-
+	routeTestInstanceLocked(10),
+	routeTestInstanceDisabled(11),
+	routeTestInstanceBusy(12),
+	routeTestAlreadyInProgress(13) }
+ReceiveCongestionThresholdAbatement ::= INTEGER
+ReceiveCongestionThresholdOnset ::= INTEGER
+RelatedLinkGroupNumber ::= INTEGER(0..15)
 RemoteExchangeLabel ::= IA5String
 -- the size of this string is implementation dependend
-
 RemoteUpUnavailable ::= SEQUENCE {
-	pointCode	[0]	PointCode,
-	userPart		[1]	UserPart }
-
+	pointCode [0] PointCode,
+	userPart [1] UserPart }
 ResultMtpRouteTest ::= SEQUENCE {
-	testedDestination		PointCode,
-	routeTestActionResult		MRVTActionResult,
-	announcementOfMRVR	[0] 	BOOLEAN OPTIONAL,
-	failureType		[1] 	MRVTFailureString OPTIONAL,
-	routeTrace		[2] 	RouteTrace OPTIONAL,
-	pointCodeInfo		[3] 	PointCode OPTIONAL,
-	pointCodeListInfo	[4]	PointCodeList OPTIONAL,
-	routePriorityListInfo	[5] 	RoutePriorityListInfo OPTIONAL,
-	copyData			[6] 	OCTET STRING OPTIONAL,
-	...}
-
+	testedDestination PointCode,
+	routeTestActionResult MRVTActionResult,
+	announcementOfMRVR [0] BOOLEAN OPTIONAL,
+	failureType [1] MRVTFailureString OPTIONAL,
+	routeTrace [2] RouteTrace OPTIONAL,
+	pointCodeInfo [3] PointCode OPTIONAL,
+	pointCodeListInfo [4] PointCodeList OPTIONAL,
+	routePriorityListInfo [5] RoutePriorityListInfo OPTIONAL,
+	copyData [6] OCTET STRING OPTIONAL,
+	... }
 ResultOfAction ::= ENUMERATED {
-	success				(0),
-	unsuccessful			(1),
-	notPerformed			(2),
-	linkAlreadyInhibited		(3),
-	linkNotInhibited		(4),
-	wrongClassReferenced		(5),
-	signTermNonExisting		(6),
-	signTermAlreadyReferenced	(7),
-	wrongSignLinkTpStatus		(8),
-	...}
-
+	success(0),
+	unsuccessful(1),
+	notPerformed(2),
+	linkAlreadyInhibited(3),
+	linkNotInhibited(4),
+	wrongClassReferenced(5),
+	signTermNonExisting(6),
+	signTermAlreadyReferenced(7),
+	wrongSignLinkTpStatus(8),
+	... }
 ResultOfMRVT ::= ENUMERATED {
-	success 			(0),
-	partialSuccess 	(1), -- 2.1.1.3.2/T1.116.4 Partial  Success
-	failure 			(2)  -- 2.1.1.3.1/T1.116.4 Failure
+	success(0),
+	partialSuccess(1),-- 2.1.1.3.2/T1.116.4 Partial  Success
+	failure(2)-- 2.1.1.3.1/T1.116.4 Failure
 	}
-
 ReturnUnknownParams ::= BIT STRING {
-	tag15 	(0),
-	tag16 	(1),
-	...}
-
+	tag15(0),
+	tag16(1),
+	... }
 RoutePriorityListInfo ::= SEQUENCE OF PriorityInfo
-
 RouteSetUnavailable ::= OBJECT IDENTIFIER
-
 RouteTrace ::= CHOICE {
-	success			[0] IMPLICIT PointCodeList,
-	detectedLoop		[1] IMPLICIT PointCodeList,
-	excessiveLengthRoute	[2] IMPLICIT PointCodeList,
-	unknownDestination	[3] IMPLICIT NULL,
-	routeInaccessible	[4] IMPLICIT PointCodeList,
-	processingFailure	[5] IMPLICIT NULL,
-	unknownInitiatingSP	[6] IMPLICIT PointCode,
-	timerExpired		[7] IMPLICIT PointCodeList,
-	spNotAnSTP		[8] IMPLICIT PointCodeList,
-	indirectRoute		[9] IMPLICIT PointCode}
-
-ScreenedOpcsOrLinkSetsList::= SET SIZE (0..maxNoOfScreenedOpcs) OF 
-		SEQUENCE {
-			screenedOpcOrLinkset	StpScreeningTableLineId,
-			messageTreatment	TreatmentOf }
-
-ScreeningByLinkSetOrByOpc::= ENUMERATED	{
-	byOpc			(0),
-	byIncomingLinkset	(1),
-	byOutgoingLinkset	(2)}
-
+	success [0] IMPLICIT PointCodeList,
+	detectedLoop [1] IMPLICIT PointCodeList,
+	excessiveLengthRoute [2] IMPLICIT PointCodeList,
+	unknownDestination [3] IMPLICIT NULL,
+	routeInaccessible [4] IMPLICIT PointCodeList,
+	processingFailure [5] IMPLICIT NULL,
+	unknownInitiatingSP [6] IMPLICIT PointCode,
+	timerExpired [7] IMPLICIT PointCodeList,
+	spNotAnSTP [8] IMPLICIT PointCodeList,
+	indirectRoute [9] IMPLICIT PointCode }
+ScreenedOpcsOrLinkSetsList ::= SET SIZE(0..maxNoOfScreenedOpcs) OF SEQUENCE {
+	screenedOpcOrLinkset StpScreeningTableLineId,
+	messageTreatment TreatmentOf }
+ScreeningByLinkSetOrByOpc ::= ENUMERATED {
+	byOpc(0),
+	byIncomingLinkset(1),
+	byOutgoingLinkset(2) }
 Seconds ::= INTEGER
-
 SIOType ::= SEQUENCE {
 	service ENUMERATED {
-					signallingNetworkManagement 	(0),
-					signallingNetworkTesting	(1),
-					sccp		(3),
-					tup		(4),
-					isup		(5),
-					dup		(6),
-					mt		(8),
-					b-isup		(9),
-					siup		(10),
-					...} , 
+		signallingNetworkManagement(0),
+		signallingNetworkTesting(1),
+		sccp(3),
+		tup(4),
+		isup(5),
+		dup(6),
+		mt(8),
+		b-isup(9),
+		siup(10),
+		... },
 	subService ENUMERATED {
-					internationalNetwork	(0),
-					nationalNetwork		(2),
-					...}
-					} 
-
-SignRouteSetNePartName::= IA5String
+		internationalNetwork(0),
+		nationalNetwork(2),
+		... } }
+SignRouteSetNePartName ::= IA5String
 -- the size of this string is implementation dependend
-
-SlCode ::= INTEGER (0..15)
-
-Sls::=INTEGER (0..15)
-
+SlCode ::= INTEGER(0..15)
+Sls ::= INTEGER(0..15)
 SLSCodeCurrentList ::= SlsCodeList
-
-SlsCodeList ::= SET SIZE (0..16) OF Sls
+SlsCodeList ::= SET SIZE(0..16) OF Sls
 -- Each Sls value can occur at most once in a given SET
-
 SlsCodeNormalList ::= SlsCodeList
-
 SlsLinkPriorityList ::= SEQUENCE {
-	slsCode			[0]	Sls,
-	normalSlcCode	[1]	SlCode,
-	alternativeSlCodeList	[2]	AlternativeSlCodeList
-	}
-
-StmChannel::= INTEGER (1..31)
-
-SpecificDpc::= PointCode
-
-SpType ::= ENUMERATED
-	{sep		(0),
-	 step	(1),
-	 stp		(2)}
-
-SS7OnOccEventInfo::=SEQUENCE{
-	probableCause		ProbableCause,
-	specificProblems	[1]	SpecificProblems OPTIONAL,
-	perceivedSeverity		PerceivedSeverity,
-	notificationIdentifier	[5]	NotificationIdentifier OPTIONAL,
-	correlatedNotifications	[6]	CorrelatedNotifications OPTIONAL,
-	additionalText			AdditionalText OPTIONAL,
-	additionalInformation	[10] 	AdditionalInformation OPTIONAL }
-
+	slsCode [0] Sls,
+	normalSlcCode [1] SlCode,
+	alternativeSlCodeList [2] AlternativeSlCodeList }
+StmChannel ::= INTEGER(1..31)
+SpecificDpc ::= PointCode
+SpType ::= ENUMERATED {
+	sep(0),
+	step(1),
+	stp(2) }
+SS7OnOccEventInfo ::= SEQUENCE {
+	probableCause ProbableCause,
+	specificProblems [1] SpecificProblems OPTIONAL,
+	perceivedSeverity PerceivedSeverity,
+	notificationIdentifier [5] NotificationIdentifier OPTIONAL,
+	correlatedNotifications [6] CorrelatedNotifications OPTIONAL,
+	additionalText AdditionalText OPTIONAL,
+	additionalInformation [10] AdditionalInformation OPTIONAL }
 StartMtpRouteTest ::= SEQUENCE {
-	testDestination		PointCode,
-	traceRequested		BOOLEAN,
-	threshold				ThresholdN,
-	infoRequest		[0] 	InfoRequest OPTIONAL,
-	returnUnknownParams	[1]	ReturnUnknownParams OPTIONAL,
-	directRouteCheck	[2] 	BOOLEAN OPTIONAL}
-
-StpScreeningElement ::= SEQUENCE{
-	designatedDPC	DpcComponent,
-	messageTreatment	TreatmentOf }
-
-StpScreeningTableLineContent::= SET SIZE (1..maxNoOfScreenedDpcs) OF StpScreeningElement
-
-StpScreeningTableLineId::= CHOICE {
-	designatedlinkset	[0]	Objectinstance,
-	designatedopc		[1]	PointCode}
-
+	testDestination PointCode,
+	traceRequested BOOLEAN,
+	threshold ThresholdN,
+	infoRequest [0] InfoRequest OPTIONAL,
+	returnUnknownParams [1] ReturnUnknownParams OPTIONAL,
+	directRouteCheck [2] BOOLEAN OPTIONAL }
+StpScreeningElement ::= SEQUENCE {
+	designatedDPC DpcComponent,
+	messageTreatment TreatmentOf }
+StpScreeningTableLineContent ::= SET SIZE(1..maxNoOfScreenedDpcs) OF StpScreeningElement
+StpScreeningTableLineId ::= CHOICE {
+	designatedlinkset [0] Objectinstance,
+	designatedopc [1] PointCode }
 StpScreeningTableListMode ::= BOOLEAN
-
-SuermNSU::= INTEGER (0..256)
+SuermNSU ::= INTEGER(0..256)
 -- lower range is implementation dependent
-
-SuermThresh ::= INTEGER (32 | 64) -- (minSuermThresh or maxSuermThres)
-
-TestResult ::= BIT STRING
-		{detectedLoop 		(0),
-		 excessiveLengthRoute 	(1),
-		 unknownDestination 	(2),
-		 routeInaccesible 		(3),
-		 processingFailure 		(4),
-		 unknownInitiatingSP 	(5),
-		 timerExpired 		(6),
-		 spNotAnSTP 		(7),
-		 indirectRoute 		(8),
-		 maxNrMRVTestsAlready	(9),
-		 ...}
-
+SuermThresh ::= INTEGER(32|64)-- (minSuermThresh or maxSuermThres)
+TestResult ::= BIT STRING {
+	detectedLoop(0),
+	excessiveLengthRoute(1),
+	unknownDestination(2),
+	routeInaccesible(3),
+	processingFailure(4),
+	unknownInitiatingSP(5),
+	timerExpired(6),
+	spNotAnSTP(7),
+	indirectRoute(8),
+	maxNrMRVTestsAlready(9),
+	... }
 ThresholdN ::= INTEGER
-
 TimeD ::= INTEGER
-
-TimerValue ::= INTEGER (0..60000)
-
-TransmissionCongestionThresholdAbatementLevel1::= INTEGER 
-
-TransmissionCongestionThresholdAbatementLevel2::= INTEGER 
-
-TransmissionCongestionThresholdAbatementLevel3::= INTEGER 
-
-TransmissionCongestionThresholdDiscardLevel1::= INTEGER 
-
-TransmissionCongestionThresholdDiscardLevel2::= INTEGER 
-
-TransmissionCongestionThresholdDiscardLevel3::= INTEGER 
-
-TransmissionCongestionThresholdOnsetLevel1	::= INTEGER 
-
-TransmissionCongestionThresholdOnsetLevel2::= INTEGER 
-
-TransmissionCongestionThresholdOnsetLevel3::= INTEGER 
-
+TimerValue ::= INTEGER(0..60000)
+TransmissionCongestionThresholdAbatementLevel1 ::= INTEGER
+TransmissionCongestionThresholdAbatementLevel2 ::= INTEGER
+TransmissionCongestionThresholdAbatementLevel3 ::= INTEGER
+TransmissionCongestionThresholdDiscardLevel1 ::= INTEGER
+TransmissionCongestionThresholdDiscardLevel2 ::= INTEGER
+TransmissionCongestionThresholdDiscardLevel3 ::= INTEGER
+TransmissionCongestionThresholdOnsetLevel1 ::= INTEGER
+TransmissionCongestionThresholdOnsetLevel2 ::= INTEGER
+TransmissionCongestionThresholdOnsetLevel3 ::= INTEGER
 TransmissionRate ::= ENUMERATED {
-	kbits4point8	(0),
-	kbits56		(1),
-	kbits64		(2)}
-
+	kbits4point8(0),
+	kbits56(1),
+	kbits64(2) }
 TreatmentOf ::= ENUMERATED {
-			normal	(0),
-			discard	(1) }
+	normal(0),
+	discard(1) }
+UserPart ::= ENUMERATED {
+	isup(5),
+	sccp(3),
+	tup(4),
+	dup(6),
+	mt(8),
+	b-isup(9),
+	siup(10),
+	... }
+END-- end of MTPDefinedTypesModule
 
-UserPart ::= ENUMERATED
-	{ isup	(5),
-	 sccp 	(3),
-	 tup		(4),
-	 dup		(6),
-	 mt		(8),
-	 b-isup	(9),
-	 siup		(10),
-	...}
 
-END -- end of MTPDefinedTypesModule
+END
+--< GDMO.EndDocument "ANSI T1.116.1/2000"
+--  { itu-t recommendation q(17) omap(751) mtp(1) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

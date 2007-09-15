@@ -1,24 +1,31 @@
-
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:04:54 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. G.774.04 : 1995"
+--  { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) } >--
+MODULE "ITU-T Rec. G.774.04 : 1995" { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) }
+--< ASN1.Version 1994 SDHSNCPASN1
+--  { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) asn1Module(2) sdhsncp(0) } >--
 -- 14 Supporting ASN.1 productions
-SDHSNCPASN1 { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(04)
-informationModel(0) asn1Module(2) sdhsncp (0) }
+SDHSNCPASN1 { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) asn1Module(2) sdhsncp(0) }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS everything --
 IMPORTS
 ObjectInstance
-FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }
 AdministrativeState, OperationalState
-FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
-AddLeg, Connected, ConnectionType, ConnectionTypeBi, Directionality, ExplicitPtoMP,
-ExplicitPtoP, ExplicitTP, Failed, PointToMultipoint, PointToPoint, PtoMPools, PtoTPPool
-FROM ASN1DefinedTypesModule { ccitt recommendation m(13) gnm(3100)
-informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+AddLeg, Connected, ConnectionType, ConnectionTypeBi, Directionality, ExplicitPtoMP, ExplicitPtoP, ExplicitTP, Failed, PointToMultipoint, PointToPoint, PtoMPools, PtoTPPool
+	FROM ASN1DefinedTypesModule { ccitt recommendation m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
 Boolean, Integer, ProtectionStatus, ProtectionStatusParameter
-FROM SDHProtASN1 { itu(0) recommendation(0) g(7) g774(774) hyphen(127) prot(03)
-informationModel(0) asn1Module(2) sdhprot(0) };
-sdhSNCP OBJECT IDENTIFIER ::= { itu(0) recommendation(0) g(7) g774(774) hyphen(127)
-sncp(04) informationModel(0) }
+	FROM SDHProtASN1 { itu(0) recommendation(0) g(7) g774(774) hyphen(127) prot(3) informationModel(0) asn1Module(2) sdhprot(0) };
+sdhSNCP OBJECT IDENTIFIER ::= { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) }
 g774-04MObjectClass OBJECT IDENTIFIER ::= { sdhSNCP managedObjectClass(3) }
 g774-04Attribute OBJECT IDENTIFIER ::= { sdhSNCP attribute(7) }
 g774-04Action OBJECT IDENTIFIER ::= { sdhSNCP action(9) }
@@ -32,100 +39,89 @@ scnpProtectionCriteria OBJECT IDENTIFIER ::= { g774-04StandardSpecificExtension 
 sncpPathTraceMismatchCriteria OBJECT IDENTIFIER ::= { scnpProtectionCriteria 1 }
 sncpExcessiveErrorCriteria OBJECT IDENTIFIER ::= { sncpProtectionCriteria 2 }
 ConnectUnreliableTP ::= CHOICE {
-notConnected [0] UnreliableTp,
-connected [1] UnreliableTp
-}
+	notConnected [0] UnreliableTp,
+	connected [1] UnreliableTp }
 HoldOffTime ::= INTEGER
 PointToPointProtection ::= SEQUENCE {
-protectedPointToPoint PointToPoint,
-protectingPointToPoint ProtectingConnection
-}
+	protectedPointToPoint PointToPoint,
+	protectingPointToPoint ProtectingConnection }
 -- The object Instance of the xCon of PointToPoint represents the object instance of the created
 -- connectionProtection
 PointToMultipointProtection ::= SEQUENCE {
-protectedPointToMultipoint PointToMultipoint,
-protectingPointToMultipoint ProtectingConnection
-}
+	protectedPointToMultipoint PointToMultipoint,
+	protectingPointToMultipoint ProtectingConnection }
 -- The object Instance of the xConnections and mpXCon of PointToMultipoint represents the
 -- object
 -- instances of the created crossConnections and mpConnectionProtection
 -- The protectingPointToMultipoint represents the object instance of the unreliable TP and
 -- the object instance of the created mpConnectionProtection of the protecting connection
 ProtectedAddLeg ::= CHOICE {
-protected [0] AddLeg,
-unProtected [1] AddLeg
-}
+	protected [0] AddLeg,
+	unProtected [1] AddLeg }
 -- The object Instance of the mpXCon of AddLeg represents the object instance of the
 -- mpConnectionProtection to which new legs are added
 ProtectedConnectInformation ::= SEQUENCE OF SEQUENCE {
-CHOICE {
-connect [0] ProtectedConnection,
-addleg [1] ProtectedAddLeg,
-addUnreliable [2] ConnectUnreliableTP
-},
-administrativeState AdministrativeState OPTIONAL
-}
+	xxx CHOICE {
+		connect [0] ProtectedConnection,
+		addleg [1] ProtectedAddLeg,
+		addUnreliable [2] ConnectUnreliableTP },
+	administrativeState AdministrativeState OPTIONAL }
 ProtectedConnection ::= SEQUENCE {
-protectionConnectionType ProtectionConnectionType,
-protectingTP ExplicitTP,
-revertive Boolean,
-waitToRestore [0] Integer OPTIONAL,
-holdOffTime [1] HoldOffTime OPTIONAL
-}
+	protectionConnectionType ProtectionConnectionType,
+	protectingTP ExplicitTP,
+	revertive Boolean,
+	waitToRestore [0] Integer OPTIONAL,
+	holdOffTime [1] HoldOffTime OPTIONAL }
 ProtectionConnectionType ::= CHOICE {
-unidirectional [0] ConnectionType,
-bidirectional [1] ConnectionTypeBi
-}
+	unidirectional [0] ConnectionType,
+	bidirectional [1] ConnectionTypeBi }
 ProtectedConnectionResult ::= SEQUENCE {
-CHOICE {
-pointToPoint [0] PointToPointProtection,
-pointToMultipoint [1] PointToMultipointProtection
-},
-connectionPG ObjectInstance
-}
+	xxx CHOICE {
+		pointToPoint [0] PointToPointProtection,
+		pointToMultipoint [1] PointToMultipointProtection },
+	connectionPG ObjectInstance }
 ProtectedConnectResult ::= SEQUENCE OF CHOICE {
-failed [0] Failed,
-protected [1] ProtectedConnectionResult,
-unprotected [2] Unprotected
-}
+	failed [0] Failed,
+	protected [1] ProtectedConnectionResult,
+	unprotected [2] Unprotected }
 -- the n-th element in the "SEQUENCE OF" is related to the n-th element in the "SEQUENCE OF"
 -- of the "ProtectedConnectInformation" type.
 ProtectingConnection ::= SEQUENCE {
-unreliableTp ObjectInstance,
-conProt ObjectInstance
-}
+	unreliableTp ObjectInstance,
+	conProt ObjectInstance }
 ProtectionCriteria ::= SET OF Criterion
 Criterion ::= OBJECT IDENTIFIER
 ProtectUnprotectInformation ::= SEQUENCE OF SEQUENCE {
-CHOICE {
-protect [3] ProtectedConnection,
-unprotect [4] UnprotectConnection
-},
-administrativeState AdministrativeState OPTIONAL
-}
+	xxx CHOICE {
+		protect [3] ProtectedConnection,
+		unprotect [4] UnprotectConnection },
+	administrativeState AdministrativeState OPTIONAL }
 Unprotected ::= CHOICE {
-uniform [0] Connected,
-divers [1] UnprotectedMultiple
-}
+	uniform [0] Connected,
+	divers [1] UnprotectedMultiple }
 UnprotectedMultiple ::= SEQUENCE {
-sending PointToPoint,
-receiving pointToPoint
-}
+	sending PointToPoint,
+	receiving PointToPoint }
 UnprotectConnection ::= CHOICE {
-uniPToP [0] ExplicitPtoP,
-pToMp [1] ExplicitPtoMP,
-bidirectional [2] UnprotectBi
-}
+	uniPToP [0] ExplicitPtoP,
+	pToMp [1] ExplicitPtoMP,
+	bidirectional [2] UnprotectBi }
 UnprotectBi ::= CHOICE {
-uniformRoute [0] ExplicitPtoP,
-diverseRoute [1] UnprotectMultiple
-}
+	uniformRoute [0] ExplicitPtoP,
+	diverseRoute [1] UnprotectMultiple }
 UnprotectMultiple ::= SEQUENCE {
-firstXCon ExplicitPtoP,
-secondXCon ExplicitPtoP
-}
+	firstXCon ExplicitPtoP,
+	secondXCon ExplicitPtoP }
 UnreliableTp ::= SEQUENCE {
-unreliableTp ExplicitTP,
-connectionProtection ObjectInstance
-}
+	unreliableTp ExplicitTP,
+	connectionProtection ObjectInstance }
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. G.774.04 : 1995"
+--  { itu(0) recommendation(0) g(7) g774(774) hyphen(127) sncp(4) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

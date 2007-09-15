@@ -4,11 +4,11 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Tue Sep  4 14:44:58 MDT 2007
+--@@ Date: Fri Sep 14 00:22:48 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Document "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997" >--
---< GDMO.Namespace "x750" >--
+--< GDMO.Namespace itut_x750 >--
 --< GDMO.Alias "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997" "X.750",
 --  "ITU-T Rec. X.750 (1996)/Amd.1 (1997) | ISO/IEC 10164-16 : 1997/Amd.1 1998",
 --  "ITU-T Rec. X.750 (1996)/Cor.1 (2000) | ISO/IEC 10164-16 : 1997/Cor.1 2001" >--
@@ -1236,53 +1236,52 @@ END
 --@@
 --@@ Derivation Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":managedObjectClassRepertoire
---@@ +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":repertoire
---@@ +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":aSN1Module
---@@ +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":document
---@@ +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":template
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":actionTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":attributeGroupTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":attributeTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":behaviourTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":managedObjectClassTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":nameBindingTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":notificationTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":packageTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":parameterTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":relationshipClassTemplate
---@@ |  +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":relationshipMappingTemplate
---@@ +- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":discoveryObject
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x750::managedObjectClassRepertoire
+--@@ +- itut_x750::repertoire
+--@@ +- itut_x750::aSN1Module
+--@@ +- itut_x750::document
+--@@ +- itut_x750::template
+--@@ |  +- itut_x750::actionTemplate
+--@@ |  +- itut_x750::attributeGroupTemplate
+--@@ |  +- itut_x750::attributeTemplate
+--@@ |  +- itut_x750::behaviourTemplate
+--@@ |  +- itut_x750::managedObjectClassTemplate
+--@@ |  +- itut_x750::nameBindingTemplate
+--@@ |  +- itut_x750::notificationTemplate
+--@@ |  +- itut_x750::packageTemplate
+--@@ |  +- itut_x750::parameterTemplate
+--@@ |  +- itut_x750::relationshipClassTemplate
+--@@ |  +- itut_x750::relationshipMappingTemplate
+--@@ +- itut_x750::discoveryObject
 --@@
 
 --@@
 --@@ Containment Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":repertoire
---@@ |  >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":managedObjectClassRepertoire
---@@ >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":document
---@@ |  >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":aSN1Module
---@@ |  >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":template
---@@ >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":document +++
---@@ >- "ITU-T Rec. X.750 (1996) | ISO/IEC 10164-16 : 1997":discoveryObject
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x750::repertoire
+--@@ |  >- itut_x750::managedObjectClassRepertoire
+--@@ >- itut_x750::document
+--@@ |  >- itut_x750::aSN1Module
+--@@ |  >- itut_x750::template
+--@@ >- itut_x750::document +++
+--@@ >- itut_x750::discoveryObject
 --@@
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

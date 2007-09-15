@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 MKMD {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 5} >--
 -- A.1 Allocation of object identifiers
 -- This Recommendation | International Standard allocates the following object identifiers.
 --%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= {v1990, v1994}
@@ -28,6 +29,7 @@ mkmAttribute OBJECT IDENTIFIER ::=
 mkmAction OBJECT IDENTIFIER ::=
 {joint-iso-ccitt(2) ms(9) function(2) part16(16) action(9)}
 END
+--< ASN1.Version 1994 RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0} >--
 -- A.2.4 Abstract syntax
 --%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= v1990
 RepertoireASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 0}
@@ -59,6 +61,7 @@ SupportedManagedObjectClassList ::= SET OF GdmoObjectClass
 SupportedNameBindingList ::= SET OF NameBinding
 SupportedRelationshipClassList ::= SET OF OBJECT IDENTIFIER
 END
+--< ASN1.Version 1994 DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1} >--
 -- A.3.5 Abstract syntax
 -- %PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= {v1990, v1994}
 DefinitionASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 1}
@@ -186,6 +189,7 @@ derivationRule [1] TemplateLabel}
 WithAttribute ::= TemplateLabel
 WithSyntax ::= CHOICE { present DefinedType, absent NULL}
 END
+--< ASN1.Version 1994 DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2} >--
 -- A.4.5 Abstract syntax
 --%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= {v1990, v1994}
 DiscoveryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 2}
@@ -223,6 +227,7 @@ rootObject ObjectInstance,
 classOfRoot GdmoObjectClass OPTIONAL,
 subordinates SET OF NameTree OPTIONAL}
 END
+--< ASN1.Version 1994 RepertoireDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 3} >--
 -- Annex B
 -- Management knowledge Directory objects
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -307,6 +312,7 @@ EQUALITY MATCHING RULE booleanMatch
 SINGLE VALUETRUE
 ID { mkmDirectoryAttributeType 44}}
 END
+--< ASN1.Version 1994 DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4} >--
 -- B.2 Definition Directory object definitions
 --%PRAGMA version BIT STRING {v1990(0), v1994(1)} ::= v1994
 DefinitionDirectoryASN1Module {joint-iso-ccitt(2) ms(9) function(2) part16(16) asn1Modules(2) 4}

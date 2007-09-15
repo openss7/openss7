@@ -1,4 +1,5 @@
 --< GDMO.Document "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" >--
+--< GDMO.Namespace itut_x743 >--
 MODULE "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
 -- Annex A
 -- Definition of Time Management Information

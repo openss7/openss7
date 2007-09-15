@@ -9,6 +9,7 @@
 --< GDMO.Include "X.721.gdmo" >--
 --< GDMO.Include "X.738.gdmo" >--
 --< GDMO.Document "Rec. X.746 (1995)" >--
+--< GDMO.Namespace itut_x746 >--
 --< GDMO.Alias "Rec. X.746 (1995)" "ITU-T Recommendation X.746" >--
 --< GDMO.Version 1.3 >--
 --< GDMO.Copyright

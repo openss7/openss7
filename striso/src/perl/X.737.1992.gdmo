@@ -1,3 +1,6 @@
+--< GDMO.Document "ITU-T Rec. X.737 (1992)" >--
+--< GDMO.Namespace itut_x737 >--
+MODULE "ITU-T Rec. X.737 (1992)"
 -- A.2 Generic Object Classes
 -- A.2.1 Connection Test Object
 connectionTestObject MANAGED OBJECT CLASS
@@ -618,3 +621,5 @@ waitingInterval ATTRIBUTE
 WITH ATTRIBUTE SYNTAX TestCategories-ASN1Module.WaitingInterval;
 MATCHES FOR EQUALITY, ORDERING;
 ;--REGISTERED AS {part14Attribute ??};
+END
+--< GDMO.EndDocument "ITU-T Rec. X.737 (1992)" >--

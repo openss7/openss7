@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 MetricModule {joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0} >--
 -- A.5 ASN.1 definitions
 MetricModule {joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0}
 DEFINITIONS IMPLICIT TAGS ::=

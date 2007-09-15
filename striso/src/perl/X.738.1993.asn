@@ -1,3 +1,4 @@
+--< ASN1.Version 1994 SummarizationASN1Productions { joint-iso-ccitt ms(9) function(2) part13(13) asn1Module(2) 0 } >--
 -- A.9 ASN.1 definitions
 SummarizationASN1Productions { joint-iso-ccitt ms(9) function(2) part13(13) asn1Module(2) 0 }
 DEFINITIONS IMPLICIT TAGS ::=

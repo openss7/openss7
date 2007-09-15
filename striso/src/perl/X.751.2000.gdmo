@@ -4,14 +4,14 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Tue Sep  4 22:25:57 MDT 2007
+--@@ Date: Fri Sep 14 00:22:48 MDT 2007
 --@@ 
---< GDMO.Document "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" >--
---< GDMO.Namespace "x751" >--
+--< GDMO.Document "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" { joint-iso-ccitt ms(9) function(2) part17(17) } >--
+--< GDMO.Namespace itut_x751 >--
 --< GDMO.Alias "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" "X.751",
 --  "ITU-T Rec. X.751 (1995)/Cor.1 (1998) | ISO/IEC 10164-17 : 1996/Cor.1 : 1999" >--
 --  "ITU-T Rec. X.751 (1995)/Cor.2 (2000) | ISO/IEC 10164-17 : 1996/Cor.2 : 2001" >--
-MODULE "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996"
+MODULE "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" { joint-iso-ccitt ms(9) function(2) part17(17) }
 -- Annex A
 -- Management information definitions
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -301,7 +301,7 @@ secondaryInstanceUnavailable PARAMETER
 REGISTERED AS { part17Parameter 10 };
 
 END
---< GDMO.EndDocument "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" >--
+--< GDMO.EndDocument "ITU-T Rec. X.751 (1995) | ISO/IEC 10164-17 : 1996" { joint-iso-ccitt ms(9) function(2) part17(17) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 
@@ -324,5 +324,4 @@ END
 --@@ ClassReference references undefined "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top
 --@@ ClassReference references undefined "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top
 --@@ ClassReference references undefined "Rec. X.721 (1992) | ISO/IEC 10165-2:1992":top
---@@ vim: comments=\b\:--
---@@ vim: formatoptions+=tcqlornw tw=120 nocin nosi
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

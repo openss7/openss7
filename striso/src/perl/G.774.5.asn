@@ -1,21 +1,40 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:04:56 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. G.774.5"
+--  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) } >--
+MODULE "ITU-T Rec. G.774.5" { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) }
+--< ASN1.Version 1994 SDHCSASN1
+--  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) asn1Module(2) sdhcs(0) } >--
 -- 15 Supporting ASN.1 productions
-SDHCSASN1 {itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(05)
-informationModel(0) asn1Module(2) sdhcs(0)}
+SDHCSASN1 { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) asn1Module(2) sdhcs(0) }
 DEFINITIONS IMPLICIT TAGS ::=
 BEGIN
 -- EXPORTS Everything
 IMPORTS
-PathTrace FROM SDH {itu-t(0) recommendation(0) g(7) sdhm(774) informationModel(0)
-asn1Module(2) sdh(0)};
-sdhCS OBJECT IDENTIFIER ::= {itu-t(0) recommendation(0) g(7) g774(774)
-hyphen(127) cs(05) informationModel(0)}
-g774-05MObjectClass OBJECT IDENTIFIER ::= {sdhCS managedObjectClass(3)}
-g774-05Package OBJECT IDENTIFIER ::={sdhCS package(4)}
-g774-05NameBinding OBJECT IDENTIFIER ::= {sdhCS nameBinding(6)}
-g774-05Attribute OBJECT IDENTIFIER ::={sdhCS attribute(7)}
+PathTrace
+	FROM SDH { itu-t(0) recommendation(0) g(7) sdhm(774) informationModel(0) asn1Module(2) sdh(0) };
+sdhCS OBJECT IDENTIFIER ::= { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) }
+g774-05MObjectClass OBJECT IDENTIFIER ::= { sdhCS managedObjectClass(3) }
+g774-05Package OBJECT IDENTIFIER ::= { sdhCS package(4) }
+g774-05NameBinding OBJECT IDENTIFIER ::= { sdhCS nameBinding(6) }
+g774-05Attribute OBJECT IDENTIFIER ::= { sdhCS attribute(7) }
 Boolean ::= BOOLEAN
 defaultNull Null ::= NULL
 Null ::= NULL
 PathTraceRS ::= GraphicString
 END
 
+END
+--< GDMO.EndDocument "ITU-T Rec. G.774.5"
+--  { itu-t(0) recommendation(0) g(7) g774(774) hyphen(127) cs(5) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

@@ -1,3 +1,4 @@
+--< GDMO.Copyright
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: X.711.asn,v $ $Name:  $($Revision: 0.9.2.1 $) $Date: 2007/09/06 10:59:02 $
@@ -54,7 +55,10 @@
 -- - added new gdmo files
 --
 -- =============================================================================
+-- >--
 
+--< ASN1.Version 1994 CMIP-A-ASSOCIATE-Information
+--  {joint-iso-itu-t ms(9) cmip(1) modules(0) aAssociateUserInfo(1)} >--
 CMIP-A-ASSOCIATE-Information {joint-iso-itu-t ms(9) cmip(1) modules(0) aAssociateUserInfo(1)}
 DEFINITIONS ::= BEGIN
 FunctionalUnits ::= BIT STRING {
@@ -75,7 +79,10 @@ CMIPUserInfo ::= SEQUENCE {
 ProtocolVersion ::= BIT STRING {version1 (0), version2 (1)}
 END
 
-CMIP-A-ABORT-Information {joint-iso-itu-t ms(9) cmip(1) modules(0) aAbortUserInfo(2)} DEFINITIONS ::= BEGIN
+--< ASN1.Version 1994 CMIP-A-ABORT-Information
+--  {joint-iso-itu-t ms(9) cmip(1) modules(0) aAbortUserInfo(2)} >--
+CMIP-A-ABORT-Information {joint-iso-itu-t ms(9) cmip(1) modules(0) aAbortUserInfo(2)}
+DEFINITIONS ::= BEGIN
 
 -- Information carried in user-information parameter of A -ABORT
 CMIPAbortInfo ::= SEQUENCE {abortSource [0] IMPLICIT CMIPAbortSource,
@@ -87,8 +94,11 @@ CMIPAbortSource ::= ENUMERATED {cmiseServiceUser (0),
 cmiseServiceProvider (1)}
 
 END
+--< ASN1.Version 1994 CMIP-1
+--  {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)} >--
 -- Common Management Information Protocol (CMIP)
-CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)} DEFINITIONS ::= BEGIN
+CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)}
+DEFINITIONS ::= BEGIN
 -- Remote Operations definitions
 IMPORTS OPERATION, ERROR FROM Remote-Operation-Notation {joint-iso-ccitt remote-operations(4) notation(0)}
 -- Remote Operations Service definitions
@@ -353,7 +363,10 @@ SpecificErrorInfo ::= SEQUENCE {
 
 END -- End of CMIP syntax definitions
 
-CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)} DEFINITIONS ::= BEGIN
+--< ASN1.Version 1994 CMIP-1
+--  {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)} >--
+CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3)}
+DEFINITIONS ::= BEGIN
 
 -- Remote Operations definitions IMPORTS OPERATION, ERROR FROM Remote-Operation-Notation {joint-iso-ccitt remote-operations(4) notation(0)}
 

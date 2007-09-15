@@ -4,13 +4,14 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Sun Sep  9 06:07:41 MDT 2007
+--@@ Date: Sat Sep 15 06:33:11 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
---< GDMO.Document "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" { joint-iso-ccitt ms(9) function(2) part20(20) } >--
---< GDMO.Namespace x743 >--
+--< GDMO.Document "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
+--  { joint-iso-ccitt ms(9) function(2) part20(20) } >--
+--< GDMO.Namespace itut_x743 >--
 --< GDMO.Version 1.3 >--
-MODULE "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
+MODULE "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" { joint-iso-ccitt ms(9) function(2) part20(20) }
 -- Annex A
 -- Definition of Time Management Information
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -664,7 +665,8 @@ selectWeight ATTRIBUTE
 REGISTERED AS { TimeMF.selectWeightOID };
 
 END
---< GDMO.EndDocument "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999" { joint-iso-ccitt ms(9) function(2) part20(20) } >--
+--< GDMO.EndDocument "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999"
+--  { joint-iso-ccitt ms(9) function(2) part20(20) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 
@@ -673,35 +675,35 @@ END
 --@@
 --@@ Derivation Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":top
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventForwardingDiscriminator
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":eventLogRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":alarmRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":attributeValueChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectCreationRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":objectDeletionRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":relationshipChangeRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":securityAlarmReportRecord
---@@ |  |  +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":stateChangeRecord
---@@ +- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":clockSource
---@@ |  +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":localClock
---@@ |  +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":referenceClock
---@@ +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":synchronizationProtocol
---@@ |  +- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":ntpProtocol
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x743::clockSource
+--@@ |  +- itut_x743::localClock
+--@@ |  +- itut_x743::referenceClock
+--@@ +- itut_x743::synchronizationProtocol
+--@@ |  +- itut_x743::ntpProtocol
 --@@
 
 --@@
 --@@ Containment Tree:
 --@@
---@@ "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":system
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":discriminator
---@@ >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":log
---@@ |  >- "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992":logRecord
---@@ >- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":clockSource
---@@ >- "ITU-T Rec. X.743 (1998) | ISO/IEC 10164-20 : 1999":synchronizationProtocol
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x743::clockSource
+--@@ >- itut_x743::synchronizationProtocol
 --@@
 --@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

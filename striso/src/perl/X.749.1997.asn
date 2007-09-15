@@ -1,101 +1,105 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 06:02:58 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.749 (1997) | ISO/IEC 10164-19 : 1997"
+--  { joint-iso-itu-t ms(9) function(2) part19(19) } >--
+MODULE "ITU-T Rec. X.749 (1997) | ISO/IEC 10164-19 : 1997" { joint-iso-itu-t ms(9) function(2) part19(19) }
+--< ASN1.Version 1994 MDMPMF
+--  { joint-iso-itu-t ms(9) function(2) part19(19) asn1Module(2) 1 } >--
 -- A.1 Allocation of object identifiers
 -- This Recommendation | International Standard allocates the following object identifiers:
 MDMPMF { joint-iso-itu-t ms(9) function(2) part19(19) asn1Module(2) 1 }
-DEFINITIONS ::= BEGIN
-mdmpmfFunctionalUnitPackage OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) functionalUnitPackage(1) }
-mdmpmfManagedObject OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) managedObject(3) }
-mdmpmfPackage OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) package(4) }
-mdmpmfParameter OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) parameter(5) }
-mdmpmfNameBinding OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) nameBinding(6) }
-mdmpmfAttribute OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) attribute(7) }
-mdmpmfAction OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) action(8) }
-mdmpmfNotification OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) notification(10) }
-mdmpmfRelationship OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) relationship (11) }
-mdmpmfRelationshipMapping OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) relationshipMapping(12) }
+DEFINITIONS ::=
+BEGIN
+mdmpmfFunctionalUnitPackage OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) functionalUnitPackage(1) }
+mdmpmfManagedObject OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) managedObject(3) }
+mdmpmfPackage OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) package(4) }
+mdmpmfParameter OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) parameter(5) }
+mdmpmfNameBinding OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) nameBinding(6) }
+mdmpmfAttribute OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) attribute(7) }
+mdmpmfAction OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) action(8) }
+mdmpmfNotification OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) notification(10) }
+mdmpmfRelationship OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) relationship(11) }
+mdmpmfRelationshipMapping OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) relationshipMapping(12) }
 --
 -- The following arcs support the defined policy classes.
 --
-assertedValueIdentifier OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) }
-operationType OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-operationType(1) }
-errorType OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-errorType(2) }
-notificationType OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-notificationType(3) }
-actionType OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-actionType(4) }
-eventInfo OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-eventInfo(5) }
-eventReply OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-eventReply(6) }
-actionInfo OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-actionInfo(7) }
-actionReply OBJECT IDENTIFIER ::=
-{ joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13)
-actionReply(8) }
-OneToOne ::= INTEGER (1 .. 1)
+assertedValueIdentifier OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) }
+operationType OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) operationType(1) }
+errorType OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) errorType(2) }
+notificationType OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) notificationType(3) }
+actionType OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) actionType(4) }
+eventInfo OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) eventInfo(5) }
+eventReply OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) eventReply(6) }
+actionInfo OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) actionInfo(7) }
+actionReply OBJECT IDENTIFIER ::= { joint-iso-itu-t ms(9) function(2) part19(19) assertedValueIdentifier(13) actionReply(8) }
+OneToOne ::= INTEGER(1..1)
 END
+
+--< ASN1.Version 1994 MdmpmfASN1Module
+--  { joint-iso-itu-t ms(9) function(2) part19(19) asn1Module(2) 2 } >--
 -- A.10 ASN.1
 -- This Recommendation | International Standard defines the following ASN.1 module:
-MdmpmfASN1Module { joint-iso-itu-t ms(9) function(2) part19(19) asn1Module(2) 2}
-DEFINITIONS ::= BEGIN
+MdmpmfASN1Module { joint-iso-itu-t ms(9) function(2) part19(19) asn1Module(2) 2 }
+DEFINITIONS ::=
+BEGIN
 IMPORTS
 ObjectInstance, CMISFilter, ActionArgument, GetArgument, SetArgument
-FROM CMIP-1 {joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3) }
+	FROM CMIP-1 { joint-iso-itu-t ms(9) cmip(1) modules(0) protocol(3) }
 SimpleNameType
-FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1
-}
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 }
 CommonError, OperationResult
-FROM Schedule-ASN1Module { joint-iso-itu-t ms(9) function(2) part15(15) modules(1)}
+	FROM Schedule-ASN1Module { joint-iso-itu-t ms(9) function(2) part15(15) modules(1) }
 TimeStamp
-FROM Time-ASN1Module { joint-iso-itu-t ms(9) ms(9) smi(3) part20(20) asn1Module(2)
-1 };
+	FROM Time-ASN1Module { joint-iso-itu-t ms(9) ms(9) smi(3) part20(20) asn1Module(2) 1 };
 ApplyOperationToMembershipReply ::= SEQUENCE OF OperationResult
 ApplyOperationToMembershipRequest ::= CHOICE {
-set [0] IMPLICIT SetArgument,
-action [1] IMPLICIT ActionArgument,
-get [2] IMPLICIT GetArgument }
-Completeness ::= ENUMERATED { completenessUnknown (0),
-knownComplete (1),
-knownNotComplete (2) }
-DetermineViolationStatusReply ::= ENUMERATED { unknown (1),
-no-violation (2),
-violation-detected (3),
-non-member (4) }
+	set [0] IMPLICIT SetArgument,
+	action [1] IMPLICIT ActionArgument,
+	get [2] IMPLICIT GetArgument }
+Completeness ::= ENUMERATED {
+	completenessUnknown(0),
+	knownComplete(1),
+	knownNotComplete(2) }
+DetermineViolationStatusReply ::= ENUMERATED {
+	unknown(1),
+	no-violation(2),
+	violation-detected(3),
+	non-member(4) }
 DetermineViolationStatusRequest ::= ObjectInstance
 InformationString ::= GeneralString
-ListMembershipReply ::= SEQUENCE { completeness Completeness,
-membership Membership }
+ListMembershipReply ::= SEQUENCE {
+	completeness Completeness,
+	membership Membership }
 Membership ::= SET OF ObjectInstance
-MembershipStatus ::= ENUMERATED { unknown (1),
-member (2),
-non-member (3) }
+MembershipStatus ::= ENUMERATED {
+	unknown(1),
+	member(2),
+	non-member(3) }
 Nothing ::= NULL
-PolicyViolation ::= SEQUENCE { violatorName ObjectInstance,
-violatedPolicy ObjectInstance }
-VerifyMembershipStatusReply ::= SEQUENCE { objectName ObjectInstance,
-membershipStatus MembershipStatus
-}
+PolicyViolation ::= SEQUENCE {
+	violatorName ObjectInstance,
+	violatedPolicy ObjectInstance }
+VerifyMembershipStatusReply ::= SEQUENCE {
+	objectName ObjectInstance,
+	membershipStatus MembershipStatus }
 VerifyMembershipStatusRequest ::= ObjectInstance
-ViolationStatus ::= ENUMERATED { unknown (1),
-no-violation (2),
-violation-detected (3) }
+ViolationStatus ::= ENUMERATED {
+	unknown(1),
+	no-violation(2),
+	violation-detected(3) }
 END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.749 (1997) | ISO/IEC 10164-19 : 1997"
+--  { joint-iso-itu-t ms(9) function(2) part19(19) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi
