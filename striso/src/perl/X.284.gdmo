@@ -1,0 +1,2124 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 13:38:50 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Document "ITU-T Rec. X.284 (1997)"
+--  { joint-iso-ccitt transport-layer(14) management(0) } >--
+--< GDMO.Namespace itut_x284 >--
+MODULE "ITU-T Rec. X.284 (1997)" { joint-iso-ccitt transport-layer(14) management(0) }
+-- 5.2  Common transport layer GDMO definitions
+
+commonCreationDeletion-B BEHAVIOUR
+	DEFINED AS
+		!Managed object class imports the X.721 | 10165-2 objectCreation and 
+		objectDeletion notifications. Used as follows:
+
+		ObjectCreation Generated whenever an instance of the managed object class is 
+		created. Implementations may optionally include the sourceIndicator parameter in 
+		the notification. If creation occured as a result of internal operation of the 
+		resource, the value 'resourceOperation' is used. If creation occured in response 
+		to a management operation, the value 'managementOperation' is used. A value of 
+		'unknown' may be returned if it is not possible to determine the source of the 
+		operation. None of the other optional parameters are used.
+
+		ObjectDeletion Generated whenever an instance of the managed object class is 
+		deleted. Implementations may optionally include the sourceIndicator parameter in 
+		the notification. If deletion occured as a result of internal operation of the 
+		resource, the value 'resourceOperation' is used. If deletion occured in response 
+		to a management operation, the value 'managementOperation' is used. A value of 
+		'unknown' may be returned if it is not possible to determine the source of the 
+		operation. None of the other optional parameters are used.!;
+
+
+commonStateChange-B BEHAVIOUR
+	DEFINED AS
+		!Managed object class imports the X.721 | 10165-2 stateChange notification. Used 
+		to report the changes to the operationalState attribute, and where present, the 
+		administrativeState attribute. A single parameter set is included in the State 
+		change definition field. Only the (mandatory) attributeId and (optional) 
+		newAttributeValue parameters are used.!;
+
+
+octetsSentReceivedCounter-B BEHAVIOUR
+	DEFINED AS
+		!The octetsSentCounter and octetsReceivedCounter shall count only user data 
+		octets in valid data TPDUs. They shall not count user data octets in data TPDUs 
+		which are rejected for any reason, nor user data octets in nondata TPDUs.!;
+
+
+successfulConnectionEstablishment-B BEHAVIOUR
+	DEFINED AS
+		!This Package imports the communicationsInformation notification from "GMI". It 
+		is used to report the following events: successfulConnectionEstablishment: 
+		Generated when a connection is successfully established. However the precise 
+		synchronization between the notification and the corresponding protocol and 
+		service interface interactions is not defined by this Recommendation | 
+		International Standard. The value TLM.successfulConnectionEstablishment shall be 
+		reported in the informationType field.!;
+
+
+deactivateConnection-B BEHAVIOUR
+	DEFINED AS
+		!The deactivate action causes the connection to be terminated. The termination 
+		should occur as rapidly as practical, but no particular time constraints are 
+		implied. Typically, this action simulates a disconnect request received across 
+		the service interface. If a more rapid means for terminating the connection 
+		exists, then this should be used. The termination shall occur in conformance to 
+		the protocol standard. The Managed Object remains in existence after completion 
+		of the Deactivate Action. It is subsequently deleted when the connection is 
+		terminated, in the same way as if the connection has been terminated by other 
+		means. A Deactivate action may fail (with the ProcessingError response) if it is 
+		temporarily not possible to terminate the connection.!;
+
+
+resettingTimer-B BEHAVIOUR
+	DEFINED AS
+		!This attribute specifies the interval between certain events in the operation of 
+		the protocol state machine. If the value of the attribute is changed to a new 
+		value while the protocol state machine is in operation, the implementation shall 
+		take the necessary steps to ensure that for any time interval which was in 
+		progress when the corresponding attribute was changed, the next expiration of 
+		that interval takes place no later than the expiration of the interval in 
+		progress or the specified interval whichever is the sooner. The precision with 
+		which this time shall be implemented shall be the same as that associated with 
+		the basic operation of the timer attribute.!;
+-- 5.3 Transport subsystem managed object
+-- Managed Object for Transport Layer Subsystem
+-- There is exactly one of these MOs within
+-- a system. It exists to provide a container for the layer entity MOs.
+--
+-- The transportSubsystem managed object cannot be created or deleted
+-- explicitly by management operation. It exists inherently in a system;
+-- created and deleted as part of system operation.
+
+
+transportSubsystem MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":subsystem;
+	-- which is derived from "DMI":top
+	CHARACTERIZED BY
+		transportSubsystem-P PACKAGE
+			ATTRIBUTES
+				"GMI":subsystemId
+					INITIAL VALUE TLM.transportSubsystemId-Value
+					GET;;;
+REGISTERED AS { TLM.moi transportSubsystem(1) };
+-- Name Bindings
+
+
+transportSubsystem-system NAME BINDING
+	SUBORDINATE OBJECT CLASS transportSubsystem AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "DMI":system AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":subsystemId;
+REGISTERED AS { TLM.nboi transportSubsystem-system(1) };
+-- 5.4 Transport entity managed object
+-- There may be multiple instances of these MOs within a system.
+-- Its definition permits it to be deleted and created explicitly by
+-- management operation, or to be created and deleted automatically
+-- as part of system operation.
+
+
+transportEntity MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":communicationsEntity;
+	-- which is derived from "DMI":top
+	CHARACTERIZED BY
+		transportEntity-P PACKAGE
+			BEHAVIOUR
+				tEPackageImportedNotifications-B,
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				actualNSAP GET,
+				checksumErrorsDetected GET,
+				protocolErrors GET,
+				targetNSAP GET-REPLACE ADD-REMOVE,
+				undecodedNSDUs GET;
+			ATTRIBUTE GROUPS
+				-- The following attribute group is present in each of the transport
+				-- MOs which define counters. It allows all of the
+				-- counters to be retrieved in a single request.
+				"GMI":counters
+					checksumErrorsDetected
+					protocolErrors
+					undecodedNSDUs;
+			NOTIFICATIONS
+				-- protocolErrorNotification;
+				-- The following notification is issued by the entity MO
+				-- because in some cases it may be impossible to associate the
+				-- protocol Error with any of the protocol Machines.
+				"DMI":communicationsAlarm
+					tEProtocolErrorPDUHeader
+					tEProtocolErrorSourceAddress
+					tEProtocolErrorReasonCode,
+				"DMI":objectDeletion,
+				"DMI":objectCreation;;;
+REGISTERED AS { TLM.moi transportEntity(2) };
+-- Behaviours
+-- Definition of the tEPackageImportedNotifications and of the mapping
+-- of specific protocol error parameters into the fields of
+-- communicationsAlarm Notification.
+--
+
+
+tEPackageImportedNotifications-B BEHAVIOUR
+	DEFINED AS
+		!Notification issued when a Transport Entity receives a PDU which is invalid or 
+		contains a protocol error. The notification includes the header of the invalid 
+		PDU, the source N-Address, and the reason why the PDU is considered to be in 
+		error. The Reason code appears only if the protocol error relates to the 
+		connection-mode protocol, and if it has been possible to relate the PDU to a 
+		particular connection. The reason code is the value placed in the corresponding 
+		parameter of the ER TPDU, if sent. The tEPackage imports the communicationsAlarm 
+		Notification from DMI, in order to report the ProtocolError event. The 
+		probableCause shall be set to TLM.communicationsProtocolError. The 
+		tEProtocolErrorPDUheader, tEProtocolErrorSourceAddress and 
+		tEProtocolErrorReasonCode are reported as parameters in the 
+		additionalInformation field of the communicationsAlarm. The significance 
+		subparameter of each item of the problemData shall be set to the value mFalset 
+		(i.e. not significant) so that a managing system receiving the event will be 
+		less likely to reject it. The perceivedSeverity shall be set to Minor. A 
+		subsequent communicationsAlarm with a perceivedSeverity value of TClearede shall 
+		not be generated. No other fields or parameters shall be used, with the 
+		exception of further parameters in the additionalInformationfield.!;
+-- Name Bindings
+
+
+transportEntity-transportSubsystem-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS transportEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":communicationsEntityId;
+	BEHAVIOUR
+		transportEntity-transportSubsystem-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!This name binding shall be used when the transportEntity MO is created 
+				automatically by the operation of the system. The details of this operation are 
+				outside the scope of this Recommendation.!;;
+REGISTERED AS { TLM.nboi transportEntity-transportSubsystem-Automatic(11) };
+
+
+transportEntity-transportSubsystem-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS transportEntity AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportSubsystem AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":communicationsEntityId;
+	BEHAVIOUR
+		transportEntity-transportSubsystem-Management-B BEHAVIOUR
+			DEFINED AS
+				!This name binding shall be used when the transportEntity MO is created by 
+				management.!;;
+	CREATE;
+	DELETE;
+REGISTERED AS { TLM.nboi transportEntity-transportSubsystem-Management(12) };
+-- Attributes
+
+
+actualNSAP ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.LocalDistinguishedNames;
+	MATCHES FOR EQUALITY, SET-INTERSECTION;
+	BEHAVIOUR
+		actualNSAP-B BEHAVIOUR
+			DEFINED AS
+				!The actual MO name(s) of the NSAP(s) in use by this Transport Entity!;;
+REGISTERED AS { TLM.aoi actualNSAP(4) };
+
+
+checksumErrorsDetected ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		clChecksumErrorsDetected-B BEHAVIOUR
+			DEFINED AS
+				!The number of PDUs received with an incorrect checksum!;;
+REGISTERED AS { TLM.aoi checksumErrorsDetected(6) };
+
+
+protocolErrors ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		protocolErrors-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated to protocol errors!;;
+REGISTERED AS { TLM.aoi protocolErrors(7) };
+
+
+targetNSAP ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.LocalDistinguishedNames;
+	MATCHES FOR EQUALITY, SET-INTERSECTION;
+	BEHAVIOUR
+		targetNSAP-B BEHAVIOUR
+			DEFINED AS
+				!The MO name(s) of the NSAP(s) to be used by this Transport Entity. The value of 
+				this attribute cannot be changed unless the Operational State of the entity is 
+				Off. An implementation may permit it to be set only at creation of the 
+				transportEntity MO. An implementation may permit the size of the set to be 
+				restricted to 1. An implementation may permit a null value (empty set) to be 
+				specified, in which case some systemdependent auto configuration takes place!;;
+REGISTERED AS { TLM.aoi targetNSAP(3) };
+
+
+undecodedNSDUs ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		undecodedNSDUs-B BEHAVIOUR
+			DEFINED AS
+				!Number of NSDUs that cannot be attributed to any protocol machines!;;
+REGISTERED AS { TLM.aoi undecodedNSDUs(5) };
+-- Parameters
+
+
+tEProtocolErrorPDUHeader PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.PDUHeaderSyntax;
+	BEHAVIOUR
+		pDUHeader-B BEHAVIOUR
+			DEFINED AS
+				!Header of the invalid PDU that caused the event. Returned in the problemData 
+				field of a communicationsAlarm notification!;;
+REGISTERED AS { TLM.proi tEProtocolErrorPDUHeader(1) };
+
+
+tEProtocolErrorSourceAddress PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.SourceAddressSyntax;
+	BEHAVIOUR
+		sourceAddress-B BEHAVIOUR
+			DEFINED AS
+				!Source N-Address of the invalid PDU that caused the event. Returned in the 
+				problemData field of a communicationsAlarm notification!;;
+REGISTERED AS { TLM.proi tEProtocolErrorSourceAddress(2) };
+
+
+tEProtocolErrorReasonCode PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.ReasonCodeSyntax;
+	BEHAVIOUR
+		reasonCode-B BEHAVIOUR
+			DEFINED AS
+				!Reason why the PDU is in error as placed in the corresponding parameter of the 
+				ER TPDU. Returned in the problemData field of a communicationsAlarm 
+				notification. This parameter is optional!;;
+REGISTERED AS { TLM.proi tEProtocolErrorReasonCode(3) };
+-- 5.5 Connectionless-mode transport protocol machine managed object
+-- There is no more than one of these MOs per Transport Entity.
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation, but in some systems it will exist inherently
+-- and neither creation nor deletion by management operation
+-- will be possible. Name bindings are defined for both cases.
+--
+-- When the protocol Machine is operable, the operationalState shall
+-- have the value oenabledn; otherwise it shall have the value
+-- hdisabledv.
+--
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification. An clmodeTPM MO may be created in the
+-- senabledn operational state.
+
+
+clmodeTPM MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":clProtocolMachine;
+	-- which is derived from "DMI":top
+	CHARACTERIZED BY
+		clmodeTPM-P PACKAGE
+			BEHAVIOUR
+				clPackageImportedNotifications-B,
+				commonStateChange-B,
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				"DMI":administrativeState GET-REPLACE,
+				"GMI":clProtocolMachineId
+					INITIAL VALUE TLM.clmodeTPMId-Value
+					GET,
+				clChecksumOption REPLACE-WITH-DEFAULT GET-REPLACE,
+				"DMI":octetsSentCounter GET,
+				"DMI":octetsReceivedCounter GET,
+				"DMI":pdusSentCounter GET,
+				"DMI":pdusReceivedCounter GET,
+				undeliverablePDUsCounter GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":administrativeState
+					"DMI":operationalState,
+				"GMI":counters
+					"DMI":octetsSentCounter
+					"DMI":octetsReceivedCounter
+					"DMI":pdusSentCounter
+					"DMI":pdusReceivedCounter
+					undeliverablePDUsCounter;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange,
+				"DMI":communicationsAlarm
+					clPMPDUHeader
+					clPMSourceAddress;;;
+REGISTERED AS { TLM.moi clmodeTPM(3) };
+-- Behaviours
+-- Definition of the clPackageImportedNotifications and
+-- of the mapping of specific parameters into the fields
+-- of communicationsAlarm Notification.
+
+
+clPackageImportedNotifications-B BEHAVIOUR
+	DEFINED AS
+		!The clmodeTPM-P package imports communicationsAlarm from DMI, in order to report 
+		the Undeliverable PDU event. The probableCause is set to 
+		TLM.communicationsProtocolError. The clPMPDUheader and clPMSourceAddress are 
+		reported as parameters in the additionalInformation field of the 
+		communicationsAlarm. The significance subparameter of each item of the 
+		additionalInformation shall be set to the value iFalsea (i.e. not significant) 
+		so that a managing system receiving the event will be less likely to reject it. 
+		The perceivedSeverity shall be set to Minor. A subsequent communicationsAlarm 
+		with a perceived Severity value of iClearedr shall not be generated. No other 
+		fields or parameters shall be used, with the exception of further parameters in 
+		the additionalInformationfield.!;
+
+
+clmodeTPM-transportEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS clmodeTPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":clProtocolMachineId;
+	BEHAVIOUR
+		clmodeTPM-transportEntity-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the clmodeTPM managed object can be 
+				explicitly created and deleted by management!;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { TLM.nboi clmodeTPM-transportEntity-Management(3) };
+
+
+clmodeTPM-transportEntity-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS clmodeTPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":clProtocolMachineId;
+	BEHAVIOUR
+		clmodeTPM-transportEntity-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the clmodeTPM managed object cannot be 
+				explicitly created and deleted by management!;;
+REGISTERED AS { TLM.nboi clmodeTPM-transportEntity-Automatic(9) };
+-- Attributes
+
+
+clChecksumOption ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		clChecksumOption-B BEHAVIOUR
+			DEFINED AS
+				!Enables use of the checksum option in ITU-T Rec. X.234 | ISO/IEC 8602 PDUs (in 
+				the absence of over-riding local controls) use (TRUE) or non-use (FALSE)!;;
+REGISTERED AS { TLM.aoi clChecksumOption(9) };
+
+
+undeliverablePDUsCounter ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		undeliverablePDUsCounter-B BEHAVIOUR
+			DEFINED AS
+				!Counter associated with the notification as recommended in GDMO 9.8.5 (the 
+				notification may be suppressed)!;;
+REGISTERED AS { TLM.aoi undeliverablePDUsCounter(10) };
+-- Parameters
+
+
+clPMPDUHeader PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.PDUHeaderSyntax;
+	BEHAVIOUR
+		clPMPDUHeader-B BEHAVIOUR
+			DEFINED AS
+				!Header of the PDU that cannot be delivered. Returned in the problemData field of 
+				a communicationsAlarm notification!;;
+REGISTERED AS { TLM.proi clPMPDUHeader(4) };
+
+
+clPMSourceAddress PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.SourceAddressSyntax;
+	BEHAVIOUR
+		clPMsourceAddress-B BEHAVIOUR
+			DEFINED AS
+				!Source N-Address. Returned in the problemData field of a communicationsAlarm 
+				notification!;;
+REGISTERED AS { TLM.proi clPMSourceAddress(5) };
+-- 5.6 Connection-oriented transport protocol machine managed object
+-- There is no more than one of these MOs per Transport Entity.
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation, but in some systems it will exist inherently
+-- and neither creation nor deletion by management operation
+-- will be possible. Name bindings are defined for both cases.
+--
+-- When the protocol machine is operable, the operationalState shall
+-- have the value oenabledn; otherwise it shall have the value
+-- hdisabledv.
+--
+-- Transitions of operationalState shall be reported using the
+-- stateChange notification. An comodeTPM MO may be created in the
+-- senabledn operational state.
+
+
+comodeTPM MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":coProtocolMachine;
+	-- which is derived from "DMI":top
+	CHARACTERIZED BY
+		comodeTPM-P PACKAGE
+			BEHAVIOUR
+				commonStateChange-B,
+				commonCreationDeletion-B,
+				comodeTPMImportedNotifications-B;
+			ATTRIBUTES
+				"DMI":administrativeState GET-REPLACE,
+				"DMI":octetsReceivedCounter GET,
+				"DMI":octetsSentCounter GET,
+				"GMI":coProtocolMachineId
+					INITIAL VALUE TLM.comodeTPMId-Value
+					GET,
+				localErrorDisconnects GET,
+				localSuccessfulConnections GET,
+				localUnsuccessfulConnections GET,
+				maxConnections REPLACE-WITH-DEFAULT GET-REPLACE,
+				maxOpenConnections REPLACE-WITH-DEFAULT GET,
+				openConnections GET,
+				remoteErrorDisconnects GET,
+				remoteSuccessfulConnections GET,
+				remoteUnsuccessfulConnections GET,
+				unassociatedTPDUs GET;
+			ATTRIBUTE GROUPS
+				"DMI":state
+					"DMI":administrativeState
+					"DMI":operationalState,
+				-- The following attribute group is present in each of the transport
+				-- MOs which define counters. It allows all of the
+				-- counters to be retrieved in a single request.
+				"GMI":counters
+					"DMI":octetsSentCounter
+					"DMI":octetsReceivedCounter
+					openConnections
+					localSuccessfulConnections
+					remoteSuccessfulConnections
+					localUnsuccessfulConnections
+					remoteUnsuccessfulConnections
+					localErrorDisconnects
+					remoteErrorDisconnects
+					unassociatedTPDUs
+					maxOpenConnections;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange,
+				-- incomingConnectionRejected
+				"GMI":communicationsInformation
+					rejectionCause
+					callingNSAPAddress-PAR
+					calledNSAPAddress-PAR
+					callingTSelector-PAR
+					calledTSelector-PAR
+					networkConnectionIDs-PAR;;;
+REGISTERED AS { TLM.moi comodeTPM(4) };
+-- Behaviours
+
+
+comodeTPMImportedNotifications-B BEHAVIOUR
+	DEFINED AS
+		!The comodeTPM-P package imports the communicationsInformation notification from 
+		"ITU-T Rec. X.723 | ISO/IEC 10165-5" in order to report when an incoming 
+		connection is rejected. The value TLM.incomingConnectionRejected shall be 
+		reported in the informationType field. The rejection Cause, Calling NSAP 
+		Address, Called NSPA Address, Calling TSelector, Called TSelector and Network 
+		ConnectionId shall be reported as parameters in the informationData field!;
+-- Name Bindings
+
+
+comodeTPM-transportEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS comodeTPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		comodeTPM-transportEntity-Management-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the comodeTPM managed object can be 
+				explicitly created and deleted by management!;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { TLM.nboi comodeTPM-transportEntity-Management(4) };
+
+
+comodeTPM-transportEntity-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS comodeTPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":coProtocolMachineId;
+	BEHAVIOUR
+		comodeTPM-transportEntity-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the comodeTPM managed object cannot be 
+				explicitly created and deleted by management!;;
+REGISTERED AS { TLM.nboi comodeTPM-transportEntity-Automatic(10) };
+-- Attributes
+
+
+localErrorDisconnects ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		localErrorDisconnects-B BEHAVIOUR
+			DEFINED AS
+				!The number of transport disconnects initiated by the local entity upon issuing a 
+				DR TPDU with an error code other than "Normal disconnect initiated by Service 
+				User", or upon issuing an ER TPDU!;;
+REGISTERED AS { TLM.aoi localErrorDisconnects(18) };
+
+
+localSuccessfulConnections ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		localSuccessfulConnections-B BEHAVIOUR
+			DEFINED AS
+				!Number of transport connections initiated by the local entity which have reached 
+				the Open state!;;
+REGISTERED AS { TLM.aoi localSuccessfulConnections(14) };
+
+
+localUnsuccessfulConnections ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		localUnsuccessfulConnections-B BEHAVIOUR
+			DEFINED AS
+				!The number of (local) unsuccessful transport connections initiated by the local 
+				Transport Entity which failed to reach the Open State. (Retransmission of CR 
+				TPDUs is not included in this counter)!;;
+REGISTERED AS { TLM.aoi localUnsuccessfulConnections(16) };
+
+
+maxConnections ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxConnections-B BEHAVIOUR
+			DEFINED AS
+				!The maximum number of simultaneously open transport connections allowed by the 
+				Transport Entity. There may be a period during which the openConnection 
+				attribute has a value which is greater than maxConnections. During this period, 
+				it shall not be permitted to initiate or accept new connections. It is a local 
+				matter whether action is taken to reduce the number of open connections to a 
+				value less than or equal to maxConnections by terminating connections chosen in 
+				an implementation-dependent manner. Whether or not such action is taken, there 
+				may be a period during which the openConnections attribute has a value which is 
+				greater than maxConnections.!;;
+REGISTERED AS { TLM.aoi maxConnections(13) };
+
+
+maxOpenConnections ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxOpenConnections-B BEHAVIOUR
+			DEFINED AS
+				!The highest number of simultaneously open transport connections which has 
+				occurred since the last REPLACE-WITH-DEFAULT operation. The effect of this 
+				operation is to set the attribute to the number of currently open connections. 
+				Multiple managers need to coordinate their actions to avoid confusion!;;
+REGISTERED AS { TLM.aoi maxOpenConnections(21) };
+
+
+openConnections ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		openConnections-B BEHAVIOUR
+			DEFINED AS
+				!The number of transport connections which are in the Open state as defined in 
+				the state tables for ITU-T Rec. X.224 | ISO/IEC 8073. Updated upon each 
+				connection establishment and release!;;
+REGISTERED AS { TLM.aoi openConnections(12) };
+
+
+remoteErrorDisconnects ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		remoteErrorDisconnects-B BEHAVIOUR
+			DEFINED AS
+				!The number of disconnects initiated by a peer Transport Entity upon issuing a DR 
+				TPDU with an error code other than "Normal disconnect initiated by Session 
+				Entity" or upon issuing an ER TPDU!;;
+REGISTERED AS { TLM.aoi remoteErrorDisconnects(19) };
+
+
+remoteSuccessfulConnections ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		remoteSuccessfulConnections-B BEHAVIOUR
+			DEFINED AS
+				!Number of transport connections initiated by a remote entity which have reached 
+				the Open state!;;
+REGISTERED AS { TLM.aoi remoteSuccessfulConnections(15) };
+
+
+remoteUnsuccessfulConnections ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		remoteUnsuccessfulConnections-B BEHAVIOUR
+			DEFINED AS
+				!The number of (remote) unsuccessful transport connections initiated by a remote 
+				Transport Entity which failed to reach the open state!;;
+REGISTERED AS { TLM.aoi remoteUnsuccessfulConnections(17) };
+
+
+unassociatedTPDUs ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		unassociatedTPDUs-B BEHAVIOUR
+			DEFINED AS
+				!The number of TPDUs received which could not be associated with a Transport 
+				Connection. This counter is incremented only for such TPDUs received over the 
+				CONS!;;
+REGISTERED AS { TLM.aoi unassociatedTPDUs(20) };
+-- Parameters
+
+
+rejectionCause PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.DeletionCauseSyntax;
+	BEHAVIOUR
+		rejectionCause-B BEHAVIOUR
+			DEFINED AS
+				!Reason why the incoming Connection was rejected!;;
+REGISTERED AS { TLM.proi rejectionCause(7) };
+-- 5.7 TSAP managed object
+-- There is one tSAP MO for each TSAP currently
+-- recognized by the containing Transport Entity.
+-- Its definition permits it to be created and deleted by Management
+-- operation or to be created and deleted automatically as part
+-- of system operation.
+-- Some implementations may require TSAP MOs to be created
+-- explicitly through management before they can be used.
+-- Others may create them automatically when a user entity attaches
+-- itself to them (in some implementation-dependent fashion).
+-- In this case, it is recommended that the naming convention
+-- be used whereby the name of the Managed Object
+-- is the representation in hexadecimal of the Transport Selector of
+-- the TSAP, so that it is possible to configure Transport Users
+-- without system specific knowledge.
+
+
+tSAP MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":sap1;
+	-- which is derived from "DMI":top;
+	CHARACTERIZED BY
+		tSAP-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B;
+			ATTRIBUTES
+				"GMI":sap1Address
+					INITIAL VALUE DERIVATION RULE
+						tSAPAddress-B
+					GET;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { TLM.moi tSAP(5) };
+-- Behaviours
+
+
+tSAPAddress-B BEHAVIOUR
+	DEFINED AS
+		!If the package is created using the tSAP-transportEntity-Automatic name binding, 
+		it is recommended that the naming convention be used whereby the name of the MO 
+		is the representation in Hexadecimal of the Transport Selector of the TSAP. If 
+		the package is created using the tSAP-transportEntity-Management name binding, 
+		the initial value shall be specified in the CMIP create!;
+-- Name Bindings
+
+
+tSAP-transportEntity-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS tSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":sapId;
+	BEHAVIOUR
+		tSAP-transportEntity-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!This Name Binding corresponds to the use of TSAPs which are automatically 
+				created!;;
+REGISTERED AS { TLM.nboi tSAP-transportEntity-Automatic(5) };
+
+
+tSAP-transportEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS tSAP AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":sapId;
+	BEHAVIOUR
+		tSAP-transportEntity-management-B BEHAVIOUR
+			DEFINED AS
+				!This Name Binding corresponds to the use of TSAPs which are explicitly created 
+				by management. The value of the tsapID attribute shall be included in the Create 
+				operation, otherwise the create operation will fail!;;
+	CREATE;
+	DELETE;
+REGISTERED AS { TLM.nboi tSAP-transportEntity-Management(6) };
+-- 5.8 Transport connection managed object and IVMO
+-- 5.8.1 Transport connection managed object
+-- There may be multiple instances of these Managed Objects
+-- within a connection-oriented protocol Machine. Each corresponds
+-- to a Transport Connection. A transportConnection is created
+-- automatically as part of system operation. A transportConnection may
+-- be deleted automatically as part of system operation or
+-- may be deleted as a result of the deactivate management operation.
+-- A transportConnectionIVMO may be used as the source
+-- of initial values of attributes of a transportConnectionMO.
+--
+-- This section defines the Transport Connection Managed Object. The
+-- Transport Connection Managed Object contains the set of attributes
+-- characterizing the manageable aspects of a
+-- Transport Layer Protocol Connection.
+--
+-- An MO of this class exists corresponding to each active Transport
+-- Connection, i.e. for which a CR
+-- TPDU has been sent or received and which has not yet been
+-- terminated. An MO may also exist prior to transmission of a CR TPDU,
+-- corresponding to interactions across the service interface.
+-- The precise synchronization of the creation and deletion of the MO
+-- with the protocol exchanges corresponding to the Transport Connection
+-- is not however defined by this standard. For example,
+-- there may be a visible delay after transmission or reception of a CR
+-- TPDU or interaction at the service interface before the MO is created
+-- and becomes visible to management. A Transport
+-- Connection MO is not required for terminated connections whose
+-- References have been placed in the Frozen state (for Class 4
+-- operation), although according to the above the MO may remain
+-- visible for some time after the connection has in other respects been
+-- terminated.
+
+
+transportConnection MANAGED OBJECT CLASS
+	DERIVED FROM
+		"GMI":singlePeerConnection;
+	-- which is derived from "DMI":top
+	CHARACTERIZED BY
+		transportConnection-P PACKAGE
+			BEHAVIOUR
+				initialValues-B,
+				connectionCreationDeletion-B,
+				successfulConnectionEstablishment-B,
+				deactivateConnection-B,
+				transportConnection-B BEHAVIOUR
+					DEFINED AS
+						!The following point should be noted with regard to items inherited from 
+						elsewhere: octets sent/received counters count only octets of user data, not 
+						protocol control information.!;;
+			ATTRIBUTES
+				"DMI":octetsReceivedCounter GET,
+				"DMI":octetsSentCounter GET,
+				"DMI":pdusReceivedCounter GET,
+				"DMI":pdusRetransmittedErrorCounter GET,
+				"DMI":pdusSentCounter GET,
+				calledNSAPAddress GET,
+				calledTSelector GET,
+				callingNSAPAddress GET,
+				callingTSelector GET,
+				connectionDirection GET,
+				localReference GET,
+				maxTPDUSize GET,
+				networkConnectionIDs GET,
+				protocolClass GET,
+				protocolErrors GET,
+				remoteReference GET,
+				respondingNSAPAddress GET;
+			ATTRIBUTE GROUPS
+				"GMI":counters
+					"DMI":octetsReceivedCounter
+					"DMI":octetsSentCounter
+					"DMI":pdusReceivedCounter
+					"DMI":pdusSentCounter
+					"DMI":pdusRetransmittedErrorCounter
+					protocolErrors;
+			NOTIFICATIONS
+				"DMI":objectCreation
+					transportConnectionName
+					protocolClass-PAR
+					maxTPDUSize-PAR
+					callingTSelector-PAR
+					calledTSelector-PAR
+					callingNSAPAddress-PAR
+					calledNSAPAddress-PAR
+					respondingNSAPAddress-PAR
+					connectionDirection-PAR
+					networkConnectionIDs-PAR,
+				"DMI":objectDeletion
+					transportConnectionName
+					protocolClass-PAR
+					maxTPDUSize-PAR
+					callingTSelector-PAR
+					calledTSelector-PAR
+					callingNSAPAddress-PAR
+					calledNSAPAddress-PAR
+					respondingNSAPAddress-PAR
+					connectionDirection-PAR
+					networkConnectionIDs-PAR
+					objectDeletionCause,
+				-- successfulConnectionEstablishment
+				"GMI":communicationsInformation
+				-- The following parameters are reported in the informationData field
+				transportConnectionName
+					protocolClass-PAR
+					maxTPDUSize-PAR
+					callingTSelector-PAR
+					calledTSelector-PAR
+					callingNSAPAddress-PAR
+					calledNSAPAddress-PAR
+					respondingNSAPAddress-PAR
+					connectionDirection-PAR
+					networkConnectionIDs-PAR;;;
+	CONDITIONAL PACKAGES
+		transportConnectionClass1-P
+			PRESENT IF
+				!At the initiating side, present if class 1 is requested or can be accepted 
+				following class negotiation procedures. At the responding side, present if class 
+				1 is chosen!,
+		transportConnectionClass2-P
+			PRESENT IF
+				!At the initiating side, present if class 2 is requested or can be accepted 
+				following class negotiation procedures. At the responding side, present if class 
+				2 is chosen!,
+		transportConnectionClass3-P
+			PRESENT IF
+				!At the initiating side, present if class 3 is requested or can be accepted 
+				following class negotiation procedures. At the responding side, present if class 
+				3 is chosen!,
+		transportConnectionClass4-P
+			PRESENT IF
+				!At the initiating side, present if class 4 is requested or can be accepted 
+				following class negotiation procedures. At the responding side, present if class 
+				4 is chosen!,
+		transportConnectionNCMS-P
+			PRESENT IF
+				!NCMS is implemented!;
+REGISTERED AS { TLM.moi transportConnection(7) };
+-- 5.8.2 Transport connection initial value managed object
+-- There may be multiple instances of the transportConnectionIVMO
+-- in a system. A transportConnectionIVMO may be used to supply initial
+-- values for the attributes of automatically created
+-- transportConnection MOs.
+--
+-- The values supplied in an IVMO may be overridden by values
+-- supplied in an implementation-specific manner across the service
+-- interface.
+--
+-- Its definition permits it to be created and deleted explicitly by
+-- management operation.
+
+
+transportConnectionIVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		transportConnectionIVMO-P PACKAGE
+			BEHAVIOUR
+				use-of-initialValues-B;
+			ATTRIBUTES
+				transportConnectionIVMOId GET,
+				protocolClasses REPLACE-WITH-DEFAULT GET-REPLACE,
+				-- DEFAULT VALUE is implementation dependent
+				maxTPDUSize REPLACE-WITH-DEFAULT GET-REPLACE;
+			-- DEFAULT VALUE is implementation dependent
+			;;
+	CONDITIONAL PACKAGES
+		transportConnectionIVMOClass1-P
+			PRESENT IF
+				Transport Class 1 is implemented,
+		transportConnectionIVMOClass2-P
+			PRESENT IF
+				Transport Class 2 is implemented,
+		transportConnectionIVMOClass3-P
+			PRESENT IF
+				Transport Class 3 is implemented,
+		transportConnectionIVMOClass4-P
+			PRESENT IF
+				Transport Class 4 is implemented;
+REGISTERED AS { TLM.moi transportConnectionIVMO(6) };
+-- 5.8.3 Elements of management Information for transportConnection MO and 
+-- transportConnection IVMO
+-- Conditional Packages
+
+
+transportConnectionIVMOClass1-P PACKAGE
+	BEHAVIOUR
+		transportConnectionIVMOClass1-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 1 is implemented!;;
+	ATTRIBUTES
+		networkExpeditedData REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		receiptConfirmation REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		reassignmentTime REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		transportExpeditedService REPLACE-WITH-DEFAULT GET-REPLACE;
+	-- DEFAULT VALUE is implementation dependent
+	REGISTERED AS { TLM.poi transportConnectionIVMOClass1-P(1) };
+
+
+transportConnectionIVMOClass2-P PACKAGE
+	BEHAVIOUR
+		transportConnectionIVMOClass2-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 2 is implemented!;;
+	ATTRIBUTES
+		explicitFlowControl REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		extendedFormat REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		maximumWindow REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		transportExpeditedService REPLACE-WITH-DEFAULT GET-REPLACE;
+	-- DEFAULT VALUE is implementation dependent
+	REGISTERED AS { TLM.poi transportConnectionIVMOClass2-P(2) };
+
+
+transportConnectionIVMOClass3-P PACKAGE
+	BEHAVIOUR
+		transportConnectionIVMOClass3-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 3 is implemented!;;
+	ATTRIBUTES
+		extendedFormat REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		reassignmentTime REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		maximumWindow REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		transportExpeditedService REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { TLM.poi transportConnectionIVMOClass3-P(3) };
+
+
+transportConnectionIVMOClass4-P PACKAGE
+	BEHAVIOUR
+		transportConnectionIVMOClass4-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 4 is implemented!;;
+	ATTRIBUTES
+		checksumNonuse REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		extendedFormat REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		inactivityTime REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		maxTransmissions REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		retransmissionTime REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		windowTimer REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		maximumWindow REPLACE-WITH-DEFAULT GET-REPLACE,
+		-- DEFAULT VALUE is implementation dependent
+		transportExpeditedService REPLACE-WITH-DEFAULT GET-REPLACE;
+REGISTERED AS { TLM.poi transportConnectionIVMOClass4-P(4) };
+
+
+transportConnectionClass1-P PACKAGE
+	BEHAVIOUR
+		transportConnectionClass1-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 1 is implemented!;;
+	ATTRIBUTES
+		networkExpeditedData GET,
+		reassignmentsAfterFailure GET,
+		reassignmentTime GET,
+		receiptConfirmation GET,
+		transportExpeditedService GET;
+REGISTERED AS { TLM.poi transportConnectionClass1-P(5) };
+
+
+transportConnectionClass2-P PACKAGE
+	BEHAVIOUR
+		transportConnectionClass2-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 2 is implemented!;;
+	ATTRIBUTES
+		extendedFormat GET,
+		explicitFlowControl GET,
+		transportExpeditedService GET;
+REGISTERED AS { TLM.poi transportConnectionClass2-P(6) };
+
+
+transportConnectionClass3-P PACKAGE
+	BEHAVIOUR
+		transportConnectionClass3-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 3 is implemented!;;
+	ATTRIBUTES
+		extendedFormat GET,
+		reassignmentTime GET,
+		reassignmentsAfterFailure GET,
+		transportExpeditedService GET;
+REGISTERED AS { TLM.poi transportConnectionClass3-P(7) };
+
+
+transportConnectionClass4-P PACKAGE
+	BEHAVIOUR
+		transportConnectionClass4-P-B BEHAVIOUR
+			DEFINED AS
+				!When Class 4 is implemented!;;
+	ATTRIBUTES
+		acknowledgeTime GET,
+		checksumNonuse GET,
+		extendedFormat GET,
+		inactivityTime GET,
+		maxTransmissions GET,
+		retransmissionTime GET,
+		transportExpeditedService GET,
+		windowTimer GET;
+REGISTERED AS { TLM.poi transportConnectionClass4-P(8) };
+
+
+transportConnectionNCMS-P PACKAGE
+	BEHAVIOUR
+		transportConnectionNCMS-P-B BEHAVIOUR
+			DEFINED AS
+				!When NCMS is implemented!;;
+	ATTRIBUTES
+		relatingNCCMONames GET;
+REGISTERED AS { TLM.poi transportConnectionNCMS-P(9) };
+-- Behaviours
+
+
+initialValues-B BEHAVIOUR
+	DEFINED AS
+		!When an instance of the transportConnection MO is created using the 
+		transportConnection-comodeTPM name binding, the initial values for some of the 
+		attributes of the transportConnection MO may be supplied by an instance of the 
+		transportConnectionIVMO MO. The means by which an instance (if any) of the 
+		transportConnectionIVMO are identified are a local matter.!;
+
+
+use-of-initialValues-B BEHAVIOUR
+	DEFINED AS
+		!The creation of an instance of the transportConnection MO using the 
+		transportConnection-comodeTPM name binding may reference an instance of the 
+		transportConnectionIVMO MO under the conditions specified by the 
+		transportConnection MO. When this occurs, some of the initial values of the 
+		attributes of the instance of the transportConnection MO may be supplied by the 
+		values of the attributes in the specified instance of the 
+		transportConnectionIVMO. However, any such value may be overridden by a value 
+		supplied by local means (for example across an internal interface). Where values 
+		are supplied by the IVMO, the initial value of an attribute of 
+		transportConnection MO shall be the value of the corresponding attribute in the 
+		transportConnectionIVMO (that is, which has the same attribute template label).!;
+
+
+connectionCreationDeletion-B BEHAVIOUR
+	DEFINED AS
+		!Managed object class imports the X.721 | 10165-2 objectCreation and 
+		objectDeletion notifications for transportConnection.The precise synchronization 
+		between these notifications and related protocol and service interactions is not 
+		defined by this Recommendation | International Standard. In addition, where a 
+		connection is attempted as a result of an interaction at a single interface 
+		(i.e. either the protocol or the service), and fails before any interaction 
+		occurs at the other, it is a local matter whether a managed object is created or 
+		not, i.e. whether the creation and deletion events occur or not.
+
+		ObjectCreation Generated whenever an instance of the managed object class is 
+		created. The sourceIndicator parameter shall be set to the value 
+		'resourceOperation'. None of the other optional parameters are used, with the 
+		exception of the additionalInformation field which contains the following 
+		parameters:
+
+		transportConnectionName
+
+		protocolClass-PAR
+
+		maxTPDUsize-PAR
+
+		callingTselector-PAR
+
+		calledTSelector-PAR
+
+		callingNSAPAddress-PAR
+
+		calledNSAPAddress-PAR
+
+		respondingNSAPAddress-PAR
+
+		connectionDirection-PAR
+
+		networkConnectionIDs-PAR.
+
+		ObjectDeletion Generated whenever an instance of the managed object class is 
+		deleted. The sourceIndicator parameter shall be set to the value 
+		'resourceOperation'. None of the other optional parameters are used, with the 
+		exception of the additionalInformation field which contains the following 
+		parameters:
+
+		transportConnectionName
+
+		protocolClass-PAR
+
+		maxTPDUsize-PAR
+
+		callingTselector-PAR
+
+		calledTSelector-PAR
+
+		callingNSAPAddress-PAR
+
+		calledNSAPAddress-PAR
+
+		respondingNSAPAddress-PAR
+
+		connectionDirection-PAR
+
+		networkConnectionIDs-PAR
+
+		objectDeletionCause.!;
+-- Name Bindings
+
+
+transportConnection-comodeTPM NAME BINDING
+	SUBORDINATE OBJECT CLASS transportConnection AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS comodeTPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"GMI":connectionId;
+REGISTERED AS { TLM.nboi transportConnection-comodeTPM(8) };
+
+
+transportConnectionIVMO-comodeTPM NAME BINDING
+	SUBORDINATE OBJECT CLASS transportConnectionIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS comodeTPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		transportConnectionIVMOId;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE;
+REGISTERED AS { TLM.nboi transportConnectionIVMO-comodeTPM(7) };
+-- Attributes
+
+
+acknowledgeTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		acknowledgeTime-B BEHAVIOUR
+			DEFINED AS
+				!Value of local Acknowledge Timer (as defined in ITU-T Rec. X.224 | ISO/IEC 8073) 
+				in use for the connection. Unit is in seconds!;;
+REGISTERED AS { TLM.aoi acknowledgeTime(47) };
+
+
+calledNSAPAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.OctetString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		calledNSAPAddress-B BEHAVIOUR
+			DEFINED AS
+				!The Called NSAP Address received at the network service interface at 
+				N-connection establishment when operating over the CONS, or with the N-Unitdata 
+				indication that conveyed the CR TPDU when operating over the CLNS!;;
+REGISTERED AS { TLM.aoi calledNSAPAddress(58) };
+
+
+calledTSelector ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.OctetString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		calledTSelector-B BEHAVIOUR
+			DEFINED AS
+				!The "Called TSAP Identifier" specified at connection establishment!;;
+REGISTERED AS { TLM.aoi calledTSelector(56) };
+
+
+callingNSAPAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.OctetString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingNSAPAddress-B BEHAVIOUR
+			DEFINED AS
+				!The Calling NSAP Address specified at the network service interface at 
+				N-connection establishment when operating over the CONS, or for each 
+				N-Unitdata.request interaction when operating over the CLNS!;;
+REGISTERED AS { TLM.aoi callingNSAPAddress(57) };
+
+
+callingTSelector ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.OctetString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		callingTSelector-B BEHAVIOUR
+			DEFINED AS
+				!The "Calling TSAP Identifier" specified at connection establishment!;;
+REGISTERED AS { TLM.aoi callingTSelector(55) };
+
+
+checksumNonuse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		checksumNonuse-B BEHAVIOUR
+			DEFINED AS
+				!Enables negotiation/indicates non-use of checksum. In transportConnectionIVMO, 
+				enables negotiation of checksum non-use (Class 4 only) during connection 
+				establishment. TRUE enables non-use, FALSE disables it. In transportConnection, 
+				indicates whether checksum non-use has been selected for the connection (TRUE) 
+				or not (FALSE). During connection establishment, this attribute represents the 
+				desired value and not necessarily the value which will ultimately be used.!;;
+REGISTERED AS { TLM.aoi checksumNonuse(43) };
+
+
+connectionDirection ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.ConnectionDirectionSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		connectionDirection-B BEHAVIOUR
+			DEFINED AS
+				!Indicates the direction of the connection. The value Incoming means that it was 
+				initiated by the remote Transport Entity, the value Outgoing means that it was 
+				initiated by the local Transport Entity.!;;
+REGISTERED AS { TLM.aoi connectionDirection(60) };
+
+
+explicitFlowControl ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		explicitFlowControl-B BEHAVIOUR
+			DEFINED AS
+				!Enables negotiation/indicates use of explicit Flow Control. In 
+				transportConnectionIVMO, enables negotiation of non-use of explicit flow control 
+				(Class 2 only) during connection establishment. TRUE enables non-use, FALSE 
+				disables it. In transportConnection, indicates whether non-use of explicit flow 
+				control has been selected for the connection (TRUE) or not (FALSE). For 
+				connections not using Class 2 of the protocol, this attribute has the value 
+				False. During connection establishment, this attribute represents the desired 
+				value and not necessarily the value which will ultimately be used!;;
+REGISTERED AS { TLM.aoi explicitFlowControl(45) };
+
+
+extendedFormat ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		extendedFormat-B BEHAVIOUR
+			DEFINED AS
+				!Enables negotiation/indicates use of extended TPDU format. In 
+				transportConnectionIVMO, enables negotiation of extended TPDU format (for the 
+				classes where this is appropriate) during transport connection establishment. 
+				TRUE enables use of extended format, FALSE disables it. In transportConnection, 
+				indicates whether extended TPDU format is in use (TRUE) or not (FALSE). For 
+				connections not using Class 4 of the protocol, this attribute will be False. 
+				During connection establishment, this attribute represents the desired value and 
+				not necessarily the value which will ultimately be used!;;
+REGISTERED AS { TLM.aoi extendedFormat(41) };
+
+
+inactivityTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		inactivityTime-B BEHAVIOUR
+			DEFINED AS
+				!Value of inactivity time (as defined in ITU-T Rec. X.224 | ISO/IEC 8073) in use 
+				for the connection. Unit is in seconds!;;
+REGISTERED AS { TLM.aoi inactivityTime(46) };
+
+
+localReference ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		localReference-B BEHAVIOUR
+			DEFINED AS
+				!The local reference number (as defined in ITU-T Rec. X.224 | ISO/IEC 8073) in 
+				use for the connection!;;
+REGISTERED AS { TLM.aoi localReference(53) };
+
+
+maximumWindow ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maximumWindow-B BEHAVIOUR
+			DEFINED AS
+				!The maximum window permitted to be given on the connection at any time. 
+				Buffering or other implementation constraints or policies may cause a smaller 
+				value to be used.!;;
+REGISTERED AS { TLM.aoi maximumWindow(36) };
+
+
+maxTPDUSize ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxTPDUSize-B BEHAVIOUR
+			DEFINED AS
+				!The maximum TPDU size negotiated for the connection. Implementation constraints 
+				or policies, or relating to the remote NSPA or Transport Entity, may cause a 
+				smaller value to be used as an initial value for negotiation. During connection 
+				establishment, this attribute represents the desired value and not necessarily 
+				the value which will ultimately be used!;;
+REGISTERED AS { TLM.aoi maxTPDUSize(51) };
+
+
+maxTransmissions ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY, ORDERING;
+	BEHAVIOUR
+		maxTransmissions-B BEHAVIOUR
+			DEFINED AS
+				!The maximum number of transmissions as defined (for Class 4 only) as the 
+				parameter N in ITU-T Rec. X.224 | ISO/IEC 8073!;;
+REGISTERED AS { TLM.aoi maxTransmissions(52) };
+
+
+networkConnectionIDs ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.LocalDistinguishedNames;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		networkConnectionIDs-B BEHAVIOUR
+			DEFINED AS
+				!The Network Connection(s) which support the Transport Connection. If the TC is 
+				running over the CLNS, this attribute has the value of the empty set.!;;
+REGISTERED AS { TLM.aoi networkConnectionIDs(61) };
+
+
+networkExpeditedData ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		networkExpeditedData-B BEHAVIOUR
+			DEFINED AS
+				!Enables negotiation/indicates use of Network Expedited in 
+				transportConnectionIVMO, enables the negotiation of use or non-use of Network 
+				Expedited Data (for Class 1 only) during transport connection establishment. 
+				TRUE enables use of Network Expedited Data, FALSE disables it. In 
+				transportConnection, indicates whether Network Expedited Data is in use (TRUE) 
+				or not (FALSE). For connections not using Class 1, the value will always be 
+				False. During connection establishment, this attribute represents the desired 
+				value and not necessarily the value which will ultimately be used!;;
+REGISTERED AS { TLM.aoi networkExpeditedData(42) };
+
+
+protocolClass ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.ProtocolClassSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		protocolClass-B BEHAVIOUR
+			DEFINED AS
+				!The protocol class in use on the connection, as negotiated during connection 
+				establishment. During connection establishment (before the connection reaches 
+				the OPEN state) this indicates what is currently preferred and not necessarily 
+				the ultimate class which will be used for the connection!;;
+REGISTERED AS { TLM.aoi protocolClass(40) };
+
+
+protocolClasses ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.ProtocolClassesSyntax;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		protocolClasses-B BEHAVIOUR
+			DEFINED AS
+				!The preferred/alternate set of protocol classes which may be stated at 
+				connection establishment. The default value is implementation dependent, but 
+				must be consistent with the class negotiation rules of ITU-T Rec. X.224 | 
+				ISO/IEC 8073!;;
+REGISTERED AS { TLM.aoi protocolClasses(26) };
+
+
+reassignmentsAfterFailure ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		reassignmentsAfterFailure-B BEHAVIOUR
+			DEFINED AS
+				!The total number of times the TC has been reassigned to NC!;;
+REGISTERED AS { TLM.aoi reassignmentsAfterFailure(62) };
+
+
+reassignmentTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		reassignmentTime-B BEHAVIOUR
+			DEFINED AS
+				!The value of the Reassignment Time (as defined in ITU-T Rec. X.224 | ISO/IEC 
+				8073) to be conveyed or established during connection establishment. Unit is in 
+				seconds!;;
+REGISTERED AS { TLM.aoi reassignmentTime(48) };
+
+
+receiptConfirmation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		receiptConfirmation-B BEHAVIOUR
+			DEFINED AS
+				!Enables negotiation/indicates use of receipt confirmation. In 
+				transportConnectionIVMO, enables negotiation of use of network receipt 
+				confirmation (Class 1 only) during transport connection establishment. TRUE 
+				enables use, FALSE enables non-use. In transportConnection, indicates whether 
+				use of network receipt confirmation has been selected for the connection (TRUE) 
+				or not (FALSE). For connections not using Class 1 of the protocol, this 
+				attribute has the value False. During connection establishment, this attribute 
+				represents the desired value and not necessarily the value which will ultimately 
+				be used!;;
+REGISTERED AS { TLM.aoi receiptConfirmation(44) };
+
+
+relatingNCCMONames ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.LocalDistinguishedNames;
+	MATCHES FOR SET-COMPARISON, SET-INTERSECTION;
+	BEHAVIOUR
+		relatingNCCMONames-B BEHAVIOUR
+			DEFINED AS
+				!This attribute indicates the NCC MO(s)!;;
+REGISTERED AS { TLM.aoi relatingNCCMONames(66) };
+
+
+remoteReference ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Integer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		remoteReference-B BEHAVIOUR
+			DEFINED AS
+				!The remote reference number (as defined in ITU-T Rec. X.224 | ISO/IEC 8073) in 
+				use for the connection!;;
+REGISTERED AS { TLM.aoi remoteReference(54) };
+
+
+respondingNSAPAddress ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.OctetString;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		respondingNSAPAddress-B BEHAVIOUR
+			DEFINED AS
+				!The Responding NSAP Address received at network service interface at 
+				N-connection establishment. The value of this attribute is only meaningful when 
+				operating over the CONS, and when the N-connection was initiated by Transport 
+				Entity. Otherwise, the value is not meaningful and no constraints are applied to 
+				the value!;;
+REGISTERED AS { TLM.aoi respondingNSAPAddress(59) };
+
+
+retransmissionTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		resettingTimer-B,
+		retransmissionTime-B BEHAVIOUR
+			DEFINED AS
+				!Initial or current value for the Local Retransmission Time as defined in ITU-T 
+				Rec. X.224 | ISO/IEC 8073. Another value may be adopted initially based on 
+				knowledge concerning the remote system. The current value may change during the 
+				lifetime of the connection, based on observations of traffic on the connection 
+				or other information concerning the remote Transport Entity. The value of this 
+				attribute is used in the absence of other information. Unit is in seconds!;;
+REGISTERED AS { TLM.aoi retransmissionTime(49) };
+
+
+transportConnectionIVMOId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NamingString;
+	MATCHES FOR EQUALITY, SUBSTRINGS;
+	BEHAVIOUR
+		transportConnectionIVMOId-B BEHAVIOUR
+			DEFINED AS
+				!The name of this instance of transportConnectionIVMO!;;
+REGISTERED AS { TLM.aoi transportConnectionIVMOId(25) };
+
+
+transportExpeditedService ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.Boolean;
+	BEHAVIOUR
+		transportExpeditedService-B BEHAVIOUR
+			DEFINED AS
+				!Indicated whether the Transport Expedited Service is provided (true) or not 
+				(False).!;;
+REGISTERED AS { TLM.aoi transportExpeditedService(65) };
+
+
+windowTimer ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		windowTimer-B BEHAVIOUR
+			DEFINED AS
+				!Value of Window Timer as defined in ITU-T Rec. X.224 | ISO/IEC 8073. The value 
+				of this attribute is meaningful only for connections using Class 4 of the 
+				protocol. For other connections no constraint is placed on the value to be 
+				returned. Unit is in seconds!;;
+REGISTERED AS { TLM.aoi windowTimer(50) };
+-- Parameters
+
+
+calledNSAPAddress-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		calledNSAPAddress;;
+
+
+calledTSelector-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		calledTSelector;;
+
+
+callingNSAPAddress-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		callingNSAPAddress;;
+
+
+callingTSelector-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		callingTSelector;;
+
+
+connectionDirection-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		connectionDirection;;
+
+
+maxTPDUSize-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		maxTPDUSize;;
+
+
+networkConnectionIDs-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		networkConnectionIDs;;
+
+
+objectDeletionCause PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.DeletionCauseSyntax;
+	BEHAVIOUR
+		objectDeletionCauseB BEHAVIOUR
+			DEFINED AS
+				! Reason why the Transport Connection Object is being deleted!;;
+REGISTERED AS { TLM.proi objectDeletionCause(6) };
+
+
+protocolClass-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		protocolClass;;
+
+
+respondingNSAPAddress-PAR PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		respondingNSAPAddress;;
+
+
+transportConnectionName PARAMETER
+	CONTEXT EVENT-INFO;
+	ATTRIBUTE
+		"GMI":connectionId;;
+-- 5.9 NCMS protocol machine managed object
+
+
+ncmsPM MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		ncmsPM-P PACKAGE
+			BEHAVIOUR
+				commonCreationDeletion-B,
+				commonStateChange-B,
+				ncmsPMPackageImportedNotifications-B,
+				ncmsPM-B BEHAVIOUR
+					DEFINED AS
+						!This managed object class represents the part of transport entity that performs 
+						the NCMS protocol.
+
+						Only one instance of this managed object class may exist within a TEMO instance.!;;
+			ATTRIBUTES
+				ncmsPMId GET,
+				"DMI":administrativeState GET-REPLACE,
+				"DMI":operationalState GET;
+			ACTIONS
+				"GMI":activate,
+				"GMI":deactivate;
+			NOTIFICATIONS
+				"DMI":communicationsAlarm
+					ncmsPMPDUHeader-- this is a parameter --
+					ncmsPMSourceAddress,-- this is a parameter --
+				"DMI":objectCreation,
+				"DMI":objectDeletion,
+				"DMI":stateChange;;;
+REGISTERED AS { TLM.moi ncmsPM(8) };
+-- Behaviours
+
+
+ncmsPMPackageImportedNotifications-B BEHAVIOUR
+	DEFINED AS
+		!The ncmsPM-P package imports communicationsAlarm from DMI, in order to report 
+		the failure of NC sharing. The probableCause is set to 
+		TLM.communicationsProtocolError. The ncmsPMPDUHeader and ncmsPMSourceAddress are 
+		reported as parameters in the additionalInformation field of the 
+		communicationsAlarm.
+
+		The significance subparameter of each item of the additionalInformation shall be 
+		set to the value False (i.e. not significant) so that a managing system 
+		receiving the event will be less likely to reject it. The perceivedSeverity 
+		shall be set to Minor.
+
+		A subsequent communicationsAlarm with a perceived Severity value of Cleared 
+		shall not be generated. No other fields or parameters shall be used, with the 
+		exception of further parameters in the additionalInformation field.!;
+-- Name Bindings
+
+
+ncmsPM-transportEntity-Management NAME BINDING
+	SUBORDINATE OBJECT CLASS ncmsPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ncmsPMId;
+	BEHAVIOUR
+		ncmsPM-transportEntity-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the ncmsPM managed object is explicitly 
+				created by management.!;;
+	CREATE;
+	DELETE ONLY-IF-NO-CONTAINED-OBJECTS;
+REGISTERED AS { TLM.nboi ncmsPM-transportEntity-Management(13) };
+
+
+ncmsPM-transportEntity-Automatic NAME BINDING
+	SUBORDINATE OBJECT CLASS ncmsPM AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS transportEntity AND SUBCLASSES;
+	WITH ATTRIBUTE
+		ncmsPMId;
+	BEHAVIOUR
+		ncmsPM-transportEntity-Automatic-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the ncmsPM managed object is created.
+
+				The name binding that applies when the ncmsPM managed object can not be 
+				explicitly created by management.!;;
+REGISTERED AS { TLM.nboi ncmsPM-transportEntity-Automatic(14) };
+-- Attribute
+
+
+ncmsPMId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		ncmsPMId-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that is used in naming instances of the ncms Protocol Machine 
+				managed object class.!;;
+REGISTERED AS { TLM.aoi ncmsPMId(67) };
+-- Parameters
+
+
+ncmsPMPDUHeader PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.PDUHeaderSyntax;
+	BEHAVIOUR
+		ncmsPMPDUHeader-B BEHAVIOUR
+			DEFINED AS
+				!Header of the PDU that causes the failure of NC sharing.
+
+				Returned in the problemData field of a communicationsAlarm notification.!;;
+REGISTERED AS { TLM.proi ncmsPMPDUHeader(8) };
+
+
+ncmsPMSourceAddress PARAMETER
+	CONTEXT EVENT-INFO;
+	WITH SYNTAX TLM.SourceAddressSyntax;
+	BEHAVIOUR
+		ncmsPMSourceAddress-B BEHAVIOUR
+			DEFINED AS
+				!Source N-Address.
+
+				Returned in the problemData field of a communicationsAlarm notification.!;;
+REGISTERED AS { TLM.proi ncmsPMSourceAddress(9) };
+-- 5.10 Network connection control managed object and initial value managed 
+-- object
+-- 5.10.1 Network connection control managed object
+
+
+ncc MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		ncc-P PACKAGE
+			BEHAVIOUR
+				nccInitialValues-B,
+				ncc-B BEHAVIOUR
+					DEFINED AS
+						!This managed object class represents the management aspect of the information 
+						needed to control the network connections by NCMS.
+
+						Multiple instances of this managed object class may exist within a NCMSPM MO 
+						instance. This MO is created and deleted as a result of NCMS operation.!;;
+			ATTRIBUTES
+				nccId GET,
+				nc-COL GET,
+				nc-REC GET,
+				nc-REF GET,
+				nc-PREF GET,
+				nc-Right GET,
+				ncRecoveries GET,
+				ttrNCTime GET,
+				tpdNCTime GET,
+				tfrNCTime GET,
+				sourceOfAllocation GET,
+				"GMI":underlyingConnectionNames GET;
+			NOTIFICATIONS
+				"DMI":objectCreation,
+				"DMI":objectDeletion;;;
+REGISTERED AS { TLM.moi ncc(9) };
+-- 5.10.2 Network connection control initial value managed object
+
+
+nccIVMO MANAGED OBJECT CLASS
+	DERIVED FROM
+		"DMI":top;
+	CHARACTERIZED BY
+		nccIVMO-P PACKAGE
+			BEHAVIOUR
+				use-of-nccInitialValues-B,
+				nccIVMO-B BEHAVIOUR
+					DEFINED AS
+						!This managed object class represents the set of initial values for NCC MO 
+						instances.
+
+						Multiple instances of this managed object class may exist within a NCMSPM MO 
+						instance.
+
+						The relationship between instances of NCC MO and NCCIV MO is not specified in 
+						this Recommendation | International Standard.!;;
+			ATTRIBUTES
+				nccIVMOId GET,
+				nc-COL REPLACE-WITH-DEFAULT GET-REPLACE,
+				nc-REC REPLACE-WITH-DEFAULT GET-REPLACE,
+				nc-PREF REPLACE-WITH-DEFAULT GET-REPLACE,
+				nc-Right REPLACE-WITH-DEFAULT GET-REPLACE,
+				ttrNCTime REPLACE-WITH-DEFAULT GET-REPLACE,
+				tpdNCTime REPLACE-WITH-DEFAULT GET-REPLACE,
+				tfrNCTime REPLACE-WITH-DEFAULT GET-REPLACE;;;
+REGISTERED AS { TLM.moi nccIVMO(10) };
+-- NCC Initial values behaviour
+
+
+nccInitialValues-B BEHAVIOUR
+	DEFINED AS
+		!When an instance of the NCC MO is created using the ncc-ncmsPM name binding, the 
+		initial values for some of the attributes of the NCC MO may be supplied by an 
+		instance of the NCC IVMO. The means by which an instance(if any) of the NCC IVMO 
+		are identified are a local matter.!;
+-- Use of NCC initial values behaviour
+
+
+use-of-nccInitialValues-B BEHAVIOUR
+	DEFINED AS
+		!The creation of an instance of the NCC MO using the ncc-ncmsPM name binding may 
+		reference an instance of NCC IVMO. When this occurs, some of the initial values 
+		of the attributes of the instance of NCC MO may be supplied by the values of the 
+		attributes in the specified instance of the NCC IVMO.
+
+		However any such value may be overridden by a value supplied by local means (for 
+		example across an internal interface). Where values are supplied by the IVMO, 
+		the initial values of an attribute of NCC MO shall be the value of the 
+		corresponding attribute in the NCC IVMO (that is, which has the same attribute 
+		template label).!;
+-- Name Binding
+
+
+ncc-ncmsPM NAME BINDING
+	SUBORDINATE OBJECT CLASS ncc AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ncmsPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		nccId;
+	BEHAVIOUR
+		ncc-ncmsPM-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the ncc managed object is created and 
+				deleted.!;;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE;
+REGISTERED AS { TLM.nboi ncc-ncmsPM(15) };
+
+
+nccIVMO-ncmsPM NAME BINDING
+	SUBORDINATE OBJECT CLASS nccIVMO AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS ncmsPM AND SUBCLASSES;
+	WITH ATTRIBUTE
+		nccIVMOId;
+	BEHAVIOUR
+		nccIVMO-ncmsPM-B BEHAVIOUR
+			DEFINED AS
+				!The name binding that applies when the nccIV managed object is created and 
+				deleted.!;;
+	CREATE WITH-REFERENCE-OBJECT;
+	DELETE;
+REGISTERED AS { TLM.nboi nccIV-ncmsPM(16) };
+--- Attribute
+
+
+nccId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nccId-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that is used in naming instances of the network connection control 
+				managed object class.!;;
+REGISTERED AS { TLM.aoi nccId(68) };
+
+
+nccIVMOId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nccIVMOId-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that is used in naming instances of the network connection control 
+				initial value managed object class.!;;
+REGISTERED AS { TLM.aoi nccIVMOId(69) };
+
+
+nc-COL ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NC-COLSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nc-COL-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the collision algorithm as defined in Annex B of 
+				ITU-T Rec. X.224 | ISO/IEC 8073. In NCCIV managed object, indicates the 
+				collision algorithm to be used. In NCC managed object, indicates the collision 
+				algorithm in use.!;;
+REGISTERED AS { TLM.aoi nc-COL(70) };
+
+
+nc-PREF ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NC-PREFSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nc-PREF-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the preference the initiator has to keep the 
+				network connection as defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 8073. In 
+				NCCIV managed object, indicates the preference to be used. In NCC managed 
+				object, indicates the preference in use.!;;
+REGISTERED AS { TLM.aoi nc-PREF(71) };
+
+
+nc-REC ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NC-RECSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nc-REC-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the recovery optimization option as defined in 
+				Annex B of ITU-T Rec. X.224 | ISO/IEC 8073. In NCCIV managed object, indicates 
+				the recovery optimization option to be used. In NCC managed object, indicates 
+				the recovery optimization option in use.!;;
+REGISTERED AS { TLM.aoi nc-REC(72) };
+
+
+nc-REF ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NC-REFSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nc-REF-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the nc-reference as defined in Annex B of ITU-T 
+				Rec. X.224 | ISO/IEC 8073.!;;
+REGISTERED AS { TLM.aoi nc-REF(73) };
+
+
+ncRecoveries ATTRIBUTE
+	DERIVED FROM
+		"GMI":nonWrapping64BitCounter;
+	BEHAVIOUR
+		ncRecoveries-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the total number of network connection successful 
+				recoveries.!;;
+REGISTERED AS { TLM.aoi ncRecoveries(74) };
+
+
+nc-Right ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.NC-RightSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		nc-Right-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the type of right of use as defined in Annex B of 
+				ITU-T Rec. X.224 | ISO/IEC 8073. In NCCIV managed object, indicates the type of 
+				right of use to be used. Namely, the value "my-side" means "SA", "remote-side" 
+				means "RA" and "both-sides" means "RR". In NCC managed object, indicates the 
+				type of right of use in use.!;;
+REGISTERED AS { TLM.aoi networkConnectionRight(75) };
+
+
+sourceOfAllocation ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX TLM.SourceOfAllocationSyntax;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		sourceOfAllocation-B BEHAVIOUR
+			DEFINED AS
+				!The attribute that indicates the transport entity that established the network 
+				connection at the first time during the life time of an NC reference.!;;
+REGISTERED AS { TLM.aoi sourceOfAllocation(76) };
+
+
+tfrNCTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		tfrNCTime-B BEHAVIOUR
+			DEFINED AS
+				!Value of the TFR-NC timer as defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 
+				8073.!;;
+REGISTERED AS { TLM.aoi tfrNCTime(77) };
+
+
+tpdNCTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		tpdNCTime-B BEHAVIOUR
+			DEFINED AS
+				!Value of the TPD-NC timer as defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 
+				8073.!;;
+REGISTERED AS { TLM.aoi tpdNCTime(78) };
+
+
+ttrNCTime ATTRIBUTE
+	DERIVED FROM
+		"GMI":timer;
+	BEHAVIOUR
+		ttrNCTime-B BEHAVIOUR
+			DEFINED AS
+				!Value of the TTR-NC timer as defined in Annex B of ITU-T Rec. X.224 | ISO/IEC 
+				8073.!;;
+REGISTERED AS { TLM.aoi ttrNCTime(79) };
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.284 (1997)"
+--  { joint-iso-ccitt transport-layer(14) management(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x284::transportEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x284::clmodeTPM
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x284::comodeTPM
+--@@ +- itut_x723::sap1
+--@@ |  +- itut_x284::tSAP
+--@@ +- itut_x723::sap2
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x284::transportConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x284::transportSubsystem
+--@@ +- itut_x284::transportConnectionIVMO
+--@@ +- itut_x284::ncmsPM
+--@@ +- itut_x284::ncc
+--@@ +- itut_x284::nccIVMO
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x284::transportSubsystem
+--@@ |  >- itut_x284::transportEntity
+--@@ |  |  >- itut_x284::clmodeTPM
+--@@ |  |  >- itut_x284::clmodeTPM
+--@@ |  |  >- itut_x284::comodeTPM
+--@@ |  |  |  >- itut_x284::transportConnection
+--@@ |  |  |  >- itut_x284::transportConnectionIVMO
+--@@ |  |  >- itut_x284::comodeTPM +++
+--@@ |  |  >- itut_x284::tSAP
+--@@ |  |  >- itut_x284::tSAP
+--@@ |  |  >- itut_x284::ncmsPM
+--@@ |  |  |  >- itut_x284::ncc
+--@@ |  |  |  >- itut_x284::nccIVMO
+--@@ |  |  >- itut_x284::ncmsPM +++
+--@@ |  >- itut_x284::transportEntity +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

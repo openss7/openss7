@@ -1,0 +1,1672 @@
+/* This IDL code is meant to be stored in a file named "itut_x780.idl"
+located in the search path used by IDL compilers on your system. */
+#ifndef ITUT_X780_IDL
+#define ITUT_X780_IDL
+#include <CosNaming.idl>
+#include <CosTime.idl>
+#include <itut_x780Const.idl>
+#pragma prefix "itu.int"
+/* Most comments in this file are formatted to be parsed by an IDL-to-HTML
+converter such as idldoc or orbacus hidl. */
+// MODULE itut_x780 
+/** This module provides the fundamental capabilities for implementing network
+management interfaces and defines the "managed object" interface. The
+interfaces below are modeled after the managed object specifications
+found in the ITU-T CMIP specification document X.721. */
+module itut_x780 {
+	// IMPORTED TYPES 
+	// Types imported from CosNaming
+	typedef CosNaming::Name NameType;
+	// Types imported from CosTime
+	typedef TimeBase::UtcT UtcT;
+	// FORWARD DECLARATIONS AND TYPEDEFS 
+	/** International strings are strings of wide (16 bit unicode)
+	characters. */
+	typedef wstring Istring;
+	/** Istring Sets are just sets of Istrings */
+	typedef sequence <Istring> IstringSetType;
+	/** Additional Text Type is often used in notifications to convey a
+	text explanation for the notification.
+	*/
+	typedef Istring AdditionalTextType;
+	/** Avalibility Type is used in a sequence to indicate the
+	availability of a resource. Zero or more of these conditions may be
+	indicated.
+	*/
+	typedef short AvailabilityStatusType;
+	const AvailabilityStatusType inTest = 0;
+	const AvailabilityStatusType failed = 1;
+	const AvailabilityStatusType powerOff = 2;
+	const AvailabilityStatusType offLine = 3;
+	const AvailabilityStatusType offDuty = 4;
+	const AvailabilityStatusType dependency = 5;
+	const AvailabilityStatusType degraded = 6;
+	const AvailabilityStatusType notInstalled = 7;
+	const AvailabilityStatusType logFull = 8;
+	/** Availability status is used to indicate the availability of a
+	resource. It is represented as a sequence of integers because several
+	of the conditions may exist at once.
+	*/
+	typedef sequence<AvailabilityStatusType> AvailabilityStatusSetType;
+	/** Backed Up Status Type is used to indicate if an object has a back
+	up. */
+	typedef boolean BackedUpStatusType;
+	/** BitStrings are used to hold strings of bits. They may be of any
+	length. */
+	typedef sequence<octet> BitString;
+	/** Control Status Type is used in a sequence to indicate the
+	control status of a resource. Zero or more of these may be indicated.
+	*/
+	typedef short ControlStatusType;
+	const ControlStatusType subjectToTest = 0;
+	const ControlStatusType partOfServicesLocked = 1;
+	const ControlStatusType reservedForTest = 2;
+	const ControlStatusType suspended = 3;
+	/** Control status set is used to indicate the control status of a
+	resource. It is represented as a sequence of integers because several
+	of the conditions may exist at once.
+	*/
+	typedef sequence<ControlStatusType> ControlStatusSetType;
+	/** Generalized time is a basic ASN.1 type. It is usually represented
+	as a string in computing languages but it has certain, parseable
+	formats. The 3 possible forms are: <ol><li>
+	Local time only. "YYYYMMDDHHMMSS.fff", where the optional fff is
+	accurate to three decimal places, <li>
+	Universal time (UTC time) only. "YYYYMMDDHHMMSS.fffZ", and <li>
+	Difference between local and UTC times. "YYYYMMDDHHMMSS.fff+-HHMM".
+	</ol>
+	The options for representing this in IDL seem to be either a string or
+	the UtcT structure from the CORBA Time Service. UtcT makes it a little
+	easier to compare times from different zones, but requires managed
+	systems to know their time zones. UtcT was picked.
+	*/
+	typedef UtcT GeneralizedTimeType;
+	/** External Time is generalized time. */
+	typedef GeneralizedTimeType ExternalTimeType;
+	/** Forward declaration. CORBA uses object references
+	of type "object" to identify objects. These are used instead of ASN.1
+	object instances. For network management interfaces, all objects will
+	inherit from the "ManagedObject" interface. */
+	interface ManagedObject;
+	/** MO Set is a set of ManagedObject references. */
+	typedef sequence <ManagedObject> MOSetType;
+	/** MO Seq is a sequence of ManagedObject references. */
+	typedef sequence <ManagedObject> MOSeqType;
+	/** A set of names is definded as a sequence of names. */
+	typedef sequence <NameType> NameSetType;
+	/** Notification IDs are long integers. */
+	typedef long NotifIDType;
+	/** This defines a set of notification IDs. */
+	typedef sequence <long> NotifIDSetType;
+	/** Procedural Status Type is used in a sequence to indicate the
+	procedural status of a resource. Zero or more of these may be
+	indicated.
+	*/
+	typedef short ProceduralStatusType;
+	const ProceduralStatusType initializationRequired = 0;
+	const ProceduralStatusType notInitialized = 1;
+	const ProceduralStatusType initializing = 2;
+	const ProceduralStatusType reporting = 3;
+	const ProceduralStatusType terminating = 4;
+	/** Procedural Status Set is used to indicate the procedural status of
+	a resource. It is represented as a sequence of integers because
+	several of the conditions may exist at once.
+	*/
+	typedef sequence<ProceduralStatusType> ProceduralStatusSetType;
+	/** ScopedName is just a string. */
+	typedef string ScopedNameType;
+	/** Scoped Name Sets are simply sets of Scoped Names. */
+	typedef sequence <ScopedNameType> ScopedNameSetType;
+	/** In CORBA, strings containing scoped names are used to identify
+	object classes (actually, "interfaces"). */
+	typedef ScopedNameType ObjectClassType;
+	/** Object Class Set is a set of object classes */
+	typedef sequence <ObjectClassType> ObjectClassSetType;
+	/** Name Binding Modules are identified with scoped names. */
+	typedef ScopedNameType NameBindingType;
+	/** StartTimeType is used to specify a time when something starts.
+	It is often paired with a StopTimeType to control the activation of
+	some function.
+	*/
+	typedef GeneralizedTimeType StartTimeType;
+	/** String sets are sets of strings. */
+	typedef sequence <string> StringSetType;
+	/** System Labels are strings used to identify systems. */
+	typedef string SystemLabelType;
+	/** Unknown status is used to indicate if the status of a resource is
+	not known. A value of true indicates the status is unknown. */
+	typedef boolean UnknownStatusType;
+	// ENUMERATED TYPES 
+	/* The following state objects are used in many interfaces and parallel
+	the state objects in CMIP standards. */
+	/** Administrative State is read/write. A "locked" object is usually
+	one that may not be changed or one which is not providing service.
+	Setting the Admininstrative State of an object to "shuttingDown" begins
+	the shutdown process for that object. */
+	enum AdministrativeStateType {locked, unlocked, shuttingDown};
+	/** Operational State is read only. It simply reports the current
+	capability of the object to provide service. */
+	enum OperationalStateType {disabled, enabled};
+	/** Usage state is read only. If "idle," the resource is completely
+	unused. If "busy," the total capacity of the resource is in use.
+	"Active" is in between. */
+	enum UsageStateType {idle, active, busy};
+	/** Delete Policy indicates if an object can be deleted and if so if
+	any contained objects should automatically be deleted. Since objects
+	must not be orphaned, if an object has a delete policy of
+	"deleteOnlyIfNoContainedObjects" the object must not be deleted if it
+	has contained objects. A value of "deleteContainedObjects" means if
+	the object is deleted its contained objects should also be deleted. */
+	enum DeletePolicyType {notDeletable, deleteOnlyIfNoContainedObjects,
+	deleteContainedObjects};
+	/** PerceivedSeverity reports the severity of an alarm. "Indeterminate"
+	is used when it is not possible to assign one of the other values */
+	enum PerceivedSeverityType {indeterminate, critical, major, minor,
+	warning, cleared};
+	/** Source Indicator is used in many notifications. It identifies
+	whether the notification is a result of a management operation or
+	something that occurred on the managed system. */
+	enum SourceIndicatorType {resourceOperation, managementOperation,
+	unknown};
+	/** The standby status attribute is single-valued and read-only.
+	The value is only meaningful when the back-up relationship role exists.
+	If "hot standby" the resource is not providing service, but is
+	operating in synchronism with another resource that is to be backed-up.
+	If "cold standby" the resource is to back-up another resource, but is
+	not synchronized with that resource. If "providing service" the back-up
+	resource is providing service and is backing up another resource.
+	*/
+	enum StandbyStatusType {hotStandby, coldStandby, providingService};
+	/** Stop times are used to specify when some function should cease.
+	There are normally two choices, the function runs continually (in
+	which case no actual time is specified) or the function ends at
+	a specified time.
+	*/
+	enum StopTimeChoice {specific, continual};
+	/** Threshold indication describes if the threshold crossed was in the
+	up or down direction. */
+	enum ThresholdIndicationType {up, down};
+	/** TrendIndication values indicate if some observed condition is
+	getting better, worse, or not changing. */
+	enum TrendIndicationType {lessSevere, noChange, moreSevere};
+	// STRUCTURES AND UNIONS 
+	/* The structures defined below are used to pass values that may be
+	optionally included. For some types of values, like strings, lists,
+	and pointers, it is easy to tell if the value is included. For others,
+	like enumerations, numbers, and structures, it is not. */
+	/** AdministrativeStateTypeOpt is an optional type. If the
+	discriminator is true the value is present, otherwise the value is
+	null. */
+	union AdministrativeStateTypeOpt switch (boolean) {
+		case TRUE: AdministrativeStateType value;
+	};
+	/** BooleanTypeOpt is an optional type. If the discriminator is
+	true the value is present, otherwise the value is null. */
+	union BooleanTypeOpt switch (boolean) {
+		case TRUE: boolean value;
+	};
+	/** FloatTypeOpt is an optional type. If the discriminator is
+	true the value is present, otherwise the value is null. */
+	union FloatTypeOpt switch (boolean) {
+		case TRUE: float value;
+	};
+	/** LongTypeOpt is an optional type. If the discriminator is
+	true the value is present, otherwise the value is null. */
+	union LongTypeOpt switch (boolean) {
+		case TRUE: long value;
+	};
+	/** OperationalStateTypeOpt is an optional type. If the discriminator
+	is true the value is present, otherwise the value is null. */
+	union OperationalStateTypeOpt switch (boolean) {
+		case TRUE: OperationalStateType value;
+	};
+	/** ShortTypeOpt is an optional type. If the discriminator is
+	true the value is present, otherwise the value is null. */
+	union ShortTypeOpt switch (boolean) {
+		case TRUE: short value;
+	};
+	/** TrendIndicationTypeOpt is an optional type. If the discriminator
+	is true the value is present, otherwise the value is null. */
+	union TrendIndicationTypeOpt switch (boolean) {
+		case TRUE: TrendIndicationType value;
+	};
+	/** UnsignedShortTypeOpt is an optional type. If the discriminator is
+	the value is present, otherwise the value is null. */
+	union UnsignedShortTypeOpt switch (boolean) {
+		case TRUE: unsigned short value;
+	};
+	/** UsageStateTypeOpt is an optional type. If the discriminator is
+	true the value is present, otherwise the value is null. */
+	union UsageStateTypeOpt switch (boolean) {
+		case TRUE: UsageStateType value;
+	};
+	/** Many times interface specifications need to define standard values
+	to be passed across the interface. Also, often the scheme used to
+	define these values needs to be extensible as new interfaces are
+	subclassed, so enumerations don't work well. CMIP uses OIDs, strings
+	of numbers that are often appended, in standards. To serve this
+	purpose, the Unique ID is used. It consists of two parts, a string
+	containing a scoped module name, and an integer value defined as a
+	constant within that module. These UIDs, and the ObjectClass type
+	defined above, replace ASN.1 OIDs. It is expected that each module
+	will contain a constant string named "moduleName" that contains the
+	name of the module for error-free use by the programmer. A null module
+	name will indicate a null value for the UID. <p>
+	Code to interpret a UID might look like the following code snippet:<br>
+	<code><pre>
+	UIDType pc; // probable cause
+	...
+	if (pc.moduleName ==
+	itut_x780::ProbableCauseConst::moduleName) //string compare
+	switch (pc.value) {
+	case itut_x780::ProbableCauseConst::adapterError:
+	...
+	case
+	itut_x780::ProbableCauseConst::applicationSubsystemFailure:
+	...
+	case itut_x780::ProbableCauseConst::bandwidthReduced:
+	...
+	}
+	else if (pc.moduleName == MyLocal::ProbableCauseConst::moduleName)
+	switch (pc.value) {
+	...
+	}
+	</pre></code>
+	@member moduleName The scoped module name where values are
+	defined.
+	@member value The value defined as a constant within the
+	module.
+	*/
+	struct UIDType {
+		string moduleName; // module where value is defined
+		short value; // constant within the module
+	};
+	typedef sequence <UIDType> UIDSetType;
+	/** Management Extension is a structure for flexibly reporting
+	information. It is typically used in the Additional Information field
+	of notifications.
+	@see <a href="#AdditionalInformationSetType">
+	AdditionalInformationSetType </a>
+	@member id identifies the type of information
+	@member any contains the actual information, type will depend on
+	the value of the id member.
+	*/
+	struct ManagementExtensionType {
+		UIDType id; // identifies the type of info
+		any info; // type will depend on id
+	};
+	/** Additional Information is a flexible way to report information that
+	does not fit into the structure of a notification. It contains a
+	sequence of a structure called "Management Extension". */
+	typedef sequence <ManagementExtensionType> AdditionalInformationSetType;
+	/** An Attribute Value structure is used in a notification to report
+	the value of any attribute. The string used for the attribute's name
+	is the same as the name of the data member in the value object defined
+	for the object. In other words, it is the name of an attribute accessor
+	method minus the "get" or "set".
+	@member attributeName the name of the attribute
+	@member value contains the value of the attribute, type will
+	depend on the attributeName.
+	*/
+	struct AttributeValueType {
+		string attributeName;
+		any value; // type will depend on the attribute
+	};
+	/** Attribute Value Sets are used to report attributes generically,
+	in a batch mode. */
+	typedef sequence <AttributeValueType> AttributeSetType;
+	/** An Attribute Value Change structure is used in a notification to
+	report an attribute that has been changed.
+	@see <a href="#AttributeValueType">AttributeValueType</a>
+	@member attributeName the name of the attribute
+	@member oldValue the old value, type will depend on the
+	attributeName
+	@member newValue the new value, type will depend on the
+	attributeName.
+	*/
+	struct AttributeValueChangeType {
+		string attributeName;
+		any oldValue; // type depends on attribute
+		any newValue; // type depends on attribute
+	};
+	/** An Attribute Change Set is used to report the attributes that have
+	been changed in an attribute value change notification. */
+	typedef sequence <AttributeValueChangeType> AttributeChangeSetType;
+	/** A Correlated Notification is identified by the object that emitted
+	the notification and the notification ID. Both are included in case
+	the Notification IDs are not unique across objects.
+	@member source Reference to object that emitted the correlated
+	notification. If null, the correlated notifications
+	are from the same source as the notification containing
+	this data structure.
+	@member notifIDs IDs of the correlated notifications. Notification
+	identifiers must be chosen to be unique across all
+	notifications from a particular managed object
+	throughout the time that correlation is significant.
+	*/
+	struct CorrelatedNotificationType {
+		NameType source;
+		NotifIDSetType notifIDs;
+	};
+	/** Correlated Notification sets are sets of Correlated Notification
+	structures. */
+	typedef sequence <CorrelatedNotificationType>
+	CorrelatedNotificationSetType;
+	/** ProbableCause, in CMIP standards, may be either an integer or GDMO
+	OID, a dot-notation string. The UID type is used instead. */
+	typedef UIDType ProbableCauseType;
+	/** Proposed Repair Actions are sets of unique identifiers. */
+	typedef UIDSetType ProposedRepairActionSetType;
+	/** Security Alarm Causes are unique identifiers. */
+	typedef UIDType SecurityAlarmCauseType;
+	/** Security Alarm Detector can indicate either a mechanism or a
+	specific object. According to X.721 a choice is made between one or
+	the other, though it is not clear why. (Actually, X.721 adds a third
+	choice for an AE-title which has no equivalent here.) Unless otherwise
+	indicated, then, at most one of the members will be non-null. Two
+	nulls may be sent if the managed system does not support this property.
+	@member mechanism the scheme or function detecting the alarm, may
+	be null
+	@member obj the object detecting the alarm, may be null
+	*/
+	struct SecurityAlarmDetectorType {
+		UIDType mechanism; // may be null
+		NameType obj; // may be null
+	};
+	/** Service User
+	@member id the id of the service user
+	@member details details about the service user, type will depend on id
+	*/
+	struct ServiceUserType {
+		UIDType id;
+		any details; // value will depend on id
+	};
+	/** Service Providers share the same representation as Service Users.
+	*/
+	typedef ServiceUserType ServiceProviderType;
+	/** Specific Problems are sets of unique identifiers. */
+	typedef UIDSetType SpecificProblemSetType;
+	/** A Stop Time Type is used to indicate when some function should
+	cease. In the specific case, an actual time is given. In the
+	continual case, the function runs continually and no value is
+	carried in this union.
+	*/
+	union StopTimeType switch (StopTimeChoice) {
+		case specific: GeneralizedTimeType time;
+		/* case continual carries NULL value */
+	};
+	/** A SuspectObject identifies an object that may be the cause of a
+	failure. It is usually a component of a SuspectObjectList.
+	@member objectClass Object class of the suspect object
+	@member suspectObjectInstance Object instance of the suspect object
+	@member failureProbability Optional failure responsibility
+	probability from 1 to 100
+	*/
+	struct SuspectObjectType {
+		ObjectClassType objectClass;
+		ManagedObject suspectObjectInstance;
+		UnsignedShortTypeOpt failureProbability;
+	};
+	/** Suspect Object Lists are used to identify objects that may be the
+	cause of a failure.
+	*/
+	typedef sequence<SuspectObjectType> SuspectObjectSetType;
+	/** Threshold Level Indication describes multi-level threshold
+	crossings. Up is the only permitted choice for a counter. In ASN.1,
+	if indication is "up", low value is optional.
+	@member indication indicates up or down direction of crossing.
+	@member low the low observed value.
+	@member high the high observed value.
+	*/
+	struct ThresholdLevelIndType {
+		ThresholdIndicationType indication;
+		FloatTypeOpt low; // observed value
+		float high; // observed value
+	};
+	/** Threshold Level Ind Type Opt is an optional type. If the
+	discriminator is true the value is present, otherwise the value is
+	null. */
+	union ThresholdLevelIndTypeOpt switch (boolean) {
+		case TRUE: ThresholdLevelIndType value;
+	};
+	/** Threshold Information indicates some guage or counter attribute
+	passed a set threshold. The structure differs from X.721 some to
+	simplify the syntax.
+	@member attributeID Identifies the attribute that crossed the
+	threshold. Actually, it is an operation name
+	on an interface minus the "get" or "set". The
+	interface on which the operation is defined is
+	included elsewhere in the notification as
+	ObjectClass. A Null value indicates the entire
+	structure is null.
+	@member observedValue Attributes that are of type integer will be
+	converted to floats.
+	@member thresholdlevel This parameter is for multi-level threhsolds.
+	Optional.
+	@member armTime May be null(0). */
+	struct ThresholdInfoType {
+	string attributeID;
+	float observedValue;
+	ThresholdLevelIndTypeOpt thresholdLevel;
+	ExternalTimeType armTime;
+	};
+	// EXCEPTIONS 
+	/** Application error info types are passed back in managed object
+	exceptions.
+	@member error A unique identifier identifying the problem.
+	@member details A text message with additional information about the
+	problem.
+	*/
+	valuetype ApplicationErrorInfoType {
+		public UIDType error;
+		public Istring details;
+	};
+	/** Create error info types are passed back in managed object create
+	exceptions. They extend application error info types.
+	@member relatedObjects objects that have some relationship to the
+	object to be created that somehow prevented the
+	creation.
+	@member attributeList the values that would have been assigned to the
+	created object. These may hold some key to why
+	the object could not be created.
+	*/
+	valuetype CreateErrorInfoType : ApplicationErrorInfoType {
+		public MOSetType relatedObjects;
+		public AttributeSetType attributeList;
+	};
+	/** Delete error info types are passed back in managed object delete
+	exceptions. They extend application error info types.
+	@member relatedObjects objects that have some relationship to the
+	object to be deleted that somehow prevented the
+	deletion.
+	@member attributeList the attribute values assigned to the object to
+	be deleted. These may hold some key to why the
+	object could not be deleted.
+	*/
+	valuetype DeleteErrorInfoType : ApplicationErrorInfoType {
+		public MOSetType relatedObjects;
+		public AttributeSetType attributeList;
+	};
+	/** A package error info type is a special create error. It will be
+	passed back in a managed object create exception as a create error. If
+	the UID error code matches the package error info type, the client
+	application may narrow the value type from create error info type to
+	package error info type to access the additional information.
+	@member packages the list of requested packages that conflicted
+	or could not be supported.
+	*/
+	valuetype PackageErrorInfoType : CreateErrorInfoType {
+		public StringSetType packages;
+	};
+	/** Application error exceptions may be raised on any managed object
+	operation to identify a problem preventing the operation from being
+	completed. */
+	exception ApplicationError { ApplicationErrorInfoType info; };
+	/** Create error exceptions may be raised on any managed object create
+	operation to identify a problem preventing the object from being
+	completed. */
+	exception CreateError { CreateErrorInfoType info; };
+	/** Delete error exceptions may be raised by a managed object in
+	response to an attempt to delete the object. They may also be raised
+	by the terminator service. */
+	exception DeleteError { DeleteErrorInfoType info; };
+	/** Invalid length exceptions are raised when an invalid length is
+	supplied on an operation invocation. */
+	exception InvalidLength { long length; };
+	/** Invalid string exceptions are raised when an invalid string is
+	supplied on an operation invocation. */
+	exception InvalidString {};
+	// VALUE TYPES 
+	/** Bit string value types are used to represent bit strings with
+	associated semantic tags representing the bit string positions. */
+	valuetype BitStringValue {
+		/** The state of a bit string is kept in a data member
+		of type BitString (sequence of octets). The first octed
+		is the count of unused bits in the last octed. */
+		public BitString bitStringVal;
+		/** This initializer shall set all bit positions to '0' */
+		factory initValue (in unsigned long number_of_bits);
+		/** This initializer shall create a new BitStringValue with
+		the same length and value as the supplied BitString. */
+		factory InitFromBitString (in BitString desiredValue);
+		// local operations
+		/** This local operation returns 0 or 1 for the bit value
+		at the specified position. If the position requested is
+		beyond the length of the bit string an invalid length
+		exception shall be raised. */
+		short getBit (in unsigned long position)
+			raises (InvalidLength);
+		/** This local operation is used to set the value of the
+		bit at the requested position. If the position requested is
+		beyond the length of the bit string an invalid length
+		exception shall be raised. If the new_bit_value is 0,
+		the bit shall be set to 0, otherwise it shall be set to 1. */
+		void setBit (in unsigned long position, in short new_bit_value)
+			raises (InvalidLength);
+		/** This local operation returns the number of bits in the bit
+		string. Since the first octet contains the number of unused
+		bits in the last octet, and the last octet may contain unused
+		bits, the value returned is
+		(NumberOfOctets  2)*8 + (8  firstOctetVal) */
+		unsigned long length ();
+		/** This local operation returns the value of a bit string as a
+		character string. Each bit of value 0 shall be represented as
+		a '0' character, and each bit of value 1 shall be represented
+		as a '1' character. A 'B' character shall be appended to the
+		end of the string ("1001011B").
+		string asString ();
+		/** This local operation sets the value of the bit string given
+		a character string. Each '0' character in the string is
+		converted to a bit of value 0, and each '1' character is
+		converted to a 1. If the string has any characters other than
+		'0', '1', or a terminating 'B', the InvalidString exception
+		shall be raised. */
+		void setFromString (in string string_value)
+			raises (InvalidString);
+	};
+	// MANAGED OBJECT INTERFACE 
+	/** This valuetype object contains members for each of the attributes
+	accessible on this interface. */
+	valuetype ManagedObjectValueType {
+		public NameType name;
+		public ObjectClassType objectClass;
+		public StringSetType packages;
+		public SourceIndicatorType creationSource;
+		public DeletePolicyType deletePolicy;
+	};
+	/** The Managed Object interface is intended to be the base interface
+	from which all other managed object interfaces inherit. It is a
+	central place to specify basic functions which all managed objects are
+	expected to support. */
+	interface ManagedObject {
+		/** This method returns the fully-qualified name for the
+		object. This method is used rather than having a "get*ID"
+		method defined for each interface, as is done in CMIP
+		specifications. This will ensure that objects have only a
+		single operation to retrieve names when they are sub-classed.
+		<p>
+		The response is a sequence of name component structures,
+		starting with the name assigned to the "local root" naming
+		context under which this object is contained. The client may
+		find the superiors of this object by removing components from
+		the tail end of this sequence and performing a resolve
+		operation on the first part of the name. */
+		NameType nameGet()
+			raises (ApplicationError);
+		/** This method returns the scoped name of the most-specific
+		class of the interface (e.g. "EquipmentR1"). */
+		ObjectClassType objectClassGet()
+			raises (ApplicationError);
+		/** This method returns a list of all the conditional packages
+		supported by this instance. */
+		StringSetType packagesGet ()
+			raises (ApplicationError);
+		/** This method returns an indication of how the object was
+		created. */
+		SourceIndicatorType creationSourceGet()
+			raises (ApplicationError);
+		/** This method returns a value indicating if the object may be
+		deleted and if it may, if all contained objects are
+		automatically deleted. */
+		DeletePolicyType deletePolicyGet ()
+			raises (ApplicationError);
+		/** This method may be used to generically get all of the
+		attributes supported by an instance. Each interface is
+		expected to sub-class the Managed Object value type and add the
+		other attributes supported by that interface. The managed
+		object must return a value object of that type. The client
+		must then narrow the reference to access all the attributes.
+		<p>
+		The client may also submit a list of names indicating the
+		attributes it wishes to receive. These names must match the
+		member names in the value object. For members not on the list,
+		and for members that are part of packages that are not
+		supported, the server may return any value but it should be as
+		short as possible. The server also returns the list of
+		attributes, which may be shorter due to exclusion of attributes
+		in unsupported packages. The client must regard the value of
+		any member not in the list as garbage. <p>
+		A null attribute names list indicates that all supported
+		attributes are to be returned. The server must return the
+		actual list. */
+		ManagedObjectValueType attributesGet (
+			inout StringSetType attributeNames)
+			raises (ApplicationError);
+		/** This method destroys the object. It is used to simply
+		release any resources associated with the managed object. It
+		does not check for contained objects or remove name bindings
+		from the naming tree. <p>
+		The intent of this operation is to allow support services to
+		destroy the managed object. <p><b>
+		NOTE: Direct invocation of this operation from a managing
+		system could corrupt the naming tree and is recommended only
+		under extraordinary circumstances. Clients wishing to delete
+		an object should instead use the terminator service. </b> */
+		void destroy()
+			raises (ApplicationError, DeleteError);
+	}; // end of ManagedObject interface
+	// MANAGED OBJECT FACTORY INTERFACE 
+	/** This interface defines the generic managed object factory
+	interface. All Managed Object factories should inherit from this
+	interface. <p>
+	In addition to providing the means for creating objects by management
+	operation, the factories are assumed to take responsibility for
+	maintaining the integrity of the naming tree by creating name bindings
+	for the objects they create. <p>
+	Currently, this interface is null. It is included, however, as a
+	placeholder for capabilities that must be supported by all managed
+	object factories.
+	*/
+	interface ManagedObjectFactory {
+	}; // end of ManagedObjectFactory interface
+	// NOTIFICATIONS INTERFACE 
+	/** This interface contains the definitions of notifications emitted by
+	many managed objects. <p>
+	The use of "typed" notifications is done here so that the notifications
+	can be documented in IDL and to support typed notifications for those
+	manager and managing systems that wish to use them. Note that the
+	OMG's Notification Service supports both structured and typed
+	notifications. It is not clear if implementations of the Notification
+	Service will support translation between them. It is expected that the
+	implementation agreement between the managing and managed system will
+	specify the use of structured or typed notifications. <p>
+	Notification users wishing to use typed notifications need only support
+	the interfaces below. Notification publishers and subscribers wishing
+	to use structured notifications based on the operations defined below
+	should follow these rules for constructing and reading the notification
+	structure: <ul><li>
+	The domain_type string in the fixed header of the structure should be
+	set to "telecommunications". <li>
+	The event_type string in the fixed header of the structure should be
+	set to the scoped name of the operation. For example, for the
+	Attribute Value Change notification defined below this field would be
+	"itut_x780::Notifications::attributeValueChange". <li>
+	The event_name string in the fixed header of the structure is not used
+	by this framework. It can be set to null or used for other purposes.
+	<li>
+	Optional header fields may be included to support features like Quality
+	of Service as appropriate. <li>
+	Each parameter in the operation should be placed in a name-value pair
+	in the filterable body portion of the notification. The fd_name string
+	of this pair shall be set to the name of the parameter and the type
+	placed in the associated fd_value will be the type specified for the
+	parameter. For example, each of the notifications defined below has a
+	parameter named "eventTime" that is an "ExternalTimeType." This
+	parameter would be placed in the filterable data portion of the event.
+	The fd_name string of this pair would be set to "eventTime" and
+	fd_value would contain an ExternalTimeType value. <li>
+	The remainder of the body of the notification (the unfilterable part)
+	should be null. </ul>
+	Unfortunately, typed notifications are mapped to notification
+	structures differently, so if one system wants to use typed
+	notifications and the other structured, the structured notification
+	user must be aware of how the CORBA Notification Service translates
+	typed notifications to structured notifications. See the specification
+	for details. In short, however, each of the parameters in the
+	operations below will be converted into a name-value pair in the
+	filterable data protion of the structured notification. Also, the
+	event_type field in the fixed header of the structured notification
+	will be set to the special value "%TYPED" and the domain_type field
+	will be an empty string. Finally, a name-value pair will be added as
+	the first element in the filterable data portion of the notification
+	with the name "operation". The value associated with this name will be
+	a string with the value set to the scoped name of the operation used to
+	emit the notification
+	(e.g. itut_x780::Notifications::attributeValueChange). <p>
+	Also, structured notification publishers may exclude notification
+	parameters that are marked "optional" or are of an optional type (a
+	type name ending in "TypeOpt." This should be done for efficiency.
+	This will, however, preclude the automatic conversion of structured
+	notifications to typed, so managers must be capable of accepting
+	structured notifications. (They do not strictly have to support typed
+	notifications, but if managed systems emit typed notifications managers
+	should accept them rather than translations because it will be more
+	efficient.) If an "optional" parameter is included in a notification,
+	the "optional" type (discriminated union) must be used. <p>
+	Parameters named "operation" should be avoided in notification
+	operations to support the use of typed notifications. While the
+	notification channel should be able to differentiate the real parameter
+	from the one added based on their positions in the filterable data
+	list, it could have an impact on filtering as the default filtering
+	language does not have a way to differentiate parameters based on
+	position. <p>
+	Because the scoped operation name is placed in either the type_name
+	string (when structured notifications are used) or a filterable body
+	name-value pair with the name "operation" (when typed notifications are
+	used), there is no "event type" parameter explicitly included in any of
+	the notification data structures. */
+	interface Notifications {
+		/** An Attribute Value Change notification is used to report changes to
+		the attributes of an object such as addition or deletion of members to
+		one or more set-valued attributes and replacement of the value of one
+		or more attributes.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		param sourceIndicator Cause of event. Optional. Use
+		"unknown" if not supported.
+		@param attributeChanges Changed attributes
+		*/
+		void attributeValueChange (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SourceIndicatorType sourceIndicator,
+			in AttributeChangeSetType attributeChanges
+			);
+		/** A Communications Alarm notification is used to report when an
+		object detects a communications error.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param probableCause
+		@param specificProblems Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param perceivedSeverity
+		@param backedUpStatus "True" if backed up
+		@param backUpObject Will be null if backedUpStatus is
+		"false"
+		@param trendIndication Optional. See type for details.
+		@param thresholdInfo Optional. See type for details.
+		@param stateChangeDefinition Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param monitoredAttributes Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param proposedRepairActions Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param alarmEffectOnService True if alarm is service effecting.
+		@param alarmingResumed True if alarming was just resumed,
+		possibly resulting in delayed reporting
+		of an alarm
+		@param suspectObjectList Objects possibly involved in failure.
+		*/
+		void communicationsAlarm (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in ProbableCauseType probableCause,
+			in SpecificProblemSetType specificProblems,
+			in PerceivedSeverityType perceivedSeverity,
+			in BooleanTypeOpt backedUpStatus,
+			in NameType backUpObject,
+			in TrendIndicationTypeOpt trendIndication,
+			in ThresholdInfoType thresholdInfo,
+			in AttributeChangeSetType stateChangeDefinition,
+			in AttributeSetType monitoredAttributes,
+			in ProposedRepairActionSetType proposedRepairActions,
+			in BooleanTypeOpt alarmEffectOnService,
+			in BooleanTypeOpt alarmingResumed,
+			in SuspectObjectSetType suspectObjectList
+			);
+		/** An Environmental Alarm notification is used to report a problem in
+		the environment.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param probableCause
+		@param specificProblems Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param perceivedSeverity
+		@param backedUpStatus "True" if backed up
+		@param backUpObject Will be null if backedUpStatus is
+		"false"
+		@param trendIndication Optional. See type for details.
+		@param thresholdInfo Optional. See type for details.
+		@param stateChangeDefinition Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param monitoredAttributes Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param proposedRepairActions Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param alarmEffectOnService True if alarm is service effecting.
+		@param alarmingResumed True if alarming was just resumed,
+		possibly resulting in delayed reporting
+		of an alarm
+		@param suspectObjectList Objects possibly involved in failure.
+		*/
+		void environmentalAlarm (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in ProbableCauseType probableCause,
+			in SpecificProblemSetType specificProblems,
+			in PerceivedSeverityType perceivedSeverity,
+			in BooleanTypeOpt backedUpStatus,
+			in NameType backUpObject,
+			in TrendIndicationTypeOpt trendIndication,
+			in ThresholdInfoType thresholdInfo,
+			in AttributeChangeSetType stateChangeDefinition,
+			in AttributeSetType monitoredAttributes,
+			in ProposedRepairActionSetType proposedRepairActions,
+			in BooleanTypeOpt alarmEffectOnService,
+			in BooleanTypeOpt alarmingResumed,
+			in SuspectObjectSetType suspectObjectList
+			);
+		/** An Equipment Alarm notification is used to report a failure in the
+		equipment.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param probableCause
+		@param specificProblems Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param perceivedSeverity
+		@param backedUpStatus "True" if backed up
+		@param backUpObject Will be null if backedUpStatus is
+		"false"
+		@param trendIndication Optional. See type for details.
+		@param thresholdInfo Optional. See type for details.
+		@param stateChangeDefinition Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param monitoredAttributes Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param proposedRepairActions Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param alarmEffectOnService True if alarm is service effecting.
+		@param alarmingResumed True if alarming was just resumed,
+		possibly resulting in delayed reporting
+		of an alarm
+		@param suspectObjectList Objects possibly involved in failure.
+		*/
+		void equipmentAlarm (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in ProbableCauseType probableCause,
+			in SpecificProblemSetType specificProblems,
+			in PerceivedSeverityType perceivedSeverity,
+			in BooleanTypeOpt backedUpStatus,
+			in NameType backUpObject,
+			in TrendIndicationTypeOpt trendIndication,
+			in ThresholdInfoType thresholdInfo,
+			in AttributeChangeSetType stateChangeDefinition,
+			in AttributeSetType monitoredAttributes,
+			in ProposedRepairActionSetType proposedRepairActions,
+			in BooleanTypeOpt alarmEffectOnService,
+			in BooleanTypeOpt alarmingResumed,
+			in SuspectObjectSetType suspectObjectList
+			);
+		/** An Integrity Violation notification is used to report that a
+		potential interruption in information flow has occurred such that
+		information may have been illegally modified, inserted or deleted.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param securityAlarmCause
+		@param securityAlarmSeverity Clears allowed? X.721 appears to
+		restrict the "cleared" value on this
+		alarm but clears should be allowed.
+		@param securityAlarmDetector
+		@param serviceUser
+		@param serviceProvider
+		*/
+		void integrityViolation (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SecurityAlarmCauseType securityAlarmCause,
+			in PerceivedSeverityType securityAlarmSeverity,
+			in SecurityAlarmDetectorType securityAlarmDetector,
+			in ServiceUserType serviceUser,
+			in ServiceProviderType serviceProvider
+			);
+		/** An Object Creation notification is used to report the creation of a
+		managed object to another open system. Note that the source field
+		should be set to the created object, not the factory.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param sourceIndicator Cause of event. Optional. Use
+		"unknown" if not supported.
+		@param attributeSet Attribute values. Optional. Zero length
+		sequence indicates absence of this
+		parameter.
+		*/
+		void objectCreation (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SourceIndicatorType sourceIndicator,
+			in AttributeSetType attributeList
+			);
+		/** An Object Deletion notification is used to report the deletion of a
+		managed object. Note that the source field should be set to
+		the object being deleted.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param sourceIndicator Cause of event. Optional. Use
+		"unknown" if not supported.
+		@param attributeSet Attribute values. Optional. Zero length
+		sequence indicates absence of this
+		parameter.
+		*/
+		void objectDeletion (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SourceIndicatorType sourceIndicator,
+			in AttributeSetType attributeList
+			);
+		/** An Operational Violation notification is used to report that the
+		provision of the requested service was not possible due to the
+		unavailability, malfunction or incorrect invocation of the service.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param securityAlarmCause
+		@param securityAlarmSeverity Clears allowed? X.721 appears to
+		restrict the "cleared" value on this
+		alarm but clears should be allowed.
+		@param securityAlarmDetector
+		@param serviceUser
+		@param serviceProvider
+		*/
+		void operationalViolation (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SecurityAlarmCauseType securityAlarmCause,
+			in PerceivedSeverityType securityAlarmSeverity,
+			in SecurityAlarmDetectorType securityAlarmDetector,
+			in ServiceUserType serviceUser,
+			in ServiceProviderType serviceProvider
+			);
+		/** A Physical Violation notification is used to report that a physical
+		resource has been violated in a way that indicates a potential security
+		attack.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param securityAlarmCause
+		@param securityAlarmSeverity Clears allowed? X.721 appears to
+		restrict the "cleared" value on this
+		alarm but clears should be allowed.
+		@param securityAlarmDetector
+		@param serviceUser
+		@param serviceProvider
+		*/
+		void physicalViolation (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SecurityAlarmCauseType securityAlarmCause,
+			in PerceivedSeverityType securityAlarmSeverity,
+			in SecurityAlarmDetectorType securityAlarmDetector,
+			in ServiceUserType serviceUser,
+			in ServiceProviderType serviceProvider
+			);
+		/** A Processing Error Alarm notification is used to report a
+		processing failure in a managed object.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param probableCause
+		@param specificProblems Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param perceivedSeverity
+		@param backedUpStatus "True" if backed up
+		@param backUpObject Will be null if backedUpStatus is
+		"false"
+		@param trendIndication Optional. See type for details.
+		@param thresholdInfo Optional. See type for details.
+		@param stateChangeDefinition Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param monitoredAttributes Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param proposedRepairActions Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param alarmEffectOnService True if alarm is service effecting.
+		@param alarmingResumed True if alarming was just resumed,
+		possibly resulting in delayed reporting
+		of an alarm
+		@param suspectObjectList Objects possibly involved in failure.
+		*/
+		void processingErrorAlarm (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in ProbableCauseType probableCause,
+			in SpecificProblemSetType specificProblems,
+			in PerceivedSeverityType perceivedSeverity,
+			in BooleanTypeOpt backedUpStatus,
+			in NameType backUpObject,
+			in TrendIndicationTypeOpt trendIndication,
+			in ThresholdInfoType thresholdInfo,
+			in AttributeChangeSetType stateChangeDefinition,
+			in AttributeSetType monitoredAttributes,
+			in ProposedRepairActionSetType proposedRepairActions,
+			in BooleanTypeOpt alarmEffectOnService,
+			in BooleanTypeOpt alarmingResumed,
+			in SuspectObjectSetType suspectObjectList
+			);
+		/** A Quality of Service Alarm notification is used to report a failure
+		in the quality of service of the managed object.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param probableCause
+		@param specificProblems Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param perceivedSeverity
+		@param backedUpStatus "True" if backed up
+		@param backUpObject Will be null if backedUpStatus is
+		"false"
+		@param trendIndication Optional. See type for details.
+		@param thresholdInfo Optional. See type for details.
+		@param stateChangeDefinition Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param monitoredAttributes Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param proposedRepairActions Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param alarmEffectOnService True if alarm is service effecting.
+		@param alarmingResumed True if alarming was just resumed,
+		possibly resulting in delayed reporting
+		of an alarm
+		@param suspectObjectList Objects possibly involved in failure.
+		*/
+		void qualityOfServiceAlarm (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in ProbableCauseType probableCause,
+			in SpecificProblemSetType specificProblems,
+			in PerceivedSeverityType perceivedSeverity,
+			in BooleanTypeOpt backedUpStatus,
+			in NameType backUpObject,
+			in TrendIndicationTypeOpt trendIndication,
+			in ThresholdInfoType thresholdInfo,
+			in AttributeChangeSetType stateChangeDefinition,
+			in AttributeSetType monitoredAttributes,
+			in ProposedRepairActionSetType proposedRepairActions,
+			in BooleanTypeOpt alarmEffectOnService,
+			in BooleanTypeOpt alarmingResumed,
+			in SuspectObjectSetType suspectObjectList
+			);
+		/** A Relationship Change notification is used to report the change in
+		the value of one or more relationship attributes of a managed object,
+		that result through either internal operation of the managed object or
+		via management operation.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param sourceIndicator Cause of event. Optional. Use
+		"unknown" if not supported.
+		@param relationshipChanges Changed relationship attributes
+		*/
+		void relationshipChange (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SourceIndicatorType sourceIndicator,
+			in AttributeChangeSetType relationshipChanges
+			);
+		/** A Security Violation notification is used to report that a security
+		attack has been detected by a security service or mechanism.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param securityAlarmCause
+		@param securityAlarmSeverity Clears allowed? X.721 appears to
+		restrict the "cleared" value on this
+		alarm but clears should be allowed.
+		@param securityAlarmDetector
+		@param serviceUser
+		@param serviceProvider
+		*/
+		void securityViolation (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SecurityAlarmCauseType securityAlarmCause,
+			in PerceivedSeverityType securityAlarmSeverity,
+			in SecurityAlarmDetectorType securityAlarmDetector,
+			in ServiceUserType serviceUser,
+			in ServiceProviderType serviceProvider
+			);
+		/** A State Change notification is used to report the change in the the
+		value of one or more state attributes of a managed object, that result
+		through either internal operation of the managed object or via
+		management operation.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param sourceIndicator Cause of event. Optional. Use
+		"unknown" if not supported.
+		@param stateChanges Changed state attributes.
+		*/
+		void stateChange (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SourceIndicatorType sourceIndicator,
+			in AttributeChangeSetType stateChanges
+			);
+		/** A Time Domain Violation notification is used to report that an
+		event has occurred at an unexpected or prohibited time.
+		@param eventTime Managed system's current time.
+		@param source Object emitting notification.
+		@param sourceClass Actual class of source object.
+		@param notificationIdentifier A unique identifier for this
+		notification. Must be unique for
+		an object instance. (Optional in X.721
+		but not here. See text for
+		discussion of possible implications)
+		@param correlatedNotifications List of correlated notifications.
+		Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param additionalText Text message. Optional. Zero length
+		string indicates absence of this
+		parameter.
+		@param additionalInfo Optional. Zero length sequence
+		indicates absence of this parameter.
+		@param securityAlarmCause
+		@param securityAlarmSeverity Clears allowed? X.721 appears to
+		restrict the "cleared" value on this
+		alarm but clears should be allowed.
+		@param securityAlarmDetector
+		@param serviceUser
+		@param serviceProvider
+		*/
+		void timeDomainViolation (
+			in ExternalTimeType eventTime,
+			in NameType source,
+			in ObjectClassType sourceClass,
+			in NotifIDType notificationIdentifier,
+			in CorrelatedNotificationSetType correlatedNotifications,
+			in AdditionalTextType additionalText,
+			in AdditionalInformationSetType additionalInfo,
+			in SecurityAlarmCauseType securityAlarmCause,
+			in PerceivedSeverityType securityAlarmSeverity,
+			in SecurityAlarmDetectorType securityAlarmDetector,
+			in ServiceUserType serviceUser,
+			in ServiceProviderType serviceProvider
+			);
+		/** These constants define the names of the notifications declared
+		above and are provided to help reduce errors. */
+		const string attributeValueChangeTypeName =
+			"itut_x780::Notifications::attributeValueChange";
+		const string communicationsAlarmTypeName =
+			"itut_x780::Notifications::communicationsAlarm";
+		const string environmentalAlarmTypeName =
+			"itut_x780::Notifications::environmentalAlarm";
+		const string equipmentAlarmTypeName =
+			"itut_x780::Notifications::equipmentAlarm";
+		const string integrityViolationTypeName =
+			"itut_x780::Notifications::integrityViolation";
+		const string objectCreationTypeName =
+			"itut_x780::Notifications::objectCreation";
+		const string objectDeletionTypeName =
+			"itut_x780::Notifications::objectDeletion";
+		const string operationalViolationTypeName =
+			"itut_x780::Notifications::operationalViolation";
+		const string physicalViolationTypeName =
+			"itut_x780::Notifications::physicalViolation";
+		const string processingErrorAlarmTypeName =
+			"itut_x780::Notifications::processingErrorAlarm";
+		const string qualityOfServiceAlarmTypeName =
+			"itut_x780::Notifications::qualityOfServiceAlarm";
+		const string relationshipChangeTypeName =
+			"itut_x780::Notifications::relationshipChange";
+		const string securityViolationTypeName =
+			"itut_x780::Notifications::securityViolation";
+		const string stateChangeTypeName =
+			"itut_x780::Notifications::stateChange";
+		const string timeDomainViolationTypeName =
+			"itut_x780::Notifications::timeDomainViolation";
+		/** These constants define the names of the parameters used in the
+		notifications declared above and are provided to help reduce errors.
+		*/
+		const string additionalInfoName = "additionalInfo";
+		const string additionalTextName = "additionalText";
+		const string alarmEffectOnServiceName = "alarmEffectOnService";
+		const string alarmingResumedName = "alarmingResumed";
+		const string attributeChangesName = "attributeChanges";
+		const string attributeListName = "attributeList";
+		const string backedUpStatusName = "backedUpStatus";
+		const string backUpObjectName = "backUpObject";
+		const string correlatedNotificationsName = "correlatedNotifications";
+		const string eventTimeName = "eventTime";
+		const string monitoredAttributesName = "monitoredAttributes";
+		const string notificationIdentifierName = "notificationIdentifier";
+		const string perceivedSeverityName = "perceivedSeverity";
+		const string probableCauseName = "probableCause";
+		const string proposedRepairActionsName = "proposedRepairActions";
+		const string relationshipChangesName = "relationshipChanges";
+		const string securityAlarmCauseName = "securityAlarmCause";
+		const string securityAlarmDetectorName = "securityAlarmDetector";
+		const string securityAlarmSeverityName = "securityAlarmSeverity";
+		const string serviceProviderName = "serviceProvider";
+		const string serviceUserName = "serviceUser";
+		const string sourceName = "source";
+		const string sourceClassName = "sourceClass";
+		const string sourceIndicatorName = "sourceIndicator";
+		const string specificProblemsName = "specificProblems";
+		const string stateChangeDefinitionName = "stateChangeDefinition";
+		const string stateChangesName = "stateChanges";
+		const string suspectObjectListName = "suspectObjectList";
+		const string thresholdInfoName = "thresholdInfo";
+		const string trendIndicationName = "trendIndication";
+	}; // end of Notifications interface
+}; // end of itut_x780 module
+// MACROS 
+/* The following macros are provided for quickly and concisely defining
+the notifications to be supported by an object. Example usage (within an
+interface):
+MANDATORY_NOTIFICATION(itut_x780::Notifications, objectCreation);
+CONDITIONAL_NOTIFICATION(itut_x780::Notifications, stateChange, statePackage);
+The macros simply expand into nothing, as CORBA IDL doesn't really have
+anything for them to expand into that makes sense. Eventually, these
+may be changed to expand into IDL supporting the CORBA Component Model.
+*/
+#undef MANDATORY_NOTIFICATION
+#define MANDATORY_NOTIFICATION(InterfaceName, NotificationName)
+#undef CONDITIONAL_NOTIFICATION
+#define CONDITIONAL_NOTIFICATION(InterfaceName, NotificationName, PackageName)
+#endif // end of ifndef itut_x780_IDL
+ANNEX B 
+Network Management Constant Definitions 
+ 
+/* This IDL code is intended to be stored in a file named "itut_x780Const.idl"
+and located in the same directory as the file containing Annex A */
+#ifndef ITUT_X780Const_IDL
+#define ITUT_X780Const_IDL
+#pragma prefix "itu.int"
+module itut_x780 {
+	// ApplicationErrorConst Module 
+	/** This module contains the constants defined for the error code contained in
+	Application Error Info structures returned with Application Error exceptions.
+	*/
+	module ApplicationErrorConst {
+		const string moduleName = "itut_x780::ApplicationErrorConst";
+		/** This application error exception code indicates the operation
+		failed due to a problem downstream from the managed system,
+		possibly a communication problem between the managed system
+		and the resource */
+		const short downstreamError = 1;
+		/** An application error exception returining this code will return
+		the name of the offending paramter in the details field. */
+		const short invalidParameter = 2;
+		/** This application error exception code indicates the operation
+		failed due to a transient problem on the managed system. */
+		const short resourceLimit = 3;
+	}; // end of module ApplicationErrorConst
+	// CreateErrorConst Module 
+	/** This module contains the constants defined for the error code contained in
+	Create Error Info structures returned with Create Error exceptions.
+	*/
+	module CreateErrorConst {
+		const string moduleName = "itut_x780::CreateErrorConst";
+		/** This create error exception code indicates that the name included
+		in the create operation is not valid. */
+		const short badName = 1;
+		/** This create error exception code indicates that the name included
+		in the create operation is a duplicate. */
+		const short duplicateName = 2;
+		/** This create error exception code indicates some packages requested
+		in the create operation are incompatible with each other. It must
+		be included in a PackageErrorInfoType structure (subclass of
+		CreateErrorInfoType). The packages list contains the names of the
+		unsupported packages. */
+		const short incompatiblePackages = 3;
+		/** This create error exception code indicates that the name binding
+		referenced in the create operation is not valid. */
+		const short invalidNameBinding = 4;
+		/** This create error exception code indicates a package requested in
+		the create operation is not supported. It must be included in a
+		PackageErrorInfoType structure (subclass of CreateErrorInfoType).
+		The packages list contains the names of the unsupported packages.
+		*/
+		const short unsupportedPackages = 5;
+	}; // end of module CreateErrorConst
+	// DeleteErrorConst Module 
+	/** This module contains the constants defined for the error code contained in
+	Delete Error Info structures returned with Delete Error exceptions.
+	*/
+	module DeleteErrorConst {
+		const string moduleName = "itut_x780::DeleteErrorConst";
+		/** This delete error exceptin code indicates the object has both
+		subordinates and a delete policy of deleteOnlyIfNoContained. */
+		const short containsObjects = 1;
+		/** This delete error exception code indicates the object has a delete
+		policy of notDeletable, and cannot be deleted. */
+		const short notDeletable = 2;
+		/** This delete error exception code indicates the object had a
+		subordinate object that could not be deleted, so the superior
+		object(s) could not be deleted. */
+		const short undeletableContainedObject = 3;
+		/** This delete error exception code indicates the object is in
+		a state in which it cannot be deleted. */
+		const short invalidStateForDestroy = 4;
+	}; // end of module DeleteErrorConst
+	// ProbableCauseConst Module 
+	/** This module contains the constant values defined for the
+	ProbableCause UID. These values were borrowed from X.721. */
+	module ProbableCauseConst {
+		const string moduleName = "itut_x780::ProbableCauseConst";
+		const short indeterminate = 0;
+		const short adapterError = 1;
+		const short applicationSubsystemFailure = 2;
+		const short bandwidthReduced = 3;
+		const short callEstablishmentError = 4;
+		const short communicationsProtocolError = 5;
+		const short communicationsSubsystemFailure = 6;
+		const short configurationOrCustomizationError = 7;
+		const short congestion = 8;
+		const short corruptData = 9;
+		const short cpuCyclesLimitExceeded = 10;
+		const short dataSetOrModemError = 11;
+		const short degradedSignal = 12;
+		const short dTE_DCEInterfaceError = 13;
+		const short enclosureDoorOpen = 14;
+		const short equipmentMalfunction = 15;
+		const short excessiveVibration = 16;
+		const short fileError = 17;
+		const short fireDetected = 18;
+		const short floodDetected = 19;
+		const short framingError = 20;
+		const short heatingOrVentilationOrCoolingSystemProblem = 21;
+		const short humidityUnacceptable = 22;
+		const short inputOutputDeviceError = 23;
+		const short inputDeviceError = 24;
+		const short lANError = 25;
+		const short leakDetected = 26;
+		const short localNodeTransmissionError = 27;
+		const short lossOfFrame = 28;
+		const short lossOfSignal = 29;
+		const short materialSupplyExhausted = 30;
+		const short multiplexerProblem = 31;
+		const short outOfMemory = 32;
+		const short ouputDeviceError = 33;
+		const short performanceDegraded = 34;
+		const short powerProblem = 35;
+		const short pressureUnacceptable = 36;
+		const short processorProblem = 37;
+		const short pumpFailure = 38;
+		const short queueSizeExceeded = 39;
+		const short receiveFailure = 40;
+		const short receiverFailure = 41;
+		const short remoteNodeTransmissionError = 42;
+		const short resourceAtOrNearingCapacity = 43;
+		const short responseTimeExcessive = 44;
+		const short retransmissionRateExcessive = 45;
+		const short softwareError = 46;
+		const short softwareProgramAbnormallyTerminated = 47;
+		const short softwareProgramError = 48;
+		const short storageCapacityProblem = 49;
+		const short temperatureUnacceptable = 50;
+		const short thresholdCrossed = 51;
+		const short timingProblem = 52;
+		const short toxicLeakDetected = 53;
+		const short transmitFailure = 54;
+		const short transmitterFailure = 55;
+		const short underlyingResourceUnavailable = 56;
+		const short versionMismatch = 57;
+	}; // end of ProbableCauseConst module
+	// SecurityAlarmCauseConst Module
+	/** This module contains the constant values defined for the
+	SecurityAlarmCause UID. These values were borrowed from
+	X.721. */
+	module SecurityAlarmCauseConst {
+		const string moduleName = "itut_x780::SecurityAlarmCauseConst";
+		const short authenticationFailure = 1;
+		const short breachOfConfidentiality = 2;
+		const short cableTamper = 3;
+		const short delayedInformation = 4;
+		const short denialOfService = 5;
+		const short duplicateInformation = 6;
+		const short informationMissing = 7;
+		const short informationModificationDetected = 8;
+		const short informationOutOfSequence = 9;
+		const short intrusionDetection = 10;
+		const short keyExpired = 11;
+		const short nonRepudiationFailure = 12;
+		const short outOfHoursActivity = 13;
+		const short outOfService = 14;
+		const short proceduralError = 15;
+		const short unauthorizedAccessAttempt = 16;
+		const short unexpectedInformation = 17;
+		const short unspecifiedReason = 18;
+	}; // end of SecurityAlarmCauseConst module
+}; // end of itut_x780 module
+#endif // end of ifndef ITUT_X780Const_IDL
+// vim: com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS

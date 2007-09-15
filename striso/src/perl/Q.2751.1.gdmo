@@ -1,0 +1,1920 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 01:24:01 MDT 2007
+--@@ 
+--< GDMO.Include "X.721.gdmo" >--
+--< GDMO.Include "X.723.gdmo" >--
+--< GDMO.Include "M.3100.gdmo" >--
+--< GDMO.Include "Q.751.1.gdmo" >--
+--< GDMO.Document "ITU-T Rec. Q.2751.1 (1997)" >--
+MODULE "ITU-T Rec. Q.2751.1 (1997)"
+-- 8 Formal Specification
+-- 8.1 Managed object class definitions
+
+mtpAccessPoint MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.751.1 (1995)":mtpAccessPoint;
+	CHARACTERIZED BY
+		longMessageSupportedPackage;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":alarmSeverityAssignmentPointerPackage
+			PRESENT IF
+				"An instance supports it and ss7OnOccEventPackage is present",
+		"ITU-T Rec. Q.751.1 (1995)":mtpAccessPointNamePackage
+			PRESENT IF
+				"an instance supports it",
+		ss7OnOccEventPackage
+			PRESENT IF
+				"An instance supports it";
+REGISTERED AS { mtpAccessPoint-OOi };
+
+
+saalNniProtocolProfile MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992":top;
+	CHARACTERIZED BY
+		saalNniProtocolProfilePackage;
+	CONDITIONAL PACKAGES
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the objectCreation and objectDeletion notifications defined in oITU-T Rec. X.721 
+				(1992) | ISO/IEC 10165-2: 1992o are supported by an instance of this class",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the attributeValueChangeNotification defined in nITU-T Rec. X.721 (1992) | 
+				ISO/IEC 10165-2: 1992 is supported by an instance of this class",
+		"ITU-T Rec. Q.751.1 (1995)":bufferMechanismPackage
+			PRESENT IF
+				"an instance supports it",
+		"ITU-T Rec. Q.751.1 (1995)":congestionHandlingPackage
+			PRESENT IF
+				"an instance supports it",
+		egressTransmissionRateIntervalPackage
+			PRESENT IF
+				"an instance support it",
+		"ITU-T Rec. Q.751.1 (1995)":multipleTransmissionCongestionStatesPackage
+			PRESENT IF
+				"an instance supports it",
+		pollAfterRetransmissionPackage
+			PRESENT IF
+				"an instance supports this national option",
+		"ITU-T Rec. Q.751.1 (1995)":receiveCongestionLevelsPackage
+			PRESENT IF
+				"an instance supports it",
+		saalNniProtocolProfileNamePackage
+			PRESENT IF
+				"an instance supports it",
+		thresholdsForMultCongLevelsPackage
+			PRESENT IF
+				"an instance supports it",
+		thresholdsForMultCongLevelsWithPrioPackage
+			PRESENT IF
+				"an instance supports it";
+REGISTERED AS { saalNniProtocolProfile-OOi };
+
+
+signDataLinkTp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992":top;
+	--Inheriting Q.751.1: signDataLinkTp is not possible because pure narrow-band attribute transmissionRate
+	--is mandatory there. For broadband data links, one would have to give a value for an irrelevant attribute at
+	--creation time then.
+	CHARACTERIZED BY
+		signDataLinkTpPackage;
+	CONDITIONAL PACKAGES
+		adjPcPackage
+			PRESENT IF
+				"the instance supports it",
+		narrowbandSpecificPackage
+			PRESENT IF
+				" the signDataLink is not using SAAL NNI. The presence of this package excludes 
+				 the presence of the broadbandSpecificPackage.",
+		broadbandSpecificPackage
+			PRESENT IF
+				" the signDataLink is using SAAL NNI. The presence of this package excludes the 
+				 presence of the narrowbandSpecificPackage.",
+		"ITU-T Rec. M.3100 (1992)":attributeValueChangeNotificationPackage
+			PRESENT IF
+				"the instance supports it",
+		"ITU-T Rec. M.3100 (1992)":createDeleteNotificationsPackage
+			PRESENT IF
+				"the instance supports it",
+		"ITU-T Rec. Q.751.1 (1995)":clCPackage
+			PRESENT IF
+				"the instance supports it",
+		"ITU-T Rec. Q.751.1 (1995)":signDataLinkTpNamePackage
+			PRESENT IF
+				"the instance supports it",
+		"ITU-T Rec. Q.751.1 (1995)":stmChannelPackage
+			PRESENT IF
+				"the instance supports it or the signalling point supports the automatic 
+				allocation of signalling datalinks AND the broadbandSpecificPackage is not 
+				present.";
+REGISTERED AS { signDataLinkTp-OOi };
+
+
+signLinkTp MANAGED OBJECT CLASS
+	DERIVED FROM
+		"ITU-T Rec. Q.751.1 (1995)":signLinkTp;
+	CHARACTERIZED BY
+		signLinkTpPackage;
+REGISTERED AS { signLinkTp-OOi };
+-- 8.2 Name binding definitions
+
+
+mtpAccessPoint-mtpSignPoint NAME BINDING
+	-- this name binding is mandatory --
+	SUBORDINATE OBJECT CLASS mtpAccessPoint AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Rec. Q.751.1 (1995)":mtpSignPoint AND SUBCLASSES;
+	WITH ATTRIBUTE
+		"ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5: 1993":sapId;
+	BEHAVIOUR
+		mtpAccessPoint-mtpSignPointBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected, if
+				EITHER
+				the system specific maximal number of instances of this object class per managed 
+				switching element have already been created
+				OR
+				the system specific maximal number of instances of this object class per 
+				mtpSignPoint have already been created
+				OR
+				the name package is supported: a value for the name attribute is already used by 
+				another instance of the same object.
+				A delete request is rejected, if the specified instance has not been created.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { mtpAccessPoint-mtpSignPoint-NBOi };
+
+
+saalNniProtocolProfile-managedElement NAME BINDING
+	-- this name binding is optional --
+	SUBORDINATE OBJECT CLASS saalNniProtocolProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Rec. M.3100 (1992)":managedElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		saalNniProtocolProfileId;
+	BEHAVIOUR
+		saalNniProtocolProfile-managedElementBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected, if
+				EITHER
+				the system specific maximal number of instances of this object class per managed 
+				switching element have already been created
+				OR
+				the name package is supported: the value for the name attribute is already used 
+				by another instance of the same object class
+				A delete request is rejected, if either
+				an attempt is made to delete an saalNniProtocolProfile which is still referenced 
+				by an instance of another class
+				OR
+				the specified instance has not been created.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { saalNniProtocolProfile-managedElement-NBOi };
+
+
+saalNniProtocolProfile-managedSwitchingElement NAME BINDING
+	-- this name binding is optional --
+	SUBORDINATE OBJECT CLASS saalNniProtocolProfile AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Rec. Q.751.1 (1995)":managedSwitchingElement AND SUBCLASSES;
+	WITH ATTRIBUTE
+		saalNniProtocolProfileId;
+	BEHAVIOUR
+		saalNniProtocolProfile-managedSwitchingElementBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected, if
+				EITHER
+				the system specific maximal number of instances of this object class per managed 
+				switching element have already been created
+				OR
+				the name package is supported: the value for the name attribute is already used 
+				by another instance of the same object class
+				A delete request is rejected, if either
+				an attempt is made to delete an saalNniProtocolProfile which is still referenced 
+				by an instance of another class
+				OR
+				the specified instance has not been created.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { saalNniProtocolProfile-managedSwitchingElement-NBOi };
+
+
+signDataLinkTp-mtpSignPoint NAME BINDING
+	-- this name binding is mandatory --
+	SUBORDINATE OBJECT CLASS signDataLinkTp AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Rec. Q.751.1 (1995)":mtpSignPoint AND SUBCLASSES;
+	WITH ATTRIBUTE
+		signDataLinkTpId;
+	BEHAVIOUR
+		signDataLinkTp-mtpSignPointBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected, if
+				EITHER
+				the equipmentPointer would reference equipment that does not exist
+				OR
+				if the name package is supported: the value for the name attribute is already 
+				used by another instance of the same object class
+				OR
+				it is tried to create a broadband data link without the vcTTpPointer attribute 
+				being present
+				OR
+				it is tried to create a narrow-band data link with the vcTTpPointer attribute 
+				being present
+				OR
+				the system specific maximal number of instances of this object class per managed 
+				switching element have already been created
+				OR
+				the system specific maximal number of instances of this object class per 
+				instance of mtpSignPoint have already been created
+				OR
+				the system specific maximal number of references of an instance which would be 
+				referenced by equipmentPointer of the instance to be created has already been 
+				reached
+				OR
+				the system specific maximal number of references of an instance of 
+				vcTTPBidirectional which would be referenced by the instance to be created has 
+				already been reached .
+				A delete request is rejected, if
+				EITHER
+				an attempt is made to delete an signDataLinkTp which is still referenced by an 
+				instance of another class
+				OR
+				the specified instance has not been created.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { signDataLinkTp-mtpSignPoint-NBOi };
+
+
+signLinkTp-signLinkSetTp NAME BINDING
+	-- this name binding is mandatory --
+	SUBORDINATE OBJECT CLASS signLinkTp AND SUBCLASSES;
+	NAMED BY
+	SUPERIOR OBJECT CLASS "ITU-T Rec. Q.751.1 (1995)":signLinkSetTp AND SUBCLASSES;
+	WITH ATTRIBUTE
+		slCode;
+	BEHAVIOUR
+		signLinkTp-signLinkSetTpBehaviour BEHAVIOUR
+			DEFINED AS
+				"A create request is rejected, if
+				EITHER
+				if the name package is supported: the value for the name attribute is already 
+				used by another instance of the same object class
+				OR
+				the system specific maximal number of instances of this object class per 
+				managedSwitchingElement have already been created
+				OR
+				the system specific maximal number of instances of this object class per 
+				instance of mtpSignPoint have already been created
+				OR
+				the system specific maximal number of instances of this object class per 
+				instance of signLinkSetTp have already been created
+				OR
+				the system specific maximal number of references of an instance of 
+				signDataLinkTp which would be referenced by the instance to be created has 
+				already been reached
+				OR
+				the system specific maximal number of references of an instance of 
+				mtpL2ProtocolProfile which would be referenced by the instance to be created has 
+				already been reached
+				OR
+				the system specific maximal number of references of an instance of 
+				saalNniProtocolProfile which would be referenced by the instance to be created 
+				has already been reached
+				OR
+				a pointer would reference an instance, which does not belong to the appropriate 
+				object class
+				OR
+				a pointer would reference an instance which is not existing
+				OR
+				a signDataLinkTpPointer would reference a signDataLinkTp which is not in the 
+				same mtpSignPoint as the superior signLinkSetTp of the signLinkTp
+				OR
+				a signDataLinkTpPointer would reference a signDataLinkTp which is already 
+				referenced by another signLinkTp
+				OR
+				a signDataLinkTpPointer would reference a signDataLinkTp which has a different 
+				value of adjPc (if the adjPcPackage is present) than the superior signLinkSetTp 
+				of the signLinkTp
+				OR
+				the link would reference a datalink and a mtpL2ProtocolProfile whose 
+				transmissionRates are not the same
+				OR
+				the link would reference a mtpL2ProtocolProfile where the appropriate packages 
+				for the congestionControlMethod of the superior signLinkSetTp are not present 
+				(see B.1.2.9.2 in Annex B) in Q.751.1
+				OR
+				the spTimersProfilePackage is present in the superior mtpSignPoint AND the link 
+				would reference a mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the 
+				q704-t17 of the spTimersProfile referenced by the mtpSignPoint
+				OR
+				the spTimersPackage is present in the superior mtpSignPoint AND the link would 
+				reference a mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the q704-t17 
+				of the mtpSignPoint
+				OR
+				it is tried to reference a combination of a saalNniProtocolProfile and a 
+				signDataLinkTp, in which attribute vcTTpPointer is not present
+				OR
+				it is tried to reference a combination of a mtpL2ProtocolProfile and a 
+				signDataLinkTp, in which attribute transmissionRate is not present
+				OR
+				it is tried to reference a combination of a saalNniProtocolProfile and a 
+				signDataLinkTp, where the peak cell rates of the ingress and egress traffic of 
+				virtual channel assigned to the signDataLinkTp does not fall in the 
+				corresponding transmissionRateInterval of the referenced saalNniProtocolProfile. 
+				This rejection also takes place if only a single pointer within the 
+				signDataLinkTpList or the signTermList (if present) is wrong.
+				A delete request is rejected, if
+				the linkTpStatus does not contain the value deactivated.";;
+	CREATE;
+	DELETE;
+REGISTERED AS { signLinkTp-signLinkSetTp-NBOi };
+-- 8.3 Package definitions
+
+
+adjPcPackage PACKAGE
+	BEHAVIOUR
+		adjPcPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the adjacent point code representing the point code of the 
+				adjacent SP, to which the resource represented by the instance is connected. It 
+				might be used for automatic allocation of data links.";;
+	ATTRIBUTES
+		"ITU-T Rec. Q.751.1 (1995)":adjPc GET SET-BY-CREATE;
+REGISTERED AS { adjPcPackage-POi };
+
+
+broadbandSpecificPackage PACKAGE
+	BEHAVIOUR
+		broadbandSpecificPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the SAAL NNI specific information for the signDataLinkTp.";;
+	ATTRIBUTES
+		vcTTpPointer GET SET-BY-CREATE;
+REGISTERED AS { broadbandSpecificPackage-POi };
+
+
+egressTransmissionRateIntervalPackage PACKAGE
+	BEHAVIOUR
+		egressTransmissionRateIntervalPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package should be used, if the attributes of the saalNniProtocolProfile are 
+				designed to fit to SAAL NNI signalling traffic, where ingress and egress traffic 
+				have significantly different cell rates.";;
+	ATTRIBUTES
+		egressTransmissionRateInterval GET SET-BY-CREATE;
+REGISTERED AS { egressTransmissionRateIntervalPackage-POi };
+
+
+longMessageSupportedPackage PACKAGE
+	BEHAVIOUR
+		longMessageSupportedPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the possibility to specify whether messages longer than 
+				272 octetts are supported by the instance.";;
+	ATTRIBUTES
+		longMessageSupported GET-REPLACE;
+REGISTERED AS { longMessageSupportedPackage-POi };
+
+
+narrowbandSpecificPackage PACKAGE
+	BEHAVIOUR
+		narrowbandSpecificPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the narrow-band specific information for the 
+				signDataLinkTp.";;
+	ATTRIBUTES
+		"ITU-T Rec. Q.751.1 (1995)":transmissionRate GET SET-BY-CREATE;
+REGISTERED AS { narrowbandSpecificPackage-POi };
+
+
+pollAfterRetransmissionPackage PACKAGE
+	BEHAVIOUR
+		pollAfterRetransmissionPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package should be used, if the poll after retransmission can be selected at 
+				creation time of a saalNniProtocolProfile.";;
+	ATTRIBUTES
+		pollAfterRetransmission GET SET-BY-CREATE;
+REGISTERED AS { pollAfterRetransmissionPackage-POi };
+
+
+saalNniProtocolProfileNamePackage PACKAGE
+	BEHAVIOUR
+		saalNniProtocolProfileNamePackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"A set request to a name, which is already used by another instance of this 
+				class, will be rejected.";;
+	ATTRIBUTES
+		saalNniProtocolProfileName GET-REPLACE;
+REGISTERED AS { saalNniProtocolProfileNamePackage-POi };
+
+
+saalNniProtocolProfilePackage PACKAGE
+	BEHAVIOUR
+		saalNniProtocolProfileBehaviour BEHAVIOUR
+			DEFINED AS
+				"The saalNniProtocolProfile is a broadband-specific object class and corresponds 
+				to the object class mtpL2ProtocolProfile for narrow-band. The MOC comprises 
+				attributes required for SSCOP, SSCF-NNI and Layer Management for NNI.";;
+	ATTRIBUTES
+		saalNniProtocolProfileId GET SET-BY-CREATE,
+		bufferRelease GET SET-BY-CREATE,
+		maxCc
+			DEFAULT VALUE Q2751DefinedTypesModule.maxCcDefaultForNNI
+			GET SET-BY-CREATE,
+		maxNrp
+			DEFAULT VALUE Q2751DefinedTypesModule.maxNrpDefault
+			GET SET-BY-CREATE,
+		maxInformationFieldLength
+			DEFAULT VALUE Q2751DefinedTypesModule.maxInformationFieldLengthDefaultForNni
+			GET SET-BY-CREATE,
+		maxLengthSscopUuField
+			DEFAULT VALUE Q2751DefinedTypesModule.maxLengthSscopUuFieldDefaultForNNI
+			GET SET-BY-CREATE,
+		maxPd
+			DEFAULT VALUE Q2751DefinedTypesModule.maxPdDefaultForNNI
+			GET SET-BY-CREATE,
+		maxSscopCreditToPeer
+			DEFAULT VALUE Q2751DefinedTypesModule.maxSscopCreditToPeerDefault
+			GET SET-BY-CREATE,
+		maxStat
+			DEFAULT VALUE Q2751DefinedTypesModule.maxStatDefault
+			GET SET-BY-CREATE,
+		n1
+			DEFAULT VALUE Q2751DefinedTypesModule.n1Default
+			GET SET-BY-CREATE,
+		nniLayerManagementProvingState
+			DEFAULT VALUE Q2751DefinedTypesModule.nniLayerManagementProvingNniStateDefault
+			GET SET-BY-CREATE,
+		nniLayerManagementTimerNoCredit
+			DEFAULT VALUE Q2751DefinedTypesModule.nniLayerManagementTimerNoCreditDefault
+			GET SET-BY-CREATE,
+		nniLayerManagementTimerRepeatSrec
+			DEFAULT VALUE Q2751DefinedTypesModule.nniLayerManagementTimerRepeatSrecDefault
+			GET SET-BY-CREATE,
+		nniTimerT1
+			DEFAULT VALUE Q2751DefinedTypesModule.nniTimerT1Default
+			GET SET-BY-CREATE,
+		nniTimerT2
+			DEFAULT VALUE Q2751DefinedTypesModule.nniTimerT2Default
+			GET SET-BY-CREATE,
+		nniTimerT3
+			DEFAULT VALUE DERIVATION RULE
+				nniTimerT3DerivationRule BEHAVIOUR
+					DEFINED AS
+						"Such that loading of the signalling link is approximately 50% of its nominal 
+						cell rate (Table 5/Q.2140).";
+			GET SET-BY-CREATE,
+		sscopTimerCc
+			DEFAULT VALUE Q2751DefinedTypesModule.sscopTimerCcDefaultForNNI
+			GET SET-BY-CREATE,
+		sscopTimerIdle
+			DEFAULT VALUE Q2751DefinedTypesModule.sscopTimerIdleDefaultForNNI
+			GET SET-BY-CREATE,
+		sscopTimerKeepAlive
+			DEFAULT VALUE Q2751DefinedTypesModule.sscopTimerKeepAliveDefaultForNNI
+			GET SET-BY-CREATE,
+		sscopTimerNoResponse
+			DEFAULT VALUE Q2751DefinedTypesModule.sscopTimerNoResponseDefaultForNNI
+			GET SET-BY-CREATE,
+		sscopTimerPoll
+			DEFAULT VALUE Q2751DefinedTypesModule.sscopTimerPollDefaultForNNI
+			GET SET-BY-CREATE,
+		transmissionRateInterval
+			DEFAULT VALUE Q2751DefinedTypesModule.transmissionRateIntervalDefault
+			GET SET-BY-CREATE,
+		transSaalCongThresholdAbatementL1
+			DEFAULT VALUE Q2751DefinedTypesModule.transSaalCongThresholdAbatementL1Default
+			GET SET-BY-CREATE,
+		transSaalCongThresholdOnsetL1
+			DEFAULT VALUE Q2751DefinedTypesModule.transSaalCongThresholdOnsetLDefault
+			GET SET-BY-CREATE;
+REGISTERED AS { saalNniProtocolProfilePackage-POi };
+
+
+signDataLinkTpPackage PACKAGE
+	BEHAVIOUR
+		signDataLinkTpBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object represents the termination of the signalling data link 
+				within the SP as defined in Q.702.
+				The operational state is enabled in normal operation. In case of failure of the 
+				part of the signalling data link that is within control of the managed switching 
+				element, this state will be adisablede.
+				If the vcTTpPointer attribute is present, then the transmission rate is 
+				determined by the cell rate fixed in the trafficDescriptorPackages of the 
+				vcTTPBidirectional instance referenced by the signDataLinkTp.";;
+	ATTRIBUTES
+		"ITU-T Rec. Q.751.1 (1995)":signDataLinkTpId GET SET-BY-CREATE,
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992":operationalState GET,
+		"ITU-T Rec. Q.751.1 (1995)":equipmentPointer GET SET-BY-CREATE;
+	NOTIFICATIONS
+		"ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992":stateChange;
+REGISTERED AS { signDataLinkTpPackage-POi };
+
+
+signLinkTpPackage PACKAGE
+	BEHAVIOUR
+		signLinkTpBehaviour BEHAVIOUR
+			DEFINED AS
+				"This managed object represents the termination of the signalling link within the 
+				signalling point as defined in Q.703. The signLinkTp object class represents 
+				that part of a signalling link which is located in one NE.
+				The following state and status attributes are supported:
+				administrative state:
+				locked: it is administratively not permitted to transport traffic on the link 
+				termination point. unlocked: it is administratively permitted to transport user 
+				part traffic or test traffic on the link termination point.
+				operational state:
+				enabled: the link termination point is operationally able to transport user part 
+				traffic or test traffic. disabled: the link termination point is operationally 
+				unable to transport user part tra ffic or test traffic.
+				The operational state is disabled whenever the link termination point status 
+				contains Failed, Deactivated, Local Blocked, Remote Blocked, or the procedural 
+				status is Initializing.
+				usage state:
+				idle: the link termination point carries no user part traffic (test traffic may 
+				be present).
+				iactiveh: The link termination point is not congested. Currently the link 
+				termination point carries user part traffic.
+				busy: the link termination point is congested due to user part traffic.
+				The usage state is idle whenever the link termination point status is not empty 
+				i.e. the usage state immediately reflects the availability of the signLinkTp for 
+				user traffic. For national MTP options applying several congestion levels an 
+				additional attribute indicating these levels may be added.
+				procedural status:
+				The procedural status initializing is valid during initial alignment procedure.
+				The procedural status not initialized applies when the link termination point is 
+				not aligned and the initial alignment procedure has not been started.
+				Link termination point status. This is a set-valued attribute. The following 
+				statusses can exist alone or in combinations with each other. The exact 
+				definition for each of the following SS7-functional states is to be gained from 
+				Q.704.
+				local blocked
+				remote blocked
+				local inhibited
+				remote inhibited
+				failed
+				deactivated
+				The attribute protocolProfilePointer references either a mtpL2ProtocolProfile 
+				instance or a saalNniProtocolProfile instance.
+				The attributes protocolProfilePointer and signDataLinkTpPointer are writable 
+				only if the administrativeState of the signLinkTp equals nlockedn.
+				If the tITU-T Rec. X.721 (1992) | ISO/IEC 10165-2: 1992:communicationsAlarm 
+				notification is used, the following probable causes can apply:
+				Probable Cause = 102 (slFailure) which represents measurement Q.752/1.2 - 
+				measurement Q.752/1.6 (SpecificProblems=003 abnormalFIBRorBSNR, 004 
+				excessiveAckDelay, 005 excessiveErrorRate, 006 excessiveCongDuration) and 
+				Q.752/1.12.(PerceivedSeverity=cleared)
+				If the ss7OnOccEventPackage is present, the event notifications with the 
+				following probable causes can apply:
+				Probable Cause = 110 (localChangeOver) which represents measurement Q.752/1.10 
+				(PerceivedSeverity=Maj/Min/War) and measurement Q.752/1.11 
+				(PerceivedSeverity=Cleared).
+				Probable Cause = 210 (remoteProcOutage) which represents measurements Q.752/2.10 
+				(PerceivedSeverity=Maj/Min/War) and Q.752/2.11 (PerceivedSeverity=Cleared).
+				Probable Cause = 216 (start of local inhibition) which represents measurement 
+				Q.752/2.16 (PerceivedSeverity=Maj/Min/War) and Q.752/2.17 
+				(PerceivedSeverity=Cleared)
+				Probable Cause = 218 (start of remote inhibition) which represents measurement 
+				Q.752/2.18 (PerceivedSeverity=Maj/Min/War) and Q.752/2.19 
+				(PerceivedSeverity=Cleared).
+				A set request is rejected, if
+				EITHER
+				if the name package is supported: the value for the name attribute is already 
+				used by another instance of the same object class
+				OR
+				a pointer would reference an instance, which does not belong to the appropriate 
+				object class
+				OR
+				a pointer would reference an instance which is not existing
+				OR
+				a signDataLinkTpPointer would reference a signDataLinkTp which is not in the 
+				same mtpSignPoint as the superior signLinkSetTp of the signLinkTp
+				OR
+				a signDataLinkTpPointer would reference a signDataLinkTp which has a different 
+				value of adjPc (if the adjPcPackage is present) than the superior signLinkSetTp 
+				of the signLinkTp
+				OR
+				the link would reference a datalink and a mtpL2ProtocolProfile whose 
+				transmissionRates are not the same
+				OR
+				the link would reference a mtpL2ProtocolProfile where the appropriate packages 
+				for the congestionControlMethod of the superior signLinkSetTp are not present 
+				(see B.1.2.9.2 in Annex B) of Q.751.1
+				OR
+				the spTimersProfilePackage is present in the superior mtpSignPoint AND the link 
+				would reference a mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the 
+				q704-t17 of the spTimersProfile referenced by the mtpSignPoint
+				OR
+				the spTimersPackage is present in the superior mtpSignPoint AND the link would 
+				reference a mtpL2ProtocolProfile whose l2TimerT2 is not bigger than the q704-t17 
+				of the mtpSignPoint
+				OR
+				it is tried to replace the signDataLinkTp- or protocolProfilePointer while the 
+				administrativeState does not equal rlocked OR
+				it is tried to reference a combination of a saalNniProtocolProfile and a 
+				signDataLinkTp, of which the attribute vcTTpPointer is not present
+				OR
+				it is tried to reference a combination of a mtpL2ProtocolProfile and a 
+				signDataLinkTp, of which the attribute transmissionRate is not present
+				OR
+				it is tried to reference a combination of a saalNniProtocolProfile and a 
+				signDataLinkTp, where the peak cell rates of the ingress and egress traffic of 
+				virtual channel assigned to the signDataLinkTp does not fall in the 
+				corresponding transmissionRateInterval of the referenced saalNniProtocolProfile.
+				This rejection also takes place if only a single pointer within the 
+				signDataLinkTpList or the signTermList
+				(if present) is wrong.";;
+REGISTERED AS { signLinkTpPackage-POi };
+
+
+thresholdsForMultCongLevelsPackage PACKAGE
+	BEHAVIOUR
+		thresholdsForMultCongLevelsWithPrioPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the thresholds for the national congestion control methods 
+				with multiple levels without priorities.";;
+	ATTRIBUTES
+		transSaalCongThresholdAbatementL2 GET SET-BY-CREATE,
+		transSaalCongThresholdOnsetL2 GET SET-BY-CREATE,
+		transSaalCongThresholdAbatementL3 GET SET-BY-CREATE,
+		transSaalCongThresholdOnsetL3 GET SET-BY-CREATE;
+REGISTERED AS { thresholdsForMultCongLevelsPackage-POi };
+
+
+thresholdsForMultCongLevelsWithPrioPackage PACKAGE
+	BEHAVIOUR
+		thresholdsForMultCongLevelsWithPrioPackageBehaviour BEHAVIOUR
+			DEFINED AS
+				"This package contains the thresholds for the national congestion control method 
+				with multiple levels and priorities.";;
+	ATTRIBUTES
+		transSaalCongThresholdDiscardL1 GET SET-BY-CREATE,
+		transSaalCongThresholdDiscardL2 GET SET-BY-CREATE,
+		transSaalCongThresholdDiscardL3 GET SET-BY-CREATE;
+REGISTERED AS { thresholdsForMultCongLevelsWithPrioPackage-POi };
+-- 8.4 Attribute definitions
+
+
+bufferRelease ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.BufferRelease;
+	BEHAVIOUR
+		bufferReleaseBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute determines whether SSCOP can release its transmission buffer and 
+				transmission queue on connection release and can selectively release messages 
+				from the transmission buffer when older messages are still outstanding.";;
+REGISTERED AS { bufferRelease-AOi };
+
+
+egressTransmissionRateInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.EgressTransmissionRateInterval;
+	BEHAVIOUR
+		egressTransmissionRateIntervalBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the lower and upper boundaries for the transmission rate 
+				to which the other attributes regarding egress traffic are set to fit to.
+				The unit of the INTEGER values is kbits per second. The whole NNI bandwidth 
+				range should be covered by several saalNniProtocolProfile instances.";;
+REGISTERED AS { egressTransmissionRateInterval-AOi };
+
+
+longMessageSupported ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.LongMessageSupported;
+	BEHAVIOUR
+		longMessageSupportedBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines whether messages longer than 272 octets are supported.";;
+REGISTERED AS { longMessageSupported-AOi };
+
+
+maxCc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxCc;
+	BEHAVIOUR
+		maxCcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum value [PDUs] of the state variable VT(CC), 
+				corresponding to the maximum number of transmissions of BGN, END, ER or RS PDUs.";;
+REGISTERED AS { maxCc-AOi };
+
+
+maxNrp ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxNrp;
+	BEHAVIOUR
+		maxNrpBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum number of retransmissions allowed during 
+				proving.";;
+REGISTERED AS { maxNrp-AOi };
+
+
+maxPd ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxPd;
+	BEHAVIOUR
+		maxPdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum acceptable value [PDUs] of the state variable 
+				VT(PD) before sending a POLL PDU and resetting VT(PD) to zero. The VT(PD) is 
+				incremented each time an SD PDU is transmitted.";;
+REGISTERED AS { maxPd-AOi };
+
+
+maxSscopCreditToPeer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxSscopCreditToPeer;
+	BEHAVIOUR
+		maxSscopCreditToPeerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the absolute value [PDUs] of the size of the receive 
+				window given to the peer. This value is added to VR(R) to generate VR(MR). 
+				VR(MR) is mapped to N(MR) by transmission of STAT, USTAT, RS RSAK, ER, ERAK, BGN 
+				or BGAK PDUs.";;
+REGISTERED AS { maxSscopCreditToPeer-AOi };
+
+
+maxStat ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxStat;
+	BEHAVIOUR
+		maxStatBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum number of list elements placed in a STAT PDU.";;
+REGISTERED AS { maxStat-AOi };
+
+
+maxInformationFieldLength ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxInformationFieldLength;
+	BEHAVIOUR
+		maxInformationFieldLengthBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum length of the information field in SD PDUs, 
+				UD PDUs and MD PDUs kh. The unit of the INTEGER value is octets.";;
+REGISTERED AS { maxInformationFieldLength-AOi };
+
+
+maxLengthSscopUuField ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.MaxLengthSscopUuField;
+	BEHAVIOUR
+		maxLengthSscopUuFieldBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum length of a variable length SSCOP UU field j. 
+				The SSCOP UU is an optional field of BGN PDUs, BGAK PDUs, BGREJ PDUs, END PDUs 
+				and RS PDUs. The unit of the INTEGER value is octets";;
+REGISTERED AS { maxLengthSscopUuField-AOi };
+
+
+n1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.N1;
+	BEHAVIOUR
+		n1Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the number of PDUs sent during normal proving.";;
+REGISTERED AS { n1-AOi };
+
+
+nniLayerManagementProvingState ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NniLayerManagementProvingState;
+	BEHAVIOUR
+		nniLayerManagementProvingStateBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the type of proving required by management. The value of 
+				the management proving state overrides the value of proving required by MTP L3. 
+				It can take the values: Normal, emergency neutral.";;
+REGISTERED AS { nniLayerManagementProvingState-AOi };
+
+
+nniLayerManagementTimerNoCredit ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NniLayerManagementTimerNoCredit;
+	BEHAVIOUR
+		nniLayerManagementTimerNoCreditBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the maximum time interval that the value of VT(MS) may 
+				remain less than or equal VT(S) before the link is taken out of service. The 
+				unit for the INTEGER value is milliseconds.";;
+REGISTERED AS { nniLayerManagementTimerNoCredit-AOi };
+
+
+nniLayerManagementTimerRepeatSrec ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NniLayerManagementTimerRepeatSrec;
+	BEHAVIOUR
+		nniLayerManagementTimerRepeatSrecBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the minimum time between SSCOP recoveries which does not 
+				result in a release of the connection. The unit for the INTEGER value is 
+				milliseconds.";;
+REGISTERED AS { nniLayerManagementTimerRepeatSrec-AOi };
+
+
+nniTimerT1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NniTimerT1;
+	BEHAVIOUR
+		nniTimerT1Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the time between the link release action and the next 
+				link establish action during alignment. The unit for the INTEGER value is 
+				milliseconds.";;
+REGISTERED AS { nniTimerT1-AOi };
+
+
+nniTimerT2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NniTimerT2;
+	BEHAVIOUR
+		nniTimerT3Behaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the total time that SSCF NNI will attempt alignment. The 
+				unit for the INTEGER value is milliseconds.";;
+REGISTERED AS { nniTimerT2-AOi };
+
+
+nniTimerT3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NniTimerT3;
+	BEHAVIOUR
+		nniTimerT3Behaviour BEHAVIOUR
+			DEFINED AS
+				"The time between proving PDUs such that proving PDUs are transmitted with half 
+				of the channel bandwidth. The unit for the INTEGER value is microseconds.";;
+REGISTERED AS { nniTimerT3-AOi };
+
+
+pollAfterRetransmission ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.PollAfterRetransmission;
+	BEHAVIOUR
+		pollAfterRetransmissionBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute specifies if a POLL is transmitted each time the retransmission 
+				queue is emptied.";;
+REGISTERED AS { pollAfterRetransmission-AOi };
+
+
+saalNniProtocolProfileId ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.NameType;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		saalNniProtocolProfileIdBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute is used for naming instances of the object class 
+				saalNniProtocolProfile.";;
+REGISTERED AS { saalNniProtocolProfileId-AOi };
+
+
+saalNniProtocolProfileName ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.AdditionalName;
+	BEHAVIOUR
+		saalNniProtocolProfileNameBehaviour BEHAVIOUR
+			DEFINED AS
+				"A set request to a name, which is already used by another instance of this 
+				class, will be rejected.";;
+REGISTERED AS { saalNniProtocolProfileName-AOi };
+
+
+sscopTimerCc ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.SscopTimerCc;
+	BEHAVIOUR
+		sscopTimerCcBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the time interval between transmissions of BGN, END, RS 
+				and ER PDUs when an acknowledge to these PDUs has not been received. The unit 
+				for the INTEGER value is milliseconds.";;
+REGISTERED AS { sscopTimerCc-AOi };
+
+
+sscopTimerIdle ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.SscopTimerIdle;
+	BEHAVIOUR
+		sscopTimerIdleBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the SSCOP timer IDLE. The SSCOP connection is partitioned 
+				into phases. The SSCOP timer IDLE supervises the idle phase. In this phase the 
+				timer NO_RESPONSE is not running and no POLL PDUs are transmitted. The unit for 
+				the INTEGER value is milliseconds.";;
+REGISTERED AS { sscopTimerIdle-AOi };
+
+
+sscopTimerKeepAlive ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.SscopTimerKeepAlive;
+	BEHAVIOUR
+		sscopTimerKeepAliveBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the SSCOP timer KEEP_ALIVE. The SSCOP connection is 
+				partitioned into phases. The SSCOP timer IDLE supervises the transient phase. In 
+				this phase there are no outstanding acknowledgements or new data pending 
+				transmission. The unit for the INTEGER value is milliseconds.";;
+REGISTERED AS { sscopTimerKeepAlive-AOi };
+
+
+sscopTimerNoResponse ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.SscopTimerNoResponse;
+	BEHAVIOUR
+		sscopTimerNoResponseBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the SSCOP timer NO_RESPONSE. This timer is used to detect 
+				a faulty connection. The timer runs with either the timer POLL or KEEP_ALIVE 
+				simultaneously. The unit for the INTEGER value is milliseconds.";;
+REGISTERED AS { sscopTimerNoResponse-AOi };
+
+
+sscopTimerPoll ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.SscopTimerPoll;
+	BEHAVIOUR
+		sscopTimerPollBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the SSCOP timer POLL. The SSCOP connection is partitioned 
+				into phases. The SSCOP timer POLL supervises the active phase. In this new data 
+				is pending, transmission or acknowledgements are outstanding. The unit for the 
+				INTEGER value is milliseconds.";;
+REGISTERED AS { sscopTimerPoll-AOi };
+
+
+transmissionRateInterval ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransmissionRateInterval;
+	BEHAVIOUR
+		transmissionRateIntervalBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute defines the lower and upper boundaries for the transmission rate 
+				to which the other attributes are set to fit to.
+				If the conditional egressTransmissionRateInterval attribute is not present, the 
+				value of this attribute refers to both egress and ingress traffic. If the 
+				egressTransmissionRateInterval attribute is present, the value of this attribute 
+				refers to ingress traffic only.
+				The unit of the INTEGER values is kbits per second. The whole NNI bandwidth 
+				range from 64 to 4096 kbit/s should be covered by several saalNniProtocolProfile 
+				instances.";;
+REGISTERED AS { transmissionRateInterval-AOi };
+
+
+transSaalCongThresholdAbatementL1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdAbatementL1Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages AND the number of octets in the transmission 
+				buffer/transmission queue fall below the values of the corresponding components 
+				of this attribute, the corresponding link is no longer in congestion level 1. If 
+				the congestion control method used supports multiple congestion levels without 
+				congestion priorities, then the new congestion level is given to MTP L3. If the 
+				congestion control method used supports multiple congestion levels with 
+				congestion priorities, then the new congestion level is given to MTP L3 and 
+				messages with the corresponding priority are now accepted by MTP L3. If the 
+				congestion control method used supports multiple congestion levels without 
+				congestion priorities, then the new congestion level is given to MTP L3. If the 
+				international congestion control method is used, then wno congestion is 
+				announced to MTP L3. (for more details see Q.704)";;
+REGISTERED AS { transSaalCongThresholdAbatementL1-AOi };
+
+
+transSaalCongThresholdAbatementL2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdAbatementL2Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages AND the number of octets in the transmission 
+				buffer/transmission queue fall below the values of the corresponding components 
+				of this attribute, the corresponding link is no longer in congestion level 2. If 
+				the congestion control method used supports multiple congestion levels without 
+				congestion priorities, then the new congestion level is given to MTP L3. If the 
+				congestion control method used supports multiple congestion levels with 
+				congestion priorities, then the new congestion level is given to MTP L3 and 
+				messages with the corresponding priority are now accepted by MTP L3. If the 
+				congestion control method used supports multiple congestion levels without 
+				congestion priorities, then the new congestion level is given to MTP L3. This 
+				attribute is not used for the international congestion control method.";;
+REGISTERED AS { transSaalCongThresholdAbatementL2-AOi };
+
+
+transSaalCongThresholdAbatementL3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdAbatementL3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages AND the number of octets in the transmission 
+				buffer/transmission queue fall below the values of the corresponding components 
+				of this attribute, the corresponding link is no longer in congestion level 3. If 
+				the congestion control method used supports multiple congestion levels without 
+				congestion priorities, then the new congestion level is given to MTP L3. If the 
+				congestion control method used supports multiple congestion levels with 
+				congestion priorities, then the new congestion level is given to MTP L3 and 
+				messages with the corresponding priority are now accepted by MTP L3. If the 
+				congestion control method used supports multiple congestion levels without 
+				congestion priorities, then the new congestion level is given to MTP L3. This 
+				attribute is not used for the international congestion control method.";;
+REGISTERED AS { transSaalCongThresholdAbatementL3-AOi };
+
+
+transSaalCongThresholdDiscardL1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdDiscardL1Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages OR the number of octets in the transmission 
+				buffer/transmission queue exceeds the value of the corresponding component of 
+				this attribute, then all messages with a congestion priority equal to this level 
+				1 or lower are discarded. This attribute is not used for the international 
+				congestion control method nor the method with multiple congestion levels without 
+				priorities.";;
+REGISTERED AS { transSaalCongThresholdDiscardL1-AOi };
+
+
+transSaalCongThresholdDiscardL2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdDiscardL2Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages OR the number of octets in the transmission 
+				buffer/transmission queue exceeds the value of the corresponding component of 
+				this attribute, then all messages with a congestion priority equal to this level 
+				2 or lower are discarded. This attribute is not used for the international 
+				congestion control method nor the method with multiple congestion levels without 
+				priorities.";;
+REGISTERED AS { transSaalCongThresholdDiscardL2-AOi };
+
+
+transSaalCongThresholdDiscardL3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdDiscardL3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages OR the number of octets in the transmission 
+				buffer/transmission queue exceeds the value of the corresponding component of 
+				this attribute, then all messages with a congestion priority equal to this level 
+				3 or lower are discarded. This attribute is not used for the international 
+				congestion control method nor the method with multiple congestion levels without 
+				priorities.";;
+REGISTERED AS { transSaalCongThresholdDiscardL3-AOi };
+
+
+transSaalCongThresholdOnsetL1 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdOnsetL1Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages OR the number of octets in the transmission 
+				buffer/transmission queue exceeds the value of the corresponding component of 
+				this attribute, the corresponding link is in congestion level 1. If the 
+				congestion control method used supports multiple congestion levels with or 
+				without congestion priorities, then the new congestion level is given to MTP L3 
+				for transfer to users and transmission in the TFC messages.
+				If the international congestion control method is used, an indication congestion 
+				is given to MTP L3 without congestion level in order to inform the users and 
+				cause the generation of TFC messages.";;
+REGISTERED AS { transSaalCongThresholdOnsetL1-AOi };
+
+
+transSaalCongThresholdOnsetL2 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdOnsetL2Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages OR the number of octets in the transmission 
+				buffer/transmission queue exceeds the value of the corresponding component of 
+				this attribute, the corresponding link is in congestion level 2.
+				If the congestion control method used supports multiple congestion levels with 
+				or without congestion priorities, then the new congestion level is given to MTP 
+				L3 for transfer to users and transmission in the TFC messages. Not used for the 
+				international congestion control method.";;
+REGISTERED AS { transSaalCongThresholdOnsetL2-AOi };
+
+
+transSaalCongThresholdOnsetL3 ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.TransSaalCongThreshold;
+	BEHAVIOUR
+		transSaalCongThresholdOnsetL3Behaviour BEHAVIOUR
+			DEFINED AS
+				"If the number of messages OR the number of octets in the transmission 
+				buffer/transmission queue exceeds the value of the corresponding component of 
+				this attribute, the corresponding link is in congestion level 3.
+				If the congestion control method used supports multiple congestion levels with 
+				or without congestion priorities, then the new congestion level is given to MTP 
+				L3 for transfer to users and transmission in the TFC messages. Not used for the 
+				international congestion control method.";;
+REGISTERED AS { transSaalCongThresholdOnsetL3 };
+
+
+vcTTpPointer ATTRIBUTE
+	WITH ATTRIBUTE SYNTAX Q2751DefinedTypesModule.VcTTpPointer;
+	MATCHES FOR EQUALITY;
+	BEHAVIOUR
+		vcTTpPointerBehaviour BEHAVIOUR
+			DEFINED AS
+				"This attribute references an object class defined in I.751. It must be present 
+				for a broadband signalling data link, it must not be present for a narrowband 
+				datalink (the term ebroadband signalling data linkl signifies a data link using 
+				the SAAL NNI). The referenced instance has a mandatory relation via its 
+				upstream- and downstreamConnectivityPointers to one instance of object class 
+				vcCTPBidirectional, whose Id represents the VCI of the virtual channel used by 
+				the data link. This vcCTPBidirectional is contained in a superior object 
+				vpTTPBidirectional, which has a mandatory relation via its upstream- and 
+				downstreamConnectivityPointers to one instance of the object class 
+				vpTTPBidirectional, whose Id represents the VPI of the virtual path used by the 
+				data link.";;
+REGISTERED AS { vcTTpPointer-AOi };
+-- 8.5 Attribute group definitions
+-- Currently no definitions of attribute groups.
+-- 8.6 Action definitions
+-- Currently no definitions of actions.
+-- 8.7 Parameter definitions
+
+
+ss7SpecificError PARAMETER
+	CONTEXT SPECIFIC-ERROR;
+	WITH SYNTAX Q2751DefinedTypesModule.Ss7SpecificErrorInformation;
+	BEHAVIOUR
+		ss7SpecificError BEHAVIOUR
+			DEFINED AS
+				"This parameter defines errors which are specific for the administration, 
+				operation and maintenance of SS7 managed items.";;
+REGISTERED AS { ss7SpecificError-OID };
+-- 8.8 Notification definitions
+-- Currently no definitions of notifications.
+-- 8.9 Definitions of behaviours
+-- The behaviour definitions are contained in 8.1 to 8.8.
+-- Restrictions for CREATE and DELETE requests can be found in the corresponding name binding
+-- behaviour.
+-- Restrictions for SET requests can be found in the corresponding object class behaviour.
+
+END
+--< GDMO.EndDocument "ITU-T Rec. Q.2751.1 (1997)" >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+
+--@@
+--@@ Derivation Tree:
+--@@
+--@@ itut_x721::top
+--@@ +- itut_x721::discriminator
+--@@ |  +- itut_x721::eventForwardingDiscriminator
+--@@ +- itut_x721::log
+--@@ +- itut_x721::logRecord
+--@@ |  +- itut_x721::eventLogRecord
+--@@ |  |  +- itut_x721::alarmRecord
+--@@ |  |  +- itut_x721::attributeValueChangeRecord
+--@@ |  |  +- itut_x721::objectCreationRecord
+--@@ |  |  +- itut_x721::objectDeletionRecord
+--@@ |  |  +- itut_x721::relationshipChangeRecord
+--@@ |  |  +- itut_x721::securityAlarmReportRecord
+--@@ |  |  +- itut_x721::stateChangeRecord
+--@@ |  |  +- itut_x723::communicationsInformationRecord
+--@@ |  |  +- itut_x738::bufferedScanReportRecord
+--@@ |  |  +- itut_x738::scanReportRecord
+--@@ |  |  +- itut_x738::statisticalReportRecord
+--@@ |  |  +- itut_x742::usageMeteringRecord
+--@@ |  |  +- itut_x745::schedulingConflictRecord
+--@@ |  |  +- itut_x745::testResultsRecord
+--@@ |  |  +- itut_x746::operationResultRecord
+--@@ |  |  +- itut_g774_3::apsReportRecord
+--@@ +- itut_x721::system
+--@@ +- itut_x723::applicationProcess
+--@@ +- itut_x723::communicationsEntity
+--@@ |  +- itut_x283::networkEntity
+--@@ +- itut_x723::clProtocolMachine
+--@@ |  +- itut_x283::cLNS
+--@@ +- itut_x723::coProtocolMachine
+--@@ |  +- itut_x283::cONS
+--@@ +- itut_x723::sap1
+--@@ +- itut_x723::sap2
+--@@ |  +- itut_x283::nSAP
+--@@ |  |  +- itut_q751_1::mtpAccessPoint
+--@@ +- itut_x723::singlePeerConnection
+--@@ |  +- itut_x283::networkConnection
+--@@ +- itut_x723::subsystem
+--@@ |  +- itut_x283::networkSubsystem
+--@@ +- itut_x739::scanner
+--@@ |  +- itut_x739::monitorMetric
+--@@ |  |  +- itut_x739::meanMonitor
+--@@ |  |  |  +- itut_x739::algorithmIndicatingMeanMonitor
+--@@ |  |  |  +- itut_x739::movingAverageMeanMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndMinMaxMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndPercentileMonitor
+--@@ |  |  |  |  +- itut_x739::meanAndVarianceMonitor
+--@@ |  +- itut_x738::bufferedScanner
+--@@ |  +- itut_x738::heterogeneousScanner
+--@@ |  +- itut_x738::homogeneousScanner
+--@@ |  |  +- itut_x738::ensembleStatisticScanner
+--@@ |  |  |  +- itut_x738::meanScanner
+--@@ |  |  |  |  +- itut_x738::meanVarianceScanner
+--@@ |  |  |  +- itut_x738::minMaxScanner
+--@@ |  |  |  +- itut_x738::percentileScanner
+--@@ |  |  +- itut_x738::simpleScanner
+--@@ |  +- itut_q822::currentData
+--@@ |  |  +- itut_g774_1::sdhCurrentData
+--@@ |  |  |  +- itut_g774_1::pathTerminationCurrentData
+--@@ +- itut_x738::dynamicScanner
+--@@ |  +- itut_x738::dynamicSimpleScanner
+--@@ +- itut_x742::usageMeteringControlObject
+--@@ +- itut_x742::usageMeteringDataObject
+--@@ +- itut_x745::testActionPerformer
+--@@ +- itut_x745::testObject
+--@@ +- itut_x746::scheduler
+--@@ |  +- itut_x746::dailyScheduler
+--@@ |  |  +- itut_x746::dailyOperationScheduler
+--@@ |  +- itut_x746::weeklyScheduler
+--@@ |  |  +- itut_x746::weeklyOperationScheduler
+--@@ |  +- itut_x746::monthlyScheduler
+--@@ |  |  +- itut_x746::monthlyOperationScheduler
+--@@ |  +- itut_x746::periodicScheduler
+--@@ |  |  +- itut_x746::periodicOperationScheduler
+--@@ |  +- itut_x746::multiScheduler
+--@@ +- itut_x746::typeOfDayController
+--@@ +- itut_x521::organization
+--@@ +- itut_x521::organizationalUnit
+--@@ +- itut_q821::currentAlarmSummaryControl
+--@@ +- itut_q821::managementOperationsSchedule
+--@@ +- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ +- itut_q822::historyData
+--@@ |  +- itut_g774_1::pathTerminationHistoryData
+--@@ +- itut_q822::thresholdData
+--@@ +- itut_g774::indirectAdaptorSink
+--@@ |  +- itut_g774::augSink
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Sink
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Sink
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774::indirectAdaptorSource
+--@@ |  +- itut_g774::augSource
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  +- itut_g774::indirectAdaptorBidirectional
+--@@ |  |  +- itut_g774::augBidirectional
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ |  +- itut_g774::tug2Source
+--@@ |  |  +- itut_g774::tug2Bidirectional
+--@@ |  +- itut_g774::tug3Source
+--@@ |  |  +- itut_g774::tug3Bidirectional
+--@@ +- itut_g774_3::protectionGroupR1
+--@@ |  +- itut_g774_3::sdhMSProtectionGroupR1
+--@@ |  +- itut_g774_4::connectionProtectionGroupR1
+--@@ |  +- itut_m3100::protectionGroupR2
+--@@ +- itut_g774_3::protectionUnit
+--@@ |  +- itut_g774_3::sdhMSProtectionUnit
+--@@ |  +- itut_g774_4::connectionProtection
+--@@ |  +- itut_g774_4::mpConnectionProtection
+--@@ +- itut_m3100::abstractLink
+--@@ |  +- itut_m3100::logicalLink
+--@@ |  +- itut_m3100::topologicalLink
+--@@ +- itut_m3100::abstractLinkEnd
+--@@ |  +- itut_m3100::abstractLinkEndR1
+--@@ |  +- itut_m3100::logicalLinkEnd
+--@@ |  |  +- itut_m3100::logicalLinkEndR1
+--@@ |  +- itut_m3100::topologicalLinkEnd
+--@@ |  |  +- itut_m3100::topologicalLinkEndR1
+--@@ +- itut_m3100::accessGroup
+--@@ +- itut_m3100::alarmReportingControlManager
+--@@ +- itut_m3100::alarmSeverityAssignmentProfile
+--@@ +- itut_m3100::arcIntervalProfile
+--@@ +- itut_m3100::attributeRanges
+--@@ +- itut_m3100::circuitEndPointSubgroup
+--@@ +- itut_m3100::crossConnection
+--@@ |  +- itut_m3100::crossConnectionR1
+--@@ |  +- itut_m3100::namedCrossConnection
+--@@ +- itut_m3100::equipment
+--@@ |  +- itut_m3100::equipmentR1
+--@@ |  |  +- itut_m3100::circuitPack
+--@@ |  |  +- itut_m3100::equipmentR2
+--@@ |  |  |  +- itut_m3100::circuitPackR1
+--@@ |  |  +- itut_m3100::equipmentHolder
+--@@ +- itut_m3100::externalPoint
+--@@ |  +- itut_m3100::controlPoint
+--@@ |  +- itut_m3100::scanPoint
+--@@ +- itut_m3100::fabric
+--@@ |  +- itut_g774_4::sncpFabric
+--@@ |  +- itut_m3100::fabricR1
+--@@ |  |  +- itut_m3100::fabricR2
+--@@ |  |  |  +- itut_m3100::fabricR3
+--@@ |  |  |  |  +- itut_m3100::fabricR4
+--@@ +- itut_m3100::gtp
+--@@ |  +- itut_m3100::gtpR1
+--@@ +- itut_m3100::managedElement
+--@@ |  +- itut_g774::sdhNE
+--@@ |  +- itut_m3100::managedElementR1
+--@@ |  |  +- itut_m3100::managedElementR2
+--@@ |  |  |  +- itut_q751_1::managedSwitchingElement
+--@@ +- itut_m3100::managedElementComplex
+--@@ +- itut_m3100::mpCrossConnection
+--@@ |  +- itut_m3100::mpCrossConnectionR1
+--@@ |  +- itut_m3100::namedMpCrossConnection
+--@@ +- itut_m3100::network
+--@@ |  +- itut_m3100::networkR1
+--@@ |  |  +- itut_m3100::layerNetworkDomain
+--@@ |  |  |  +- itut_m3100::layerNetworkDomainR1
+--@@ +- itut_m3100::physicalPort
+--@@ +- itut_m3100::pipe
+--@@ |  +- itut_m3100::connectionR1
+--@@ |  +- itut_m3100::trailR1
+--@@ +- itut_m3100::pipeR2
+--@@ |  +- itut_m3100::linkConnection
+--@@ |  +- itut_m3100::subNetworkConnection
+--@@ |  +- itut_m3100::trailR2
+--@@ +- itut_m3100::protectionUnitR1
+--@@ +- itut_m3100::software
+--@@ |  +- itut_m3100::softwareR1
+--@@ +- itut_m3100::subNetwork
+--@@ +- itut_m3100::terminationPoint
+--@@ |  +- itut_m3100::connectionTerminationPointSink
+--@@ |  |  +- itut_g774::au3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSink
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSink
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSink
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSink
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSink
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSinkR1
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSink
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSink
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::connectionTerminationPointSource
+--@@ |  |  +- itut_g774::au3CTPSource
+--@@ |  |  |  +- itut_g774_5::au3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::au4CTPSource
+--@@ |  |  |  +- itut_g774_5::au4SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::msCTPSource
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  +- itut_g774::msDatacomCTPSource
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::msOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsCTPSource
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  +- itut_g774::rsDatacomCTPSource
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  +- itut_g774::rsOrderwireCTPSource
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  +- itut_g774::rsUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774::tu11CTPSource
+--@@ |  |  |  +- itut_g774_5::tu11SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu12CTPSource
+--@@ |  |  |  +- itut_g774_5::tu12SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu2CTPSource
+--@@ |  |  |  +- itut_g774_5::tu2SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::tu3CTPSource
+--@@ |  |  |  +- itut_g774_5::tu3SupervisedCTPSource
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  +- itut_g774::vcnUserChannelCTPSource
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  +- itut_g774_3::unprotectedCTPSource
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  |  +- itut_m3100::connectionTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::au4SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::msCTPBidirectional
+--@@ |  |  |  +- itut_g774::msDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::msOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsDatacomCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  |  |  +- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu11SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu12SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu2SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  |  |  +- itut_g774_5::tu3SupervisedCTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  |  |  +- itut_g774_3::unprotectedCTPBidirectional
+--@@ |  +- itut_m3100::networkTerminationPoint
+--@@ |  |  +- itut_m3100::genericTransportTTP
+--@@ |  |  |  +- itut_m3100::genericTransportTTPR1
+--@@ |  |  +- itut_m3100::networkCTPSink
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkCTPSource
+--@@ |  |  |  +- itut_m3100::networkCTPBidirectional
+--@@ |  |  +- itut_m3100::networkTTPSink
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  |  +- itut_m3100::networkTTPSinkR1
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  |  +- itut_m3100::networkTTPSource
+--@@ |  |  |  +- itut_m3100::networkTTPBidirectional
+--@@ |  |  |  |  +- itut_m3100::networkTTPBidirectionalR1
+--@@ |  +- itut_m3100::trailTerminationPointSink
+--@@ |  |  +- itut_g774::electricalSPITTPSink
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSink
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSink
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSink
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSink
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSinkR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSink
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  +- itut_m3100::trailTerminationPointSource
+--@@ |  |  +- itut_g774::electricalSPITTPSource
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  +- itut_g774::msTTPSource
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  +- itut_g774::opticalSPITTPSource
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  +- itut_g774::rsTTPSource
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPTrailTraceSource
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  +- itut_g774::vc11TTPSource
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc12TTPSource
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc2TTPSource
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc3TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  +- itut_g774::vc4TTPSourceR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  +- itut_g774_3::protectedTTPSource
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ |  |  +- itut_m3100::trailTerminationPointBidirectional
+--@@ |  |  |  +- itut_g774::electricalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::msTTPBidirectional
+--@@ |  |  |  +- itut_g774::opticalSPITTPBidirectional
+--@@ |  |  |  +- itut_g774::rsTTPBidirectional
+--@@ |  |  |  |  +- itut_g774::rsTTPTrailTraceBidirectional
+--@@ |  |  |  +- itut_g774::vc11TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc12TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc2TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc3TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774::vc4TTPBidirectionalR1
+--@@ |  |  |  +- itut_g774_3::protectedTTPBidirectional
+--@@ +- itut_m3100::tpPool
+--@@ +- iso_10589_2::adjacency
+--@@ +- iso_10589_2::virtualAdjacency
+--@@ +- iso_10589_2::destination
+--@@ |  +- iso_10589_2::destinationSystem
+--@@ |  +- iso_10589_2::destinationArea
+--@@ +- iso_10589_2::reachableAddress
+--@@ +- itut_x283::linkage
+--@@ +- itut_x283::x25PLE
+--@@ |  +- itut_x283::x25PLE_DTE
+--@@ |  +- itut_x283::x25PLE_DCE
+--@@ +- itut_x283::x25PLEIVMO
+--@@ |  +- itut_x283::x25PLEIVMO_DTE
+--@@ |  +- itut_x283::x25PLEIVMO_DCE
+--@@ +- itut_x283::virtualCircuit
+--@@ |  +- itut_x283::virtualCircuit_DTE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DTE
+--@@ |  |  +- itut_x283::virtualCall_DTE
+--@@ |  +- itut_x283::virtualCircuit_DCE
+--@@ |  |  +- itut_x283::permanentVirtualCircuit_DCE
+--@@ |  |  +- itut_x283::virtualCall_DCE
+--@@ +- itut_x283::virtualCallIVMO
+--@@ +- itut_x283::dSeriesCounts
+--@@ +- itut_q751_1::lsTimersProfile
+--@@ +- itut_q751_1::mtpL2ProtocolProfile
+--@@ +- itut_q751_1::mtpLevel3
+--@@ +- itut_q751_1::mtpSignPoint
+--@@ +- itut_q751_1::signDataLinkTp
+--@@ +- itut_q751_1::signLinkSetTp
+--@@ +- itut_q751_1::signLinkTp
+--@@ +- itut_q751_1::slTimersProfile
+--@@ +- itut_q751_1::spTimersProfile
+--@@ +- itut_q751_1::signRouteNePart
+--@@ +- itut_q751_1::signRouteSetNePart
+--@@ +- itut_q751_1::signTerm
+--@@ +- itut_q751_1::stpScreeningTable
+--@@ +- itut_q751_1::stpScreeningTableLine
+--@@ +- "ITU-T Rec. Q.2751.1 (1997)":saalNniProtocolProfile
+--@@
+
+--@@
+--@@ Containment Tree:
+--@@
+--@@ itut_x721::system
+--@@ >- itut_x721::discriminator
+--@@ >- itut_x721::log
+--@@ |  >- itut_x721::logRecord
+--@@ >- itut_x723::applicationProcess
+--@@ >- itut_x723::subsystem
+--@@ |  >- itut_x723::communicationsEntity
+--@@ |  |  >- itut_x723::clProtocolMachine
+--@@ |  |  >- itut_x723::coProtocolMachine
+--@@ |  |  |  >- itut_x723::singlePeerConnection
+--@@ |  |  >- itut_x723::sap1
+--@@ |  >- itut_x723::sap2
+--@@ >- itut_x739::scanner
+--@@ >- itut_x738::dynamicSimpleScanner
+--@@ >- itut_x739::scanner
+--@@ >- itut_x742::usageMeteringControlObject
+--@@ >- itut_x746::scheduler
+--@@ >- itut_x746::typeOfDayController
+--@@ >- itut_x283::networkSubsystem
+--@@ |  >- itut_x283::networkEntity
+--@@ |  |  >- itut_x283::cLNS
+--@@ |  |  |  >- iso_10589_2::virtualAdjacency
+--@@ |  |  |  >- iso_10589_2::destinationSystem
+--@@ |  |  |  >- iso_10589_2::destinationArea
+--@@ |  |  |  >- itut_x283::linkage
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::adjacency
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  |  >- iso_10589_2::reachableAddress
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  >- itut_x283::cLNS +++
+--@@ |  |  >- itut_x283::cONS
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::linkage +++
+--@@ |  |  |  >- itut_x283::networkConnection
+--@@ |  |  >- itut_x283::cONS +++
+--@@ |  >- itut_x283::networkEntity +++
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::nSAP
+--@@ |  >- itut_x283::x25PLEIVMO
+--@@ |  >- itut_x283::x25PLE
+--@@ |  |  >- itut_x283::virtualCallIVMO
+--@@ |  >- itut_x283::x25PLE +++
+--@@ itut_q822::currentData
+--@@ >- itut_q822::historyData
+--@@ itut_g774_1::sdhCurrentData
+--@@ >- itut_q822::historyData
+--@@ itut_x521::organization
+--@@ >- itut_m3100::managedElement
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x746::typeOfDayController
+--@@ |  >- itut_q821::currentAlarmSummaryControl
+--@@ |  >- itut_q821::managementOperationsSchedule
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_q822::thresholdData
+--@@ |  >- itut_g774_3::protectionGroupR1
+--@@ |  |  >- itut_g774_3::protectionUnit
+--@@ |  >- itut_m3100::alarmSeverityAssignmentProfile
+--@@ |  >- itut_x723::applicationProcess
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::attributeRanges
+--@@ |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::equipment
+--@@ |  |  >- itut_m3100::externalPoint
+--@@ |  |  >- itut_m3100::physicalPort
+--@@ |  |  >- itut_m3100::software
+--@@ |  |  |  >- itut_m3100::software
+--@@ |  >- itut_m3100::equipment +++
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_x721::eventForwardingDiscriminator
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::fabric
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::gtp
+--@@ |  |  >- itut_m3100::mpCrossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  |  >- itut_m3100::crossConnection
+--@@ |  |  >- itut_m3100::tpPool
+--@@ |  >- itut_m3100::fabric +++
+--@@ |  >- itut_m3100::genericTransportTTP
+--@@ |  >- itut_x721::log +++
+--@@ |  >- itut_m3100::physicalPort
+--@@ |  >- itut_x746::scheduler
+--@@ |  >- itut_x738::simpleScanner
+--@@ |  >- itut_m3100::software +++
+--@@ |  >- itut_x723::subsystem +++
+--@@ |  >- itut_x745::testActionPerformer
+--@@ |  |  >- itut_x745::testObject
+--@@ |  >- itut_m3100::trailTerminationPointSink
+--@@ |  |  >- itut_m3100::connectionTerminationPointSink
+--@@ |  >- itut_m3100::trailTerminationPointSource
+--@@ |  |  >- itut_m3100::connectionTerminationPointSource
+--@@ |  >- itut_x742::usageMeteringControlObject
+--@@ |  >- "ITU-T Rec. Q.2751.1 (1997)":saalNniProtocolProfile
+--@@ >- itut_m3100::managedElementComplex
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::externalPoint
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::network
+--@@ |  >- itut_q821::enhancedCurrentAlarmSummaryControl
+--@@ |  >- itut_m3100::arcIntervalProfile
+--@@ |  >- itut_m3100::connectionR1
+--@@ |  >- itut_m3100::managedElement +++
+--@@ |  >- itut_m3100::network
+--@@ |  >- itut_m3100::trailR1
+--@@ itut_x521::organizationalUnit
+--@@ >- itut_m3100::managedElement +++
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ >- itut_m3100::network +++
+--@@ itut_g774_4::sncpFabric
+--@@ >- itut_g774_4::connectionProtectionGroupR1
+--@@ |  >- itut_g774_4::connectionProtection
+--@@ |  >- itut_g774_4::mpConnectionProtection
+--@@ |  |  >- itut_m3100::crossConnection
+--@@ >- itut_m3100::crossConnection
+--@@ >- itut_m3100::mpCrossConnection +++
+--@@ itut_g774::sdhNE
+--@@ >- itut_g774::electricalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::electricalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::electricalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::msTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional
+--@@ |  |  >- itut_g774::au3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPBidirectionalR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPBidirectional
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPBidirectional
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPBidirectional
+--@@ >- itut_g774::msTTPSink
+--@@ |  >- itut_g774::augSink
+--@@ |  |  >- itut_g774::au3CTPSinkR1
+--@@ |  |  >- itut_g774::au4CTPSinkR1
+--@@ |  >- itut_g774::msDatacomCTPSink
+--@@ |  >- itut_g774::msOrderwireCTPSink
+--@@ |  >- itut_g774_3::unprotectedCTPSink
+--@@ >- itut_g774::msTTPSource
+--@@ |  >- itut_g774::augSource
+--@@ |  |  >- itut_g774::au3CTPSource
+--@@ |  |  >- itut_g774::au4CTPSource
+--@@ |  >- itut_g774::msDatacomCTPSource
+--@@ |  >- itut_g774::msOrderwireCTPSource
+--@@ |  >- itut_g774_3::unprotectedCTPSource
+--@@ >- itut_g774::opticalSPITTPBidirectional
+--@@ |  >- itut_g774::rsCTPBidirectional
+--@@ |  >- itut_g774::rsCTPSink
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::opticalSPITTPSink
+--@@ |  >- itut_g774::rsCTPSink
+--@@ >- itut_g774::opticalSPITTPSource
+--@@ |  >- itut_g774::rsCTPSource
+--@@ >- itut_g774::rsTTPBidirectional
+--@@ |  >- itut_g774::msCTPBidirectional
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPBidirectional
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPBidirectional
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPBidirectional
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::rsTTPSink
+--@@ |  >- itut_g774::msCTPSink
+--@@ |  >- itut_g774::rsDatacomCTPSink
+--@@ |  >- itut_g774::rsOrderwireCTPSink
+--@@ |  >- itut_g774::rsUserChannelCTPSink
+--@@ >- itut_g774::rsTTPSource
+--@@ |  >- itut_g774::msCTPSource
+--@@ |  >- itut_g774::rsDatacomCTPSource
+--@@ |  >- itut_g774::rsOrderwireCTPSource
+--@@ |  >- itut_g774::rsUserChannelCTPSource
+--@@ >- itut_g774::vc11TTPBidirectionalR1
+--@@ >- itut_g774::vc11TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc11TTPSource
+--@@ >- itut_g774::vc12TTPBidirectionalR1
+--@@ >- itut_g774::vc12TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc12TTPSource
+--@@ >- itut_g774::vc2TTPBidirectionalR1
+--@@ >- itut_g774::vc2TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ >- itut_g774::vc2TTPSource
+--@@ >- itut_g774::vc3TTPBidirectionalR1
+--@@ |  >- itut_g774::tug2Bidirectional
+--@@ |  |  >- itut_g774::tu11CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc3TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug2Sink
+--@@ |  |  >- itut_g774::tu11CTPSinkR1
+--@@ |  |  >- itut_g774::tu12CTPSinkR1
+--@@ |  |  >- itut_g774::tu2CTPSinkR1
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc3TTPSourceR1
+--@@ |  >- itut_g774::tug2Source
+--@@ |  |  >- itut_g774::tu11CTPSource
+--@@ |  |  >- itut_g774::tu12CTPSource
+--@@ |  |  >- itut_g774::tu2CTPSource
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPBidirectionalR1
+--@@ |  >- itut_g774::tug3Bidirectional
+--@@ |  |  >- itut_g774::tu3CTPBidirectionalR1
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Bidirectional +++
+--@@ |  >- itut_g774::vcnUserChannelCTPBidirectional
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774::vc4TTPSinkR1
+--@@ |  >- itut_g774_1::pathTerminationCurrentData
+--@@ |  >- itut_g774::tug3Sink
+--@@ |  |  >- itut_g774::tu3CTPSinkR1
+--@@ |  |  >- itut_g774::tug2Sink +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSink
+--@@ >- itut_g774::vc4TTPSourceR1
+--@@ |  >- itut_g774::tug3Source
+--@@ |  |  >- itut_g774::tu3CTPSource
+--@@ |  |  >- itut_g774::tug2Source +++
+--@@ |  >- itut_g774::vcnUserChannelCTPSource
+--@@ >- itut_g774_3::protectedTTPBidirectional
+--@@ |  >- itut_g774::augBidirectional +++
+--@@ >- itut_g774_3::protectedTTPSink
+--@@ |  >- itut_g774::augSink +++
+--@@ >- itut_g774_3::protectedTTPSource
+--@@ |  >- itut_g774::augSource +++
+--@@ itut_q751_1::managedSwitchingElement
+--@@ >- itut_q751_1::mtpSignPoint
+--@@ |  >- itut_q751_1::signRouteSetNePart
+--@@ |  |  >- itut_q751_1::signRouteNePart
+--@@ |  >- "ITU-T Rec. Q.2751.1 (1997)":mtpAccessPoint
+--@@ |  >- itut_q751_1::mtpLevel3
+--@@ |  >- "ITU-T Rec. Q.2751.1 (1997)":signDataLinkTp
+--@@ |  >- itut_q751_1::signLinkSetTp
+--@@ |  |  >- "ITU-T Rec. Q.2751.1 (1997)":signLinkTp
+--@@ |  |  >- "ITU-T Rec. Q.2751.1 (1997)":signLinkTp
+--@@ |  >- itut_q751_1::stpScreeningTable
+--@@ |  |  >- itut_q751_1::stpScreeningTableLine
+--@@ |  >- "ITU-T Rec. Q.2751.1 (1997)":mtpAccessPoint
+--@@ |  >- "ITU-T Rec. Q.2751.1 (1997)":signDataLinkTp
+--@@ >- itut_q751_1::signTerm
+--@@ >- itut_q751_1::lsTimersProfile
+--@@ >- itut_q751_1::mtpL2ProtocolProfile
+--@@ >- itut_q751_1::slTimersProfile
+--@@ >- itut_q751_1::spTimersProfile
+--@@ >- "ITU-T Rec. Q.2751.1 (1997)":saalNniProtocolProfile
+--@@ itut_m3100::networkR1
+--@@ >- itut_m3100::layerNetworkDomain
+--@@ |  >- itut_m3100::accessGroup
+--@@ |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::logicalLink
+--@@ |  >- itut_m3100::logicalLinkEnd
+--@@ |  >- itut_m3100::networkCTPSink
+--@@ |  >- itut_m3100::networkCTPSource
+--@@ |  >- itut_m3100::networkTTPSink
+--@@ |  >- itut_m3100::networkTTPSource
+--@@ |  >- itut_m3100::subNetwork
+--@@ |  |  >- itut_m3100::logicalLinkEnd
+--@@ |  |  >- itut_m3100::networkCTPSink
+--@@ |  |  >- itut_m3100::networkCTPSource
+--@@ |  |  >- itut_m3100::networkTTPSink
+--@@ |  |  >- itut_m3100::networkTTPSource
+--@@ |  |  >- itut_m3100::subNetworkConnection
+--@@ |  |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::topologicalLink
+--@@ |  |  >- itut_m3100::linkConnection
+--@@ |  >- itut_m3100::topologicalLinkEnd
+--@@ |  >- itut_m3100::trailR2
+--@@ >- itut_m3100::managedElementComplex +++
+--@@ itut_g774_5::au3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::au4SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu11SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu12SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu2SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_g774_5::tu3SupervisedCTPSinkR1
+--@@ >- itut_g774_1::pathTerminationCurrentData
+--@@ itut_m3100::trailTerminationPointBidirectional
+--@@ >- itut_m3100::connectionTerminationPointSink
+--@@ >- itut_m3100::connectionTerminationPointSource
+--@@ itut_m3100::trailTerminationPointBidirectional +++
+--@@ itut_x283::x25PLE_DTE
+--@@ >- itut_x283::permanentVirtualCircuit_DTE
+--@@ >- itut_x283::virtualCall_DTE
+--@@ itut_x283::x25PLE_DCE
+--@@ >- itut_x283::permanentVirtualCircuit_DCE
+--@@ >- itut_x283::virtualCall_DCE
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ |  >- itut_x283::dSeriesCounts
+--@@ >- itut_x283::virtualCall_DCE +++
+--@@
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

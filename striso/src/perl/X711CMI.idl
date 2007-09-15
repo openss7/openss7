@@ -1,0 +1,549 @@
+// File: X711CMI.idl
+#ifndef _X711CMI_IDL_
+#define _X711CMI_IDL_
+//
+// ASN.1 Module name: CMIP-1
+// ASN.1 Module OID: 2.9.1.0.3
+// ASN.1 Module nickname: X711CMI
+//
+#include <ASN1Types.idl>
+#include X501Inf.idl
+module X711CMI {
+// definitions imported from: X501Inf
+typedef X501Inf::DistinguishedNameType
+DistinguishedNameType;
+typedef X501Inf::RDNSequenceType
+RDNSequenceType;
+// Assignments mapping
+typedef ASN1_Integer InvokeIdTypeType;
+typedef ASN1_External AccessControlType;
+enum ObjectClassTypeChoice { globalFormChoice_3, localFormChoice_3 };
+union ObjectClassType
+switch(ObjectClassTypeChoice) {
+case globalFormChoice_3:
+ASN1_ObjectIdentifier globalForm;
+case localFormChoice_3:
+ASN1_Integer localForm;
+};
+enum ObjectInstanceTypeChoice { distinguishedNameChoice,
+nonSpecificFormChoice, localDistinguishedNameChoice };
+union ObjectInstanceType
+switch(ObjectInstanceTypeChoice) {
+case distinguishedNameChoice:
+DistinguishedNameType distinguishedName;
+case nonSpecificFormChoice:
+ASN1_OctetString nonSpecificForm;
+case localDistinguishedNameChoice:
+RDNSequenceType localDistinguishedName;
+};
+union AccessControlTypeOpt
+switch (boolean) {
+case TRUE: AccessControlType value;
+};
+enum CMISSyncType { bestEffort, atomic };
+union CMISSyncTypeOpt
+switch (boolean) {
+case TRUE: CMISSyncType value;
+};
+typedef CMISSyncTypeOpt CMISSyncTypeDef;
+typedef ASN1_Integer ScopeLevelType;
+enum ScopeTypeChoice { levelChoice, individualLevelsChoice,
+baseToNthLevelChoice };
+union ScopeType
+switch(ScopeTypeChoice) {
+case levelChoice:
+ScopeLevelType level;
+case individualLevelsChoice:
+ASN1_Integer individualLevels;
+case baseToNthLevelChoice:
+ASN1_Integer baseToNthLevel;
+};
+union ScopeTypeOpt
+switch (boolean) {
+case TRUE: ScopeType value;
+};
+typedef ScopeTypeOpt ScopeTypeDef;
+enum AttributeIdTypeChoice { globalFormChoice_1, localFormChoice_1 };
+union AttributeIdType
+switch(AttributeIdTypeChoice) {
+case globalFormChoice_1:
+ASN1_ObjectIdentifier globalForm;
+case localFormChoice_1:
+ASN1_Integer localForm;
+};
+struct FilterItemSubstringsItemInitialStringType {
+AttributeIdType attributeId;
+ASN1_DefinedAny string_1; // defined by:attributeId
+};
+struct FilterItemSubstringsItemAnyStringType {
+AttributeIdType attributeId;
+ASN1_DefinedAny string_1; // defined by:attributeId
+};
+struct FilterItemSubstringsItemFinalStringType {
+AttributeIdType attributeId;
+ASN1_DefinedAny string_1; // defined by:attributeId
+};
+enum FilterItemSubstringsItemTypeChoice { initialStringChoice,
+anyStringChoice, finalStringChoice };
+union FilterItemSubstringsItemType
+switch(FilterItemSubstringsItemTypeChoice) {
+case initialStringChoice:
+FilterItemSubstringsItemInitialStringType initialString;
+case anyStringChoice:
+FilterItemSubstringsItemAnyStringType anyString;
+case finalStringChoice:
+FilterItemSubstringsItemFinalStringType finalString;
+};
+typedef sequence <FilterItemSubstringsItemType>
+FilterItemSubstringsType;
+enum FilterItemTypeChoice { equalityChoice, substringsChoice,
+greaterOrEqualChoice, lessOrEqualChoice, presentChoice,
+subsetOfChoice, supersetOfChoice,
+nonNullSetIntersectionChoice };
+union FilterItemType
+switch(FilterItemTypeChoice) {
+case equalityChoice:
+AttributeType equality;
+case substringsChoice:
+FilterItemSubstringsType substrings;
+case greaterOrEqualChoice:
+AttributeType greaterOrEqual;
+case lessOrEqualChoice:
+AttributeType lessOrEqual;
+case presentChoice:
+AttributeIdType present;
+case subsetOfChoice:
+AttributeType subsetOf;
+case supersetOfChoice:
+AttributeType supersetOf;
+case nonNullSetIntersectionChoice:
+AttributeType nonNullSetIntersection;
+};
+enum CMISFilterTypeChoice { itemChoice, andChoice, orChoice,
+notChoice };
+union CMISFilterType
+switch(CMISFilterTypeChoice) {
+case itemChoice:
+FilterItemType item;
+case andChoice:
+sequence<CMISFilterType> and;
+case orChoice:
+sequence<CMISFilterType> or;
+case notChoice:
+sequence<CMISFilterType, 1> not;
+};
+union CMISFilterTypeOpt
+switch (boolean) {
+case TRUE: CMISFilterType value;
+};
+typedef CMISFilterTypeOpt CMISFilterTypeDef;
+enum ActionTypeIdTypeChoice { globalFormChoice, localFormChoice };
+union ActionTypeIdType
+switch(ActionTypeIdTypeChoice) {
+case globalFormChoice:
+ASN1_ObjectIdentifier globalForm;
+case localFormChoice:
+ASN1_Integer localForm;
+};
+union ASN1_DefinedAnyOpt
+switch (boolean) {
+case TRUE: ASN1_DefinedAny value;
+};
+struct ActionInfoType {
+ActionTypeIdType actionType;
+ASN1_DefinedAnyOpt actionInfoArg; // defined by:actionType
+};
+struct ActionArgumentType {
+ObjectClassType baseManagedObjectClass;
+ObjectInstanceType baseManagedObjectInstance;
+AccessControlTypeOpt accessControl;
+CMISSyncTypeDef synchronization;
+ScopeTypeDef scope;
+CMISFilterTypeDef filter;
+ActionInfoType actionInfo;
+};
+const ScopeLevelType baseObject =
+0;
+union ObjectClassTypeOpt
+switch (boolean) {
+case TRUE: ObjectClassType value;
+};
+union ObjectInstanceTypeOpt
+switch (boolean) {
+case TRUE: ObjectInstanceType value;
+};
+union ASN1_GeneralizedTimeOpt
+switch (boolean) {
+case TRUE: ASN1_GeneralizedTime value;
+};
+enum ActionErrorInfoErrorStatusType { accessDenied, noSuchAction,
+noSuchArgument, invalidArgumentValue };
+struct NoSuchArgumentActionIdType {
+ObjectClassTypeOpt managedObjectClass;
+ActionTypeIdType actionType;
+};
+enum EventTypeIdTypeChoice { globalFormChoice_2, localFormChoice_2 };
+union EventTypeIdType
+switch(EventTypeIdTypeChoice) {
+case globalFormChoice_2:
+ASN1_ObjectIdentifier globalForm;
+case localFormChoice_2:
+ASN1_Integer localForm;
+};
+struct NoSuchArgumentEventIdType {
+ObjectClassTypeOpt managedObjectClass;
+EventTypeIdType eventType;
+};
+enum NoSuchArgumentTypeChoice { actionIdChoice, eventIdChoice };
+union NoSuchArgumentType
+switch(NoSuchArgumentTypeChoice) {
+case actionIdChoice:
+NoSuchArgumentActionIdType actionId;
+case eventIdChoice:
+NoSuchArgumentEventIdType eventId;
+};
+struct InvalidArgumentValueEventValueType {
+EventTypeIdType eventType;
+ASN1_DefinedAnyOpt eventInfo; // defined by:eventType
+};
+enum InvalidArgumentValueTypeChoice { actionValueChoice,
+eventValueChoice };
+union InvalidArgumentValueType
+switch(InvalidArgumentValueTypeChoice) {
+case actionValueChoice:
+ActionInfoType actionValue;
+case eventValueChoice:
+InvalidArgumentValueEventValueType eventValue;
+};
+enum ActionErrorInfoErrorInfoTypeChoice { actionTypeChoice,
+actionArgumentChoice, argumentValueChoice };
+union ActionErrorInfoErrorInfoType
+switch(ActionErrorInfoErrorInfoTypeChoice) {
+case actionTypeChoice:
+ActionTypeIdType actionType;
+case actionArgumentChoice:
+NoSuchArgumentType actionArgument;
+case argumentValueChoice:
+InvalidArgumentValueType argumentValue;
+};
+struct ActionErrorInfoType {
+ActionErrorInfoErrorStatusType errorStatus;
+ActionErrorInfoErrorInfoType errorInfo;
+};
+struct ActionErrorType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+ActionErrorInfoType actionErrorInfo;
+};
+struct ActionReplyType {
+ActionTypeIdType actionType;
+ASN1_DefinedAny actionReplyInfo; // defined by:actionType
+};
+union ActionReplyTypeOpt
+switch (boolean) {
+case TRUE: ActionReplyType value;
+};
+struct ActionResultType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+ActionReplyTypeOpt actionReply;
+};
+enum AttributeErrorErrorStatusType { accessDenied_1,
+noSuchAttribute, invalidAttributeValue, invalidOperation,
+invalidOperator };
+typedef ASN1_Integer ModifyOperatorType;
+union ModifyOperatorTypeOpt
+switch (boolean) {
+case TRUE: ModifyOperatorType value;
+};
+struct AttributeErrorType {
+AttributeErrorErrorStatusType errorStatus;
+ModifyOperatorTypeOpt modifyOperator;
+AttributeIdType attributeId;
+ASN1_DefinedAnyOpt attributeValue; // defined by:attributeId
+};
+enum AttributeIdErrorErrorStatusType { accessDenied_2,
+noSuchAttribute_1 };
+struct AttributeIdErrorType {
+AttributeIdErrorErrorStatusType errorStatus;
+AttributeIdType attributeId;
+};
+struct BaseManagedObjectIdType {
+ObjectClassType baseManagedObjectClass;
+ObjectInstanceType baseManagedObjectInstance;
+};
+struct ComplexityLimitationType {
+ScopeTypeOpt scope;
+CMISFilterTypeOpt filter;
+CMISSyncTypeOpt sync;
+};
+enum CreateArgumentObjectInstanceTypeChoice {
+managedObjectInstanceChoice, superiorObjectInstanceChoice };
+union CreateArgumentObjectInstanceType
+switch(CreateArgumentObjectInstanceTypeChoice) {
+case managedObjectInstanceChoice:
+ObjectInstanceType managedObjectInstance;
+case superiorObjectInstanceChoice:
+ObjectInstanceType superiorObjectInstance;
+};
+union CreateArgumentObjectInstanceTypeOpt
+switch (boolean) {
+case TRUE: CreateArgumentObjectInstanceType value;
+};
+typedef sequence <AttributeType>
+CreateArgumentAttributeListType;
+union CreateArgumentAttributeListTypeOpt
+switch (boolean) {
+case TRUE: CreateArgumentAttributeListType value;
+};
+struct CreateArgumentType {
+ObjectClassType managedObjectClass;
+CreateArgumentObjectInstanceTypeOpt objectInstance;
+AccessControlTypeOpt accessControl;
+ObjectInstanceTypeOpt referenceObjectInstance;
+CreateArgumentAttributeListTypeOpt attributeList;
+};
+typedef sequence <AttributeType>
+CreateResultAttributeListType;
+union CreateResultAttributeListTypeOpt
+switch (boolean) {
+case TRUE: CreateResultAttributeListType value;
+};
+struct CreateResultType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+CreateResultAttributeListTypeOpt attributeList;
+};
+struct DeleteArgumentType {
+ObjectClassType baseManagedObjectClass;
+ObjectInstanceType baseManagedObjectInstance;
+AccessControlTypeOpt accessControl;
+CMISSyncTypeDef synchronization;
+ScopeTypeDef scope;
+CMISFilterTypeDef filter;
+};
+enum DeleteErrorDeleteErrorInfoType { accessDenied_3 };
+struct DeleteErrorType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+DeleteErrorDeleteErrorInfoType deleteErrorInfo;
+};
+struct DeleteResultType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+};
+struct EventReplyType {
+EventTypeIdType eventType;
+ASN1_DefinedAnyOpt eventReplyInfo; // defined by:eventType
+};
+struct EventReportArgumentType {
+ObjectClassType managedObjectClass;
+ObjectInstanceType managedObjectInstance;
+ASN1_GeneralizedTimeOpt eventTime;
+EventTypeIdType eventType;
+ASN1_DefinedAnyOpt eventInfo; // defined by:eventType
+};
+union EventReplyTypeOpt
+switch (boolean) {
+case TRUE: EventReplyType value;
+};
+struct EventReportResultType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+EventReplyTypeOpt eventReply;
+};
+typedef sequence <AttributeIdType>
+GetArgumentAttributeIdListType;
+union GetArgumentAttributeIdListTypeOpt
+switch (boolean) {
+case TRUE: GetArgumentAttributeIdListType value;
+};
+struct GetArgumentType {
+ObjectClassType baseManagedObjectClass;
+ObjectInstanceType baseManagedObjectInstance;
+AccessControlTypeOpt accessControl;
+CMISSyncTypeDef synchronization;
+ScopeTypeDef scope;
+CMISFilterTypeDef filter;
+GetArgumentAttributeIdListTypeOpt attributeIdList;
+};
+enum GetInfoStatusTypeChoice { attributeIdErrorChoice,
+attribute_1Choice };
+union GetInfoStatusType
+switch(GetInfoStatusTypeChoice) {
+case attributeIdErrorChoice:
+AttributeIdErrorType attributeIdError;
+case attribute_1Choice:
+AttributeType attribute_1;
+};
+typedef sequence <GetInfoStatusType>
+GetListErrorGetInfoListType;
+struct GetListErrorType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+GetListErrorGetInfoListType getInfoList;
+};
+typedef sequence <AttributeType>
+GetResultAttributeListType;
+union GetResultAttributeListTypeOpt
+switch (boolean) {
+case TRUE: GetResultAttributeListType value;
+};
+struct GetResultType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+GetResultAttributeListTypeOpt attributeList;
+};
+typedef sequence <AttributeType>
+SetResultAttributeListType;
+union SetResultAttributeListTypeOpt
+switch (boolean) {
+case TRUE: SetResultAttributeListType value;
+};
+struct SetResultType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+SetResultAttributeListTypeOpt attributeList;
+};
+enum SetInfoStatusTypeChoice { attributeErrorChoice,
+attribute_1Choice_1 };
+union SetInfoStatusType
+switch(SetInfoStatusTypeChoice) {
+case attributeErrorChoice:
+AttributeErrorType attributeError;
+case attribute_1Choice_1:
+AttributeType attribute_1;
+};
+typedef sequence <SetInfoStatusType>
+SetListErrorSetInfoListType;
+struct SetListErrorType {
+ObjectClassTypeOpt managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+ASN1_GeneralizedTimeOpt currentTime;
+SetListErrorSetInfoListType setInfoList;
+};
+struct SpecificErrorInfoType {
+ASN1_ObjectIdentifier errorId;
+ASN1_DefinedAny errorInfo; // defined by:errorId
+};
+struct ProcessingFailureType {
+ObjectClassType managedObjectClass;
+ObjectInstanceTypeOpt managedObjectInstance;
+SpecificErrorInfoType specificErrorInfo;
+};
+enum LinkedReplyArgumentTypeChoice { getResultChoice,
+getListErrorChoice, setResultChoice, setListErrorChoice,
+actionResultChoice, processingFailureChoice,
+deleteResultChoice, actionErrorChoice, deleteErrorChoice };
+union LinkedReplyArgumentType
+switch(LinkedReplyArgumentTypeChoice) {
+case getResultChoice:
+GetResultType getResult;
+case getListErrorChoice:
+GetListErrorType getListError;
+case setResultChoice:
+SetResultType setResult;
+case setListErrorChoice:
+SetListErrorType setListError;
+case actionResultChoice:
+ActionResultType actionResult;
+case processingFailureChoice:
+ProcessingFailureType processingFailure;
+case deleteResultChoice:
+DeleteResultType deleteResult;
+case actionErrorChoice:
+ActionErrorType actionError;
+case deleteErrorChoice:
+DeleteErrorType deleteError;
+};
+const ModifyOperatorType replace =
+0;
+const ModifyOperatorType addValues =
+1;
+const ModifyOperatorType removeValues =
+2;
+const ModifyOperatorType setToDefault =
+3;
+struct NoSuchActionType {
+ObjectClassType managedObjectClass;
+ActionTypeIdType actionType;
+};
+struct NoSuchEventTypeType {
+ObjectClassType managedObjectClass;
+EventTypeIdType eventType;
+};
+const ScopeLevelType firstLevelOnly =
+1;
+const ScopeLevelType wholeSubtree =
+2;
+typedef ModifyOperatorTypeOpt ModifyOperatorTypeDef;
+struct SetArgumentModificationListItemType {
+ModifyOperatorTypeDef modifyOperator;
+AttributeIdType attributeId;
+ASN1_DefinedAnyOpt attributeValue; // defined by:attributeId
+};
+typedef sequence <SetArgumentModificationListItemType>
+SetArgumentModificationListType;
+struct SetArgumentType {
+ObjectClassType baseManagedObjectClass;
+ObjectInstanceType baseManagedObjectInstance;
+AccessControlTypeOpt accessControl;
+CMISSyncTypeDef synchronization;
+ScopeTypeDef scope;
+CMISFilterTypeDef filter;
+SetArgumentModificationListType modificationList;
+};
+const ModifyOperatorType modifyOperatorDefault =
+replace;
+typedef sequence <AttributeIdType>
+MissingAttributeValueType;
+// Complex constants declaration.
+interface ConstValues {
+// ** Generated values for <ActionArgumentType::synchronization>:
+CMISSyncType synchronizationDefault();
+// returns: bestEffort
+// ** Generated values for <ActionArgumentType::scope>:
+ScopeType scopeDefault();
+// returns: baseObject
+// ** Generated values for <ActionArgumentType::filter>:
+CMISFilterType filterDefault();
+// returns: {}
+// ** Generated values for <DeleteArgumentType::synchronization>:
+CMISSyncType synchronizationDefault_1();
+// returns: bestEffort
+// ** Generated values for <DeleteArgumentType::scope>:
+ScopeType scopeDefault_1();
+// returns: baseObject
+// ** Generated values for <DeleteArgumentType::filter>:
+CMISFilterType filterDefault_1();
+// returns: {}
+// ** Generated values for <GetArgumentType::synchronization>:
+CMISSyncType synchronizationDefault_2();
+// returns: bestEffort
+// ** Generated values for <GetArgumentType::scope>:
+ScopeType scopeDefault_2();
+// returns: baseObject
+// ** Generated values for <GetArgumentType::filter>:
+CMISFilterType filterDefault_2();
+// returns: {}
+// ** Generated values for <SetArgumentType::synchronization>:
+CMISSyncType synchronizationDefault_3();
+// returns: bestEffort
+// ** Generated values for <SetArgumentType::scope>:
+ScopeType scopeDefault_3();
+// returns: baseObject
+// ** Generated values for <SetArgumentType::filter>:
+CMISFilterType filterDefault_3();
+// returns: {}
+};
+};
+#endif /* _X711CMI_IDL_ */

@@ -1,0 +1,138 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 12:46:49 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. M.3641 (1994)"
+--  { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) } >--
+MODULE "ITU-T Rec. M.3641 (1994)" { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) }
+--< ASN1.Version 1994 ASN1TypeModule
+--  { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) asn1Module(2) asn1TypeModule(0) } >--
+-- 7 ASN.1 Type definitions module
+-- This clause contains the abstract syntax in ASN.1 [10] for the management information defined in this Recommendation.
+ASN1TypeModule { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) asn1Module(2) asn1TypeModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+NameType
+	FROM ASN1DefinedTypeModule { itu(0) recommendation(0) m(13) gnm(3100) informationModel(0) asn1Module(2) asn1DefinedTypesModule(0) };
+m3641InformationModel OBJECT IDENTIFIER ::= { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) }
+m3641StandardSpecificExtension OBJECT IDENTIFIER ::= { m3641InformationModel standardSpecificExtension(0) }
+m3641ManagedObjectClass OBJECT IDENTIFIER ::= { m3641InformationModel managedObjectClass(3) }
+m3641Package OBJECT IDENTIFIER ::= { m3641InformationModel package(4) }
+m3641NameBinding OBJECT IDENTIFIER ::= { m3641InformationModel nameBinding(6) }
+m3641Attribute OBJECT IDENTIFIER ::= { m3641InformationModel attribute(7) }
+m3641Notification OBJECT IDENTIFIER ::= { m3641InformationModel notification(10) }
+defaultZero DefaultZero ::= 0
+CallReferenceFlag ::= INTEGER
+CallReferenceValue ::= INTEGER
+CauseType ::= OCTET STRING
+-- The causeType contains the octets three to five as defined in Recommendation Q.931.
+-- This includes the cause value, location and the diagnostic field.
+DataLinkState ::= ENUMERATED {
+	awaitingEstablishment(1),
+	awaitingRelease(2),
+	multipleFrameEstablishedMode(3),
+	multipleFrameTimeRecoveryMode(4),
+	tEIAssigned(5),
+	tEIUnassigned(6) }
+DefaultZero ::= INTEGER
+ErrorFrames ::= SEQUENCE {
+	tEIValue TEIValue,
+	typeOfErrorFrame TypeOfErrorFrame }
+FrameType ::= ENUMERATED {
+	dISC(1),
+	dM(2),
+	fRMR(3),
+	i(4),
+	rEJ(5),
+	rNR(6),
+	rR(7),
+	sABME(8),
+	uA(9),
+	uI(10),
+	xID(11) }
+InvalidFrames ::= BIT STRING
+MessageCallRefError ::= SEQUENCE {
+	messageType MessageType,
+	relatingToActiveCall RelatingToActiveCall,
+	callReferenceFlag CallReferenceFlag,
+	callReferenceValue CallReferenceValue,
+	tEIValue TEIValue }
+MessageType ::= ENUMERATED {
+	aLERTING(1),
+	cALLpROCEEDING(2),
+	cONGESTIONcONTROL(3),
+	cONNECT(4),
+	cONNECTaCKNOWLEDGE(5),
+	dISCONNECT(6),
+	fACILITY(7),
+	iNFORMATION(8),
+	nOTIFY(9),
+	pROGRESS(10),
+	rELEASE(11),
+	rELEASEcOMPLETE(12),
+	rESTART(13),
+	rESUME(14),
+	rESUMEaCKNOWLEDGE(15),
+	rESUMErEJECT(16),
+	sETUP(17),
+	sETUPaCKNOWLEDGE(18),
+	sTATUS(19),
+	sTATUSeNQUIRY(20),
+	sUSPEND(21),
+	sUSPENDaCKNOWLEDGE(22),
+	sUSPENDrEJECT(23),
+	uSERiNFORMATION(24) }
+OtherSpecialMessage ::= SEQUENCE {
+	messageType MessageType,
+	received Received,
+	tEIValue TEIValue,
+	causeValue CauseType OPTIONAL }
+OldestRecordAge ::= GeneralizedTime
+OldestRecordLessThanLimit ::= BOOLEAN
+Received ::= BOOLEAN
+RelatingToActiveCall ::= BOOLEAN
+SpecialMessageType ::= SEQUENCE {
+	messageType MessageType,
+	received Received,
+	tEIValue TEIValue,
+	causeValue CauseType }
+TEIValue ::= INTEGER
+TimerExpiryNetwork ::= SEQUENCE {
+	tEIValue TEIValue,
+	typeOfTimer TypeOfTimer }
+TypeOfErrorFrame ::= ENUMERATED {
+	framesWithBadInfoField(1),
+	framesWithBadControlField(2),
+	supervisoryFramesWithBadLength(3),
+	unnumberedFramesBadLength(4),
+	framesWithInvalidReceiveSeqNumber(5),
+	framesWithInfoFieldTooLong(6),
+	fRMRReceived(7),
+	dMFramesSentInResponseToSABME(8),
+	notProperResponseAfterN200SABMEs(9),
+	dMFramesReceivedInResponseToSABME(10) }
+TypeOfTimer ::= ENUMERATED {
+	t308(0),
+	t309(1),
+	t316(2),
+	t317(3) }
+UnexpectedFrames ::= SEQUENCE {
+	frameType FrameType,
+	dataLinkState DataLinkState,
+	tEIValue TEIValue }
+END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. M.3641 (1994)"
+--  { itu(0) recommendation(0) m(13) m3641(3641) informationModel(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

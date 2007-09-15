@@ -1,0 +1,68 @@
+// File: OSITracking.idl
+#ifndef _OSITRACKING_IDL_
+#define _OSITRACKING_IDL_
+#include <OSICaching.idl>
+#pragma prefix jidm.org
+module OSITracking {
+typedef OSICaching::ManagedObjectClassSeq ManagedObjectClassSeq;
+typedef OSICaching::AttrIdSeq AttrIdSeq;
+// abstract interface to configure all tracking
+interface TrackConfigurator {
+void set_tracking_enabled (
+in boolean enabled,
+in boolean override_specific_settings
+);
+boolean is_tracking_enabled ();
+};
+// abstract interface to configure per-attribute tracking
+interface PerAttributeTrackConfigurator {
+void add_tracked_attributes (
+in AttrIdSeq attr_list,
+in boolean override_specific_settings
+) raises ( OSICaching::NoSuchAttributes );
+// If the attr_id_list contains an attribute identifier that is not
+// being tracked, then that attribute identifier is ignored
+// by remove_tracked_attributes.
+void remove_tracked_attributes (
+in AttrIdSeq attr_id_list,
+in boolean override_specific_settings
+) raises ( OSICaching::NoSuchAttributes );
+AttrIdSeq get_tracked_attributes ();
+};
+// managed object class with indicated attributes tracked
+struct TrackedObjectClass {
+OSICaching::ManagedObjectClass moc;
+AttrIdSeq list_of_tracked_attributes;
+};
+typedef sequence < TrackedObjectClass > TrackedObjectClassSeq;
+// TrackConfigException is similar in purpose to
+// OSICaching::CacheConfigException
+exception TrackConfigException {
+ManagedObjectClassSeq no_such_mocs;
+AttrIdSeq no_such_attr_ids;
+OSICaching::ObjectClassAttributesPairSeq invalid_moc_attrs_pairs;
+};
+// abstract interface to configure per-class tracking
+interface PerClassTrackConfigurator {
+void add_tracked_classes (
+in TrackedObjectClassSeq class_list,
+in boolean override_specific_settings
+) raises ( TrackConfigException );
+void remove_tracked_classes (
+in ManagedObjectClassSeq moc_list,
+in boolean override_specific_settings
+) raises ( OSICaching::NoSuchObjectClasses );
+TrackedObjectClassSeq get_tracked_classes ();
+AttrIdSeq get_tracked_attributes_for_class (
+in OSICaching::ManagedObjectClass class_name
+) raises ( OSIMgmt::NoSuchObjectClass );
+};
+interface ProxyAgent : OSICaching::ProxyAgent,
+TrackConfigurator,
+PerAttributeTrackConfigurator,
+PerClassTrackConfigurator {};
+interface ManagedObject : OSICaching::ManagedObject,
+TrackConfigurator,
+PerAttributeTrackConfigurator {};
+};
+#endif /* _OSITRACKING_IDL_ */

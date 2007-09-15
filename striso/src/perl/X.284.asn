@@ -1,0 +1,95 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Sat Sep 15 05:44:00 MDT 2007
+--@@ 
+--< GDMO.Document "ITU-T Rec. X.284 (1997)"
+--  { joint-iso-ccitt transport-layer(14) management(0) } >--
+MODULE "ITU-T Rec. X.284 (1997)" { joint-iso-ccitt transport-layer(14) management(0) }
+--< ASN1.Version 1994 TLM
+--  { joint-iso-ccitt transport-layer(14) management(0) tlAsn1Module(2) 0 } >--
+-- 6 ASN.1 modules
+TLM { joint-iso-ccitt transport-layer(14) management(0) tlAsn1Module(2) 0 }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+communicationsProtocolError
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+NameType
+	FROM ASN1DefinedTypesModule { ccitt recommendation m gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+BaseManagedObjectId
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) };
+-- 6.1 Object Identifier definitions
+-- 6.1.1 Abbreviations
+tloi OBJECT IDENTIFIER ::= { joint-iso-ccitt transport-layer(14) management(0) }
+sseoi OBJECT IDENTIFIER ::= { tloi standardSpecificExtension(0) }
+moi OBJECT IDENTIFIER ::= { tloi objectclass(3) }
+poi OBJECT IDENTIFIER ::= { tloi package(4) }
+proi OBJECT IDENTIFIER ::= { tloi parameter(5) }
+nboi OBJECT IDENTIFIER ::= { tloi namebinding(6) }
+aoi OBJECT IDENTIFIER ::= { tloi attribute(7) }
+agoi OBJECT IDENTIFIER ::= { tloi attributeGroup(8) }
+acoi OBJECT IDENTIFIER ::= { tloi action(9) }
+noi OBJECT IDENTIFIER ::= { tloi notification(10) }
+-- 6.1.2 Other Object Identifier definitions
+successfulConnectionEstablishment OBJECT IDENTIFIER ::= { sseoi informationtype(4) successfulConnectionEstablishment(1) }
+incomingConnectionRejectedType OBJECT IDENTIFIER ::= { sseoi informationtype(4) incomingConnectionRejected(2) }
+-- 6.2 Other definitions
+Boolean ::= BOOLEAN
+ConnectionDirectionSyntax ::= ENUMERATED {
+	outgoing(0),
+	incoming(1) }
+clmodeTPMId-Value GraphicString ::= "CLTPM"
+comodeTPMId-Value GraphicString ::= "COTPM"
+DeletionCauseSyntax ::= ENUMERATED {
+	protocolError(0),
+	networkServiceProvider(1),
+	remoteCongestion(3),
+	localCongestion(4) }
+NamingString ::= GraphicString
+Integer ::= INTEGER
+LocalDistinguishedName ::= CMIP-1.BaseManagedObjectId
+LocalDistinguishedNames ::= SET OF LocalDistinguishedName
+NC-COLSyntax ::= ENUMERATED {
+	nc-COL0(0) }
+NC-PREFSyntax ::= ENUMERATED {
+	highest(0),
+	medium(1),
+	lowest(3) }
+NC-RECSyntax ::= ENUMERATED {
+	pleaseDoNotRecover(0),
+	pleaseRecover(1) }
+NC-REFSyntax ::= INTEGER
+NC-RightSyntax ::= ENUMERATED {
+	my-side(1),
+	remote-side(2),
+	both-sides(3) }
+OctetString ::= OCTET STRING
+ProtocolClassSyntax ::= ENUMERATED {
+	class0(0),
+	class1(1),
+	class2(2),
+	class3(3),
+	class4(4) }
+ProtocolClassesSyntax ::= SET OF ProtocolClassSyntax
+PDUHeaderSyntax ::= OCTET STRING(SIZE(1..255))
+ReasonCodeSyntax ::= INTEGER
+SourceAddressSyntax ::= OCTET STRING
+SourceOfAllocationSyntax ::= ENUMERATED {
+	local(0),
+	remote(1) }
+transportSubsystemId-Value GraphicString ::= "TransportSubsystem"
+END
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.284 (1997)"
+--  { joint-iso-ccitt transport-layer(14) management(0) } >--
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

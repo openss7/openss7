@@ -1,0 +1,218 @@
+--@@ GDMOCHECK $Revision: 0.9.2.2 $
+--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>
+--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>
+--@@ 
+--@@ Input File: <(standard input)>
+--@@ Special File: <(standard input).specials>
+--@@ Date: Fri Sep 14 02:16:09 MDT 2007
+--@@ 
+--< ASN1.Version 1990 Q2751DefinedTypesModule
+--  { itu(0) recommendation(0) q(17) omap2(2751) part1(1) informationModel(0) asn1Modules(2) q2751DefinedTypesModule(0) } >--
+-- 8.10 Abstract syntax productions
+-- The syntax of this ASN.1 is based on Recommendation X.208.
+-- The default values have been taken from Table 5/Q.2140.
+Q2751DefinedTypesModule { itu(0) recommendation(0) q(17) omap2(2751) part1(1) informationModel(0) asn1Modules(2) q2751DefinedTypesModule(0) }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+EXPORTS EVERYTHING;
+IMPORTS
+NameType, Pointer
+	FROM ASN1DefinedTypesModule { ccitt(0) recommendation(0) m(13) gnm(3100) informationModel(0) asn1Modules(2) asn1DefinedTypesModule(0) }
+AdditionalName
+	FROM MTPDefinedTypesModule { ccitt(0) recommendation(0) q(17) omap(751) mtp(1) informationModel(0) asn1Modules(2) mtpDefinedTypesModule(0) };
+-- ASN.1 type definitions
+BufferRelease ::= BOOLEAN
+EgressTransmissionRateInterval ::= TransmissionRateInterval
+LongMessageSupported ::= BOOLEAN
+MaxCc ::= INTEGER
+maxCcDefaultForNNI MaxCc ::= 4
+MaxInformationFieldLength ::= INTEGER
+maxInformationFieldLengthDefaultForNni MaxInformationFieldLength ::= 4096
+MaxLengthSscopUuField ::= INTEGER
+maxLengthSscopUuFieldDefaultForNNI MaxLengthSscopUuField ::= 4
+MaxNrp ::= INTEGER
+MaxPd ::= INTEGER
+maxPdDefaultForNNI MaxPd ::= 500
+MaxSscopCreditToPeer ::= INTEGER
+MaxStat ::= INTEGER
+maxStatDefault MaxStat ::= 67
+N1 ::= INTEGER
+n1Default N1 ::= 1000
+NniLayerManagementProvingState ::= ENUMERATED {
+	normal(0),
+	emergency(1),
+	neutral(2) }
+NniLayerManagementTimerNoCredit ::= INTEGER
+NniLayerManagementTimerRepeatSrec ::= INTEGER
+NniTimerT1 ::= INTEGER
+nniTimerT1Default NniTimerT1 ::= 5000
+NniTimerT2 ::= INTEGER
+nniTimerT2Default NniTimerT2 ::= 30000
+NniTimerT3 ::= INTEGER
+-- there is a derivation rule for the default value
+PollAfterRetransmission ::= BOOLEAN
+Ss7SpecificErrorInformation ::= INTEGER {
+	-- reserved for implementation dependent values: Range 0..999
+	-- alternatively different specific error parameters could be defined for implementation dependent needs
+	-- reserved for errors common to Q.751.x and Q.2751.x: Range 1000..1999
+	adjPcInconsistencyError(1000),
+	-- The attribute adjPc in the containing signLinkSetTp and in at least
+	-- one of the specified signDataLinkTp instances are different.
+	adjPcNotUsedBySignRouteSetNePartError(1001),
+	-- No signRouteSetNePart instance exists for the specified value of adjPc
+	-- within the mtpSignPoint.
+	administrativeStateUnlockedError(1002),
+	-- The administrativeState of this object instance is not locked. This is a
+	-- strict prerequisite in order to delete the object instance or to change
+	-- one of the specified attributes.
+	congestionControlMethodInconsistencyError(1003),
+	-- The link would reference a ProtocolProfile where the appropriate
+	-- packages for the congestionControlMethod of the superior
+	-- signLinkSetTp are not present.
+	containedObjectsExistError(1004),
+	-- This object instance still contains one or more instances of other objects.
+	-- These instances must be deleted first.
+	invalidSignDataLinkTpAndProtocolProfileError(1005),
+	-- It is tried to reference a combination of a mtpL2ProtocolProfile and a
+	-- signDataLinkTp, in which attribute transmissionRate is not present or
+	-- it is tried to reference a combination of a saalNniProtocolProfile and a
+	-- signDataLinkTp in which the attribute vcTTpPointer is not present.
+	signLinkTpNotDeactivatedError(1006),
+	-- The linkTpStatus does not contain the value deactivated.
+	nameAlreadyUsedInObjectClassError(1007),
+	-- The given name is already used by another instance of the same object class.
+	numberOfTimeslotsInvalidError(1008),
+	-- The number of timeslots in the object instance referred by
+	-- interworkingPointPointer is not suitable for a signDataLinkTp
+	objectStillReferencedError(1009),
+	-- This object instance is still referenced by one or more instances of other
+	-- objects and therefore must not be deleted.
+	signDataLinkTpInconsistencyError(1010),
+	-- At least one of the specified signDataLinkTp instances points to a
+	-- signDataLinkTp which is not contained in the same mtpSignPoint.
+	signDataLinkTpInUseError(1011),
+	-- At least one of the specified signDataLinkTp instance is already referenced
+	-- by another signLinkTp instance.
+	spTimersProfileInconsistencyError(1012),
+	-- The link would reference an mtpL2ProtocolProfile whose l2TimerT2
+	-- is not bigger than the q704- t17 of the spTimersProfile referenced by the
+	-- containing mtpSignPoint.
+	thresholdLevelsInconsistencyError(1013),
+	-- A threshold belonging to a lower level of congestion is not lower than a
+	-- threshold of a higher level or the threshold for onset/abatement/discard in
+	-- one level do not fit together.
+	timersInconsistencyError(1014),
+	-- The link would reference an mtpL2ProtocolProfile whose l2TimerT2 is
+	-- not bigger than the q704-t17 of the containing mtpSignPoint.
+	transmissionRateInconsistencyError(1015),
+	-- The attribute transmissionRate both of at least one of the specified
+	-- signDataLinkTp instances and of the mtpL2ProtocolProfile instance
+	-- referenced by one signLinkTp instance must be equal. This request
+	-- would have resulted in a non-matching combination.
+	-- In case of a broadband signDataLinkTp, the ingress- and egress traffic
+	-- descriptors do not match the referenced saalNniProtocolProfile.
+	-- reserved for additional errors for Q.751.3: Range 3000..3999
+	-- reserved for additional errors for Q.751.4: Range 4000..4999
+	-- reserved for additional errors for Q.2751.1: Range 21000..21999
+	invalidAttributeInVcTTpError(21000)
+	-- An attribute in the object instance referred by vcTTpPointer is not
+	-- suitable for a signDataLinkTp.
+	}(0..65535)
+SscopTimerCc ::= INTEGER
+sscopTimerCcDefaultForNNI SscopTimerCc ::= 200
+SscopTimerIdle ::= INTEGER
+sscopTimerIdleDefaultForNNI SscopTimerIdle ::= 100
+SscopTimerKeepAlive ::= INTEGER
+sscopTimerKeepAliveDefaultForNNI SscopTimerKeepAlive ::= 100
+SscopTimerNoResponse ::= INTEGER
+sscopTimerNoResponseDefaultForNNI SscopTimerNoResponse ::= 1500
+SscopTimerPoll ::= INTEGER
+sscopTimerPollDefaultForNNI SscopTimerPoll ::= 100
+TransmissionRateInterval ::= SEQUENCE {
+	lowerTXRateLimit TXRateLimit,
+	upperTXRateLimit TXRateLimit }
+transmissionRateIntervalDefault TransmissionRateInterval ::= { 129, 256 }
+TransSaalCongThreshold ::= SEQUENCE {
+	messages INTEGER,
+	octets INTEGER }
+TXRateLimit ::= INTEGER(minTxRate..maxTxRate)
+minTxRate INTEGER ::= 64
+maxTxRate INTEGER ::= 4096
+VcTTpPointer ::= Pointer
+-- ASN.1 OBJECT IDENTIFIER definitions
+q2751InformationModel OBJECT IDENTIFIER ::= { itu-t recommendation(0) q(17) omap2(2751) part1(1) informationModel(0) }
+q2751ObjectClass OBJECT IDENTIFIER ::= { q2751InformationModel managedObjectClass(3) }
+q2751Package OBJECT IDENTIFIER ::= { q2751InformationModel package(4) }
+q2751Parameter OBJECT IDENTIFIER ::= { q2751InformationModel parameter(5) }
+q2751Attribute OBJECT IDENTIFIER ::= { q2751InformationModel attribute(7) }
+q2751NameBinding OBJECT IDENTIFIER ::= { q2751InformationModel nameBinding(6) }
+q2751Action OBJECT IDENTIFIER ::= { q2751InformationModel action(9) }
+q2751Notification OBJECT IDENTIFIER ::= { q2751InformationModel notification(10) }
+q2751SpecificExtensions OBJECT IDENTIFIER ::= { q2751InformationModel specificExtensions(0) }
+adjPcPackage-POi OBJECT IDENTIFIER ::= { q2751Package adjPcPackage(13) }
+broadbandSpecificPackage-POi OBJECT IDENTIFIER ::= { q2751Package broadbandSpecificPackage(1) }
+bufferRelease-AOi OBJECT IDENTIFIER ::= { q2751Attribute bufferRelease(1) }
+egressTransmissionRateInterval-AOi OBJECT IDENTIFIER ::= { q2751Attribute egressTransmissionRateInterval(2) }
+egressTransmissionRateIntervalPackage-POi OBJECT IDENTIFIER ::= { q2751Package egressTransmissionRateIntervalPackage(2) }
+longMessageSupported-AOi OBJECT IDENTIFIER ::= { q2751Attribute longMessageSupported(36) }
+longMessageSupportedPackage-POi OBJECT IDENTIFIER ::= { q2751Package longMessageSupportedPackage(14) }
+maxCc-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxCc(3) }
+maxNrp-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxNrp(4) }
+maxPd-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxPd(5) }
+maxSscopCreditToPeer-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxSscopCreditToPeer(6) }
+maxStat-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxStat(7) }
+maxInformationFieldLength-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxInformationFieldLength(8) }
+maxLengthSscopUuField-AOi OBJECT IDENTIFIER ::= { q2751Attribute maxLengthSscopUuField(9) }
+mtpAccessPoint-mtpSignPoint-NBOi OBJECT IDENTIFIER ::= { q2751NameBinding mtpAccessPointmtpSignPoint(3) }
+mtpAccessPoint-OOi OBJECT IDENTIFIER ::= { q2751ObjectClass mtpAccessPoint(1) }
+n1-AOi OBJECT IDENTIFIER ::= { q2751Attribute n1(11) }
+narrowbandSpecificPackage-POi OBJECT IDENTIFIER ::= { q2751Package narrowband specificPackage(5) }
+nniLayerManagementProvingState-AOi OBJECT IDENTIFIER ::= { q2751Attribute nniLayerManagementProvingState(12) }
+nniLayerManagementTimerNoCredit-AOi OBJECT IDENTIFIER ::= { q2751Attribute nniLayerManagementTimerNoCredit(13) }
+nniLayerManagementTimerRepeatSrec-AOi OBJECT IDENTIFIER ::= { q2751Attribute nniLayerManagementTimerRepeatSrec(14) }
+nniTimerT1-AOi OBJECT IDENTIFIER ::= { q2751Attribute nniTimerT1(15) }
+nniTimerT2-AOi OBJECT IDENTIFIER ::= { q2751Attribute nniTimerT2(16) }
+nniTimerT3-AOi OBJECT IDENTIFIER ::= { q2751Attribute nniTimerT3(17) }
+pollAfterRetransmission-AOi OBJECT IDENTIFIER ::= { q2751Attribute pollAfterRetransmission(18) }
+pollAfterRetransmissionPackage-POi OBJECT IDENTIFIER ::= { q2751Package pollAfterRetransmissionPackage(6) }
+saalNniProtocolProfile-managedElement-NBOi OBJECT IDENTIFIER ::= { q2751NameBinding(1) }
+saalNniProtocolProfile-managedSwitchingElement-NBOi OBJECT IDENTIFIER ::= { q2751NameBinding(2) }
+saalNniProtocolProfile-OOi OBJECT IDENTIFIER ::= { q2751ObjectClass saalNniProtocolProfile(2) }
+saalNniProtocolProfileId-AOi OBJECT IDENTIFIER ::= { q2751Attribute saalNniProtocolProfileId(19) }
+saalNniProtocolProfileName-AOi OBJECT IDENTIFIER ::= { q2751Attribute saalNniProtocolProfileName(20) }
+saalNniProtocolProfileNamePackage-POi OBJECT IDENTIFIER ::= { q2751Package saalNniProtocolProfileNamePackage(7) }
+saalNniProtocolProfilePackage-POi OBJECT IDENTIFIER ::= { q2751Package saalNniProtocolProfilePackage(8) }
+signDataLinkTp-mtpSignPoint-NBOi OBJECT IDENTIFIER ::= { q2751NameBinding(4) }
+signDataLinkTp-OOi OBJECT IDENTIFIER ::= { q2751ObjectClass signDataLinkTp(3) }
+signDataLinkTpPackage-POi OBJECT IDENTIFIER ::= { q2751Package signDataLinkTpPackage(9) }
+signLinkTp-OOi OBJECT IDENTIFIER ::= { q2751ObjectClass signLinkTp(4) }
+signLinkTp-signLinkSetTp-NBOi OBJECT IDENTIFIER ::= { q2751NameBinding(5) }
+signLinkTpPackage-POi OBJECT IDENTIFIER ::= { q2751Package signLinkTpPackage(10) }
+sscopTimerCc-AOi OBJECT IDENTIFIER ::= { q2751Attribute sscopTimerCc(21) }
+sscopTimerIdle-AOi OBJECT IDENTIFIER ::= { q2751Attribute sscopTimerIdle(22) }
+sscopTimerKeepAlive-AOi OBJECT IDENTIFIER ::= { q2751Attribute sscopTimerKeepAlive(23) }
+sscopTimerNoResponse-AOi OBJECT IDENTIFIER ::= { q2751Attribute sscopTimerNoResponse(24) }
+sscopTimerPoll-AOi OBJECT IDENTIFIER ::= { q2751Attribute sscopTimerPoll(25) }
+thresholdsForMultCongLevelsPackage-POi OBJECT IDENTIFIER ::= { q2751Package thresholdsForMultCongLevelsPackage(11) }
+thresholdsForMultCongLevelsWithPrioPackage-POi OBJECT IDENTIFIER ::= { q2751Package thresholdsForMultCongLevelsWithPrioPackage(12) }
+transmissionRateInterval-AOi OBJECT IDENTIFIER ::= { q2751Attribute transmissionRateInterval(26) }
+transSaalCongThresholdAbatementL1-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdAbatementL1(27) }
+transSaalCongThresholdAbatementL2-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdAbatementL2(28) }
+transSaalCongThresholdAbatementL3-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdAbatementL3(29) }
+transSaalCongThresholdDiscardL1-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdDiscardL1(30) }
+transSaalCongThresholdDiscardL2-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdDiscardL2(31) }
+transSaalCongThresholdDiscardL3-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdDiscardL3(32) }
+transSaalCongThresholdOnsetL1-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdOnsetL1(33) }
+transSaalCongThresholdOnsetL2-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdOnsetL2(34) }
+transSaalCongThresholdOnsetL3-AOi OBJECT IDENTIFIER ::= { q2751Attribute transSaalCongThresholdOnsetL3(35) }
+vcTTpPointer-AOi OBJECT IDENTIFIER ::= { q2751Attribute vcTTpPointer(36) }
+-- ASN.1 OBJECT IDENTIFIER definitions for context specific errors
+ss7SpecificError-OID OBJECT IDENTIFIER ::= { q2751Parameter ss7SpecificError(0) }
+END-- end of Q2751DefinedTypesModule
+
+
+--@@ 
+--@@ end of gdmos
+--@@ 
+--@@ 
+--@@ vim: comments=\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=120 nocin nosi

@@ -1,0 +1,413 @@
+#!/usr/bin/perl
+# =============================================================================
+# 
+# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:52 $
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>, or write to the
+# Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date: 2007/09/09 22:58:52 $ by $Author: brian $
+#
+# -----------------------------------------------------------------------------
+#
+# $Log: gdmocheck,v $
+# Revision 0.9.2.2  2007/09/09 22:58:52  brian
+# - updates for namespace
+#
+# Revision 0.9.2.1  2007/09/06 10:59:10  brian
+# - added new gdmo files
+#
+# =============================================================================
+
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}'
+	if $running_under_some_shell;
+
+$progname = $0;
+
+# ---------------------------------------------------------------------
+package SnmpModuleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+
+# -----------------------------------------------------------------------------
+# SNMPv2 MIB modules are distinguished by
+#
+# ModuleIdentifier DEFINITIONS ::= BEGIN ... END
+#
+# An SNMPv2 MIB module is the same as an ASN.1 module with the exception that
+# there is no object identifier between the module identifier and the
+# DEFINITIONS keyword.  See RFC 2578 Section 3.
+# -----------------------------------------------------------------------------
+package SnmpModule;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGeneratorMajor);
+
+sub read { 
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		if (($self->{directives} = SnmpDirectives->parse($line,@_[1,-1],$self))) {
+			push @{$self->{children}}, $self->{directives};
+		}
+		last TEST unless (($self->{name} = ModuleIdentifier->parse($line,@_[1,-1],$self)));
+		push @{$self->{children}}, $self->{name};
+		#last TEST unless (($self->{oid} = ObjectIdentifierValue->parse($line,@_[1,-1],$self)));
+		#push @{$self->{children}}, $self->{oid};
+		last TEST unless (($self->{definitions} = DefinitionsToken->parse($line,@_[1,-1],$self)));
+		push @{$self->{children}}, $self->{definitions};
+		if ($self->{tagdefault} = TagDefault->parse($line,@_[1,-1],$self)) {
+			push @{$self->{children}}, $self->{tagdefault};
+		}
+		if ($self->{extdefault} = ExtensionDefault->parse($line,@_[1,-1],$self)) {
+			push @{$self->{children}}, $self->{extdefault};
+		}
+		last TEST unless (($self->{assign} = Assign->parse($line,@_[1,-1],$self)));
+		push @{$self->{children}}, $self->{assign};
+		last TEST unless (($self->{begin} = BeginToken->parse($line,@_[1,-1],$self)));
+		push @{$self->{children}}, $self->{begin};
+		if ($self->{body} = ModuleBody->parse($line,@_[1,-1],$self)) {
+			push @{$self->{children}}, $self->{body};
+		}
+		last TEST unless (($self->{end} = EndToken->parse($line,@_[1,-1],$self)));
+		push @{$self->{children}}, $self->{end};
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line); 
+}
+
+package Assign;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+sub read { my $self = shift; return $self->readtoken('::=',@_); }
+
+package BeginToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleUCTokenIndented);
+
+package DefinitionsToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleUCTokenIndented);
+
+# -----------------------------------------------------------------------------
+# TagDefault ::=
+# 	EXPLICIT TAGS
+# 	| IMPLICIT TAGS
+# 	| AUTOMATIC TAGS
+# 	| empty
+# -----------------------------------------------------------------------------
+package TagDefault;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless (
+			($self->{tags} = ExplicitTags->parse($line,@_[1,-1])) ||
+			($self->{tags} = ImplicitTags->parse($line,@_[1,-1])) ||
+			($self->{tags} = AutomaticTags->parse($line,@_[1,-1]))
+		);
+		push @{$self->{children}}, $self->{tags};
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+package ExplicitTags;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+sub read { my $self = shift; return $self->readtoken('EXPLICIT TAGS',@_); }
+
+package ImplicitTags;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+sub read { my $self = shift; return $self->readtoken('IMPLICIT TAGS',@_); }
+
+package AutomaticTags;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+# -----------------------------------------------------------------------------
+# ExtensionDefault ::=
+# 	EXTENSIBILITY IMPLIED
+# 	| empty
+# -----------------------------------------------------------------------------
+package ExtensionDefault;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+sub read {
+	my $self = shift;
+	return $self->readtoken('EXTENSIBILITY IMPLIED',@_);
+}
+
+# -----------------------------------------------------------------------------
+# ModuleBody ::=
+# 	Exports Imports AssignmentList
+# 	| empty
+# -----------------------------------------------------------------------------
+package ModuleBody;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		if ($self->{exports} = Exports->parse($line,@_[1,-1])) {
+			push @{$self->{children}}, $self->{exports};
+		}
+		if ($self->{imports} = Imports->parse($line,@_[1,-1])) {
+			push @{$self->{children}}, $self->{imports};
+		}
+		if ($self->{assignmentlist} = AssignmentList->parse($line,@_[1,-1])) {
+			push @{$self->{children}}, $self->{assignmentlist};
+		}
+		#last TEST unless ($line=~s/^\s*((?:.|\n)*?)\s*(?=END)//s);
+		#$self->{text} = $1;
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my $s;
+		if (($s = $self->{exports})) { $s->gdmo(); }
+		if (($s = $self->{imports})) { $s->gdmo(); }
+		if (($s = $self->{assignmentlist})) { $s->gdmo(); }
+		#if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		#printf "$self->{text}"; $::first = 0;
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+	}
+}
+
+# -----------------------------------------------------------------------------
+# Exports ::=
+# 	EXPORTS SymbolsExported ";"
+# 	| EXPORTS ALL ";"
+# 	| empty
+# -----------------------------------------------------------------------------
+package Exports;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+# -------------------------------------
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless (($self->{token} = ExportsToken->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{token};
+		last TEST unless (
+			($self->{exports} = ExportsAll->parse($line,@_[1,-1])) ||
+			($self->{exports} = ExportsEverything->parse($line,@_[1,-1])) ||
+			($self->{exports} = ExportedSymbols->parse($line,@_[1,-1]))
+		);
+		push @{$self->{children}}, $self->{exports};
+		last TEST unless (($self->{semicolon} = Semicolon->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{semicolon};
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+package ExportsAll;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+sub read { my $self = shift; return $self->readtoken('ALL',@_); }
+
+package ExportsEverything;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleToken);
+
+sub read { my $self = shift; return $self->readtoken('EVERYTHING',@_); }
+
+package Semicolon;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(Punctuation);
+
+sub read { my $self = shift; return $self->readsymbols(';',@_); }
+
+package ExportsToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleUCTokenIndented);
+
+# -----------------------------------------------------------------------------
+# SymbolsExported ::=
+# 	SymbolList
+# 	| empty
+# -----------------------------------------------------------------------------
+package ExportedSymbols;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(CommaList);
+# -------------------------------------
+
+sub read { my $self = shift; return $self->readitem('TypeReference',@_); }
+
+# -----------------------------------------------------------------------------
+# Imports ::=
+# 	IMPORTS SymbolsImported ";"
+# 	| empty
+# -----------------------------------------------------------------------------
+package Imports;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		last TEST unless (($self->{token} = ImportsToken->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{token};
+		if (($self->{imports} = SymbolsFromModuleList->parse($line,@_[1,-1]))) {
+			push @{$self->{children}}, $self->{imports};
+		}
+		last TEST unless (($self->{semicolon} = Semicolon->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{semicolon};
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+package ImportsToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleUCTokenIndented);
+
+# -----------------------------------------------------------------------------
+# SymbolsImported ::=
+# 	SymbolsFromModuleList
+# 	| empty
+# 
+# SymbolsFromModuleList ::=
+# 	SymbolsFromModule
+# 	| SymbolsFromModuleList SymbolsFromModule
+# -----------------------------------------------------------------------------
+package SymbolsFromModuleList;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleList);
+
+# -----------------------------------------------------------------------------
+# SymbolsFromModule ::=
+# 	SymbolList FROM GlobalModuleReference
+# -----------------------------------------------------------------------------
+package SymbolsFromModule;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(ParserGenerator);
+
+sub read {
+	my $self = shift;
+	my $line = $_[0];
+	TEST: {
+		my ($s);
+		last TEST unless (($self->{symbols} = SymbolList->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{symbols};
+		last TEST unless (($self->{from} = FromToken->parse($line,@_[1,-1])));
+		push @{$self->{children}}, $self->{from};
+		last TEST unless (
+			($self->{module} = GlobalModuleReference->parse($line,@_[1,-1])) ||
+			($self->{module} = ModuleReference->parse($line,@_[1,-1]))
+		);
+		push @{$self->{children}}, $self->{module};
+		$_[0] = $line; return $self;
+	}
+	return $self->error($line);
+}
+
+sub xref {
+	my $self = shift;
+	# note the order, imported symbols are called with the associated
+	# module on the stack
+	$self->{module}->xref(@_);
+	$self->{symbols}->xref(@_,$self->{module});
+	return;
+}
+
+sub gdmo {
+	my $self = shift;
+	PRINT: {
+		my ($s);
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		$self->{symbols}->gdmo();
+		if (!$::first) { printf "\n$::indent"; $::first = 1; }
+		printf "\t"; $::first = 1;
+		$self->{from}->gdmo();
+		$self->{module}->gdmo();
+	}
+}
+
+package FromToken;
+use strict;
+use vars qw(@ISA);
+@ISA = qw(SimpleUCToken);
+
+
+# vim: ft=perl comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlorn

@@ -1,0 +1,86 @@
+// File: ASN1Types.idl
+#ifndef _ASN1TYPES_IDL_
+#define _ASN1TYPES_IDL_
+#pragma prefix "jidm.org"
+// ASN.1 base types
+// Null type
+typedef char ASN1_Null;
+const ASN1_Null ASN1_NullValue = \000;
+// Boolean
+typedef boolean ASN1_Boolean;
+// Integers
+typedef unsigned short ASN1_Unsigned16;
+typedef unsigned long ASN1_Unsigned;
+typedef unsigned long long ASN1_Unsigned64;
+typedef short ASN1_Integer16;
+typedef long ASN1_Integer;
+typedef long long ASN1_Integer64;
+// Real
+typedef double ASN1_Real;
+// ASN.1 strings which may not contain binary zeros
+typedef string ASN1_NumericString;
+typedef string ASN1_PrintableString;
+typedef string ASN1_VisibleString;
+typedef ASN1_VisibleString ASN1_ISO646String;
+typedef string ASN1_GraphicString;
+typedef ASN1_GraphicString ASN1_ObjectDescriptor;
+typedef string ASN1_TeletexString;
+typedef ASN1_TeletexString ASN1_T61String;
+// Times
+typedef ASN1_VisibleString ASN1_GeneralizedTime; // PIDL defined
+typedef ASN1_VisibleString ASN1_UTCTime;
+// ASN.1 strings which may contain binary zeros
+typedef sequence<octet> ASN1_OctetString;
+typedef sequence<octet> ASN1_GeneralString;
+typedef sequence<octet> ASN1_IA5String;
+typedef sequence<octet> ASN1_VideotexString;
+// ASN.1 strings of wide characters (which may contain binary zeros)
+typedef sequence<unsigned short> ASN1_BMPString;
+typedef sequence<unsigned long> ASN1_UniversalString;
+// Object Identifier
+typedef string ASN1_ObjectIdentifier;
+// Bit String
+typedef sequence<octet> ASN1_BitString; // PIDL defined
+// Any
+typedef any ASN1_Any;
+typedef any ASN1_DefinedAny;
+// ASN.1 recursive references
+typedef any ASN1_Recursive;
+// External
+module X208Ext {
+union ASN1_ObjectIdentifierOpt
+switch (boolean) {
+case TRUE: ASN1_ObjectIdentifier value;
+};
+union ASN1_IntegerOpt
+switch (boolean) {
+case TRUE: ASN1_Integer value;
+};
+union ASN1_ObjectDescriptorOpt
+switch (boolean) {
+case TRUE: ASN1_ObjectDescriptor value;
+};
+enum ExternalEncodingTypeChoice { single_ASN1_typeChoice,
+octet_alignedChoice, arbitraryChoice };
+union ExternalEncodingType
+switch(ExternalEncodingTypeChoice) {
+case single_ASN1_typeChoice:
+ASN1_Any single_ASN1_type;
+case octet_alignedChoice:
+ASN1_OctetString octet_aligned;
+case arbitraryChoice:
+ASN1_BitString arbitrary;
+};
+struct ExternalType {
+ASN1_ObjectIdentifierOpt direct_reference;
+ASN1_IntegerOpt indirect_reference;
+ASN1_ObjectDescriptorOpt data_value_descriptor;
+ExternalEncodingType encoding;
+};
+};
+typedef X208Ext::ExternalType ASN1_External;
+// define constants for ASN.1 Real infinity values
+#include <ASN1Limits.idl>
+const ASN1_Real plus_infinity = MAX_FLT;
+const ASN1_Real minus_infinity = MIN_FLT;
+#endif /* _ASN1TYPES_IDL_ */

@@ -1,0 +1,61 @@
+// File: JIDM.idl
+#ifndef _JIDM_IDL_
+#define _JIDM_IDL_
+#include <CosNaming.idl>
+#include <CosLifeCycle.idl>
+#include <CosEventChannelAdmin.idl>
+#pragma prefix jidm.org
+module JIDM
+{
+typedef CosNaming::Name Key;
+typedef CosLifeCycle::Criteria Criteria;
+exception InvalidKey {};
+exception InvalidCriteria {};
+exception CannotMeetCriteria { Criteria reason; };
+exception CannotAccess {};
+exception AlreadyExists {};
+exception NoEventPort {};
+interface ProxyAgent {
+enum DestructionMode {gracefully, non_gracefully};
+readonly attribute Criteria access_criteria;
+CosLifeCycle::FactoryFinder get_domain_factory_finder ();
+CosNaming::NamingContext get_domain_naming_context ();
+Criteria destroy (in DestructionMode mode, in Criteria the_criteria)
+raises (InvalidCriteria, CannotMeetCriteria);
+};
+interface ProxyAgentController {
+Criteria destruction_is_allowed (in Criteria the_criteria)
+raises (InvalidCriteria,CannotMeetCriteria);
+void destroyed (in Criteria the_criteria);
+};
+interface ProxyAgentFinder {
+ProxyAgent access_domain (in Key k, in Criteria the_criteria)
+raises (InvalidKey, CannotAccess, InvalidCriteria, CannotMeetCriteria);
+};
+interface DomainPort {
+readonly attribute Criteria associated_criteria;
+void destroy ();
+};
+interface DomainPortFactory {
+DomainPort create_domain_port (in Key k, in Criteria creation_criteria)
+raises (InvalidKey, InvalidCriteria, CannotMeetCriteria);
+};
+interface EventPort {
+readonly attribute CosEventChannelAdmin::SupplierAdmin supplier_admin;
+readonly attribute Criteria associated_criteria;
+void destroy ();
+};
+interface EventPortFactory {
+EventPort
+create_event_port (in Key k, in Criteria creation_criteria,
+in CosEventChannelAdmin::SupplierAdmin the_supplier_admin)
+raises (InvalidKey, InvalidCriteria, CannotMeetCriteria,
+AlreadyExists);
+};
+interface EventPortFinder {
+CosEventChannelAdmin::SupplierAdmin
+find_event_port (in Key k, in Criteria the_criteria)
+raises (InvalidKey, InvalidCriteria, CannotMeetCriteria, NoEventPort);
+};
+};
+#endif /* _JIDM_IDL_ */
