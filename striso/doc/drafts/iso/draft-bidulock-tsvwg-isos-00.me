@@ -1,0 +1,818 @@
+.\" -*- nroff -*- vim: ft=nroff nocin nosi
+.\"
+.\" @(#) $Id: draft-bidulock-tsvwg-isos-00.me,v 0.9.2.1 2007/09/29 14:58:26 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com/>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\"
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.  The author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2007/09/29 14:58:26 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: draft-bidulock-tsvwg-isos-00.me,v $
+.\" Revision 0.9.2.1  2007/09/29 14:58:26  brian
+.\" - added new files
+.\"
+.\" =========================================================================
+.ds version Version\ 0.0
+.ds date September\ 16,\ 2007
+.ds expiry March\ 2007
+.nr levels 0
+.so ../draft4.me
+.bp
+.sz \n(tp
+.he 'Internet Draft'ISO Transport over SCTP (ISOS)'\\\\*[date]'
+.TS
+expand tab(;);
+l c r.
+Network Working Group;;Brian Bidulock
+INTERNET-DRAFT;;OpenSS7 Corporation
+Intended status: PROPOSED STANDARD;;\*[date]
+.bl
+Expires in \*[expiry]
+.bl
+.TE
+.(l C
+.sz \n(tp
+\fB\
+ISO Transport Service on top of the SCTP (ISOS)
+Version: 1
+<draft-bidulock-tsvwg-itos-00.\*(|x>
+.)l
+.rr |x
+.ne 4
+.#S 2007 \*[expiry]
+.uh "Abstract"
+.pp
+This document is a revision to STD35, RFC1006
+.[
+rfc1006
+%Z 1
+.]
+written by Marshall T. Rose and Dwight E. Cass, and RFC2126
+.[
+rfc2126
+%Z 1
+.]
+written by Yanick Pouffary and Alan Young.  Since the release of STD35/RFC1006 in
+May 1987, and the revision with RFC2126 in March 1997, a new IP transport
+protocol, Stream Control Transmission Protocol (SCTP) RFC2960,
+.[
+rfc2960
+%Z 1
+.]
+.[
+rfc3309
+%Z 1
+.]
+has been released as a Proposed Standard which provides superior services to
+TCP in some respects, particularly related to OSI or Signalling protocols.
+.pp
+This document describes the mechanism to allow ISO Transport Services to run
+over SCTP over IPv4 or IPv6.  In also defines a number of new features which
+are not provided in RFC1006 or RFC2126 due to the superior transport support
+provided by SCTP.
+.pp
+The goal of this version is to minimize the number of changes to RFC1006 and
+RFC2126 as well as ITU-T Rec. X.224 | ISO/IEC 8073 transport protocol
+defintions,
+.[
+x224
+%Z 2
+.]
+while maximizing performance, extending its applicability and
+protecting the install based of RFC1006 users.
+.\"
+.\"
+.sh 1 "Introduction and Philosophy"
+.pp
+The Internet community has a well-developed, mature set of transport and
+internetwork protocols (TCP/IP), which are quite successful in offering
+network and transport services to end-users. The ITU-T and the ISO have
+defined various session, presentation, and application recommendations which
+have been adopted by the international community and numerous vendors.  To the
+largest extent possible, it is desirable to offer these higher level directly
+in the ARPA Internet, without disrupting existing facilities.  This permits
+users to develop expertise with ISO and ITU-T applications which previously
+were not available in the ARPA Internet.  It also permits a more graceful
+convergence and transition strategy from TCP/IP-based networks to ISO-based
+networks in the medium-and long-term.
+.pp
+There are two basic approaches which can be taken when "porting" an ISO or
+ITU-T application to a TCP/IP environment.  One approach is to port each
+individual application separately, developing local protocols on top of the
+TCP.  Although this is useful in the short-term (since special-purpose
+interfaces to the TCP can be developed quickly), it lacks generality.
+.pp
+A second approach is based on the observation that both the ARPA Internet
+protocol suite and the ISO protocol suite are both layered systems (though the
+former uses layering from a more pragmatic perspective).  A key aspect of the
+layering principle is that of layer-independence.  Although this section is
+redundant for most readers, a slight bit of background material is necessary
+to introduce this concept.
+.pp
+Externally, a layer is defined by two definitions:
+.np
+a service-offered definition, which describes the services provided by the
+layer and the interfaces it provides to access those services; and,
+.np
+a service-required definitions, which describes the services used by the layer
+and the interfaces it uses to access those services.
+.pp
+Collectively, all of the entities in the network which co-operate to provide
+the service are known as the service-provider.  Individually, each of these
+entities is known as a service-peer.
+.pp
+Internally, a layer is defined by one definition:
+.np
+a protocol definition, which describes the rules which each service-peer uses
+when communicating with other service-peers.
+.pp
+Putting all this together, the service-provider uses the protocol and services
+from the layer below to offer the its service to the layer above.  Protocol
+verification, for instance, deals with proving that this in fact happens (and
+is also a fertile field for many Ph.D. dissertations in computer science).
+.pp
+The concept of layer-independence quite simply is:
+.lp
+IF one preserves the services offered by the service-provider
+.lp
+THEN the service-user is completely naive with respect to the protocol which
+the service-peers use
+.pp
+For the purposes of this memo, we will use the layer-independence to define a
+Transport Service Access Point (TSAP) which appears to be identical to the
+services and interfaces offered by the ISO/ITU-T TSAP,
+.[
+ISO/IEC 8072
+%Z 1
+.]
+but we will in fact implement the ISO TP0 protocol on top of
+TCP/IP,
+.[
+rfc793
+%Z 2
+.]
+.[
+rfc791
+%Z 2
+.]
+not on top of the the ISO/ITU-T network protocol.
+.[
+x223
+%Z 2
+.]
+.[
+x233
+%Z 2
+.]
+Since the transport class 0 protocol is used over the TCP/IP connection, it
+achieves identical functionality as transport class 4.  Hence, ISO/ITU-T
+higher level layers (all session, presentation, and application entities) can
+operate fully without knowledge of the fact that they are running on a TCP/IP
+internetwork.
+.#e
+.\"
+.\"
+.sh 1 "Motivation"
+.pp
+In migrating from the use of TCP/IP to the ISO protocols, there are several
+strategies that one might undertake.  This memo was written with one
+particular strategy in mind.
+.pp
+The particular migration strategy which this memo uses is based on the notion
+of gatewaying between the TCP/IP and ISO protocol suites at the transport
+layer.  There are two strong arguments for this approach:
+.np
+Experience teaches us that it takes just as long to get good implementations
+of the lower level protocols as it takes to get implementations of the higher
+level ones.  In particular, it has been observed that there is still a lot of
+work being done at the ISO network and transport layers.  As a result,
+implementations of protocols above these layers are not being aggressively
+pursued. Thus, something must be done "now" to provide a medium in which the
+higher level protocols can be developed.  Since TCP/IP is mature, and
+essentially provides identical functionality, it is an ideal medium to support
+this development.
+.np
+Implementation of gateways at the IP and ISO IP layers are probably not of
+general use in the long term.  In effect, this would require each Internet
+host to support both TP4 and TCP.  As such, a better strategy is to implement
+a graceful migration path from TCP/IP to ISO protocols for the ARPA Internet
+when the ISO protocols have matured sufficiently.
+.pp
+Both of these arguments indicate that gatewaying should occur at or above the
+transport layer service access point.  Further, the first argument suggests
+that the best approach is to perform the gatewaying exactly AT the transport
+service access point to maximize the number of ISO layers which can be
+developed.
+.ip "NOTE:" \w'NOTE:\(em'u
+This memo does not intend to act as a migration or intercept document.  It is
+intended ONLY to meet the needs discussed above.  However, it would not be
+unexpected that the protocol described in this memo might form part of an
+overall transition plan.  The description of such a plan however is COMPLETELY
+beyond the scope of this memo.
+.pp
+Finally, in general, building gateways between other layers in the TCP/IP and
+ISO protocol suites is problematic, at best.
+.pp
+To summarize: the primary motivation for the standard described in this memo
+is to facilitate the process of gaining experience with higher-level ISO
+protocols (session, presentation, and application). The stability and maturity
+of TCP/IP are ideal for providing solid transport services independent of
+actual implementation.
+.#e
+.\"
+.\"
+.sh 1 "The Model"
+.pp
+The standard
+.[
+ISO/IEC 8072
+.]
+describes the ISO transport service definition,
+henceforth called TP.
+.ip "ASIDE:" \w'ASIDE:\(em'u
+This memo references the ISO specifications rather than the ITU-T
+recommendations.  The differences between these parallel standards are quite
+small, and can be ignored, with respect to this memo, without loss of
+generality.  To provide the reader with the relationships:
+.(b I
+.TS
+tab(:);
+lcc.
+Transport service:[ISO8072]:[X.214]
+Transport protocol:[ISO8073]:[X.224]
+Session protocol:[ISO8327]:[X.225]
+.TE
+.)b
+.X
+.[
+ISO/IEC 8072
+.]
+.[
+ISO/IEC 8073
+%Z 1
+.]
+.[
+ISO/IEC 8327
+%Z 2
+.]
+.pp
+The ISO transport service definition describes the services offered by the
+TS-provider (transport service) and the interfaces used to access those
+services.  This memo focuses on how the ARPA Transmission Control Protocol
+(TCP)
+.[
+rfc793
+.]
+can be used to offer the services and provide the interfaces.
+.lp
+For expository purposes, the following abbreviations are used:
+.ip "TS-peer" \w'TS-provider\(em'u
+a process which implements the protocol described by this memo
+.ip "TS-user" \w'TS-provider\(em'u
+a process talking using the services of a TS-peer
+.ip "TS-provider" \w'TS-provider\(em'u
+the black-box entity implementing the protocol described by this memo
+.pp
+For the purposes of this memo, which describes version 2 of the TSAP protocol,
+all aspects of
+TS
+.[
+ISO/IEC 8072
+.]
+are supported with one exception:
+.np
+Quality of Service parameters
+.pp
+In the spirit of ITU-T, this is left "for further study".  A future version of
+the protocol will most likely support the QOS parameters for TP by mapping
+these onto various TCP parameters.
+.pp
+The ISO standards do not specify the format of a session port (termed a TSAP
+ID).  This memo mandates the use of the GOSIP specification [GOSIP86] for the
+interpretation of this field.  (Please refer to Section 5.2, entitled "UPPER
+LAYERS ADDRESSING".)
+.pp
+Finally, the ISO TSAP is fundamentally symmetric in behavior.  There is no
+underlying client/server model.  Instead of a server listening on a well-known
+port, when a connection is established, the TS-provider generates an
+INDICATION event which, presumably the TS-user catches and acts upon.
+Although this might be implemented by having a server "listen" by hanging on
+the INDICATION event, from the perspective of the ISO TSAP, all TS- users just
+sit around in the IDLE state until they either generate a REQUEST or accept an
+INDICATION.
+.#e
+.sh 1 "The Primitives"
+.pp
+The protocol assumes that the TCP
+.[
+rfc793
+.]
+offers the following service
+primitives:
+.(b
+.(c
+.ce 1
+Events
+.TS
+tab(:);
+llss.
+connected:- open succeeded (either ACTIVE or PASSIVE)
+
+connect fails:- ACTIVE open failed
+
+data ready:- data can be read from the connection
+
+errored:- the connection has errored and is now closed
+
+closed:- an orderly disconnection has started
+.TE
+.)c
+.)b
+.(b
+.(c
+.ce 1
+Actions
+.TS
+tab(:);
+llss.
+listen on port:- PASSIVE open on the given port
+
+open port:- ACTIVE open to the given port
+
+read data:- data is read from the connection
+
+send data:- data is sent on the connection
+
+close:- the connection is closed (pending data is sent)
+.TE
+.)c
+.)b
+.pp
+This memo describes how to use these services to emulate the following service
+primitives, which are required by TP:
+.[
+ISO/IEC 8073
+%Z 1
+.]
+.(b
+.ce 1
+Events
+.ba +\n(iiu
+.ip "N-CONNECT.INDICATION"
+\- An NS-user (responder) is notified that connection establishment is in
+progress
+.ip "N-CONNECT.CONFIRMATION"
+\- An NS-user (responder) is notified that the connection has been established
+.ip "N-DATA.INDICATION"
+\- An NS-user is notified that data can be read from the connection
+.ip "N-DISCONNECT.INDICATION"
+\- An NS-user is notified that the connection is closed
+.ba -\n(iiu
+.)b
+.(b
+.ce 1
+Actions
+.ba +\n(iiu
+.ip "N-CONNECT.REQUEST"
+\- An NS-user (initiator) indicates that it wants to establish a connection
+.ip "N-CONNECT.RESPONSE"
+\- An NS-user (responder) indicates that it will honor the request
+.ip "N-DATA.REQUEST"
+\- An NS-user sends data
+.ip "N-DISCONNECT.REQUEST"
+\- An NS-user indicates that the connection is to be closed
+.ba -\n(iiu
+.)b
+.pp
+The protocol offers the following service primitives, as defined in
+TS,
+.[
+ISO/IEC 8072
+.]
+to the TS-user:
+.(b
+.ce 1
+Events
+.ba +\n(iiu
+.ip "T-CONNECT.INDICATION"
+\- a TS-user (responder) is notified that connection establishment is in progress 
+.ip "T-CONNECT.CONFIRMATION"
+\- a TS-user (initiator) is notified that the connection has been established 
+.ip "T-DATA.INDICATION"
+\- a TS-user is notified that data can be read from the connection 
+.ip "T-EXPEDITED DATA.INDICATION"
+\- a TS-user is notified that "expedited" data can be read from the connection 
+.ip "T-DISCONNECT.INDICATION"
+\- a TS-user is notified that the connection is closed
+.ba -\n(iiu
+.)b
+.(b
+.ce 1
+Actions
+.ba +\n(iiu
+.ip "T-CONNECT.REQUEST"
+\- a TS-user (initiator) indicates that it wants to establish a connection 
+.ip "T-CONNECT.RESPONSE"
+\- a TS-user (responder) indicates that it will honor the request 
+.ip "T-DATA.REQUEST"
+\- a TS-user sends data 
+.ip "T-EXPEDITED DATA.REQUEST"
+\- a TS-user sends "expedited" data 
+.ip "T-DISCONNECT.REQUEST"
+\- a TS-user indicates that the connection is to be closed
+.ba -\n(iiu
+.)b
+.#e
+.\"
+.\"
+.sh 1 "The Protocol"
+.pp
+The protocol specified by this memo is identical to the protocol for ISO
+transport class 0, with the following exceptions:
+.ip \- \w'\-\(em'u
+for testing purposes, initial data may be exchanged during connection establishment
+.ip \- \w'\-\(em'u
+for testing purposes, an expedited data service is supported
+.ip \- \w'\-\(em'u
+for performance reasons, a much larger TSDU size is supported
+.ip \- \w'\-\(em'u
+the network service used by the protocol is provided by the TCP
+.pp
+The ISO transport protocol exchanges information between peers in discrete
+units of information called transport protocol data units (TPDUs).  The
+protocol defined in this memo encapsulates these TPDUs in discrete units
+called TPKTs.  The structure of these TPKTs and their relationship to TPDUs
+are discussed in the next section.
+.sh 2 "Primitives"
+.pp
+The mapping between the TCP service primitives and the service
+primitives expected by transport class 0 are quite straight-forward:
+.(b
+.TS
+tab(:);
+lbsw(3.0i)lbw(2.5i).
+_:_
+Network Service:SCTP
+_:_
+.T&
+lissw(5.5i).
+CONNECTION ESTABLISHMENT
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N-CONNECT.REQUEST:T{
+open completes
+T}
+:N-CONNECT.INDICATION:T{
+listen (PASSIVE open) finishes
+T}
+:N-CONNECT.RESPONSE:T{
+listen completes
+T}
+:N-CONNECT.CONFIRMATION:T{
+open (ACTIVE open) finishes
+T}
+
+.T&
+lissw(5.5i).
+DATA TRANSFER
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N-DATA.REQUEST:T{
+send data
+T}
+:N-DATA.INDICATION:T{
+data ready followed by read data
+T}
+
+.T&
+lissw(5.5i).
+CONNECTION RELEASE
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:N-DISCONNECT.REQUEST:T{
+close
+T}
+:N-DISCONNECT.INDICATION:T{
+connection closes or errors
+T}
+.TE
+.)b
+.lp
+Mapping parameters is also straight-forward:
+.(b
+.TS
+tab(:);
+lbsw(3.0i)lbw(2.5i).
+_:_
+Network Service:SCTP
+_:_
+.T&
+lissw(5.5i).
+CONNECTION ESTABLISHMENT
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:Called Address:T{
+.ad l
+.hy 0
+Server's IPv4 or IPv6 address(es) and SCTP port number.
+T}
+:Calling Address:T{
+.ad l
+.hy 0
+Client's IPv4 or IPv4 address(es).
+T}
+:All other parameters:ignored
+
+.T&
+lissw(5.5i).
+DATA TRANSFER
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:NS User Data (NSDU):T{
+.ad l
+.hy 0
+DATA
+T}
+
+.T&
+lissw(5.5i).
+CONNECTION RELEASE
+.T&
+lw(0.5i)lw(2.5i)lw(2.5i).
+:all parameters:ignored\*#
+_
+.TE
+.)b
+.(d
+.ip \*#
+\fB\)EDITOR'S NOTE:\-\fR\)\  It is possible to map the SCTP error onto the
+disconnect reason.
+.)d
+.sh 2 "Connection Establishment"
+.lp
+The elements of procedure used during connection establishment are identical
+to those presented in TP
+.[
+ISO/IEC 8073
+.]
+with three exceptions.
+.pp
+In order to facilitate testing, the connection request and connection
+confirmation TPDUs may exchange initial user data, using the user data fields
+of these TPDUs.
+.pp
+In order to experiment with expedited data services, the connection request
+and connection confirmation TPDUs may negotiate the use of expedited data
+transfer using the negotiation mechanism specified in TP
+.[
+ISO/IEC 8073
+.]
+is used (e.g.,
+setting the "use of transport expedited data transfer service" bit in the
+"Additional Option Selection" variable part). The default is not to use the
+transport expedited data transfer service.
+.pp
+In order to achieve good performance, the default TPDU size is 65531 octets,
+instead of 128 octets.  In order to negotiate a smaller (standard) TPDU size,
+the negotiation mechanism specified in TP
+.[
+ISO/IEC 8073
+.]
+is used (e.g., setting the
+desired bit in the "TPDU Size" variable part).
+.pp
+To perform an N-CONNECT.REQUEST action, the TS-peer performs an active open to
+the desired IP address using TCP port 102.  When the TCP signals either
+success or failure, this results in an N-CONNECT.INDICATION action.
+.pp
+To await an N-CONNECT.INDICATION event, a server listens on TCP port 102.
+When a client successfully connects to this port, the event occurs, and an
+implicit N-CONNECT.RESPONSE action is performed.
+.ip "NOTE:" \w'NOTE:\(em'u
+In most implementations, a single server will perpetually LISTEN on port 102,
+handing off connections as they are made
+.sh 2 "Data Transfer"
+.pp
+The elements of procedure used during data transfer are identical to those
+presented in TP,
+.[
+ISO/IEC 8073
+.]
+with one exception: expedited data may be supported
+(if so negotiated during connection establishment) by sending a modified ED
+TPDU (described below).  The TPDU is sent on the same TCP connection as all of
+the other TPDUs. This method, while not faithful to the spirit of TSD,
+.[
+ISO/IEC 8072
+.]
+is true to the letter of the specification.
+.pp
+To perform an N-DATA.REQUEST action, the TS-peer constructs the desired TPKT
+and uses the TCP send data primitive.
+.pp
+To trigger an N-DATA.INDICATION action, the TCP indicates that data is ready
+and a TPKT is read using the TCP read data primitive.
+.sh 2 "Connection Release"
+.pp
+To perform an N-DISCONNECT.REQUEST action, the TS-peer simply closes the TCP
+connection.
+.pp
+If the TCP informs the TS-peer that the connection has been closed or has
+errored, this indicates an N-DISCONNECT.INDICATION event.
+.#e
+.\"
+.\"
+.sh 1 "Packet Format"
+.pp
+A fundamental difference between the TCP and the network service expected by
+TP0 is that the TCP manages a continuous stream of octets, with no explicit
+boundaries.  The TP0 expects information to be sent and delivered in discrete
+objects termed network service data units (NSDUs).  Although other classes of
+transport may combine more than one TPDU inside a single NSDU, transport class
+0 does not use this facility.  Hence, an NSDU is identical to a TPDU for the
+purposes of our discussion.
+.pp
+The protocol described by this memo uses a simple packetization scheme in
+order to delimit TPDUs.  Each packet, termed a TPKT, is viewed as an object
+composed of an integral number of octets, of variable length.
+.ip "NOTE:" \w'NOTE:\(em'u
+For the purposes of presentation, these objects are shown as being 4 octets
+(32 bits wide).  This representation is an artifact of the style of this memo
+and should not be interpreted as requiring that a TPKT be a multiple of 4
+octets in length.
+.pp
+A TPKT consists of two parts:  a packet-header and a TPDU.  The format of the
+header is constant regardless of the type of packet.  The format of the
+packet-header is as follows:
+.(l L
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      vrsn     |    reserved   |          packet length        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.)l
+.lp
+where
+.ip vrsn 3.0i
+8 bits
+.lp
+This field is always 3 for the version of the protocol described in this memo.
+.ip "packet length" 3.0i
+16 bits (min=7, max=65535)
+.lp
+This field contains the length of entire packet in octets, including
+packet-header.  This permits a maximum TPDU size of 65531 octets.  Based on
+the size of the data transfer (DT) TPDU, this permits a maximum TSDU size of
+65524 octets.
+.lp
+The format of the TPDU is defined in TP.
+.[
+ISO/IEC 8073
+.]
+Note that only TPDUs
+formatted for transport class 0 are exchanged (different transport classes may
+use slightly different formats).
+.lp
+To support expedited data, a non-standard TPDU, for expedited data is
+permitted.  The format used for the ED TPDU is nearly identical to the format
+for the normal data, DT, TPDU.  The only difference is that the value used for
+the TPDU's code is ED, not DT:
+.(l L
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+| header length | code  |credit |TPDU-NR and EOT|   user data   |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|      ...      |      ...      |      ...      |      ...      |
+|      ...      |      ...      |      ...      |      ...      |
+|      ...      |      ...      |      ...      |      ...      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+.)l
+.lp
+After the credit field (which is always ZERO on output and ignored on input),
+there is one additional field prior to the user data.
+.ip "TPDU-NR and EOT" 3.0i
+8 bits
+.lp
+Bit 7 (the high-order bit, bit mask 1000 0000) indicates the end of a XSDU
+(expedited TSDU).  All other bits should be ZERO on output and ignored on
+input.
+.lp
+Note that the TP specification limits the size of an expedited transport
+service data unit (XSDU) to 16 octets.
+.#e
+.\"
+.\"
+.sh 1 "Comments"
+.lp
+Since the release of RFC983 in April of 1986, we have gained much experience
+in using ISO transport services on top of the TCP.  In September of 1986, we
+introduced the use of version 2 of the protocol, based mostly on comments from
+the community.
+.pp
+In January of 1987, we observed that the differences between version 2 of the
+protocol and the actual transport class 0 definition were actually quite
+small.  In retrospect, this realization took much longer than it should have:
+TP0 is is meant to run over a reliable network service, e.g., X.25. The TCP
+can be used to provide a service of this type, and, if no one complains too
+loudly, one could state that this memo really just describes a method for
+encapsulating TPO inside of TCP!
+.pp
+The changes in going from version 1 of the protocol to version 2 and then to
+version 3 are all relatively small. Initially, in describing version 1, we
+decided to use the TPDU formats from the ISO transport protocol.  This
+naturally led to the evolution described above.
+.#e
+.\"
+.\"
+.(b M
+.sh 1 "Change History" 0
+.pp
+This section provides historical information on the changes made to this
+draft.  This section will be removed from the document when the document is
+minor formattting changes.
+.sh 2 "Changes from Version 0.0 to Version 0.1" 0 1
+.bu
+.bu
+.uh "Change Log"
+.lp
+.(l I
+.nf
+\fC\s-3
+$Log: draft-bidulock-tsvwg-isos-00.me,v $
+Revision 0.9.2.1  2007/09/29 14:58:26  brian
+- added new files
+
+.)l
+.)b
+.\"
+.\"
+.#E
+.(b M
+.[
+$LIST$
+.]
+.)b
+.\"
+.\"
+.(b M
+.uh "Acknowledgments"
+.pp
+The authors would like to thank
+Marshall T. Rose
+for leading the way.
+.#A
+.bl 3
+.lp
+This draft expires \*[expiry].
+.)b
+.#T 2007
