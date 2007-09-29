@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # =============================================================================
 # 
-# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/09 22:58:52 $
+# @(#) $RCSfile: gdmocheck,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/29 14:28:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,11 +46,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2007/09/09 22:58:52 $ by $Author: brian $
+# Last Modified $Date: 2007/09/29 14:28:02 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: gdmocheck,v $
+# Revision 0.9.2.3  2007/09/29 14:28:02  brian
+# - update gdmos and asns
+#
 # Revision 0.9.2.2  2007/09/09 22:58:52  brian
 # - updates for namespace
 #
@@ -1212,7 +1215,7 @@ sub head {
 
 sub gdmo {
 	my $self = shift;
-	print '--@@ GDMOCHECK $Revision: 0.9.2.2 $';
+	print '--@@ GDMOCHECK $Revision: 0.9.2.3 $';
 	print '--@@ Copyright (c), 2001-2007 OpenSS7 Corporation  <http://www.openss7.com/>';
 	print '--@@ Copyright (c), 1999-2000 Brian F. G. Bidulock <bidulock@openss7.org>';
 	print '--@@ ';
