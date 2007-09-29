@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/07 07:05:37 $
+ @(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/29 14:26:02 $
 
  -----------------------------------------------------------------------------
 
@@ -59,11 +59,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2007/09/07 07:05:37 $ by $Author: brian $
+ Last Modified $Date: 2007/09/29 14:26:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sl.c,v $
+ Revision 0.9.2.3  2007/09/29 14:26:02  brian
+ - quiet gcc 3.4.3
+
  Revision 0.9.2.2  2007/09/07 07:05:37  brian
  - added manual page for test-sl program
 
@@ -72,10 +75,10 @@
 
  *****************************************************************************/
 
-#ident "@(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/07 07:05:37 $"
+#ident "@(#) $RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/29 14:26:02 $"
 
 static char const ident[] =
-    "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.2 $) $Date: 2007/09/07 07:05:37 $";
+    "$RCSfile: test-sl.c,v $ $Name:  $($Revision: 0.9.2.3 $) $Date: 2007/09/29 14:26:02 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -348,7 +351,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permission.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.2 $ $Date: 2007/09/07 07:05:37 $");
+", NAME, PACKAGE, VERSION, "$Revision: 0.9.2.3 $ $Date: 2007/09/29 14:26:02 $");
 }
 
 void
