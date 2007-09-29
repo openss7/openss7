@@ -363,11 +363,11 @@ sub endclass {
 	$::indent=~s/^.//s;
 	$::indent=~s/^.//s;
 	printf "\n$::indent}";
-	if ($::indent=~/^$/) {
-		printf ";\t// class $name";
-	} else {
-		printf " $name;";
-	}
+	#if ($::indent=~/^$/) {
+	printf ";\t// class $name";
+	#} else {
+	#printf " $name;";
+	#}
 	print '';
 }
 
@@ -12110,7 +12110,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*MANAGED(?:\s|\n)*((-)?)(?:\s|\n)*OBJECT(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{derivedfrom} = DerivedFromClasses->parse($line,@_[1,-1],$self))) {
@@ -12137,7 +12137,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{objects}->{$self->{label}}->{intf}) {
+	if (defined $::root->{objects}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{objects}->{$self->{label}}->{intf} = $self;
@@ -12375,7 +12375,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*PACKAGE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
@@ -12408,7 +12408,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{packages}->{$self->{label}}->{intf}) {
+	if (defined $::root->{packages}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{packages}->{$self->{label}}->{intf} = $self;
@@ -12448,7 +12448,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*PARAMETER//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		last TEST unless ($self->{context} = Context->parse($line,@_[1,-1],$self));
@@ -12476,7 +12476,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{parameters}->{$self->{label}}->{intf}) {
+	if (defined $::root->{parameters}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{parameters}->{$self->{label}}->{intf} = $self;
@@ -12539,7 +12539,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*NAME(?:\s|\n)*((-)?)(?:\s|\n)*BINDING//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		last TEST unless ($self->{subordinate} = SubordinateObjectClass->parse($line,@_[1,-1],$self));
@@ -12585,7 +12585,7 @@ sub xref {
 
 sub head {
 	my $self = shift;
-	if ($::root->{bindings}->{$self->{label}}->{intf}) {
+	if (defined $::root->{bindings}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{bindings}->{$self->{label}}->{intf} = $self;
@@ -12643,7 +12643,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		last TEST unless (
@@ -12675,13 +12675,12 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{attributes}->{$self->{label}}->{intf}) {
+	if (defined $::root->{attributes}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{attributes}->{$self->{label}}->{intf} = $self;
 		my $x;
 		$self->decclass('Attribute');
-		$::indent.="\t";
 		$self->{syntax}->generate('head',@_,$self);
 		printf "\n$::indent"."static const char name"."[];";
 		printf "\n$::indent"."static const bool equality;";
@@ -12692,7 +12691,6 @@ sub head {
 		if (($x = $self->{behaviour}))	    { $x->generate('head',@_,$self); }
 		if (($x = $self->{parameters}))	    { $x->generate('head',@_,$self); }
 		if (($x = $self->{registration}))   { $x->generate('head',@_,$self); }
-		$::indent=~s/^.//s;
 		$self->endclass('Attribute');
 	}
 }
@@ -12740,7 +12738,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*ATTRIBUTE(?:\s|\n)*((-)?)(?:\s|\n)*GROUP//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{groupelements} = GroupElements->parse($line,@_[1,-1],$self))) {
@@ -12767,7 +12765,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{groups}->{$self->{label}}->{intf}) {
+	if (defined $::root->{groups}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{groups}->{$self->{label}}->{intf} = $self;
@@ -12807,7 +12805,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*BEHAVIOUR//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{definedas} = DefinedAs->parse($line,@_[1,-1],$self))) {
@@ -12825,7 +12823,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{behaviours}->{$self->{label}}->{intf}) {
+	if (defined $::root->{behaviours}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{behaviours}->{$self->{label}}->{intf} = $self;
@@ -12865,7 +12863,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*ACTION//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
@@ -12898,7 +12896,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{actions}->{$self->{label}}->{intf}) {
+	if (defined $::root->{actions}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{actions}->{$self->{label}}->{intf} = $self;
@@ -12938,7 +12936,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*NOTIFICATION//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{behaviour} = Behaviour->parse($line,@_[1,-1],$self))) {
@@ -12968,7 +12966,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{notifications}->{$self->{label}}->{intf}) {
+	if (defined $::root->{notifications}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{notifications}->{$self->{label}}->{intf} = $self;
@@ -13008,7 +13006,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*SUBORDINATION(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		last TEST unless (($self->{superior} = SuperiorObjectClass->parse($line,@_[1,-1],$self)));
@@ -13029,7 +13027,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{subordinates}->{$self->{label}}->{intf}) {
+	if (defined $::root->{subordinates}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{subordinates}->{$self->{label}}->{intf} = $self;
@@ -13069,7 +13067,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*CONSTRAINT(?:\s|\n)*((-)?)(?:\s|\n)*RULE//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		last TEST unless (($self->{objectclass} = GdmoObjectClass->parse($line,@_[1,-1],$self)));
@@ -13092,7 +13090,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if ($::root->{constraints}->{$self->{label}}->{intf}) {
+	if (defined $::root->{constraints}->{$self->{label}}->{intf}) {
 		printf "\n$::indent"."$self->{name} $self->{name};";
 	} else {
 		$::root->{constraints}->{$self->{label}}->{intf} = $self;
@@ -13132,7 +13130,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*RELATIONSHIP(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*RELATIONSHIP(?:\s|\n)*((-)?)(?:\s|\n)*CLASS//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1],$self);
 		if (($self->{derivedfrom} = DerivedFromRelationshipClasses->parse($line,@_[1,-1],$self))) {
@@ -13175,7 +13173,7 @@ sub read {
 	my $line = $_[0];
 	TEST: {
 		$self->{scope} = join('::',@::scopes);
-		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/]|-(?!-))*(?<!-))(?:\s|\n)*RELATIONSHIP(?:\s|\n)*((-)?)(?:\s|\n)*MAPPING//s);
+		last TEST unless ($line=~s/^([a-z](?:[a-zA-Z0-9\.\/_]|-(?!-))*(?<!-))(?:\s|\n)*RELATIONSHIP(?:\s|\n)*((-)?)(?:\s|\n)*MAPPING//s);
 		$self->pushscope($1);
 		$self->{comments1} = Comments->parse($line,@_[1,-1]);
 		last TEST unless (($self->{class} = RelationshipClass->parse($line,@_[1,-1])));
@@ -16648,6 +16646,10 @@ sub head {
 	my $tmpl = $_[-1]; # PackageTemplate
 	print "\n\n$::indent"."// CHARACTERIZED BY: (mandatory packages)";
 	$self->call('head',@_);
+	my $p; foreach $p (@{$self->{packages}->{items}}) {
+		printf "\n$::indent"."$p->{name} $p->{name};";
+	}
+	print '';
 }
 
 sub gdmo {
@@ -16754,11 +16756,13 @@ sub xref {
 sub head {
 	my $self = shift;
 	my $tmpl = $_[-1]; # PackageTemplate
+	#printf "\n$::indent// $self->{package}->{scopedname} is a ".ref($self->{package}->{reference}).".";
 	if (ref($self->{package}->{reference})=~/PackageTemplate/) {
-		if (!$::root->{packages}->{$self->{package}->{label}}->{intf}) {
-			$::root->{packages}->{$self->{package}->{label}}->{intf} = $self->{package}->{reference};
-			$self->{package}->generate('head',@_);
-		} 
+		if (!defined $::root->{packages}->{$self->{package}->{label}}->{intf}) {
+			#$::root->{packages}->{$self->{package}->{label}}->{intf} = $self->{package}->{reference};
+			#printf "\n$::indent// calling head";
+			$self->{package}->{reference}->head(@_);
+		}
 	}
 	$self->{condition}->generate('head',@_,$self->{package});
 	printf "\n$::indent"."$self->{package}->{scopedname} *$self->{package}->{name};";
@@ -17101,7 +17105,7 @@ sub read {
 
 sub head {
 	my $self = shift;
-	if (ref($self->{attribute}->{reference})=~/AttributeTemplate/) {
+	if (ref($self->{attribute}->{reference}) eq "AttributeTemplate") {
 		$self->call('head',@_);
 	} else {
 		my $x;
@@ -18531,6 +18535,17 @@ sub read {
 	return $self->error($line);
 }
 
+sub head {
+	my $self = shift;
+	if (ref($self->{notification}) eq "NotificationTemplate") {
+		$self->call('head',@_);
+	} else {
+		my $x;
+		printf "\n$::indent"."$self->{notification}->{scopedname} $self->{notification}->{name};";
+		if (($x = $self->{parameters})) { $x->generate('head',@_,$self); }
+	}
+}
+
 sub gdmo {
 	my $self = shift;
 	PRINT: {
@@ -19431,6 +19446,9 @@ sub read {
 sub head {
 	my $self = shift;
 	printf ' : public Attribute {';
+	$::indent.="\t";
+	printf "\n$::indent"."private:";
+	$::indent.="\t";
 	# could actually let the syntax fill out the parent class
 	$self->{syntax}->generate('head',@_);
 }

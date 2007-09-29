@@ -1,11 +1,51 @@
-%L XNS
+%K XNS99 XNS
+%L XNS99
 %A Open\ Group
-%R XNS Issue 5.2 Draft 2.0
+%R XNS
+%N Issue 5.2, Draft 2
+%S Open Group CAE Specification
 %T Technical Standard: Network Services (XNS)
 %D 1999
+%C Berkshire, UK
 %I Open Group Publication
 %G ISBN 1-85912-241-8
 %U http://www.opengroup.org/onlinepubs/
+
+%K XNS98
+%L XNS98
+%A Open\ Group
+%R C523 (XNS)
+%S CAE Specification
+%T Networking Services (XNS)
+%N Issue 5
+%D February 1997
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-165-9
+%U http://www.opengroup.org/onlinepubs/
+
+%L XAP
+%A X/Open
+%R C303 (XAP)
+%T ACSE/Presentation Services API (XAP)
+%D September 1993
+%C Berkshire, UK
+%I X/Open Company Limited
+%G ISBN 1-872630-91-X
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
+
+%L XOM
+%A X/Open
+%R C607 (XOM)
+%N Issue 3
+%T OSI-Abstract-Data Manipulation API (XOM)
+%D May 1996
+%C Berkshire, UK
+%I Open Group Publication
+%G ISBN: 1-85912-175-6
+%U http://www.opengroup.org/onlinepubs/
+%S X/Open CAE Specification
 
 %L XTI
 %A XPG
@@ -13,14 +53,17 @@
 %D n.d.
 %R XTI/TLI Revision 1.0
 %T XOpen Transport Interface
+%C Berkshire, UK
 %I X Programmer's Group
 %U http://www.opengroup.org/onlinepubs/
+%S Open Group CAE Specification
+%N Revision 1
 
 %L TCI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
-%R TCI Revision 0.9.2
-%N Draft 2
+%R TCI
+%N Revision 0.9.2, Draft 2
 %T Transaction Component Interface (TCI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
@@ -31,8 +74,8 @@
 %L TRI
 %A The\ OpenSS7\ Project
 %Q The\ OpenSS7\ Project
-%R TRI Revision 0.9.2
-%N Draft 2
+%R TRI
+%N Revision 0.9.2, Draft 2
 %T Transaction Interface (TRI) Specification
 %D July 15, 2007
 %C Edmonton, Alberta
@@ -44,29 +87,31 @@
 %A Open\ Group
 %Q Open\ Group
 %R TPI Revision 2.0.0
-%N Draft 2
+%N Revision 2.0.0, Draft 2
 %T Transport Provider Interface (TPI) Specification
 %D 1999
-%C Parsippany, New Jersey
+%C Berkshire, UK
 %I Open Group Publication
 %U http://www.opengroup.org/onlinepubs/
+%S Open Group CAE Specification
 
 %L NPI
 %A UNIX\ International,\ Inc.
 %Q UNIX\ International,\ Inc.
-%R NPI Revision 2.0.0
-%N Draft 2
+%R NPI
+%N Revision 2.0.0, Draft 2
 %T Network Provider Interface (NPI) Specification
 %D August 17, 1992
 %C Parsippany, New Jersey
 %I UNIX International Press
 %U http://www.openss7.org/docs/npi.pdf
+%S Open Group CAE Specification
 
 %L DLPI
 %A UNIX International,\ Inc.
 %Q UNIX International,\ Inc.
-%R DLPI Revision 2.0.0
-%N Draft 2
+%R DLPI
+%N Revision 2.0.0, Draft 2
 %T Data Link Provider Interface (DLPI) Specification
 %D August 20, 1991
 %C Parsippany, New Jersey
@@ -76,8 +121,8 @@
 %L TLI
 %A UNIX\ International,\ Inc.
 %Q UNIX\ International,\ Inc.
-%R TLI Revision 1.5
-%N Draft 2
+%R TLI
+%N Revision 1.5, Draft 2
 %T Transport Provider Interface Specification
 %D December 10, 1992
 %C Parsippany, New Jersey
@@ -93,8 +138,8 @@
 %L CDI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R CDI Revision 0.9.2
-%N Draft 2
+%R CDI
+%N Revision 0.9.2, Draft 2
 %T Communications Device Interface (CDI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -105,8 +150,8 @@
 %L LMI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R LMI Revision 0.9.2
-%N Draft 2
+%R LMI
+%N Revision 0.9.2, Draft 2
 %T Local Management Interface (LMI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -117,8 +162,8 @@
 %L SLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SLI Revision 0.9.2
-%N Draft 2
+%R SLI
+%N Revision 0.9.2, Draft 2
 %T Signalling Link Interface (SLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -129,8 +174,8 @@
 %L SDTI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SDTI Revision 0.9.2
-%N Draft 2
+%R SDTI
+%N Revision 0.9.2, Draft 2
 %T Signalling Data Terminal Interface (SDTI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -141,8 +186,8 @@
 %L SDLI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R SDLI Revision 0.9.2
-%N Draft 2
+%R SDLI
+%N Revision 0.9.2, Draft 2
 %T Signalling Data Link Interface (SDLI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -153,8 +198,8 @@
 %L MTPI
 %A Brian Bidulock
 %Q OpenSS7\ Corporation
-%R MTPI Revision 0.9.2
-%N Draft 1
+%R MTPI
+%N Revision 0.9.2, Draft 1
 %T Message Transfer Provider Interface (MTPI)  Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -165,8 +210,8 @@
 %L CHI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R CHI Revision 0.9.2
-%N Draft 2
+%R CHI
+%N Revision 0.9.2, Draft 2
 %T Channel Interface (CHI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -176,8 +221,8 @@
 %L MXI
 %A Brian Bidulock
 %Q OpenSS7 Corporation
-%R MXI Revision 0.9.2
-%N Draft 2
+%R MXI
+%N Revision 0.9.2, Draft 2
 %T Multiplex Interface (MXI) Specification
 %D July 15, 2007
 %C Edmonton, Canada
@@ -669,6 +714,19 @@ Part 1: Protocol Specification
 %O Work In Progress.
 %I Internet Engineering Task Force \(em Signalling Transport Working Group
 %U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-m2ua-09.txt
+
+%L M3UABIS05
+%K m3ua-bis-05
+%A Javier Pastor
+%A Ken Morneault
+%E Javier Pastor
+%Q Internet Engineering Task Force \(em Signalling Transport Working Group
+%T Signaling System 7 (SS7) Message Transfer Part 3 (MTP3)-User Adaptation Layer (M3UA)
+%R draft-ietf-sigtran-rfc3332bis-05.txt
+%D October 2005
+%O Work In Progress
+%I Internet Engineering Task Force \(em Signalling Transport Working Group
+%U http://www.ietf.org/internet-drafts/draft-ietf-sigtran-rfc3332bis-05.txt
 
 %K m3uaig04
 %L M3UAIG04
@@ -6578,9 +6636,22 @@ Part 1: Protocol Specification
 %I The Internet Society
 %U http://www.ietf.org/rfc/rfc3554.txt
 
+%K rfc3629
+%K std63
+%L STD63
+%R STD 63/RFC 3629
+%T UTF-8, a transformation of ISO 10646
+%A Francois Yergeau
+%E Francois Yergeau
+%D November 2003
+%O (Obsoletes RFC 2279) (Status: STANDARD) (Also STD 63)
+%Q Internet Engineering Task Force
+%I The Internet Society
+%U http://www.ietf.org/rfc/rfc3629.txt
+
 %K rfc3666
 %K bcp76
-%L BCP 76
+%L BCP76
 %R BCP 76/RFC 3666
 %A Alan Johnston
 %A Steve Donovan

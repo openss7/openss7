@@ -4,17 +4,20 @@
 --@@ 
 --@@ Input File: <(standard input)>
 --@@ Special File: <(standard input).specials>
---@@ Date: Wed Sep 12 10:58:00 MDT 2007
+--@@ Date: Wed Sep 19 15:38:59 MDT 2007
 --@@ 
 --< GDMO.Include "X.721.gdmo" >--
---< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" >--
+--< GDMO.Document "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--  { joint-iso-ccitt ms(9) function(2) part10(10) } >--
 --< GDMO.Namespace itut_x742 >--
 --< GDMO.Alias "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" "X.742",
+--  "Recommendation X.742 | ISO/IEC 10164-10: 1995",
+--  "ITU-T Rec. X.742 | ISO/IEC 10164-10 : 1995",
 --  "ITU-T Rec. X.742 | ISO/IEC 10164-10",
 --  "ITU-T Rec. X.742 (1995)/Cor.1 (1998) | ISO/IEC 10164-10 : 1995/Cor.1 : 1999",
 --  "ITU-T Rec. X.742 (1995)/Cor.2 (2000) | ISO/IEC 10164-10 : 1995/Cor.2 : 2001",
 --  "Rec. X.742 (1995)" >--
-MODULE "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+MODULE "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" { joint-iso-ccitt ms(9) function(2) part10(10) }
 -- Annex A
 -- Usage metering templates and abstract syntax
 -- (This annex forms an integral part of this Recommendation | International Standard)
@@ -529,8 +532,254 @@ deniedMeteringAction PARAMETER
 				that has the value of terminating for the procedural status.";;
 REGISTERED AS { umf-par 1 };
 
+--< ASN1.Version 1990 UMFObjId
+--  { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 } >--
+-- A.9 Definition of ASN.1 modules
+UMFObjId { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 0 }
+DEFINITIONS ::=
+BEGIN
+umf-mo OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) managedObjectClass(3) }
+umf-pkg OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) package(4) }
+umf-par OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) parameter(5) }
+umf-nb OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) nameBinding(6) }
+umf-att OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) attribute(7) }
+umf-act OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) action(9) }
+umf-not OBJECT IDENTIFIER ::= { joint-iso-ccitt ms(9) function(2) part10(10) notification(10) }
 END
---< GDMO.EndDocument "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995" >--
+
+--< ASN1.Version 1994 UsageMeteringFunction
+--  { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1 } >--
+UsageMeteringFunction { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 1 }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+-- EXPORTS everything
+IMPORTS
+ObjectInstance
+	FROM CMIP-1 { joint-iso-ccitt ms(9) cmip(1) modules(0) protocol(3) }-- Corrigendum 1
+DMI-TYPE-IDENTIFIER, ControlStatus, ProceduralStatus, SimpleNameType, ManagementExtension
+	FROM Attribute-ASN1Module { joint-iso-ccitt ms(9) smi(3) part2(2) asn1Module(2) 1 }
+TimePeriod
+	FROM MetricModule { joint-iso-ccitt ms(9) function(2) part11(11) asn1Module(2) 0 }
+UsageInfo
+	FROM UsageMeteringDataInfo { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 }-- Corrigendum 1
+;
+AccountableObjectReference ::= ObjectInstance
+AccountableObjectsReferenceList ::= SET OF ObjectInstance
+ActionArgument ::= CHOICE {
+	selectedObjects SET OF ObjectInstance,
+	-- set of data objects, controlled by the control
+	-- object for which the request is appropriate
+	allObjects NULL
+	-- selects all data objects controlled by control
+	-- object -- }
+ActionResponse ::= SEQUENCE {
+	-- at least one component shall be present
+	success [0] SET OF ObjectInstance OPTIONAL,
+	failed [1] SET OF ObjectInstance OPTIONAL,
+	indeterminate [2] SET OF ObjectInstance OPTIONAL }
+UMF-AUDIT ::= DMI-TYPE-IDENTIFIER
+AuditInfo ::= SEQUENCE {
+	service UMF-AUDIT.&id( {AuditInfoSet }),
+	auditDetails UMF-AUDIT.&Value( { AuditInfoSet } { @.service }) }
+AuditInfoSet UMF-AUDIT ::= {
+	... }
+ControlInfo ::= SEQUENCE {
+	actionResponse ActionResponse,
+	reportingTriggers [0] ReportingTriggers OPTIONAL,
+	accountableObjectsReferenceList [1] AccountableObjectsReferenceList OPTIONAL,
+	dataObjectsReferenceList [2] DataObjectsReferenceList OPTIONAL,
+	additionalInformation [3] SET OF ManagementExtension }
+ControlStatusValue ::= ControlStatus(WITH COMPONENT(suspended))
+DataErrors ::= CHOICE {
+	possibleErrors SET OF PossibleError,
+	noProblem NULL }
+DataObjectsReferenceList ::= SET OF ObjectInstance
+DeniedMeteringAction ::= ENUMERATED {
+	canNotStart(0),
+	canNotSuspend(1),
+	canNotResume(2) }
+Induced ::= ENUMERATED {
+	start(0),
+	suspend(1),
+	resume(2),
+	delete(3),
+	disabled(4),
+	enabled(5) }
+NotificationCause ::= CHOICE {
+	periodic [1] TimePeriod,
+	induced [2] Induced,
+	event [3] ReportingEvent,
+	stimulus [4] OBJECT IDENTIFIER }
+PossibleError ::= OBJECT IDENTIFIER
+ProceduralStatusValue ::= ProceduralStatus(WITH COMPONENT(terminating))
+ProviderId ::= CHOICE {
+	objectReference [1] ObjectInstance,
+	textualName [2] GraphicString,
+	serviceSpecific [3] ServiceSpecificId,
+	unknown [4] NULL }
+ReportingTriggers ::= SET OF CHOICE {
+	periodic [1] TimePeriod,
+	induced [2] Induced,
+	event [3] ReportingEvent,
+	stimulus [4] OBJECT IDENTIFIER }
+ReportingEvent ::= ENUMERATED {
+	registration(0),
+	request(1),
+	accept(2),
+	complete(3),
+	corresponding(4),
+	bulk(5),
+	interruption(6) }
+-- The applicability of each of these values must be specified by a specialization, together
+-- with the exact semantics of the values used.
+-- NOTE  All of events from 8.2.3 have been included in this enumerated type for the
+-- sake of completeness. It does not imply that specializations need to assign semantics to all
+-- of them. In particular the values "corresponding (4)" and "bulk (5)" may not be required in
+-- certain specializations.
+UMF-SERVICE ::= DMI-TYPE-IDENTIFIER
+ServiceSpecificId ::= SEQUENCE {
+	service UMF-SERVICE.&id( {ServiceSpecificSet }),
+	serviceSpecificId UMF-SERVICE.&Value( { ServiceSpecificSet } { @.service }) }
+ServiceSpecificSet UMF-SERVICE ::= {
+	... }
+UsageDataInfo ::= SEQUENCE {
+	accountableObjectReference [0] ObjectInstance,
+	notificationCause [1] NotificationCause,
+	usageInfo [2] UsageInfo,
+	auditInfo [3] AuditInfo OPTIONAL,
+	dataErrors [4] DataErrors,
+	providerId [5] ProviderId OPTIONAL,
+	additionalInformation [6] SET OF ManagementExtension OPTIONAL }
+UsageMeteringControlObjectId ::= SimpleNameType
+UsageMeteringDataObjectId ::= SimpleNameType
+END
+
+--< ASN1.Version 1994 UsageMeteringDataInfo
+--  { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 } >--
+UsageMeteringDataInfo { joint-iso-ccitt ms(9) function(2) part10(10) asn1Modules(2) 2 }
+DEFINITIONS IMPLICIT TAGS ::=
+BEGIN
+EXPORTS UsageInfo;-- Corrigendum 1
+IMPORTS
+DMI-TYPE-IDENTIFIER
+	FROM Attribute-ASN1Module { joint-iso-itu-t ms(9) smi(3) part2(2) asn1Module(2) 1 };
+UMF-USAGE ::= DMI-TYPE-IDENTIFIER
+UsageInfo ::= SEQUENCE {
+	serviceType UMF-USAGE.&id( {UsageInfoSet }),
+	usageData UMF-USAGE.&Value( { UsageInfoSet } { @.serviceType }) }
+UsageInfoSet UMF-USAGE ::= {
+	... }
+-- the following ASN.1 provides the means to include the service-specific information in the usage
+-- metering data. The data type XxxUsageData, detailed below, is a prototype of how a
+-- specialization shall specify a data type to replace the ANY in the usageData field of the UsageInfo
+-- in a way that allows the specifier to include the necessary syntax to fully specify each block. In
+-- addition the specialization shall allocate an OBJECT IDENTIFIER value to register the variant of
+-- usageData specified by the specialization. A concrete example of a specification, using PSTN as
+-- illustration is given in G.1.
+--
+-- Detail for the contents of each block are given as follows:
+-- XxxUsageData ::= SEQUENCE OF CHOICE {
+-- registration XxxRegistrationType,
+-- The registration block is used to identify the requester using the service. An
+-- XxxRegistrationType shall be specified by all specializations. The registration component shall
+-- appear once and only once in every value of the UsageInfo data type, and shall always
+-- appear as the first element in the XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- identification of the requester (directory number, user address, etc.)
+-- request XxxRequestType,
+-- The request block identifies the service request made by the requester. The XxxRequestType
+-- may be omitted from specializations not requiring it. If an XxxRequestType is specified in a
+-- specialization, zero or more request components may appear in a value of the XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- service request information which identifies the type of service requested and also any
+-- additional service parameters, note that this information can be very detailed and complex
+-- depending on the service type and the types of request that the service supports (e.g.
+-- destination addresses, electronic mail message information, directory numbers, feature
+-- codes).
+-- and the following information may be provided:
+-- a usage measurement (time, volume);
+-- a time stamp (date and time).
+-- accept XxxAcceptType,
+-- The accept block identifies the details of what service was provided and the associated usage.
+-- The XxxAcceptType may be omitted from specializations not requiring it. If an XxxAcceptType
+-- is specified in a specialization, zero or more accept components may appear in a value of the
+-- XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- service information which identifies the type of service provided and also any additional service
+-- parameters;
+-- a usage measurement;
+-- a time stamp.
+-- complete XxxCompleteType,
+-- The complete block identifies the details of the end of some instance of utilization. The
+-- XxxCompleteType may be omitted from specializations not requiring it. If an XxxCompleteType
+-- is specified in a specialization, zero or more complete components may appear in a value
+-- of the XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- a usage measurement;
+-- and the following information may be provided:
+-- service information which identifies any further details about the provided service
+-- (reason for call completion);
+-- a time stamp.
+-- interrupt XxxInterruptType,
+-- The interrupt block indicates any abnormal occurrence during the transaction
+-- for which different charging algorithms may need to be applied by the recipient of the usage
+-- metering record. The XxxInterruptType may be omitted from specializations not requiring it.
+-- If an XxxInterruptType is specified in a specialization, zero or more interrupt components
+-- may appear in a value of the XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- duration of the interruption,
+-- reason for the interruption;
+-- and the following information may be provided:
+-- a usage measurement
+-- a time stamp.
+-- bulk XxxBulkType,
+-- The bulk block indicates any bulk usage measurements made. The
+-- XxxBulkType may be omitted from specializations not requiring it. If an XxxBulkType
+-- is specified in a specialization, zero or more bulk components may appear in a
+--value of the XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- a usage measurement
+-- and the following information may be provided:
+-- reason for reporting
+-- corresponding XxxCorrespondingType }
+-- The corresponding block includes any specific information to allow many
+-- usage metering records to be correlated. The XxxCorrespondingType may be omitted
+-- from specializations not requiring it. If an XxxCorrespondingType is specified in a
+-- specialization, at most one corresponding components may appear in a value of the
+-- XxxUsageData.
+--
+-- The definition of the service-specific syntax to be included in this block, shall include the
+-- following information:
+-- an identifying key which relates many usage metering records to one service transaction record.
+-- The above data type gives the usage metering record structure, where, for a given requester,
+-- there are associated a set of the events required to describe the transaction, i.e. the
+-- SEQUENCE OF CHOICE construct allows an ordered list of the different event types. The
+-- registration and corresponding event types will only appear in the sequence once. The
+-- registration block shall always be present. This constraint ensures that a usage metering record
+-- only applies to the one requester and that there is only one set of correlation information.
+-- there are associated a set of the events required to describe the transaction, i.e. the
+-- SEQUENCE OF CHOICE construct allows an ordered list of the different event types. The
+-- registration and corresponding event types will only appear in the sequence once. The
+-- registration block shall always be present. This constraint ensures that a usage metering record
+-- only applies to the one requester and that there is only one set of correlation information.
+END-- Corrigendum 1
+
+
+END
+--< GDMO.EndDocument "ITU-T Rec. X.742 (1995) | ISO/IEC 10164-10 : 1995"
+--  { joint-iso-ccitt ms(9) function(2) part10(10) } >--
 --@@ 
 --@@ end of gdmos
 --@@ 

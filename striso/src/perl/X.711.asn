@@ -111,74 +111,183 @@ DistinguishedName, RDNSequence FROM InformationFramework {joint-iso-ccitt ds(5) 
 -- CMISE operations
 -- in the following operations, the argument type is mandatory in the corresponding ROSE APDU 
 -- Action operations (M-ACTION)
-m-Action OPERATIONARGUMENT ActionArgument ::= localValue : 6 m-Action-Confirmed OPERATIONARGUMENT ActionArgument RESULT ActionResult
--- this result is conditional; for conditions see 8.3.3.2.9 of ITU-T Rec. X.710 |
--- ISO/IEC 9595
-ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidScope,invalidArgumentValue, invalidFilter, noSuchAction, noSuchArgument, noSuchObjectClass,
-noSuchObjectInstance, processingFailure, syncNotSupported }
-LINKED { m-Linked-Reply } ::= localValue : 7 m-CancelGet OPERATIONARGUMENT
-getInvokeId InvokeIDTypeRESULT ERRORS { mistypedOperation, noSuchInvokeId, processingFailure }::= localValue : 10
+m-Action OPERATION
+	ARGUMENT ActionArgument
+	::= localValue : 6
+
+m-Action-Confirmed OPERATION
+	ARGUMENT ActionArgument
+	RESULT ActionResult
+	-- this result is conditional; for conditions see 8.3.3.2.9 of ITU-T Rec. X.710 |
+	-- ISO/IEC 9595
+	ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidScope,invalidArgumentValue, invalidFilter, noSuchAction, noSuchArgument, noSuchObjectClass, noSuchObjectInstance, processingFailure, syncNotSupported }
+	LINKED { m-Linked-Reply }
+	::= localValue : 7
+
+m-CancelGet OPERATION
+	ARGUMENT getInvokeId
+	InvokeIDType RESULT
+	ERRORS { mistypedOperation, noSuchInvokeId, processingFailure }
+	::= localValue : 10
+
 -- Create operation (M-CREATE)
-m-Create OPERATIONARGUMENT CreateArgument RESULT CreateResult
--- this result is conditional; for conditions see 8.3.4.1.3 of ITU-T Rec.  X.710 |
--- ISO/IEC 9595
-ERRORS { accessDenied, classInstanceConflict, duplicateManagedObjectInstance,invalidAttributeValue, invalidObjectInstance, missingAttributeValue, noSuchAttribute,
-noSuchObjectClass, noSuchObjectInstance, noSuchReferenceObject, processingFailure }::= localValue : 8
+m-Create OPERATION
+	ARGUMENT CreateArgument
+	RESULT CreateResult
+	-- this result is conditional; for conditions see 8.3.4.1.3 of ITU-T Rec.  X.710 |
+	-- ISO/IEC 9595
+	ERRORS { accessDenied, classInstanceConflict, duplicateManagedObjectInstance,invalidAttributeValue, invalidObjectInstance, missingAttributeValue, noSuchAttribute, noSuchObjectClass, noSuchObjectInstance, noSuchReferenceObject, processingFailure }
+	::= localValue : 8
+
 -- Delete operation (M-DELETE)
-m-Delete OPERATIONArgument DeleteArgument RESULT DeleteResult
--- this result is conditional; for conditions see 8.3.5.2.8 of ITU-T Rec.  X.710 |
--- ISO/IEC 9595
-ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidFilter,InvalidScope, noSuchObjectClass, noSuchObjectInstance, processingFailure, syncNotSupported }
-LINKED { m-Linked-Reply }::= localValue : 9
+m-Delete OPERATION
+	ARGUMENT DeleteArgument
+	RESULT DeleteResult
+	-- this result is conditional; for conditions see 8.3.5.2.8 of ITU-T Rec.  X.710 |
+	-- ISO/IEC 9595
+	ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidFilter,InvalidScope, noSuchObjectClass, noSuchObjectInstance, processingFailure, syncNotSupported }
+	LINKED { m-Linked-Reply }
+	::= localValue : 9
+
 -- Event Reporting operations (M-EVENT-REPORT)
-m-EventReport OPERATIONARGUMENT EventReportArgument ::= localValue : 0 m-EventReport-Confirmed OPERATIONARGUMENT EventReportArgument
-RESULT EventReportResult
--- optional
-ERRORS { invalidArgumentValue, noSuchArgument, noSuchEventType, noSuchObjectClass,
-noSuchObjectInstance, processingFailure }::= localValue : 1
+m-EventReport OPERATION
+	ARGUMENT EventReportArgument
+	::= localValue : 0
+
+m-EventReport-Confirmed OPERATION
+	ARGUMENT EventReportArgument
+	RESULT EventReportResult
+	-- optional
+	ERRORS { invalidArgumentValue, noSuchArgument, noSuchEventType, noSuchObjectClass, noSuchObjectInstance, processingFailure }
+	::= localValue : 1
+
 -- Get operation (M-GET)
-m-Get OPERATIONARGUMENT GetArgument
-RESULT GetResult
--- this result is conditional; for conditions see 8.3.1.2.8 of ITU-T Rec.  X.710 |
--- ISO/IEC 9595
-ERRORS { accessDenied, classInstanceConflict, complexityLimitation, getListError, invalidFilter, invalidScope,noSuchObjectClass, noSuchObjectInstance, operationCancelled, processingFailure, syncNotSupported
-}LINKED { m-Linked-Reply } ::= localValue : 3
+m-Get OPERATION
+	ARGUMENT GetArgument
+	RESULT GetResult
+	-- this result is conditional; for conditions see 8.3.1.2.8 of ITU-T Rec.  X.710 |
+	-- ISO/IEC 9595
+	ERRORS { accessDenied, classInstanceConflict, complexityLimitation, getListError, invalidFilter, invalidScope,noSuchObjectClass, noSuchObjectInstance, operationCancelled, processingFailure, syncNotSupported }
+	LINKED { m-Linked-Reply }
+	::= localValue : 3
+
 -- Linked operation to M-GET, M-SET (Confirmed), M-ACTION (Confirmed), and M-DELETE
-m-Linked-Reply OPERATIONARGUMENT LinkedReplyArgument ::= localValue : 2
+m-Linked-Reply OPERATION
+	ARGUMENT LinkedReplyArgument
+	::= localValue : 2
+
 -- Set operations (M-SET)
-m-Set OPERATIONARGUMENT SetArgument ::= localValue : 4 m-Set-Confirmed OPERATIONARGUMENT SetArgument RESULT SetResult
--- this result is conditional; for conditions see 8.3.2.2.9 of ITU-T Rec.  X.710 |
--- ISO/IEC 9595
-ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidFilter, invalidScope,noSuchObjectClass, noSuchObjectInstance, processingFailure, setListError, syncNotSupported } LINKED { m-Linked-Reply }::= localValue : 5
+m-Set OPERATION
+	ARGUMENT SetArgument
+	::= localValue : 4
+
+m-Set-Confirmed OPERATION
+	ARGUMENT SetArgument
+	RESULT SetResult
+	-- this result is conditional; for conditions see 8.3.2.2.9 of ITU-T Rec.  X.710 |
+	-- ISO/IEC 9595
+	ERRORS { accessDenied, classInstanceConflict, complexityLimitation, invalidFilter, invalidScope,noSuchObjectClass, noSuchObjectInstance, processingFailure, setListError, syncNotSupported }
+	LINKED { m-Linked-Reply }
+	::= localValue : 5
+
 -- CMIS error definitions
 -- in the following errors, unless otherwise indicated, the parameter type is mandatory in the corresponding ROSE 
 -- APDU
-accessDenied ERROR::= localValue : 2
-classInstanceConflict ERRORPARAMETER BaseManagedObjectId ::= localValue : 19
-complexityLimitation ERRORPARAMETER ComplexityLimitation ::= localValue : 20
+accessDenied ERROR
+	::= localValue : 2
+
+classInstanceConflict ERROR
+	PARAMETER BaseManagedObjectId
+	::= localValue : 19
+
+complexityLimitation ERROR
+	PARAMETER ComplexityLimitation
+	::= localValue : 20
+
 -- optional
-duplicateManagedObjectInstance ERRORPARAMETER ObjectInstance ::= localValue : 11
-getListError ERRORPARAMETER GetListError ::= localValue : 7
-invalidArgumentValue ERRORPARAMETER InvalidArgumentValue ::= localValue : 15
-invalidAttributeValue ERRORPARAMETER Attribute ::= localValue : 6
-invalidFilter ERRORPARAMETER CMISFilter ::= localValue : 4
-invalidObjectInstance ERRORPARAMETER ObjectInstance ::= localValue : 17
-invalidScope ERRORPARAMETER Scope ::= localValue : 16
-missingAttributeValue ERRORPARAMETER SET OF AttributeId ::= localValue : 18
-mistypedOperation ERROR::= localValue : 21
-noSuchAction ERRORPARAMETER NoSuchAction ::= localValue : 9
-noSuchArgument ERRORPARAMETER NoSuchArgument ::= localValue : 14
-noSuchAttribute ERRORPARAMETER AttributeId ::= localValue : 5
-noSuchEventType ERRORPARAMETER NoSuchEventType ::= localValue : 13
-noSuchInvokeId ERRORPARAMETER InvokeIDType ::= localValue : 22
-noSuchObjectClass ERRORPARAMETER ObjectClass ::= localValue : 0
-noSuchObjectInstance ERRORPARAMETER ObjectInstance ::= localValue : 1
-noSuchReferenceObject ERRORPARAMETER ObjectInstance ::= localValue : 12
-operationCancelled ERROR::= localValue : 23
-processingFailure ERRORPARAMETER ProcessingFailure ::= localValue : 10
+duplicateManagedObjectInstance ERROR
+	PARAMETER ObjectInstance
+	::= localValue : 11
+
+getListError ERROR
+	PARAMETER GetListError
+	::= localValue : 7
+
+invalidArgumentValue ERROR
+	PARAMETER InvalidArgumentValue
+	::= localValue : 15
+
+invalidAttributeValue ERROR
+	PARAMETER Attribute
+	::= localValue : 6
+
+invalidFilter ERROR
+	PARAMETER CMISFilter
+	::= localValue : 4
+
+invalidObjectInstance ERROR
+	PARAMETER ObjectInstance
+	::= localValue : 17
+
+invalidScope ERROR
+	PARAMETER Scope
+	::= localValue : 16
+
+missingAttributeValue ERROR
+	PARAMETER SET OF AttributeId
+	::= localValue : 18
+
+mistypedOperation ERROR
+	::= localValue : 21
+
+noSuchAction ERROR
+	PARAMETER NoSuchAction
+	::= localValue : 9
+
+noSuchArgument ERROR
+	PARAMETER NoSuchArgument
+	::= localValue : 14
+
+noSuchAttribute ERROR
+	PARAMETER AttributeId
+	::= localValue : 5
+
+noSuchEventType ERROR
+	PARAMETER NoSuchEventType
+	::= localValue : 13
+
+noSuchInvokeId ERROR
+	PARAMETER InvokeIDType
+	::= localValue : 22
+
+noSuchObjectClass ERROR
+	PARAMETER ObjectClass
+	::= localValue : 0
+
+noSuchObjectInstance ERROR
+	PARAMETER ObjectInstance
+	::= localValue : 1
+
+noSuchReferenceObject ERROR
+	PARAMETER ObjectInstance
+	::= localValue : 12
+
+operationCancelled ERROR
+	::= localValue : 23
+
+processingFailure ERROR
+	PARAMETER ProcessingFailure
+	::= localValue : 10
+
 -- optional
-setListError ERRORPARAMETER SetListError ::= localValue : 8
-syncNotSupported ERRORPARAMETER CMISSync ::= localValue : 3
+setListError ERROR
+	PARAMETER SetListError
+	::= localValue : 8
+
+syncNotSupported ERROR
+	PARAMETER CMISSync
+	::= localValue : 3
+
 -- Supporting type definitions
 AccessControl ::= EXTERNAL ActionArgument ::= SEQUENCE {COMPONENTS OF BaseManagedObjectId, accessControl [5] AccessControl OPTIONAL,synchronization [6] IMPLICIT CMISSync DEFAULT bestEffort, scope [7] Scope DEFAULT namedNumbers : baseObject,filter CMISFilter DEFAULT and : {}, actionInfo [12] IMPLICIT ActionInfo}
 ActionError ::= SEQUENCE {managedObjectClass ObjectClass OPTIONAL, managedObjectInstance ObjectInstance OPTIONAL,currentTime [5] IMPLICIT GeneralizedTime OPTIONAL, actionErrorInfo [6] ActionErrorInfo}
