@@ -145,6 +145,69 @@
 	* src/perl/X.754.2000.asn: update gdmos and asns
 	* src/perl/X.754.2000.gdmo: update gdmos and asns
 
+	* src/perl/asn1check: added new gdmo idl and asn files
+	* src/perl/ASN1.idl: added new gdmo idl and asn files
+	* src/perl/ASN1Limits.idl: added new gdmo idl and asn files
+	* src/perl/ASN1Types.idl: added new gdmo idl and asn files
+	* src/perl/draft-ietf-sigtran-m3ua-mib-07.txt: added new gdmo idl and asn files
+	* src/perl/draft-labarre-iimc-party-04.txt: added new gdmo idl and asn files
+	* src/perl/draft-labarre-internetmib-iso-04.txt: added new gdmo idl and asn files
+	* src/perl/draft-newnan-isomib-internet-03.txt: added new gdmo idl and asn files
+	* src/perl/G.774.3.asn: added new gdmo idl and asn files
+	* src/perl/itut_x780.idl: added new gdmo idl and asn files
+	* src/perl/JIDM.idl: added new gdmo idl and asn files
+	* src/perl/M.3641.1994.asn: added new gdmo idl and asn files
+	* src/perl/M.3641.1994.gdmo: added new gdmo idl and asn files
+	* src/perl/OSICaching.idl: added new gdmo idl and asn files
+	* src/perl/OSICollection.idl: added new gdmo idl and asn files
+	* src/perl/OSIMgmt.idl: added new gdmo idl and asn files
+	* src/perl/OSITracking.idl: added new gdmo idl and asn files
+	* src/perl/Q.2751.1.asn: added new gdmo idl and asn files
+	* src/perl/Q.2751.1.gdmo: added new gdmo idl and asn files
+	* src/perl/Q.824.0.asn: added new gdmo idl and asn files
+	* src/perl/Q.824.0.gdmo: added new gdmo idl and asn files
+	* src/perl/Q.824.1.asn: added new gdmo idl and asn files
+	* src/perl/Q.824.1.gdmo: added new gdmo idl and asn files
+	* src/perl/Q.836.1.asn: added new gdmo idl and asn files
+	* src/perl/Q.836.1.gdmo: added new gdmo idl and asn files
+	* src/perl/snmpcheck: added new gdmo idl and asn files
+	* src/perl/SNMPMgmt.idl: added new gdmo idl and asn files
+	* src/perl/SNMPMIR.idl: added new gdmo idl and asn files
+	* src/perl/X.162.asn: added new gdmo idl and asn files
+	* src/perl/X.162.gdmo: added new gdmo idl and asn files
+	* src/perl/X227ACS.idl: added new gdmo idl and asn files
+	* src/perl/X.281.asn: added new gdmo idl and asn files
+	* src/perl/X.281.gdmo: added new gdmo idl and asn files
+	* src/perl/X.282.asn: added new gdmo idl and asn files
+	* src/perl/X.282.gdmo: added new gdmo idl and asn files
+	* src/perl/X.284.asn: added new gdmo idl and asn files
+	* src/perl/X.284.gdmo: added new gdmo idl and asn files
+	* src/perl/X.287.gdmo: added new gdmo idl and asn files
+	* src/perl/X501Inf.idl: added new gdmo idl and asn files
+	* src/perl/X711CMI.idl: added new gdmo idl and asn files
+	* src/perl/X.790.1995.asn: added new gdmo idl and asn files
+	* src/perl/X.790.1995.gdmo: added new gdmo idl and asn files
+	* src/perl/X.790.1999.asn: added new gdmo idl and asn files
+	* src/perl/X.790.1999.gdmo: added new gdmo idl and asn files
+	* src/perl/X.790.2001.asn: added new gdmo idl and asn files
+	* src/perl/X.790.2001.gdmo: added new gdmo idl and asn files
+	* doc/drafts/draft.me: added new gdmo idl and asn files
+	* doc/drafts/draft2.me: added new gdmo idl and asn files
+	* doc/drafts/draft3.me: added new gdmo idl and asn files
+	* doc/drafts/draft4.me: added new gdmo idl and asn files
+	* doc/drafts/fixup: added new gdmo idl and asn files
+	* doc/drafts/idrefs: added new gdmo idl and asn files
+	* doc/drafts/iso: added new gdmo idl and asn files
+	* doc/standards/10589.asc: added new gdmo idl and asn files
+	* doc/standards/10589.gdm: added new gdmo idl and asn files
+	* doc/standards/ISO10589v1.asn: added new gdmo idl and asn files
+	* doc/standards/ISO10589v1.gdmo: added new gdmo idl and asn files
+	* doc/standards/ISO10589v2-2001-07-04.doc: added new gdmo idl and asn files
+	* doc/standards/ISO10589v2.asn: added new gdmo idl and asn files
+	* doc/standards/ISO10589v2.gdmo: added new gdmo idl and asn files
+	* doc/standards/ISO10733D.gdmo: added new gdmo idl and asn files
+	* doc/standards/dis10733.gdm: added new gdmo idl and asn files
+
 2007-09-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/perl/EN300292.gdmo: updates for namespace
